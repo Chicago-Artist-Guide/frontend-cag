@@ -1,10 +1,13 @@
 /*main colors*/
-$theme-colors: (
-    "primary" : #D2E4DC,
-    "cag_pink" : #F0ADCB,
-    "cag_yellow" : #FAEEAB
-);
+$body-bg: #f4f5fb;
 
+$theme-colors: (
+    "green":#82b29a,
+    "salmon":#e17b60,
+    "yellow":#e9c268,
+    "blue":#2f4550,
+
+);
 
 
 @import "~bootstrap/scss/bootstrap";
