@@ -1,12 +1,12 @@
 import React from 'react';
 import '../styles/App.scss';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import Resources from '../pages/landing-section/Resources';
-import Home from '../pages/landing-section/Home';
-import NotFound from '../pages/NotFound';
-import Test from '../pages/Test';
-import Registration from '../pages/authentication/Registration';
+import Header from '../components/layout/header';
+import Footer from '../components/layout/footer';
+import Home from './Home';
+import FAQ from './FAQ';
+import NotFound from './Not-Found';
+import TOS from './Terms-of-Service';
+import WhoWeAre from './Who-We-Are';
 import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
 function App() {
@@ -15,10 +15,10 @@ function App() {
       <div>
       <Header/>
       <Switch>
-        <Route exact path="/" component={ Home } />
-        <Route path="/resources" component={ Resources } />
-        <Route exact path="/registration" component={ Registration } />
-        <Route exact path="/test" component={Test} />
+        <Route exact path="/" component={Home}/>
+        <Route exact path="/faq" component={FAQ}/>
+        <Route exact path="/terms-of-service" component={TOS}/>
+        <Route exact path="/who-we-are" component={WhoWeAre}/>
         <Route component={NotFound}/>
       </Switch>
       <Footer/>
