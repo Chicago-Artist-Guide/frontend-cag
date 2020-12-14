@@ -9,8 +9,8 @@ import Fayfer from '../images/who-we-are/fayfer-matt.jpg';
 import Geis from '../images/who-we-are/geis-leah.jpg';
 import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
 import Schutz from '../images/who-we-are/schutz-anna.png';
-import Voghel from '../images/who-we-are/voghel-alison.jpeg';
-import Zacks from '../images/who-we-are/zacks-steven.jpeg';
+import Voghel from '../images/who-we-are/voghel-alison.png';
+import Zacks from '../images/who-we-are/zacks-steven.png';
 import SVGLayer from "../components/svg-layer.js";
 
 function WhoWeAre() {
