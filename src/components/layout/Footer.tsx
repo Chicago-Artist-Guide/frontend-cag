@@ -19,7 +19,7 @@ const Footer = () => (
       <Nav.Link href="https://www.linkedin.com/company/chicago-artist-guide">
         <Image className="footer-logo" src={Linkedin} />
       </Nav.Link>
-      <Nav.Link href="mailto:chicagoartistguide@gmail.com">
+      <Nav.Link href="mailto:contact@chicagoartistguide.org">
         <Image className="footer-logo" src={Envelope} />
       </Nav.Link>
     </Nav>
