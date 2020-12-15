@@ -1,13 +1,12 @@
-import React from 'react';
+import React from "react";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
-import {ReactComponent as Logo} from '../../images/logoPlain.svg';
+import { ReactComponent as Logo } from "../../images/logoPlain.svg";
 
-function Header() {
-  return (
-    <Navbar expand="lg" className="white-back nav" sticky="top">
-      <Navbar.Brand href="/">
-      <Logo height="60px" width="70px"/>
+const Header = () => (
+  <Navbar className="white-back nav" expand="lg" sticky="top">
+    <Navbar.Brand href="/">
+      <Logo height="60px" width="70px" />
     </Navbar.Brand>
     <Navbar.Toggle aria-controls="basic-navbar-nav" />
     <Navbar.Collapse id="basic-navbar-nav">
@@ -17,7 +16,6 @@ function Header() {
       </Nav>
     </Navbar.Collapse>
   </Navbar>
-    );
-}
+);
 
 export default Header;
