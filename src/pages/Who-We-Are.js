@@ -22,7 +22,7 @@ const team = [
     {id:3,name:"KAYSWANNA KEI MCCOY",pronoun:"SHE/HER",subtitle:"Research Director",image:Mccoy},
     {id:4,name:"LEAH GEIS",pronoun:"SHE/HER",subtitle:"Communications Manager",image:Geis},
     {id:5,name:"STEVEN ZACKS",pronoun:"HE/HIM",subtitle:"Head of Platform",image:Zacks},
-    {id:6,name:"ALISON VOGHEL",pronoun:"SHE/HER",subtitle:"UIUX/Desginer",image:Voghel},
+    {id:6,name:"ALISON VOGHEL",pronoun:"SHE/HER",subtitle:"UI/UX Desginer",image:Voghel},
     {id:7,name:"ALEX JEWELL",pronoun:"HE/HIM",subtitle:"Engineering Lead",image:Jewell},
     {id:8,name:"CODY NICHOLSON",pronoun:"HE/HIM",subtitle:"Engineering Lead",image:Nicholson},
 ]

@@ -2,7 +2,6 @@ import React from 'react';
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import {ReactComponent as Logo} from '../../images/logoPlain.svg';
-import Button from "react-bootstrap/Button";
 
 function Header() {
   return (
@@ -15,7 +14,6 @@ function Header() {
       <Nav className="ml-auto">
         <Nav.Link href="/">HOME</Nav.Link>
         <Nav.Link href="/who-we-are">WHO WE ARE</Nav.Link>
-        <Button size='sm' href='/sign-up'>LOG IN \ SIGN UP</Button>
       </Nav>
     </Navbar.Collapse>
   </Navbar>
