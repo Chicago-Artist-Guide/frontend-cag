@@ -1,10 +1,10 @@
-import React from "react";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import Image from "react-bootstrap/Image";
-import Facebook from "../../images/icons-footer/facebook-f-brands.svg";
-import Linkedin from "../../images/icons-footer/linkedin-in-brands.svg";
-import Envelope from "../../images/icons-footer/envelope-regular.svg";
+import React from 'react';
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import Image from 'react-bootstrap/Image';
+import Facebook from '../../images/icons-footer/facebook-f-brands.svg';
+import Linkedin from '../../images/icons-footer/linkedin-in-brands.svg';
+import Envelope from '../../images/icons-footer/envelope-regular.svg';
 
 const Footer = () => (
   <Navbar className="nav" expand="sm" sticky="bottom">

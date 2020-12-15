@@ -1,13 +1,13 @@
-import React from "react";
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import Home from "./Home";
-import FAQ from "./FAQ";
-import NotFound from "./NotFound";
-import TOS from "./TOS";
-import WhoWeAre from "./WhoWeAre";
-import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
-import "../styles/App.scss";
+import React from 'react';
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import Home from './Home';
+import FAQ from './FAQ';
+import NotFound from './NotFound';
+import TOS from './TOS';
+import WhoWeAre from './WhoWeAre';
+import Header from '../components/layout/Header';
+import Footer from '../components/layout/Footer';
+import '../styles/App.scss';
 
 const App = () => (
   <Router>

@@ -1,5 +1,5 @@
-import React from "react";
-import Container from "react-bootstrap/Container";
+import React from 'react';
+import Container from 'react-bootstrap/Container';
 
 const TOS = () => (
   <Container className="margin-container">

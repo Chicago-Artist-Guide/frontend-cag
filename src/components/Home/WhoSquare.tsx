@@ -1,5 +1,5 @@
-import React from "react";
-import SVGLayer from "../../components/SVGLayer";
+import React from 'react';
+import SVGLayer from '../../components/SVGLayer';
 
 const WhoSquare = (props: any) => {
   const { blob, dancer, key, points: whoWeArray, title } = props;

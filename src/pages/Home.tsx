@@ -1,35 +1,35 @@
-import React from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import WhoSquare from "../components/Home/WhoSquare";
-import SVGLayer from "../components/SVGLayer";
-import yellowBlob1 from "../images/yellow_blob_1.svg";
-import homeDance from "../images/home_dance.svg";
-import greenBlob from "../images/green_blob.svg";
-import dance1 from "../images/wwww-1.svg";
-import redBlob from "../images/red_blob.svg";
-import dance2 from "../images/wwww-2.svg";
-import blueBlob1 from "../images/blue_blob.svg";
-import dance3 from "../images/wwww-3.svg";
+import React from 'react';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import WhoSquare from '../components/Home/WhoSquare';
+import SVGLayer from '../components/SVGLayer';
+import yellowBlob1 from '../images/yellow_blob_1.svg';
+import homeDance from '../images/home_dance.svg';
+import greenBlob from '../images/green_blob.svg';
+import dance1 from '../images/wwww-1.svg';
+import redBlob from '../images/red_blob.svg';
+import dance2 from '../images/wwww-2.svg';
+import blueBlob1 from '../images/blue_blob.svg';
+import dance3 from '../images/wwww-3.svg';
 
 const Home = () => {
   const whoWeWorkWith = [
     {
       id: 1,
-      title: "Individual Artists",
+      title: 'Individual Artists',
       points: [
         {
-          id: "a",
-          text: "Connections to affordable help for artists"
+          id: 'a',
+          text: 'Connections to affordable help for artists'
         },
         {
-          id: "b",
-          text: "Create a business profile"
+          id: 'b',
+          text: 'Create a business profile'
         },
         {
-          id: "c",
-          text: "Apply for jobs"
+          id: 'c',
+          text: 'Apply for jobs'
         }
       ],
       blob: greenBlob,
@@ -37,24 +37,24 @@ const Home = () => {
     },
     {
       id: 2,
-      title: "Theatre Companies",
+      title: 'Theatre Companies',
       points: [
         {
-          id: "a",
-          text: "Information for operations, resources, & best practices"
+          id: 'a',
+          text: 'Information for operations, resources, & best practices'
         },
         {
-          id: "b",
-          text: "Hire staff, designers, and crews"
+          id: 'b',
+          text: 'Hire staff, designers, and crews'
         },
         {
-          id: "c",
-          text: "Cast your productions"
+          id: 'c',
+          text: 'Cast your productions'
         },
         {
-          id: "d",
+          id: 'd',
           text:
-            "Connect to local and nation businesses and educational organizations that support the arts"
+            'Connect to local and nation businesses and educational organizations that support the arts'
         }
       ],
       blob: redBlob,
@@ -62,19 +62,19 @@ const Home = () => {
     },
     {
       id: 3,
-      title: "Communities",
+      title: 'Communities',
       points: [
         {
-          id: "a",
-          text: "Connections to affordable help for artists"
+          id: 'a',
+          text: 'Connections to affordable help for artists'
         },
         {
-          id: "b",
-          text: "Create a business profile"
+          id: 'b',
+          text: 'Create a business profile'
         },
         {
-          id: "c",
-          text: "Apply for jobs"
+          id: 'c',
+          text: 'Apply for jobs'
         }
       ],
       blob: blueBlob1,

@@ -1,7 +1,7 @@
-import React from "react";
-import Navbar from "react-bootstrap/Navbar";
-import Nav from "react-bootstrap/Nav";
-import { ReactComponent as Logo } from "../../images/logoPlain.svg";
+import React from 'react';
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import { ReactComponent as Logo } from '../../images/logoPlain.svg';
 
 const Header = () => (
   <Navbar className="white-back nav" expand="lg" sticky="top">

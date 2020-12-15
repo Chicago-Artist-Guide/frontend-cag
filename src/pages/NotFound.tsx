@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import Container from "react-bootstrap/Container";
+import React from 'react';
+import styled from 'styled-components';
+import Container from 'react-bootstrap/Container';
 
 const NotFound = () => (
   <Container className="margin-container whole-screen">

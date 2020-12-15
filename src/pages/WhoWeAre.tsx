@@ -1,54 +1,54 @@
-import React from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Team from "../components/WhoWeAre/Team";
-import SVGLayer from "../components/SVGLayer";
-import greenBlob from "../images/green_blob.svg";
-import WAWDance from "../images/waw_dance.svg";
-import Fayfer from "../images/who-we-are/fayfer-matt.jpg";
-import Geis from "../images/who-we-are/geis-leah.jpg";
-import Mccoy from "../images/who-we-are/mccoy-kayswanna.jpg";
-import Schutz from "../images/who-we-are/schutz-anna.png";
-import Voghel from "../images/who-we-are/voghel-alison.png";
-import Zacks from "../images/who-we-are/zacks-steven.png";
+import React from 'react';
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Team from '../components/WhoWeAre/Team';
+import SVGLayer from '../components/SVGLayer';
+import greenBlob from '../images/green_blob.svg';
+import WAWDance from '../images/waw_dance.svg';
+import Fayfer from '../images/who-we-are/fayfer-matt.jpg';
+import Geis from '../images/who-we-are/geis-leah.jpg';
+import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
+import Schutz from '../images/who-we-are/schutz-anna.png';
+import Voghel from '../images/who-we-are/voghel-alison.png';
+import Zacks from '../images/who-we-are/zacks-steven.png';
 
 const WhoWeAre = () => {
   const team = [
     {
       id: 1,
-      name: "ANNA SCHUTZ (SHE/HER)",
-      subtitle: "Founder + Exective Director",
+      name: 'ANNA SCHUTZ (SHE/HER)',
+      subtitle: 'Founder + Exective Director',
       image: Schutz
     },
     {
       id: 2,
-      name: "MATT FAYFER (HE/HIM)",
-      subtitle: "Managing Director",
+      name: 'MATT FAYFER (HE/HIM)',
+      subtitle: 'Managing Director',
       image: Fayfer
     },
     {
       id: 3,
-      name: "LEAH GEIS (SHE/HER)",
-      subtitle: "Development Director",
+      name: 'LEAH GEIS (SHE/HER)',
+      subtitle: 'Development Director',
       image: Geis
     },
     {
       id: 4,
-      name: "KAYSWANNA KEI MCCOY (SHE/HER)",
-      subtitle: "Research Director",
+      name: 'KAYSWANNA KEI MCCOY (SHE/HER)',
+      subtitle: 'Research Director',
       image: Mccoy
     },
     {
       id: 5,
-      name: "STEVEN ZACKS (HE/HIM)",
-      subtitle: "Head of Product",
+      name: 'STEVEN ZACKS (HE/HIM)',
+      subtitle: 'Head of Product',
       image: Zacks
     },
     {
       id: 6,
-      name: "ALISON VOGHEL (SHE/HER)",
-      subtitle: "UIUX/Desginer",
+      name: 'ALISON VOGHEL (SHE/HER)',
+      subtitle: 'UIUX/Desginer',
       image: Voghel
     }
   ];
