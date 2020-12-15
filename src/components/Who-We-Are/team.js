@@ -7,6 +7,7 @@ function Team(props) {
             <Image width="100%" className="shadow-team" src={props.image} roundedCircle/>
             <div className="text-center">
                 <h3 className="subtitle">{props.name}</h3>
+                <h3 className="subtitle">{props.pronoun}</h3>
                 <p>{props.subtitle}</p>   
             </div>
       </div>    

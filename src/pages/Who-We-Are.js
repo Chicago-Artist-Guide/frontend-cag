@@ -11,16 +11,20 @@ import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
 import Schutz from '../images/who-we-are/schutz-anna.png';
 import Voghel from '../images/who-we-are/voghel-alison.png';
 import Zacks from '../images/who-we-are/zacks-steven.png';
+import Jewell from '../images/who-we-are/jewell-alexander.png';
+import Nicholson from '../images/who-we-are/nicholson-cody.jpg';
 import SVGLayer from "../components/svg-layer.js";
 
 function WhoWeAre() {
 const team = [
-    {id:1,name:"ANNA SCHUTZ (SHE/HER)",subtitle:"Founder + Exective Director",image:Schutz},
-    {id:2,name:"MATT FAYFER (HE/HIM)",subtitle:"Managing Director",image:Fayfer},
-    {id:3,name:"LEAH GEIS (SHE/HER)",subtitle:"Development Director",image:Geis},
-    {id:4,name:"KAYSWANNA KEI MCCOY (SHE/HER)",subtitle:"Research Director",image:Mccoy},
-    {id:5,name:"STEVEN ZACKS (HE/HIM)",subtitle:"Head of Product",image:Zacks},
-    {id:6,name:"ALISON VOGHEL (SHE/HER)",subtitle:"UIUX/Desginer",image:Voghel},
+    {id:1,name:"ANNA SCHUTZ",pronoun:"SHE/HER",subtitle:"Exective Director",image:Schutz},
+    {id:2,name:"MATT FAYFER",pronoun:"HE/HIM",subtitle:"Managing Director",image:Fayfer},
+    {id:3,name:"KAYSWANNA KEI MCCOY",pronoun:"SHE/HER",subtitle:"Research Director",image:Mccoy},
+    {id:4,name:"LEAH GEIS",pronoun:"SHE/HER",subtitle:"Communications Manager",image:Geis},
+    {id:5,name:"STEVEN ZACKS",pronoun:"HE/HIM",subtitle:"Head of Platform",image:Zacks},
+    {id:6,name:"ALISON VOGHEL",pronoun:"SHE/HER",subtitle:"UIUX/Desginer",image:Voghel},
+    {id:7,name:"ALEX JEWELL",pronoun:"HE/HIM",subtitle:"Engineering Lead",image:Jewell},
+    {id:8,name:"CODY NICHOLSON",pronoun:"HE/HIM",subtitle:"Engineering Lead",image:Nicholson},
 ]
   return (
       <Container className="margin-container">
@@ -30,10 +34,14 @@ const team = [
         <h1 className="title">WHO WE ARE</h1>
         <div className="mt-5">
           <h3 className="subtitle">BOARD OF DIRECTORS</h3>
-          <br/>
           <p>President | Anna Schutz (she/her)</p> 
-          <p>Secretary | Leah Geis (she/her) </p>
+          <p>Secretary | Leah Geis (she/her)</p>
           <p>Treasurer | Matt Fayfer (he/him)</p>
+        </div>
+        <div className="mt-5 mb-5">
+          <h3 className="subtitle">ADVISORY BOARD</h3>
+          <p>Luciana Mendez Gonzalez (any)</p> 
+          <p>Zev Steinrock (he/him)</p>
         </div>
         </Col>
         <Col lg={5}>
@@ -44,8 +52,8 @@ const team = [
         <h3 className="subtitle margin-top">THE TEAM</h3>
         <Row>
             {team.map(who=>(
-                <Col md={4} key={who.id}>
-                  <Team name={who.name} subtitle={who.subtitle} image={who.image}/>
+                <Col md={3} key={who.id}>
+                  <Team name={who.name} subtitle={who.subtitle} image={who.image} pronoun={who.pronoun}/>
                 </Col>
               ))}
           </Row>
@@ -54,15 +62,10 @@ const team = [
             <Col lg={6}>
 
             <h3 className="subtitle">JOIN US</h3>
-            <p>We are still growing and looking for people to join our team. Email <span id="email">chicagoartistguide@gmail.com</span> for more information.</p>
+            <p>We are still growing and looking for people to join our team. Email <span id="email">contact@chicagoartistguide.org</span> for more information.</p>
           
             </Col>
 
-            <Col lg={6}>
-            <h3 className="subtitle">SPECIAL THANKS</h3>
-            <p>Nicole Brennan, Samantha Dzirko, Joey Harbert, Charlie Sheets, Luciana Mendez Gonzalez</p>
-          
-            </Col>
           </Row>
 
             <h1 className="title">Vision</h1>
@@ -97,9 +100,20 @@ const team = [
                 <h3 className="subtitle">SAFETY</h3>
                 <p>
                 Your safety and the privacy of your data are of the utmost importance to us. We are committed to following, and (where we’re able) exceeding industry standards and best practices with regard to safeguarding your information. 
-                - CAG is committed to full transparency with regard to what data we collect from you, why we are collecting it, and, most importantly, what will and will not be displayed publicly for on your profile or elsewhere on our site. 
-                - CAG will never share your information without your explicit, affirmative consent -CAG will never sell your data to a third party  
                 </p>
+                <ul>
+                  <li><p>
+                  CAG is committed to full transparency with regard to what data we collect from you, why we are collecting it, and, most importantly, what will and will not be displayed publicly for on your profile or elsewhere on our site. 
+                  </p>
+                  </li>
+                  <li><p>
+                  CAG will never share your information without your explicit, affirmative consent.   
+                  </p></li>
+                  <li><p>
+                  CAG will never sell your data to a third party.  
+                  </p>
+                  </li>
+                </ul>
                 </Col>
             </Row>
 

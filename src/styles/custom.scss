@@ -143,5 +143,9 @@ p {
 font-weight:bold;
 }
 
+#change-color-nav {
+    color:$main-font-color; 
+}
+
 
 @import "~bootstrap/scss/bootstrap";
