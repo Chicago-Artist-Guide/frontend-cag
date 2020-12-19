@@ -5,6 +5,7 @@ import FAQ from './FAQ';
 import NotFound from './NotFound';
 import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
+import Login from './Login';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import '../styles/App.scss';
@@ -18,6 +19,7 @@ const App = () => (
         <Route component={FAQ} exact path="/faq" />
         <Route component={TOS} exact path="/terms-of-service" />
         <Route component={WhoWeAre} exact path="/who-we-are" />
+        <Route component={Login} exact path="/login" />
         <Route component={NotFound} />
       </Switch>
       <Footer />

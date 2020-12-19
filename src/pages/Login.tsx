@@ -9,7 +9,7 @@ import Red_Blob from '../images/red_blob.svg';
 const Login = () => (
   <Container className="margin-container">
     <Row>
-      <Col flex lg={5}>
+      <Col lg={5}>
         <h1 className="title margin_button_login">WELCOME BACK</h1>
         <Form className="margin-team">
           <Form.Group controlId="formBasicEmail">
@@ -28,7 +28,7 @@ const Login = () => (
           </Button>
         </Form>
       </Col>
-      <Col lg={2}></Col>
+      <Col lg={2} />
       <Col lg={5}>
         <img src={Red_Blob} alt="Chicago Artist Guide" />
       </Col>
