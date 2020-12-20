@@ -1,10 +1,12 @@
 import React from 'react';
+import styled from 'styled-components';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import { colors } from '../../theme/styleVars';
 import { ReactComponent as Logo } from '../../images/logoPlain.svg';
 
 const Header = () => (
-  <Navbar className="white-back nav" expand="lg" sticky="top">
+  <WhiteBackNav className="white-back nav" expand="lg" sticky="top">
     <Navbar.Brand href="/">
       <Logo height="60px" width="70px" />
     </Navbar.Brand>
@@ -15,7 +17,11 @@ const Header = () => (
         <Nav.Link href="/who-we-are">WHO WE ARE</Nav.Link>
       </Nav>
     </Navbar.Collapse>
-  </Navbar>
+  </WhiteBackNav>
 );
+
+const WhiteBackNav = styled(Navbar)`
+  background-color: ${colors.bodyBg};
+`;
 
 export default Header;

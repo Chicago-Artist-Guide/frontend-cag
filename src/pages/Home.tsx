@@ -1,7 +1,9 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
+import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import PageContainer from '../components/layout/PageContainer';
+import { Tagline, Title, TitleThree } from '../components/layout/Titles';
 import WhoSquare from '../components/Home/WhoSquare';
 import SVGLayer from '../components/SVGLayer';
 import yellowBlob1 from '../images/yellow_blob_1.svg';
@@ -83,13 +85,12 @@ const Home = () => {
   ];
 
   return (
-    <Container className="margin-container">
-      {/*Hero Section*/}
+    <PageContainer>
       <Row>
         <Col lg={8}>
-          <h1 className="title">CHICAGO ARTIST GUIDE</h1>
-          <h2 className="tagline">We make connections. You make art.</h2>
-          <h3 className="subtitle">WHAT WE DO</h3>
+          <Title>CHICAGO ARTIST GUIDE</Title>
+          <Tagline>We make connections. You make art.</Tagline>
+          <TitleThree>WHAT WE DO</TitleThree>
           <p className="margin-container">
             We bring Chicago individual artists, theatre companies, and
             communities together. We provide the infrastructure so you can focus
@@ -100,21 +101,26 @@ const Home = () => {
           <SVGLayer blob={yellowBlob1} dancer={homeDance} />
         </Col>
       </Row>
-      <h3 className="subtitle margin-top">WHO WE WORK WITH</h3>
+      <TitleThree className="margin-top">WHO WE WORK WITH</TitleThree>
       <Row>
         {whoWeWorkWith.map(who => (
-          <Col className="margin-wwww" key={who.id} lg={true}>
+          <MarginCol key={who.id} lg={true}>
             <WhoSquare
               blob={who.blob}
               dancer={who.dancer}
               points={who.points}
               title={who.title}
             />
-          </Col>
+          </MarginCol>
         ))}
       </Row>
-    </Container>
+    </PageContainer>
   );
 };
+
+const MarginCol = styled(Col)`
+  margin-top: 2%;
+  margin-bottom: 2%;
+`;
 
 export default Home;

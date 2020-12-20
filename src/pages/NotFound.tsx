@@ -1,25 +1,31 @@
 import React from 'react';
 import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
+import PageContainer from '../components/layout/PageContainer';
+import { Title, TitleThree, TitleTwo } from '../components/layout/Titles';
 
 const NotFound = () => (
-  <Container className="margin-container whole-screen">
+  <FullSceenContainer>
     <CenterDiv>
-      <h1 className="title">THIS PAGE IS NOT AVAILABLE</h1>
-      <h2>
+      <Title>THIS PAGE IS NOT AVAILABLE</Title>
+      <TitleTwo>
         Return to <a href="/">Chicago Artist Guide</a>
-      </h2>
+      </TitleTwo>
       <div className="mt-5">
-        <h3 className="subtitle">
+        <TitleThree>
           "Memory, all alone in the moonlight, I can smile at the old days, I
           was beautiful then. I remember the time I knew what happiness was, let
           the memory live again."
-        </h3>
-        <h3 className="subtitle">Cats</h3>
+        </TitleThree>
+        <TitleThree>Cats</TitleThree>
       </div>
     </CenterDiv>
-  </Container>
+  </FullSceenContainer>
 );
+
+const FullSceenContainer = styled(PageContainer)`
+  margin-top: 20rem;
+  margin-bottom: 20rem;
+`;
 
 const CenterDiv = styled.div`
   text-align: center;

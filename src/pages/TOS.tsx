@@ -1,11 +1,13 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
+import styled from 'styled-components';
+import PageContainer from '../components/layout/PageContainer';
+import { Title, TitleThree } from '../components/layout/Titles';
 
 const TOS = () => (
-  <Container className="margin-container">
-    <h1 className="title">TERMS OF SERVICE</h1>
+  <TOSContainer>
+    <Title>TERMS OF SERVICE</Title>
     <h3>1. Introduction</h3>
-    <h3 className="subtitle">1.1 Contract</h3>
+    <TitleThree>1.1 Contract</TitleThree>
     <p>
       When you use our Services you agree to all of these terms. Your use of our
       Services is also subject to our Cookie Policy and our Privacy Policy,
@@ -23,7 +25,7 @@ const TOS = () => (
       at any time you can do so by closing your account and no longer accessing
       or using our Services.
     </p>
-    <p id="bold">Services</p>
+    <BoldP>Services</BoldP>
     <p>
       This Contract applies to Chicagoartistguide.org, Chicago Artist
       Guide-branded apps, and other CAG-related sites, apps, communications and
@@ -33,26 +35,26 @@ const TOS = () => (
       CAG” plugins. Registered users of our Services are “Members” and
       unregistered users are “Visitors”.
     </p>
-    <p id="bold">Chicago Artist Guide</p>
+    <BoldP>Chicago Artist Guide</BoldP>
     <p>
       You are entering into this Contract with Chicago Artist Guide (also
       referred to as “we”, “us”, and “CAG”).
     </p>
-    <p id="bold">This Contract applies to Members and Visitors.</p>
+    <BoldP>This Contract applies to Members and Visitors.</BoldP>
     <p>
       As a Visitor or Member of our Services, the collection, use and sharing of
       your personal data is subject to this Privacy Policy (which includes our
       Cookie Policy and other documents referenced in this Privacy Policy) and
       updates.
     </p>
-    <h3 className="subtitle">1.2 Members and Visitors</h3>
+    <TitleThree>1.2 Members and Visitors</TitleThree>
     <p>
       When you register and join the CAG Services, you become a Member. If you
       have chosen not to register for our Services, you may access certain
       features as a “Visitor.”
     </p>
-    <h3 className="subtitle">1.3 Change</h3>
-    <p id="bold">We may make changes to the Contract.</p>
+    <TitleThree>1.3 Change</TitleThree>
+    <BoldP>We may make changes to the Contract.</BoldP>
     <p>
       We may modify this Contract, our Privacy Policy and our Cookies Policy
       from time to time. If we make material changes to it, we will provide you
@@ -64,14 +66,14 @@ const TOS = () => (
       consenting to the updated terms as of their effective date.
     </p>
     <h3>2. Obligations</h3>
-    <h3 className="subtitle">2.1 Service Eligibility</h3>
-    <p id="bold">
+    <TitleThree>2.1 Service Eligibility</TitleThree>
+    <BoldP>
       Here are some promises that you make to us in this Contract:
-    </p>
-    <p id="bold">
+    </BoldP>
+    <BoldP>
       You’re eligible to enter into this Contract and you are at least our
       “Minimum Age.”
-    </p>
+    </BoldP>
     <p>The Services are not for use by anyone under the age of 18.</p>
     <p>
       To use the Services, you agree that: (1) you must be the “Minimum Age”
@@ -87,12 +89,12 @@ const TOS = () => (
       parental consent (including using of your personal data) then the Minimum
       Age is such older age.
     </p>
-    <h3 className="subtitle">2.2 Your Account</h3>
-    <p id="bold">You will keep your password a secret.</p>
-    <p id="bold">
+    <TitleThree>2.2 Your Account</TitleThree>
+    <BoldP>You will keep your password a secret.</BoldP>
+    <BoldP>
       You will not share an account with anyone else and will follow our rules
       and the law.
-    </p>
+    </BoldP>
     <p>
       Members are account holders. You agree to: (1) use a strong password and
       keep it confidential; (2) not transfer any part of your account (e.g.,
@@ -108,7 +110,7 @@ const TOS = () => (
       use of such paid Service; however, they do not have rights to your
       personal account.
     </p>
-    <h3 className="subtitle">2.3 Notices and Messages</h3>
+    <TitleThree>2.3 Notices and Messages</TitleThree>
     <p>
       You’re okay with us providing notices and messages to you through our
       websites, apps, and contact information. If your contact information is
@@ -124,7 +126,7 @@ const TOS = () => (
       Please review your settings to control and limit messages you receive from
       us.
     </p>
-    <h3 className="subtitle">2.4 Sharing</h3>
+    <TitleThree>2.4 Sharing</TitleThree>
     <p>
       When you share information on our Services, others can see, copy and use
       that information.
@@ -148,9 +150,9 @@ const TOS = () => (
       and can remove it with or without notice.
     </p>
     <h3>3. Rights and Limits</h3>
-    <h3 className="subtitle">
+    <TitleThree>
       3.1 Your License to Chicago Artist Guide (aka “CAG”)
-    </h3>
+    </TitleThree>
     <p>
       You own all of the content, feedback and personal information you provide
       to us, but you also grant us a non-exclusive license to it.
@@ -249,7 +251,7 @@ const TOS = () => (
       agree that your profile information will be truthful. CAG may be required
       by law to remove certain information or content in certain countries.
     </p>
-    <h3 className="subtitle">3.2 Service Availability</h3>
+    <TitleThree>3.2 Service Availability</TitleThree>
     <p>We may change or end any Service or modify our prices prospectively.</p>
     <p>
       We may change, suspend or discontinue any of our Services. We may also
@@ -263,7 +265,7 @@ const TOS = () => (
       information that you or others provide, except to the extent required by
       applicable law and as noted in our Privacy Policy.
     </p>
-    <h3 className="subtitle">3.3 Other Content, Sites and Apps</h3>
+    <TitleThree>3.3 Other Content, Sites and Apps</TitleThree>
     <p>
       Your use of others’ content and information posted on our Services, is at
       your own risk.
@@ -308,10 +310,10 @@ const TOS = () => (
       vet any of these events, and (4) that you will adhere to these terms and
       conditions that apply to such events.
     </p>
-    <h3 className="subtitle">3.4 Limits</h3>
-    <p id="bold">
+    <TitleThree>3.4 Limits</TitleThree>
+    <BoldP>
       We have the right to limit how you connect and interact on our Services.
-    </p>
+    </BoldP>
     <p>
       CAG reserves the right to limit your use of the Services, including the
       number of your connections and your ability to contact other Members. CAG
@@ -319,10 +321,10 @@ const TOS = () => (
       breach this Contract or the law or are misusing the Services (e.g.,
       violating any of the Dos and Don’ts or Professional Community Policies).
     </p>
-    <h3 className="subtitle">3.5 Intellectual Property Rights</h3>
-    <p id="bold">
+    <TitleThree>3.5 Intellectual Property Rights</TitleThree>
+    <BoldP>
       We’re providing you notice about our intellectual property rights.
-    </p>
+    </BoldP>
     <p>
       CAG reserves all of its intellectual property rights in the Services.
       Trademarks and logos used in connection with the Services are the
@@ -331,11 +333,11 @@ const TOS = () => (
       registered trademarks of CAG.
     </p>
     <h3>4. Disclaimer and Limit of Liability</h3>
-    <h3 className="subtitle">4.1 No Warranty</h3>
-    <p id="bold">
+    <TitleThree>4.1 No Warranty</TitleThree>
+    <BoldP>
       This is our disclaimer of legal liability for the quality, safety, or
       reliability of our Services.
-    </p>
+    </BoldP>
     <p>
       CHICAGO ARTIST GUIDE AND ITS AFFILIATES MAKE NO REPRESENTATION OR WARRANTY
       ABOUT THE SERVICES, INCLUDING ANY REPRESENTATION THAT THE SERVICES WILL BE
@@ -346,8 +348,8 @@ const TOS = () => (
       IMPLIED WARRANTY OF TITLE, ACCURACY OF DATA, NON-INFRINGEMENT,
       MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
     </p>
-    <h3 className="subtitle">4.2 Exclusion of Liability</h3>
-    <p id="bold">These are the limits of legal liability we may have to you.</p>
+    <TitleThree>4.2 Exclusion of Liability</TitleThree>
+    <BoldP>These are the limits of legal liability we may have to you.</BoldP>
     <p>
       TO THE FULLEST EXTENT PERMITTED BY LAW (AND UNLESS CHICAGO ARTIST GUIDE
       HAS ENTERED INTO A SEPARATE WRITTEN AGREEMENT THAT OVERRIDES THIS
@@ -364,7 +366,7 @@ const TOS = () => (
       FEES PAID OR PAYABLE BY YOU TO CHICAGO ARTIST GUIDE FOR THE SERVICES
       DURING THE TERM OF THIS CONTRACT, IF ANY, OR (B) US $1000.
     </p>
-    <h3 className="subtitle">4.3 Basis of the Bargain; Exclusions</h3>
+    <TitleThree>4.3 Basis of the Bargain; Exclusions</TitleThree>
     <p>
       The limitations of liability in this Section 4 are part of the basis of
       the bargain between you and Chicago Artist Guide (or “CAG”) and shall
@@ -384,9 +386,9 @@ const TOS = () => (
       in the context of this Contract.
     </p>
     <h3>5. Termination</h3>
-    <p id="bold">
+    <BoldP>
       We can each end this Contract, but some rights and obligations survive.
-    </p>
+    </BoldP>
     <p>
       Both you and CAG may terminate this Contract at any time with notice to
       the other. On termination, you lose the right to access or use the
@@ -394,14 +396,14 @@ const TOS = () => (
     </p>
     <ul>
       <li>
-        <p id="bold">Our rights to use and disclose your feedback</p>
+        <BoldP>Our rights to use and disclose your feedback</BoldP>
         <p>
           Members and/or Visitors’ rights to further re-share content and
           information you shared through the Services.
         </p>
       </li>
       <li>
-        <p id="bold">Sections 4, 6, 7, and 8.2 of this Contract</p>
+        <BoldP>Sections 4, 6, 7, and 8.2 of this Contract</BoldP>
         <p>
           Any amounts owed by either party prior to termination remain owed
           after termination. You can visit our Help Center to close your
@@ -415,7 +417,7 @@ const TOS = () => (
       Guide agree to resolve it in Illinois courts using Illinois law.
     </p>
     <h3>7. General Terms</h3>
-    <p id="bold">Here are some important details about the Contract.</p>
+    <BoldP>Here are some important details about the Contract.</BoldP>
     <p>
       If a court with authority over this Contract finds any part of it
       unenforceable, you and we agree that the court should modify the terms to
@@ -442,7 +444,7 @@ const TOS = () => (
       provided in Section 10.
     </p>
     <h3>8. CAG "Dos and Don'ts"</h3>
-    <h3 className="subtitle">8.1 Dos</h3>
+    <TitleThree>8.1 Dos</TitleThree>
     <p>
       Chicago Artist Guide is a community of professionals. This list of “Dos
       and Don’ts” along with our Professional Community Policies limit what you
@@ -461,7 +463,7 @@ const TOS = () => (
         <li>Use the Services in a professional manner.</li>
       </p>
     </ul>
-    <h3 className="subtitle">8.2 Don'ts</h3>
+    <TitleThree>8.2 Don'ts</TitleThree>
     <p>You agree that you will not:</p>
     <ul>
       <p>
@@ -573,7 +575,17 @@ const TOS = () => (
       Our Contact information. For general inquiries and legal notices or
       service of process, you may contact us online.
     </p>
-  </Container>
+  </TOSContainer>
 );
+
+const TOSContainer = styled(PageContainer)`
+  h3 {
+    font-size: 20px;
+  }
+`;
+
+const BoldP = styled.p`
+  font-weight: bold;
+`;
 
 export default TOS;
