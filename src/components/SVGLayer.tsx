@@ -1,14 +1,23 @@
 import React from 'react';
+import styled from 'styled-components';
 
 const SVGLayer = (props: any) => {
   const { blob, dancer } = props;
 
   return (
     <>
-      <img alt="" className="bottom-img" src={blob} />
-      <img alt="" className="top-img" src={dancer} />
+      <BottomImg alt="" src={blob} />
+      <TopImg alt="" src={dancer} />
     </>
   );
 };
+
+const BottomImg = styled.img`
+  position: absolute;
+`;
+
+const TopImg = styled.img`
+  position: relative;
+`;
 
 export default SVGLayer;

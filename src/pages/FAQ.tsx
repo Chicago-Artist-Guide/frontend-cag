@@ -1,7 +1,8 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import PageContainer from '../components/layout/PageContainer';
+import { Tagline, Title, TitleThree } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';
 import blueBlob from '../images/blue_blob.svg';
 import streamingDance from '../images/streaming_dance.svg';
@@ -47,15 +48,14 @@ const FAQ = () => {
   ];
 
   return (
-    <Container className="margin-container">
-      {/*Hero Section*/}
+    <PageContainer>
       <Row>
         <Col lg={8}>
-          <h1 className="title">FREQUENTLY ASKED QUESTIONS</h1>
-          <h2 className="tagline">Find out what we're all about</h2>
+          <Title>FREQUENTLY ASKED QUESTIONS</Title>
+          <Tagline>Find out what we're all about</Tagline>
           {questions.map(qa => (
             <div className="margin-team">
-              <h3 className="subtitle">{qa.question}</h3>
+              <TitleThree>{qa.question}</TitleThree>
               <p>{qa.answer}</p>
             </div>
           ))}
@@ -64,7 +64,7 @@ const FAQ = () => {
           <SVGLayer blob={blueBlob} dancer={streamingDance} />
         </Col>
       </Row>
-    </Container>
+    </PageContainer>
   );
 };
 

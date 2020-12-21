@@ -1,151 +1,29 @@
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital@1&family=Montserrat:wght@400;700&family=Open+Sans:wght@300;600&display=swap');
-
 $body-bg: #F8F9FA;
-$montserrat: 'Montserrat',sans-serif;
-$lora:'Lora',serif;
-$open-sans:'Open Sans',sans-serif;
+$montserrat: 'Montserrat', sans-serif;
+$lora: 'Lora', serif;
+$open-sans: 'Open Sans', sans-serif;
 $main-font-color: #0C2028;
-$primary:#82B29A;
-$orange:#E17B60;
+$primary: #82B29A;
+$orange: #E17B60;
 
 body {
-    font-family:$montserrat;
-    color:$main-font-color;
-}
-
-.title {
-    font-weight:bold;
-    font-size:3rem;
-}
-
-.subtitle {
-    font-weight:bold;
-    font-size:1.25rem;
-}
-
-h1 {
-    letter-spacing:3.36px;
-}
-
-h2 {
-    font-family: $lora;
-    font-size:1.75rem;
-}
-
-.tagline {
-    font-size:1.75;
-    margin-bottom:40px;
-}
-
-h3 {
-    font-size:20px;
-}   
-
-p {
-    font-family:$open-sans;
-    font-size:16px;
-}
-
-.white-back {
-    background-color:$body-bg;
-}
-
-.margin-container {
-    margin-top:7%;
-    margin-bottom:7%;
-}
-
-.shadow-wwww {
-    box-shadow: 2px 2px 10px rgba(0,0,29,.10);
-    border-radius: 8px;
-    background-color: #F8F9FA;
-    padding:20px 40px 20px 40px;
-    height:100%;
+    font-family: $montserrat;
+    color: $main-font-color;
 }
 
 .shadow-identity-cards {
     box-shadow: 2px 2px 10px rgba(0,0,29,.10);
     border-radius: 8px;
-    background-color: #F8F9FA;
-    padding:30px 20px 50px 20px;
-    height:100%;
+    background-color: $body-bg;
+    padding: 30px 20px 50px 20px;
+    height: 100%;
 
 }
 
 .margin-identity-cards {
-    margin-right:2%;
-    margin-top:10px;
-    margin-bottom:50px;
+    margin-right: 2%;
+    margin-top: 10px;
+    margin-bottom: 50px;
 }
-
-.title-wwww {
-    font-family:$open-sans;
-    font-size:20px;
-    font-weight: 600;
-}
-
-#email {
-    color:$orange;
-    font-weight:bold;
-    font-family:$lora;
-}
-
-.nav {
-    font-size:12px;
-    letter-spacing:0.84px;
-    line-height:15px;
-    color:$main-font-color;
-}
-
-.top-img {
-    position:relative;
-}
-
-.bottom-img {
-    position:absolute;
-}
-
-.test {
-    background-color: $orange;
-}
-
-.shadow-team {
-    box-shadow: 2px 2px 10px rgba(0,0,29,.10);
-    margin-bottom:10px;
-    margin-top:10px;
-}
-
-.margin-team {
-    margin-top:50px;
-    margin-bottom:50px;
-}
-
-.margin-wwww {
-    margin-top:2%;
-    margin-bottom:2%;
-}
-
-.whole-screen {
-    margin-top:  20rem;
-    margin-bottom: 20rem;
-}
-
-.footer-logo {
-    height:15px;
-    width:15px;
-}
-
-.margin_login {
-    margin-top:5rem;
-}
-
-#bold {
-font-weight:bold;
-}
-
-#change-color-nav {
-    color:$main-font-color; 
-}
-
 
 @import "~bootstrap/scss/bootstrap";

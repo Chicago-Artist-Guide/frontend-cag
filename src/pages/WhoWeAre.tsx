@@ -1,7 +1,8 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import PageContainer from '../components/layout/PageContainer';
+import { Tagline, Title, TitleThree } from '../components/layout/Titles';
 import Team from '../components/WhoWeAre/Team';
 import SVGLayer from '../components/SVGLayer';
 import greenBlob from '../images/green_blob.svg';
@@ -70,19 +71,18 @@ const WhoWeAre = () => {
   ];
 
   return (
-    <Container className="margin-container">
-      {/*Hero Section*/}
+    <PageContainer>
       <Row>
         <Col lg={7}>
-          <h1 className="title">WHO WE ARE</h1>
+          <Title>WHO WE ARE</Title>
           <div className="mt-5">
-            <h3 className="subtitle">BOARD OF DIRECTORS</h3>
+            <TitleThree>BOARD OF DIRECTORS</TitleThree>
             <p>President | Anna Schutz (she/her)</p>
             <p>Secretary | Leah Geis (she/her)</p>
             <p>Treasurer | Matt Fayfer (he/him)</p>
           </div>
           <div className="mt-5 mb-5">
-            <h3 className="subtitle">ADVISORY BOARD</h3>
+            <TitleThree>ADVISORY BOARD</TitleThree>
             <p>Luciana Mendez Gonzalez (any)</p> 
             <p>Zev Steinrock (he/him)</p>
           </div>
@@ -91,7 +91,7 @@ const WhoWeAre = () => {
           <SVGLayer blob={greenBlob} dancer={WAWDance} />
         </Col>
       </Row>
-      <h3 className="subtitle margin-top">THE TEAM</h3>
+      <TitleThree>THE TEAM</TitleThree>
       <Row>
         {team.map(who => (
           <Col key={who.id} md={3}>
@@ -101,46 +101,46 @@ const WhoWeAre = () => {
       </Row>
       <Row className="margin-team">
         <Col lg={6}>
-          <h3 className="subtitle">JOIN US</h3>
+          <TitleThree>JOIN US</TitleThree>
           <p>
             We are still growing and looking for people to join our team. Email{" "}
-            <span id="email">contact@chicagoartistguide.org</span> for more
+            <span className="orangeText">contact@chicagoartistguide.org</span> for more
             information.
           </p>
         </Col>
       </Row>
-      <h1 className="title">Vision</h1>
-      <h2 className="tagline">Theatre made by anyone, for everyone</h2>
-      <h1 className="title">Mission</h1>
-      <h2 className="tagline">
+      <Title>Vision</Title>
+      <Tagline>Theatre made by anyone, for everyone</Tagline>
+      <Title>Mission</Title>
+      <Tagline>
         We provide a centralized place for Chicago theatre companies, individual
         artists, and communities to come together. We remove common obstacles
         with time and money-saving resources so artists can focus on what’s most
         important: making art.
-      </h2>
-      <h1 className="title margin-team">Values</h1>
+      </Tagline>
+      <Title className="margin-team">Values</Title>
       <Row>
         <Col lg={6}>
-          <h3 className="subtitle">ACCESSIBILITY</h3>
+          <TitleThree>ACCESSIBILITY</TitleThree>
           <p>
             We provide easily accessible resources to empower those in
             marginalized groups to advocate for themselves. By leveraging online
             technologies, we eliminate geographical barriers so that more
             artists can connect to work across the city.
           </p>
-          <h3 className="subtitle">CONTINUED LEARNING</h3>
+          <TitleThree>CONTINUED LEARNING</TitleThree>
           <p>
             We are committed to bettering ourselves, our services, and our
             industry. We are open to feedback to stay current in our practices.
           </p>
-          <h3 className="subtitle">INCLUSION</h3>
+          <TitleThree>INCLUSION</TitleThree>
           <p>
             We are committed to bettering ourselves, our services, and our
             industry. We are open to feedback to stay current in our practices.
           </p>
         </Col>
         <Col>
-          <h3 className="subtitle">SAFETY</h3>
+          <TitleThree>SAFETY</TitleThree>
           <p>
             Your safety and the privacy of your data are of the utmost
             importance to us. We are committed to following, and (where we’re
@@ -166,7 +166,7 @@ const WhoWeAre = () => {
           </ul>
         </Col>
       </Row>
-    </Container>
+    </PageContainer>
   );
 };
 

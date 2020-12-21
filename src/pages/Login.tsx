@@ -1,16 +1,17 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import PageContainer from '../components/layout/PageContainer';
+import { Title } from '../components/layout/Titles';
 import Red_Blob from '../images/red_blob.svg';
 
 const Login = () => (
-  <Container className="margin-container">
+  <PageContainer>
     <Row>
-      <Col flex lg={5}>
-        <h1 className="title margin_button_login">WELCOME BACK</h1>
+      <Col lg={5}>
+        <Title>WELCOME BACK</Title>
         <Form className="margin-team">
           <Form.Group controlId="formBasicEmail">
             <Form.Label>Email address</Form.Label>
@@ -21,19 +22,19 @@ const Login = () => (
             <Form.Control type="password" />
           </Form.Group>
           <Form.Text className="text-muted">
-            <p>Not a member yet? <a href="/sign-up" id="email">Join Us</a></p>
+            <p>Not a member yet? <a className="orangeText" href="/sign-up">Join Us</a></p>
           </Form.Text>
           <Button variant="primary" href="/" type="submit">
             LOG IN
           </Button>
         </Form>
       </Col>
-      <Col lg={2}></Col>
+      <Col lg={2} />
       <Col lg={5}>
-        <img src={Red_Blob} alt="Chicago Artist Guide" />
+        <img alt="Chicago Artist Guide" src={Red_Blob} />
       </Col>
     </Row>
-  </Container>
+  </PageContainer>
 );
 
 export default Login;

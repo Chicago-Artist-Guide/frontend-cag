@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Image from 'react-bootstrap/Image';
@@ -14,16 +15,21 @@ const Footer = () => (
       <Nav.Link href="/terms-of-service">TERMS OF SERVICE</Nav.Link>
       <Nav.Link href="/faq">FAQ</Nav.Link>
       <Nav.Link href="http://www.facebook.com/chiartistguide">
-        <Image className="footer-logo" src={Facebook} />
+        <FooterLogo src={Facebook} />
       </Nav.Link>
       <Nav.Link href="https://www.linkedin.com/company/chicago-artist-guide">
-        <Image className="footer-logo" src={Linkedin} />
+        <FooterLogo src={Linkedin} />
       </Nav.Link>
       <Nav.Link href="mailto:contact@chicagoartistguide.org">
-        <Image className="footer-logo" src={Envelope} />
+        <FooterLogo src={Envelope} />
       </Nav.Link>
     </Nav>
   </Navbar>
 );
+
+const FooterLogo = styled(Image)`
+  height: 15px;
+  width: 15px;
+`;
 
 export default Footer;
