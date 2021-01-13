@@ -1,23 +1,33 @@
-import React from 'react';
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
-import styled from 'styled-components';
-import Home from './Home';
-import FAQ from './FAQ';
-import NotFound from './NotFound';
-import TOS from './TOS';
-import WhoWeAre from './WhoWeAre';
-import Login from './Login';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import { colors, fonts } from '../theme/styleVars';
-import '../styles/App.scss';
+import React from "react";
+import {
+  Redirect,
+  Route,
+  BrowserRouter as Router,
+  Switch
+} from "react-router-dom";
+import styled from "styled-components";
+import Home from "./Home";
+import FAQ from "./FAQ";
+import NotFound from "./NotFound";
+import TOS from "./TOS";
+import WhoWeAre from "./WhoWeAre";
+import Login from "./Login";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
+import { colors, fonts } from "../theme/styleVars";
+import "../styles/App.scss";
 
 const App = () => (
   <Router>
     <Section>
       <Header />
       <Switch>
-        <Route component={Home} exact path="/" />
+        <Route
+          exact
+          path="/"
+          render={() => <Redirect to={{ pathname: "/home" }} />}
+        />
+        <Route component={Home} exact path="/home" />
         <Route component={FAQ} exact path="/faq" />
         <Route component={TOS} exact path="/terms-of-service" />
         <Route component={WhoWeAre} exact path="/who-we-are" />
