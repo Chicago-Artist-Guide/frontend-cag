@@ -6,9 +6,9 @@ const colors = {
 };
 
 const fonts = {
-  lora: `'Lora', serif`,
-  montserrat: `Montserrat', sans-serif`,
-  mainFont: `'Open Sans', sans-serif`
+  lora: '"Lora", serif',
+  montserrat: '"Montserrat", sans-serif',
+  mainFont: '"Open Sans", sans-serif'
 };
 
 export { colors, fonts };
