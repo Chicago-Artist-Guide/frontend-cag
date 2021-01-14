@@ -7,10 +7,15 @@ const Team = (props: any) => {
 
   return (
     <MarginTeam key={key}>
-      <ShadowTeam className="shadow-team" roundedCircle src={image} width="100%" />
+      <ShadowTeam
+        className="shadow-team"
+        roundedCircle
+        src={image}
+        width="100%"
+      />
       <div className="text-center">
-        <h3 className="subtitle">{name}</h3>
-        <h3 className="subtitle">{pronoun}</h3>
+        <h3>{name}</h3>
+        <h4>({pronoun})</h4>
         <p>{subtitle}</p>
       </div>
     </MarginTeam>
@@ -18,14 +23,14 @@ const Team = (props: any) => {
 };
 
 const ShadowTeam = styled(Image)`
-    box-shadow: 2px 2px 10px rgba(0, 0, 29, .10);
-    margin-bottom: 10px;
-    margin-top: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
+  margin-bottom: 10px;
+  margin-top: 10px;
 `;
 
 const MarginTeam = styled.div`
-    margin-top: 50px;
-    margin-bottom: 50px;
+  margin-top: 50px;
+  margin-bottom: 50px;
 `;
 
 export default Team;

@@ -1,5 +1,10 @@
 import React from 'react';
-import { Route, BrowserRouter as Router, Switch } from 'react-router-dom';
+import {
+  Redirect,
+  Route,
+  BrowserRouter as Router,
+  Switch
+} from 'react-router-dom';
 import styled from 'styled-components';
 import Home from './Home';
 import FAQ from './FAQ';
@@ -17,7 +22,12 @@ const App = () => (
     <Section>
       <Header />
       <Switch>
-        <Route component={Home} exact path="/" />
+        <Route
+          exact
+          path="/"
+          render={() => <Redirect to={{ pathname: '/home' }} />}
+        />
+        <Route component={Home} exact path="/home" />
         <Route component={FAQ} exact path="/faq" />
         <Route component={TOS} exact path="/terms-of-service" />
         <Route component={WhoWeAre} exact path="/who-we-are" />

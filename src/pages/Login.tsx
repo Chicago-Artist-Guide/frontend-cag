@@ -22,9 +22,14 @@ const Login = () => (
             <Form.Control type="password" />
           </Form.Group>
           <Form.Text className="text-muted">
-            <p>Not a member yet? <a className="orangeText" href="/sign-up">Join Us</a></p>
+            <p>
+              Not a member yet?{' '}
+              <a className="orangeText" href="/sign-up">
+                Join Us
+              </a>
+            </p>
           </Form.Text>
-          <Button variant="primary" href="/" type="submit">
+          <Button href="/" type="submit" variant="primary">
             LOG IN
           </Button>
         </Form>
