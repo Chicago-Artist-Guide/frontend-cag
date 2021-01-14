@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import Image from "react-bootstrap/Image";
+import React from 'react';
+import styled from 'styled-components';
+import Image from 'react-bootstrap/Image';
 
 const Team = (props: any) => {
   const { image, key, name, pronoun, subtitle } = props;

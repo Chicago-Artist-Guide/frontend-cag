@@ -1,11 +1,11 @@
-import React from "react";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import PageContainer from "../components/layout/PageContainer";
-import { Title } from "../components/layout/Titles";
-import Red_Blob from "../images/red_blob.svg";
+import React from 'react';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button';
+import PageContainer from '../components/layout/PageContainer';
+import { Title } from '../components/layout/Titles';
+import Red_Blob from '../images/red_blob.svg';
 
 const Login = () => (
   <PageContainer>
@@ -23,7 +23,7 @@ const Login = () => (
           </Form.Group>
           <Form.Text className="text-muted">
             <p>
-              Not a member yet?{" "}
+              Not a member yet?{' '}
               <a className="orangeText" href="/sign-up">
                 Join Us
               </a>
