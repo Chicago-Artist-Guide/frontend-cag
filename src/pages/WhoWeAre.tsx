@@ -1,71 +1,77 @@
-import React from 'react';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import PageContainer from '../components/layout/PageContainer';
-import { Tagline, Title, TitleThree } from '../components/layout/Titles';
-import Team from '../components/WhoWeAre/Team';
-import SVGLayer from '../components/SVGLayer';
-import greenBlob from '../images/green_blob.svg';
-import WAWDance from '../images/waw_dance.svg';
-import Fayfer from '../images/who-we-are/fayfer-matt.jpg';
-import Geis from '../images/who-we-are/geis-leah.jpg';
-import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
-import Schutz from '../images/who-we-are/schutz-anna.png';
-import Voghel from '../images/who-we-are/voghel-alison.png';
-import Jewell from '../images/who-we-are/jewell-alexander.png';
-import Nicholson from '../images/who-we-are/nicholson-cody.jpg';
-import Zacks from '../images/who-we-are/zacks-steven.png';
+import React from "react";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import PageContainer from "../components/layout/PageContainer";
+import { Tagline, Title, TitleThree } from "../components/layout/Titles";
+import Team from "../components/WhoWeAre/Team";
+import SVGLayer from "../components/SVGLayer";
+import greenBlob from "../images/green_blob.svg";
+import WAWDance from "../images/waw_dance.svg";
+import Fayfer from "../images/who-we-are/fayfer-matt.jpg";
+import Geis from "../images/who-we-are/geis-leah.jpg";
+import Mccoy from "../images/who-we-are/mccoy-kayswanna.jpg";
+import Schutz from "../images/who-we-are/schutz-anna.png";
+import Voghel from "../images/who-we-are/voghel-alison.png";
+import Jewell from "../images/who-we-are/jewell-alexander.png";
+import Nicholson from "../images/who-we-are/nicholson-cody.jpg";
+import Zacks from "../images/who-we-are/zacks-steven.png";
 
 const WhoWeAre = () => {
   const team = [
     {
       id: 1,
-      name: 'ANNA SCHUTZ (SHE/HER)',
-      subtitle: 'Exective Director',
+      name: "ANNA SCHUTZ",
+      pronoun: "SHE/HER",
+      subtitle: "Exective Director",
       image: Schutz
     },
     {
       id: 2,
-      name: 'MATT FAYFER (HE/HIM)',
-      subtitle: 'Managing Director',
+      name: "MATT FAYFER",
+      pronoun: "HE/HIM",
+      subtitle: "Managing Director",
       image: Fayfer
     },
     {
       id: 3,
-      name: 'KAYSWANNA KEI MCCOY (SHE/HER)',
-      subtitle: 'Research Director',
+      name: "KAYSWANNA KEI MCCOY",
+      pronoun: "SHE/HER",
+      subtitle: "Development Director",
       image: Mccoy
     },
     {
       id: 4,
-      name: 'LEAH GEIS (SHE/HER)',
-      subtitle: 'Communications Director',
+      name: "LEAH GEIS",
+      pronoun: "SHE/HER",
+      subtitle: "Communications Director",
       image: Geis
     },
     {
       id: 5,
-      name: 'STEVEN ZACKS (HE/HIM)',
-      subtitle: 'Head of Platform',
+      name: "STEVEN ZACKS",
+      pronoun: "HE/HIM",
+      subtitle: "Head of Platform",
       image: Zacks
     },
     {
       id: 6,
-      name: 'ALISON VOGHEL (SHE/HER)',
-      subtitle: 'UI/UX Desginer',
+      name: "ALISON VOGHEL",
+      pronoun: "SHE/HER",
+      subtitle: "UI/UX Desginer",
       image: Voghel
     },
     {
       id: 7,
-      name: 'ALEX JEWELL',
-      pronoun: 'HE/HIM',
-      subtitle: 'Engineering Lead',
+      name: "ALEX JEWELL",
+      pronoun: "HE/HIM",
+      subtitle: "Engineering Lead",
       image: Jewell
     },
     {
       id: 8,
-      name: 'CODY NICHOLSON',
-      pronoun: 'HE/HIM',
-      subtitle: 'Engineering Lead',
+      name: "CODY NICHOLSON",
+      pronoun: "HE/HIM",
+      subtitle: "Engineering Lead",
       image: Nicholson
     }
   ];
@@ -83,7 +89,7 @@ const WhoWeAre = () => {
           </div>
           <div className="mt-5 mb-5">
             <TitleThree>ADVISORY BOARD</TitleThree>
-            <p>Luciana Mendez Gonzalez (any)</p> 
+            <p>Luciana Mendez Gonzalez (any)</p>
             <p>Zev Steinrock (he/him)</p>
           </div>
         </Col>
@@ -91,26 +97,45 @@ const WhoWeAre = () => {
           <SVGLayer blob={greenBlob} dancer={WAWDance} />
         </Col>
       </Row>
-      <TitleThree>THE TEAM</TitleThree>
+      <Row>
+        <Col lg={7}>
+          <TitleThree>THE TEAM</TitleThree>
+        </Col>
+      </Row>
       <Row>
         {team.map(who => (
           <Col key={who.id} md={3}>
-            <Team image={who.image} name={who.name} pronoun={who.pronoun} subtitle={who.subtitle} />
+            <Team
+              image={who.image}
+              name={who.name}
+              pronoun={who.pronoun}
+              subtitle={who.subtitle}
+            />
           </Col>
         ))}
+      </Row>
+      <Row className="margin-team">
+        <Col lg={7}>
+          <TitleThree>DEVELOPERS</TitleThree>
+          <p>Austin Oie (he/him)</p>
+          <p>Pedro Rebollar (he/him)</p>
+          <p>Kaitlyn Salemi (she/her)</p>
+          <p>Morgan Volland (she/her)</p>
+          <p>James Wilson (he/him)</p>
+        </Col>
       </Row>
       <Row className="margin-team">
         <Col lg={6}>
           <TitleThree>JOIN US</TitleThree>
           <p>
             We are still growing and looking for people to join our team. Email{" "}
-            <span className="orangeText">contact@chicagoartistguide.org</span> for more
-            information.
+            <span className="orangeText">contact@chicagoartistguide.org</span>{" "}
+            for more information.
           </p>
         </Col>
       </Row>
       <Title>Vision</Title>
-      <Tagline>Theatre made by anyone, for everyone</Tagline>
+      <Tagline>Theatre made by anyone, for everyone.</Tagline>
       <Title>Mission</Title>
       <Tagline>
         We provide a centralized place for Chicago theatre companies, individual
@@ -150,18 +175,20 @@ const WhoWeAre = () => {
           <ul>
             <li>
               <p>
-                CAG is committed to full transparency with regard to what data we collect from you, why we are collecting it, and, most importantly, what will and will not be displayed publicly for on your profile or elsewhere on our site. 
+                CAG is committed to full transparency with regard to what data
+                we collect from you, why we are collecting it, and, most
+                importantly, what will and will not be displayed publicly for on
+                your profile or elsewhere on our site.
               </p>
             </li>
             <li>
               <p>
-                CAG will never share your information without your explicit, affirmative consent.   
+                CAG will never share your information without your explicit,
+                affirmative consent.
               </p>
             </li>
             <li>
-              <p>
-                CAG will never sell your data to a third party.  
-              </p>
+              <p>CAG will never sell your data to a third party.</p>
             </li>
           </ul>
         </Col>
