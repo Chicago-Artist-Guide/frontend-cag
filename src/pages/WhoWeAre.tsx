@@ -12,7 +12,7 @@ import Geis from '../images/who-we-are/geis-leah.jpg';
 import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
 import Schutz from '../images/who-we-are/schutz-anna.png';
 import Voghel from '../images/who-we-are/voghel-alison.png';
-import Jewell from '../images/who-we-are/jewell-alexander.png';
+import Jewell from '../images/who-we-are/jewell-alexander.jpg';
 import Nicholson from '../images/who-we-are/nicholson-cody.jpg';
 import Zacks from '../images/who-we-are/zacks-steven.png';
 
@@ -86,6 +86,7 @@ const WhoWeAre = () => {
             <p>President | Anna Schutz (she/her)</p>
             <p>Secretary | Leah Geis (she/her)</p>
             <p>Treasurer | Matt Fayfer (he/him)</p>
+            <p>Member | Hallie Gordon (she/her)</p>
           </div>
           <div className="mt-5 mb-5">
             <TitleThree>ADVISORY BOARD</TitleThree>
@@ -129,7 +130,9 @@ const WhoWeAre = () => {
           <TitleThree>JOIN US</TitleThree>
           <p>
             We are still growing and looking for people to join our team. Email{' '}
-            <span className="orangeText">contact@chicagoartistguide.org</span>{' '}
+            <a href="mailto:contact@chicagoartistguide.org">
+              <span className="orangeText">contact@chicagoartistguide.org</span>
+            </a>{' '}
             for more information.
           </p>
         </Col>
