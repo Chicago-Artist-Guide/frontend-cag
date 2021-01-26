@@ -57,7 +57,7 @@ const WhoWeAre = () => {
       id: 6,
       name: 'ALISON VOGHEL',
       pronoun: 'SHE/HER',
-      subtitle: 'UI/UX Desginer',
+      subtitle: 'UI/UX Designer',
       image: Voghel
     },
     {
