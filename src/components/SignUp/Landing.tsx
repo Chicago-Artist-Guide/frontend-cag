@@ -16,9 +16,9 @@ const Card: React.FC<{
   text: string;
   input: any;
   key: string;
-}> = ({ blob, dancer, text, input, key }) => {
+}> = ({ blob, dancer, text, input }) => {
   return (
-    <Col className="shadow-identity-cards" key={key} lg="6">
+    <Col className="shadow-identity-cards" lg="6">
       <SVGLayer blob={blob} dancer={dancer} />
       <div>
         <p>{text}</p>
@@ -123,7 +123,7 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
         <Col lg="8">
           {landingStep === 2 && (
             <Button
-              onClick={navigation.previous}
+              onClick={() => setLandingStep(1)}
               type="button"
               variant="secondary"
             >
@@ -131,7 +131,7 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
             </Button>
           )}
           <Button
-            onClick={landingStep === 2 ? next : setLandingStep(2)}
+            onClick={landingStep === 2 ? next : () => setLandingStep(2)}
             type="button"
             variant="primary"
           >
