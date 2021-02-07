@@ -2,7 +2,9 @@ import React from 'react';
 import { useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
 import PageContainer from '../components/layout/PageContainer';
+import Landing from '../components/SignUp/Landing';
 // import all of the step components up here
 
 const steps = [
@@ -21,6 +23,8 @@ const steps = [
   { id: 'additionalSkills' },
   { id: 'awards' }
 ];
+
+const flatSteps = steps.map(step => step.id);
 
 const defaultData = {
   landingType: '',
@@ -72,30 +76,35 @@ const defaultData = {
 
 const SignUp = () => {
   const [formData, setForm] = useForm(defaultData);
-  const { step, navigation } = useStep({ initialStep: 0, steps });
-  const { id } = step;
+  const { step, navigation } = useStep({ initialStep: 0, steps: flatSteps });
+  //const { id } = step;
+
+  console.log(step, navigation);
 
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
 
-    switch (id) {
-      case 'landing':
-      case 'basics':
-      case 'privacy':
-      case 'actorInfo1':
-      case 'actorInfo2':
-      case 'offstageRoles':
-      case 'profilePhoto':
-      case 'demographics':
-      case 'profilePreview':
-      case 'training':
-      case 'credits':
-      case 'upcoming':
-      case 'additionalSkills':
-      case 'awards':
+    switch (step) {
+      case 'landing' as any:
+        returnStep = <Landing {...props} />;
+        break;
+      case 'basics' as any:
+      case 'privacy' as any:
+      case 'actorInfo1' as any:
+      case 'actorInfo2' as any:
+      case 'offstageRoles' as any:
+      case 'profilePhoto' as any:
+      case 'demographics' as any:
+      case 'profilePreview' as any:
+      case 'training' as any:
+      case 'credits' as any:
+      case 'upcoming' as any:
+      case 'additionalSkills' as any:
+      case 'awards' as any:
       default:
         returnStep = <></>;
+        break;
     }
 
     return returnStep;
@@ -105,6 +114,24 @@ const SignUp = () => {
     <PageContainer>
       <Row>
         <Col lg={8}>{stepFrame()}</Col>
+      </Row>
+      <Row>
+        <Col lg="8">
+          {step !== ('landing' as any) && (
+            <Button
+              onClick={navigation.previous}
+              type="button"
+              variant="secondary"
+            >
+              Back
+            </Button>
+          )}
+          {step !== ('landing' as any) && step !== ('awards' as any) && (
+            <Button onClick={navigation.next} type="button" variant="primary">
+              Continue
+            </Button>
+          )}
+        </Col>
       </Row>
     </PageContainer>
   );
