@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
-// import Landing from '../components/SignUp/Landing';
 // import all of the step components up here
 
 const steps = [
@@ -25,7 +24,7 @@ const steps = [
 
 const defaultData = {
   landingType: '',
-  landingPerformType: '',
+  landingPerformType: [],
 
   basicsFirstName: '',
   basicsLastName: '',
@@ -76,55 +75,27 @@ const SignUp = () => {
   const { step, navigation } = useStep({ initialStep: 0, steps });
   const { id } = step;
 
-  // what the basics component (step 2) does:
-  // gets currentStep, setCurrentStep, profileData, setProfileData
-  // on submit, it:
-  //  - validates anything that's required (like 18+ agreement)
-  //  - updates profileData using current profile data + changes (new step data)
-  //  - updates currentStep
-  // example of what this might look like:
-  /*
-
-    const [fields, setFields] = useState({ id: 'basics', ...profileData['flows'][0]['steps'][currentStep - 1] });
-    const updateField = (fieldName, value) => setFields({ ...fields, fieldName: value });
-    const onSubmit = () => {
-      // make sure validations are good based on fields
-      const newProfileData = { ...profileData };
-      newProfileData['flows'][0]['steps'][currentStep - 1] = { ...fields };
-      setProfileData(newProfileData);
-      setCurrentStep(currentStep + 1);
-    };
-
-  */
-
   const stepFrame = () => {
+    const props = { formData, setForm, navigation };
     let returnStep;
 
-    if (currentFlow === 1) {
-      switch (currentStep) {
-        case 2:
-        // returnStep 2
-        case 3:
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        // step 7
-        case 1:
-        default:
-          returnStep = <></>; // <Landing currentStep={currentStep} setCurrentStep={setCurrentStep} />;
-      }
-    } else {
-      switch (currentStep) {
-        case 2:
-        // returnStep 2
-        case 3:
-        case 4:
-        case 5:
-        case 1:
-        default:
-          returnStep = <></>; // <Training currentStep={currentStep} setCurrentStep={setCurrentStep} />;
-      }
+    switch (id) {
+      case 'landing':
+      case 'basics':
+      case 'privacy':
+      case 'actorInfo1':
+      case 'actorInfo2':
+      case 'offstageRoles':
+      case 'profilePhoto':
+      case 'demographics':
+      case 'profilePreview':
+      case 'training':
+      case 'credits':
+      case 'upcoming':
+      case 'additionalSkills':
+      case 'awards':
+      default:
+        returnStep = <></>;
     }
 
     return returnStep;
