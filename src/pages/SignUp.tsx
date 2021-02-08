@@ -77,9 +77,6 @@ const defaultData = {
 const SignUp = () => {
   const [formData, setForm] = useForm(defaultData);
   const { step, navigation } = useStep({ initialStep: 0, steps: flatSteps });
-  //const { id } = step;
-
-  console.log(step, navigation);
 
   const stepFrame = () => {
     const props = { formData, setForm, navigation };

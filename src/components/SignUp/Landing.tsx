@@ -4,6 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Button from 'react-bootstrap/Button';
+import { Tagline, Title } from '../layout/Titles';
 import SVGLayer from '../SVGLayer';
 import Individual_Dancer from '../../images/wwww-2.svg';
 import Individual_Dancer_2 from '../../images/wwww-2.svg';
@@ -13,7 +14,7 @@ import Red_blob from '../../images/red_blob.svg';
 const Card: React.FC<{
   blob: any;
   dancer: any;
-  text: string;
+  text: any;
   input: any;
   key: string;
 }> = ({ blob, dancer, text, input }) => {
@@ -42,7 +43,7 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       {
         blob: Green_blob,
         dancer: Individual_Dancer,
-        text: 'An Individual',
+        text: <span>An Individual</span>,
         input: (
           <ToggleButton
             checked={landingType === 'individual'}
@@ -56,7 +57,7 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       {
         blob: Red_blob,
         dancer: Individual_Dancer_2,
-        text: 'A Theatre Group',
+        text: <span>A Theatre Group</span>,
         input: (
           <ToggleButton
             checked={landingType === 'group'}
@@ -72,7 +73,11 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       {
         blob: Green_blob,
         dancer: Individual_Dancer,
-        text: 'On-Stage',
+        text: (
+          <span>
+            <strong>On-Stage</strong> (Actors, Singers, Dancers)
+          </span>
+        ),
         input: (
           <ToggleButton
             checked={landingPerformType === 'on-stage'}
@@ -86,7 +91,11 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       {
         blob: Red_blob,
         dancer: Individual_Dancer_2,
-        text: 'Off-Stage',
+        text: (
+          <span>
+            <strong>Off-Stage</strong> (Directors, Production Designers, Crew)
+          </span>
+        ),
         input: (
           <ToggleButton
             checked={landingPerformType === 'off-stage'}
@@ -103,12 +112,18 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
   return (
     <Container className="margin-container">
       <Row>
-        <div>
-          <h1 className="title">BUILD CONNECTIONS TODAY</h1>
-          <h2 className="tagline">
-            Join the Community today for new opportunities
-          </h2>
-        </div>
+        <Col lg={12}>
+          <Title>
+            {landingStep === 1
+              ? 'BUILD CONNECTIONS TODAY'
+              : 'WHERE DO YOU PERFORM?'}
+          </Title>
+          <Tagline>
+            {landingStep === 1
+              ? 'Join the Community today for new opportunities'
+              : 'On-Stage? Off-Stage? Both?'}
+          </Tagline>
+        </Col>
       </Row>
       <Row>
         <Col lg={8}>
