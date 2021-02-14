@@ -28,7 +28,8 @@ const flatSteps = steps.map(step => step.id);
 
 const defaultData = {
   landingType: '',
-  landingPerformType: [],
+  landingPerformTypeOnStage: false,
+  landingPerformTypeOffStage: false,
 
   basicsFirstName: '',
   basicsLastName: '',
@@ -130,6 +131,15 @@ const SignUp = () => {
               Continue
             </Button>
           )}
+        </Col>
+      </Row>
+      <Row>
+        <Col lg="2" />
+        <Col lg="8">
+          <p>
+            Step {steps.findIndex(s => s.id === (step as any)) + 1} of{' '}
+            {steps.length}
+          </p>
         </Col>
       </Row>
     </PageContainer>

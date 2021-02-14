@@ -11,32 +11,48 @@ import Individual_Dancer_2 from '../../images/wwww-2.svg';
 import Green_blob from '../../images/green_blob.svg';
 import Red_blob from '../../images/red_blob.svg';
 
-const Card: React.FC<{
-  blob: any;
-  dancer: any;
-  text: any;
-  input: any;
-  key: string;
-}> = ({ blob, dancer, text, input }) => {
-  return (
-    <Col className="shadow-identity-cards" lg="6">
-      <SVGLayer blob={blob} dancer={dancer} />
-      <div>
-        <p>{text}</p>
-        <div>{input}</div>
-      </div>
-    </Col>
-  );
-};
-
 const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
   setForm,
   formData,
   navigation
 }) => {
-  const { landingType, landingPerformType } = formData;
+  const {
+    landingType,
+    landingPerformTypeOnStage,
+    landingPerformTypeOffStage
+  } = formData;
   const { next } = navigation;
   const [landingStep, setLandingStep] = useState(1);
+
+  const Card: React.FC<{
+    blob: any;
+    dancer: any;
+    setForm: any;
+    target: any;
+    text: any;
+    input: any;
+    key: string;
+  }> = ({ blob, dancer, setForm, target, text, input }) => {
+    const setFormCheck = () => {
+      const newTarget = { ...target };
+
+      if (newTarget.type && newTarget.type === 'checkbox') {
+        newTarget.checked = !formData[newTarget.name];
+      }
+
+      setForm({ target: newTarget });
+    };
+
+    return (
+      <Col className="shadow-identity-cards" lg="6" onClick={setFormCheck}>
+        <SVGLayer blob={blob} dancer={dancer} />
+        <div>
+          <p>{text}</p>
+          <div>{input}</div>
+        </div>
+      </Col>
+    );
+  };
 
   const cards = [
     [
@@ -44,6 +60,11 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
         blob: Green_blob,
         dancer: Individual_Dancer,
         text: <span>An Individual</span>,
+        setForm,
+        target: {
+          name: 'landingType',
+          value: 'individual'
+        },
         input: (
           <ToggleButton
             checked={landingType === 'individual'}
@@ -58,6 +79,11 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
         blob: Red_blob,
         dancer: Individual_Dancer_2,
         text: <span>A Theatre Group</span>,
+        setForm,
+        target: {
+          name: 'landingType',
+          value: 'group'
+        },
         input: (
           <ToggleButton
             checked={landingType === 'group'}
@@ -78,12 +104,18 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
             <strong>On-Stage</strong> (Actors, Singers, Dancers)
           </span>
         ),
+        setForm,
+        target: {
+          name: 'landingPerformTypeOnStage',
+          type: 'checkbox',
+          value: 'on-stage'
+        },
         input: (
           <ToggleButton
-            checked={landingPerformType === 'on-stage'}
-            name="landingPerformType"
+            checked={landingPerformTypeOnStage}
+            name="landingPerformTypeOnStage"
             onChange={setForm}
-            type="radio"
+            type="checkbox"
             value="on-stage"
           />
         )
@@ -96,12 +128,18 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
             <strong>Off-Stage</strong> (Directors, Production Designers, Crew)
           </span>
         ),
+        setForm,
+        target: {
+          name: 'landingPerformTypeOffStage',
+          type: 'checkbox',
+          value: 'off-stage'
+        },
         input: (
           <ToggleButton
-            checked={landingPerformType === 'off-stage'}
-            name="landingPerformType"
+            checked={landingPerformTypeOffStage}
+            name="landingPerformTypeOffStage"
             onChange={setForm}
-            type="radio"
+            type="checkbox"
             value="off-stage"
           />
         )
@@ -128,7 +166,7 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       <Row>
         <Col lg={8}>
           <Row>
-            {cards[landingStep - 1].map((card, i) => {
+            {(cards as any)[landingStep - 1].map((card: any, i: any) => {
               return <Card {...card} key={`card-${landingStep}-${i}`} />;
             })}
           </Row>
@@ -146,7 +184,11 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
             </Button>
           )}
           <Button
-            onClick={landingStep === 2 ? next : () => setLandingStep(2)}
+            onClick={
+              landingStep === 2 || landingType === 'group'
+                ? next
+                : () => setLandingStep(2)
+            }
             type="button"
             variant="primary"
           >
