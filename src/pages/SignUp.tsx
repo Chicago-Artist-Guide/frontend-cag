@@ -83,8 +83,6 @@ const SignUp = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
 
-    console.log(step, formData);
-
     switch (step) {
       case 'landing' as any:
         returnStep = <Landing {...props} />;
