@@ -8,15 +8,22 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import LogoSrc from '../../images/logoPlain.svg';
-import Facebook from '../../images/icons-footer/facebook-f-brands.svg';
-import Linkedin from '../../images/icons-footer/linkedin-in-brands.svg';
-import Envelope from '../../images/icons-footer/envelope-regular.svg';
+import Facebook from '../../images/icons-footer/social_facebook.png';
+import Linkedin from '../../images/icons-footer/social_linkedin.png';
+import Envelope from '../../images/icons-footer/email.png';
+import Insta from '../../images/icons-footer/social_instagram.png';
+import Twitter from '../../images/icons-footer/social_twitter.png';
+import Medium from '../../images/icons-footer/social_medium.png';
 
 const Footer = () => (
   <Navbar className="justify-content-center" expand="sm" sticky="bottom">
     <FooterContainer fluid>
       <Row>
-        <Col lg="4">
+        <EdgeCols
+          md={{ order: 1, span: 3 }}
+          sm={{ order: 1, span: 4 }}
+          xs={{ span: 5 }}
+        >
           <Nav className="flex-column m-auto" fill>
             <Nav.Item>
               <Nav.Link as={Link} to="/">
@@ -29,9 +36,15 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
           </Nav>
-        </Col>
-        <MidCol lg="4">
-          <FooterCAGLogo alt="Chicago Artist Guide" src={LogoSrc} />
+        </EdgeCols>
+        <MidCol
+          md={{ span: 4, order: 2 }}
+          sm={{ order: 3, span: 6 }}
+          xs={{ order: 3, span: 12 }}
+        >
+          <div className="d-sm-none d-none d-md-block">
+            <FooterCAGLogo alt="Chicago Artist Guide" src={LogoSrc} />
+          </div>
           <Nav className="m-auto" fill>
             <Nav.Item>
               <Nav.Link href="http://www.facebook.com/chiartistguide">
@@ -44,22 +57,36 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
+              <Nav.Link href="https://www.instagram.com/chiartistguide">
+                <FooterLogo src={Insta} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="https://twitter.com/chiartistguide">
+                <FooterLogo src={Twitter} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link href="https://medium.com/chiartistguide">
+                <FooterLogo src={Medium} />
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
               <Nav.Link href="mailto:contact@chicagoartistguide.org">
                 <FooterLogo src={Envelope} />
               </Nav.Link>
             </Nav.Item>
           </Nav>
         </MidCol>
-        <Col lg="4">
+        <EdgeCols
+          md={{ order: 3, span: 3 }}
+          sm={{ order: 2, span: 4 }}
+          xs={{ span: 5 }}
+        >
           <Nav className="flex-column m-auto" fill>
             <Nav.Item>
               <Nav.Link as={Link} to="/faq">
                 FAQ
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={Link} to="#">
-                DONATE
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
@@ -68,7 +95,7 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
           </Nav>
-        </Col>
+        </EdgeCols>
       </Row>
     </FooterContainer>
   </Navbar>
@@ -77,6 +104,7 @@ const Footer = () => (
 const FooterContainer = styled(Container)`
   .row {
     flex: 1;
+    justify-content: center;
   }
 `;
 
@@ -94,8 +122,18 @@ const FooterCAGLogo = styled(Image)`
 `;
 
 const FooterLogo = styled(Image)`
-  height: 15px;
-  width: 15px;
+  height: 23px;
+  width: 23px;
+  padding: 0;
+  margin: 0;
+`;
+
+const EdgeCols = styled(Col)`
+  a {
+    text-align: Left;
+    font-size: 12px;
+    padding: 5px 0;
+  }
 `;
 
 export default Footer;
