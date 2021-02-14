@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
 import PageContainer from '../components/layout/PageContainer';
+import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
 // import all of the step components up here
 
@@ -78,6 +78,7 @@ const defaultData = {
 const SignUp = () => {
   const [formData, setForm] = useForm(defaultData);
   const { step, navigation } = useStep({ initialStep: 0, steps: flatSteps });
+  const [landingStep, setLandingStep] = useState(1);
 
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
@@ -85,7 +86,13 @@ const SignUp = () => {
 
     switch (step) {
       case 'landing' as any:
-        returnStep = <Landing {...props} />;
+        returnStep = (
+          <Landing
+            {...props}
+            landingStep={landingStep}
+            setLandingStep={setLandingStep}
+          />
+        );
         break;
       case 'basics' as any:
       case 'privacy' as any:
@@ -113,33 +120,16 @@ const SignUp = () => {
       <Row>
         <Col lg={8}>{stepFrame()}</Col>
       </Row>
-      <Row>
-        <Col lg="8">
-          {step !== ('landing' as any) && (
-            <Button
-              onClick={navigation.previous}
-              type="button"
-              variant="secondary"
-            >
-              Back
-            </Button>
-          )}
-          {step !== ('landing' as any) && step !== ('awards' as any) && (
-            <Button onClick={navigation.next} type="button" variant="primary">
-              Continue
-            </Button>
-          )}
-        </Col>
-      </Row>
-      <Row>
-        <Col lg="2" />
-        <Col lg="8">
-          <p>
-            Step {steps.findIndex(s => s.id === (step as any)) + 1} of{' '}
-            {steps.length}
-          </p>
-        </Col>
-      </Row>
+      {formData.landingType !== '' && (
+        <SignUpFooter
+          landingStep={landingStep}
+          landingType={formData.landingType}
+          navigation={navigation}
+          setLandingStep={setLandingStep}
+          step={step}
+          steps={steps}
+        />
+      )}
     </PageContainer>
   );
 };

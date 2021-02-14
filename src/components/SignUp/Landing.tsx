@@ -1,38 +1,33 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
-import Button from 'react-bootstrap/Button';
+import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
-import SVGLayer from '../SVGLayer';
-import Individual_Dancer from '../../images/wwww-2.svg';
-import Individual_Dancer_2 from '../../images/wwww-2.svg';
 import Green_blob from '../../images/green_blob.svg';
 import Red_blob from '../../images/red_blob.svg';
 
-const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
-  setForm,
-  formData,
-  navigation
-}) => {
+const Landing: React.FC<{
+  setForm: any;
+  formData: any;
+  landingStep: any;
+  setLandingStep: any;
+}> = ({ setForm, formData, landingStep, setLandingStep }) => {
   const {
     landingType,
     landingPerformTypeOnStage,
     landingPerformTypeOffStage
   } = formData;
-  const { next } = navigation;
-  const [landingStep, setLandingStep] = useState(1);
 
   const Card: React.FC<{
     blob: any;
-    dancer: any;
     setForm: any;
     target: any;
     text: any;
     input: any;
     key: string;
-  }> = ({ blob, dancer, setForm, target, text, input }) => {
+  }> = ({ blob, setForm, target, text, input }) => {
     const setFormCheck = () => {
       const newTarget = { ...target };
 
@@ -45,7 +40,7 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
 
     return (
       <Col className="shadow-identity-cards" lg="6" onClick={setFormCheck}>
-        <SVGLayer blob={blob} dancer={dancer} />
+        <Image alt="" src={blob} />
         <div>
           <p>{text}</p>
           <div>{input}</div>
@@ -58,7 +53,6 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
     [
       {
         blob: Green_blob,
-        dancer: Individual_Dancer,
         text: <span>An Individual</span>,
         setForm,
         target: {
@@ -77,7 +71,6 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       },
       {
         blob: Red_blob,
-        dancer: Individual_Dancer_2,
         text: <span>A Theatre Group</span>,
         setForm,
         target: {
@@ -98,7 +91,6 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
     [
       {
         blob: Green_blob,
-        dancer: Individual_Dancer,
         text: (
           <span>
             <strong>On-Stage</strong> (Actors, Singers, Dancers)
@@ -122,7 +114,6 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
       },
       {
         blob: Red_blob,
-        dancer: Individual_Dancer_2,
         text: (
           <span>
             <strong>Off-Stage</strong> (Directors, Production Designers, Crew)
@@ -170,30 +161,6 @@ const Landing: React.FC<{ setForm: any; formData: any; navigation: any }> = ({
               return <Card {...card} key={`card-${landingStep}-${i}`} />;
             })}
           </Row>
-        </Col>
-      </Row>
-      <Row>
-        <Col lg="8">
-          {landingStep === 2 && (
-            <Button
-              onClick={() => setLandingStep(1)}
-              type="button"
-              variant="secondary"
-            >
-              Back
-            </Button>
-          )}
-          <Button
-            onClick={
-              landingStep === 2 || landingType === 'group'
-                ? next
-                : () => setLandingStep(2)
-            }
-            type="button"
-            variant="primary"
-          >
-            Continue
-          </Button>
         </Col>
       </Row>
     </Container>
