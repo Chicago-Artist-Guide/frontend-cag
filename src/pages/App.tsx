@@ -12,6 +12,7 @@ import NotFound from './NotFound';
 import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
 import Login from './Login';
+import SignUp from './SignUp';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import { colors, fonts } from '../theme/styleVars';
@@ -32,6 +33,7 @@ const App = () => (
         <Route component={TOS} exact path="/terms-of-service" />
         <Route component={WhoWeAre} exact path="/who-we-are" />
         <Route component={Login} exact path="/login" />
+        <Route component={SignUp} exact path="/sign-up" />
         <Route component={NotFound} />
       </Switch>
       <Footer />
