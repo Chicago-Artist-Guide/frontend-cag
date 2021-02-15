@@ -1,13 +1,14 @@
 import React from 'react';
-import '../../styles/Footer.scss';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { media } from 'styled-bootstrap-grid';
 import Container from 'react-bootstrap/Container';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import FooterBg from '../../images/footer-background.png';
 import LogoSrc from '../../images/logoPlain.svg';
 import Facebook from '../../images/icons-footer/social_facebook.png';
 import Linkedin from '../../images/icons-footer/social_linkedin.png';
@@ -17,7 +18,7 @@ import Twitter from '../../images/icons-footer/social_twitter.png';
 import Medium from '../../images/icons-footer/social_medium.png';
 
 const Footer = () => (
-  <Navbar
+  <FooterNavbar
     className="justify-content-center nav-container"
     expand="sm"
     sticky="bottom"
@@ -43,7 +44,7 @@ const Footer = () => (
           </Nav>
         </EdgeCols>
         <MidCol
-          md={{ span: 4, order: 2 }}
+          md={{ order: 2, span: 4 }}
           sm={{ order: 3, span: 6 }}
           xs={{ order: 3, span: 12 }}
         >
@@ -82,6 +83,7 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
           </Nav>
+          <p>&copy; Chicago Artist Guide 2021</p>
         </MidCol>
         <EdgeCols
           md={{ order: 3, span: 3 }}
@@ -103,8 +105,26 @@ const Footer = () => (
         </EdgeCols>
       </Row>
     </FooterContainer>
-  </Navbar>
+  </FooterNavbar>
 );
+
+const FooterNavbar = styled(Navbar)`
+  ${media.smaller`
+    background-image: url(${FooterBg});
+    background-position: top left -50px;
+    background-repeat: no-repeat;
+    background-size: 150% auto;
+    min-height: 200px;
+    padding-top: 50px;
+
+    .navbar-nav.icon-list {
+      flex: 1;
+      flex-direction: row;
+      justify-content: space-between;
+      width: 75%;
+    }
+  `}
+`;
 
 const FooterContainer = styled(Container)`
   .row {
@@ -129,6 +149,11 @@ const FooterCAGLogo = styled(Image)`
 const FooterLogo = styled(Image)`
   height: 30px;
   width: 30px;
+
+  ${media.sm`
+    height: 25px;
+    width: 25px;
+  `}
 `;
 
 const EdgeCols = styled(Col)`
