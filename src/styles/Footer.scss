@@ -1,0 +1,22 @@
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins/_breakpoints";
+
+.nav-container {
+    @include media-breakpoint-down(sm) {
+        height: 200px;
+        background-image: url('../images/icons-footer/footer-background.svg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: bottom 35% right 50%;
+    }
+}
+
+.icon-list {
+    @include media-breakpoint-down(sm) {
+        .nav-item img {
+            width: 25px;
+            height: 25px;
+        }
+    }
+}

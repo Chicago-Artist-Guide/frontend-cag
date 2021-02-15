@@ -1,4 +1,5 @@
 import React from 'react';
+import '../../styles/Footer.scss';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
@@ -16,7 +17,11 @@ import Twitter from '../../images/icons-footer/social_twitter.png';
 import Medium from '../../images/icons-footer/social_medium.png';
 
 const Footer = () => (
-  <Navbar className="justify-content-center" expand="sm" sticky="bottom">
+  <Navbar
+    className="justify-content-center nav-container"
+    expand="sm"
+    sticky="bottom"
+  >
     <FooterContainer fluid>
       <Row>
         <EdgeCols
@@ -45,7 +50,7 @@ const Footer = () => (
           <div className="d-sm-none d-none d-md-block">
             <FooterCAGLogo alt="Chicago Artist Guide" src={LogoSrc} />
           </div>
-          <Nav className="m-auto" fill>
+          <Nav className="m-auto icon-list" fill>
             <Nav.Item>
               <Nav.Link href="http://www.facebook.com/chiartistguide">
                 <FooterLogo src={Facebook} />
@@ -122,10 +127,8 @@ const FooterCAGLogo = styled(Image)`
 `;
 
 const FooterLogo = styled(Image)`
-  height: 23px;
-  width: 23px;
-  padding: 0;
-  margin: 0;
+  height: 30px;
+  width: 30px;
 `;
 
 const EdgeCols = styled(Col)`
