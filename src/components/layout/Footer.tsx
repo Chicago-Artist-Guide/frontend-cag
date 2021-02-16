@@ -83,7 +83,7 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
           </Nav>
-          <p>&copy; Chicago Artist Guide 2021</p>
+          <p className="copy-text">&copy; Chicago Artist Guide 2021</p>
         </MidCol>
         <EdgeCols
           md={{ order: 3, span: 3 }}
@@ -109,6 +109,9 @@ const Footer = () => (
 );
 
 const FooterNavbar = styled(Navbar)`
+  .copy-text {
+    font-size: 9pt;
+  }
   ${media.smaller`
     background-image: url(${FooterBg});
     background-position: top left -50px;
@@ -116,7 +119,10 @@ const FooterNavbar = styled(Navbar)`
     background-size: 150% auto;
     min-height: 200px;
     padding-top: 50px;
-
+    
+    .copy-text {
+      font-size: 7pt;
+    }
     .navbar-nav.icon-list {
       flex: 1;
       flex-direction: row;
