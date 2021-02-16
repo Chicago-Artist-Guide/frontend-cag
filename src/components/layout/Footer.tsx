@@ -23,7 +23,7 @@ const Footer = () => (
     expand="sm"
     sticky="bottom"
   >
-    <FooterContainer fluid>
+    <FooterContainer className="container" fluid>
       <Row>
         <EdgeCols
           md={{ order: 1, span: 3 }}
