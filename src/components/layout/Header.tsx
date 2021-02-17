@@ -7,7 +7,7 @@ import { colors } from '../../theme/styleVars';
 import { ReactComponent as Logo } from '../../images/logoPlain.svg';
 
 const Header = () => (
-  <WhiteBackNav className="white-back nav container" expand="lg" sticky="top">
+  <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">
     <Navbar.Brand href="/">
       <Logo height="60px" width="70px" />
     </Navbar.Brand>
