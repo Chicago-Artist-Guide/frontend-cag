@@ -109,9 +109,6 @@ const Footer = () => (
 );
 
 const FooterNavbar = styled(Navbar)`
-  .copy-text {
-    font-size: 9pt;
-  }
   ${media.smaller`
     background-image: url(${FooterBg});
     background-position: top left -50px;
@@ -120,9 +117,6 @@ const FooterNavbar = styled(Navbar)`
     min-height: 200px;
     padding-top: 50px;
     
-    .copy-text {
-      font-size: 7pt;
-    }
     .navbar-nav.icon-list {
       flex: 1;
       flex-direction: row;
