@@ -80,7 +80,9 @@ const ButtonCol = styled(Col)`
 `;
 
 const Pagination = styled.ul`
+  align-items: center;
   display: flex;
+  height: 100%;
   justify-content: space-between;
   margin: 0;
   padding: 0;
