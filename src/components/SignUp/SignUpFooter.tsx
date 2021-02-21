@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import { colors } from '../../theme/styleVars';
 
 const SignUpFooter: React.FC<{
   landingStep: any;
@@ -86,18 +87,18 @@ const Pagination = styled.ul`
   width: 100%;
 
   li {
-    border: 1px solid #82b29a;
+    border: 1px solid ${colors.darkGreen};
     border-radius: 50%;
     height: 21px;
     list-style-type: none;
     width: 21px;
 
     &.complete {
-      background: rgba(130, 178, 154, 0.5);
+      background: ${colors.darkGreen}50;
     }
 
     &.active {
-      background: rgba(130, 178, 154, 1);
+      background: ${colors.darkGreen};
     }
   }
 `;
