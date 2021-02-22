@@ -23,7 +23,7 @@ const Footer = () => (
     expand="sm"
     sticky="bottom"
   >
-    <FooterContainer fluid>
+    <FooterContainer>
       <Row>
         <EdgeCols
           md={{ order: 1, span: 3 }}
@@ -83,7 +83,7 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
           </Nav>
-          <p>&copy; Chicago Artist Guide 2021</p>
+          <CopyText>&copy; Chicago Artist Guide 2021</CopyText>
         </MidCol>
         <EdgeCols
           md={{ order: 3, span: 3 }}
@@ -116,7 +116,7 @@ const FooterNavbar = styled(Navbar)`
     background-size: 150% auto;
     min-height: 200px;
     padding-top: 50px;
-
+    
     .navbar-nav.icon-list {
       flex: 1;
       flex-direction: row;
@@ -162,6 +162,14 @@ const EdgeCols = styled(Col)`
     font-size: 12px;
     padding: 5px 0;
   }
+`;
+
+const CopyText = styled.p`
+  font-size: 9px;
+
+  ${media.smaller`
+    font-size: 7px;
+  `}
 `;
 
 export default Footer;
