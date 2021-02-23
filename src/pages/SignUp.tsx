@@ -43,7 +43,8 @@ const defaultData = {
   actorInfo1LGBTQ: '',
   actorInfo1Ethnicities: [],
 
-  actorInfo2Height: [],
+  actorInfo2HeightFt: 0,
+  actorInfo2HeightIn: 0,
   actorInfo2AgeRanges: [],
   actorInfo2Gender: '',
   actorInfo2GenderRoles: [],
@@ -65,7 +66,7 @@ const defaultData = {
 
   training: [], // { institution, locationCity, locationState, locationCountry, degree, yearStart, yearEnd, notes }
 
-  credits: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
+  pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
   upcoming: [], // { title, synopsis, industryCode, url, imageUrl }
 
