@@ -1,7 +1,9 @@
 import React from 'react';
+import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
+import { colors } from '../../theme/styleVars';
 
 const SignUpFooter: React.FC<{
   landingStep: any;
@@ -26,10 +28,11 @@ const SignUpFooter: React.FC<{
     (step === ('landing' as any) &&
       (landingStep === 2 || landingType === 'group')) ||
     step !== ('landing' as any);
+  const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
 
   return (
-    <Row>
-      <Col lg="2">
+    <PageFooterRow>
+      <Col lg="4">
         {showBackButton && (
           <Button
             onClick={backButtonLandingStep ? () => setLandingStep(1) : previous}
@@ -40,13 +43,18 @@ const SignUpFooter: React.FC<{
           </Button>
         )}
       </Col>
-      <Col lg="8">
-        <p>
-          Step {steps.findIndex((s: any) => s.id === (step as any)) + 1} of{' '}
-          {steps.length}
-        </p>
+      <Col lg="4">
+        <Pagination>
+          {steps.map((s: any, i: number) => (
+            <li
+              className={
+                i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
+              }
+            />
+          ))}
+        </Pagination>
       </Col>
-      <Col lg="2">
+      <ButtonCol lg="4">
         {step !== ('awards' as any) && (
           <Button
             onClick={navigationNext ? next : () => setLandingStep(2)}
@@ -56,9 +64,45 @@ const SignUpFooter: React.FC<{
             Continue
           </Button>
         )}
-      </Col>
-    </Row>
+      </ButtonCol>
+    </PageFooterRow>
   );
 };
+
+const PageFooterRow = styled(Row)`
+  padding-top: 100px;
+`;
+
+const ButtonCol = styled(Col)`
+  align-items: center;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const Pagination = styled.ul`
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+
+  li {
+    border: 1px solid ${colors.darkGreen};
+    border-radius: 50%;
+    height: 21px;
+    list-style-type: none;
+    width: 21px;
+
+    &.complete {
+      background: ${colors.darkGreen}50;
+    }
+
+    &.active {
+      background: ${colors.darkGreen};
+    }
+  }
+`;
 
 export default SignUpFooter;
