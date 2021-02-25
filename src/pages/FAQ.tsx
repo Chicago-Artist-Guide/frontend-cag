@@ -54,7 +54,7 @@ const FAQ = () => {
           <Title>FREQUENTLY ASKED QUESTIONS</Title>
           <Tagline>Find out what we're all about</Tagline>
           {questions.map(qa => (
-            <div className="margin-team">
+            <div className="margin-team" key={qa.id}>
               <TitleThree>{qa.question}</TitleThree>
               <p>{qa.answer}</p>
             </div>
