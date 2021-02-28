@@ -7,6 +7,7 @@ import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
 // import all of the step components up here
 
+// Establish our steps
 const steps = [
   { id: 'landing' },
   { id: 'basics' },
@@ -24,8 +25,11 @@ const steps = [
   { id: 'awards' }
 ];
 
+// flatten our step id's into a single array
 const flatSteps = steps.map(step => step.id);
 
+// establish our form data structure
+// assign defaults
 const defaultData = {
   landingType: '',
   landingPerformTypeOnStage: false,
@@ -77,10 +81,11 @@ const defaultData = {
 };
 
 const SignUp = () => {
-  const [formData, setForm] = useForm(defaultData);
-  const { step, navigation } = useStep({ initialStep: 0, steps: flatSteps });
-  const [landingStep, setLandingStep] = useState(1);
+  const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
+  const { step, navigation } = useStep({ initialStep: 0, steps: flatSteps }); // defaults for our steps
+  const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
+  // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
@@ -121,11 +126,12 @@ const SignUp = () => {
       <Row>
         <Col lg={8}>{stepFrame()}</Col>
       </Row>
-      {formData.landingType !== '' && (
+      {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
         <SignUpFooter
           landingStep={landingStep}
           landingType={formData.landingType}
           navigation={navigation}
+          setForm={setForm}
           setLandingStep={setLandingStep}
           step={step}
           steps={steps}

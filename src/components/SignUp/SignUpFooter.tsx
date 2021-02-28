@@ -9,6 +9,7 @@ const SignUpFooter: React.FC<{
   landingStep: any;
   landingType: string;
   navigation: any;
+  setForm: any;
   setLandingStep: any;
   step: any;
   steps: any;
@@ -16,10 +17,26 @@ const SignUpFooter: React.FC<{
   landingStep,
   landingType,
   navigation,
+  setForm,
   setLandingStep,
   step,
   steps
 }) => {
+  /*
+    SPECIAL CASES:
+    1. We don't want a back button unless we're:
+      - Past the Landing step OR
+      - Past the 1st step of the Landing step
+    2. We don't want to show our global navigation next button unless we're:
+      - Past the Landing step OR
+      - Past the 1st step of the Landing step OR
+      - A Theater Group was selected (meaning no 2nd internal Landing step)
+      - Not on the Privacy Step (we have a different callback for Privacy in order to set agreement)
+    3. We need to show different button text for the Privacy Agreement step 
+    4. We need to set our form field "privacyAgreement" to true if we Agree & Continue in the Privacy step
+    5. We don't want to show our Next button if we're on the last step (Awards)
+      - We'll show "Go to Profile" when we tackle that step in development
+  */
   const { next, previous } = navigation;
   const showBackButton = step !== ('landing' as any) || landingStep === 2;
   const backButtonLandingStep =
@@ -27,8 +44,19 @@ const SignUpFooter: React.FC<{
   const navigationNext =
     (step === ('landing' as any) &&
       (landingStep === 2 || landingType === 'group')) ||
-    step !== ('landing' as any);
+    (step !== ('landing' as any) && step !== ('privacy' as any));
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
+  const continueText =
+    step === ('privacy' as any) ? 'Accept & Continue' : 'Continue';
+  const privacyAgree = () => {
+    const target = {
+      name: 'privacyAgreement',
+      value: true
+    };
+
+    setForm({ target });
+    next();
+  };
 
   return (
     <PageFooterRow>
@@ -57,11 +85,17 @@ const SignUpFooter: React.FC<{
       <ButtonCol lg="4">
         {step !== ('awards' as any) && (
           <Button
-            onClick={navigationNext ? next : () => setLandingStep(2)}
+            onClick={
+              navigationNext
+                ? next
+                : step === ('privacy' as any)
+                ? privacyAgree
+                : () => setLandingStep(2)
+            }
             type="button"
             variant="primary"
           >
-            Continue
+            {continueText}
           </Button>
         )}
       </ButtonCol>
