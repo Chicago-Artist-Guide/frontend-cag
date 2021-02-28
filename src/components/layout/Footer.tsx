@@ -164,11 +164,11 @@ const EdgeCols = styled(Col)`
   }
 `;
 
-const CopyText = styled.p`
-  font-size: 9px;
+const CopyText = styled.div`
+  font-size: 10px;
 
   ${media.smaller`
-    font-size: 7px;
+    font-size: 9px;
   `}
 `;
 

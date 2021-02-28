@@ -15,11 +15,13 @@ import Login from './Login';
 import SignUp from './SignUp';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
+import ScrollToTop from '../components/ScrollToTop';
 import { colors, fonts } from '../theme/styleVars';
 import '../styles/App.scss';
 
 const App = () => (
   <Router>
+    <ScrollToTop />
     <Section>
       <Header />
       <Switch>
