@@ -15,7 +15,7 @@ const Team = (props: any) => {
       />
       <div className="text-center">
         <h3>{name}</h3>
-        <h4>({pronoun})</h4>
+        <h5>({pronoun})</h5>
         <p>{subtitle}</p>
       </div>
     </MarginTeam>
