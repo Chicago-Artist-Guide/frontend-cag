@@ -9,7 +9,7 @@ const WhoSquare = (props: any) => {
   return (
     <ShadowContainer key={key}>
       <SVGLayer blob={blob} dancer={dancer} />
-      <h3>{title}</h3>
+      <ShadowTitle>{title}</ShadowTitle>
       <ul>
         {whoWeArray.map((who: any) => (
           <li key={who.id}>
@@ -27,6 +27,11 @@ const ShadowContainer = styled.div`
   background-color: ${colors.bodyBg};
   padding: 20px 40px 20px 40px;
   height: 100%;
+`;
+
+const ShadowTitle = styled.h3`
+  margin: 0;
+  padding: 0;
 `;
 
 export default WhoSquare;
