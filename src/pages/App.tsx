@@ -44,11 +44,6 @@ const App = () => (
 );
 
 const Section = styled.section`
-  p {
-    font-family: ${fonts.mainFont};
-    font-size: 16px;
-  }
-
   .orangeText {
     color: ${colors.orange};
     font-weight: bold;
@@ -65,6 +60,72 @@ const Section = styled.section`
   .margin-team {
     margin-bottom: 50px;
     margin-top: 50px;
+  }
+
+  h1 {
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 56px;
+    color: ${colors.secondaryFontColor};
+  }
+
+  h2 {
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 36px;
+    color: ${colors.mainFont};
+  }
+
+  h3 {
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 56px;
+    color: ${colors.mainFont};
+  }
+
+  h4 {
+    font-family: ${fonts.lora};
+    font-weight: 400;
+    font-style: italic;
+    font-size: 24px;
+    line-height: 28px;
+    letter-spacing: 0.01em;
+    color: ${colors.italicColor};
+  }
+
+  h5 {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 20px;
+  }
+
+  h6 {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  p {
+    font-family: ${fonts.mainFont};
+    font-weight: 400;
+    size: 16px;
+    line-height: 24px;
+    letter-spacing: 0.5px;
+  }
+
+  .button {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    letter-spacing: 0.1em;
+  }
+
+  .caption {
+    font-family: ${fonts.mainFont};
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 14px;
+    letter-spacing: 0.4px;
   }
 `;
 

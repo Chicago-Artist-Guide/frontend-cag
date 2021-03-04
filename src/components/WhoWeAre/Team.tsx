@@ -34,8 +34,8 @@ const MarginTeam = styled.div`
 `;
 
 const TeamName = styled.h3`
-  margin: 0px;
-  padding: 0px;
+  margin: 0;
+  padding: 0;
 `;
 
 export default Team;
