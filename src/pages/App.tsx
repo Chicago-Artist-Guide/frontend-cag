@@ -63,69 +63,69 @@ const Section = styled.section`
   }
 
   h1 {
-    font-weight: 700;
-    font-size: 48px;
-    line-height: 56px;
     color: ${colors.secondaryFontColor};
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 56px;
   }
 
   h2 {
-    font-weight: 700;
-    font-size: 28px;
-    line-height: 36px;
     color: ${colors.mainFont};
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 36px;
   }
 
   h3 {
-    font-weight: 500;
-    font-size: 24px;
-    line-height: 56px;
     color: ${colors.mainFont};
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 56px;
   }
 
   h4 {
-    font-family: ${fonts.lora};
-    font-weight: 400;
-    font-style: italic;
-    font-size: 24px;
-    line-height: 28px;
-    letter-spacing: 0.01em;
     color: ${colors.italicColor};
+    font-family: ${fonts.lora};
+    font-size: 24px;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 28px;
   }
 
   h5 {
-    font-weight: 500;
     font-size: 18px;
+    font-weight: 500;
     line-height: 20px;
   }
 
   h6 {
-    font-weight: 400;
     font-size: 16px;
+    font-weight: 400;
     line-height: 24px;
   }
 
   p {
     font-family: ${fonts.mainFont};
     font-weight: 400;
-    size: 16px;
-    line-height: 24px;
     letter-spacing: 0.5px;
+    line-height: 24px;
+    size: 16px;
   }
 
   .button {
-    font-weight: 700;
     font-size: 14px;
-    line-height: 16px;
+    font-weight: 700;
     letter-spacing: 0.1em;
+    line-height: 16px;
   }
 
   .caption {
     font-family: ${fonts.mainFont};
-    font-size: 12px;
     font-weight: 400;
-    line-height: 14px;
+    font-size: 12px;
     letter-spacing: 0.4px;
+    line-height: 14px;
   }
 `;
 
