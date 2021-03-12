@@ -22,17 +22,14 @@ const WhoSquare = (props: any) => {
 };
 
 const ShadowContainer = styled.div`
-  box-shadow: 2px 2px 10px rgba(0,0,29,.10);
+  box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
   background-color: ${colors.bodyBg};
   padding: 20px 40px 20px 40px;
   height: 100%;
 `;
 
-const ShadowTitle = styled.h4`
-  font-family: $open-sans;
-  font-size: 20px;
-  font-weight: 600;
+const ShadowTitle = styled.h3`
   margin: 0;
   padding: 0;
 `;
