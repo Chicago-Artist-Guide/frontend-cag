@@ -2,82 +2,42 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
-import { Tagline, Title, TitleThree } from '../components/layout/Titles';
-import Team from '../components/WhoWeAre/Team';
-import SVGLayer from '../components/SVGLayer';
-import greenBlob from '../images/green_blob.svg';
-import WAWDance from '../images/waw_dance.svg';
-import Fayfer from '../images/who-we-are/fayfer-matt.jpg';
-import Geis from '../images/who-we-are/geis-leah.jpg';
-import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
-import Schutz from '../images/who-we-are/schutz-anna.png';
-import Voghel from '../images/who-we-are/voghel-alison.png';
-import Jewell from '../images/who-we-are/jewell-alexander.jpg';
-import Nicholson from '../images/who-we-are/nicholson-cody.jpg';
-import Zacks from '../images/who-we-are/zacks-steven.png';
+//import Team from '../components/WhoWeAre/Team';
+import Departments from '../components/WhoWeAre/Departments';
+//import SVGLayer from '../components/SVGLayer';
+//import greenBlob from '../images/green_blob.svg';
+//import WAWDance from '../images/waw_dance.svg';
+import styled from 'styled-components';
+//import Fayfer from '../images/who-we-are/fayfer-matt.jpg';
+//import Geis from '../images/who-we-are/geis-leah.jpg';
+//import Mccoy from '../images/who-we-are/mccoy-kayswanna.jpg';
+//import Schutz from '../images/who-we-are/schutz-anna.png';
+//import Voghel from '../images/who-we-are/voghel-alison.png';
+//import Jewell from '../images/who-we-are/jewell-alexander.jpg';
+//import Nicholson from '../images/who-we-are/nicholson-cody.jpg';
+//import Zacks from '../images/who-we-are/zacks-steven.png';
+//import Accordion from 'react-bootstrap/Accordion';
+//import Card from 'react-bootstrap/Card';
 
 const WhoWeAre = () => {
-  const team = [
-    {
-      id: 1,
-      name: 'ANNA SCHUTZ',
-      pronoun: 'SHE/HER',
-      subtitle: 'Exective Director',
-      image: Schutz
-    },
-    {
-      id: 2,
-      name: 'MATT FAYFER',
-      pronoun: 'HE/HIM',
-      subtitle: 'Managing Director',
-      image: Fayfer
-    },
-    {
-      id: 3,
-      name: 'KAYSWANNA KEI MCCOY',
-      pronoun: 'SHE/HER',
-      subtitle: 'Development Director',
-      image: Mccoy
-    },
-    {
-      id: 4,
-      name: 'LEAH GEIS',
-      pronoun: 'SHE/HER',
-      subtitle: 'Communications Director',
-      image: Geis
-    },
-    {
-      id: 5,
-      name: 'STEVEN ZACKS',
-      pronoun: 'HE/HIM',
-      subtitle: 'Head of Platform',
-      image: Zacks
-    },
-    {
-      id: 6,
-      name: 'ALISON VOGHEL',
-      pronoun: 'SHE/HER',
-      subtitle: 'UI/UX Designer',
-      image: Voghel
-    },
-    {
-      id: 7,
-      name: 'ALEX JEWELL',
-      pronoun: 'HE/HIM',
-      subtitle: 'Engineering Lead',
-      image: Jewell
-    },
-    {
-      id: 8,
-      name: 'CODY NICHOLSON',
-      pronoun: 'HE/HIM',
-      subtitle: 'Engineering Lead',
-      image: Nicholson
-    }
-  ];
-
   return (
     <PageContainer>
+      <Row>
+        <Col>
+          <h1>THE TEAM</h1>
+
+          <BoardOfDirectors className="mt-5">
+            <h2>BOARD OF DIRECTORS</h2>
+            <p>President | Anna Schutz (she/her)</p>
+            <p>Secretary | Rossana Quixito (she/her)</p>
+            <p>Treasurer | Matt Fayfer (he/him)</p>
+          </BoardOfDirectors>
+
+          <Departments />
+        </Col>
+      </Row>
+
+      {/*
       <Row>
         <Col lg={7}>
           <Title>WHO WE ARE</Title>
@@ -196,8 +156,16 @@ const WhoWeAre = () => {
           </ul>
         </Col>
       </Row>
+            */}
     </PageContainer>
   );
 };
+
+const BoardOfDirectors = styled.div`
+  p {
+    padding: 0;
+    margin: 0;
+  }
+`;
 
 export default WhoWeAre;
