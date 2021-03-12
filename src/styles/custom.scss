@@ -1,14 +1,18 @@
+@import "~bootstrap/scss/bootstrap";
+
 $body-bg: #F8F9FA;
 $montserrat: 'Montserrat', sans-serif;
 $lora: 'Lora', serif;
 $open-sans: 'Open Sans', sans-serif;
 $main-font-color: #0C2028;
+$body-bg: #F8F9FA;
 $primary: #82B29A;
 $orange: #E17B60;
 
 body {
-    font-family: $montserrat;
     color: $main-font-color;
+    letter-spacing: 0.07em;
+    background-color: $body-bg;
 }
 
 .margin-identity-cards {
@@ -17,4 +21,3 @@ body {
     margin-bottom: 50px;
 }
 
-@import "~bootstrap/scss/bootstrap";

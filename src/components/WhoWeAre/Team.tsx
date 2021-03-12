@@ -14,8 +14,8 @@ const Team = (props: any) => {
         width="100%"
       />
       <div className="text-center">
-        <h3>{name}</h3>
-        <h4>({pronoun})</h4>
+        <TeamName>{name}</TeamName>
+        <h5>({pronoun})</h5>
         <p>{subtitle}</p>
       </div>
     </MarginTeam>
@@ -31,6 +31,11 @@ const ShadowTeam = styled(Image)`
 const MarginTeam = styled.div`
   margin-top: 50px;
   margin-bottom: 50px;
+`;
+
+const TeamName = styled.h3`
+  margin: 0;
+  padding: 0;
 `;
 
 export default Team;
