@@ -5,6 +5,7 @@ import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
 import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
+import Privacy from '../components/SignUp/Privacy';
 // import all of the step components up here
 
 // Establish our steps
@@ -102,6 +103,8 @@ const SignUp = () => {
         break;
       case 'basics' as any:
       case 'privacy' as any:
+        returnStep = <Privacy {...props} />;
+        break;
       case 'actorInfo1' as any:
       case 'actorInfo2' as any:
       case 'offstageRoles' as any:
