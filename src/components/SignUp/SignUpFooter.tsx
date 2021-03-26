@@ -92,8 +92,8 @@ const SignUpFooter: React.FC<{
                 ? privacyAgree
                 : () => setLandingStep(2)
             }
+            style={{ background: colors.darkGreen, border: colors.darkGreen }}
             type="button"
-            variant="primary"
           >
             {continueText}
           </Button>

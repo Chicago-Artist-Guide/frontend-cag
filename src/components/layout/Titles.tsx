@@ -17,6 +17,11 @@ const Tagline = (props: any) => {
   return <TaglineH2 {...rest}>{children}</TaglineH2>;
 };
 
+const TaglineTwo = (props: any) => {
+  const { children, ...rest } = props;
+  return <TaglineH3 {...rest}>{children}</TaglineH3>;
+};
+
 const TitleThree = (props: any) => {
   const { children, ...rest } = props;
   return <TitleH3 {...rest}>{children}</TitleH3>;
@@ -31,10 +36,14 @@ const TitleH2 = styled.h2`
 const TaglineH2 = styled(TitleH2 as any)`
   margin-bottom: 40px;
 `;
+const TaglineH3 = styled(TitleH2 as any)`
+  margin-top: 40px;
+  font-size: 0.8rem;
+`;
 
 const TitleH3 = styled.h3`
   font-size: 1.25rem;
   font-weight: bold;
 `;
 
-export { Tagline, Title, TitleThree, TitleTwo };
+export { Tagline, TaglineTwo, Title, TitleThree, TitleTwo };

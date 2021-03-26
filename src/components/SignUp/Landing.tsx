@@ -5,10 +5,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
-import { Tagline, Title } from '../layout/Titles';
+import { Tagline, TaglineTwo, Title } from '../layout/Titles';
 import { colors } from '../../theme/styleVars';
 import Green_blob from '../../images/green_blob.svg';
 import Red_blob from '../../images/red_blob.svg';
+import Blue_blob from '../../images/blue_blob.svg';
 
 const Landing: React.FC<{
   setForm: any;
@@ -125,10 +126,10 @@ const Landing: React.FC<{
         )
       },
       {
-        blob: Red_blob,
+        blob: Blue_blob,
         text: (
           <span>
-            <strong>Off-Stage</strong> (Directors, Production Designers, Crew)
+            <strong>Off-Stage</strong> (Directors, Designers, Crew)
           </span>
         ),
         setForm,
@@ -174,6 +175,15 @@ const Landing: React.FC<{
             })}
           </Row>
         </Col>
+      </Row>
+      <Row>
+        <TaglineTwo>
+          {'Already a member?'}
+          <a href="/login" style={{ color: colors.orange }}>
+            {' '}
+            Log in here{' '}
+          </a>
+        </TaglineTwo>
       </Row>
     </Container>
   );
