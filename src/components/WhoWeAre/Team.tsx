@@ -1,18 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
 import Image from 'react-bootstrap/Image';
+//import Card from 'react-bootstrap/Card';
 
 const Team = (props: any) => {
   const { image, key, name, pronoun, subtitle } = props;
 
   return (
     <MarginTeam key={key}>
-      <ShadowTeam
-        className="shadow-team"
-        roundedCircle
-        src={image}
-        width="100%"
-      />
+      <ShadowTeam className="shadow-team" rounded src={image} width="100%" />
       <div className="text-center">
         <TeamName>{name}</TeamName>
         <h5>({pronoun})</h5>

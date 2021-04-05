@@ -2,13 +2,8 @@ import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
-//import Team from '../components/WhoWeAre/Team';
 import Departments from '../components/WhoWeAre/Departments';
-//import SVGLayer from '../components/SVGLayer';
-//import greenBlob from '../images/green_blob.svg';
-//import WAWDance from '../images/waw_dance.svg';
 import styled from 'styled-components';
-//import Card from 'react-bootstrap/Card';
 
 const WhoWeAre = () => {
   return (
