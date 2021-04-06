@@ -11,16 +11,20 @@ const Department = () => {
     <AccordionSection className="container">
       <Accordion defaultActiveKey="0">
         <Accordion.Toggle className="accordionHeader row" eventKey="0">
-          <h2>LEADERSHIP</h2>
+          <h2>BOARD OF DIRECTORS</h2>
         </Accordion.Toggle>
         <Accordion.Collapse eventKey="0">
           <Row>
             {bios['board'].map(who => (
-              <Col md={3}>
+              <Col lg={4} md={6} sm={8}>
                 <Team
+                  bio={who.bio}
                   image={who.image}
+                  key={who.key}
+                  linkedin={who.linkedin}
                   name={who.name}
                   pronoun={who.pronouns}
+                  role={who.role}
                 />
               </Col>
             ))}
@@ -33,11 +37,15 @@ const Department = () => {
         <Accordion.Collapse eventKey="1">
           <Row>
             {bios['operations'].map(who => (
-              <Col md={3}>
+              <Col lg={4} md={6} sm={8}>
                 <Team
+                  bio={who.bio}
                   image={who.image}
+                  key={who.key}
+                  linkedin={who.linkedin}
                   name={who.name}
                   pronoun={who.pronouns}
+                  role={who.role}
                 />
               </Col>
             ))}
@@ -45,16 +53,20 @@ const Department = () => {
         </Accordion.Collapse>
 
         <Accordion.Toggle className="accordionHeader row" eventKey="2">
-          <h2>DEVELOPMENT</h2>
+          <h2>SITE DEVELOPMENT TEAM</h2>
         </Accordion.Toggle>
         <Accordion.Collapse eventKey="2">
           <Row>
             {bios['technical'].map(who => (
-              <Col md={3}>
+              <Col lg={4} md={6} sm={8}>
                 <Team
+                  bio={who.bio}
                   image={who.image}
+                  key={who.key}
+                  linkedin={who.linkedin}
                   name={who.name}
                   pronoun={who.pronouns}
+                  role={who.role}
                 />
               </Col>
             ))}
