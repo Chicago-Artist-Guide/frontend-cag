@@ -4,41 +4,49 @@ import Image from 'react-bootstrap/Image';
 import Card from 'react-bootstrap/Card';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-//import Accordion from 'react-bootstrap/Accordion';
+import Accordion from 'react-bootstrap/Accordion';
 import LinkedinLogo from '../../images/icons-footer/social_linkedin.png';
 import Nav from 'react-bootstrap/Nav';
 import { media } from 'styled-bootstrap-grid';
 
 const Team = (props: any) => {
-  const { bio, image, key, linkedin, name, pronoun, role } = props;
+  const { bio, id, image, linkedin, name, pronoun, role } = props;
 
   return (
-    <MarginTeam key={key}>
-      <PersonCard>
-        <Row>
-          <Col md={5}>
-            <PersonImg src={image} variant="top" />
-          </Col>
-          <Col md={7}>
-            <Card.Body style={{ padding: 0 }}>
-              <PersonName>{name}</PersonName>
-              <PersonPronouns>{pronoun}</PersonPronouns>
-              <PersonRole>{role}</PersonRole>
-              {linkedin != null && (
-                <Nav.Link
-                  href={`https://www.linkedin.com/in/${linkedin}`}
-                  style={{ padding: 0 }}
-                  target="_blank"
-                >
-                  <FooterLogo src={LinkedinLogo} />
-                </Nav.Link>
-              )}
-
-              {bio}
-            </Card.Body>
-          </Col>
-        </Row>
-      </PersonCard>
+    <MarginTeam key={id}>
+      <Accordion defaultActiveKey="0">
+        <PersonCard>
+          <Row>
+            <Col md={5}>
+              <PersonImg src={image} variant="top" />
+            </Col>
+            <Col md={7}>
+              <Card.Body style={{ padding: 0 }}>
+                <PersonName>{name}</PersonName>
+                <PersonPronouns>{pronoun}</PersonPronouns>
+                <PersonRole>{role}</PersonRole>
+                {linkedin != null && (
+                  <Nav.Link
+                    href={`https://www.linkedin.com/in/${linkedin}`}
+                    style={{ padding: 0 }}
+                    target="_blank"
+                  >
+                    <FooterLogo src={LinkedinLogo} />
+                  </Nav.Link>
+                )}
+                <Accordion.Toggle eventKey={id}>View Bio</Accordion.Toggle>
+              </Card.Body>
+            </Col>
+          </Row>
+          <Accordion.Collapse eventKey={id}>
+            <Row>
+              <Col>
+                <p>{bio}</p>
+              </Col>
+            </Row>
+          </Accordion.Collapse>
+        </PersonCard>
+      </Accordion>
     </MarginTeam>
   );
 };

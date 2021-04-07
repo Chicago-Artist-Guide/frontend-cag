@@ -1,92 +1,93 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Accordion from 'react-bootstrap/Accordion';
 import bios from './bios';
 import Team from './Team';
+import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { colors } from '../../theme/styleVars';
+
+const sections = [bios['board'], bios['operations'], bios['technical']];
 
 const Department = () => {
+  const [activeID, setActiveID] = useState(0);
+  function toggleActive(id: any) {
+    if (activeID === id) {
+      setActiveID(-1);
+    } else {
+      setActiveID(id);
+    }
+  }
+
   return (
     <AccordionSection className="container">
-      <Accordion defaultActiveKey="0">
-        <Accordion.Toggle className="accordionHeader row" eventKey="0">
-          <h2>BOARD OF DIRECTORS</h2>
-        </Accordion.Toggle>
-        <Accordion.Collapse eventKey="0">
-          <Row>
-            {bios['board'].map(who => (
-              <Col lg={4} md={6} sm={8}>
-                <Team
-                  bio={who.bio}
-                  image={who.image}
-                  key={who.key}
-                  linkedin={who.linkedin}
-                  name={who.name}
-                  pronoun={who.pronouns}
-                  role={who.role}
-                />
-              </Col>
-            ))}
-          </Row>
-        </Accordion.Collapse>
-
-        <Accordion.Toggle className="accordionHeader row" eventKey="1">
-          <h2>BUSINESS OPERATIONS</h2>
-        </Accordion.Toggle>
-        <Accordion.Collapse eventKey="1">
-          <Row>
-            {bios['operations'].map(who => (
-              <Col lg={4} md={6} sm={8}>
-                <Team
-                  bio={who.bio}
-                  image={who.image}
-                  key={who.key}
-                  linkedin={who.linkedin}
-                  name={who.name}
-                  pronoun={who.pronouns}
-                  role={who.role}
-                />
-              </Col>
-            ))}
-          </Row>
-        </Accordion.Collapse>
-
-        <Accordion.Toggle className="accordionHeader row" eventKey="2">
-          <h2>SITE DEVELOPMENT TEAM</h2>
-        </Accordion.Toggle>
-        <Accordion.Collapse eventKey="2">
-          <Row>
-            {bios['technical'].map(who => (
-              <Col lg={4} md={6} sm={8}>
-                <Team
-                  bio={who.bio}
-                  image={who.image}
-                  key={who.key}
-                  linkedin={who.linkedin}
-                  name={who.name}
-                  pronoun={who.pronouns}
-                  role={who.role}
-                />
-              </Col>
-            ))}
-          </Row>
-        </Accordion.Collapse>
-
-        {console.log(bios['board'])}
-        {console.log(bios['operations'])}
-        {console.log(bios['technical'])}
-      </Accordion>
+      {sections.map((sect, index) => (
+        <Accordion defaultActiveKey="0" key={index}>
+          <Accordion.Toggle
+            className="accordionHeader row"
+            eventKey={index.toString()}
+            onClick={() => toggleActive(index)}
+          >
+            <h2 className="sectionText">
+              {index === 0
+                ? 'BOARD OF DIRECTORS'
+                : index === 1
+                ? 'BUSINESS OPERATIONS'
+                : 'SITE DEVELOPMENT TEAM'}
+              <FontAwesomeIcon
+                icon={activeID === index ? faAngleUp : faAngleDown}
+                pull="right"
+                size="lg"
+              />
+            </h2>
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey={index.toString()}>
+            <Row>
+              {sect.map(who => (
+                <Col key={who.id} lg={4} md={6} sm={8}>
+                  <Team
+                    bio={who.bio}
+                    id={who.id}
+                    image={who.image}
+                    linkedin={who.linkedin}
+                    name={who.name}
+                    pronoun={who.pronouns}
+                    role={who.role}
+                  />
+                </Col>
+              ))}
+            </Row>
+          </Accordion.Collapse>
+          <HrLine />
+        </Accordion>
+      ))}
     </AccordionSection>
   );
 };
 
 const AccordionSection = styled.div`
-  margin-top: 2em;
+  padding: 0;
+  margin-top: 1rem;
   .accordionHeader {
     border: none;
     background: none;
     padding: 0;
+    margin: 0;
   }
+  .sectiontext: hover {
+    color: ${colors.darkGreen};
+  }
+  button: focus {
+    outline: none;
+  }
+`;
+
+const HrLine = styled.hr`
+  border-width: 2px;
+  border-color: ${colors.orange};
+  padding: 0;
+  width: 100%;
 `;
 export default Department;
