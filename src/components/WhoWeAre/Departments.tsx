@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import Masonry from 'react-masonry-css';
 import Accordion from 'react-bootstrap/Accordion';
 import bios from './bios';
 import Team from './Team';
@@ -9,10 +8,18 @@ import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { colors } from '../../theme/styleVars';
 
-const sections = [bios['board'], bios['operations'], bios['technical']];
-
 const Department = () => {
+  const sections = [bios['board'], bios['operations'], bios['technical']];
+
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 2,
+    700: 2,
+    500: 1
+  };
+
   const [activeID, setActiveID] = useState(0);
+
   function toggleActive(id: any) {
     if (activeID === id) {
       setActiveID(-1);
@@ -30,7 +37,7 @@ const Department = () => {
             eventKey={index.toString()}
             onClick={() => toggleActive(index)}
           >
-            <h2 className="sectionText">
+            <h2 className="section-text">
               {index === 0
                 ? 'BOARD OF DIRECTORS'
                 : index === 1
@@ -44,21 +51,23 @@ const Department = () => {
             </h2>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey={index.toString()}>
-            <Row>
+            <Masonry
+              breakpointCols={breakpointColumnsObj}
+              className="my-masonry-grid"
+              columnClassName="my-masonry-grid_column"
+            >
               {sect.map(who => (
-                <Col key={who.id} lg={4} md={6} sm={8}>
-                  <Team
-                    bio={who.bio}
-                    id={who.id}
-                    image={who.image}
-                    linkedin={who.linkedin}
-                    name={who.name}
-                    pronoun={who.pronouns}
-                    role={who.role}
-                  />
-                </Col>
+                <Team
+                  bio={who.bio}
+                  id={who.id}
+                  image={who.image}
+                  linkedin={who.linkedin}
+                  name={who.name}
+                  pronoun={who.pronouns}
+                  role={who.role}
+                />
               ))}
-            </Row>
+            </Masonry>
           </Accordion.Collapse>
           <HrLine />
         </Accordion>
@@ -76,11 +85,23 @@ const AccordionSection = styled.div`
     padding: 0;
     margin: 0;
   }
-  .sectiontext: hover {
+  .section-text: hover {
     color: ${colors.darkGreen};
   }
   button: focus {
     outline: none;
+  }
+  .my-masonry-grid {
+    display: flex;
+    margin-left: -30px;
+    width: auto;
+  }
+  .my-masonry-grid_column {
+    padding-left: 30px;
+    background-clip: padding-box;
+  }
+  .my-masonry-grid_column > div {
+    margin-bottom: 30px;
   }
 `;
 

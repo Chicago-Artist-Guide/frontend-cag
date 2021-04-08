@@ -8,6 +8,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import LinkedinLogo from '../../images/icons-footer/social_linkedin.png';
 import Nav from 'react-bootstrap/Nav';
 import { media } from 'styled-bootstrap-grid';
+import { colors } from '../../theme/styleVars';
 
 const Team = (props: any) => {
   const { bio, id, image, linkedin, name, pronoun, role } = props;
@@ -16,11 +17,11 @@ const Team = (props: any) => {
     <MarginTeam key={id}>
       <Accordion defaultActiveKey="0">
         <PersonCard>
-          <Row>
+          <TopRow className="align-items-center justify-content-center">
             <Col md={5}>
-              <PersonImg src={image} variant="top" />
+              <PersonImg fluid src={image} />
             </Col>
-            <Col md={7}>
+            <Col md={7} style={{ padding: 0 }}>
               <Card.Body style={{ padding: 0 }}>
                 <PersonName>{name}</PersonName>
                 <PersonPronouns>{pronoun}</PersonPronouns>
@@ -31,19 +32,24 @@ const Team = (props: any) => {
                     style={{ padding: 0 }}
                     target="_blank"
                   >
-                    <FooterLogo src={LinkedinLogo} />
+                    <BioLogo src={LinkedinLogo} />
                   </Nav.Link>
                 )}
-                <Accordion.Toggle eventKey={id}>View Bio</Accordion.Toggle>
+
+                {bio != null && (
+                  <Accordion.Toggle className="button" eventKey={id}>
+                    View Bio
+                  </Accordion.Toggle>
+                )}
               </Card.Body>
             </Col>
-          </Row>
+          </TopRow>
           <Accordion.Collapse eventKey={id}>
-            <Row>
-              <Col>
-                <p>{bio}</p>
-              </Col>
-            </Row>
+            <BottomRow>
+              <BioCol>
+                <BioText className="caption">{bio}</BioText>
+              </BioCol>
+            </BottomRow>
           </Accordion.Collapse>
         </PersonCard>
       </Accordion>
@@ -53,10 +59,25 @@ const Team = (props: any) => {
 
 const PersonCard = styled(Card)`
   border-radius: 5px;
-  width: 20rem;
+  width: 22rem;
+  box-shadow: 5px 5px 5px ${colors.lightGrey};
+  border: none;
+  .button {
+    border: none;
+  }
 `;
 
-const PersonImg = styled(Card.Img)`
+const TopRow = styled(Row)`
+  height: 9rem;
+  margin: 2px;
+`;
+
+const BottomRow = styled(Row)`
+  height: 11rem;
+  margin: 2px;
+`;
+
+const PersonImg = styled(Image)`
   border-radius: 5px;
 `;
 
@@ -67,6 +88,8 @@ const MarginTeam = styled.div`
 
 const PersonName = styled.h5`
   font-weight: 700;
+  font-size: 14px;
+  line-height: 16px;
   text-transform: uppercase;
   padding: 0;
   margin: 0;
@@ -74,20 +97,57 @@ const PersonName = styled.h5`
 
 const PersonPronouns = styled.p`
   margin: 0;
+  padding: 0;
+  font-size: 14px;
+  color: ${colors.darkGrey};
 `;
 
 const PersonRole = styled.h5`
   margin: 0;
+  padding: 0;
+  font-size: 14px;
+  color: ${colors.darkGrey};
 `;
 
-const FooterLogo = styled(Image)`
-  height: 30px;
-  width: 30px;
-  padding: 0;
+const BioLogo = styled(Image)`
+  height: 25px;
+  width: 25px;
+  margin-bottom: 5px;
 
   ${media.sm`
-    height: 25px;
-    width: 25px;
+    height: 20px;
+    width: 20px;
   `}
+`;
+
+const BioCol = styled(Col)`
+  height: auto;
+`;
+
+const BioText = styled.p`
+  font-size: 13px;
+  line-height: 17px;
+  height: 11rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+  white-space: pre-wrap;
+
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: ${colors.lightGrey};
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: ${colors.peach};
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: ${colors.scrollOrange};
+  }
 `;
 export default Team;

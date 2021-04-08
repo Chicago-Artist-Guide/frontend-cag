@@ -77,6 +77,7 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .button {
+    font-family: ${fonts.montserrat};
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.1em;
