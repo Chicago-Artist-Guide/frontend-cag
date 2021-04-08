@@ -18,10 +18,10 @@ const Team = (props: any) => {
       <Accordion defaultActiveKey="0">
         <PersonCard>
           <TopRow className="align-items-center justify-content-center">
-            <Col md={5}>
+            <Col md={5} xs={5}>
               <PersonImg fluid src={image} />
             </Col>
-            <Col md={7} style={{ padding: 0 }}>
+            <Col md={7} style={{ padding: 0 }} xs={7}>
               <Card.Body style={{ padding: 0 }}>
                 <PersonName>{name}</PersonName>
                 <PersonPronouns>{pronoun}</PersonPronouns>
@@ -35,7 +35,6 @@ const Team = (props: any) => {
                     <BioLogo src={LinkedinLogo} />
                   </Nav.Link>
                 )}
-
                 {bio != null && (
                   <Accordion.Toggle className="button" eventKey={id}>
                     View Bio
@@ -64,7 +63,18 @@ const PersonCard = styled(Card)`
   border: none;
   .button {
     border: none;
+    box-shadow: 2px 2px 2px ${colors.lightGrey};
+    background: ${colors.lightestGrey};
+    border-radius: 20px;
+    padding: 10px 15px;
   }
+  .button: hover {
+    background: ${colors.lightGrey};
+    box-shadow: inset 2px 2px 2px ${colors.darkGrey};
+  }
+  ${media.smaller`
+    width: auto;
+  `}
 `;
 
 const TopRow = styled(Row)`
@@ -99,13 +109,15 @@ const PersonPronouns = styled.p`
   margin: 0;
   padding: 0;
   font-size: 14px;
+  line-height: 16px;
   color: ${colors.darkGrey};
 `;
 
 const PersonRole = styled.h5`
   margin: 0;
   padding: 0;
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 15px;
   color: ${colors.darkGrey};
 `;
 

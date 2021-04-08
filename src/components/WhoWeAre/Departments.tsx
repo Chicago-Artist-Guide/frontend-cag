@@ -7,6 +7,7 @@ import Team from './Team';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { colors } from '../../theme/styleVars';
+import { media } from 'styled-bootstrap-grid';
 
 const Department = () => {
   const sections = [bios['board'], bios['operations'], bios['technical']];
@@ -33,7 +34,7 @@ const Department = () => {
       {sections.map((sect, index) => (
         <Accordion defaultActiveKey="0" key={index}>
           <Accordion.Toggle
-            className="accordionHeader row"
+            className="accordion-header row"
             eventKey={index.toString()}
             onClick={() => toggleActive(index)}
           >
@@ -44,6 +45,7 @@ const Department = () => {
                 ? 'BUSINESS OPERATIONS'
                 : 'SITE DEVELOPMENT TEAM'}
               <FontAwesomeIcon
+                className="bod-icon"
                 icon={activeID === index ? faAngleUp : faAngleDown}
                 pull="right"
                 size="lg"
@@ -79,11 +81,16 @@ const Department = () => {
 const AccordionSection = styled.div`
   padding: 0;
   margin-top: 1rem;
-  .accordionHeader {
+  .accordion-header {
     border: none;
     background: none;
     padding: 0;
     margin: 0;
+  }
+  .section-text {
+    ${media.smaller`
+      text-align: left;
+    `}
   }
   .section-text: hover {
     color: ${colors.darkGreen};
