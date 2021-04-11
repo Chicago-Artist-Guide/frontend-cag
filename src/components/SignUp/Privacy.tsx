@@ -39,9 +39,8 @@ const Privacy: React.FC<{
               View our full terms and privacy policy
             </Caption>
           </Link>
-          <br></br>
           <PrivacyPar>
-            Tap the button below to agree with our terms and privacy policy.
+            Tap the button below to agree with our terms and privacy policy
           </PrivacyPar>
         </Col>
         <ImageCol lg="4">
@@ -81,11 +80,11 @@ const PrivacyPar = styled.p`
   }
 `;
 
-const Caption = styled.em`
+const Caption = styled.p`
   font-family: ${fonts.lora};
+  font-style: italics;
   font-size: 14px;
-  margin-top: 26px;
-  margin-bottom: 18px;
+  padding-top: 26px;
   font-color: #4DS0S5;
 `;
 
