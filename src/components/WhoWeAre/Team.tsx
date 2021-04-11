@@ -11,7 +11,7 @@ import { media } from 'styled-bootstrap-grid';
 import { colors } from '../../theme/styleVars';
 
 const Team = (props: any) => {
-  const { bio, id, image, linkedin, name, pronoun, role } = props;
+  const { bio, id, image, linkedin, name, pronouns, role } = props;
 
   return (
     <MarginTeam key={id}>
@@ -24,7 +24,7 @@ const Team = (props: any) => {
             <Col md={7} style={{ padding: 0 }} xs={7}>
               <Card.Body style={{ padding: 0 }}>
                 <PersonName>{name}</PersonName>
-                <PersonPronouns>{pronoun}</PersonPronouns>
+                <PersonPronouns>{pronouns}</PersonPronouns>
                 <PersonRole>{role}</PersonRole>
                 {linkedin != null && (
                   <Nav.Link
@@ -46,7 +46,9 @@ const Team = (props: any) => {
           <Accordion.Collapse eventKey={id}>
             <BottomRow>
               <BioCol>
-                <BioText className="caption">{bio}</BioText>
+                <BioText className="caption">
+                  {name} ({pronouns}) - {bio}
+                </BioText>
               </BioCol>
             </BottomRow>
           </Accordion.Collapse>
@@ -61,16 +63,17 @@ const PersonCard = styled(Card)`
   width: 22rem;
   box-shadow: 5px 5px 5px ${colors.lightGrey};
   border: none;
+
   .button {
     border: none;
-    box-shadow: 2px 2px 2px ${colors.lightGrey};
+    box-shadow: 2px 2px 5px ${colors.lightGrey};
     background: ${colors.lightestGrey};
     border-radius: 20px;
     padding: 10px 15px;
   }
   .button: hover {
     background: ${colors.lightGrey};
-    box-shadow: inset 2px 2px 2px ${colors.darkGrey};
+    box-shadow: inset 1px 1px 2px ${colors.darkGrey};
   }
   ${media.smaller`
     width: auto;
@@ -147,17 +150,14 @@ const BioText = styled.p`
   ::-webkit-scrollbar {
     width: 10px;
   }
-
   ::-webkit-scrollbar-track {
     background: ${colors.lightGrey};
     border-radius: 10px;
   }
-
   ::-webkit-scrollbar-thumb {
     background: ${colors.peach};
     border-radius: 10px;
   }
-
   ::-webkit-scrollbar-thumb:hover {
     background: ${colors.scrollOrange};
   }

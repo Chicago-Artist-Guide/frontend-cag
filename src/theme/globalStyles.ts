@@ -2,6 +2,9 @@ import { createGlobalStyle } from 'styled-components';
 import { colors, fonts } from './styleVars';
 
 const GlobalStyle = createGlobalStyle`
+  h1, h2, h3, h5, h6, button {
+    font-family: ${fonts.montserrat};
+  }
   .orangeText {
     color: ${colors.orange};
     font-weight: bold;
@@ -22,7 +25,6 @@ const GlobalStyle = createGlobalStyle`
 
   h1 {
     color: ${colors.secondaryFontColor};
-    font-family: ${fonts.montserrat};
     font-size: 48px;
     font-weight: 700;
     line-height: 56px;
@@ -30,7 +32,6 @@ const GlobalStyle = createGlobalStyle`
 
   h2 {
     color: ${colors.mainFont};
-    font-family: ${fonts.montserrat};
     font-size: 28px;
     font-weight: 700;
     line-height: 36px;
@@ -38,7 +39,6 @@ const GlobalStyle = createGlobalStyle`
 
   h3 {
     color: ${colors.mainFont};
-    font-family: ${fonts.montserrat};
     font-size: 24px;
     font-weight: 500;
     line-height: 56px;
@@ -55,14 +55,12 @@ const GlobalStyle = createGlobalStyle`
   }
 
   h5 {
-    font-family: ${fonts.montserrat};
     font-size: 18px;
     font-weight: 500;
     line-height: 20px;
   }
 
   h6 {
-    font-family: ${fonts.montserrat};
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;
@@ -77,7 +75,6 @@ const GlobalStyle = createGlobalStyle`
   }
 
   .button {
-    font-family: ${fonts.montserrat};
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.1em;

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import Masonry from 'react-masonry-css';
 import Accordion from 'react-bootstrap/Accordion';
-import bios from './bios';
-import Team from './Team';
+import Masonry from 'react-masonry-css';
+import styled from 'styled-components';
+import { media } from 'styled-bootstrap-grid';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { colors } from '../../theme/styleVars';
-import { media } from 'styled-bootstrap-grid';
+import bios from './bios';
+import Team from './Team';
 
 const Department = () => {
   const sections = [bios['board'], bios['operations'], bios['technical']];
@@ -21,13 +21,9 @@ const Department = () => {
 
   const [activeID, setActiveID] = useState(0);
 
-  function toggleActive(id: any) {
-    if (activeID === id) {
-      setActiveID(-1);
-    } else {
-      setActiveID(id);
-    }
-  }
+  const toggleActive = (id: any) => {
+    setActiveID(activeID === id ? -1 : id);
+  };
 
   return (
     <AccordionSection className="container">
@@ -59,15 +55,7 @@ const Department = () => {
               columnClassName="my-masonry-grid_column"
             >
               {sect.map(who => (
-                <Team
-                  bio={who.bio}
-                  id={who.id}
-                  image={who.image}
-                  linkedin={who.linkedin}
-                  name={who.name}
-                  pronoun={who.pronouns}
-                  role={who.role}
-                />
+                <Team {...who} />
               ))}
             </Masonry>
           </Accordion.Collapse>
@@ -87,26 +75,32 @@ const AccordionSection = styled.div`
     padding: 0;
     margin: 0;
   }
+
   .section-text {
     ${media.smaller`
       text-align: left;
     `}
   }
-  .section-text: hover {
+
+  .section-text:hover {
     color: ${colors.darkGreen};
   }
+
   button: focus {
     outline: none;
   }
+
   .my-masonry-grid {
     display: flex;
     margin-left: -30px;
     width: auto;
   }
+
   .my-masonry-grid_column {
-    padding-left: 30px;
     background-clip: padding-box;
+    padding-left: 30px;
   }
+
   .my-masonry-grid_column > div {
     margin-bottom: 30px;
   }
