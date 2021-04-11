@@ -10,7 +10,16 @@ import bios from './bios';
 import Team from './Team';
 
 const Department = () => {
-  const sections = [bios['board'], bios['operations'], bios['technical']];
+  const sectionTitles = {
+    board: 'BOARD OF DIRECTORS',
+    operations: 'BUSINESS OPERATIONS',
+    technical: 'SITE DEVELOPMENT TEAM'
+  };
+
+  const sections = Object.keys(bios).map(s => ({
+    title: (sectionTitles as any)[s],
+    bios: (bios as any)[s]
+  }));
 
   const breakpointColumnsObj = {
     default: 3,
@@ -35,11 +44,7 @@ const Department = () => {
             onClick={() => toggleActive(index)}
           >
             <h2 className="section-text">
-              {index === 0
-                ? 'BOARD OF DIRECTORS'
-                : index === 1
-                ? 'BUSINESS OPERATIONS'
-                : 'SITE DEVELOPMENT TEAM'}
+              {sect.title}
               <FontAwesomeIcon
                 className="bod-icon"
                 icon={activeID === index ? faAngleUp : faAngleDown}
@@ -54,7 +59,7 @@ const Department = () => {
               className="my-masonry-grid"
               columnClassName="my-masonry-grid_column"
             >
-              {sect.map(who => (
+              {sect.bios.map((who: any) => (
                 <Team {...who} />
               ))}
             </Masonry>
