@@ -71,7 +71,7 @@ const PersonCard = styled(Card)`
     box-shadow: 2px 2px 5px ${colors.lightGrey};
     padding: 10px 15px;
 
-    &: hover {
+    &:hover {
       background: ${colors.lightGrey};
       box-shadow: inset 1px 1px 2px ${colors.darkGrey};
     }
