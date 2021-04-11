@@ -59,22 +59,24 @@ const Team = (props: any) => {
 };
 
 const PersonCard = styled(Card)`
-  border-radius: 5px;
-  width: 22rem;
-  box-shadow: 5px 5px 5px ${colors.lightGrey};
   border: none;
+  border-radius: 5px;
+  box-shadow: 5px 5px 5px ${colors.lightGrey};
+  width: 22rem;
 
   .button {
-    border: none;
-    box-shadow: 2px 2px 5px ${colors.lightGrey};
     background: ${colors.lightestGrey};
+    border: none;
     border-radius: 20px;
+    box-shadow: 2px 2px 5px ${colors.lightGrey};
     padding: 10px 15px;
+
+    &: hover {
+      background: ${colors.lightGrey};
+      box-shadow: inset 1px 1px 2px ${colors.darkGrey};
+    }
   }
-  .button: hover {
-    background: ${colors.lightGrey};
-    box-shadow: inset 1px 1px 2px ${colors.darkGrey};
-  }
+
   ${media.smaller`
     width: auto;
   `}
@@ -95,39 +97,39 @@ const PersonImg = styled(Image)`
 `;
 
 const MarginTeam = styled.div`
-  margin-top: 10px;
   margin-bottom: 10px;
+  margin-top: 10px;
 `;
 
 const PersonName = styled.h5`
-  font-weight: 700;
   font-size: 14px;
+  font-weight: 700;
   line-height: 16px;
-  text-transform: uppercase;
-  padding: 0;
   margin: 0;
+  padding: 0;
+  text-transform: uppercase;
 `;
 
 const PersonPronouns = styled.p`
-  margin: 0;
-  padding: 0;
+  color: ${colors.darkGrey};
   font-size: 14px;
   line-height: 16px;
-  color: ${colors.darkGrey};
+  margin: 0;
+  padding: 0;
 `;
 
 const PersonRole = styled.h5`
-  margin: 0;
-  padding: 0;
+  color: ${colors.darkGrey};
   font-size: 13px;
   line-height: 15px;
-  color: ${colors.darkGrey};
+  margin: 0;
+  padding: 0;
 `;
 
 const BioLogo = styled(Image)`
   height: 25px;
-  width: 25px;
   margin-bottom: 5px;
+  width: 25px;
 
   ${media.sm`
     height: 20px;
@@ -141,8 +143,8 @@ const BioCol = styled(Col)`
 
 const BioText = styled.p`
   font-size: 13px;
-  line-height: 17px;
   height: 11rem;
+  line-height: 17px;
   overflow-x: hidden;
   overflow-y: auto;
   white-space: pre-wrap;
@@ -150,14 +152,17 @@ const BioText = styled.p`
   ::-webkit-scrollbar {
     width: 10px;
   }
+
   ::-webkit-scrollbar-track {
     background: ${colors.lightGrey};
     border-radius: 10px;
   }
+
   ::-webkit-scrollbar-thumb {
     background: ${colors.peach};
     border-radius: 10px;
   }
+
   ::-webkit-scrollbar-thumb:hover {
     background: ${colors.scrollOrange};
   }

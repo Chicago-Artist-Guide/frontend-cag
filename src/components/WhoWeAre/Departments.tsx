@@ -69,6 +69,7 @@ const Department = () => {
 const AccordionSection = styled.div`
   padding: 0;
   margin-top: 1rem;
+
   .accordion-header {
     border: none;
     background: none;
@@ -99,10 +100,10 @@ const AccordionSection = styled.div`
   .my-masonry-grid_column {
     background-clip: padding-box;
     padding-left: 30px;
-  }
 
-  .my-masonry-grid_column > div {
-    margin-bottom: 30px;
+    > div {
+      margin-bottom: 30px;
+    }
   }
 `;
 

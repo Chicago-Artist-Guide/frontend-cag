@@ -5,6 +5,7 @@ const GlobalStyle = createGlobalStyle`
   h1, h2, h3, h5, h6, button {
     font-family: ${fonts.montserrat};
   }
+  
   .orangeText {
     color: ${colors.orange};
     font-weight: bold;
