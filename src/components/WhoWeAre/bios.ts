@@ -9,13 +9,13 @@ import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
 import Richardson from '../../images/who-we-are/board/Board_Richardson.jpg';
 import White from '../../images/who-we-are/board/Board_White.jpg';
-import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez Gonzalez.jpeg';
+import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 
 //Operations Images
 import Geis from '../../images/who-we-are/operations/Staff_Geis.jpg';
 import McCoy from '../../images/who-we-are/operations/Staff_Kei McCoy.jpg';
-import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpeg';
+import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpg';
 
 //Technical Images
 import Jewell from '../../images/who-we-are/technical/Staff_Jewell.jpg';
@@ -25,7 +25,7 @@ import Voghel from '../../images/who-we-are/technical/Staff_Voghel.png';
 import KendalBrown from '../../images/who-we-are/technical/Staff_Kendal Brown.jpg';
 import Oie from '../../images/who-we-are/technical/Staff_Oie.jpg';
 import Rebollar from '../../images/who-we-are/technical/Staff_Rebollar.jpg';
-import Salemi from '../../images/who-we-are/technical/Staff_Salemi.jpeg';
+import Salemi from '../../images/who-we-are/technical/Staff_Salemi.jpg';
 import Turner from '../../images/who-we-are/technical/Staff_Turner.png';
 import Volland from '../../images/who-we-are/technical/Staff_Volland.jpg';
 import Wilson from '../../images/who-we-are/technical/Staff_Wilson.jpg';
