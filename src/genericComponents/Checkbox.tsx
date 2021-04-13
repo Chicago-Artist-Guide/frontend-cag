@@ -1,21 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { InputGroup } from 'react-bootstrap';
 import styled from 'styled-components';
 
 const Checkbox = (props: any) => {
-  const [clicked, setClicked] = useState(false);
-
-  return <CAGCheckbox onClick={() => setClicked(!clicked)}></CAGCheckbox>;
+  return <CAGCheckbox {...props} />;
 };
 
 const CAGCheckbox = styled(InputGroup.Checkbox)`
-  background: var(--unnamed-color-ffffff) 0% 0% no-repeat padding-box;
-  background: #ffffff 0% 0% no-repeat padding-box;
-  box-shadow: 2px 2px 10px #0000001a;
+  background: white 0% 0% no-repeat padding-box;
   border-radius: 6px;
-  opacity: 1;
-  width: 24px;
-  height: 24px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 1a);
 `;
 
 export default Checkbox;

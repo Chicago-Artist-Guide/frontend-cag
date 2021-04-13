@@ -1,17 +1,21 @@
 import React from 'react';
-import { FormControl, InputGroup } from 'react-bootstrap';
+import { FormControl, FormLabel, InputGroup } from 'react-bootstrap';
 import styled from 'styled-components';
+// import { colors, fonts } from '../theme/styleVars';
 
 const InputField = (props: any) => {
-  const { placeholder } = props;
+  const { formType, label, name, onChange, placeholder } = props;
 
   return (
     <CAGInput>
-      <InputGroup className="mb-3">
+      <InputGroup>
+        <FormLabel>{label}</FormLabel>
         <FormControl
-          aria-describedby="basic-addon1"
-          aria-label="Username"
+          aria-label={label}
+          name={name}
+          onChange={onChange}
           placeholder={placeholder}
+          type={formType}
         />
       </InputGroup>
     </CAGInput>
@@ -19,13 +23,9 @@ const InputField = (props: any) => {
 };
 
 const CAGInput = styled(InputGroup)`
-  width: 279px;
-  height: 32px;
-  background: var(--unnamed-color-ffffff) 0% 0% no-repeat padding-box;
-  background: #ffffff 0% 0% no-repeat padding-box;
-  box-shadow: 2px 2px 10px #0000001a;
+  background: white 0% 0% no-repeat padding-box;
   border-radius: 6px;
-  opacity: 1;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 1a);
 `;
 
 export default InputField;

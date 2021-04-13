@@ -1,16 +1,29 @@
 import React from 'react';
 import { Col, Form } from 'react-bootstrap';
+// import { colors, fonts } from '../theme/styleVars';
 
 const DropdownMenu = (props: any) => {
-  const { onChange, values } = props;
-  //do mapping that returns options
+  const {
+    defaultFormValue,
+    controlId,
+    label,
+    onChange,
+    selectedValue,
+    values
+  } = props;
   return (
-    <Form.Group as={Col} controlId="formGridState">
-      <Form.Label>Select</Form.Label>
-      <Form.Control as="select" defaultValue="Choose..." onChange={onChange}>
-        {values.map((value: string) => {
-          return <option>{value}</option>;
-        })}
+    <Form.Group as={Col} controlId={controlId}>
+      <Form.Label>{label}</Form.Label>
+      <Form.Control
+        as="select"
+        defaultValue={defaultFormValue}
+        onChange={onChange}
+      >
+        {values.map((value: string) => (
+          <option selected={value === selectedValue} value={value}>
+            {value}
+          </option>
+        ))}
       </Form.Control>
     </Form.Group>
   );
