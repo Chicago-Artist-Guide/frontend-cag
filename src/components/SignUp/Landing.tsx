@@ -5,11 +5,12 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
-import { Tagline, TaglineTwo, Title } from '../layout/Titles';
+import { Tagline, Title } from '../layout/Titles';
 import { colors } from '../../theme/styleVars';
 import Green_blob from '../../images/green_blob.svg';
 import Red_blob from '../../images/red_blob.svg';
 import Blue_blob from '../../images/blue_blob.svg';
+import { Link } from 'react-router-dom';
 
 const Landing: React.FC<{
   setForm: any;
@@ -177,13 +178,11 @@ const Landing: React.FC<{
         </Col>
       </Row>
       <Row>
-        <TaglineTwo>
-          {'Already a member?'}
-          <a href="/login" style={{ color: colors.orange }}>
-            {' '}
-            Log in here{' '}
-          </a>
-        </TaglineTwo>
+        <Col lg={12}>
+          <LoginLink>
+            Already a member? <Link to="/login">Log in here</Link>
+          </LoginLink>
+        </Col>
       </Row>
     </Container>
   );
@@ -221,6 +220,18 @@ const StyledCard = styled(Col)`
   p {
     font-size: 20px;
     text-align: center;
+  }
+`;
+
+const LoginLink = styled.p`
+  text-align: left;
+  font-size: 14px/18px;
+  font-style: italic;
+  letter-spacing: 0.14px;
+  margin-top: 40px;
+
+  a {
+    color: ${colors.orange};
   }
 `;
 
