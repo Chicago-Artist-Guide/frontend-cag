@@ -83,7 +83,7 @@ const defaultData = {
 
 const SignUp = () => {
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
-  const { step, navigation } = useStep({ initialStep: 0, steps: flatSteps }); // defaults for our steps
+  const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
   const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
   // based on which step we're on, return a different step component and pass it the props it needs
