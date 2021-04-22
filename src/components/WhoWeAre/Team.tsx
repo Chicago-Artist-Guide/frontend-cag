@@ -11,7 +11,7 @@ import { media } from 'styled-bootstrap-grid';
 import { colors } from '../../theme/styleVars';
 
 const Team = (props: any) => {
-  const { bio, id, image, linkedin, name, pronouns, role } = props;
+  const { affiliation, bio, id, image, linkedin, name, pronouns, role } = props;
 
   return (
     <MarginTeam key={id}>
@@ -47,6 +47,7 @@ const Team = (props: any) => {
             <BottomRow>
               <BioCol>
                 <BioText className="caption">
+                  <b>{affiliation != null && affiliation + '\n\n'}</b>
                   {name} ({pronouns}) - {bio}
                 </BioText>
               </BioCol>
