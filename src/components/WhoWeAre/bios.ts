@@ -14,7 +14,8 @@ import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 
 //Operations Images
 import Geis from '../../images/who-we-are/operations/Staff_Geis.jpg';
-import McCoy from '../../images/who-we-are/operations/Staff_Kei McCoy.jpg';
+import McCoy from '../../images/who-we-are/operations/Staff_Kei_McCoy.jpg';
+import Morris from '../../images/who-we-are/operations/Staff_Morris.jpg';
 import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpg';
 
 //Technical Images
@@ -22,7 +23,7 @@ import Jewell from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import Nicholson from '../../images/who-we-are/technical/Staff_Nicholson.jpg';
 import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
 import Voghel from '../../images/who-we-are/technical/Staff_Voghel.png';
-import KendalBrown from '../../images/who-we-are/technical/Staff_Kendal Brown.jpg';
+import KendalBrown from '../../images/who-we-are/technical/Staff_Kendal-Brown.jpg';
 import Oie from '../../images/who-we-are/technical/Staff_Oie.jpg';
 import Rebollar from '../../images/who-we-are/technical/Staff_Rebollar.jpg';
 import Salemi from '../../images/who-we-are/technical/Staff_Salemi.jpg';
@@ -37,6 +38,7 @@ const bios = {
       name: 'Anna Schutz',
       role: 'President',
       pronouns: 'she/her',
+      affiliation: 'Executive Director, Chicago Artist Guide',
       image: Schutz,
       linkedin: 'annaschutz',
       bio:
@@ -47,6 +49,8 @@ const bios = {
       name: 'Emmanuel Dávila',
       role: 'Vice President',
       pronouns: 'he/him',
+      affiliation:
+        'Program Coordinator, Illinois Small Business Development Center, Puerto Rican Cultural Center',
       image: Davila,
       linkedin: 'emmanuel-d-12b2311a5',
       bio:
@@ -57,6 +61,8 @@ const bios = {
       name: 'Rossana Quixito',
       role: 'Secretary',
       pronouns: 'she/her',
+      affiliation:
+        'Development and Finance Coordinator, The American Academy of Orthopedic Surgeons',
       image: Quixito,
       linkedin: 'rossanaquixito',
       bio:
@@ -67,6 +73,7 @@ const bios = {
       name: 'Matt Fayfer',
       role: 'Treasurer',
       pronouns: 'he/him',
+      affiliation: 'Customer Service Specialist, Jetson Probiotics',
       image: Fayfer,
       linkedin: 'matt-fayfer-a8ab2b73',
       bio:
@@ -77,6 +84,7 @@ const bios = {
       name: 'Lamar B. Butler',
       role: 'Board Member',
       pronouns: 'he/him',
+      affiliation: 'Partner, ​Midwest Legacy Group',
       image: Butler,
       linkedin: 'lamarbutler',
       bio:
@@ -87,6 +95,7 @@ const bios = {
       name: 'Hallie Gordon',
       role: 'Board Member',
       pronouns: 'she/her',
+      affiliation: 'Artistic Producer, Rivendell Ensemble',
       image: Gordon,
       linkedin: 'halliegordonl66',
       bio:
@@ -97,6 +106,8 @@ const bios = {
       name: 'J​oey M. McCall, Esq.',
       role: 'Board Member',
       pronouns: 'he/him',
+      affiliation:
+        'Founder & Managing Partner, McCall | Atten; Founder & Chief Vision Officer, Law Lynx',
       image: McCall,
       linkedin: 'joey-m-mccall-esq-303356143',
       bio:
@@ -107,6 +118,8 @@ const bios = {
       name: 'Adebayo Onigbanjo',
       role: 'Board Member',
       pronouns: 'he/him',
+      affiliation:
+        'Senior Director, Business Operations Transport Intelligence GE Transportation ',
       image: Onigbanjo,
       linkedin: 'aonigbanjo',
       bio:
@@ -117,6 +130,7 @@ const bios = {
       name: 'Maurice Richardson',
       role: 'Board Member',
       pronouns: 'he/him',
+      affiliation: 'Vice President of Finance, Financial Health Network',
       image: Richardson,
       linkedin: 'reesie',
       bio:
@@ -127,6 +141,8 @@ const bios = {
       name: 'Alexis White',
       role: 'Board Member',
       pronouns: 'she/her',
+      affiliation:
+        'Chief Administration & Finance Officer, Office of the City Clerk, City of Chicago',
       image: White,
       linkedin: 'alexismwhite82',
       bio:
@@ -137,6 +153,7 @@ const bios = {
       name: 'Luciana Mendez Gonzalez',
       role: 'Advisory Board Member',
       pronouns: 'any',
+      affiliation: 'Software Engineer, First Look Appraisals',
       image: MendezGonzalez,
       linkedin: 'lucianamendezg',
       bio:
@@ -147,6 +164,8 @@ const bios = {
       name: 'Zev Steinrock',
       role: 'Advisory Board Member',
       pronouns: 'he/him',
+      affiliation:
+        'Assistant Professor of Acting, University of Illinois Urbana-Champaign',
       image: Steinrock,
       linkedin: null,
       bio:
@@ -155,54 +174,59 @@ const bios = {
   ],
   operations: [
     {
-      id: 13,
-      name: 'Matt Fayfer',
-      role: 'Managing Director',
-      pronouns: 'he/him',
-      image: Fayfer,
-      linkedin: 'matt-fayfer-a8ab2b73',
-      bio:
-        'Managing Director holds degrees in Psychology and Theatre Studies from the University of Wisconsin Green Bay. After relocating to Chicago in 2013, he worked for Actors’ Equity Association for four years working as a Contract Associate and Business Representative. He has been a theatre professional for over 10 years, working as an actor, box office manager, director, and general administrator. Most recently, he worked as Business Manager for Brown Paper Box Co overseeing their daily operations until they closed at the end of 2020. His non-theatre work includes experience with payment operations and customer service.'
-    },
-    {
-      id: 14,
-      name: 'Leah Geis',
-      role: 'Communications Manager',
-      pronouns: 'she/her',
-      image: Geis,
-      linkedin: 'leah-geis-1907ab1a2',
-      bio:
-        "Communications Manager is a director/stage manager originally from the sweeping prairies of Nebraska. Since moving to Chicago in October of 2018, Leah hit the ground running by landing leadership roles on eight productions within her first year in the city and is anxiously awaiting her return to stagework post-pandemic. She is especially proud of her projects that develop new works focused on the women and non-binary people within the LGBT+ community. Leah is excited to continue to contribute to artist's and theatre's success by joining the Chicago Artist Guide's team. When it's safe to open stages again, you can find more information on Leah’s projects at leahgeis.com"
-    },
-    {
-      id: 15,
-      name: 'Kayswanna Kei McCoy',
-      role: 'Development Director',
-      pronouns: 'she/her',
-      image: McCoy,
-      linkedin: 'kayswanna-mccoy',
-      bio:
-        "Development Manager previously served as Chicago Artist Guide's Research Director and now lends her expertise as its Development Director. Kayswanna is a graduate of Xavier University and has her Masters in Nonprofit Management from DePaul University. She is currently a student success coach at National Louis University working with domestic and international culinary students. She previously worked in DePaul University's Office of Multicultural Student Success as a graduate assistant, providing career advice to students through soft skill building, post-graduate exploration, and career prep activities. Kayswanna comes to us from Philadelphia, PA and is bilingual in Spanish."
-    },
-    {
       id: 16,
       name: 'Anna Schutz',
       role: 'Executive Director',
       pronouns: 'she/her',
+      affiliation: null,
       image: Schutz,
       linkedin: 'annaschutz',
       bio:
         "Executive Director holds a BFA in Acting from the University of Illinois Urbana-Champaign and has worked in Chicago as a performer, playwright, and producer for over a decade. She co-founded the storefront theatre Brown Paper Box Co. and served as its Managing Director during its 11 years of operation. \n\nAnna completed her Master of Nonprofit Management at DePaul University where her research was on Representation in Nonprofit Performing Arts Leadership. She served twice as the TA for DePaul's Women in Chicago Theatre class exposing first year students to intersectional feminist theory through field trips to performances around the city. Currently, she oversees daily operations and visits for Undergraduate Admission at DePaul University. There she has the privilege of managing and mentoring students employees, ensuring their professional development. \n\n​As a lover of technology, Anna previously facilitated technical and customer service training during her 6 years with Apple Inc. in its Chicago stores and around the world on its Global Retail Training team. \n\nSunday in the Park with George will never not make her cry. More info at www.annaschutz.com or connect on LinkedIn.​"
     },
     {
+      id: 15,
+      name: 'Kayswanna Kei McCoy',
+      role: 'Development Director',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: McCoy,
+      linkedin: 'kayswanna-mccoy',
+      bio:
+        "Development Manager previously served as Chicago Artist Guide's Research Director and now lends her expertise as its Development Director. Kayswanna is a graduate of Xavier University and has her Masters in Nonprofit Management from DePaul University. She is currently a student success coach at National Louis University working with domestic and international culinary students. She previously worked in DePaul University's Office of Multicultural Student Success as a graduate assistant, providing career advice to students through soft skill building, post-graduate exploration, and career prep activities. Kayswanna comes to us from Philadelphia, PA and is bilingual in Spanish."
+    },
+    {
+      id: 13,
+      name: 'Ellen Morris Palermo',
+      role: 'Managing Director',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Morris,
+      linkedin: 'ellen-morris-palermo',
+      bio:
+        'holds a BM in Piano & Music Direction and English Literature from Northwestern University and an MS in Nonprofit Leadership and Management from the University of Pennsylvania. She has worked as a musician, music director, and teaching artist all over the Chicago area with credits at Writers Theatre, Drury Lane Theater, Marriott Theatre, and Boho Theatre, among others. She served as the Music Director In-Residence at the Wilmette Children’s Theatre for 3 years and taught at many area organizations including the Actor’s Training Center, Music Institute of Chicago, and Evanston Children’s Choir. \n\nEllen completed her Master of Nonprofit Leadership and Management at Penn and while there, held a fellowship in Grant Writing and Development at the Centro de Cultura, Arte, Trabajo y Educación (CCATE) in Norristown, PA. While at CCATE, she expanded their grants funding by 15%, increased annual giving by 25%, and also taught piano and SAT prep. Ellen returned to Chicago in 2020 and works as a nonprofit development and operations specialist. She is the Finance and Administrative Coordinator at GlobeMed and works as a Consultant with the Artistic Fundraising Group where she is the primary project manager, grant writer, and development specialist for three small organizations and their respective fundraising efforts. \n\nEllen spends her free time growing vegetables in the garden, reading fantasy novels, and hiking and exploring with her husband, Joe, and pup, Cleo.'
+    },
+    {
       id: 17,
       name: 'Steven Zacks',
       role: 'Head of Platform',
       pronouns: 'he/him',
+      affiliation: null,
       image: Zacks,
       linkedin: 'stevenzacks',
       bio:
         'Head of Platform is a Product Manager, building software for the mortgage industry. Now based in Chicago, he has a BA in Economics from Fordham University and a J.D. from Washington University in St. Louis. Prior to moving to Chicago two years ago, Steven was a producer in Los Angeles, focusing mostly on documentaries and virtual reality experiences. His life goal is to steal a cape from Andrew Lloyd Webber.'
+    },
+    {
+      id: 14,
+      name: 'Leah Geis',
+      role: 'Communications Manager',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Geis,
+      linkedin: 'leah-geis-1907ab1a2',
+      bio:
+        "Communications Manager is a director/stage manager originally from the sweeping prairies of Nebraska. Since moving to Chicago in October of 2018, Leah hit the ground running by landing leadership roles on eight productions within her first year in the city and is anxiously awaiting her return to stagework post-pandemic. She is especially proud of her projects that develop new works focused on the women and non-binary people within the LGBT+ community. Leah is excited to continue to contribute to artist's and theatre's success by joining the Chicago Artist Guide's team. When it's safe to open stages again, you can find more information on Leah’s projects at leahgeis.com"
     }
   ],
   technical: [
@@ -211,6 +235,7 @@ const bios = {
       name: 'Alex Jewell',
       role: 'Engineering Lead',
       pronouns: 'he/him',
+      affiliation: null,
       image: Jewell,
       linkedin: 'alexjewellcom',
       bio:
@@ -221,6 +246,7 @@ const bios = {
       name: 'Cody Nicholson',
       role: 'Engineering Lead',
       pronouns: 'he/him',
+      affiliation: null,
       image: Nicholson,
       linkedin: 'codynicholson',
       bio:
@@ -231,6 +257,7 @@ const bios = {
       name: 'Carlene Liriano',
       role: 'Product Manager',
       pronouns: 'she/her',
+      affiliation: null,
       image: Liriano,
       linkedin: 'carlene-liriano-99390429',
       bio:
@@ -241,6 +268,7 @@ const bios = {
       name: 'Alison Voghel',
       role: 'UI/UX Designer',
       pronouns: 'she/her',
+      affiliation: null,
       image: Voghel,
       linkedin: 'alison-voghel',
       bio:
@@ -251,6 +279,7 @@ const bios = {
       name: 'Amanda J. Kendal-Brown',
       role: 'Frontend Developer',
       pronouns: 'she/her',
+      affiliation: null,
       image: KendalBrown,
       linkedin: 'akendalb',
       bio:
@@ -261,6 +290,7 @@ const bios = {
       name: 'Austin Oie',
       role: 'Developer',
       pronouns: 'he/him',
+      affiliation: null,
       image: Oie,
       linkedin: 'austin-oie-4a176519',
       bio:
@@ -271,6 +301,7 @@ const bios = {
       name: 'Pedro Rebollar',
       role: 'Developer',
       pronouns: 'he/him',
+      affiliation: null,
       image: Rebollar,
       linkedin: 'prebollar',
       bio:
@@ -281,6 +312,7 @@ const bios = {
       name: 'Kaitlyn Salemi',
       role: 'Developer',
       pronouns: 'she/her',
+      affiliation: null,
       image: Salemi,
       linkedin: 'kaitlynsalemi',
       bio:
@@ -291,6 +323,7 @@ const bios = {
       name: 'Noah Turner',
       role: 'Developer',
       pronouns: 'he/him',
+      affiliation: null,
       image: Turner,
       linkedin: 'noah-turner-full-stack-dev',
       bio:
@@ -301,6 +334,7 @@ const bios = {
       name: 'Morgan Volland',
       role: 'Developer',
       pronouns: 'she/her',
+      affiliation: null,
       image: Volland,
       linkedin: 'morgan-volland-9691b81a2',
       bio:
@@ -311,6 +345,7 @@ const bios = {
       name: 'James Wilson',
       role: 'Developer',
       pronouns: 'he/him',
+      affiliation: null,
       image: Wilson,
       linkedin: 'jameswilson425',
       bio:
