@@ -5,7 +5,8 @@ const colors = {
   primary: '#82B29A',
   orange: '#E17B60',
   darkGreen: '#82b29a',
-  italicColor: '#537C8C'
+  italicColor: '#537C8C',
+  veryDarkGrayBlue: '#4D5055'
 };
 
 const fonts = {

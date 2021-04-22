@@ -1,12 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Tagline, TitleThree } from '../layout/Titles';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Link } from 'react-router-dom';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 import Image from 'react-bootstrap/Image';
-import { fonts } from '../../theme/styleVars';
+import { colors, fonts } from '../../theme/styleVars';
 
 const Privacy: React.FC<{
   setForm: any;
@@ -32,13 +33,11 @@ const Privacy: React.FC<{
             to inform our search algorithm, we won’t display this information on
             your profile, or to producers and casting directors. If you’d like
             to learn more about the measures we take to secure your data,{' '}
-            <Link to="/faq">click here</Link> [link to FAQs].
+            <Link to="/faq">click here</Link>.
           </PrivacyPar>
-          <Link to="/terms-of-service">
-            <Caption className="caption">
-              View our full terms and privacy policy
-            </Caption>
-          </Link>
+          <TermsPrivacyLink to="/terms-of-service">
+            View our full terms and privacy policy
+          </TermsPrivacyLink>
           <PrivacyPar>
             Tap the button below to agree with our terms and privacy policy
           </PrivacyPar>
@@ -51,68 +50,38 @@ const Privacy: React.FC<{
   );
 };
 
-const Tagline = (props: any) => {
-  const { children, ...rest } = props;
-  return <TaglineH2 {...rest}>{children}</TaglineH2>;
-};
-
-const TitleThree = (props: any) => {
-  const { children, ...rest } = props;
-  return <TitleH3 {...rest}>{children}</TitleH3>;
-};
-
 const ImageCol = styled(Col)`
-  max-width: 100%;
-  max-height: 100%;
   display: flex;
+  max-height: 100%;
+  max-width: 100%;
 `;
 
 const PrivacyPar = styled.p`
+  color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
   letter-spacing: 0px;
-  color: #0c2028;
   margin-top: 17px;
+
   span {
     font-size: 16px;
-    color: #82b29a;
+    color: ${colors.primary};
     font-weight: bold;
   }
 `;
 
-const Caption = styled.p`
+const TermsPrivacyLink = styled(Link)`
+  color: ${colors.veryDarkGrayBlue};
   font-family: ${fonts.lora};
-  font-style: italics;
   font-size: 14px;
-  padding-top: 26px;
-  font-color: #4DS0S5;
+  margin-bottom: 18px;
+  margin-top: 26px;
 `;
 
 const Title = styled.h1`
   font-family: ${fonts.montserrat};
   font-size: 48px;
   font-weight: bold;
-`;
-
-const TitleH2 = styled.h2`
-  font-family: ${fonts.lora};
-  font-size: 1.75rem;
-  font-weight: 400;
-`;
-
-const TaglineH2 = styled(TitleH2 as any)`
-  margin-bottom: 17px;
-  font-family: ${fonts.lora};
-  font-size: 28px;
-  letter-spacing: 0em;
-`;
-
-const TitleH3 = styled.h3`
-  font-family: ${fonts.montserrat}
-  font-size: 28px;
-  font-weight: bold;
-  color: #0c2028;
-  text-transform: uppercase;
 `;
 
 export default Privacy;
