@@ -1,6 +1,5 @@
 import React from 'react';
 import { Col, Form } from 'react-bootstrap';
-// import { colors, fonts } from '../theme/styleVars';
 
 const DropdownMenu = (props: any) => {
   const {
@@ -11,6 +10,7 @@ const DropdownMenu = (props: any) => {
     selectedValue,
     values
   } = props;
+
   return (
     <Form.Group as={Col} controlId={controlId}>
       <Form.Label>{label}</Form.Label>
@@ -19,7 +19,7 @@ const DropdownMenu = (props: any) => {
         defaultValue={defaultFormValue}
         onChange={onChange}
       >
-        {values.map((value: string) => (
+        {values.map((name: string, value: string) => (
           <option selected={value === selectedValue} value={value}>
             {value}
           </option>
