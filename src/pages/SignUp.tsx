@@ -127,7 +127,7 @@ const SignUp = () => {
   return (
     <PageContainer>
       <Row>
-        <Col lg={8}>{stepFrame()}</Col>
+        <Col lg={12}>{stepFrame()}</Col>
       </Row>
       {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
         <SignUpFooter
