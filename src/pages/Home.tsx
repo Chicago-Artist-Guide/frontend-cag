@@ -92,9 +92,8 @@ const Home = () => {
           <Tagline>We make connections. You make art.</Tagline>
           <TitleThree>WHAT WE DO</TitleThree>
           <p className="margin-container">
-            We bring Chicago individual artists, theatre companies, and
-            communities together. We provide the infrastructure so you can focus
-            on what you do best.
+            We provide affordable and free tools to help diversify theatre in
+            Chicago.
           </p>
         </Col>
         <Col lg={4}>

@@ -4,10 +4,13 @@ const colors = {
   secondaryFontColor: '#2F4550',
   primary: '#82B29A',
   orange: '#E17B60',
+<<<<<<< HEAD
+  gray: '#4d5055'
+=======
   darkGreen: '#82b29a',
   italicColor: '#537C8C',
-  veryDarkGrayBlue: '#4D5055',
-  gray: '#4d5055'
+  veryDarkGrayBlue: '#4D5055'
+>>>>>>> master
 };
 
 const fonts = {
