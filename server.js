@@ -11,4 +11,4 @@ app.post('/api/user/sign_up', function(req, res) {
 
 app.listen(5000, function() {
   console.log("Started on PORT 5000");
-})
+});
