@@ -78,6 +78,7 @@ const SignUpFooter: React.FC<{
               className={
                 i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
               }
+              key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
             />
           ))}
         </Pagination>

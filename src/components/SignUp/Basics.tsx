@@ -22,11 +22,11 @@ const Privacy: React.FC<{
         <Title>LET'S GET TO KNOW EACH OTHER</Title>
         <Col lg="8">
           <Form>
-            <InputField label="First"></InputField>
-            <InputField label="Last"></InputField>
-            <InputField label="Email Address"></InputField>
-            <InputField label="Password"></InputField>
-            <Checkbox> 18 years or older</Checkbox>
+            <InputField label="First" />
+            <InputField label="Last" />
+            <InputField label="Email Address" />
+            <InputField label="Password" />
+            <Checkbox label="18 years or older" />
             <TermsPrivacyLink to="/terms-of-service">
               View our full terms and privacy policy
             </TermsPrivacyLink>
