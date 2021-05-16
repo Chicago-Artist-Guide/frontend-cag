@@ -6,6 +6,7 @@ import PageContainer from '../components/layout/PageContainer';
 import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
 import Privacy from '../components/SignUp/Privacy';
+import Basics from '../components/SignUp/Basics';
 // import all of the step components up here
 
 // Establish our steps
@@ -102,6 +103,8 @@ const SignUp = () => {
         );
         break;
       case 'basics' as any:
+        returnStep = <Basics {...props} />;
+        break;
       case 'privacy' as any:
         returnStep = <Privacy {...props} />;
         break;

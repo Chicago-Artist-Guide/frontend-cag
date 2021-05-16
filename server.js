@@ -1,5 +1,5 @@
-var express        =         require("express");
-var bodyParser     =         require("body-parser");
+var express        =         require('express');
+var bodyParser     =         require('body-parser');
 var app            =         express();
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -10,5 +10,5 @@ app.post('/api/user/sign_up', function(req, res) {
 });
 
 app.listen(5000, function() {
-  console.log("Started on PORT 5000");
+  console.log('Started on PORT 5000');
 });

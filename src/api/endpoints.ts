@@ -7,7 +7,7 @@ const paths = {
   CREATE_PROFILE: `${base}user/create_profile`,
   EXTRA_INFORMATION: `${base}user/extra_information`,
   PROFILE_PHOTO_UPLOAD: `${base}user/profile_photo_upload`,
-  UPCOMING_SHOW_PHOTO_UPLOAD: `${base}/upcoming_show_photo_upload`
+  UPCOMING_SHOW_PHOTO_UPLOAD: `${base}upcoming_show_photo_upload`
 };
 
 interface SubmitSignUpStep {
