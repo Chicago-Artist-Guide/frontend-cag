@@ -60,7 +60,7 @@ const OffstageRoles = (...props: any) => {
         setForm={setForm}
         setLandingStep={setLandingStep}
         step={step}
-        steps={steps.offstageroles}
+        steps={steps}
       />
     </div>
   );
