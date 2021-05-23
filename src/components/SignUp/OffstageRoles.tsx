@@ -1,66 +1,58 @@
 import React from 'react';
 // import { colors } from '../../theme/styleVars';
 // import styled from 'styled-components';
-import Header from '../layout/Header';
-import SignUpFooter from '../SignUp/SignUpFooter';
-import Accordion from '../../genericComponents/Accordion';
+import GenericAccordion from '../../genericComponents/Accordion';
 
 const OffstageRoles = (...props: any) => {
-  const {
-    landingStep,
-    landingType,
-    navigation,
-    setForm,
-    setLandingStep,
-    step,
-    steps,
-    offstageRolesGeneral,
-    offstageRolesProduction,
-    offstageRolesScenic,
-    offstageRolesLighting,
-    offstageRolesSound,
-    offstageRolesHairMakeupCostumes
-  } = props;
+  const offstageRoles = {
+    general: [
+      'Directing',
+      'Violence/Fight Design',
+      'Intimacy Design',
+      'Choreography',
+      'Casting',
+      'Dramaturgy',
+      'Dialect Coaching',
+      'Musical Directing'
+    ],
+    production: [
+      'Stage Management',
+      'Production Management',
+      'Board Op',
+      'Run Crew'
+    ],
+    scenicAndProperties: ['abc'],
+    lighting: ['def'],
+    sound: ['ghi'],
+    hairMakeupCostumes: ['jkl']
+  };
 
-  const general = [
-    'Directing',
-    'Violence/Fight Design',
-    'Intimacy Design',
-    'Choreography',
-    'Casting',
-    'Dramaturgy',
-    'Dialect Coaching',
-    'Musical Directing'
-  ];
+  // const renderOffstageRoles = () => {
+  //     return offstageRoles.map(offstageRolesItem => {
+  //         return <GenericAccordion offstageRoleItem={offstageRolesItem} />
+  //     })
+  // }
 
   return (
     <div>
-      <Header />
       <h1>SO, WHAT DO YOU LIKE DOING</h1>
       <h2>Tell us what positions suit you best</h2>
       <h3>Off-Stage Roles</h3>
       <h4>Select all applicable positions</h4>
-      <Accordion
-        General={offstageRolesGeneral}
-        text={general}
-        textHeader="General"
+      <GenericAccordion text={offstageRoles.general} textHeader="General" />
+      <GenericAccordion
+        text={offstageRoles.production}
+        textHeader="Production"
       />
-      <Accordion Production={offstageRolesProduction} textHeader="Production" />
-      <Accordion Scenic={offstageRolesScenic} textHeader="Scenic" />
-      <Accordion Lighting={offstageRolesLighting} textHeader="Lighting" />
-      <Accordion Sound={offstageRolesSound} textHeader="Sound" />
-      <Accordion
-        HairMakeupCostumes={offstageRolesHairMakeupCostumes}
-        textHeader="HairMakeupCostumes"
+      <GenericAccordion
+        text={offstageRoles.scenicAndProperties}
+        textHeader="Scenic"
       />
-      <SignUpFooter
-        landingStep={landingStep}
-        landingType={landingType}
-        navigation={navigation}
-        setForm={setForm}
-        setLandingStep={setLandingStep}
-        step={step}
-        steps={steps}
+      <GenericAccordion text={offstageRoles.lighting} textHeader="Lighting" />
+      <GenericAccordion text={offstageRoles.sound} textHeader="Sound" />
+      <GenericAccordion
+        text={offstageRoles.hairMakeupCostumes}
+        textHeader="Hair/Makeup/Costumes"
       />
     </div>
   );

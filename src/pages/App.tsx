@@ -17,7 +17,6 @@ import Footer from '../components/layout/Footer';
 import ScrollToTop from '../components/ScrollToTop';
 import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
-import OffstageRoles from '../components/SignUp/OffstageRoles';
 
 const App = () => (
   <Router>
@@ -36,7 +35,6 @@ const App = () => (
       <Route component={WhoWeAre} exact path="/who-we-are" />
       <Route component={Login} exact path="/login" />
       <Route component={SignUp} exact path="/sign-up" />
-      <Route component={OffstageRoles} exact path="/sign-up/offstageRoles" />
       <Route component={NotFound} />
     </Switch>
     <Footer />

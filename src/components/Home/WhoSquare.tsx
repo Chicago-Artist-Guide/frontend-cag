@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import SVGLayer from '../../components/SVGLayer';
 import { colors } from '../../theme/styleVars';
+import OffstageRoles from '../SignUp/OffstageRoles';
 
 const WhoSquare = (props: any) => {
   const { blob, dancer, key, points: whoWeArray, title } = props;
@@ -19,6 +20,7 @@ const WhoSquare = (props: any) => {
           ))}
         </ul>
       </ShadowContainer>
+      <OffstageRoles />
     </div>
   );
 };

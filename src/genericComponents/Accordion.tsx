@@ -9,12 +9,6 @@ const GenericAccordion = (props: any) => {
 
   const [isOpen, setIsOpen] = useState(false);
 
-  const renderItems = () => {
-    return text.map((textObj: { id: any }) => {
-      return <Checkbox textObj={textObj} />;
-    });
-  };
-
   return (
     <Accordion defaultActiveKey="0" onClick={() => setIsOpen(!isOpen)}>
       <Card>
@@ -24,7 +18,9 @@ const GenericAccordion = (props: any) => {
           </Accordion.Toggle>
         </Card.Header>
         <Accordion.Collapse eventKey="0">
-          <Card.Body>{renderItems}</Card.Body>
+          <Card.Body>
+            <Checkbox {...text} />
+          </Card.Body>
         </Accordion.Collapse>
       </Card>
     </Accordion>
