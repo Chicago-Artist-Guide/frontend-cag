@@ -6,6 +6,7 @@ import PageContainer from '../components/layout/PageContainer';
 import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
 import Privacy from '../components/SignUp/Privacy';
+import OffstageRoles from '../components/SignUp/OffstageRoles';
 // import all of the step components up here
 
 // Establish our steps
@@ -128,6 +129,7 @@ const SignUp = () => {
     <PageContainer>
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
+        <OffstageRoles />
       </Row>
       {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
         <SignUpFooter

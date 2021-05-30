@@ -3,7 +3,7 @@ import { InputGroup } from 'react-bootstrap';
 import styled from 'styled-components';
 
 const Checkbox = (props: any) => {
-  return <CAGCheckbox {...props} />;
+  return <CAGCheckbox />;
 };
 
 const CAGCheckbox = styled(InputGroup.Checkbox)`
