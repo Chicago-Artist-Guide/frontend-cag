@@ -3,7 +3,7 @@ import axios, { AxiosPromise } from 'axios';
 const base = '/api/';
 
 const paths = {
-  SIGN_UP: `${base}user/sign_up`,
+  SIGN_UP: `${base}user/register`,
   CREATE_PROFILE: `${base}user/create_profile`,
   EXTRA_INFORMATION: `${base}user/extra_information`,
   PROFILE_PHOTO_UPLOAD: `${base}user/profile_photo_upload`,

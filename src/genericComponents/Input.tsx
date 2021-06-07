@@ -1,5 +1,6 @@
 import React from 'react';
-import { FormControl, FormLabel, InputGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
+import { colors, fonts } from '../theme/styleVars';
 import styled from 'styled-components';
 
 const InputField = (props: any) => {
@@ -7,24 +8,26 @@ const InputField = (props: any) => {
 
   return (
     <CAGInput>
-      <InputGroup>
-        <FormLabel>{label}</FormLabel>
-        <FormControl
-          aria-label={label}
-          name={name}
-          onChange={onChange}
-          placeholder={placeholder}
-          type={formType}
-        />
-      </InputGroup>
+      <CAGLabel>{label}</CAGLabel>
+      <Form.Control
+        aria-label={label}
+        name={name}
+        onChange={onChange}
+        placeholder={placeholder}
+        type={formType}
+      />
     </CAGInput>
   );
 };
 
-const CAGInput = styled(InputGroup)`
-  background: white 0% 0% no-repeat padding-box;
-  border-radius: 6px;
-  box-shadow: 2px 2px 10px black;
+const CAGInput = styled(Form.Group)`
+  box-shadow: 0px 13px 21px -10px rgba(0, 0, 0, 0.3);
+`;
+
+const CAGLabel = styled(Form.Label)`
+  color: ${colors.mainFont};
+  font-family: ${fonts.mainFont};
+  font-size: 20px;
 `;
 
 export default InputField;

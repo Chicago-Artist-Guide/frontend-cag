@@ -5,7 +5,7 @@ var app            =         express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.post('/api/user/sign_up', function(req, res) {
+app.post('/api/user/register', function(req, res) {
   res.status(200).end('success');
 });
 

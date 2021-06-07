@@ -48,6 +48,7 @@ const SignUpFooter: React.FC<{
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
   const continueText =
     step === ('privacy' as any) ? 'Accept & Continue' : 'Continue';
+
   const privacyAgree = () => {
     const target = {
       name: 'privacyAgreement',

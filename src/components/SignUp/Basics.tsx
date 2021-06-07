@@ -4,9 +4,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Link } from 'react-router-dom';
-import yellow_blob from '../../images/yellow_blob_2.svg';
-import Image from 'react-bootstrap/Image';
-import { colors, fonts } from '../../theme/styleVars';
+import { fonts } from '../../theme/styleVars';
 import InputField from '../../genericComponents/Input';
 import Checkbox from '../../genericComponents/Checkbox';
 import { Form } from 'react-bootstrap';
@@ -19,61 +17,28 @@ const Privacy: React.FC<{
     <Container>
       <Row>
         <Title>LET'S GET TO KNOW EACH OTHER</Title>
-        <Col lg="8">
+        <Col lg="4">
           <Form>
             <InputField label="First" />
             <InputField label="Last" />
             <InputField label="Email Address" />
             <InputField label="Password" />
-            <Checkbox label="18 years or older" />
-            <TermsPrivacyLink to="/terms-of-service">
-              View our full terms and privacy policy
-            </TermsPrivacyLink>
-            <PrivacyPar>
-              Tap the button below to agree with our terms and privacy policy
-            </PrivacyPar>
+            <Checkbox label="18 years or older" type="checkbox" />
           </Form>
+          <p>
+            Already a member? <Link to="/login">Log in here</Link>.
+          </p>
         </Col>
-        <ImageCol lg="4">
-          <Image alt="" src={yellow_blob} />
-        </ImageCol>
+        <Col lg="4"></Col>
+        <Col lg="4"></Col>
       </Row>
     </Container>
   );
 };
 
-const ImageCol = styled(Col)`
-  display: flex;
-  max-height: 100%;
-  max-width: 100%;
-`;
-
-const PrivacyPar = styled.p`
-  color: ${colors.mainFont};
-  font-family: ${fonts.mainFont};
-  font-size: 20px;
-  letter-spacing: 0px;
-  margin-top: 17px;
-
-  span {
-    font-size: 16px;
-    color: ${colors.primary};
-    font-weight: bold;
-  }
-`;
-
-const TermsPrivacyLink = styled(Link)`
-  color: ${colors.veryDarkGrayBlue};
-  font-family: ${fonts.lora};
-  font-size: 14px;
-  margin-bottom: 18px;
-  margin-top: 26px;
-`;
-
 const Title = styled.h1`
-  font-family: ${fonts.montserrat};
-  font-size: 48px;
-  font-weight: bold;
+  font: ${fonts.montserrat} 48px bold;
+  padding: 48px 0px;
 `;
 
 export default Privacy;
