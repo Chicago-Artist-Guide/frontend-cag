@@ -7,7 +7,11 @@ import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
 import Privacy from '../components/SignUp/Privacy';
 import Basics from '../components/SignUp/Basics';
-// import all of the step components up here
+import ActorInfo1 from '../components/SignUp/ActorInfo1';
+import ActorInfo2 from '../components/SignUp/ActorInfo2';
+import OffstageRoles from '../components/SignUp/OffstageRoles';
+import ProfilePhoto from '../components/SignUp/ProfilePhoto';
+import Demographics from '../components/SignUp/Demographics';
 
 // Establish our steps
 const steps = [
@@ -18,13 +22,13 @@ const steps = [
   { id: 'actorInfo2' },
   { id: 'offstageRoles' },
   { id: 'profilePhoto' },
-  { id: 'demographics' },
-  { id: 'profilePreview' },
+  { id: 'demographics' }
+  /*{ id: 'profilePreview' },
   { id: 'training' },
   { id: 'credits' },
   { id: 'upcoming' },
   { id: 'additionalSkills' },
-  { id: 'awards' }
+  { id: 'awards' }*/
 ];
 
 // flatten our step id's into a single array
@@ -88,7 +92,7 @@ const SignUp = () => {
   const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
   // based on which step we're on, return a different step component and pass it the props it needs
-  const stepFrame = () => {
+  const StepFrame = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
 
@@ -109,28 +113,40 @@ const SignUp = () => {
         returnStep = <Privacy {...props} />;
         break;
       case 'actorInfo1' as any:
+        returnStep = <ActorInfo1 {...props} />;
+        break;
       case 'actorInfo2' as any:
+        returnStep = <ActorInfo2 {...props} />;
+        break;
       case 'offstageRoles' as any:
+        returnStep = <OffstageRoles {...props} />;
+        break;
       case 'profilePhoto' as any:
+        returnStep = <ProfilePhoto {...props} />;
+        break;
       case 'demographics' as any:
-      case 'profilePreview' as any:
+        returnStep = <Demographics {...props} />;
+        break;
+      /*case 'profilePreview' as any:
       case 'training' as any:
       case 'credits' as any:
       case 'upcoming' as any:
       case 'additionalSkills' as any:
-      case 'awards' as any:
+      case 'awards' as any:*/
       default:
         returnStep = <></>;
         break;
     }
 
-    return returnStep;
+    return <>{returnStep}</>;
   };
 
   return (
     <PageContainer>
       <Row>
-        <Col lg={12}>{stepFrame()}</Col>
+        <Col lg={12}>
+          <StepFrame />
+        </Col>
       </Row>
       {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
         <SignUpFooter
