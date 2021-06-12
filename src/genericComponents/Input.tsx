@@ -4,7 +4,7 @@ import { colors, fonts } from '../theme/styleVars';
 import styled from 'styled-components';
 
 const InputField = (props: any) => {
-  const { formType, label, name, onChange, placeholder, ...rest } = props;
+  const { fieldType, label, name, onChange, placeholder, ...rest } = props;
 
   return (
     <CAGInput>
@@ -14,7 +14,7 @@ const InputField = (props: any) => {
         name={name}
         onChange={onChange}
         placeholder={placeholder}
-        type={formType}
+        type={fieldType}
         {...rest}
       />
     </CAGInput>

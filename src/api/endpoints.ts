@@ -11,8 +11,6 @@ const paths = {
 };
 
 interface SubmitSignUpStep {
-  landingPerformTypeOnStage: boolean;
-  landingPerformTypeOffStage: boolean;
   basicsFirstName: string;
   basicsLastName: string;
   basicsEmailAddress: string;
@@ -23,14 +21,12 @@ interface SubmitSignUpStep {
 
 const submitSignUpStep = (step: SubmitSignUpStep): AxiosPromise<void> => {
   const payload = {
-    onStage: step.landingPerformTypeOnStage,
-    offStage: step.landingPerformTypeOffStage,
-    firstName: step.basicsFirstName,
-    lastName: step.basicsLastName,
+    first_name: step.basicsFirstName,
+    last_name: step.basicsLastName,
     email: step.basicsEmailAddress,
-    password: step.basicsPassword,
-    agreeAge: step.basics18Plus,
-    agreePrivacy: step.privacyAgreement
+    pass: step.basicsPassword,
+    agreed_18: step.basics18Plus,
+    agreed_privacy: step.privacyAgreement
   };
 
   return axios.post(paths.SIGN_UP, payload);

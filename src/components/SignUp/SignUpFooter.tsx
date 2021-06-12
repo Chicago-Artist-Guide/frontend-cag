@@ -13,6 +13,7 @@ const SignUpFooter: React.FC<{
   setLandingStep: any;
   step: any;
   steps: any;
+  submitBasics: any;
 }> = ({
   landingStep,
   landingType,
@@ -20,7 +21,8 @@ const SignUpFooter: React.FC<{
   setForm,
   setLandingStep,
   step,
-  steps
+  steps,
+  submitBasics
 }) => {
   /*
     SPECIAL CASES:
@@ -56,6 +58,7 @@ const SignUpFooter: React.FC<{
     };
 
     setForm({ target });
+    submitBasics();
     next();
   };
 

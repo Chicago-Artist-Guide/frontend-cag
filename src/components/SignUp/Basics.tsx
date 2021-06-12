@@ -32,33 +32,33 @@ const Privacy: React.FC<{
               label="First"
               name="basicsFirstName"
               onChange={setForm}
-              value={basicsFirstName}
+              value={basicsFirstName || ''}
             />
             <InputField
               label="Last"
               name="basicsLastName"
               onChange={setForm}
-              value={basicsLastName}
+              value={basicsLastName || ''}
             />
             <InputField
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
-              value={basicsEmailAddress}
+              value={basicsEmailAddress || ''}
             />
             <InputField
-              formType="password"
+              fieldType="password"
               label="Password"
               name="basicsPassword"
               onChange={setForm}
-              value={basicsPassword}
+              value={basicsPassword || ''}
             />
             <Checkbox
               checked={basics18Plus}
+              fieldType="checkbox"
               label="18 years or older"
               name="basics18Plus"
               onChange={setForm}
-              type="checkbox"
             />
           </Form>
           <p>

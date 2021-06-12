@@ -12,6 +12,7 @@ import ActorInfo2 from '../components/SignUp/ActorInfo2';
 import OffstageRoles from '../components/SignUp/OffstageRoles';
 import ProfilePhoto from '../components/SignUp/ProfilePhoto';
 import Demographics from '../components/SignUp/Demographics';
+import { submitSignUpStep } from '../api/endpoints';
 
 // Establish our steps
 const steps = [
@@ -91,8 +92,34 @@ const SignUp = () => {
   const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
   const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
+  const submitBasics = async () => {
+    const {
+      basicsFirstName,
+      basicsLastName,
+      basicsEmailAddress,
+      basicsPassword,
+      basics18Plus,
+      privacyAgreement
+    } = formData;
+
+    try {
+      const getResp = await submitSignUpStep({
+        basicsFirstName,
+        basicsLastName,
+        basicsEmailAddress,
+        basicsPassword,
+        basics18Plus,
+        privacyAgreement
+      });
+
+      console.log(getResp);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   // based on which step we're on, return a different step component and pass it the props it needs
-  const StepFrame = () => {
+  const stepFrame = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
 
@@ -138,15 +165,13 @@ const SignUp = () => {
         break;
     }
 
-    return <>{returnStep}</>;
+    return returnStep;
   };
 
   return (
     <PageContainer>
       <Row>
-        <Col lg={12}>
-          <StepFrame />
-        </Col>
+        <Col lg={12}>{stepFrame()}</Col>
       </Row>
       {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
         <SignUpFooter
@@ -157,6 +182,7 @@ const SignUp = () => {
           setLandingStep={setLandingStep}
           step={step}
           steps={steps}
+          submitBasics={submitBasics}
         />
       )}
     </PageContainer>
