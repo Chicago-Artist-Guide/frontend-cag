@@ -11,6 +11,7 @@ const colors = {
   darkGrey: '#232020',
   scrollOrange: '#F0960E',
   peach: '#F5AF19',
+  darkGreyBlue: '#355669',
   veryDarkGrayBlue: '#4D5055',
   gray: '#4d5055'
 };

@@ -44,9 +44,20 @@ const Landing: React.FC<{
       setForm({ target: newTarget });
     };
 
+    let selected = false;
+
+    if (landingStep === 1) {
+      selected = landingType === name;
+    } else {
+      selected =
+        target.name === 'landingPerformTypeOnStage'
+          ? landingPerformTypeOnStage
+          : landingPerformTypeOffStage;
+    }
+
     return (
       <StyledCard
-        className={`${className} ${landingType === name ? 'selected' : ''}`}
+        className={`${className} ${selected ? 'selected' : ''}`}
         lg="5"
         onClick={setFormCheck}
       >
@@ -105,6 +116,7 @@ const Landing: React.FC<{
     [
       {
         blob: Green_blob,
+        className: 'green-shadow-hover',
         text: (
           <span>
             <strong>On-Stage</strong> (Actors, Singers, Dancers)
@@ -128,6 +140,7 @@ const Landing: React.FC<{
       },
       {
         blob: Blue_blob,
+        className: 'blue-shadow-hover',
         text: (
           <span>
             <strong>Off-Stage</strong> (Directors, Designers, Crew)
@@ -169,7 +182,7 @@ const Landing: React.FC<{
         </Col>
       </Row>
       <Row>
-        <Col lg={12}>
+        <Col lg={7}>
           <Row>
             {(cards as any)[landingStep - 1].map((card: any, i: any) => {
               return <Card {...card} key={`card-${landingStep}-${i}`} />;
@@ -200,8 +213,12 @@ const StyledCard = styled(Col)`
   &.selected {
     cursor: pointer;
 
+    &.blue-shadow-hover {
+      box-shadow: 2px 2px 10px rgba(53, 86, 105, 0.65);
+    }
+
     &.green-shadow-hover {
-      box-shadow: 2px 2px 10px rgba(149, 189, 168, 0.65);
+      box-shadow: 2px 2px 10px rgba(149, 189, 168, 0.99);
     }
 
     &.red-shadow-hover {

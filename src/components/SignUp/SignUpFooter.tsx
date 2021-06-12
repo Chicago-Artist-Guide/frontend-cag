@@ -13,6 +13,7 @@ const SignUpFooter: React.FC<{
   setLandingStep: any;
   step: any;
   steps: any;
+  submitBasics: any;
 }> = ({
   landingStep,
   landingType,
@@ -20,7 +21,8 @@ const SignUpFooter: React.FC<{
   setForm,
   setLandingStep,
   step,
-  steps
+  steps,
+  submitBasics
 }) => {
   /*
     SPECIAL CASES:
@@ -48,6 +50,7 @@ const SignUpFooter: React.FC<{
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
   const continueText =
     step === ('privacy' as any) ? 'Accept & Continue' : 'Continue';
+
   const privacyAgree = () => {
     const target = {
       name: 'privacyAgreement',
@@ -55,6 +58,7 @@ const SignUpFooter: React.FC<{
     };
 
     setForm({ target });
+    submitBasics();
     next();
   };
 
@@ -78,6 +82,7 @@ const SignUpFooter: React.FC<{
               className={
                 i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
               }
+              key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
             />
           ))}
         </Pagination>

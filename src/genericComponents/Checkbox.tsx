@@ -1,15 +1,22 @@
 import React from 'react';
-import { InputGroup } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import styled from 'styled-components';
+import { colors, fonts } from '../theme/styleVars';
 
 const Checkbox = (props: any) => {
-  return <CAGCheckbox {...props} />;
+  const { fieldType, label } = props;
+
+  return (
+    <CAGCheckbox>
+      <Form.Check label={label} type={fieldType} />
+    </CAGCheckbox>
+  );
 };
 
-const CAGCheckbox = styled(InputGroup.Checkbox)`
-  background: white 0% 0% no-repeat padding-box;
-  border-radius: 6px;
-  box-shadow: 2px 2px 10px black;
+const CAGCheckbox = styled(Form.Group)`
+  label {
+    font: ${fonts.mainFont} ${colors.mainFont};
+  }
 `;
 
 export default Checkbox;
