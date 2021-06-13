@@ -1,15 +1,15 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import { SessionContext } from '../../utils/session';
 import { colors } from '../../theme/styleVars';
 import { ReactComponent as Logo } from '../../images/logoPlain.svg';
 
-const Header = () => {
-  const session = useContext(SessionContext);
-  const showSession = !!(session.userId !== undefined && session.active_status);
+const Header: React.FC<{
+  showSession: boolean;
+}> = props => {
+  const { showSession } = props;
 
   return (
     <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">

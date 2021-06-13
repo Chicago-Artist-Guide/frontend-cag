@@ -22,8 +22,6 @@ const Privacy: React.FC<{
     basics18Plus
   } = formData;
 
-  console.log(formData);
-
   return (
     <Container>
       <Row>

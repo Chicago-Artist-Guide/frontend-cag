@@ -93,7 +93,10 @@ const SignUp = () => {
   const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
   const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
-  const submitBasics = async () => {
+  console.log('formData', formData);
+
+  const submitBasics = async (fields: any) => {
+    console.log('fields', fields);
     const {
       basicsFirstName,
       basicsLastName,
@@ -101,7 +104,7 @@ const SignUp = () => {
       basicsPassword,
       basics18Plus,
       privacyAgreement
-    } = formData;
+    } = fields;
 
     try {
       const getResp = await submitSignUpStep({
@@ -184,7 +187,7 @@ const SignUp = () => {
           setLandingStep={setLandingStep}
           step={step}
           steps={steps}
-          submitBasics={submitBasics}
+          submitBasics={() => submitBasics(formData)}
         />
       )}
     </PageContainer>

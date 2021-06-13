@@ -51,13 +51,17 @@ const SignUpFooter: React.FC<{
   const continueText =
     step === ('privacy' as any) ? 'Accept & Continue' : 'Continue';
 
-  const privacyAgree = () => {
+  const setPrivacyAgree = () => {
     const target = {
       name: 'privacyAgreement',
       value: true
     };
 
     setForm({ target });
+  };
+
+  const privacyAgree = async () => {
+    await setPrivacyAgree();
     submitBasics();
     next();
   };
