@@ -3,7 +3,16 @@ import React from 'react';
 // import styled from 'styled-components';
 import GenericAccordion from '../../genericComponents/Accordion';
 
+// create local state to monitor checkboxes and push values to arrays
+
 const OffstageRoles = (...props: any) => {
+  // const [general, setGeneral] = useState([]);
+  // const [production, setProduction] = useState([]);
+  // const [scenicAndProperties, setScenicAndProperties] = useState([]);
+  // const [lighting, setLighting] = useState([]);
+  // const [sound, setSound] = useState([]);
+  // const [hairMakeupCostumes, setHairMakeupCostumes] = useState([]);
+
   const offstageRoles = {
     general: [
       'Directing',
@@ -21,22 +30,31 @@ const OffstageRoles = (...props: any) => {
       'Board Op',
       'Run Crew'
     ],
-    scenicAndProperties: ['abc'],
-    lighting: ['def'],
-    sound: ['ghi'],
-    hairMakeupCostumes: ['jkl']
+    scenicAndProperties: [
+      'Set Design',
+      'Technical Direction',
+      'Properties Designer',
+      'Scenic Carpentry',
+      'Charge Artist'
+    ],
+    lighting: [
+      'Lighting Design',
+      'Projection Design',
+      'Special Effects Design',
+      'Master Electrician'
+    ],
+    sound: ['Sound Design', 'Sound Mixer/Engineer'],
+    hairMakeupCostumes: [
+      'Costume Design',
+      'Hair & Wig Design',
+      'Make-up Design'
+    ]
   };
-
-  // const renderOffstageRoles = () => {
-  //     return offstageRoles.map(offstageRolesItem => {
-  //         return <GenericAccordion offstageRoleItem={offstageRolesItem} />
-  //     })
-  // }
 
   return (
     <div>
-      <h1>SO, WHAT DO YOU LIKE DOING</h1>
-      <h2>Tell us what positions suit you best</h2>
+      <h1>SO, WHAT DO YOU LIKE DOING?</h1>
+      <h2>Tell us what positions suit you best.</h2>
       <h3>Off-Stage Roles</h3>
       <h4>Select all applicable positions</h4>
       <GenericAccordion text={offstageRoles.general} textHeader="General" />

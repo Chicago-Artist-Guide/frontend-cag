@@ -11,7 +11,7 @@ const GenericAccordion = (props: any) => {
 
   const renderText = () => {
     return text.map((textObj: any) => {
-      return <Checkbox key={textObj.id} label={textObj} />;
+      return <Checkbox key={textObj.id}>{textObj}</Checkbox>;
     });
   };
   return (
