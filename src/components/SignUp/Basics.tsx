@@ -1,13 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Link } from 'react-router-dom';
-import { fonts } from '../../theme/styleVars';
+import { Form } from 'react-bootstrap';
 import InputField from '../../genericComponents/Input';
 import Checkbox from '../../genericComponents/Checkbox';
-import { Form } from 'react-bootstrap';
+import { colors, fonts } from '../../theme/styleVars';
 
 const Privacy: React.FC<{
   setForm: any;
@@ -61,9 +61,9 @@ const Privacy: React.FC<{
               onChange={setForm}
             />
           </Form>
-          <p>
-            Already a member? <Link to="/login">Log in here</Link>.
-          </p>
+          <LoginLink>
+            Already a member? <Link to="/login">Log in here</Link>
+          </LoginLink>
         </Col>
         <Col lg="4"></Col>
         <Col lg="4"></Col>
@@ -75,6 +75,18 @@ const Privacy: React.FC<{
 const Title = styled.h1`
   font: ${fonts.montserrat} 48px bold;
   padding: 48px 0px;
+`;
+
+const LoginLink = styled.p`
+  text-align: left;
+  font-size: 14px/18px;
+  font-style: italic;
+  letter-spacing: 0.14px;
+  margin-top: 40px;
+
+  a {
+    color: ${colors.orange};
+  }
 `;
 
 export default Privacy;
