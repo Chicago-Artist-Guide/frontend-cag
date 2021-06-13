@@ -93,18 +93,26 @@ const SignUp = () => {
   const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
   const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
-  console.log('formData', formData);
+  const setPrivacyAgree = () => {
+    const target = {
+      name: 'privacyAgreement',
+      value: true
+    };
 
-  const submitBasics = async (fields: any) => {
-    console.log('fields', fields);
+    setForm({ target });
+  };
+
+  const submitBasics = async () => {
+    // set privacy agree even though it won't work for the payload yet
+    setPrivacyAgree();
+
     const {
       basicsFirstName,
       basicsLastName,
       basicsEmailAddress,
       basicsPassword,
-      basics18Plus,
-      privacyAgreement
-    } = fields;
+      basics18Plus
+    } = formData;
 
     try {
       const getResp = await submitSignUpStep({
@@ -113,7 +121,7 @@ const SignUp = () => {
         basicsEmailAddress,
         basicsPassword,
         basics18Plus,
-        privacyAgreement
+        privacyAgreement: true // must be set manually for now
       });
 
       console.log(getResp);
@@ -187,7 +195,7 @@ const SignUp = () => {
           setLandingStep={setLandingStep}
           step={step}
           steps={steps}
-          submitBasics={() => submitBasics(formData)}
+          submitBasics={submitBasics}
         />
       )}
     </PageContainer>

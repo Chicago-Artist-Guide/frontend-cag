@@ -1,15 +1,28 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
+import { getSessionCookie } from '../../utils/session';
 import { colors } from '../../theme/styleVars';
+
 import { ReactComponent as Logo } from '../../images/logoPlain.svg';
 
-const Header: React.FC<{
-  showSession: boolean;
-}> = props => {
-  const { showSession } = props;
+const Header = () => {
+  const [session, setSession] = useState(getSessionCookie());
+  const showSession = !!(
+    session &&
+    session.data &&
+    session.data.userId !== undefined &&
+    session.data.active_status !== undefined &&
+    session.data.active_status
+  );
+
+  useEffect(() => {
+    const detectCookieUpdate = () => setSession(getSessionCookie());
+    const interval = window.setInterval(detectCookieUpdate, 250);
+    return () => window.clearInterval(interval);
+  }, []);
 
   return (
     <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">
