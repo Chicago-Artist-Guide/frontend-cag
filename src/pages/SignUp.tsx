@@ -13,6 +13,7 @@ import OffstageRoles from '../components/SignUp/OffstageRoles';
 import ProfilePhoto from '../components/SignUp/ProfilePhoto';
 import Demographics from '../components/SignUp/Demographics';
 import { submitSignUpStep } from '../api/endpoints';
+import { setSessionCookie } from '../utils/session';
 
 // Establish our steps
 const steps = [
@@ -113,6 +114,7 @@ const SignUp = () => {
       });
 
       console.log(getResp);
+      setSessionCookie({ ...getResp });
     } catch (err) {
       console.log(err);
     }
