@@ -1,6 +1,9 @@
 import axios, { AxiosPromise } from 'axios';
 
-const base = '/api/';
+const base = 'https://cag-backend-api.herokuapp.com/';
+const headers = {
+  authKey: 'mockAuthKey'
+};
 
 const paths = {
   SIGN_UP: `${base}user/register`,
@@ -29,7 +32,7 @@ const submitSignUpStep = (step: SubmitSignUpStep): AxiosPromise<void> => {
     agreed_privacy: step.privacyAgreement
   };
 
-  return axios.post(paths.SIGN_UP, payload);
+  return axios.post(paths.SIGN_UP, payload, { headers });
 };
 
 export { submitSignUpStep };

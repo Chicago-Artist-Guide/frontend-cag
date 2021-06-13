@@ -54,7 +54,7 @@ const Privacy: React.FC<{
               value={basicsPassword || ''}
             />
             <Checkbox
-              checked={basics18Plus}
+              checked={basics18Plus || false}
               fieldType="checkbox"
               label="18 years or older"
               name="basics18Plus"

@@ -13,6 +13,7 @@ import OffstageRoles from '../components/SignUp/OffstageRoles';
 import ProfilePhoto from '../components/SignUp/ProfilePhoto';
 import Demographics from '../components/SignUp/Demographics';
 import { submitSignUpStep } from '../api/endpoints';
+import { setSessionCookie } from '../utils/session';
 
 // Establish our steps
 const steps = [
@@ -92,14 +93,25 @@ const SignUp = () => {
   const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
   const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
 
+  const setPrivacyAgree = () => {
+    const target = {
+      name: 'privacyAgreement',
+      value: true
+    };
+
+    setForm({ target });
+  };
+
   const submitBasics = async () => {
+    // set privacy agree even though it won't work for the payload yet
+    setPrivacyAgree();
+
     const {
       basicsFirstName,
       basicsLastName,
       basicsEmailAddress,
       basicsPassword,
-      basics18Plus,
-      privacyAgreement
+      basics18Plus
     } = formData;
 
     try {
@@ -109,10 +121,11 @@ const SignUp = () => {
         basicsEmailAddress,
         basicsPassword,
         basics18Plus,
-        privacyAgreement
+        privacyAgreement: true // must be set manually for now
       });
 
       console.log(getResp);
+      setSessionCookie({ ...getResp });
     } catch (err) {
       console.log(err);
     }

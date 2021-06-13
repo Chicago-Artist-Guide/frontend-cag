@@ -4,11 +4,11 @@ import styled from 'styled-components';
 import { colors, fonts } from '../theme/styleVars';
 
 const Checkbox = (props: any) => {
-  const { fieldType, label } = props;
+  const { fieldType, label, ...rest } = props;
 
   return (
     <CAGCheckbox>
-      <Form.Check label={label} type={fieldType} />
+      <Form.Check label={label} type={fieldType} {...rest} />
     </CAGCheckbox>
   );
 };
