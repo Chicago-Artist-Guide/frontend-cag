@@ -3,6 +3,7 @@ const colors = {
   mainFont: '#0C2028',
   secondaryFontColor: '#2F4550',
   primary: '#82B29A',
+  darkPrimary: '#425B4E',
   orange: '#E17B60',
   darkGreen: '#82b29a',
   italicColor: '#537C8C',
@@ -11,6 +12,7 @@ const colors = {
   darkGrey: '#232020',
   scrollOrange: '#F0960E',
   peach: '#F5AF19',
+  darkGreyBlue: '#355669',
   veryDarkGrayBlue: '#4D5055',
   gray: '#4d5055'
 };

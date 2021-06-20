@@ -109,6 +109,8 @@ const SignUp = () => {
       case 'actorInfo1' as any:
       case 'actorInfo2' as any:
       case 'offstageRoles' as any:
+        returnStep = <OffstageRoles {...props} />;
+        break;
       case 'profilePhoto' as any:
       case 'demographics' as any:
       case 'profilePreview' as any:
@@ -129,7 +131,6 @@ const SignUp = () => {
     <PageContainer>
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
-        <OffstageRoles />
       </Row>
       {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
         <SignUpFooter

@@ -1,13 +1,13 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Tagline, TitleThree } from '../layout/Titles';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Link } from 'react-router-dom';
-import yellow_blob from '../../images/yellow_blob_2.svg';
 import Image from 'react-bootstrap/Image';
+import { Tagline, TitleThree } from '../layout/Titles';
 import { colors, fonts } from '../../theme/styleVars';
+import yellow_blob from '../../images/yellow_blob_2.svg';
 
 const Privacy: React.FC<{
   setForm: any;

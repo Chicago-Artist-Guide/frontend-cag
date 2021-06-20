@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
+import Button from '../../genericComponents/Button';
 import { colors } from '../../theme/styleVars';
 
 const SignUpFooter: React.FC<{
@@ -13,6 +13,7 @@ const SignUpFooter: React.FC<{
   setLandingStep: any;
   step: any;
   steps: any;
+  submitBasics: any;
 }> = ({
   landingStep,
   landingType,
@@ -20,7 +21,8 @@ const SignUpFooter: React.FC<{
   setForm,
   setLandingStep,
   step,
-  steps
+  steps,
+  submitBasics
 }) => {
   /*
     SPECIAL CASES:
@@ -48,13 +50,9 @@ const SignUpFooter: React.FC<{
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
   const continueText =
     step === ('privacy' as any) ? 'Accept & Continue' : 'Continue';
-  const privacyAgree = () => {
-    const target = {
-      name: 'privacyAgreement',
-      value: true
-    };
 
-    setForm({ target });
+  const privacyAgree = () => {
+    submitBasics();
     next();
   };
 
@@ -64,11 +62,10 @@ const SignUpFooter: React.FC<{
         {showBackButton && (
           <Button
             onClick={backButtonLandingStep ? () => setLandingStep(1) : previous}
+            text="Back"
             type="button"
             variant="secondary"
-          >
-            Back
-          </Button>
+          />
         )}
       </Col>
       <Col lg="4">
@@ -78,6 +75,7 @@ const SignUpFooter: React.FC<{
               className={
                 i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
               }
+              key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
             />
           ))}
         </Pagination>
@@ -92,11 +90,10 @@ const SignUpFooter: React.FC<{
                 ? privacyAgree
                 : () => setLandingStep(2)
             }
+            text={continueText}
             type="button"
             variant="primary"
-          >
-            {continueText}
-          </Button>
+          />
         )}
       </ButtonCol>
     </PageFooterRow>
