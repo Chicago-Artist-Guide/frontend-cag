@@ -2,78 +2,170 @@ import React from 'react';
 // import { colors } from '../../theme/styleVars';
 // import styled from 'styled-components';
 import GenericAccordion from '../../genericComponents/Accordion';
-
-// create local state to monitor checkboxes and push values to arrays
+import Checkbox from '../../genericComponents/Accordion';
 
 const OffstageRoles = (...props: any) => {
-  // const [general, setGeneral] = useState([]);
-  // const [production, setProduction] = useState([]);
-  // const [scenicAndProperties, setScenicAndProperties] = useState([]);
-  // const [lighting, setLighting] = useState([]);
-  // const [sound, setSound] = useState([]);
-  // const [hairMakeupCostumes, setHairMakeupCostumes] = useState([]);
 
-  const offstageRoles = {
-    general: [
-      'Directing',
-      'Violence/Fight Design',
-      'Intimacy Design',
-      'Choreography',
-      'Casting',
-      'Dramaturgy',
-      'Dialect Coaching',
-      'Musical Directing'
-    ],
-    production: [
-      'Stage Management',
-      'Production Management',
-      'Board Op',
-      'Run Crew'
-    ],
-    scenicAndProperties: [
-      'Set Design',
-      'Technical Direction',
-      'Properties Designer',
-      'Scenic Carpentry',
-      'Charge Artist'
-    ],
-    lighting: [
-      'Lighting Design',
-      'Projection Design',
-      'Special Effects Design',
-      'Master Electrician'
-    ],
-    sound: ['Sound Design', 'Sound Mixer/Engineer'],
-    hairMakeupCostumes: [
-      'Costume Design',
-      'Hair & Wig Design',
-      'Make-up Design'
-    ]
+  const offstageRolesObj = {
+    general: {
+      textHeader: 'General',
+      checkboxes: [
+        {
+          label: 'Directing',
+          value: 'Directing'
+        },
+        {
+          label: 'Violence / Fight Design',
+          value: 'Violence / Fight Design'
+        },
+        {
+          label: 'Intimacy Design',
+          value: 'Intimacy Design'
+        },
+        {
+          label: 'Choreography',
+          value: 'Choreography'
+        },
+        {
+          label: 'Casting',
+          value: 'Casting'
+        },
+        {
+          label: 'Dramaturgy',
+          value: 'Dramaturgy'
+        },
+        {
+          label: 'Dialect Coaching',
+          value: 'Dialect Coaching'
+        },
+        {
+          label: 'Musical Directing',
+          value: 'Musical Directing'
+        }
+      ]
+    },
+    production: {
+      textHeader: 'Production',
+      checkboxes: [
+        {
+          label: 'Stage Management',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Production Management',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Board Op',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Run Crew',
+          value: 'the-checkbox-name'
+        }
+      ]
+    },
+    scenicAndProperties: {
+      textHeader: 'Scenic & Properties',
+      checkboxes: [
+        {
+          label: 'Set Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Technical Direction',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Properties Designer',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Scenic Carpentry',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Charge Artist',
+          value: 'the-checkbox-name'
+        },
+      ]
+    },
+    lighting: {
+      textHeader: 'Lighting',
+      checkboxes: [
+        {
+          label: 'Lighting Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Projection Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Special Effect Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Master Electrician',
+          value: 'the-checkbox-name'
+        },
+      ]
+    },
+    sound: {
+      textHeader: 'Sound',
+      checkboxes: [
+        {
+          label: 'Sound Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Sound Mixer / Engineer',
+          value: 'the-checkbox-name'
+        }
+      ]
+    },
+    hairMakeupCostumes: {
+      textHeader: 'Hair, Makeup, Costumes',
+      checkboxes: [
+        {
+          label: 'Costume Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Hair & Wig Design',
+          value: 'the-checkbox-name'
+        },
+        {
+          label: 'Make-up Design',
+          value: 'the-checkbox-name'
+        },
+      ]
+    }
   };
 
-  return (
+  return(
     <div>
       <h1>SO, WHAT DO YOU LIKE DOING?</h1>
       <h2>Tell us what positions suit you best.</h2>
       <h3>Off-Stage Roles</h3>
       <h4>Select all applicable positions</h4>
-      <GenericAccordion text={offstageRoles.general} textHeader="General" />
-      <GenericAccordion
-        text={offstageRoles.production}
-        textHeader="Production"
-      />
-      <GenericAccordion
-        text={offstageRoles.scenicAndProperties}
-        textHeader="Scenic"
-      />
-      <GenericAccordion text={offstageRoles.lighting} textHeader="Lighting" />
-      <GenericAccordion text={offstageRoles.sound} textHeader="Sound" />
-      <GenericAccordion
-        text={offstageRoles.hairMakeupCostumes}
-        textHeader="Hair/Makeup/Costumes"
-      />
-    </div>
-  );
-};
+      
+      {Object.keys(offstageRolesObj).map(
+        (objKey) => {
+          const currObjKey = (offstageRolesObj as any)[objKey as any];
+            return <GenericAccordion textHeader={currObjKey.textHeader}>
+              <div>abc</div>
+              {currObjKey.checkboxes.map(
+                (chk: { label: any; value: any; }) => {
+                  return <Checkbox fieldType="checkbox" label={chk.label} value={chk.value}/>
+                }
+              )}
+            </GenericAccordion>
+          ;
+        }
+    )
+  }
+  </div>
+  )}
 
 export default OffstageRoles;
