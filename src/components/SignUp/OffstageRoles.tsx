@@ -2,7 +2,7 @@ import React from 'react';
 // import { colors } from '../../theme/styleVars';
 // import styled from 'styled-components';
 import GenericAccordion from '../../genericComponents/Accordion';
-import Checkbox from '../../genericComponents/Accordion';
+import Checkbox from '../../genericComponents/Checkbox';
 
 const OffstageRoles = (...props: any) => {
 
@@ -153,11 +153,11 @@ const OffstageRoles = (...props: any) => {
       {Object.keys(offstageRolesObj).map(
         (objKey) => {
           const currObjKey = (offstageRolesObj as any)[objKey as any];
-            return <GenericAccordion textHeader={currObjKey.textHeader}>
-              <div>abc</div>
+            return <GenericAccordion key={`accordion-${currObjKey.textHeader}`} textHeader={currObjKey.textHeader}>
               {currObjKey.checkboxes.map(
                 (chk: { label: any; value: any; }) => {
-                  return <Checkbox fieldType="checkbox" label={chk.label} value={chk.value}/>
+                  const { label: chkLabel, value: chkValue } = chk;
+                  return <Checkbox fieldType="checkbox" key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`} label={chkLabel} value={chkValue}/>
                 }
               )}
             </GenericAccordion>
