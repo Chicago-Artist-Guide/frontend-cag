@@ -159,7 +159,7 @@ const OffstageRoles = (...props: any) => {
 
         return (
           <>
-            <GenericAccordion
+            <GenericAccordion1
               key={`accordion-${currObjKey.textHeader}`}
               textHeader={currObjKey.textHeader}
             >
@@ -186,7 +186,7 @@ const OffstageRoles = (...props: any) => {
                   </ImageCol>
                 </Row>
               </Container>
-            </GenericAccordion>
+            </GenericAccordion1>
             <br></br>
           </>
         );
@@ -217,5 +217,9 @@ const ImageCol = styled(Col)`
   max-height: 100%;
   max-width: 100%;
 `;
+const GenericAccordion1 = styled(GenericAccordion)`
+    display:flex
+    justify-content: space-between
+  `;
 
 export default OffstageRoles;
