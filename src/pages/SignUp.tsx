@@ -57,6 +57,7 @@ const defaultData = {
 
   actorInfo2HeightFt: 0,
   actorInfo2HeightIn: 0,
+  actorInfo2HeightNoAnswer: false,
   actorInfo2AgeRanges: [],
   actorInfo2Gender: '',
   actorInfo2GenderRoles: [],
