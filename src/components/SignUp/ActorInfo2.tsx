@@ -29,17 +29,66 @@ const genders = [
   'I choose not to respond'
 ];
 
-const genderRoles = [
-  'Women',
-  'Men',
-  'Neither'
-];
+const genderRoles = ['Women', 'Men', 'Neither'];
 
 const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
 }> = props => {
-  const { setForm } = props;
+  const { formData, setForm } = props;
+  const {
+    actorInfo2AgeRanges,
+    actorInfo2GenderRoles,
+    actorInfo2GenderTransition,
+    actorInfo2HeightNoAnswer
+  } = formData;
+
+  const isAgeRangeInAgeRanges = (ageRange: string) =>
+    actorInfo2AgeRanges.indexOf(ageRange) > -1;
+  const isGenderRoleInGenderRoles = (genderRole: string) =>
+    actorInfo2GenderRoles.indexOf(genderRole) > -1;
+
+  const ageRangeChange = (checkValue: any, range: string) => {
+    let newRanges = [...actorInfo2AgeRanges];
+
+    if (checkValue) {
+      // check age range value
+      if (newRanges.indexOf(range) < 0) {
+        newRanges.push(range);
+      }
+    } else {
+      // uncheck age range value
+      newRanges = newRanges.filter(aR => aR !== range);
+    }
+
+    const target = {
+      name: 'actorInfo2AgeRanges',
+      value: newRanges
+    };
+
+    setForm({ target });
+  };
+
+  const genderRoleChange = (checkValue: any, role: string) => {
+    let newRoles = [...actorInfo2GenderRoles];
+
+    if (checkValue) {
+      // check gender role value
+      if (newRoles.indexOf(role) < 0) {
+        newRoles.push(role);
+      }
+    } else {
+      // uncheck gender role value
+      newRoles = newRoles.filter(gR => gR !== role);
+    }
+
+    const target = {
+      name: 'actorInfo2GenderRoles',
+      value: newRoles
+    };
+
+    setForm({ target });
+  };
 
   return (
     <Container>
@@ -59,6 +108,7 @@ const ActorInfo2: React.FC<{
                         name="actorInfo2HeightFt"
                         onChange={setForm}
                       >
+                        <option value={undefined}>Feet</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7].map(ft => (
                           <option value={ft}>{ft} ft</option>
                         ))}
@@ -71,6 +121,7 @@ const ActorInfo2: React.FC<{
                         name="actorInfo2HeightIn"
                         onChange={setForm}
                       >
+                        <option value={undefined}>Inches</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(inches => (
                           <option value={inches}>{inches} in</option>
                         ))}
@@ -78,7 +129,7 @@ const ActorInfo2: React.FC<{
                     </Col>
                     <Col lg="6">
                       <Checkbox
-                        checked={false}
+                        checked={actorInfo2HeightNoAnswer}
                         fieldType="checkbox"
                         label="I do not wish to answer"
                         name="actorInfo2HeightNoAnswer"
@@ -93,19 +144,23 @@ const ActorInfo2: React.FC<{
                 <p>Select up to 3 ranges</p>
                 {ageRanges.map(ageRange => (
                   <Checkbox
-                    checked={false}
+                    checked={isAgeRangeInAgeRanges(ageRange)}
                     fieldType="checkbox"
                     label={ageRange}
                     name="actorInfo2AgeRanges"
-                    onChange={setForm}
+                    onChange={(e: any) =>
+                      ageRangeChange(e.currentTarget.checked, ageRange)
+                    }
                   />
                 ))}
               </Form.Group>
               <Form.Group>
                 <CAGLabel>Gender Identity - Private</CAGLabel>
                 <p>
-                  First, choose your gender identity - additional options may be presented for casting purposes. 
-                  If other, please select the option with which you most closely identify for casting purposes.
+                  First, choose your gender identity - additional options may be
+                  presented for casting purposes. If other, please select the
+                  option with which you most closely identify for casting
+                  purposes.
                 </p>
                 <Form.Control
                   as="select"
@@ -113,6 +168,7 @@ const ActorInfo2: React.FC<{
                   name="actorInfo2Gender"
                   onChange={setForm}
                 >
+                  <option value={undefined}>Select</option>
                   {genders.map(g => (
                     <option value={g}>{g}</option>
                   ))}
@@ -123,34 +179,43 @@ const ActorInfo2: React.FC<{
           <Row>
             <Col lg="6">
               <Form.Group>
-                <CAGLabel>I would also be comfortable playing roles usually played by:</CAGLabel>
+                <CAGLabel>
+                  I would also be comfortable playing roles usually played by:
+                </CAGLabel>
                 {genderRoles.map(g => (
                   <Checkbox
-                    checked={false}
+                    checked={isGenderRoleInGenderRoles(g)}
                     fieldType="checkbox"
                     label={g}
                     name="actorInfo2GenderRoles"
-                    onChange={setForm}
+                    onChange={(e: any) =>
+                      genderRoleChange(e.currentTarget.checked, g)
+                    }
                   />
                 ))}
               </Form.Group>
             </Col>
             <Col lg="6">
               <Form.Group>
-                <CAGLabel>I would be comfortable playing a character through all phases of their transition:</CAGLabel>
+                <CAGLabel>
+                  I would be comfortable playing a character through all phases
+                  of their transition:
+                </CAGLabel>
                 <Checkbox
-                  checked={false}
-                  fieldType="checkbox"
+                  checked={actorInfo2GenderTransition === 'Yes'}
+                  fieldType="radio"
                   label="Yes"
                   name="actorInfo2GenderTransition"
                   onChange={setForm}
+                  value="Yes"
                 />
                 <Checkbox
-                  checked={false}
-                  fieldType="checkbox"
+                  checked={actorInfo2GenderTransition === 'No'}
+                  fieldType="radio"
                   label="No"
                   name="actorInfo2GenderTransition"
                   onChange={setForm}
+                  value="No"
                 />
               </Form.Group>
             </Col>
