@@ -12,7 +12,7 @@ const GenericAccordion = (props: any) => {
     <Accordion defaultActiveKey="0" onClick={() => setIsOpen(!isOpen)}>
       <Card>
         <Card.Header>
-          <Accordion.Toggle as={Button} eventKey="0" variant="link">
+          <Accordion.Toggle as={Button} eventKey="0" variant="button">
             {textHeader}
           </Accordion.Toggle>
         </Card.Header>

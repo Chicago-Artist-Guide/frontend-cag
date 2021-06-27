@@ -1,11 +1,15 @@
 import React from 'react';
-// import { colors } from '../../theme/styleVars';
-// import styled from 'styled-components';
+import { fonts } from '../../theme/styleVars';
+import styled from 'styled-components';
 import GenericAccordion from '../../genericComponents/Accordion';
 import Checkbox from '../../genericComponents/Checkbox';
+import yellow_blob_1 from '../../images/yellow_blob_1.svg';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Image from 'react-bootstrap/Image';
+import Container from 'react-bootstrap/Container';
 
 const OffstageRoles = (...props: any) => {
-
   const offstageRolesObj = {
     general: {
       textHeader: 'General',
@@ -87,7 +91,7 @@ const OffstageRoles = (...props: any) => {
         {
           label: 'Charge Artist',
           value: 'the-checkbox-name'
-        },
+        }
       ]
     },
     lighting: {
@@ -108,7 +112,7 @@ const OffstageRoles = (...props: any) => {
         {
           label: 'Master Electrician',
           value: 'the-checkbox-name'
-        },
+        }
       ]
     },
     sound: {
@@ -138,34 +142,80 @@ const OffstageRoles = (...props: any) => {
         {
           label: 'Make-up Design',
           value: 'the-checkbox-name'
-        },
+        }
       ]
     }
   };
 
-  return(
+  return (
     <div>
-      <h1>SO, WHAT DO YOU LIKE DOING?</h1>
-      <h2>Tell us what positions suit you best.</h2>
-      <h3>Off-Stage Roles</h3>
-      <h4>Select all applicable positions</h4>
-      
-      {Object.keys(offstageRolesObj).map(
-        (objKey) => {
-          const currObjKey = (offstageRolesObj as any)[objKey as any];
-            return <GenericAccordion key={`accordion-${currObjKey.textHeader}`} textHeader={currObjKey.textHeader}>
-              {currObjKey.checkboxes.map(
-                (chk: { label: any; value: any; }) => {
-                  const { label: chkLabel, value: chkValue } = chk;
-                  return <Checkbox fieldType="checkbox" key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`} label={chkLabel} value={chkValue}/>
-                }
-              )}
+      <Title>SO, WHAT DO YOU LIKE DOING?</Title>
+      <TitleSecond>Tell us what positions suit you best.</TitleSecond>
+      <TitleThird>Off-Stage Roles</TitleThird>
+      <TitleFourth>Select all applicable positions</TitleFourth>
+
+      {Object.keys(offstageRolesObj).map(objKey => {
+        const currObjKey = (offstageRolesObj as any)[objKey as any];
+
+        return (
+          <>
+            <GenericAccordion
+              key={`accordion-${currObjKey.textHeader}`}
+              textHeader={currObjKey.textHeader}
+            >
+              <Container>
+                <Row>
+                  <Col lg="8">
+                    {currObjKey.checkboxes.map(
+                      (chk: { label: any; value: any }) => {
+                        const { label: chkLabel, value: chkValue } = chk;
+
+                        return (
+                          <Checkbox
+                            fieldType="checkbox"
+                            key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`}
+                            label={chkLabel}
+                            value={chkValue}
+                          />
+                        );
+                      }
+                    )}
+                  </Col>
+                  <ImageCol lg="4">
+                    <Image src={yellow_blob_1} />
+                  </ImageCol>
+                </Row>
+              </Container>
             </GenericAccordion>
-          ;
-        }
-    )
-  }
-  </div>
-  )}
+            <br></br>
+          </>
+        );
+      })}
+    </div>
+  );
+};
+
+const Title = styled.h1`
+  font-family: ${fonts.montserrat};
+  font-size: 48px;
+`;
+const TitleSecond = styled.h2`
+  font-family: ${fonts.lora};
+  font-size: 28px;
+  font-weight: italic;
+`;
+const TitleThird = styled.h3`
+  font-family: ${fonts.mainFont};
+  font-size: 20px;
+`;
+const TitleFourth = styled.h4`
+  font-family: ${fonts.lora};
+  font-size: 14px;
+`;
+const ImageCol = styled(Col)`
+  display: flex;
+  max-height: 100%;
+  max-width: 100%;
+`;
 
 export default OffstageRoles;
