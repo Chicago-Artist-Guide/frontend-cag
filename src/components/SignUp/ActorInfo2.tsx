@@ -10,14 +10,16 @@ import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
 const ageRanges = [
-  '19 and younger',
-  '20-24',
-  '25-29',
-  '30-34',
-  '34-39',
-  '40-45',
-  '46-55',
-  '56+'
+  '18-22',
+  '23-27',
+  '28-32',
+  '33-37',
+  '38-42',
+  '43-47',
+  '48-52',
+  '53-57',
+  '58-62',
+  '62+'
 ];
 
 const genders = [
