@@ -9,143 +9,156 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
 
-const OffstageRoles = (...props: any) => {
-  const offstageRolesObj = {
-    general: {
-      textHeader: 'General',
-      checkboxes: [
-        {
-          label: 'Directing',
-          value: 'Directing'
-        },
-        {
-          label: 'Violence / Fight Design',
-          value: 'Violence / Fight Design'
-        },
-        {
-          label: 'Intimacy Design',
-          value: 'Intimacy Design'
-        },
-        {
-          label: 'Choreography',
-          value: 'Choreography'
-        },
-        {
-          label: 'Casting',
-          value: 'Casting'
-        },
-        {
-          label: 'Dramaturgy',
-          value: 'Dramaturgy'
-        },
-        {
-          label: 'Dialect Coaching',
-          value: 'Dialect Coaching'
-        },
-        {
-          label: 'Musical Directing',
-          value: 'Musical Directing'
-        }
-      ]
-    },
-    production: {
-      textHeader: 'Production',
-      checkboxes: [
-        {
-          label: 'Stage Management',
-          value: 'Stage Management'
-        },
-        {
-          label: 'Production Management',
-          value: 'Production Management'
-        },
-        {
-          label: 'Board Op',
-          value: 'Board Op'
-        },
-        {
-          label: 'Run Crew',
-          value: 'Run Crew'
-        }
-      ]
-    },
-    scenicAndProperties: {
-      textHeader: 'Scenic & Properties',
-      checkboxes: [
-        {
-          label: 'Set Design',
-          value: 'Set Design'
-        },
-        {
-          label: 'Technical Direction',
-          value: 'Technical Direction'
-        },
-        {
-          label: 'Properties Designer',
-          value: 'Properties Designer'
-        },
-        {
-          label: 'Scenic Carpentry',
-          value: 'Scenic Carpentry'
-        },
-        {
-          label: 'Charge Artist',
-          value: 'Charge Artist'
-        }
-      ]
-    },
-    lighting: {
-      textHeader: 'Lighting',
-      checkboxes: [
-        {
-          label: 'Lighting Design',
-          value: 'Lighting Design'
-        },
-        {
-          label: 'Projection Design',
-          value: 'Projection Design'
-        },
-        {
-          label: 'Special Effect Design',
-          value: 'Special Effect Design'
-        },
-        {
-          label: 'Master Electrician',
-          value: 'Master Electrician'
-        }
-      ]
-    },
-    sound: {
-      textHeader: 'Sound',
-      checkboxes: [
-        {
-          label: 'Sound Design',
-          value: 'Sound Design'
-        },
-        {
-          label: 'Sound Mixer / Engineer',
-          value: 'Sound Mixer / Engineer'
-        }
-      ]
-    },
-    hairMakeupCostumes: {
-      textHeader: 'Hair, Makeup, Costumes',
-      checkboxes: [
-        {
-          label: 'Costume Design',
-          value: 'Costume Design'
-        },
-        {
-          label: 'Hair & Wig Design',
-          value: 'Hair & Wig Design'
-        },
-        {
-          label: 'Make-up Design',
-          value: 'Make-up Design'
-        }
-      ]
-    }
-  };
+const offstageRolesObj = {
+  general: {
+    textHeader: 'General',
+    checkboxes: [
+      {
+        label: 'Directing',
+        value: 'Directing'
+      },
+      {
+        label: 'Violence / Fight Design',
+        value: 'Violence / Fight Design'
+      },
+      {
+        label: 'Intimacy Design',
+        value: 'Intimacy Design'
+      },
+      {
+        label: 'Choreography',
+        value: 'Choreography'
+      },
+      {
+        label: 'Casting',
+        value: 'Casting'
+      },
+      {
+        label: 'Dramaturgy',
+        value: 'Dramaturgy'
+      },
+      {
+        label: 'Dialect Coaching',
+        value: 'Dialect Coaching'
+      },
+      {
+        label: 'Musical Directing',
+        value: 'Musical Directing'
+      }
+    ]
+  },
+  production: {
+    textHeader: 'Production',
+    checkboxes: [
+      {
+        label: 'Stage Management',
+        value: 'Stage Management'
+      },
+      {
+        label: 'Production Management',
+        value: 'Production Management'
+      },
+      {
+        label: 'Board Op',
+        value: 'Board Op'
+      },
+      {
+        label: 'Run Crew',
+        value: 'Run Crew'
+      }
+    ]
+  },
+  scenicAndProperties: {
+    textHeader: 'Scenic & Properties',
+    checkboxes: [
+      {
+        label: 'Set Design',
+        value: 'Set Design'
+      },
+      {
+        label: 'Technical Direction',
+        value: 'Technical Direction'
+      },
+      {
+        label: 'Properties Designer',
+        value: 'Properties Designer'
+      },
+      {
+        label: 'Scenic Carpentry',
+        value: 'Scenic Carpentry'
+      },
+      {
+        label: 'Charge Artist',
+        value: 'Charge Artist'
+      }
+    ]
+  },
+  lighting: {
+    textHeader: 'Lighting',
+    checkboxes: [
+      {
+        label: 'Lighting Design',
+        value: 'Lighting Design'
+      },
+      {
+        label: 'Projection Design',
+        value: 'Projection Design'
+      },
+      {
+        label: 'Special Effect Design',
+        value: 'Special Effect Design'
+      },
+      {
+        label: 'Master Electrician',
+        value: 'Master Electrician'
+      }
+    ]
+  },
+  sound: {
+    textHeader: 'Sound',
+    checkboxes: [
+      {
+        label: 'Sound Design',
+        value: 'Sound Design'
+      },
+      {
+        label: 'Sound Mixer / Engineer',
+        value: 'Sound Mixer / Engineer'
+      }
+    ]
+  },
+  hairMakeupCostumes: {
+    textHeader: 'Hair, Makeup, Costumes',
+    checkboxes: [
+      {
+        label: 'Costume Design',
+        value: 'Costume Design'
+      },
+      {
+        label: 'Hair & Wig Design',
+        value: 'Hair & Wig Design'
+      },
+      {
+        label: 'Make-up Design',
+        value: 'Make-up Design'
+      }
+    ]
+  }
+};
+
+const OffstageRoles: React.FC<{
+  setForm: any;
+  formData: any;
+}> = props => {
+  // const { formData, setForm } = props;
+  // const {
+  //   // offstageRolesGeneral,
+  //   // offstageRolesProduction,
+  //   // offstageRolesScenic,
+  //   // offstageRolesLighting,
+  //   // offstageRolesSound,
+  //   // offstageRolesHairMakeupCostumes
+  // } = formData;
 
   return (
     <div>
@@ -159,34 +172,36 @@ const OffstageRoles = (...props: any) => {
 
         return (
           <>
-            <GenericAccordion
-              key={`accordion-${currObjKey.textHeader}`}
-              textHeader={currObjKey.textHeader}
-            >
-              <Container>
-                <Row>
-                  <Col lg="8">
-                    {currObjKey.checkboxes.map(
-                      (chk: { label: any; value: any }) => {
-                        const { label: chkLabel, value: chkValue } = chk;
+            <Col lg="10">
+              <GenericAccordion
+                key={`accordion-${currObjKey.textHeader}`}
+                textHeader={currObjKey.textHeader}
+              >
+                <Container>
+                  <Row>
+                    <Col lg="6">
+                      {currObjKey.checkboxes.map(
+                        (chk: { label: any; value: any }) => {
+                          const { label: chkLabel, value: chkValue } = chk;
 
-                        return (
-                          <Checkbox
-                            fieldType="checkbox"
-                            key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`}
-                            label={chkLabel}
-                            value={chkValue}
-                          />
-                        );
-                      }
-                    )}
-                  </Col>
-                  <ImageCol lg="4">
-                    <Image src={yellow_blob_1} />
-                  </ImageCol>
-                </Row>
-              </Container>
-            </GenericAccordion>
+                          return (
+                            <Checkbox
+                              fieldType="checkbox"
+                              key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`}
+                              label={chkLabel}
+                              value={chkValue}
+                            />
+                          );
+                        }
+                      )}
+                    </Col>
+                    <ImageCol lg="5">
+                      <Image src={yellow_blob_1} />
+                    </ImageCol>
+                  </Row>
+                </Container>
+              </GenericAccordion>
+            </Col>
             <br></br>
           </>
         );

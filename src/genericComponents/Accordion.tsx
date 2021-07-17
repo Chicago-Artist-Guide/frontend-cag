@@ -12,9 +12,9 @@ const GenericAccordion = (props: any) => {
 
   const arrowDirection = () => {
     if (isOpen) {
-      return <CaretUpFill />;
-    } else {
       return <CaretDownFill />;
+    } else {
+      return <CaretUpFill />;
     }
   };
 
@@ -38,10 +38,13 @@ const GenericAccordion = (props: any) => {
 const CardHeader = styled(Card.Header)`
   display: flex;
   justify-content: space-between;
+  background-color: white;
 `;
 
 const Accordion1 = styled(Accordion)`
-  box-shadow: 10px 10px;
+  box-shadow: 2px 2px 10px #00000029;
+  border-radius: 8px;
+  opacity: 1;
 `;
 
 export default GenericAccordion;
