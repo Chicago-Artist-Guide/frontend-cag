@@ -19,7 +19,7 @@ const GenericAccordion = (props: any) => {
   };
 
   return (
-    <Accordion defaultActiveKey="0" onClick={() => setIsOpen(!isOpen)}>
+    <Accordion1 defaultActiveKey="0" onClick={() => setIsOpen(!isOpen)}>
       <Card>
         <CardHeader>
           {textHeader}
@@ -31,13 +31,17 @@ const GenericAccordion = (props: any) => {
           <Card.Body>{children}</Card.Body>
         </Accordion.Collapse>
       </Card>
-    </Accordion>
+    </Accordion1>
   );
 };
 
 const CardHeader = styled(Card.Header)`
   display: flex;
   justify-content: space-between;
+`;
+
+const Accordion1 = styled(Accordion)`
+  box-shadow: 10px 10px;
 `;
 
 export default GenericAccordion;

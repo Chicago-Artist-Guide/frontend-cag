@@ -53,19 +53,19 @@ const OffstageRoles = (...props: any) => {
       checkboxes: [
         {
           label: 'Stage Management',
-          value: 'the-checkbox-name'
+          value: 'Stage Management'
         },
         {
           label: 'Production Management',
-          value: 'the-checkbox-name'
+          value: 'Production Management'
         },
         {
           label: 'Board Op',
-          value: 'the-checkbox-name'
+          value: 'Board Op'
         },
         {
           label: 'Run Crew',
-          value: 'the-checkbox-name'
+          value: 'Run Crew'
         }
       ]
     },
@@ -74,23 +74,23 @@ const OffstageRoles = (...props: any) => {
       checkboxes: [
         {
           label: 'Set Design',
-          value: 'the-checkbox-name'
+          value: 'Set Design'
         },
         {
           label: 'Technical Direction',
-          value: 'the-checkbox-name'
+          value: 'Technical Direction'
         },
         {
           label: 'Properties Designer',
-          value: 'the-checkbox-name'
+          value: 'Properties Designer'
         },
         {
           label: 'Scenic Carpentry',
-          value: 'the-checkbox-name'
+          value: 'Scenic Carpentry'
         },
         {
           label: 'Charge Artist',
-          value: 'the-checkbox-name'
+          value: 'Charge Artist'
         }
       ]
     },
@@ -99,19 +99,19 @@ const OffstageRoles = (...props: any) => {
       checkboxes: [
         {
           label: 'Lighting Design',
-          value: 'the-checkbox-name'
+          value: 'Lighting Design'
         },
         {
           label: 'Projection Design',
-          value: 'the-checkbox-name'
+          value: 'Projection Design'
         },
         {
           label: 'Special Effect Design',
-          value: 'the-checkbox-name'
+          value: 'Special Effect Design'
         },
         {
           label: 'Master Electrician',
-          value: 'the-checkbox-name'
+          value: 'Master Electrician'
         }
       ]
     },
@@ -120,11 +120,11 @@ const OffstageRoles = (...props: any) => {
       checkboxes: [
         {
           label: 'Sound Design',
-          value: 'the-checkbox-name'
+          value: 'Sound Design'
         },
         {
           label: 'Sound Mixer / Engineer',
-          value: 'the-checkbox-name'
+          value: 'Sound Mixer / Engineer'
         }
       ]
     },
@@ -133,15 +133,15 @@ const OffstageRoles = (...props: any) => {
       checkboxes: [
         {
           label: 'Costume Design',
-          value: 'the-checkbox-name'
+          value: 'Costume Design'
         },
         {
           label: 'Hair & Wig Design',
-          value: 'the-checkbox-name'
+          value: 'Hair & Wig Design'
         },
         {
           label: 'Make-up Design',
-          value: 'the-checkbox-name'
+          value: 'Make-up Design'
         }
       ]
     }
@@ -159,7 +159,7 @@ const OffstageRoles = (...props: any) => {
 
         return (
           <>
-            <GenericAccordion1
+            <GenericAccordion
               key={`accordion-${currObjKey.textHeader}`}
               textHeader={currObjKey.textHeader}
             >
@@ -186,7 +186,7 @@ const OffstageRoles = (...props: any) => {
                   </ImageCol>
                 </Row>
               </Container>
-            </GenericAccordion1>
+            </GenericAccordion>
             <br></br>
           </>
         );
@@ -217,9 +217,5 @@ const ImageCol = styled(Col)`
   max-height: 100%;
   max-width: 100%;
 `;
-const GenericAccordion1 = styled(GenericAccordion)`
-    display:flex
-    justify-content: space-between
-  `;
 
 export default OffstageRoles;
