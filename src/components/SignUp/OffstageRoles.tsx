@@ -150,16 +150,41 @@ const OffstageRoles: React.FC<{
   setForm: any;
   formData: any;
 }> = props => {
-  // const { formData, setForm } = props;
-  // const {
-  //   // offstageRolesGeneral,
-  //   // offstageRolesProduction,
-  //   // offstageRolesScenic,
-  //   // offstageRolesLighting,
-  //   // offstageRolesSound,
-  //   // offstageRolesHairMakeupCostumes
-  // } = formData;
+  const { formData, setForm } = props;
+  const {
+    offstageRolesGeneral,
+    offstageRolesProduction,
+    offstageRolesScenic,
+    offstageRolesLighting,
+    offstageRolesSound,
+    offstageRolesHairMakeupCostumes
+  } = formData;
 
+
+  const isRoleInRolesSection = (section: string[], role: string) =>
+  section.indexOf(role) > -1;
+
+ 
+  const rolesSectionChange = (chkValue: any, chk: string, fieldName: string, section: string[]) => {
+    let sectionRoles = [...section];
+    let name = fieldName;
+
+    if (chkValue) {
+      if (sectionRoles.indexOf(chk) < 0) {
+        sectionRoles.push(chk);
+      }
+    } else {
+      sectionRoles = sectionRoles.filter(rG => rG !== chk);
+    }
+
+    const target = {
+      name: 'offstageRolesGeneral',
+      value: sectionRoles
+    };
+
+    setForm({ target });
+  };  
+  
   return (
     <div>
       <Title>SO, WHAT DO YOU LIKE DOING?</Title>
@@ -186,9 +211,11 @@ const OffstageRoles: React.FC<{
 
                           return (
                             <Checkbox
+                              checked={isRoleInRolesSection(offstageRolesGeneral, chk)}
                               fieldType="checkbox"
                               key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`}
                               label={chkLabel}
+                              onChange={rolesSectionChange()}
                               value={chkValue}
                             />
                           );
