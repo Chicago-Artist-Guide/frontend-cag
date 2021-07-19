@@ -1,171 +1,187 @@
 import React from 'react';
-import { fonts } from '../../theme/styleVars';
 import styled from 'styled-components';
-import GenericAccordion from '../../genericComponents/Accordion';
-import Checkbox from '../../genericComponents/Checkbox';
-import yellow_blob_1 from '../../images/yellow_blob_1.svg';
+import { fonts } from '../../theme/styleVars';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
-
-const offstageRolesObj = {
-  general: {
-    textHeader: 'General',
-    checkboxes: [
-      {
-        label: 'Directing',
-        value: 'Directing'
-      },
-      {
-        label: 'Violence / Fight Design',
-        value: 'Violence / Fight Design'
-      },
-      {
-        label: 'Intimacy Design',
-        value: 'Intimacy Design'
-      },
-      {
-        label: 'Choreography',
-        value: 'Choreography'
-      },
-      {
-        label: 'Casting',
-        value: 'Casting'
-      },
-      {
-        label: 'Dramaturgy',
-        value: 'Dramaturgy'
-      },
-      {
-        label: 'Dialect Coaching',
-        value: 'Dialect Coaching'
-      },
-      {
-        label: 'Musical Directing',
-        value: 'Musical Directing'
-      }
-    ]
-  },
-  production: {
-    textHeader: 'Production',
-    checkboxes: [
-      {
-        label: 'Stage Management',
-        value: 'Stage Management'
-      },
-      {
-        label: 'Production Management',
-        value: 'Production Management'
-      },
-      {
-        label: 'Board Op',
-        value: 'Board Op'
-      },
-      {
-        label: 'Run Crew',
-        value: 'Run Crew'
-      }
-    ]
-  },
-  scenicAndProperties: {
-    textHeader: 'Scenic & Properties',
-    checkboxes: [
-      {
-        label: 'Set Design',
-        value: 'Set Design'
-      },
-      {
-        label: 'Technical Direction',
-        value: 'Technical Direction'
-      },
-      {
-        label: 'Properties Designer',
-        value: 'Properties Designer'
-      },
-      {
-        label: 'Scenic Carpentry',
-        value: 'Scenic Carpentry'
-      },
-      {
-        label: 'Charge Artist',
-        value: 'Charge Artist'
-      }
-    ]
-  },
-  lighting: {
-    textHeader: 'Lighting',
-    checkboxes: [
-      {
-        label: 'Lighting Design',
-        value: 'Lighting Design'
-      },
-      {
-        label: 'Projection Design',
-        value: 'Projection Design'
-      },
-      {
-        label: 'Special Effect Design',
-        value: 'Special Effect Design'
-      },
-      {
-        label: 'Master Electrician',
-        value: 'Master Electrician'
-      }
-    ]
-  },
-  sound: {
-    textHeader: 'Sound',
-    checkboxes: [
-      {
-        label: 'Sound Design',
-        value: 'Sound Design'
-      },
-      {
-        label: 'Sound Mixer / Engineer',
-        value: 'Sound Mixer / Engineer'
-      }
-    ]
-  },
-  hairMakeupCostumes: {
-    textHeader: 'Hair, Makeup, Costumes',
-    checkboxes: [
-      {
-        label: 'Costume Design',
-        value: 'Costume Design'
-      },
-      {
-        label: 'Hair & Wig Design',
-        value: 'Hair & Wig Design'
-      },
-      {
-        label: 'Make-up Design',
-        value: 'Make-up Design'
-      }
-    ]
-  }
-};
+import GenericAccordion from '../../genericComponents/Accordion';
+import Checkbox from '../../genericComponents/Checkbox';
+import yellow_blob_1 from '../../images/yellow_blob_1.svg';
 
 const OffstageRoles: React.FC<{
   setForm: any;
   formData: any;
 }> = props => {
   const { formData, setForm } = props;
+
   const {
     offstageRolesGeneral,
     offstageRolesProduction,
-    offstageRolesScenic,
+    offstageRolesScenicAndProperties,
     offstageRolesLighting,
     offstageRolesSound,
     offstageRolesHairMakeupCostumes
   } = formData;
 
+  const offstageRolesObj = {
+    general: {
+      sectionStateValue: offstageRolesGeneral,
+      sectionStateName: 'offstageRolesGeneral',
+      textHeader: 'General',
+      checkboxes: [
+        {
+          label: 'Directing',
+          value: 'Directing'
+        },
+        {
+          label: 'Violence / Fight Design',
+          value: 'Violence / Fight Design'
+        },
+        {
+          label: 'Intimacy Design',
+          value: 'Intimacy Design'
+        },
+        {
+          label: 'Choreography',
+          value: 'Choreography'
+        },
+        {
+          label: 'Casting',
+          value: 'Casting'
+        },
+        {
+          label: 'Dramaturgy',
+          value: 'Dramaturgy'
+        },
+        {
+          label: 'Dialect Coaching',
+          value: 'Dialect Coaching'
+        },
+        {
+          label: 'Musical Directing',
+          value: 'Musical Directing'
+        }
+      ]
+    },
+    production: {
+      sectionStateValue: offstageRolesProduction,
+      sectionStateName: 'offstageRolesProduction',
+      textHeader: 'Production',
+      checkboxes: [
+        {
+          label: 'Stage Management',
+          value: 'Stage Management'
+        },
+        {
+          label: 'Production Management',
+          value: 'Production Management'
+        },
+        {
+          label: 'Board Op',
+          value: 'Board Op'
+        },
+        {
+          label: 'Run Crew',
+          value: 'Run Crew'
+        }
+      ]
+    },
+    scenicAndProperties: {
+      sectionStateValue: offstageRolesScenicAndProperties,
+      sectionStateName: 'offstageRolesScenicAndProperties',
+      textHeader: 'Scenic & Properties',
+      checkboxes: [
+        {
+          label: 'Set Design',
+          value: 'Set Design'
+        },
+        {
+          label: 'Technical Direction',
+          value: 'Technical Direction'
+        },
+        {
+          label: 'Properties Designer',
+          value: 'Properties Designer'
+        },
+        {
+          label: 'Scenic Carpentry',
+          value: 'Scenic Carpentry'
+        },
+        {
+          label: 'Charge Artist',
+          value: 'Charge Artist'
+        }
+      ]
+    },
+    lighting: {
+      sectionStateValue: offstageRolesLighting,
+      sectionStateName: 'offstageRolesLighting',
+      textHeader: 'Lighting',
+      checkboxes: [
+        {
+          label: 'Lighting Design',
+          value: 'Lighting Design'
+        },
+        {
+          label: 'Projection Design',
+          value: 'Projection Design'
+        },
+        {
+          label: 'Special Effect Design',
+          value: 'Special Effect Design'
+        },
+        {
+          label: 'Master Electrician',
+          value: 'Master Electrician'
+        }
+      ]
+    },
+    sound: {
+      sectionStateValue: offstageRolesSound,
+      sectionStateName: 'offstageRolesSound',
+      textHeader: 'Sound',
+      checkboxes: [
+        {
+          label: 'Sound Design',
+          value: 'Sound Design'
+        },
+        {
+          label: 'Sound Mixer / Engineer',
+          value: 'Sound Mixer / Engineer'
+        }
+      ]
+    },
+    hairMakeupCostumes: {
+      sectionStateValue: offstageRolesHairMakeupCostumes,
+      sectionStateName: 'offstageRolesHairMakeupCostumes',
+      textHeader: 'Hair, Makeup, Costumes',
+      checkboxes: [
+        {
+          label: 'Costume Design',
+          value: 'Costume Design'
+        },
+        {
+          label: 'Hair & Wig Design',
+          value: 'Hair & Wig Design'
+        },
+        {
+          label: 'Make-up Design',
+          value: 'Make-up Design'
+        }
+      ]
+    }
+  };
 
   const isRoleInRolesSection = (section: string[], role: string) =>
-  section.indexOf(role) > -1;
+    section.indexOf(role) > -1;
 
- 
-  const rolesSectionChange = (chkValue: any, chk: string, fieldName: string, section: string[]) => {
+  const rolesSectionChange = (
+    chkValue: any,
+    chk: string,
+    fieldName: string,
+    section: string[]
+  ) => {
     let sectionRoles = [...section];
     let name = fieldName;
 
@@ -183,57 +199,67 @@ const OffstageRoles: React.FC<{
     };
 
     setForm({ target });
-  };  
-  
+  };
+
   return (
-    <div>
-      <Title>SO, WHAT DO YOU LIKE DOING?</Title>
-      <TitleSecond>Tell us what positions suit you best.</TitleSecond>
-      <TitleThird>Off-Stage Roles</TitleThird>
-      <TitleFourth>Select all applicable positions</TitleFourth>
+    <Container>
+      <Row>
+        <Col lg="12">
+          <Title>SO, WHAT DO YOU LIKE DOING?</Title>
+          <TitleSecond>Tell us what positions suit you best.</TitleSecond>
+          <TitleThird>Off-Stage Roles</TitleThird>
+          <TitleFourth>Select all applicable positions</TitleFourth>
+        </Col>
+      </Row>
 
       {Object.keys(offstageRolesObj).map(objKey => {
         const currObjKey = (offstageRolesObj as any)[objKey as any];
+        const {
+          sectionStateValue,
+          sectionStateName,
+          textHeader,
+          checkboxes
+        } = currObjKey;
 
         return (
-          <>
+          <Row>
             <Col lg="10">
               <GenericAccordion
-                key={`accordion-${currObjKey.textHeader}`}
-                textHeader={currObjKey.textHeader}
+                key={`accordion-${textHeader}`}
+                textHeader={textHeader}
               >
-                <Container>
-                  <Row>
-                    <Col lg="6">
-                      {currObjKey.checkboxes.map(
-                        (chk: { label: any; value: any }) => {
-                          const { label: chkLabel, value: chkValue } = chk;
+                <Col lg="6">
+                  {checkboxes.map((chk: { label: any; value: any }) => {
+                    const { label: chkLabel, value: chkValue } = chk;
 
-                          return (
-                            <Checkbox
-                              checked={isRoleInRolesSection(offstageRolesGeneral, chk)}
-                              fieldType="checkbox"
-                              key={`${currObjKey.textHeader}-chk-${chkLabel}-${chkValue}`}
-                              label={chkLabel}
-                              onChange={rolesSectionChange()}
-                              value={chkValue}
-                            />
-                          );
+                    return (
+                      <Checkbox
+                        checked={isRoleInRolesSection(sectionStateValue, chk)}
+                        fieldType="checkbox"
+                        key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
+                        label={chkLabel}
+                        onChange={(e: any) =>
+                          rolesSectionChange(
+                            e.currentTarget.checked,
+                            role,
+                            sectionStateName,
+                            sectionStateValue
+                          )
                         }
-                      )}
-                    </Col>
-                    <ImageCol lg="5">
-                      <Image src={yellow_blob_1} />
-                    </ImageCol>
-                  </Row>
-                </Container>
+                        value={chkValue}
+                      />
+                    );
+                  })}
+                </Col>
+                <ImageCol lg="5">
+                  <Image src={yellow_blob_1} />
+                </ImageCol>
               </GenericAccordion>
             </Col>
-            <br></br>
-          </>
+          </Row>
         );
       })}
-    </div>
+    </Container>
   );
 };
 
@@ -241,19 +267,23 @@ const Title = styled.h1`
   font-family: ${fonts.montserrat};
   font-size: 48px;
 `;
+
 const TitleSecond = styled.h2`
   font-family: ${fonts.lora};
   font-size: 28px;
   font-weight: italic;
 `;
+
 const TitleThird = styled.h3`
   font-family: ${fonts.mainFont};
   font-size: 20px;
 `;
+
 const TitleFourth = styled.h4`
   font-family: ${fonts.lora};
   font-size: 14px;
 `;
+
 const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;

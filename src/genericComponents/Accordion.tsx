@@ -11,11 +11,7 @@ const GenericAccordion = (props: any) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const arrowDirection = () => {
-    if (isOpen) {
-      return <CaretDownFill />;
-    } else {
-      return <CaretUpFill />;
-    }
+    isOpen ? <CaretDownFill /> : <CaretUpFill />;
   };
 
   return (
@@ -24,7 +20,7 @@ const GenericAccordion = (props: any) => {
         <CardHeader>
           {textHeader}
           <Accordion.Toggle as={Button} eventKey="0" variant="button">
-            {arrowDirection()}
+            {arrowDirection}
           </Accordion.Toggle>
         </CardHeader>
         <Accordion.Collapse eventKey="0">
