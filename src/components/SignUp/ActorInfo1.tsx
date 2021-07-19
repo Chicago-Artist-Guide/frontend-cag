@@ -1,10 +1,10 @@
 import React from 'react';
-import RadioButton from '../../genericComponents/RadioButton';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import InputField from '../../genericComponents/Input';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
 import Checkbox from '../../genericComponents/Checkbox';
@@ -110,7 +110,6 @@ const ActorInfo1: React.FC<{
 
   //   setForm({ target });
   // };
-
   return (
     <Container>
       <Row>
@@ -120,12 +119,13 @@ const ActorInfo1: React.FC<{
             <Col lg="12">
               <Form.Group>
                 <Container>
-                  <CAGLabel>Pronouns</CAGLabel>
                   <Row>
                     <Col lg="6">
+                      <CAGLabel>Pronouns</CAGLabel>
                       <Form.Control
                         aria-label="pronouns"
                         as="select"
+                        defaultValue={actorInfo1Pronouns}
                         name="actorInfo1Pronouns"
                         onChange={setForm}
                       >
@@ -135,16 +135,14 @@ const ActorInfo1: React.FC<{
                         ))}
                       </Form.Control>
                     </Col>
-                  </Row>
-                  <CAGLabel>Other</CAGLabel>
-                  <Row>        
                     <Col lg="6">
-                      <Form.Control
+                      <InputField
                         aria-label="other pronouns"
-                        as="text"
+                        label="Other"
                         name="actorInfo1Pronouns"
                         onChange={setForm}
-                      ></Form.Control>
+                        type="text"
+                      ></InputField>
                     </Col>
                   </Row>
                 </Container>
@@ -178,7 +176,6 @@ const ActorInfo1: React.FC<{
                   onChange={setForm}
                   value="I do not wish to respond"
                 />
-                
               </Form.Group>
               <Form.Group>
                 <CAGLabel>Do you identify as any of the following:</CAGLabel>
@@ -189,34 +186,34 @@ const ActorInfo1: React.FC<{
                   feel fits your identity. More info on our process{' '}
                   <Link to="">here</Link>.
                 </p>
-                  {ethnicityTypes.map(eth => (
-                    <>
-                      <Checkbox
-                        checked={isEthnicityInEthnicities(eth.name)}
-                        fieldType="checkbox"
-                        label={eth.name}
-                        name="actorInfo1Ethnicities"
-                        onChange={(e: any) =>
-                          ethnicityChange(e.currentTarget.checked, eth.name)
-                        }
-                      />
-                      {eth.values.length > 0 && (
-                        <InnerEthnicities>
-                          {eth.values.map((ethV) => (
-                            <Checkbox
-                              checked={isEthnicityInEthnicities(ethV)}
-                              fieldType="checkbox"
-                              label={ethV}
-                              name="actorInfoEthnicities"
-                              onChange={(e: any) =>
-                                ethnicityChange(e.currentTarget.checked, ethV)
-                              }
-                            />
-                          ))}
-                        </InnerEthnicities>
-                      )}
-                    </>
-                  ))}
+                {ethnicityTypes.map(eth => (
+                  <>
+                    <Checkbox
+                      checked={isEthnicityInEthnicities(eth.name)}
+                      fieldType="checkbox"
+                      label={eth.name}
+                      name="actorInfo1Ethnicities"
+                      onChange={(e: any) =>
+                        ethnicityChange(e.currentTarget.checked, eth.name)
+                      }
+                    />
+                    {eth.values.length > 0 && (
+                      <InnerEthnicities>
+                        {eth.values.map(ethV => (
+                          <Checkbox
+                            checked={isEthnicityInEthnicities(ethV)}
+                            fieldType="checkbox"
+                            label={ethV}
+                            name="actorInfoEthnicities"
+                            onChange={(e: any) =>
+                              ethnicityChange(e.currentTarget.checked, ethV)
+                            }
+                          />
+                        ))}
+                      </InnerEthnicities>
+                    )}
+                  </>
+                ))}
               </Form.Group>
             </Col>
           </Row>
