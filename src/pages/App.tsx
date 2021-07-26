@@ -6,6 +6,7 @@ import {
   Switch
 } from 'react-router-dom';
 import Home from './Home';
+import Donate from './Donate';
 import FAQ from './FAQ';
 import NotFound from './NotFound';
 import TOS from './TOS';
@@ -31,6 +32,7 @@ const CAG = () => (
         render={() => <Redirect to={{ pathname: '/home' }} />}
       />
       <Route component={Home} exact path="/home" />
+      <Route component={Donate} exact path="/donate" />
       <Route component={FAQ} exact path="/faq" />
       <Route component={TOS} exact path="/terms-of-service" />
       <Route component={WhoWeAre} exact path="/who-we-are" />
