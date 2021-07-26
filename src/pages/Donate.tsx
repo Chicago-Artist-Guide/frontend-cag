@@ -63,6 +63,16 @@ const Donate = () => (
         </Row>
       </Col>
     </Row>
+    <Row>
+      <Col lg="12">
+        <p>
+          <em>
+            Chicago Artist Guide NFP is a 501(c)(3) and donations are tax
+            deductible to the fullest extent of the law.
+          </em>
+        </p>
+      </Col>
+    </Row>
   </PageContainer>
 );
 
