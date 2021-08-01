@@ -41,6 +41,11 @@ const Footer = () => (
                 WHO WE ARE
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link as={Link} to="/donate">
+                DONATE
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
         </EdgeCols>
         <MidCol
