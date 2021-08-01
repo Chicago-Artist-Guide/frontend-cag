@@ -183,7 +183,6 @@ const OffstageRoles: React.FC<{
     section: string[]
   ) => {
     let sectionRoles = [...section];
-    let name = fieldName;
 
     if (chkValue) {
       if (sectionRoles.indexOf(chk) < 0) {
@@ -218,6 +217,7 @@ const OffstageRoles: React.FC<{
           sectionStateValue,
           sectionStateName,
           textHeader,
+          role,
           checkboxes
         } = currObjKey;
 
@@ -228,32 +228,37 @@ const OffstageRoles: React.FC<{
                 key={`accordion-${textHeader}`}
                 textHeader={textHeader}
               >
-                <Col lg="6">
-                  {checkboxes.map((chk: { label: any; value: any }) => {
-                    const { label: chkLabel, value: chkValue } = chk;
+                <Row>
+                  <Col lg="7">
+                    {checkboxes.map((chk: { label: any; value: any }) => {
+                      const { label: chkLabel, value: chkValue } = chk;
 
-                    return (
-                      <Checkbox
-                        checked={isRoleInRolesSection(sectionStateValue, chk)}
-                        fieldType="checkbox"
-                        key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
-                        label={chkLabel}
-                        onChange={(e: any) =>
-                          rolesSectionChange(
-                            e.currentTarget.checked,
-                            role,
-                            sectionStateName,
-                            sectionStateValue
-                          )
-                        }
-                        value={chkValue}
-                      />
-                    );
-                  })}
-                </Col>
-                <ImageCol lg="5">
-                  <Image src={yellow_blob_1} />
-                </ImageCol>
+                      return (
+                        <Checkbox
+                          checked={isRoleInRolesSection(
+                            sectionStateValue,
+                            chk.value
+                          )}
+                          fieldType="checkbox"
+                          key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
+                          label={chkLabel}
+                          onChange={(e: any) =>
+                            rolesSectionChange(
+                              e.currentTarget.checked,
+                              role,
+                              sectionStateName,
+                              sectionStateValue
+                            )
+                          }
+                          value={chkValue}
+                        />
+                      );
+                    })}
+                  </Col>
+                  <ImageCol lg="4">
+                    <Image src={yellow_blob_1} />
+                  </ImageCol>
+                </Row>
               </GenericAccordion>
             </Col>
           </Row>
@@ -291,3 +296,11 @@ const ImageCol = styled(Col)`
 `;
 
 export default OffstageRoles;
+// function role(
+//   checked: any,
+//   role: any,
+//   sectionStateName: any,
+//   sectionStateValue: any
+// ) {
+//   throw new Error('Function not implemented.');
+// }

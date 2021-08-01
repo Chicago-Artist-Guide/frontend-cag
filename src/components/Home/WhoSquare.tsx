@@ -7,19 +7,17 @@ const WhoSquare = (props: any) => {
   const { blob, dancer, key, points: whoWeArray, title } = props;
 
   return (
-    <div>
-      <ShadowContainer key={key}>
-        <SVGLayer blob={blob} dancer={dancer} />
-        <ShadowTitle>{title}</ShadowTitle>
-        <ul>
-          {whoWeArray.map((who: any) => (
-            <li key={who.id}>
-              <p>{who.text}</p>
-            </li>
-          ))}
-        </ul>
-      </ShadowContainer>
-    </div>
+    <ShadowContainer key={key}>
+      <SVGLayer blob={blob} dancer={dancer} />
+      <ShadowTitle>{title}</ShadowTitle>
+      <ul>
+        {whoWeArray.map((who: any) => (
+          <li key={who.id}>
+            <p>{who.text}</p>
+          </li>
+        ))}
+      </ul>
+    </ShadowContainer>
   );
 };
 
