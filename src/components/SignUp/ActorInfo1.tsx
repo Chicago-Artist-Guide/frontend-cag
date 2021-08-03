@@ -165,7 +165,7 @@ const ActorInfo1: React.FC<{
                   of selecting your identity is to help cast roles that call for
                   a certain demographic. Please select as may options as you
                   feel fits your identity. More info on our process{' '}
-                  <Link to="">here</Link>.
+                  <Link to="#">here</Link>.
                 </PrivacyPar>
                 {ethnicityTypes.map(eth => (
                   <>
@@ -231,10 +231,6 @@ const PrivacyPar = styled.p`
   font-size: 18px;
   letter-spacing: 0px;
   margin-top: 17px;
-
-  link {
-    color: ;
-  }
 `;
 
 const InnerEthnicities = styled(Checkbox)``;
