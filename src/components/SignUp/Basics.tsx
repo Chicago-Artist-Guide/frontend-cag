@@ -5,9 +5,10 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
+import { Title } from '../layout/Titles';
 import InputField from '../../genericComponents/Input';
 import Checkbox from '../../genericComponents/Checkbox';
-import { colors, fonts } from '../../theme/styleVars';
+import { colors } from '../../theme/styleVars';
 
 const Privacy: React.FC<{
   setForm: any;
@@ -25,7 +26,7 @@ const Privacy: React.FC<{
   return (
     <Container>
       <Row>
-        <Title>LET'S GET TO KNOW EACH OTHER</Title>
+        <PaddingTitle>LET'S GET TO KNOW EACH OTHER</PaddingTitle>
         <Col lg="4">
           <Form>
             <InputField
@@ -72,8 +73,7 @@ const Privacy: React.FC<{
   );
 };
 
-const Title = styled.h1`
-  font: ${fonts.montserrat} 48px bold;
+const PaddingTitle = styled(Title)`
   padding: 48px 0px;
 `;
 

@@ -19,7 +19,7 @@ const Privacy: React.FC<{
     <Container>
       <Row>
         <Col lg="8">
-          <TitleThree>Hi, {formData.basicsFirstName}!</TitleThree>
+          <TitleThree>Hi, {formData.basicsFirstName || 'member'}!</TitleThree>
           <Title>LET'S TALK PRIVACY</Title>
           <Tagline>Your privacy is our top concern. Always.</Tagline>
           <PrivacyPar>

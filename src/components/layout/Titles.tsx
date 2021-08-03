@@ -24,8 +24,11 @@ const TitleThree = (props: any) => {
 
 const TitleH2 = styled.h2`
   font-family: ${fonts.lora};
-  font-size: 1.75rem;
+  font-size: 24px;
   font-weight: 400;
+  font-style: italic;
+  line-height: 28px;
+  letter-spacing: 0.01em;
 `;
 
 const TaglineH2 = styled(TitleH2 as any)`

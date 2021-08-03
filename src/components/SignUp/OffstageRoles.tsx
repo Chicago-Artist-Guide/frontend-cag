@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
+import { Tagline, Title } from '../layout/Titles';
 import GenericAccordion from '../../genericComponents/Accordion';
 import Checkbox from '../../genericComponents/Checkbox';
 import yellow_blob_1 from '../../images/yellow_blob_1.svg';
@@ -205,7 +206,7 @@ const OffstageRoles: React.FC<{
       <Row>
         <Col lg="12">
           <Title>SO, WHAT DO YOU LIKE DOING?</Title>
-          <TitleSecond>Tell us what positions suit you best.</TitleSecond>
+          <Tagline>Tell us what positions suit you best.</Tagline>
           <TitleThird>Off-Stage Roles</TitleThird>
           <TitleFourth>Select all applicable positions</TitleFourth>
         </Col>
@@ -267,17 +268,6 @@ const OffstageRoles: React.FC<{
     </Container>
   );
 };
-
-const Title = styled.h1`
-  font-family: ${fonts.montserrat};
-  font-size: 48px;
-`;
-
-const TitleSecond = styled.h2`
-  font-family: ${fonts.lora};
-  font-size: 28px;
-  font-weight: italic;
-`;
 
 const TitleThird = styled.h3`
   font-family: ${fonts.mainFont};
