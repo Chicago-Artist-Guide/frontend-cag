@@ -5,6 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
+import { Title } from '../layout/Titles';
 import Checkbox from '../../genericComponents/Checkbox';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
@@ -96,7 +97,7 @@ const ActorInfo2: React.FC<{
     <Container>
       <Row>
         <Col lg="8">
-          <h1>Let's Get Some Details</h1>
+          <PaddingTitle>LET'S GET SOME DETAILS</PaddingTitle>
           <Row>
             <Col lg="12">
               <Form.Group>
@@ -230,6 +231,10 @@ const ActorInfo2: React.FC<{
     </Container>
   );
 };
+
+const PaddingTitle = styled(Title)`
+  padding: 20px 0px;
+`;
 
 const ImageCol = styled(Col)`
   display: flex;
