@@ -296,11 +296,3 @@ const ImageCol = styled(Col)`
 `;
 
 export default OffstageRoles;
-// function role(
-//   checked: any,
-//   role: any,
-//   sectionStateName: any,
-//   sectionStateValue: any
-// ) {
-//   throw new Error('Function not implemented.');
-// }
