@@ -18,7 +18,7 @@ const ProfilePhoto: React.FC<{
     <Container>
       <Row>
         <Col lg="12">
-          <h1>Let's Put A Face to the Name</h1>
+          <h1>LET'S PUT A FACE TO THE NAME</h1>
           <h2>We just need one for now, but you can add more later.</h2>
           <PhotoUploadRow>
             <Col lg="4">

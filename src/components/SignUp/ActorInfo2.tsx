@@ -96,7 +96,7 @@ const ActorInfo2: React.FC<{
     <Container>
       <Row>
         <Col lg="8">
-          <h1>Let's Get Some Details</h1>
+          <h1>LET'S GET SOME DETAILS</h1>
           <Row>
             <Col lg="12">
               <Form.Group>

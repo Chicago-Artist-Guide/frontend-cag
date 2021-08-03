@@ -176,7 +176,7 @@ const Landing: React.FC<{
           </Title>
           <Tagline>
             {landingStep === 1
-              ? 'Join the Community today for new opportunities'
+              ? 'Join the community today for new opportunities'
               : 'On-Stage? Off-Stage? Both?'}
           </Tagline>
         </Col>

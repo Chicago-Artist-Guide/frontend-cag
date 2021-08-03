@@ -11,7 +11,7 @@ const Demographics: React.FC<{
     <Container>
       <Row>
         <Col lg="12">
-          <h1>Almost Done!</h1>
+          <h1>ALMOST DONE!</h1>
           <h2>Just a few more questions.</h2>
         </Col>
       </Row>

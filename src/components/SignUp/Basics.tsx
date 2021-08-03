@@ -56,7 +56,7 @@ const Privacy: React.FC<{
             <Checkbox
               checked={basics18Plus || false}
               fieldType="checkbox"
-              label="18 years or older"
+              label="I confirm that I am at least 18 years of age or older"
               name="basics18Plus"
               onChange={setForm}
             />
