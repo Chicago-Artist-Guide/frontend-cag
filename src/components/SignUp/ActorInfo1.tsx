@@ -4,7 +4,6 @@ import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import InputField from '../../genericComponents/Input';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
 import Checkbox from '../../genericComponents/Checkbox';
@@ -90,26 +89,6 @@ const ActorInfo1: React.FC<{
     setForm({ target });
   };
 
-  // const genderRoleChange = (checkValue: any, role: string) => {
-  //   let newRoles = [...actorInfo2GenderRoles];
-
-  //   if (checkValue) {
-  //     // check gender role value
-  //     if (newRoles.indexOf(role) < 0) {
-  //       newRoles.push(role);
-  //     }
-  //   } else {
-  //     // uncheck gender role value
-  //     newRoles = newRoles.filter(gR => gR !== role);
-  //   }
-
-  //   const target = {
-  //     name: 'actorInfo2GenderRoles',
-  //     value: newRoles
-  //   };
-
-  //   setForm({ target });
-  // };
   return (
     <Container>
       <Row>
@@ -136,20 +115,22 @@ const ActorInfo1: React.FC<{
                       </Form.Control>
                     </Col>
                     <Col lg="6">
-                      <InputField
-                        aria-label="other pronouns"
-                        label="Other"
+                      <CAGLabel>Other</CAGLabel>
+                      <Form.Control
+                        aria-label="pronouns"
+                        defaultValue=""
+                        disabled={actorInfo1Pronouns === 'Other' ? false : true}
                         name="actorInfo1Pronouns"
                         onChange={setForm}
-                        type="text"
-                      ></InputField>
+                      ></Form.Control>
                     </Col>
                   </Row>
                 </Container>
               </Form.Group>
               <Form.Group>
                 <CAGLabel>
-                  Do you identify as part of the LGBTQIA+ community? - Private
+                  Do you identify as part of the LGBTQIA+ community? -{' '}
+                  <PrivateSpan>Private</PrivateSpan>
                 </CAGLabel>
                 <p>A = asexual, not ally</p>
                 <Checkbox
@@ -179,13 +160,13 @@ const ActorInfo1: React.FC<{
               </Form.Group>
               <Form.Group>
                 <CAGLabel>Do you identify as any of the following:</CAGLabel>
-                <p>
+                <PrivacyPar>
                   Note: This list is not exhaustive nor hyper-specific. The goal
                   of selecting your identity is to help cast roles that call for
                   a certain demographic. Please select as may options as you
                   feel fits your identity. More info on our process{' '}
                   <Link to="">here</Link>.
-                </p>
+                </PrivacyPar>
                 {ethnicityTypes.map(eth => (
                   <>
                     <Checkbox
@@ -236,6 +217,24 @@ const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+`;
+
+const PrivateSpan = styled.span`
+  font-size: 16px;
+  color: ${colors.primary};
+  font-weight: bold;
+`;
+
+const PrivacyPar = styled.p`
+  color: ${colors.mainFont};
+  font-family: ${fonts.lora};
+  font-size: 18px;
+  letter-spacing: 0px;
+  margin-top: 17px;
+
+  link {
+    color: ;
+  }
 `;
 
 const InnerEthnicities = styled(Checkbox)``;
