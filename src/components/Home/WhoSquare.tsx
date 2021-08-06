@@ -8,7 +8,9 @@ const WhoSquare = (props: any) => {
 
   return (
     <ShadowContainer key={key}>
-      <SVGLayer blob={blob} dancer={dancer} />
+      <SvgHolder>
+        <SVGLayer blob={blob} dancer={dancer} />
+      </SvgHolder>
       <ShadowTitle>{title}</ShadowTitle>
       <ul>
         {whoWeArray.map((who: any) => (
@@ -27,6 +29,16 @@ const ShadowContainer = styled.div`
   background-color: ${colors.bodyBg};
   padding: 20px 40px 20px 40px;
   height: 100%;
+  position: relative;
+`;
+
+const SvgHolder = styled.div`
+  width: 100%;
+  padding-bottom: 10px;
+
+  > img:first-child {
+    width: calc(100% - 80px);
+  }
 `;
 
 const ShadowTitle = styled.h3`

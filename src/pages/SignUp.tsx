@@ -65,7 +65,7 @@ const defaultData = {
 
   offstageRolesGeneral: [],
   offstageRolesProduction: [],
-  offstageRolesScenic: [],
+  offstageRolesScenicAndProperties: [],
   offstageRolesLighting: [],
   offstageRolesSound: [],
   offstageRolesHairMakeupCostumes: [],
