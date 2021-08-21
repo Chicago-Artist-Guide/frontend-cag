@@ -13,7 +13,9 @@ import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
 import Login from './Login';
 import Logout from './Logout';
+import Profile from './Profile';
 import SignUp from './SignUp';
+import SignUp2 from './SignUp2';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';
 import ScrollToTop from '../components/ScrollToTop';
@@ -38,7 +40,9 @@ const CAG = () => (
       <Route component={WhoWeAre} exact path="/who-we-are" />
       <Route component={Login} exact path="/login" />
       <Route component={Logout} exact path="/logout" />
+      <Route component={Profile} exact path="/profile" />
       <Route component={SignUp} exact path="/sign-up" />
+      <Route component={SignUp2} exact path="/sign-up-2" />
       <Route component={NotFound} />
     </Switch>
     <Footer />

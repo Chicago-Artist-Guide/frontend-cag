@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
 import { Tagline, Title } from '../layout/Titles';
-import GenericAccordion from '../../genericComponents/Accordion';
+import GenericAccordion from '../../genericComponents/GenericAccordion';
 import Checkbox from '../../genericComponents/Checkbox';
 import yellow_blob_1 from '../../images/yellow_blob_1.svg';
 
@@ -211,7 +211,6 @@ const OffstageRoles: React.FC<{
           <TitleFourth>Select all applicable positions</TitleFourth>
         </Col>
       </Row>
-
       {Object.keys(offstageRolesObj).map(objKey => {
         const currObjKey = (offstageRolesObj as any)[objKey as any];
         const {
@@ -223,7 +222,7 @@ const OffstageRoles: React.FC<{
         } = currObjKey;
 
         return (
-          <Row>
+          <Row key={`accordion-row-${textHeader}`}>
             <Col lg="10">
               <GenericAccordion
                 key={`accordion-${textHeader}`}

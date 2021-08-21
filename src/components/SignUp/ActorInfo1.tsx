@@ -111,7 +111,9 @@ const ActorInfo1: React.FC<{
                       >
                         <option value={undefined}>Choose...</option>
                         {pronouns.map(noun => (
-                          <option value={noun}>{noun}</option>
+                          <option key={`option-value-${noun}`} value={noun}>
+                            {noun}
+                          </option>
                         ))}
                       </Form.Control>
                     </Col>
@@ -169,10 +171,11 @@ const ActorInfo1: React.FC<{
                   <Link to="#">here</Link>.
                 </PrivacyPar>
                 {ethnicityTypes.map(eth => (
-                  <>
+                  <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                     <Checkbox
                       checked={isEthnicityInEthnicities(eth.name)}
                       fieldType="checkbox"
+                      key={`first-level-chk-${eth.name}`}
                       label={eth.name}
                       name="actorInfo1Ethnicities"
                       onChange={(e: any) =>
@@ -185,6 +188,7 @@ const ActorInfo1: React.FC<{
                           <Checkbox
                             checked={isEthnicityInEthnicities(ethV)}
                             fieldType="checkbox"
+                            key={`${eth.name}-child-chk-${ethV}`}
                             label={ethV}
                             name="actorInfoEthnicities"
                             onChange={(e: any) =>
@@ -194,7 +198,7 @@ const ActorInfo1: React.FC<{
                         ))}
                       </InnerEthnicities>
                     )}
-                  </>
+                  </React.Fragment>
                 ))}
               </Form.Group>
             </Col>
