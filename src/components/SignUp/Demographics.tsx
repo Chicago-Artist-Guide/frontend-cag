@@ -2,14 +2,7 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import styled from 'styled-components';
-import Image from 'react-bootstrap/Image';
-import Form from 'react-bootstrap/Form';
-
-import { colors, fonts } from '../../theme/styleVars';
-import yellow_blob from '../../images/yellow_blob_2.svg';
-
-const unions = [];
+import { Tagline, Title } from '../layout/Titles';
 
 const Demographics: React.FC<{
   setForm: any;
@@ -50,86 +43,9 @@ const Demographics: React.FC<{
   return (
     <Container>
       <Row>
-        <Col lg="8">
-          <h1>ALMOST DONE!</h1>
-          <Row>
-            <Col lg="10">
-              <Form.Group>
-                <Container>
-                  <Row>
-                    <Col lg="5">
-                      <CAGLabel>Union</CAGLabel>
-                      <Form.Control
-                        aria-label="unions"
-                        as="select"
-                        defaultValue={demographicsUnionStatus}
-                        name="demographicsUnionStatus"
-                        onChange={setForm}
-                      >
-                        <option value={undefined}>Select</option>
-                        <option value={undefined}>Union</option>
-                        <option value={undefined}>Non-Union</option>
-                        <option value={undefined}>Other</option>
-                      </Form.Control>
-                    </Col>
-                    <Col lg="5">
-                      <CAGLabel>Other</CAGLabel>
-                      <Form.Control
-                        aria-label="unions"
-                        defaultValue=""
-                        disabled={
-                          demographicsUnionStatus === 'Other' ? false : true
-                        }
-                        name="demographicsUnionStatus"
-                        onChange={setForm}
-                      ></Form.Control>
-                    </Col>
-                  </Row>
-                </Container>
-              </Form.Group>
-              <Col lg="8">
-                <Form.Group>
-                  <CAGLabel>Agency</CAGLabel>
-                  <Form.Control
-                    aria-label="agency"
-                    defaultValue={demographicsAgency}
-                    name="demographicsAgency"
-                    onChange={setForm}
-                  ></Form.Control>
-                </Form.Group>
-              </Col>
-              <Col lg="12">
-                <Form.Group>
-                  <Container>
-                    <Row>
-                      <Col lg="6">
-                        <CAGLabel>Website Links</CAGLabel>
-                        <Form.Control
-                          aria-label="website-link"
-                          defaultValue={demographicsWebsites}
-                          name="demographicsWebsites"
-                          onChange={setForm}
-                        ></Form.Control>
-                      </Col>
-                      <Col lg="4">
-                        <CAGLabel>Website</CAGLabel>
-                        <Form.Control
-                          aria-label="website"
-                          as="select"
-                          defaultValue=""
-                          name="demographicsWebsites"
-                          onChange={setForm}
-                        ></Form.Control>
-                      </Col>
-                      <Col lg="4">
-                        <PrivacyPar>Remove this link</PrivacyPar>
-                      </Col>
-                    </Row>
-                  </Container>
-                </Form.Group>
-              </Col>
-            </Col>
-          </Row>
+        <Col lg="12">
+          <Title>ALMOST DONE!</Title>
+          <Tagline>Just a few more questions.</Tagline>
         </Col>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
