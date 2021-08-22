@@ -113,7 +113,9 @@ const ActorInfo2: React.FC<{
                       >
                         <option value={undefined}>Feet</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7].map(ft => (
-                          <option value={ft}>{ft} ft</option>
+                          <option key={`ft-option-value-${ft}`} value={ft}>
+                            {ft} ft
+                          </option>
                         ))}
                       </Form.Control>
                     </Col>
@@ -126,7 +128,12 @@ const ActorInfo2: React.FC<{
                       >
                         <option value={undefined}>Inches</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(inches => (
-                          <option value={inches}>{inches} in</option>
+                          <option
+                            key={`inch-option-value-${inches}`}
+                            value={inches}
+                          >
+                            {inches} in
+                          </option>
                         ))}
                       </Form.Control>
                     </Col>
@@ -149,6 +156,7 @@ const ActorInfo2: React.FC<{
                   <Checkbox
                     checked={isAgeRangeInAgeRanges(ageRange)}
                     fieldType="checkbox"
+                    key={`age-range-chk-${ageRange}`}
                     label={ageRange}
                     name="actorInfo2AgeRanges"
                     onChange={(e: any) =>
@@ -173,7 +181,9 @@ const ActorInfo2: React.FC<{
                 >
                   <option value={undefined}>Select</option>
                   {genders.map(g => (
-                    <option value={g}>{g}</option>
+                    <option key={`gender-value-${g}`} value={g}>
+                      {g}
+                    </option>
                   ))}
                 </Form.Control>
               </Form.Group>
@@ -189,6 +199,7 @@ const ActorInfo2: React.FC<{
                   <Checkbox
                     checked={isGenderRoleInGenderRoles(g)}
                     fieldType="checkbox"
+                    key={`gender-chk-${g}`}
                     label={g}
                     name="actorInfo2GenderRoles"
                     onChange={(e: any) =>
