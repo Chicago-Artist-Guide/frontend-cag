@@ -5,7 +5,8 @@ import Col from 'react-bootstrap/Col';
 import styled from 'styled-components';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
-
+import { Title } from '../layout/Titles';
+import { Tagline } from '../layout/Titles';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
@@ -51,16 +52,18 @@ const Demographics: React.FC<{
     <Container>
       <Row>
         <Col lg="8">
-          <h1>ALMOST DONE!</h1>
+          <Title>ALMOST DONE!</Title>
+          <Tagline>Just a few more questions.</Tagline>
           <Row>
             <Col lg="10">
               <Form.Group>
+              
                 <Container>
+                <CAGLabel>Union</CAGLabel>
                   <Row>
                     <Col lg="5">
-                      <CAGLabel>Union</CAGLabel>
                       <Form.Control
-                        aria-label="unions"
+                        aria-label="union"
                         as="select"
                         defaultValue={demographicsUnionStatus}
                         name="demographicsUnionStatus"
@@ -73,15 +76,15 @@ const Demographics: React.FC<{
                       </Form.Control>
                     </Col>
                     <Col lg="5">
-                      <CAGLabel>Other</CAGLabel>
                       <Form.Control
-                        aria-label="unions"
+                        aria-label="union"
                         defaultValue=""
                         disabled={
                           demographicsUnionStatus === 'Other' ? false : true
                         }
                         name="demographicsUnionStatus"
                         onChange={setForm}
+                        placeholder="Other"
                       ></Form.Control>
                     </Col>
                   </Row>
@@ -89,21 +92,22 @@ const Demographics: React.FC<{
               </Form.Group>
               <Col lg="8">
                 <Form.Group>
-                  <CAGLabel>Agency</CAGLabel>
                   <Form.Control
                     aria-label="agency"
                     defaultValue={demographicsAgency}
                     name="demographicsAgency"
                     onChange={setForm}
+                    placeholder="Agency"
                   ></Form.Control>
                 </Form.Group>
               </Col>
-              <Col lg="12">
+              <Col lg="10">
                 <Form.Group>
                   <Container>
+                  <CAGLabel>Website Links</CAGLabel>
                     <Row>
                       <Col lg="6">
-                        <CAGLabel>Website Links</CAGLabel>
+                        
                         <Form.Control
                           aria-label="website-link"
                           defaultValue={demographicsWebsites}
@@ -139,8 +143,6 @@ const Demographics: React.FC<{
   );
 };
 
-
-
 const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;
@@ -153,8 +155,6 @@ const CAGLabel = styled(Form.Label)`
   font-size: 20px;
 `;
 
-
-
 const PrivacyPar = styled.p`
   color: ${colors.mainFont};
   font-family: ${fonts.lora};
@@ -162,5 +162,7 @@ const PrivacyPar = styled.p`
   letter-spacing: 0px;
   margin-top: 17px;
 `;
+
+
 
 export default Demographics;
