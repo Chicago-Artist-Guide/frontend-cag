@@ -57,9 +57,8 @@ const Demographics: React.FC<{
           <Row>
             <Col lg="10">
               <Form.Group>
-              
                 <Container>
-                <CAGLabel>Union</CAGLabel>
+                  <CAGLabel>Union</CAGLabel>
                   <Row>
                     <Col lg="5">
                       <Form.Control
@@ -104,10 +103,9 @@ const Demographics: React.FC<{
               <Col lg="10">
                 <Form.Group>
                   <Container>
-                  <CAGLabel>Website Links</CAGLabel>
+                    <CAGLabel>Website Links</CAGLabel>
                     <Row>
                       <Col lg="6">
-                        
                         <Form.Control
                           aria-label="website-link"
                           defaultValue={demographicsWebsites}
@@ -162,7 +160,5 @@ const PrivacyPar = styled.p`
   letter-spacing: 0px;
   margin-top: 17px;
 `;
-
-
 
 export default Demographics;
