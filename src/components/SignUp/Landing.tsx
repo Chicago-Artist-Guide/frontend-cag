@@ -20,11 +20,7 @@ const Landing: React.FC<{
   landingStep: any;
   setLandingStep: any;
 }> = ({ setForm, formData, landingStep, setLandingStep }) => {
-  const {
-    landingType,
-    landingPerformTypeOnStage,
-    landingPerformTypeOffStage
-  } = formData;
+  const { landingType, performType } = formData;
 
   const Card: React.FC<{
     icon: any;
@@ -51,10 +47,7 @@ const Landing: React.FC<{
     if (landingStep === 1) {
       selected = landingType === name;
     } else {
-      selected =
-        target.name === 'landingPerformTypeOnStage'
-          ? landingPerformTypeOnStage
-          : landingPerformTypeOffStage;
+      selected = performType === name;
     }
 
     return (
@@ -78,7 +71,7 @@ const Landing: React.FC<{
         icon: Individual,
         className: 'green-shadow-hover',
         name: 'individual',
-        text: <span>An Individual</span>,
+        text: <span>Individual Artist</span>,
         setForm,
         target: {
           name: 'landingType',
@@ -98,7 +91,7 @@ const Landing: React.FC<{
         icon: Group,
         className: 'red-shadow-hover',
         name: 'group',
-        text: <span>A Theatre Group</span>,
+        text: <span>Theatre Group</span>,
         setForm,
         target: {
           name: 'landingType',
@@ -119,6 +112,7 @@ const Landing: React.FC<{
       {
         icon: OnStage,
         className: 'green-shadow-hover',
+        name: 'on-stage',
         text: (
           <span>
             <strong>On-Stage</strong> (Actors, Singers, Dancers)
@@ -126,14 +120,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'landingPerformTypeOnStage',
-          type: 'radio',
+          name: 'performType',
           value: 'on-stage'
         },
         input: (
           <ToggleButton
-            checked={landingPerformTypeOnStage}
-            name="landingPerformTypeOnStage"
+            checked={performType === 'on-stage'}
+            name="performType"
             onChange={setForm}
             type="radio"
             value="on-stage"
@@ -143,6 +136,7 @@ const Landing: React.FC<{
       {
         icon: OffStage,
         className: 'blue-shadow-hover',
+        name: 'off-stage',
         text: (
           <span>
             <strong>Off-Stage</strong> (Directors, Designers, Crew)
@@ -150,14 +144,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'landingPerformTypeOffStage',
-          type: 'radio',
+          name: 'performType',
           value: 'off-stage'
         },
         input: (
           <ToggleButton
-            checked={landingPerformTypeOffStage}
-            name="landingPerformTypeOffStage"
+            checked={performType === 'off-stage'}
+            name="performType"
             onChange={setForm}
             type="radio"
             value="off-stage"
@@ -167,6 +160,7 @@ const Landing: React.FC<{
       {
         icon: BothStage,
         className: 'red-shadow-hover',
+        name: 'both-stage',
         text: (
           <span>
             <strong>Both</strong> (Directors, Designers, Dancers)
@@ -174,14 +168,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'landingPerformTypeBothStage',
-          type: 'radio',
+          name: 'performType',
           value: 'both-stage'
         },
         input: (
           <ToggleButton
-            checked={landingPerformTypeOffStage}
-            name="landingPerformTypeBothStage"
+            checked={performType === 'both-stage'}
+            name="performType"
             onChange={setForm}
             type="radio"
             value="both-stage"
