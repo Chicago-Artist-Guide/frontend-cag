@@ -71,7 +71,12 @@ const Landing: React.FC<{
         icon: Individual,
         className: 'green-shadow-hover',
         name: 'individual',
-        text: <span>Individual Artist</span>,
+        text: (
+          <>
+            <span className="cardHeading">Individual Artist</span>{' '}
+            <p>Show off your skills and experience</p>
+          </>
+        ),
         setForm,
         target: {
           name: 'landingType',
@@ -91,7 +96,16 @@ const Landing: React.FC<{
         icon: Group,
         className: 'red-shadow-hover',
         name: 'group',
-        text: <span>Theatre Group</span>,
+        text: (
+          <>
+            <span className="cardHeading">Theatre Group</span>{' '}
+            <p>
+              Urna gravida tellus nullam nulla. Tempor sollicitudin sed sed enim
+              morbi amet bibendum massa. Consequat feugiat in pulvinar id
+              egestas.
+            </p>
+          </>
+        ),
         setForm,
         target: {
           name: 'landingType',
@@ -114,9 +128,10 @@ const Landing: React.FC<{
         className: 'green-shadow-hover',
         name: 'on-stage',
         text: (
-          <span>
-            <strong>On-Stage</strong> (Actors, Singers, Dancers)
-          </span>
+          <>
+            <span className="cardHeading">On-Stage</span>{' '}
+            <p>(Actors, Singers, Dancers)</p>
+          </>
         ),
         setForm,
         target: {
@@ -138,9 +153,10 @@ const Landing: React.FC<{
         className: 'blue-shadow-hover',
         name: 'off-stage',
         text: (
-          <span>
-            <strong>Off-Stage</strong> (Directors, Designers, Crew)
-          </span>
+          <>
+            <span className="cardHeading">Off-Stage</span>{' '}
+            <p>(Directors, Designers, Crew)</p>
+          </>
         ),
         setForm,
         target: {
@@ -162,9 +178,10 @@ const Landing: React.FC<{
         className: 'red-shadow-hover',
         name: 'both-stage',
         text: (
-          <span>
-            <strong>Both</strong> (Directors, Designers, Dancers)
-          </span>
+          <>
+            <span className="cardHeading">Both</span>{' '}
+            <p>(Directors, Designers, Dancers)</p>
+          </>
         ),
         setForm,
         target: {
@@ -221,12 +238,62 @@ const Landing: React.FC<{
 };
 
 const StyledCard = styled(Col)`
+  position: absolute;
+  width: 273px;
+  height: 353.23px;
   margin-right: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
   background-color: ${colors.bodyBg};
+  backdrop-filter: blur(15px);
   padding: 30px 20px 50px 20px;
-  height: 100%;
+
+  .cardHeading {
+    position: static;
+    width: 225px;
+    left: 0px;
+    top: 23.81%;
+    bottom: 42.86%;
+
+    font-family: Montserrat;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 28px;
+    /* identical to box height, or 117% */
+    letter-spacing: 0.07em;
+
+    color: #000000;
+
+    flex: none;
+    order: 1;
+    flex-grow: 0;
+    margin: 12px 0px;
+  }
+
+  p {
+    position: static;
+    left: 0%;
+    right: 4.44%;
+    top: 45.45%;
+    bottom: 0%;
+
+    font-family: Open Sans;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 16px;
+    line-height: 24px;
+    /* or 150% */
+    letter-spacing: 0.5px;
+
+    color: #000000;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+    margin: 12px 0px;
+  }
 
   &:hover,
   &.selected {
