@@ -7,9 +7,11 @@ import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
 import { colors } from '../../theme/styleVars';
-import Green_blob from '../../images/green_blob.svg';
-import Red_blob from '../../images/red_blob.svg';
-import Blue_blob from '../../images/blue_blob.svg';
+import Group from '../../images/icons-signup/group.svg';
+import Individual from '../../images/icons-signup/individual.svg';
+import OnStage from '../../images/icons-signup/on-stage.svg';
+import OffStage from '../../images/icons-signup/off-stage.svg';
+import BothStage from '../../images/icons-signup/both-stage.svg';
 import { Link } from 'react-router-dom';
 
 const Landing: React.FC<{
@@ -25,7 +27,7 @@ const Landing: React.FC<{
   } = formData;
 
   const Card: React.FC<{
-    blob: any;
+    icon: any;
     className: string;
     name: string;
     setForm: any;
@@ -33,7 +35,7 @@ const Landing: React.FC<{
     text: any;
     input: any;
     key: string;
-  }> = ({ blob, className, name, setForm, target, text, input }) => {
+  }> = ({ icon, className, name, setForm, target, text, input }) => {
     const setFormCheck = () => {
       const newTarget = { ...target };
 
@@ -61,7 +63,7 @@ const Landing: React.FC<{
         lg="5"
         onClick={setFormCheck}
       >
-        <Image alt="" src={blob} />
+        <Image alt="" src={icon} />
         <div>
           <p>{text}</p>
           <div>{input}</div>
@@ -73,7 +75,7 @@ const Landing: React.FC<{
   const cards = [
     [
       {
-        blob: Green_blob,
+        icon: Individual,
         className: 'green-shadow-hover',
         name: 'individual',
         text: <span>An Individual</span>,
@@ -93,7 +95,7 @@ const Landing: React.FC<{
         )
       },
       {
-        blob: Red_blob,
+        icon: Group,
         className: 'red-shadow-hover',
         name: 'group',
         text: <span>A Theatre Group</span>,
@@ -115,7 +117,7 @@ const Landing: React.FC<{
     ],
     [
       {
-        blob: Green_blob,
+        icon: OnStage,
         className: 'green-shadow-hover',
         text: (
           <span>
@@ -125,7 +127,7 @@ const Landing: React.FC<{
         setForm,
         target: {
           name: 'landingPerformTypeOnStage',
-          type: 'checkbox',
+          type: 'radio',
           value: 'on-stage'
         },
         input: (
@@ -133,13 +135,13 @@ const Landing: React.FC<{
             checked={landingPerformTypeOnStage}
             name="landingPerformTypeOnStage"
             onChange={setForm}
-            type="checkbox"
+            type="radio"
             value="on-stage"
           />
         )
       },
       {
-        blob: Blue_blob,
+        icon: OffStage,
         className: 'blue-shadow-hover',
         text: (
           <span>
@@ -149,7 +151,7 @@ const Landing: React.FC<{
         setForm,
         target: {
           name: 'landingPerformTypeOffStage',
-          type: 'checkbox',
+          type: 'radio',
           value: 'off-stage'
         },
         input: (
@@ -157,8 +159,32 @@ const Landing: React.FC<{
             checked={landingPerformTypeOffStage}
             name="landingPerformTypeOffStage"
             onChange={setForm}
-            type="checkbox"
+            type="radio"
             value="off-stage"
+          />
+        )
+      },
+      {
+        icon: BothStage,
+        className: 'red-shadow-hover',
+        text: (
+          <span>
+            <strong>Both</strong> (Directors, Designers, Dancers)
+          </span>
+        ),
+        setForm,
+        target: {
+          name: 'landingPerformTypeBothStage',
+          type: 'radio',
+          value: 'both-stage'
+        },
+        input: (
+          <ToggleButton
+            checked={landingPerformTypeOffStage}
+            name="landingPerformTypeBothStage"
+            onChange={setForm}
+            type="radio"
+            value="both-stage"
           />
         )
       }
