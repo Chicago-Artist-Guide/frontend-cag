@@ -57,10 +57,9 @@ const Landing: React.FC<{
         onClick={setFormCheck}
       >
         <Image alt="" src={icon} />
-        <div>
-          <p>{text}</p>
-          <div>{input}</div>
-        </div>
+
+        <div>{text}</div>
+        <div>{input}</div>
       </StyledCard>
     );
   };
@@ -249,9 +248,17 @@ const StyledCard = styled(Col)`
   padding: 30px 20px 50px 20px;
 
   div {
-    overflow: scroll;
+    overflow: auto;
     height: calc(var(--cardHeight) / 2);
+    margin-top: 5px;
+
+    div:last-of-type {
+      position: absolute;
+      display: flex;
+      align-items: self-start;
+    }
   }
+
   p {
     left: 0%;
     right: 4.5%;
@@ -261,9 +268,10 @@ const StyledCard = styled(Col)`
     font-family: Open Sans;
     font-style: normal;
     font-weight: normal;
-    font-size: 16px;
+    font-size: 20px;
     line-height: 24px;
     /* or 150% */
+    text-align: left;
     letter-spacing: 0.5px;
 
     color: #000000;
@@ -319,13 +327,8 @@ const StyledCard = styled(Col)`
     font-weight: bold;
   }
 
-  > div > div {
+  label {
     display: none;
-  }
-
-  p {
-    font-size: 20px;
-    text-align: left;
   }
 `;
 
