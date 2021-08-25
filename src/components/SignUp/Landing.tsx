@@ -219,7 +219,7 @@ const Landing: React.FC<{
       </Row>
       <Row>
         <Col lg={7}>
-          <Row>
+          <Row style={{ flexWrap: 'nowrap' }}>
             {(cards as any)[landingStep - 1].map((card: any, i: any) => {
               return <Card {...card} key={`card-${landingStep}-${i}`} />;
             })}
@@ -238,9 +238,9 @@ const Landing: React.FC<{
 };
 
 const StyledCard = styled(Col)`
-  position: absolute;
   width: 273px;
-  height: 353.23px;
+  --cardHeight: 353.23px;
+  height: var(--cardHeight);
   margin-right: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
@@ -248,34 +248,14 @@ const StyledCard = styled(Col)`
   backdrop-filter: blur(15px);
   padding: 30px 20px 50px 20px;
 
-  .cardHeading {
-    position: static;
-    width: 225px;
-    left: 0px;
-    top: 23.81%;
-    bottom: 42.86%;
-
-    font-family: Montserrat;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 24px;
-    line-height: 28px;
-    /* identical to box height, or 117% */
-    letter-spacing: 0.07em;
-
-    color: #000000;
-
-    flex: none;
-    order: 1;
-    flex-grow: 0;
-    margin: 12px 0px;
+  div {
+    overflow: scroll;
+    height: calc(var(--cardHeight) / 2);
   }
-
   p {
-    position: static;
     left: 0%;
-    right: 4.44%;
-    top: 45.45%;
+    right: 4.5%;
+    top: 45%;
     bottom: 0%;
 
     font-family: Open Sans;
@@ -291,6 +271,29 @@ const StyledCard = styled(Col)`
     /* Inside Auto Layout */
     flex: none;
     order: 2;
+    flex-grow: 0;
+    margin: 12px 0px;
+  }
+
+  .cardHeading {
+    position: static;
+    width: 225px;
+    left: 0px;
+    top: 24%;
+    bottom: 43%;
+
+    font-family: Montserrat;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 28px;
+    /* identical to box height, or 117% */
+    letter-spacing: 0.07em;
+
+    color: #000000;
+
+    flex: none;
+    order: 1;
     flex-grow: 0;
     margin: 12px 0px;
   }
@@ -322,7 +325,7 @@ const StyledCard = styled(Col)`
 
   p {
     font-size: 20px;
-    text-align: center;
+    text-align: left;
   }
 `;
 
