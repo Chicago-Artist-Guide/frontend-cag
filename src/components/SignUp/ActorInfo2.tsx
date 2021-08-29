@@ -152,7 +152,7 @@ const ActorInfo2: React.FC<{
               </Form.Group>
               <Form.Group>
                 <CAGLabel>
-                  Age Range <PrivateLabel></PrivateLabel>
+                  Age Range <PrivateLabel />
                 </CAGLabel>
                 <p>Select up to 3 ranges</p>
                 {ageRanges.map(ageRange => (
@@ -170,7 +170,7 @@ const ActorInfo2: React.FC<{
               </Form.Group>
               <Form.Group>
                 <CAGLabel>
-                  Gender Identity <PrivateLabel></PrivateLabel>
+                  Gender Identity <PrivateLabel />
                 </CAGLabel>
                 <p>
                   First, choose your gender identity - additional options may be
@@ -199,7 +199,7 @@ const ActorInfo2: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   I would also be comfortable playing roles usually played by:{' '}
-                  <PrivateLabel></PrivateLabel>
+                  <PrivateLabel />
                 </CAGLabel>
 
                 {genderRoles.map(g => (
@@ -220,7 +220,7 @@ const ActorInfo2: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   I would be comfortable playing a character through all phases
-                  of their transition: <PrivateLabel></PrivateLabel>
+                  of their transition: <PrivateLabel />
                 </CAGLabel>
                 <Checkbox
                   checked={actorInfo2GenderTransition === 'Yes'}

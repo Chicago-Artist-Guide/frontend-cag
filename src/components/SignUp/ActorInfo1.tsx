@@ -134,7 +134,7 @@ const ActorInfo1: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   Do you identify as part of the LGBTQIA+ community?{' '}
-                  <PrivateLabel></PrivateLabel>
+                  <PrivateLabel />
                 </CAGLabel>
                 <p>A = asexual, not ally</p>
                 <Checkbox
