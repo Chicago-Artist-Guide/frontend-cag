@@ -8,6 +8,7 @@ import Image from 'react-bootstrap/Image';
 import { Tagline, TitleThree } from '../layout/Titles';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
+import Badge from '../../genericComponents/PrivateLabel';
 
 const Privacy: React.FC<{
   setForm: any;
@@ -28,9 +29,9 @@ const Privacy: React.FC<{
             that some of the information we're asking for is personal, and for
             some could be sensitive in nature. The reason we’re asking is to
             create the most effective, inclusive, and equitable casting & hiring
-            platform possible. If you see <span>“Private”</span> next to a
-            field, that's because even though we're collecting the information
-            to inform our search algorithm, we won't display this information on
+            platform possible. If you see <Badge></Badge> next to a field,
+            that's because even though we're collecting the information to
+            inform our search algorithm, we won't display this information on
             your profile, or to producers and casting directors. If you'd like
             to learn more about the measures we take to secure your data,{' '}
             <Link to="/faq">click here</Link>.
