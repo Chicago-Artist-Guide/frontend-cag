@@ -7,18 +7,15 @@ const Badge = () => {
   return <CAGLabel>private</CAGLabel>;
 };
 
-/* background color based on hex code color picker figma 
--- can change to ${colors.primary} or add as a new color 
-in theme/styleVars.ts*/
-
 const CAGLabel = styled(PrivateLabel)`
   border-radius: 7px;
   font-family: ${fonts.montserrat};
-  color: ${colors.mainFont};
-  letter-spacing: 0.2rem;
+  color: ${colors.secondaryFontColor};
+  letter-spacing: 0.15rem;
+  font-weight: lighter;
   padding: 8px 10px;
   text-transform: uppercase;
-  background-color: #b9d9c2;
+  background-color: #b8d8c7;
 `;
 
 export default Badge;
