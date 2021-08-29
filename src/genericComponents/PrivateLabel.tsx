@@ -15,7 +15,7 @@ const CAGLabel = styled(styledBadge)`
   font-weight: lighter;
   padding: 8px 10px;
   text-transform: uppercase;
-  background-color: grayishLightGreen;
+  background-color: ${colors.grayishLightGreen};
 `;
 
 export default PrivateLabel;
