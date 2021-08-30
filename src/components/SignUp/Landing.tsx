@@ -246,6 +246,7 @@ const StyledCard = styled(Col)`
   background-color: ${colors.bodyBg};
   backdrop-filter: blur(15px);
   padding: 30px 20px 50px 20px;
+  transition: all 0.1s ease-in-out;
 
   p {
     font-size: 20px;
@@ -260,25 +261,44 @@ const StyledCard = styled(Col)`
     margin: 12px 0px;
   }
 
-  &:hover,
-  &.selected {
+  &:hover {
+    scale: 1.05;
     cursor: pointer;
 
     &.blue-shadow-hover {
       box-shadow: 2px 2px 10px rgba(53, 86, 105, 0.65);
+      &.selected {
+        background: rgba(53, 86, 105, 0.65);
+      }
     }
 
     &.green-shadow-hover {
       box-shadow: 2px 2px 10px rgba(149, 189, 168, 0.99);
+      &.selected {
+        background: rgba(149, 189, 168, 0.99);
+      }
     }
 
     &.red-shadow-hover {
       box-shadow: 2px 2px 10px rgba(229, 143, 120, 0.65);
+      &.selected {
+        background: rgba(229, 143, 120, 0.65);
+      }
     }
   }
 
   &.selected {
-    font-weight: bold;
+    &.blue-shadow-hover {
+      background: rgba(53, 86, 105, 0.65);
+    }
+
+    &.green-shadow-hover {
+      background: rgba(149, 189, 168, 0.99);
+    }
+
+    &.red-shadow-hover {
+      background: rgba(229, 143, 120, 0.65);
+    }
   }
 
   label {
