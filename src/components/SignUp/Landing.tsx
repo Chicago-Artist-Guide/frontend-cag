@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
-import { colors } from '../../theme/styleVars';
+import { cardHeight, colors } from '../../theme/styleVars';
 import Group from '../../images/icons-signup/group.svg';
 import Individual from '../../images/icons-signup/individual.svg';
 import OnStage from '../../images/icons-signup/on-stage.svg';
@@ -57,9 +57,10 @@ const Landing: React.FC<{
         onClick={setFormCheck}
       >
         <Image alt="" src={icon} />
-
-        <div>{text}</div>
-        <div>{input}</div>
+        <CardText>
+          {text}
+          {input}
+        </CardText>
       </StyledCard>
     );
   };
@@ -72,7 +73,7 @@ const Landing: React.FC<{
         name: 'individual',
         text: (
           <>
-            <span className="cardHeading">Individual Artist</span>{' '}
+            <CardHeading>Individual Artist</CardHeading>{' '}
             <p>Show off your skills and experience</p>
           </>
         ),
@@ -97,7 +98,7 @@ const Landing: React.FC<{
         name: 'group',
         text: (
           <>
-            <span className="cardHeading">Theatre Group</span>{' '}
+            <CardHeading>Theatre Group</CardHeading>{' '}
             <p>
               Urna gravida tellus nullam nulla. Tempor sollicitudin sed sed enim
               morbi amet bibendum massa. Consequat feugiat in pulvinar id
@@ -128,7 +129,7 @@ const Landing: React.FC<{
         name: 'on-stage',
         text: (
           <>
-            <span className="cardHeading">On-Stage</span>{' '}
+            <CardHeading>On-Stage</CardHeading>{' '}
             <p>(Actors, Singers, Dancers)</p>
           </>
         ),
@@ -153,7 +154,7 @@ const Landing: React.FC<{
         name: 'off-stage',
         text: (
           <>
-            <span className="cardHeading">Off-Stage</span>{' '}
+            <CardHeading>Off-Stage</CardHeading>{' '}
             <p>(Directors, Designers, Crew)</p>
           </>
         ),
@@ -178,7 +179,7 @@ const Landing: React.FC<{
         name: 'both-stage',
         text: (
           <>
-            <span className="cardHeading">Both</span>{' '}
+            <CardHeading>Both</CardHeading>{' '}
             <p>(Directors, Designers, Dancers)</p>
           </>
         ),
@@ -238,8 +239,7 @@ const Landing: React.FC<{
 
 const StyledCard = styled(Col)`
   width: 273px;
-  --cardHeight: 353.23px;
-  height: var(--cardHeight);
+  height: ${cardHeight};
   margin-right: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
@@ -247,61 +247,15 @@ const StyledCard = styled(Col)`
   backdrop-filter: blur(15px);
   padding: 30px 20px 50px 20px;
 
-  div {
-    overflow: auto;
-    height: calc(var(--cardHeight) / 2);
-    margin-top: 5px;
-
-    div:last-of-type {
-      position: absolute;
-      display: flex;
-      align-items: self-start;
-    }
-  }
-
   p {
-    left: 0%;
-    right: 4.5%;
-    top: 45%;
-    bottom: 0%;
-
-    font-family: Open Sans;
-    font-style: normal;
-    font-weight: normal;
     font-size: 20px;
     line-height: 24px;
     /* or 150% */
-    text-align: left;
     letter-spacing: 0.5px;
-
-    color: #000000;
 
     /* Inside Auto Layout */
     flex: none;
     order: 2;
-    flex-grow: 0;
-    margin: 12px 0px;
-  }
-
-  .cardHeading {
-    position: static;
-    width: 225px;
-    left: 0px;
-    top: 24%;
-    bottom: 43%;
-
-    font-family: Montserrat;
-    font-style: normal;
-    font-weight: 500;
-    font-size: 24px;
-    line-height: 28px;
-    /* identical to box height, or 117% */
-    letter-spacing: 0.07em;
-
-    color: #000000;
-
-    flex: none;
-    order: 1;
     flex-grow: 0;
     margin: 12px 0px;
   }
@@ -342,6 +296,29 @@ const LoginLink = styled.p`
   a {
     color: ${colors.orange};
   }
+`;
+
+const CardHeading = styled.h3`
+  width: 225px;
+  top: 24%;
+  bottom: 43%;
+
+  font-family: Montserrat;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 28px;
+  /* identical to box height, or 117% */
+  letter-spacing: 0.07em;
+  flex: none;
+  order: 1;
+  flex-grow: 0;
+  margin: 12px 0px;
+`;
+
+const CardText = styled.div`
+  height: calc(${cardHeight} / 2);
+  margin-top: 5px;
+  overflow: auto;
 `;
 
 export default Landing;
