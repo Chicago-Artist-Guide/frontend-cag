@@ -320,18 +320,12 @@ const LoginLink = styled.p`
 
 const CardHeading = styled.h3`
   width: 225px;
-  top: 24%;
-  bottom: 43%;
-
   font-family: Montserrat;
   font-weight: 500;
   font-size: 24px;
   line-height: 28px;
   /* identical to box height, or 117% */
   letter-spacing: 0.07em;
-  flex: none;
-  order: 1;
-  flex-grow: 0;
   margin: 12px 0px;
 `;
 
