@@ -7,6 +7,7 @@ import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
 import { Title } from '../layout/Titles';
 import Checkbox from '../../genericComponents/Checkbox';
+import PrivateLabel from '../../genericComponents/PrivateLabel';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
@@ -150,7 +151,9 @@ const ActorInfo2: React.FC<{
                 </Container>
               </Form.Group>
               <Form.Group>
-                <CAGLabel>Age Range - Private</CAGLabel>
+                <CAGLabel>
+                  Age Range <PrivateLabel />
+                </CAGLabel>
                 <p>Select up to 3 ranges</p>
                 {ageRanges.map(ageRange => (
                   <Checkbox
@@ -166,7 +169,9 @@ const ActorInfo2: React.FC<{
                 ))}
               </Form.Group>
               <Form.Group>
-                <CAGLabel>Gender Identity - Private</CAGLabel>
+                <CAGLabel>
+                  Gender Identity <PrivateLabel />
+                </CAGLabel>
                 <p>
                   First, choose your gender identity - additional options may be
                   presented for casting purposes. If other, please select the
@@ -193,8 +198,10 @@ const ActorInfo2: React.FC<{
             <Col lg="6">
               <Form.Group>
                 <CAGLabel>
-                  I would also be comfortable playing roles usually played by:
+                  I would also be comfortable playing roles usually played by:{' '}
+                  <PrivateLabel />
                 </CAGLabel>
+
                 {genderRoles.map(g => (
                   <Checkbox
                     checked={isGenderRoleInGenderRoles(g)}
@@ -213,7 +220,7 @@ const ActorInfo2: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   I would be comfortable playing a character through all phases
-                  of their transition:
+                  of their transition: <PrivateLabel />
                 </CAGLabel>
                 <Checkbox
                   checked={actorInfo2GenderTransition === 'Yes'}

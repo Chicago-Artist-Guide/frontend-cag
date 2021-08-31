@@ -8,6 +8,7 @@ import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
 import { Title } from '../layout/Titles';
 import Checkbox from '../../genericComponents/Checkbox';
+import PrivateLabel from '../../genericComponents/PrivateLabel';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
@@ -132,8 +133,8 @@ const ActorInfo1: React.FC<{
               </Form.Group>
               <Form.Group>
                 <CAGLabel>
-                  Do you identify as part of the LGBTQIA+ community? -{' '}
-                  <PrivateSpan>Private</PrivateSpan>
+                  Do you identify as part of the LGBTQIA+ community?{' '}
+                  <PrivateLabel />
                 </CAGLabel>
                 <p>A = asexual, not ally</p>
                 <Checkbox
@@ -226,12 +227,6 @@ const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
-`;
-
-const PrivateSpan = styled.span`
-  font-size: 16px;
-  color: ${colors.primary};
-  font-weight: bold;
 `;
 
 const PrivacyPar = styled.p`
