@@ -7,15 +7,11 @@ import styled from 'styled-components';
 
 const GenericAccordion = (props: any) => {
   const { children, textHeader } = props;
-
-  const [isOpen, setIsOpen] = useState(false);
-
-  const arrowDirection = () => {
-    isOpen ? <CaretDownFill /> : <CaretUpFill />;
-  };
+  const [isOpen, setIsOpen] = useState(true);
+  const arrowDirection = isOpen ? <CaretDownFill /> : <CaretUpFill />;
 
   return (
-    <Accordion1 defaultActiveKey="0" onClick={() => setIsOpen(!isOpen)}>
+    <StyledAccordion defaultActiveKey="0" onClick={() => setIsOpen(!isOpen)}>
       <Card>
         <CardHeader>
           {textHeader}
@@ -27,7 +23,7 @@ const GenericAccordion = (props: any) => {
           <Card.Body>{children}</Card.Body>
         </Accordion.Collapse>
       </Card>
-    </Accordion1>
+    </StyledAccordion>
   );
 };
 
@@ -37,7 +33,7 @@ const CardHeader = styled(Card.Header)`
   background-color: white;
 `;
 
-const Accordion1 = styled(Accordion)`
+const StyledAccordion = styled(Accordion)`
   box-shadow: 2px 2px 10px #00000029;
   border-radius: 8px;
   opacity: 1;

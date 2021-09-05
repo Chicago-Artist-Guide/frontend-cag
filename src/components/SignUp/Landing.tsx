@@ -6,10 +6,12 @@ import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
-import { colors } from '../../theme/styleVars';
-import Green_blob from '../../images/green_blob.svg';
-import Red_blob from '../../images/red_blob.svg';
-import Blue_blob from '../../images/blue_blob.svg';
+import { cardHeight, colors } from '../../theme/styleVars';
+import Group from '../../images/icons-signup/group.svg';
+import Individual from '../../images/icons-signup/individual.svg';
+import OnStage from '../../images/icons-signup/on-stage.svg';
+import OffStage from '../../images/icons-signup/off-stage.svg';
+import BothStage from '../../images/icons-signup/both-stage.svg';
 import { Link } from 'react-router-dom';
 
 const Landing: React.FC<{
@@ -18,14 +20,10 @@ const Landing: React.FC<{
   landingStep: any;
   setLandingStep: any;
 }> = ({ setForm, formData, landingStep, setLandingStep }) => {
-  const {
-    landingType,
-    landingPerformTypeOnStage,
-    landingPerformTypeOffStage
-  } = formData;
+  const { landingType, performType } = formData;
 
   const Card: React.FC<{
-    blob: any;
+    icon: any;
     className: string;
     name: string;
     setForm: any;
@@ -33,7 +31,7 @@ const Landing: React.FC<{
     text: any;
     input: any;
     key: string;
-  }> = ({ blob, className, name, setForm, target, text, input }) => {
+  }> = ({ icon, className, name, setForm, target, text, input }) => {
     const setFormCheck = () => {
       const newTarget = { ...target };
 
@@ -49,10 +47,7 @@ const Landing: React.FC<{
     if (landingStep === 1) {
       selected = landingType === name;
     } else {
-      selected =
-        target.name === 'landingPerformTypeOnStage'
-          ? landingPerformTypeOnStage
-          : landingPerformTypeOffStage;
+      selected = performType === name;
     }
 
     return (
@@ -61,11 +56,11 @@ const Landing: React.FC<{
         lg="5"
         onClick={setFormCheck}
       >
-        <Image alt="" src={blob} />
-        <div>
-          <p>{text}</p>
-          <div>{input}</div>
-        </div>
+        <Image alt="" src={icon} />
+        <CardText>
+          {text}
+          {input}
+        </CardText>
       </StyledCard>
     );
   };
@@ -73,10 +68,15 @@ const Landing: React.FC<{
   const cards = [
     [
       {
-        blob: Green_blob,
+        icon: Individual,
         className: 'green-shadow-hover',
         name: 'individual',
-        text: <span>An Individual</span>,
+        text: (
+          <>
+            <CardHeading>Individual Artist</CardHeading>{' '}
+            <p>Show off your skills and experience</p>
+          </>
+        ),
         setForm,
         target: {
           name: 'landingType',
@@ -93,10 +93,19 @@ const Landing: React.FC<{
         )
       },
       {
-        blob: Red_blob,
+        icon: Group,
         className: 'red-shadow-hover',
         name: 'group',
-        text: <span>A Theatre Group</span>,
+        text: (
+          <>
+            <CardHeading>Theatre Group</CardHeading>{' '}
+            <p>
+              Urna gravida tellus nullam nulla. Tempor sollicitudin sed sed enim
+              morbi amet bibendum massa. Consequat feugiat in pulvinar id
+              egestas.
+            </p>
+          </>
+        ),
         setForm,
         target: {
           name: 'landingType',
@@ -115,50 +124,77 @@ const Landing: React.FC<{
     ],
     [
       {
-        blob: Green_blob,
+        icon: OnStage,
         className: 'green-shadow-hover',
+        name: 'on-stage',
         text: (
-          <span>
-            <strong>On-Stage</strong> (Actors, Singers, Dancers)
-          </span>
+          <>
+            <CardHeading>On-Stage</CardHeading>{' '}
+            <p>(Actors, Singers, Dancers)</p>
+          </>
         ),
         setForm,
         target: {
-          name: 'landingPerformTypeOnStage',
-          type: 'checkbox',
+          name: 'performType',
           value: 'on-stage'
         },
         input: (
           <ToggleButton
-            checked={landingPerformTypeOnStage}
-            name="landingPerformTypeOnStage"
+            checked={performType === 'on-stage'}
+            name="performType"
             onChange={setForm}
-            type="checkbox"
+            type="radio"
             value="on-stage"
           />
         )
       },
       {
-        blob: Blue_blob,
+        icon: OffStage,
         className: 'blue-shadow-hover',
+        name: 'off-stage',
         text: (
-          <span>
-            <strong>Off-Stage</strong> (Directors, Designers, Crew)
-          </span>
+          <>
+            <CardHeading>Off-Stage</CardHeading>{' '}
+            <p>(Directors, Designers, Crew)</p>
+          </>
         ),
         setForm,
         target: {
-          name: 'landingPerformTypeOffStage',
-          type: 'checkbox',
+          name: 'performType',
           value: 'off-stage'
         },
         input: (
           <ToggleButton
-            checked={landingPerformTypeOffStage}
-            name="landingPerformTypeOffStage"
+            checked={performType === 'off-stage'}
+            name="performType"
             onChange={setForm}
-            type="checkbox"
+            type="radio"
             value="off-stage"
+          />
+        )
+      },
+      {
+        icon: BothStage,
+        className: 'red-shadow-hover',
+        name: 'both-stage',
+        text: (
+          <>
+            <CardHeading>Both</CardHeading>{' '}
+            <p>(Directors, Designers, Dancers)</p>
+          </>
+        ),
+        setForm,
+        target: {
+          name: 'performType',
+          value: 'both-stage'
+        },
+        input: (
+          <ToggleButton
+            checked={performType === 'both-stage'}
+            name="performType"
+            onChange={setForm}
+            type="radio"
+            value="both-stage"
           />
         )
       }
@@ -183,7 +219,7 @@ const Landing: React.FC<{
       </Row>
       <Row>
         <Col lg={7}>
-          <Row>
+          <Row style={{ flexWrap: 'nowrap' }}>
             {(cards as any)[landingStep - 1].map((card: any, i: any) => {
               return <Card {...card} key={`card-${landingStep}-${i}`} />;
             })}
@@ -202,41 +238,71 @@ const Landing: React.FC<{
 };
 
 const StyledCard = styled(Col)`
+  width: 273px;
+  height: ${cardHeight};
   margin-right: 20px;
   box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
   background-color: ${colors.bodyBg};
+  backdrop-filter: blur(15px);
   padding: 30px 20px 50px 20px;
-  height: 100%;
+  transition: all 0.1s ease-in-out;
 
-  &:hover,
-  &.selected {
+  p {
+    font-size: 20px;
+    line-height: 24px;
+    /* or 150% */
+    letter-spacing: 0.5px;
+
+    /* Inside Auto Layout */
+    flex: none;
+    order: 2;
+    flex-grow: 0;
+    margin: 12px 0px;
+  }
+
+  &:hover {
+    scale: 1.05;
     cursor: pointer;
 
     &.blue-shadow-hover {
       box-shadow: 2px 2px 10px rgba(53, 86, 105, 0.65);
+      &.selected {
+        background: rgba(53, 86, 105, 0.65);
+      }
     }
 
     &.green-shadow-hover {
       box-shadow: 2px 2px 10px rgba(149, 189, 168, 0.99);
+      &.selected {
+        background: rgba(149, 189, 168, 0.99);
+      }
     }
 
     &.red-shadow-hover {
       box-shadow: 2px 2px 10px rgba(229, 143, 120, 0.65);
+      &.selected {
+        background: rgba(229, 143, 120, 0.65);
+      }
     }
   }
 
   &.selected {
-    font-weight: bold;
+    &.blue-shadow-hover {
+      background: rgba(53, 86, 105, 0.65);
+    }
+
+    &.green-shadow-hover {
+      background: rgba(149, 189, 168, 0.99);
+    }
+
+    &.red-shadow-hover {
+      background: rgba(229, 143, 120, 0.65);
+    }
   }
 
-  > div > div {
+  label {
     display: none;
-  }
-
-  p {
-    font-size: 20px;
-    text-align: center;
   }
 `;
 
@@ -250,6 +316,23 @@ const LoginLink = styled.p`
   a {
     color: ${colors.orange};
   }
+`;
+
+const CardHeading = styled.h3`
+  width: 225px;
+  font-family: Montserrat;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 28px;
+  /* identical to box height, or 117% */
+  letter-spacing: 0.07em;
+  margin: 12px 0px;
+`;
+
+const CardText = styled.div`
+  height: calc(${cardHeight} / 2);
+  margin-top: 5px;
+  overflow: auto;
 `;
 
 export default Landing;
