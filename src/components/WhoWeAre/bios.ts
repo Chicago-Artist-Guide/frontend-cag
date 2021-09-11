@@ -204,7 +204,7 @@ const bios = {
     {
       id: 15,
       name: 'Alexandria Alyse Moorman',
-      role: 'Development Coordinator',
+      role: null,
       pronouns: 'she/her',
       affiliation: null,
       image: Moorman,
@@ -219,7 +219,7 @@ const bios = {
       pronouns: 'she/her',
       affiliation: null,
       image: Morales,
-      linkedin: 'null',
+      linkedin: null,
       bio:
         'is a performer, writer, and teacher originally from Houston, Texas. She is the Founder and active Executive Director of the Stepping Stone Theater in Chicago with its mission to uplift talented, diverse voices by giving them a platform to present their artistic excellence. She is an alumni of the American Musical and Dramatic Academy (AMDA). She is also a 2018 Second City Bob Curry Fellow and writes and performs with The Second City Touring Company. For almost 15 years, Julia has studied, performed, and taught improv and sketch comedy in Los Angeles, Houston, New York and Chicago. She has participated in countless comedy festivals and workshops all over the nation. She is also currently represented by Paonessa Talent. \n\nWhen she isn’t trying to change the world for the better, she can either be found at the gym, playing the Sims, or watching movies from her massive DVD collection. Yes, DVDs still exist. For all the current info on what the team at Stepping Stone Theater is up to, check out www.steppingstonechicago.com  '
     }
