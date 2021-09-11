@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Tagline, Title } from '../layout/Titles';
 
-const Demographics: React.FC<{
+const Credits: React.FC<{
   setForm: any;
   formData: any;
 }> = props => {
@@ -12,12 +12,12 @@ const Demographics: React.FC<{
     <Container>
       <Row>
         <Col lg="12">
-          <Title>ALMOST DONE!</Title>
-          <Tagline>Just a few more questions.</Tagline>
+          <Title>ADD YOUR PAST PERFORMANCES</Title>
+          <Tagline>Where might we have seen you?</Tagline>
         </Col>
       </Row>
     </Container>
   );
 };
 
-export default Demographics;
+export default Credits;

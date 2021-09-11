@@ -12,6 +12,7 @@ import ActorInfo2 from '../components/SignUp/ActorInfo2';
 import OffstageRoles from '../components/SignUp/OffstageRoles';
 import ProfilePhoto from '../components/SignUp/ProfilePhoto';
 import Demographics from '../components/SignUp/Demographics';
+import Profile from '../pages/Profile';
 import { submitSignUpStep } from '../api/endpoints';
 import { setSessionCookie } from '../utils/session';
 import Performances from '../components/SignUp/PastPerformances';
@@ -25,13 +26,8 @@ const steps = [
   { id: 'actorInfo2' },
   { id: 'offstageRoles' },
   { id: 'profilePhoto' },
-  { id: 'demographics' }
-  /*{ id: 'profilePreview' },
-  { id: 'training' },
-  { id: 'credits' },
-  { id: 'upcoming' },
-  { id: 'additionalSkills' },
-  { id: 'awards' }*/
+  { id: 'demographics' },
+  { id: 'profilePreview' }
 ];
 
 // flatten our step id's into a single array
@@ -66,7 +62,7 @@ const defaultData = {
 
   offstageRolesGeneral: [],
   offstageRolesProduction: [],
-  offstageRolesScenic: [],
+  offstageRolesScenicAndProperties: [],
   offstageRolesLighting: [],
   offstageRolesSound: [],
   offstageRolesHairMakeupCostumes: [],
@@ -76,18 +72,7 @@ const defaultData = {
   demographicsUnionStatus: '',
   demographicsAgency: '',
   demographicsWebsites: [], // { url, type }
-  demographicsBio: '',
-
-  training: [], // { institution, locationCity, locationState, locationCountry, degree, yearStart, yearEnd, notes }
-
-  pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
-
-  upcoming: [], // { title, synopsis, industryCode, url, imageUrl }
-
-  additionalSkillsCheckboxes: [],
-  additionalSkillsManual: [],
-
-  awards: [] // { title, year, url, description }
+  demographicsBio: ''
 };
 
 const SignUp = () => {
@@ -169,14 +154,9 @@ const SignUp = () => {
       case 'demographics' as any:
         returnStep = <Demographics {...props} />;
         break;
-      // case 'profilePreview' as any:
-      // case 'training' as any:
-      case 'credits' as any:
-        returnStep = <Performances {...props} />;
+      case 'profilePreview' as any:
+        returnStep = <Profile previewMode={true} />;
         break;
-      // case 'upcoming' as any:
-      // case 'additionalSkills' as any:
-      // case 'awards' as any:
       default:
         returnStep = <></>;
         break;
@@ -190,18 +170,19 @@ const SignUp = () => {
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
       </Row>
-      {formData.landingType !== '' && ( // if no Landing type is selected, don't show navigation yet
-        <SignUpFooter
-          landingStep={landingStep}
-          landingType={formData.landingType}
-          navigation={navigation}
-          setForm={setForm}
-          setLandingStep={setLandingStep}
-          step={step}
-          steps={steps}
-          submitBasics={submitBasics}
-        />
-      )}
+      {formData.landingType !== '' &&
+      step !== ('profilePreview' as any) && ( // if no Landing type is selected or it's profile preview, don't show navigation yet
+          <SignUpFooter
+            landingStep={landingStep}
+            landingType={formData.landingType}
+            navigation={navigation}
+            setForm={setForm}
+            setLandingStep={setLandingStep}
+            step={step}
+            steps={steps}
+            submitBasics={submitBasics}
+          />
+        )}
     </PageContainer>
   );
 };

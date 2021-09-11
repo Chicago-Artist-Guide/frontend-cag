@@ -37,6 +37,9 @@ const Header = () => {
           <Nav.Link as={Link} to="/who-we-are">
             WHO WE ARE
           </Nav.Link>
+          <Nav.Link as={Link} to="/donate">
+            DONATE
+          </Nav.Link>
           {showSession && (
             <Nav.Link as={Link} to="/logout">
               LOGOUT

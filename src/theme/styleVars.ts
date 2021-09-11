@@ -1,3 +1,5 @@
+const cardHeight = '350px';
+
 const colors = {
   bodyBg: '#F8F9FA',
   mainFont: '#0C2028',
@@ -5,6 +7,7 @@ const colors = {
   primary: '#82B29A',
   darkPrimary: '#425B4E',
   orange: '#E17B60',
+  grayishLightGreen: '#b8d8c7',
   darkGreen: '#82b29a',
   italicColor: '#537C8C',
   lightestGrey: '#EFEFEF',
@@ -14,7 +17,8 @@ const colors = {
   peach: '#F5AF19',
   darkGreyBlue: '#355669',
   veryDarkGrayBlue: '#4D5055',
-  gray: '#4d5055'
+  gray: '#4d5055',
+  black: '#000000'
 };
 
 const fonts = {
@@ -23,4 +27,4 @@ const fonts = {
   mainFont: '"Open Sans", sans-serif'
 };
 
-export { colors, fonts };
+export { cardHeight, colors, fonts };

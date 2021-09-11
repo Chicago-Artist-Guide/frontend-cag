@@ -5,19 +5,23 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
+import { Title } from '../layout/Titles';
 import Checkbox from '../../genericComponents/Checkbox';
+import PrivateLabel from '../../genericComponents/PrivateLabel';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
 const ageRanges = [
-  '19 and younger',
-  '20-24',
-  '25-29',
-  '30-34',
-  '34-39',
-  '40-45',
-  '46-55',
-  '56+'
+  '18-22',
+  '23-27',
+  '28-32',
+  '33-37',
+  '38-42',
+  '43-47',
+  '48-52',
+  '53-57',
+  '58-62',
+  '62+'
 ];
 
 const genders = [
@@ -94,7 +98,7 @@ const ActorInfo2: React.FC<{
     <Container>
       <Row>
         <Col lg="8">
-          <h1>Let's Get Some Details</h1>
+          <PaddingTitle>LET'S GET SOME DETAILS</PaddingTitle>
           <Row>
             <Col lg="12">
               <Form.Group>
@@ -110,7 +114,9 @@ const ActorInfo2: React.FC<{
                       >
                         <option value={undefined}>Feet</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7].map(ft => (
-                          <option value={ft}>{ft} ft</option>
+                          <option key={`ft-option-value-${ft}`} value={ft}>
+                            {ft} ft
+                          </option>
                         ))}
                       </Form.Control>
                     </Col>
@@ -123,7 +129,12 @@ const ActorInfo2: React.FC<{
                       >
                         <option value={undefined}>Inches</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(inches => (
-                          <option value={inches}>{inches} in</option>
+                          <option
+                            key={`inch-option-value-${inches}`}
+                            value={inches}
+                          >
+                            {inches} in
+                          </option>
                         ))}
                       </Form.Control>
                     </Col>
@@ -140,12 +151,15 @@ const ActorInfo2: React.FC<{
                 </Container>
               </Form.Group>
               <Form.Group>
-                <CAGLabel>Age Range - Private</CAGLabel>
+                <CAGLabel>
+                  Age Range <PrivateLabel />
+                </CAGLabel>
                 <p>Select up to 3 ranges</p>
                 {ageRanges.map(ageRange => (
                   <Checkbox
                     checked={isAgeRangeInAgeRanges(ageRange)}
                     fieldType="checkbox"
+                    key={`age-range-chk-${ageRange}`}
                     label={ageRange}
                     name="actorInfo2AgeRanges"
                     onChange={(e: any) =>
@@ -155,7 +169,9 @@ const ActorInfo2: React.FC<{
                 ))}
               </Form.Group>
               <Form.Group>
-                <CAGLabel>Gender Identity - Private</CAGLabel>
+                <CAGLabel>
+                  Gender Identity <PrivateLabel />
+                </CAGLabel>
                 <p>
                   First, choose your gender identity - additional options may be
                   presented for casting purposes. If other, please select the
@@ -170,7 +186,9 @@ const ActorInfo2: React.FC<{
                 >
                   <option value={undefined}>Select</option>
                   {genders.map(g => (
-                    <option value={g}>{g}</option>
+                    <option key={`gender-value-${g}`} value={g}>
+                      {g}
+                    </option>
                   ))}
                 </Form.Control>
               </Form.Group>
@@ -180,12 +198,15 @@ const ActorInfo2: React.FC<{
             <Col lg="6">
               <Form.Group>
                 <CAGLabel>
-                  I would also be comfortable playing roles usually played by:
+                  I would also be comfortable playing roles usually played by:{' '}
+                  <PrivateLabel />
                 </CAGLabel>
+
                 {genderRoles.map(g => (
                   <Checkbox
                     checked={isGenderRoleInGenderRoles(g)}
                     fieldType="checkbox"
+                    key={`gender-chk-${g}`}
                     label={g}
                     name="actorInfo2GenderRoles"
                     onChange={(e: any) =>
@@ -199,7 +220,7 @@ const ActorInfo2: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   I would be comfortable playing a character through all phases
-                  of their transition:
+                  of their transition: <PrivateLabel />
                 </CAGLabel>
                 <Checkbox
                   checked={actorInfo2GenderTransition === 'Yes'}
@@ -228,6 +249,10 @@ const ActorInfo2: React.FC<{
     </Container>
   );
 };
+
+const PaddingTitle = styled(Title)`
+  padding: 20px 0px;
+`;
 
 const ImageCol = styled(Col)`
   display: flex;
