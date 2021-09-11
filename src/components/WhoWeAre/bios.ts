@@ -12,6 +12,11 @@ import White from '../../images/who-we-are/board/Board_White.jpg';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 
+//Artists Images
+import Donterrio from '../../images/who-we-are/artists/Artist_Board_Donterrio.jpg';
+import Morales from '../../images/who-we-are/artists/Artist_Board_Morales.jpg';
+import Ledesma from '../../images/who-we-are/artists/Artist_Board_Ledesma.jpg';
+
 //Operations Images
 import Morris from '../../images/who-we-are/operations/Staff_Morris.jpg';
 import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpg';
@@ -173,9 +178,55 @@ const bios = {
         'Assistant Professor of Acting, University of Illinois Urbana-Champaign is a professional actor, fight director, intimacy director, and movement teacher. Professor Steinrock comes to us from Michigan State University, where he completed his MFA in Acting along with certifications in teaching yoga and for college teaching. His ongoing research centers around trauma-informed movement and stage combat training. After earning his BFA in Acting from Illinois Theatre in 2008, Prof. Steinrock spent several years as an actor and fight director for a variety of professional Theatre including Shattered Globe in Chicago and the renowned Paper Mill Playhouse in New Jersey. He is also a founding member of Chicago’s Brown Paper Box Theatre. Professor Steinrock is a Certified Intimacy Director with Intimacy Directors and Coordinators, Inc. and has worked as a choreographer all over the country. Prof. Steinrock most recently spent a year in Los Angeles teaching at the Stella Adler Academy of Acting, UC Irvine, and UC San Diego, along with choreographing intimacy for the South Coast Repertory Theatre. '
     }
   ],
-  operations: [
+  artists: [
     {
       id: 13,
+      name: 'Donterrio',
+      role: null,
+      pronouns: 'he/him',
+      affiliation: null,
+      image: Donterrio,
+      linkedin: 'donterriolive',
+      bio:
+        'is a Chicago-based theatre artist with a Bachelor of Fine Arts focused in Musical Theatre from the American Musical and Dramatic Academy. With a demonstrated history of work both onstage and off in the performing arts industry. He is skilled in Singing, Acting, Tap Dance, and Stage Direction. Donterrio is the former Artistic Director of the LGBTQIA+ theatre company PrideArts (formerly know as Pride Films and Plays). With a strong media and communication background, he is an advocate for the multi-hyphenated artist. You can find Donterrio on all social media platforms @donterriolive '
+    },
+    {
+      id: 14,
+      name: 'Jennifer Ledesma',
+      role: null,
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Ledesma,
+      linkedin: 'jenniferledesma',
+      bio:
+        'is a Mexican American performer currently based in Chicago. She grew up in Orange County, California and completed her Bachelor of Arts in Musical Theatre at Columbia College Chicago. \n\nFavorite credits include The Hunchback of Notre Dame (Music Theatre Works), Bright Star (Boho Theatre), Grand Hotel (Kokandy Productions), BITE: A Pucking Queer Cabaret (Pride Films and Plays), If/Then (Brown Paper Box Co.), Simply Maria or the American Dream (Haven Chicago), and Little Miss Sunshine (Chicago Theatre Workshop), along with understudying at Theatre at the Center, Raven Theatre, Theo Ubique Cabaret Theatre, and Refuge Theatre Project. She has also been featured in New Faces Sing Broadway 1956 at Porchlight Music Theatre, and is proudly represented by Big Mouth Talent. \n\nOffstage, Jennifer is passionate about accessibility, representation, and equality in the arts community. She is a team member of The Joy Jackson Initiative, an organization that works towards systematic equity in the arts by providing anti-racism resources to theaters. Recently, she also became a Board Member at Chicago Arts Access, which makes the arts more accessible to the Chicago community. From volunteering for these organizations to singing in benefit concerts for other nonprofits like Illinois Coalition for Immigrant and Refugee Rights, Urban Gateways, and My Block My Hood My City, she hopes to use her artistry to share marginalized stories onstage and give back to her community.'
+    },
+    {
+      id: 15,
+      name: 'Alexandria Alyse Moorman',
+      role: 'Development Coordinator',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Moorman,
+      linkedin: null,
+      bio:
+        'holds a BFA in Acting from Emerson College and is a proud recipient of the Isabel Sanford Award. While working in partnership with Cacique Youth Learning Center in the South End of Boston she helped lead and coordinate a classroom of Pre-K students through artistic workshops culminating in producing presentations of their original work. \n\nAlexandria’s credits as a performer/writer/poet/ improviser have been in collaboration with and on the stages of The MCA, iO (Diversity Scholar recipient), The Haitian American Museum, The Second City, The Den Theater, Brown Paper Box Co., Stage 773, The Annoyance, MPAACT Theater, Rough House Theater Co. among others. She is an ensemble member of The Not That Late Show, a monthly late night style talk show. She can also be heard as a recurring guest on the podcast Lifetime Uncorked, which was featured in O Magazine last year. \n\nFilm credits include How to Re-caulk Your Tub (Elevated FF - Audience Award Winner, Calgary Underground FF - Best Int. Short Winner), Mid 30’s Martyr (Austin Revolution FF - Best Actress Short Winner, Cindependent FF, San Angelo Revolution FF - Best Actress nom.), Ponytail (Shortcut 100 Int. FF - Winner: Audience Choice, Best Chicago Made, Female Filmmaker). When not dreaming of winning the lottery, she enjoys watching Bravo TV for all that nonsense, flexing her mixology skills, traveling and eating well with her partner John.'
+    },
+    {
+      id: 16,
+      name: 'Julia Morales',
+      role: null,
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Morales,
+      linkedin: 'null',
+      bio:
+        'is a performer, writer, and teacher originally from Houston, Texas. She is the Founder and active Executive Director of the Stepping Stone Theater in Chicago with its mission to uplift talented, diverse voices by giving them a platform to present their artistic excellence. She is an alumni of the American Musical and Dramatic Academy (AMDA). She is also a 2018 Second City Bob Curry Fellow and writes and performs with The Second City Touring Company. For almost 15 years, Julia has studied, performed, and taught improv and sketch comedy in Los Angeles, Houston, New York and Chicago. She has participated in countless comedy festivals and workshops all over the nation. She is also currently represented by Paonessa Talent. \n\nWhen she isn’t trying to change the world for the better, she can either be found at the gym, playing the Sims, or watching movies from her massive DVD collection. Yes, DVDs still exist. For all the current info on what the team at Stepping Stone Theater is up to, check out www.steppingstonechicago.com  '
+    }
+  ],
+  operations: [
+    {
+      id: 17,
       name: 'Anna Schutz',
       role: 'Executive Director',
       pronouns: 'she/her',
@@ -186,7 +237,7 @@ const bios = {
         "Executive Director holds a BFA in Acting from the University of Illinois Urbana-Champaign and has worked in Chicago as a performer, playwright, and producer for over a decade. She co-founded the storefront theatre Brown Paper Box Co. and served as its Managing Director during its 11 years of operation. \n\nAnna completed her Master of Nonprofit Management at DePaul University where her research was on Representation in Nonprofit Performing Arts Leadership. She served twice as the TA for DePaul's Women in Chicago Theatre class exposing first year students to intersectional feminist theory through field trips to performances around the city. Currently, she oversees daily operations and visits for Undergraduate Admission at DePaul University. There she has the privilege of managing and mentoring students employees, ensuring their professional development. \n\n​As a lover of technology, Anna previously facilitated technical and customer service training during her 6 years with Apple Inc. in its Chicago stores and around the world on its Global Retail Training team. \n\nSunday in the Park with George will never not make her cry. More info at www.annaschutz.com or connect on LinkedIn.​"
     },
     {
-      id: 14,
+      id: 18,
       name: 'Ellen Morris Palermo',
       role: 'Managing Director',
       pronouns: 'she/her',
@@ -197,7 +248,7 @@ const bios = {
         'holds a BM in Piano & Music Direction and English Literature from Northwestern University and an MS in Nonprofit Leadership and Management from the University of Pennsylvania. She has worked as a musician, music director, and teaching artist all over the Chicago area with credits at Writers Theatre, Drury Lane Theater, Marriott Theatre, and Boho Theatre, among others. She served as the Music Director In-Residence at the Wilmette Children’s Theatre for 3 years and taught at many area organizations including the Actor’s Training Center, Music Institute of Chicago, and Evanston Children’s Choir. \n\nEllen completed her Master of Nonprofit Leadership and Management at Penn and while there, held a fellowship in Grant Writing and Development at the Centro de Cultura, Arte, Trabajo y Educación (CCATE) in Norristown, PA. While at CCATE, she expanded their grants funding by 15%, increased annual giving by 25%, and also taught piano and SAT prep. Ellen returned to Chicago in 2020 and works as a nonprofit development and operations specialist. She is the Finance and Administrative Coordinator at GlobeMed and works as a Consultant with the Artistic Fundraising Group where she is the primary project manager, grant writer, and development specialist for three small organizations and their respective fundraising efforts. \n\nEllen spends her free time growing vegetables in the garden, reading fantasy novels, and hiking and exploring with her husband, Joe, and pup, Cleo.'
     },
     {
-      id: 15,
+      id: 19,
       name: 'Steven Zacks',
       role: 'Head of Platform',
       pronouns: 'he/him',
@@ -208,7 +259,7 @@ const bios = {
         'Head of Platform is a Product Manager, building software for the mortgage industry. Now based in Chicago, he has a BA in Economics from Fordham University and a J.D. from Washington University in St. Louis. Prior to moving to Chicago two years ago, Steven was a producer in Los Angeles, focusing mostly on documentaries and virtual reality experiences. His life goal is to steal a cape from Andrew Lloyd Webber.'
     },
     {
-      id: 16,
+      id: 20,
       name: 'Jamie Hart Birkner',
       role: 'Marketing Director',
       pronouns: 'she/her',
@@ -219,7 +270,7 @@ const bios = {
         "has built a career in content, integrated marketing and campaign strategy supporting national nonprofits based in Chicago like the American Dental Association and Northwestern Memorial Hospital. She has also performed for some of Chicago's storefront theaters, including Three Cats Productions, The Agency Theater Company, Rebekah Theater Project and On The Spot Theater Company. She is excited to join the Chicago Artist Guide because she wants to help Chicago theater arts thrive and reflect the voices of the amazing communities that live here. "
     },
     {
-      id: 17,
+      id: 21,
       name: 'Alexandria Alyse Moorman',
       role: 'Development Coordinator',
       pronouns: 'she/her',
@@ -232,7 +283,7 @@ const bios = {
   ],
   technical: [
     {
-      id: 18,
+      id: 22,
       name: 'Alex Jewell',
       role: 'Engineering Lead',
       pronouns: 'he/him',
@@ -243,7 +294,7 @@ const bios = {
         "Engineering Lead is a socially-driven senior UI software engineer in healthcare, blockchain and decentralization consultant and activist, and leftist technocratic ghostwriter for political organizations, lobbying groups, and biotech advocacy. A DePaul University alumni Alex Jewell is happiest marrying his talents with conscious efforts to disrupt and cause positive change. He is happily married with two dogs and lives in the South Loop. Alex's social media persona, @bestfoodalex, has also carved out a space in the Chicago culinary scene, supporting restaurants and hospitality with mouthwatering content."
     },
     {
-      id: 19,
+      id: 23,
       name: 'Carlene Liriano',
       role: 'Product Manager',
       pronouns: 'she/her',
@@ -254,7 +305,7 @@ const bios = {
         'is a Product Manager based out of Chicago currently working in consulting and specializing in the incubation of new asset ideas and taking them from concept to market. Carlene has a degree in Computer Science and Economics from Columbia University and an MBA from Yale. She has spent the majority of her career working in technology and brings several years of experience productizing strategic visions, managing application design and development, and driving the end-to-end product lifecycle. \n\nWhen she’s not “product managing”, you can find Carlene browsing the stacks at Open Books (yay used bookstores!) or trying to leash-train her cat, Pepper.'
     },
     {
-      id: 20,
+      id: 24,
       name: 'Alison Voghel',
       role: 'Lead UI/UX Designer',
       pronouns: 'she/her',
@@ -265,7 +316,7 @@ const bios = {
         'UI/UX Designer received her BA in Environmental Design at CU Boulder in 2012 and her Masters in Architecture & Urban Design in 2017. She has worked in tech, architecture, urban design, and interior design but fully transitioned to UX and UI Design in 2020. Alison currently works full-time as a Graphic and UI Designer for a SaaS company based in Boston, remotely. She has never been involved in any theater-related organizations, but did have fun designing a theater for a student project. Her creative outlet of choice when not working or learning how to code is digital art/illustration. You can connect with Alison via LinkedIn, her website, or on Instagram.'
     },
     {
-      id: 21,
+      id: 25,
       name: 'Alex Amaya',
       role: 'Developer',
       pronouns: 'he/him',
@@ -276,7 +327,7 @@ const bios = {
         'is a DePaul Double Demon, receiving his BS in Management and MS in Software Engineering. He was also a member of DePaul’s Men’s Track and Field team during his undergrad years at DePaul. He has worked in the logistics/transportation industry for the past 7 years. \n\nAlex has also completed several marathons and triathlons the past few years. He has done both the Chicago and Boston Marathons and hopes to do several others internationally. As a different challenge, he finished a half Iron Man in Victoria, BC and a full Iron Man in Madison, WI. Alex is thankful for the challenges and lessons learned through these races. He hopes these will be the first of many.'
     },
     {
-      id: 22,
+      id: 26,
       name: 'Miwako Chimura',
       role: 'UI/UX Desiger',
       pronouns: 'she/they',
@@ -287,7 +338,7 @@ const bios = {
         'received her BS in Psychology at University of Massachusetts Amherst. She recently made the career change from Human Resources to UX, when she discovered UX was the perfect combination of her passion for people and psychology. As a native New Yorker, Miwako trained in classical ballet for over 13 years. Her interests include spoiling her dog, watercoloring, and cooking.'
     },
     {
-      id: 23,
+      id: 27,
       name: 'Nishat Chowdhury',
       role: 'Developer',
       pronouns: 'she/her',
@@ -298,7 +349,7 @@ const bios = {
         'is a recent graduate of Barnard College where she received her bachelor’s degree in computer science. She has interest in web development and data visualization and has always been passionate about promoting women in the STEM field. She is excited to join the CAG organization and support its mission to connect and uplift people within the theatre community. She looks to constantly challenge herself to develop new skill sets—both technical and non-technical. Aside from programming, Nishat loves taylor swift, rollerblading, and trying out new desserts to satisfy her sweet tooth!'
     },
     {
-      id: 24,
+      id: 28,
       name: 'Austin Oie',
       role: 'Developer',
       pronouns: 'he/him',
@@ -309,7 +360,7 @@ const bios = {
         "Developer is a recent graduate of the Flatiron School Immersive Full Stack bootcamp. He's stoked to be working his first gig with CAG, as well as doing freelance work for the startup \"Sodalyt\" down in Austin, TX. Austin is a multidisciplinary artist, practicing music and songwriting, theatre performance, and photography. When he's not coding, plunking tunes, emoting, or snapping... he's... sleeping. What else could there possibly be time for? He's so excited for such an essential yet overlooked project. Chicago is the most segregated city in the US, and the theatre community is not immune to that fact. Here's to working towards more inclusiveness, diversity, and opportunity!"
     },
     {
-      id: 25,
+      id: 29,
       name: 'Pedro Rebollar',
       role: 'Developer',
       pronouns: 'he/him',
@@ -320,7 +371,7 @@ const bios = {
         "Developer is a Wisconsin native that moved to Chicago for college (Go Pack!). He is a DePaul Double Demon that majored in Biology for undergrad and Software Engineering for his Masters. Pedro's goal is to combine his knowledge of healthcare and software engineering to help the Latin community. To prepare me for that, he joined Chicago Artist Guide to use his engineering skills to make a positive impact within the theater community. \n\nBefore the pandemic hit, Pedro loved to explore the city through its food and events.  Now, he goes for runs and rides his bike along the lakefront to explore new places. Pedro also recently adopted a puppy named Lambo and he's been a bundle of joy to have around."
     },
     {
-      id: 26,
+      id: 30,
       name: 'Kaitlyn Salemi',
       role: 'Developer',
       pronouns: 'she/her',
@@ -331,7 +382,7 @@ const bios = {
         "Developer holds a Bachelor of Music in Music Business and Theater from Elmhurst University and works as a Stage Manager in the Chicagoland Area. \n\nLast year, Kaitlyn received a certification in Full-Stack Web Development from Northwestern University.  Kaitlyn is excited to be able to give back to the Chicago Theater Community with the Chicago Artist Guide and hopes to continue to empower theater makers through technology in the future. You can learn more about Kaitlyn's projects at kaitlynsalemi.com"
     },
     {
-      id: 27,
+      id: 31,
       name: 'Noah Turner',
       role: 'Developer',
       pronouns: 'he/him',
@@ -342,7 +393,7 @@ const bios = {
         'Developer is a Software Developer and graduate of Thinkful’s Full-Stack Software Engineering Program. Prior to his career as a developer, he was Soccer Coach and Personal Trainer for FC Barcelona Academy. Noah has coached the youth of the Chicago land area for over 6 years in physical, mental, and relational skills. He is excited to join CAG’s team because of their shared passion for creating connections through community involvement. Providing a service in his hometown only sweetens the opportunity. He loves to game and the opportunities he was given through sports that allowed him to express himself. Since those opportunities are not readily available to everyone, especially artistic minds, he wants to be part of the reason someone gets to experience that.  Find him on a pitch, in the gym, behind his desk, with his dog (son) Chapo.'
     },
     {
-      id: 28,
+      id: 32,
       name: 'Christian Walters',
       role: 'Developer',
       pronouns: 'he/him',
@@ -353,7 +404,7 @@ const bios = {
         'is a recent convert to the world of coding and website development. Having been trained as a full stack MERN developer with General Assembly, he has taken to the career shift with gusto and enthusiasm. As a volunteer, he is donating his time and experience for the dual purpose of keeping his skills sharp and supporting the essential arena of performing arts.'
     },
     {
-      id: 29,
+      id: 33,
       name: 'James Wilson',
       role: 'Developer',
       pronouns: 'he/him',
