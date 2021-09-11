@@ -15,15 +15,21 @@ import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 //Operations Images
 import Morris from '../../images/who-we-are/operations/Staff_Morris.jpg';
 import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpg';
+import Birkner from '../../images/who-we-are/operations/Staff_Birkner.jpg';
+import Moorman from '../../images/who-we-are/operations/Staff_Moorman.jpg';
 
 //Technical Images
 import Jewell from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
 import Voghel from '../../images/who-we-are/technical/Staff_Voghel.png';
+import Amaya from '../../images/who-we-are/technical/Staff_Amaya.jpg';
+import Chimura from '../../images/who-we-are/technical/Staff_Chimura.jpg';
+import Chowdhury from '../../images/who-we-are/technical/Staff_Chowdhury.png';
 import Oie from '../../images/who-we-are/technical/Staff_Oie.jpg';
 import Rebollar from '../../images/who-we-are/technical/Staff_Rebollar.jpg';
 import Salemi from '../../images/who-we-are/technical/Staff_Salemi.jpg';
 import Turner from '../../images/who-we-are/technical/Staff_Turner.png';
+import Walters from '../../images/who-we-are/technical/Staff_Walters.png';
 import Wilson from '../../images/who-we-are/technical/Staff_Wilson.jpg';
 
 const bios = {
