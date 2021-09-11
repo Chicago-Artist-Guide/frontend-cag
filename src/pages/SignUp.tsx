@@ -14,6 +14,7 @@ import ProfilePhoto from '../components/SignUp/ProfilePhoto';
 import Demographics from '../components/SignUp/Demographics';
 import { submitSignUpStep } from '../api/endpoints';
 import { setSessionCookie } from '../utils/session';
+import Performances from '../components/SignUp/PastPerformances';
 
 // Establish our steps
 const steps = [
@@ -168,12 +169,14 @@ const SignUp = () => {
       case 'demographics' as any:
         returnStep = <Demographics {...props} />;
         break;
-      /*case 'profilePreview' as any:
-      case 'training' as any:
+      // case 'profilePreview' as any:
+      // case 'training' as any:
       case 'credits' as any:
-      case 'upcoming' as any:
-      case 'additionalSkills' as any:
-      case 'awards' as any:*/
+        returnStep = <Performances {...props} />;
+        break;
+      // case 'upcoming' as any:
+      // case 'additionalSkills' as any:
+      // case 'awards' as any:
       default:
         returnStep = <></>;
         break;
