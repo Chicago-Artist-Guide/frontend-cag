@@ -15,7 +15,6 @@ import Demographics from '../components/SignUp/Demographics';
 import Profile from '../pages/Profile';
 import { submitSignUpStep } from '../api/endpoints';
 import { setSessionCookie } from '../utils/session';
-import Performances from '../components/SignUp/PastPerformances';
 
 // Establish our steps
 const steps = [
