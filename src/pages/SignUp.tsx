@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -17,7 +17,7 @@ import { submitSignUpStep } from '../api/endpoints';
 import { setSessionCookie } from '../utils/session';
 
 // Establish our steps
-const steps = [
+const defaultSteps = [
   { id: 'landing' },
   { id: 'basics' },
   { id: 'privacy' },
@@ -30,14 +30,14 @@ const steps = [
 ];
 
 // flatten our step id's into a single array
-const flatSteps = steps.map(step => step.id);
+const flatSteps = (stepsArrObj: any) =>
+  defaultSteps.map((step: any) => step.id);
 
 // establish our form data structure
 // assign defaults
 const defaultData = {
   landingType: '',
-  landingPerformTypeOnStage: false,
-  landingPerformTypeOffStage: false,
+  stageRole: '',
 
   basicsFirstName: '',
   basicsLastName: '',
@@ -47,7 +47,7 @@ const defaultData = {
 
   privacyAgreement: false,
 
-  actorInfo1Pronounds: '',
+  actorInfo1Pronouns: '',
   actorInfo1LGBTQ: '',
   actorInfo1Ethnicities: [],
 
@@ -75,9 +75,31 @@ const defaultData = {
 };
 
 const SignUp = () => {
+  const [steps, setSteps] = useState(defaultSteps);
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
-  const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
-  const [landingStep, setLandingStep] = useState(1); // Landing has two steps internally, based on if "individual"
+  const { step, navigation } = useStep({
+    steps: flatSteps(steps) as any
+  }); // defaults for our defaultSteps
+  const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
+
+  useEffect(() => {
+    const newSteps = [...steps];
+    const stageRole = formData.stageRole;
+
+    if (stageRole === '') {
+      return;
+    }
+
+    if (stageRole === 'on-stage') {
+      newSteps.splice(5, 1);
+    } else if (stageRole === 'off-stage') {
+      newSteps.splice(4, 1);
+    }
+
+    setSteps(newSteps);
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [formData.stageRole]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const setPrivacyAgree = () => {
     const target = {

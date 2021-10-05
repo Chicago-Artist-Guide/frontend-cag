@@ -20,7 +20,7 @@ const Landing: React.FC<{
   landingStep: any;
   setLandingStep: any;
 }> = ({ setForm, formData, landingStep, setLandingStep }) => {
-  const { landingType, performType } = formData;
+  const { landingType, stageRole } = formData;
 
   const Card: React.FC<{
     icon: any;
@@ -47,7 +47,7 @@ const Landing: React.FC<{
     if (landingStep === 1) {
       selected = landingType === name;
     } else {
-      selected = performType === name;
+      selected = stageRole === name;
     }
 
     return (
@@ -135,13 +135,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'performType',
+          name: 'stageRole',
           value: 'on-stage'
         },
         input: (
           <ToggleButton
-            checked={performType === 'on-stage'}
-            name="performType"
+            checked={stageRole === 'on-stage'}
+            name="stageRole"
             onChange={setForm}
             type="radio"
             value="on-stage"
@@ -160,13 +160,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'performType',
+          name: 'stageRole',
           value: 'off-stage'
         },
         input: (
           <ToggleButton
-            checked={performType === 'off-stage'}
-            name="performType"
+            checked={stageRole === 'off-stage'}
+            name="stageRole"
             onChange={setForm}
             type="radio"
             value="off-stage"
@@ -185,13 +185,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'performType',
+          name: 'stageRole',
           value: 'both-stage'
         },
         input: (
           <ToggleButton
-            checked={performType === 'both-stage'}
-            name="performType"
+            checked={stageRole === 'both-stage'}
+            name="stageRole"
             onChange={setForm}
             type="radio"
             value="both-stage"
