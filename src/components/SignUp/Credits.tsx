@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-// import { fonts } from '../../theme/styleVars';
+import { fonts } from '../../theme/styleVars';
 import { Tagline, Title } from '../layout/Titles';
 import InputField from '../../genericComponents/Input';
 import Button from '../../genericComponents/Button';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Credits: React.FC<{
   setForm: any;
@@ -70,78 +70,78 @@ const Credits: React.FC<{
         </Col>
       </Row>
 
-      <Row>
-        <Col lg="4">
-          <Form>
-            <InputField
-              name="title"
-              onChange={setForm}
-              placeholder="Show Title"
-              value={pastPerformances.title}
-            />
-            <InputField
-              name="group"
-              onChange={setForm}
-              placeholder="Theatre or Location"
-              value={pastPerformances.group}
-            />
-            <InputField
-              name="url"
-              onChange={setForm}
-              placeholder="Web Link"
-              value={pastPerformances.url}
-            />
-            <InputField
-              name="role"
-              onChange={setForm}
-              placeholder="Role"
-              value={pastPerformances.role}
-            />
-            <InputField
-              name="director"
-              onChange={setForm}
-              placeholder="Director"
-              value={pastPerformances.director}
-            />
-            <InputField
-              name="musicalDirector"
-              onChange={setForm}
-              placeholder="Musical Director"
-              value={pastPerformances.musicalDirector}
-            />
-          </Form>
-          <Button
-            onClick={addCreditBlock}
-            text="Save and add another past performance"
-          />
-        </Col>
-
-        <Col lg="4">
-          <InputField
-            name="group"
-            onChange={setForm}
-            placeholder="Theatre Group"
-            value={pastPerformances.group}
-          />
-          <h5>Running Dates</h5>
-          <DatePicker
-            name="startDate"
-            onChange={startDate => setStartDate(startDate)}
-            selected={startDate}
-            value={pastPerformances.startDate}
-          />
-
-          <h6>through</h6>
-          <DatePicker
-            name="endDate"
-            onChange={endDate => setEndDate(endDate)}
-            selected={endDate}
-            value={pastPerformances.endDate}
-          />
-        </Col>
-      </Row>
       {pastPerformances.map((credit: any, i: number) => {
         <>
+          <Row>
+            <Col lg="4">
+              <Form>
+                <InputField
+                  name="title"
+                  onChange={setForm}
+                  placeholder="Show Title"
+                  value={pastPerformances.title}
+                />
+                <InputField
+                  name="group"
+                  onChange={setForm}
+                  placeholder="Theatre or Location"
+                  value={pastPerformances.group}
+                />
+                <InputField
+                  name="url"
+                  onChange={setForm}
+                  placeholder="Web Link"
+                  value={pastPerformances.url}
+                />
+                <InputField
+                  name="role"
+                  onChange={setForm}
+                  placeholder="Role"
+                  value={pastPerformances.role}
+                />
+                <InputField
+                  name="director"
+                  onChange={setForm}
+                  placeholder="Director"
+                  value={pastPerformances.director}
+                />
+                <InputField
+                  name="musicalDirector"
+                  onChange={setForm}
+                  placeholder="Musical Director"
+                  value={pastPerformances.musicalDirector}
+                />
+              </Form>
+              <Button
+                onClick={addCreditBlock}
+                text="Save and add another past performance"
+              />
+            </Col>
+
+            <Col lg="4">
+              <InputField
+                name="group"
+                onChange={setForm}
+                placeholder="Theatre Group"
+                value={pastPerformances.group}
+              />
+              <h5>Running Dates</h5>
+              <DatePicker
+                name="startDate"
+                onChange={startDate => setStartDate(startDate)}
+                selected={startDate}
+                value={pastPerformances.startDate}
+              />
+
+              <h6>through</h6>
+              <DatePicker
+                name="endDate"
+                onChange={endDate => setEndDate(endDate)}
+                selected={endDate}
+                value={pastPerformances.endDate}
+              />
+            </Col>
+          </Row>
           {credit.title}
           <input
             name="creditTitle"
