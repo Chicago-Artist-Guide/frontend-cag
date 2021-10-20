@@ -28,9 +28,11 @@ const Demographics: React.FC<{
   const {
     demographicsUnionStatus, // checkboxes for Unions or non-union
     demographicsAgency,
-    demographicsWebsites, // { url: string, type: string }
+    demographicsWebsites, // { url: string, websiteType: string }
     demographicsBio
   } = formData;
+
+  console.log(demographicsWebsites)
 
   const onWebsiteInputChange = (
     fieldValue: string,
@@ -64,7 +66,7 @@ const Demographics: React.FC<{
     const newWebsiteInputs = [...demographicsWebsites];
 
     newWebsiteInputs.push({
-      name: '',
+      url: '',
       websiteType: ''
     });
 
@@ -144,8 +146,8 @@ const Demographics: React.FC<{
                             name="websiteUrl"
                             onChange={(e: any) =>
                               onWebsiteInputChange(
-                                'url',
                                 e.target.value || '',
+                                'url',
                                 i
                               )
                             }
@@ -156,8 +158,8 @@ const Demographics: React.FC<{
                             name="websiteType"
                             onChange={(e: any) =>
                               onWebsiteInputChange(
-                                'websiteType',
                                 e.target.value || '',
+                                'websiteType',
                                 i
                               )
                             }
