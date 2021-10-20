@@ -7,7 +7,7 @@ import Image from 'react-bootstrap/Image';
 import InputField from '../../genericComponents/Input';
 import Form from 'react-bootstrap/Form';
 import { Title } from '../layout/Titles';
-import { Tagline } from '../layout/Titles';
+import { Tagline, TitleThree } from '../layout/Titles';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
@@ -17,22 +17,26 @@ const unions = [
   "Actors' Equity Association",
   'Stage Directors and Choreographers Society',
   "Actors' Equity Association - EMC",
-  'Non-Union',
+  'Non-Union'
 ];
 
 const Demographics: React.FC<{
   setForm: any;
   formData: any;
-}> = (props) => {
+}> = props => {
   const { formData, setForm } = props;
   const {
     demographicsUnionStatus, // checkboxes for Unions or non-union
     demographicsAgency,
     demographicsWebsites, // { url: string, type: string }
-    demographicsBio,
+    demographicsBio
   } = formData;
 
-  const onWebsiteInputChange = (fieldValue: string, fieldName: string, i: any) => {
+  const onWebsiteInputChange = (
+    fieldValue: string,
+    fieldName: string,
+    i: any
+  ) => {
     // indexing to assign each website value a number
 
     const newWebsiteValues = [...demographicsWebsites];
@@ -40,7 +44,7 @@ const Demographics: React.FC<{
 
     const target = {
       name: 'demographicsWebsites',
-      value: newWebsiteValues,
+      value: newWebsiteValues
     };
     setForm({ target });
   };
@@ -50,22 +54,23 @@ const Demographics: React.FC<{
     newWebsiteValues.splice(i, 1);
     const target = {
       name: 'demographicsWebsites',
-      value: newWebsiteValues,
+      value: newWebsiteValues
     };
     setForm({ target });
   };
 
-  const addWebsiteInput = () => {
+  const addWebsiteInput = (e: any) => {
+    e.preventDefault();
     const newWebsiteInputs = [...demographicsWebsites];
 
     newWebsiteInputs.push({
       name: '',
-      websiteType: '',
+      websiteType: ''
     });
 
     const target = {
       name: 'demographicsWebsites',
-      value: newWebsiteInputs,
+      value: newWebsiteInputs
     };
 
     setForm({ target });
@@ -81,57 +86,59 @@ const Demographics: React.FC<{
           <Tagline>Just a few more questions.</Tagline>
           <Row>
             <Col lg="10">
-              <Form.Group>
-                <Container>
-                  <CAGLabel>Union</CAGLabel>
-                  <Row>
-                    <Col lg="5">
+              <TitleThree>Union</TitleThree>
+              <Container>
+                <Row>
+                  <Col lg="5">
+                    <Form.Control
+                      aria-label="union"
+                      as="select"
+                      defaultValue={demographicsUnionStatus}
+                      name="demographicsUnionStatus"
+                      onChange={setForm}
+                    >
+                      <option value={undefined}>Select</option>
+                      <option value={undefined}>Union</option>
+                      <option value={undefined}>Non-Union</option>
+                      <option value={undefined}>Other</option>
+                    </Form.Control>
+                  </Col>
+                  <Col lg="5">
+                    <Form.Control
+                      aria-label="union"
+                      defaultValue=""
+                      disabled={
+                        demographicsUnionStatus === 'Other' ? false : true
+                      }
+                      name="demographicsUnionStatus"
+                      onChange={setForm}
+                      placeholder="Other"
+                    ></Form.Control>
+                  </Col>
+                </Row>
+              </Container>
+              <Container>
+                <Row>
+                  <Col lg="8">
+                    <Form.Group>
                       <Form.Control
-                        aria-label="union"
-                        as="select"
-                        defaultValue={demographicsUnionStatus}
-                        name="demographicsUnionStatus"
+                        aria-label="agency"
+                        defaultValue={demographicsAgency}
+                        name="demographicsAgency"
                         onChange={setForm}
-                      >
-                        <option value={undefined}>Select</option>
-                        <option value={undefined}>Union</option>
-                        <option value={undefined}>Non-Union</option>
-                        <option value={undefined}>Other</option>
-                      </Form.Control>
-                    </Col>
-                    <Col lg="5">
-                      <Form.Control
-                        aria-label="union"
-                        defaultValue=""
-                        disabled={
-                          demographicsUnionStatus === 'Other' ? false : true
-                        }
-                        name="demographicsUnionStatus"
-                        onChange={setForm}
-                        placeholder="Other"
+                        placeholder="Agency"
                       ></Form.Control>
-                    </Col>
-                  </Row>
-                </Container>
-              </Form.Group>
-              <Col lg="8">
-                <Form.Group>
-                  <Form.Control
-                    aria-label="agency"
-                    defaultValue={demographicsAgency}
-                    name="demographicsAgency"
-                    onChange={setForm}
-                    placeholder="Agency"
-                  ></Form.Control>
-                </Form.Group>
-              </Col>
-              <Col lg="10">
-                <Form.Group>
-                  <Container>
-                    <CAGLabel>Website Links</CAGLabel>
-                    <Row>
-                      {demographicsWebsites.map((websiteRow: number, i: any) => {
-                        <div className="website-row" key={`website-row-${i}`}>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Container>
+              <TitleThree>Website Links</TitleThree>
+              <Container>
+                <Row>
+                  <Col lg="10">
+                    {demographicsWebsites.map((websiteRow: number, i: any) => (
+                      <div key={`website-row-${i}`}>
+                        <Col lg="12">
                           <InputField
                             label="URL"
                             name="websiteUrl"
@@ -161,15 +168,17 @@ const Demographics: React.FC<{
                               X
                             </a>
                           )}
-                        </div>;
-                      })}
+                        </Col>
+                      </div>
+                    ))}
+                    <div>
                       <a href="#" onClick={addWebsiteInput}>
                         Add Website
                       </a>
-                    </Row>
-                  </Container>
-                </Form.Group>
-              </Col>
+                    </div>
+                  </Col>
+                </Row>
+              </Container>
             </Col>
           </Row>
         </Col>
@@ -185,12 +194,6 @@ const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;
   max-width: 100%;
-`;
-
-const CAGLabel = styled(Form.Label)`
-  color: ${colors.mainFont};
-  font-family: ${fonts.mainFont};
-  font-size: 20px;
 `;
 
 const PrivacyPar = styled.p`
