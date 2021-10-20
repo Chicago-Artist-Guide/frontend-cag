@@ -1,11 +1,11 @@
 @import "~bootstrap/scss/bootstrap";
 
-$body-bg: #F8F9FA;
+$body-bg: #E5E5E5;
 $montserrat: 'Montserrat', sans-serif;
 $lora: 'Lora', serif;
 $open-sans: 'Open Sans', sans-serif;
 $main-font-color: #0C2028;
-$body-bg: #F8F9FA;
+$body-bg: #E5E5E5;
 $primary: #82B29A;
 $orange: #E17B60;
 
@@ -21,3 +21,6 @@ body {
     margin-bottom: 50px;
 }
 
+.nav-link {
+    align-self: center;
+}
