@@ -25,37 +25,33 @@ const Home = () => {
       id: 1,
       blob: yellowBlob1,
       zIndex: -1,
-      position: 'absolute',
-      left: -7.97,
-      top: -5.25,
-      transform: 0
+      left: '-84px',
+      top: '-153px',
+      transform: 'rotate(0deg)'
     },
     {
       id: 2,
       blob: redBlob,
       zIndex: -2,
-      position: 'absolute',
-      left: 17.55,
-      top: 6.5,
-      transform: 0
+      left: '105px',
+      top: '337px',
+      transform: 'rotate(0deg)'
     },
     {
       id: 3,
       blob: greenBlob,
       zIndex: -3,
-      position: 'absolute',
-      left: 63.75,
-      top: -14.3,
+      left: '1224px',
+      top: '-229px',
       transform: 'rotate(0deg)'
     },
     {
       id: 4,
       blob: yellowBlob2,
       zIndex: -4,
-      position: 'absolute',
-      left: 85.72,
-      top: 44.25,
-      transform: -124.79
+      left: '708px',
+      top: '1680px',
+      transform: 'rotate(-124.79deg)'
     }
   ];
 
@@ -131,16 +127,16 @@ const Home = () => {
     <>
       <BlobRow>
         {blobs.map(blobs => (
-          <Col key={blobs.id}>
-            <img
-              alt=""
-              //left={blobs.left}
-              //position='absolute'
-              src={blobs.blob}
-              //top={blobs.top}'rem'
-              //transform={blobs.transform}
-              z-index={blobs.zIndex}
-            />
+          <Col
+            key={blobs.id}
+            style={{
+              left: blobs.left,
+              position: 'relative',
+              top: blobs.top,
+              transform: blobs.transform
+            }}
+          >
+            <img alt="" src={blobs.blob} z-index={blobs.zIndex} />
           </Col>
         ))}
       </BlobRow>
@@ -185,21 +181,10 @@ const MarginCol = styled(Col)`
 const BlobRow = styled(Row)`
   width: 100vw;
   position: absolute;
-  overflow: hidden;
   z-index: -1;
   opacity: 0.6;
+  display: flex;
 `;
-
-// const BlobImg = styled.img`
-//   alt: "";
-//   src: ${Blob.blob};
-//   z-index: ${blobs.zIndex};
-//   position: absolute;
-//   left: ${blobs.left}rem;
-//   top: ${blobs.top}rem;
-//   transform: ${blobs.transform};
-
-// `;
 
 const StartButton = styled(Button)`
   height: 40px;
