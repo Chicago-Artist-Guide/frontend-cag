@@ -6,16 +6,18 @@ const BlobBox = (props: any) => {
   return (
     <Blobs>
       {blobs.map((blob: any) => (
-        <img
-          alt=""
-          key={blob.id}
-          src={blob.blob}
-          style={{
-            inset: blob.inset,
-            opacity: blob.opacity,
-            transform: blob.transform
-          }}
-        />
+        <div>
+          <img
+            alt=""
+            key={blob.id}
+            src={blob.blob}
+            style={{
+              opacity: blob.opacity,
+              transform: blob.transform,
+              translate: blob.translate
+            }}
+          />
+        </div>
       ))}
     </Blobs>
   );
@@ -24,12 +26,10 @@ const BlobBox = (props: any) => {
 const Blobs = styled.div`
   max-width: 100vw;
   overflow-x: hidden;
-  z-index: -9;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   img {
-    position: absolute;
     z-index: -10;
+    position: absolute;
+    overflow: visible;
   }
 `;
 
