@@ -25,7 +25,6 @@ const Cards = styled.div`
   height: 850px;
   row-gap: 25px;
   column-gap: 32px;
-  margin-left: 70px;
 
   .card:nth-of-type(2) {
     margin-bottom: 75px;

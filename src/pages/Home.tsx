@@ -6,10 +6,14 @@ import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
 import { colors } from '../theme/styleVars';
-import PageContainer from '../components/layout/PageContainer';
-import { Tagline, Title } from '../components/layout/Titles';
-import BlobBox from '../components/layout/BlobBox';
-import ForArtists from '../components/layout/ForArtists';
+import {
+  BlobBox,
+  ForArtists,
+  ForTheatres,
+  PageContainer,
+  Tagline,
+  Title
+} from '../components/layout';
 import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
 
 const Home = () => {
@@ -60,6 +64,7 @@ const Home = () => {
           </Col>
         </HomeRow>
         <ForArtists />
+        <ForTheatres />
       </PageContainer>
     </>
   );

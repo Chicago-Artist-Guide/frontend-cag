@@ -24,9 +24,7 @@ const colors = {
   slate: '#2F4550',
   veryDarkGrayBlue: '#4D5055',
   white80a: 'rgba(255, 255, 255, 0.8)',
-  yellow: '#EFC93D',
-
-  greenGrad: 'linear-gradient(90deg,#EFC93D 0%, #82B29A 100%)'
+  yellow: '#EFC93D'
 };
 
 const fonts = {

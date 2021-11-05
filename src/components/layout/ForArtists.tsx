@@ -4,8 +4,7 @@ import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
-import BlobBox from '../layout/BlobBox';
-import CardBox from '../layout/CardBox';
+import { BlobBox, CardBox } from '../layout';
 import { redBlob, yellowBlob1 } from '../../images';
 import {
   makeProfile,
@@ -14,7 +13,7 @@ import {
   submitToJobs
 } from '../../images/icons-home';
 import { colors } from '../../theme/styleVars';
-import DividerBar from '../../genericComponents/DividerBar';
+import { DividerBar } from '../../genericComponents';
 
 const ForArtists = () => {
   const blobs = [
@@ -92,7 +91,7 @@ const ForArtists = () => {
             </Nav.Link>
           </BuildButton>
         </WordBox>
-        <CardBox cards={cards} />
+        <CardBox cards={cards} style={{ marginLeft: '70px' }} />
         <BlobBox blobs={blobs} />
       </ArtistsRow>
     </>
