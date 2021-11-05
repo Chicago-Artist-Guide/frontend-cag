@@ -10,8 +10,8 @@ const colors = {
   black: '#000000',
   scrollOrange: '#F0960E',
 
-  darkGreen: '#82b29a',
-  darkGrey: '#232020',
+  darkGreen: '#82B29A',
+  darkGrey: '#2F4550',
   darkGreyBlue: '#355669',
   gray: '#4d5055',
   grayishLightGreen: '#b8d8c7',
@@ -20,9 +20,13 @@ const colors = {
   mint: '#82B29A',
   orange: '#E17B60',
   peach: '#F5AF19',
+  salmon: '#E17B60',
   slate: '#2F4550',
   veryDarkGrayBlue: '#4D5055',
-  white80a: 'rgba(255, 255, 255, 0.8)'
+  white80a: 'rgba(255, 255, 255, 0.8)',
+  yellow: '#EFC93D',
+
+  greenGrad: 'linear-gradient(90deg,#EFC93D 0%, #82B29A 100%)'
 };
 
 const fonts = {
