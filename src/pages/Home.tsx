@@ -10,6 +10,7 @@ import {
   BlobBox,
   ForArtists,
   ForTheatres,
+  InTouch,
   PageContainer,
   Tagline,
   Title
@@ -65,6 +66,7 @@ const Home = () => {
         </HomeRow>
         <ForArtists />
         <ForTheatres />
+        <InTouch />
       </PageContainer>
     </>
   );

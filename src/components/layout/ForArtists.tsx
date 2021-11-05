@@ -102,7 +102,7 @@ const ArtistsRow = styled(Row)`
   display: grid;
   width: 100%;
   height: 960px;
-  padding: 70px 0;
+  padding: 35px 0;
   grid-template-columns: 1fr 1fr;
   grid-template-areas: "wordBox cardBox";
   div:nth-child(2),
@@ -113,7 +113,8 @@ const ArtistsRow = styled(Row)`
 
 const WordBox = styled.div`
   margin-right: 70px;
-  margin-top: 210px;
+  margin-top: 35px;
+  padding-top: 20vh;
   grid-area: wordBox;
 `;
 

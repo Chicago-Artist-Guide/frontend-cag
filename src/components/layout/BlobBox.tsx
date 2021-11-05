@@ -14,7 +14,8 @@ const BlobBox = (props: any) => {
             style={{
               opacity: blob.opacity,
               transform: blob.transform,
-              translate: blob.translate
+              translate: blob.translate,
+              zIndex: blob.zIndex
             }}
           />
         </div>

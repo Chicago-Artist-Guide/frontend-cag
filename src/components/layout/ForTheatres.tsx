@@ -101,7 +101,7 @@ const TheaterRow = styled(Row)`
   display: grid;
   width: 100%;
   height: 960px;
-  padding: 70px 0;
+  padding: 35px 0;
   grid-template-columns: 1fr 1fr;
   grid-template-areas: "cardBox wordBox";
   div:nth-child(2),
@@ -112,7 +112,8 @@ const TheaterRow = styled(Row)`
 
 const WordBox = styled.div`
   margin-left: 70px;
-  margin-top: 210px;
+  margin-top: 50px;
+  padding-top: 20vh;
   grid-area: wordBox;
 `;
 

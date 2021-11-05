@@ -9,7 +9,6 @@ const PageContainer: React.FC<{ className?: string }> = ({
 
 const StyledContainer = styled(Container)`
   margin-top: calc(7% + 130px);
-  margin-bottom: 20%;
 `;
 
 export default PageContainer;
