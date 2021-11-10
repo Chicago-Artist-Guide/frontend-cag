@@ -6,6 +6,7 @@ import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title, TitleThree } from '../components/layout/Titles';
 import WhoSquare from '../components/Home/WhoSquare';
 import SVGLayer from '../components/SVGLayer';
+import Mailchimp from '../components/Home/Mailchimp';
 import yellowBlob1 from '../images/yellow_blob_1.svg';
 import homeDance from '../images/home_dance.svg';
 import greenBlob from '../images/green_blob.svg';
@@ -112,6 +113,11 @@ const Home = () => {
             />
           </MarginCol>
         ))}
+      </Row>
+      <Row>
+        <Col lg={12}>
+          <Mailchimp />
+        </Col>
       </Row>
     </PageContainer>
   );
