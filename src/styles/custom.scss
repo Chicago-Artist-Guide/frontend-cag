@@ -1,13 +1,18 @@
 @import "~bootstrap/scss/bootstrap";
 
-$body-bg: #F8F9FA;
+$body-bg: #E5E5E5;
 $montserrat: 'Montserrat', sans-serif;
 $lora: 'Lora', serif;
 $open-sans: 'Open Sans', sans-serif;
 $main-font-color: #0C2028;
-$body-bg: #F8F9FA;
+$body-bg: #E5E5E5;
 $primary: #82B29A;
 $orange: #E17B60;
+
+html, body, main, #root, #app, #app > div {
+  width: 100%;
+  overflow-x: hidden;
+}
 
 body {
     color: $main-font-color;
@@ -20,4 +25,3 @@ body {
     margin-top: 10px;
     margin-bottom: 50px;
 }
-

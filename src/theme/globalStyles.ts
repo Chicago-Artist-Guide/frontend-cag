@@ -89,6 +89,10 @@ const GlobalStyle = createGlobalStyle`
     letter-spacing: 0.4px;
     line-height: 14px;
   }
+
+  .nav-link {
+    align-self: center;
+  }
 `;
 
 export default GlobalStyle;
