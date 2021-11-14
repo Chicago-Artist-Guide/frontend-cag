@@ -15,8 +15,11 @@ const AdditionalSkills: React.FC<{
   formData: any;
 }> = props => {
   const { formData, setForm } = props;
-
   const { additionalSkillsCheckboxes } = formData;
+
+  const [input, setInput] = useState('');
+  const [skillTags, setTags] = useState([] as string[]);
+  const [isKeyReleased, setIsKeyReleased] = useState(false);
 
   const isAdditionalSkillsCheckboxes = (skillOption: string) =>
     additionalSkillsCheckboxes.indexOf(skillOption) > -1;
@@ -41,10 +44,6 @@ const AdditionalSkills: React.FC<{
 
     setForm({ target });
   };
-
-  const [input, setInput] = useState('');
-  const [skillTags, setTags] = useState([] as string[]);
-  const [isKeyReleased, setIsKeyReleased] = useState(false);
 
   const addTag = () => {
     const trimmedInput = input.trim();
@@ -81,7 +80,6 @@ const AdditionalSkills: React.FC<{
       e.preventDefault();
       const tagsCopy = [...skillTags];
       const poppedTag = tagsCopy.pop() ?? '';
-      e.preventDefault();
       setTags(tagsCopy);
       setInput(poppedTag);
     }
