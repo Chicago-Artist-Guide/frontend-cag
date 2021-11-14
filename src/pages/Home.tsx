@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { colors } from '../theme/styleVars';
 import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title } from '../components/layout/Titles';
+import Mailchimp from '../components/Home/Mailchimp';
 import BlobBox from '../components/layout/BlobBox';
 import ForArtists from '../components/layout/ForArtists';
 import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
@@ -60,8 +61,14 @@ const Home = () => {
           </Col>
         </HomeRow>
         <ForArtists />
+        <Row>
+        <Col lg={12}>
+          <Mailchimp />
+        </Col>
+      </Row>
       </PageContainer>
     </>
+
   );
 };
 
@@ -70,14 +77,13 @@ const StartButton = styled(Button)`
   width: 151px;
   display: flex;
   background: ${colors.slate};
-  font: inherit;
-  border: 0px;
+  border: 0;
   border-radius: 20px;
   align-items: center;
   justify-content: center;
 
   .nav-link {
-    color: #fff;
+    color: white;
     flex-shrink: 0;
   }
 `;

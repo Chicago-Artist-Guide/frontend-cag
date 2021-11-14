@@ -70,7 +70,7 @@ const defaultData = {
 
   demographicsUnionStatus: '',
   demographicsAgency: '',
-  demographicsWebsites: [], // { url, type }
+  demographicsWebsites: [{ url: '', websiteType: '' }], // { url, websiteType }
   demographicsBio: ''
 };
 
