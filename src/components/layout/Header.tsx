@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Row from 'react-bootstrap/Row';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import Button from 'react-bootstrap/Button';
@@ -61,8 +62,8 @@ const Header = () => {
 
 const WhiteBackNav = styled(Navbar)`
   background-color: ${colors.white80a};
-  max-width: 100vw;
-  padding: 0.875rem 6.15vw;
+  max-width: 90rem;
+  padding: 0.875rem 5rem;
   backdrop-filter: blur(15px);
   position: fixed;
   sticky: top;
@@ -84,6 +85,14 @@ const LogButton = styled(Button)`
 
   .nav-link {
     flex-shrink: 0;
+  }
+`;
+
+const BlobRow = styled(Row)`
+  max-width: 100vw;
+  overflow: hidden;
+  img {
+    position: absolute;
   }
 `;
 
