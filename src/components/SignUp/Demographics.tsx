@@ -32,7 +32,7 @@ const Demographics: React.FC<{
     demographicsBio
   } = formData;
 
-  console.log(demographicsWebsites);
+  console.log(demographicsWebsites)
 
   const onWebsiteInputChange = (
     fieldValue: string,
