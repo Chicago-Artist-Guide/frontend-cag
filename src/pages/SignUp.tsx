@@ -43,6 +43,7 @@ const defaultData = {
   basicsLastName: '',
   basicsEmailAddress: '',
   basicsPassword: '',
+  basicsPasswordConfirm: '',
   basics18Plus: false,
 
   privacyAgreement: false,
