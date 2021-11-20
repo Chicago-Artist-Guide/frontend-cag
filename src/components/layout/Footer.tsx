@@ -18,7 +18,11 @@ import Twitter from '../../images/icons-footer/social_twitter.png';
 import Medium from '../../images/icons-footer/social_medium.png';
 
 const Footer = () => (
-  <FooterNavbar className="container justify-content-center nav" expand="sm">
+  <FooterNavbar
+    className="container fixed-bottom justify-content-center nav"
+    expand="sm"
+    sticky="bottom"
+  >
     <FooterContainer>
       <Row>
         <EdgeCols
