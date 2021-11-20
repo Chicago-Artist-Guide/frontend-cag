@@ -6,30 +6,38 @@ import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
 import { colors } from '../theme/styleVars';
-import PageContainer from '../components/layout/PageContainer';
-import { Tagline, Title } from '../components/layout/Titles';
 import Mailchimp from '../components/Home/Mailchimp';
+import {
+  BlobBox,
+  ForArtists,
+  ForTheatres,
+  PageContainer,
+  Tagline,
+  Title
+} from '../components/layout';
+//import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
 
 const Home = () => {
   return (
-    <PageContainer>
-      <Row>
-        <Col lg={8}>
-          <Title>CHICAGO ARTIST GUIDE</Title>
-          <Tagline>Diversifying theater one connection at a time.</Tagline>
-          <StartButton>
-            <Nav.Link as={Link} to="/login">
-              GET STARTED
-            </Nav.Link>
-          </StartButton>
-        </Col>
-      </Row>
-      <Row>
-        <Col lg={12}>
-          <Mailchimp />
-        </Col>
-      </Row>
-    </PageContainer>
+    <>
+      <BlobBox blobs={blobs} />
+      <PageContainer>
+        <HomeRow>
+          <Col lg={8}>
+            <Title>CHICAGO ARTIST GUIDE</Title>
+            <Tagline>Diversifying theater one connection at a time.</Tagline>
+            <StartButton>
+              <Nav.Link as={Link} to="/login">
+                GET STARTED
+              </Nav.Link>
+            </StartButton>
+          </Col>
+        </HomeRow>
+        <ForArtists />
+        <ForTheatres />
+        <Mailchimp />
+      </PageContainer>
+    </>
   );
 };
 
@@ -49,9 +57,9 @@ const StartButton = styled(Button)`
   }
 `;
 
-// const HomeRow = styled(Row)`
-//   position: relative;
-//   height: 80vh;
-// `;
+const HomeRow = styled(Row)`
+  position: relative;
+  height: 80vh;
+`;
 
 export default Home;

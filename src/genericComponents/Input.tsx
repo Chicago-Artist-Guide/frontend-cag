@@ -23,12 +23,14 @@ const InputField = (props: any) => {
 
 const CAGInput = styled(Form.Group)`
   box-shadow: 0px 13px 21px -10px rgba(0, 0, 0, 0.3);
+  margin: 0px;
 `;
 
 const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+  margin: 0px;
 `;
 
 export default InputField;

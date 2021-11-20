@@ -4,7 +4,7 @@ import Checkbox from './Checkbox';
 import DividerBar from './DividerBar';
 import Dropdown from './Dropdown';
 import GenericAccordion from './GenericAccordion';
-import Input from './Input';
+import InputField from './Input';
 import PrivateLabel from './PrivateLabel';
 import RadioButton from './RadioButton';
 
@@ -15,7 +15,7 @@ export {
   DividerBar,
   Dropdown,
   GenericAccordion,
-  Input,
+  InputField,
   PrivateLabel,
   RadioButton
 };
