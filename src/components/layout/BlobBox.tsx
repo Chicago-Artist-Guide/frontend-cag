@@ -25,10 +25,9 @@ const BlobBox = (props: any) => {
 };
 
 const Blobs = styled.div`
-  max-width: 100vw;
-  overflow-x: hidden;
+  z-index: -1;
+  transform-style: preserve-3d;
   img {
-    z-index: -10;
     position: absolute;
     overflow: visible;
   }

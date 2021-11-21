@@ -15,12 +15,43 @@ import {
   Tagline,
   Title
 } from '../components/layout';
-//import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
+import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
 
 const Home = () => {
+  const blobs = [
+    {
+      id: 1,
+      blob: yellowBlob1,
+      opacity: 0.85,
+      transform: 'scale(0.6)',
+      translate: '-35rem -45rem'
+    },
+    {
+      id: 2,
+      blob: redBlob,
+      opacity: 0.6,
+      transform: 'scale(0.65)',
+      translate: '-15rem -30rem'
+    },
+    {
+      id: 3,
+      blob: greenBlob,
+      opacity: 0.7,
+      transform: 'scale(.5)',
+      translate: '30rem -35rem'
+    },
+    {
+      id: 4,
+      blob: yellowBlob2,
+      opacity: 0.85,
+      transform: 'rotate(-124.79deg) scale(0.5)',
+      translate: '45rem -25rem'
+    }
+  ];
+
   return (
     <>
-      <BlobBox blobs={blobs} />
+      <BlobBox blobs={blobs} style={{ alignSelf: 'baseline' }} />
       <PageContainer>
         <HomeRow>
           <Col lg={8}>
@@ -59,7 +90,7 @@ const StartButton = styled(Button)`
 
 const HomeRow = styled(Row)`
   position: relative;
-  height: 80vh;
+  height: 30rem;
 `;
 
 export default Home;

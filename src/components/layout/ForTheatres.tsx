@@ -21,15 +21,15 @@ const ForTheatres = () => {
       id: 1,
       blob: yellowBlob1,
       opacity: 0.85,
-      transform: 'rotate(315deg) scale(.7, .8)',
-      translate: '-25vw -10vh'
+      transform: 'rotate(315deg) scale(1)',
+      translate: ''
     },
     {
       id: 2,
       blob: greenBlob,
       opacity: 0.6,
-      transform: 'rotate(-7deg) scale(.7, .8)',
-      translate: '-30vw -15vh'
+      transform: 'rotate(-7deg) scale(1)',
+      translate: ''
     }
   ];
 
@@ -65,56 +65,51 @@ const ForTheatres = () => {
   ];
 
   return (
-    <>
-      <TheaterRow>
-        <WordBox>
-          <DividerBar
-            style={{
-              backgroundImage: 'linear-gradient(90deg,#EFC93D 0%, #82B29A 100%)'
-            }}
-          />
-          <h2>FOR THEATRE GROUPS</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Pellentesque nulla ut suspendisse tincidunt adipiscing ac ornare. A,
-            cursus turpis sit pellentesque metus posuere. Neque, quisque mattis
-            bibendum nibh vitae, auctor viverra arcu. Vestibulum dui diam et
-            varius. Integer nibh aliquam elementum tempor enim turpis.
-            Adipiscing magna ut pulvinar potenti ipsum, at tortor vitae. In at
-            euismod non consequat id nec egestas in erat. Mi lacus feugiat et a
-            proin.
-          </p>
-          <BuildButton>
-            <Nav.Link as={Link} to="/SignUp">
-              START SEARCH NOW
-            </Nav.Link>
-          </BuildButton>
-        </WordBox>
-        <CardBox cards={cards} style={{ marginRight: '70px' }} />
-        <BlobBox blobs={blobs} />
-      </TheaterRow>
-    </>
+    <TheaterRow>
+      <CardBox cards={cards} style={{ marginRight: '70px' }} />
+      <BlobBox blobs={blobs} style={{ alignSelf: 'baseline' }} />
+      <WordBox>
+        <DividerBar
+          style={{
+            backgroundImage: 'linear-gradient(90deg,#EFC93D 0%, #82B29A 100%)'
+          }}
+        />
+        <h2>FOR THEATRE GROUPS</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
+          nulla ut suspendisse tincidunt adipiscing ac ornare. A, cursus turpis
+          sit pellentesque metus posuere. Neque, quisque mattis bibendum nibh
+          vitae, auctor viverra arcu. Vestibulum dui diam et varius. Integer
+          nibh aliquam elementum tempor enim turpis. Adipiscing magna ut
+          pulvinar potenti ipsum, at tortor vitae. In at euismod non consequat
+          id nec egestas in erat. Mi lacus feugiat et a proin.
+        </p>
+        <BuildButton>
+          <Nav.Link as={Link} to="/SignUp">
+            START SEARCH NOW
+          </Nav.Link>
+        </BuildButton>
+      </WordBox>
+    </TheaterRow>
   );
 };
 
 const TheaterRow = styled(Row)`
   display: grid;
   width: 100%;
-  height: 960px;
   padding: 35px 0;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas: "cardBox wordBox";
-  div:nth-child(2),
-  div:nth-child(3) {
-    grid-area: cardBox;
+  grid-template-areas: "imgBox wordBox";
+  div:nth-child(1),
+  div:nth-child(2) {
+    grid-area: imgBox;
   }
 `;
 
 const WordBox = styled.div`
   margin-left: 70px;
-  margin-top: 50px;
-  padding-top: 20vh;
   grid-area: wordBox;
+  align-self: center;
 `;
 
 const BuildButton = styled(Button)`

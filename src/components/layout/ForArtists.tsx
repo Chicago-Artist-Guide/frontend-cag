@@ -21,15 +21,15 @@ const ForArtists = () => {
       id: 1,
       blob: yellowBlob1,
       opacity: 0.85,
-      transform: 'rotate(315deg) scale(1.3, 1.1)',
-      translate: '3vw 8vh'
+      transform: 'rotate(315deg) scale(1)',
+      translate: ''
     },
     {
       id: 2,
       blob: redBlob,
       opacity: 0.6,
-      transform: 'rotate(-7deg) scale(1.2, 1.4)',
-      translate: '-3vw 1vh'
+      transform: 'rotate(-7deg) scale(1)',
+      translate: ''
     }
   ];
 
@@ -65,57 +65,51 @@ const ForArtists = () => {
   ];
 
   return (
-    <>
-      <ArtistsRow>
-        <WordBox>
-          <DividerBar
-            style={{
-              backgroundImage:
-                'linear-gradient(90deg, #EFC93D 0%, #E17B60 100%)'
-            }}
-          />
-          <h2>FOR THEATRE ARTISTS</h2>
-          <p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-            Pellentesque nulla ut suspendisse tincidunt adipiscing ac ornare. A,
-            cursus turpis sit pellentesque metus posuere. Neque, quisque mattis
-            bibendum nibh vitae, auctor viverra arcu. Vestibulum dui diam et
-            varius. Integer nibh aliquam elementum tempor enim turpis.
-            Adipiscing magna ut pulvinar potenti ipsum, at tortor vitae. In at
-            euismod non consequat id nec egestas in erat. Mi lacus feugiat et a
-            proin.
-          </p>
-          <BuildButton>
-            <Nav.Link as={Link} to="/SignUp">
-              BUILD YOUR PROFILE
-            </Nav.Link>
-          </BuildButton>
-        </WordBox>
-        <CardBox cards={cards} style={{ marginLeft: '70px' }} />
-        <BlobBox blobs={blobs} />
-      </ArtistsRow>
-    </>
+    <ArtistsRow>
+      <WordBox>
+        <DividerBar
+          style={{
+            backgroundImage: 'linear-gradient(90deg, #EFC93D 0%, #E17B60 100%)'
+          }}
+        />
+        <h2>FOR THEATRE ARTISTS</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
+          nulla ut suspendisse tincidunt adipiscing ac ornare. A, cursus turpis
+          sit pellentesque metus posuere. Neque, quisque mattis bibendum nibh
+          vitae, auctor viverra arcu. Vestibulum dui diam et varius. Integer
+          nibh aliquam elementum tempor enim turpis. Adipiscing magna ut
+          pulvinar potenti ipsum, at tortor vitae. In at euismod non consequat
+          id nec egestas in erat. Mi lacus feugiat et a proin.
+        </p>
+        <BuildButton>
+          <Nav.Link as={Link} to="/SignUp">
+            BUILD YOUR PROFILE
+          </Nav.Link>
+        </BuildButton>
+      </WordBox>
+      <CardBox cards={cards} style={{ marginLeft: '70px' }} />
+      <BlobBox blobs={blobs} style={{ alignSelf: 'baseline' }} />
+    </ArtistsRow>
   );
 };
 
 const ArtistsRow = styled(Row)`
   display: grid;
   width: 100%;
-  height: 960px;
   padding: 35px 0;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas: "wordBox cardBox";
+  grid-template-areas: "wordBox imgBox";
   div:nth-child(2),
   div:nth-child(3) {
-    grid-area: cardBox;
+    grid-area: imgBox;
   }
 `;
 
 const WordBox = styled.div`
   margin-right: 70px;
-  margin-top: 35px;
-  padding-top: 20vh;
   grid-area: wordBox;
+  align-self: center;
 `;
 
 const BuildButton = styled(Button)`
