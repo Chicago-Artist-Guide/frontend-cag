@@ -1,7 +1,6 @@
 import axios, { AxiosPromise } from 'axios';
 
-const base =
-  'http://cagbackendapi-env.eba-v6eiz4pr.us-east-2.elasticbeanstalk.com/';
+const base = 'http://Test-env.eba-r3h3emtw.us-east-2.elasticbeanstalk.com/';
 const headers = {
   authKey: 'mockAuthKey'
 };
