@@ -46,6 +46,7 @@ const Home = () => {
       opacity: 0.85,
       transform: 'rotate(-124.79deg) scale(0.5)',
       translate: '45rem -25rem'
+
     }
   ];
 
@@ -72,20 +73,9 @@ const Home = () => {
   );
 };
 
-const StartButton = styled(Button)`
-  height: 40px;
-  width: 151px;
-  display: flex;
-  background: ${colors.slate};
-  border: 0;
-  border-radius: 20px;
-  align-items: center;
-  justify-content: center;
-
-  .nav-link {
-    color: white;
-    flex-shrink: 0;
-  }
+const MarginCol = styled(Col)`
+  margin-top: 2%;
+  margin-bottom: 2%;
 `;
 
 const HomeRow = styled(Row)`
