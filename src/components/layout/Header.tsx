@@ -61,30 +61,4 @@ const WhiteBackNav = styled(Navbar)`
   z-index: 100;
 `;
 
-const LogButton = styled(Button)`
-  height: 40px;
-  width: 183px;
-  display: flex;
-  background: ${colors.mint};
-  font: inherit;
-  font-weight: 700;
-  margin-left: 0.5rem;
-  border: 0px;
-  border-radius: 20px;
-  align-items: center;
-  justify-content: center;
-
-  .nav-link {
-    flex-shrink: 0;
-  }
-`;
-
-const BlobRow = styled(Row)`
-  max-width: 100vw;
-  overflow: hidden;
-  img {
-    position: absolute;
-  }
-`;
-
 export default Header;
