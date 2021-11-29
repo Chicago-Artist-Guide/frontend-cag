@@ -51,7 +51,7 @@ const Home = () => {
 
   return (
     <>
-      <BlobBox blobs={blobs} style={{ alignSelf: 'baseline' }} />
+      <BlobBox blobs={blobs} />
       <PageContainer>
         <HomeRow>
           <Col lg={8}>

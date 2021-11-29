@@ -22,14 +22,14 @@ const ForArtists = () => {
       blob: yellowBlob1,
       opacity: 0.85,
       transform: 'rotate(315deg) scale(1)',
-      translate: ''
+      translate: '0 10rem'
     },
     {
       id: 2,
       blob: redBlob,
       opacity: 0.6,
       transform: 'rotate(-7deg) scale(1)',
-      translate: ''
+      translate: '0 10rem'
     }
   ];
 
@@ -89,7 +89,7 @@ const ForArtists = () => {
         </BuildButton>
       </WordBox>
       <CardBox cards={cards} style={{ marginLeft: '70px' }} />
-      <BlobBox blobs={blobs} style={{ alignSelf: 'baseline' }} />
+      <BlobBox blobs={blobs} />
     </ArtistsRow>
   );
 };

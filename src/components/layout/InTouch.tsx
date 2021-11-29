@@ -80,11 +80,13 @@ const InTouch = () => {
 
 const InTouchRow = styled(Row)`
   display: grid;
+  align-content: center;
   width: 100%;
   height: 960px;
   padding: 35px 0;
   grid-template-columns: 1fr 1fr;
   grid-template-areas: "wordBox cardBox";
+
   div:nth-child(2),
   div:nth-child(3) {
     grid-area: cardBox;
@@ -93,9 +95,10 @@ const InTouchRow = styled(Row)`
 `;
 
 const WordBox = styled.div`
+  display: grid;
   margin-right: 70px;
   margin-top: 50px;
-  padding-top: 20vh;
+  padding-top: 20rem;
   grid-area: wordBox;
 `;
 

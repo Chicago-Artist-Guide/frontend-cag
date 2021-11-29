@@ -22,14 +22,14 @@ const ForTheatres = () => {
       blob: yellowBlob1,
       opacity: 0.85,
       transform: 'rotate(315deg) scale(1)',
-      translate: ''
+      translate: '0 10rem'
     },
     {
       id: 2,
       blob: greenBlob,
       opacity: 0.6,
       transform: 'rotate(-7deg) scale(1)',
-      translate: ''
+      translate: '0 10rem'
     }
   ];
 
@@ -67,7 +67,7 @@ const ForTheatres = () => {
   return (
     <TheaterRow>
       <CardBox cards={cards} style={{ marginRight: '70px' }} />
-      <BlobBox blobs={blobs} style={{ alignSelf: 'baseline' }} />
+      <BlobBox blobs={blobs} />
       <WordBox>
         <DividerBar
           style={{
