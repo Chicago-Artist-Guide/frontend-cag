@@ -1,6 +1,6 @@
 {
-    "name": "",
-    "short_name": "",
+    "name": "Chicago Artist Guide",
+    "short_name": "CAG",
     "icons": [
         {
             "src": "/android-chrome-192x192.png",
