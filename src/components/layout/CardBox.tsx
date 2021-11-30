@@ -19,18 +19,25 @@ const CardBox = (props: any) => {
 };
 
 const Cards = styled.div`
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  height: 850px;
   row-gap: 25px;
   column-gap: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 35px;
 
-  .card:nth-of-type(2) {
-    margin-bottom: 75px;
-  }
-  .card:nth-of-type(3) {
-    margin-top: 75px;
+  @media (min-width: 768px) {
+    flex-wrap: wrap;
+    padding-top: 0;
+    height: 850px;
+
+    .card:nth-of-type(2) {
+      margin-bottom: 75px;
+    }
+
+    .card:nth-of-type(3) {
+      margin-top: 75px;
+    }
   }
 `;
 

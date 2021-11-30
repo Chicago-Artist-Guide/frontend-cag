@@ -20,8 +20,13 @@ const BlobBox = (props: any) => {
   const { blobs } = props;
 
   const Blobs = styled.div`
+    display: none;
     z-index: -1;
     transform-style: preserve-3d;
+
+    @media (min-width: 768px) {
+      display: block;
+    }
 
     img {
       position: absolute;

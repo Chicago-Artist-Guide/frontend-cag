@@ -96,11 +96,20 @@ const ForArtists = () => {
 };
 
 const ArtistsRow = styled(Row)`
-  display: grid;
   width: 100%;
   padding: 35px 0;
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas: "wordBox imgBox";
+  display: flex;
+  flex-direction: column;
+  margin-right: 0;
+  margin-left: 0;
+
+  @media (min-width: 768px) {
+    display: grid;
+    grid-template-areas: "wordBox imgBox";
+    grid-template-columns: repeat(2, 1fr);
+    margin-right: -15px;
+    margin-left: -15px;
+  }
 
   div:nth-child(2),
   div:nth-child(3) {
@@ -109,9 +118,20 @@ const ArtistsRow = styled(Row)`
 `;
 
 const WordBox = styled.div`
-  margin-right: 70px;
   grid-area: wordBox;
   align-self: center;
+  text-align: center;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  @media (min-width: 768px) {
+    margin-right: 70px;
+    text-align: left;
+    padding: 0;
+    display: block;
+  }
 `;
 
 const BuildButton = styled(Link)`
@@ -121,13 +141,16 @@ const BuildButton = styled(Link)`
   justify-content: center;
   align-items: center;
   padding: 12px 18px;
-  position: absolute;
   width: 220px;
   height: 40px;
   background: ${colors.salmon};
   border-radius: 20px;
   border: none;
   box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.05);
+
+  @media (min-width: 768px) {
+    position: absolute;
+  }
 
   &:hover {
     color: white;
