@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Nav from 'react-bootstrap/Nav';
-import Button from 'react-bootstrap/Button';
 import { BlobBox, CardBox } from '../layout';
 import { greenBlob, yellowBlob1 } from '../../images';
 import {
@@ -76,19 +75,28 @@ const ForTheatres = () => {
         />
         <h2>FOR THEATRE GROUPS</h2>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
-          nulla ut suspendisse tincidunt adipiscing ac ornare. A, cursus turpis
-          sit pellentesque metus posuere. Neque, quisque mattis bibendum nibh
-          vitae, auctor viverra arcu. Vestibulum dui diam et varius. Integer
-          nibh aliquam elementum tempor enim turpis. Adipiscing magna ut
-          pulvinar potenti ipsum, at tortor vitae. In at euismod non consequat
-          id nec egestas in erat. Mi lacus feugiat et a proin.
+          Casting and hiring haven't always celebrated the diversity of our
+          city.
         </p>
-        <BuildButton>
-          <Nav.Link as={Link} to="/SignUp">
-            START SEARCH NOW
-          </Nav.Link>
-        </BuildButton>
+        <p>We're here to change that.</p>
+        <p>
+          Chicago Artist Guide offers more equitable casting and hiring
+          opportunities by removing barriers in connecting Chicago's theatre
+          companies with the artists it represents.
+        </p>
+        <p>
+          Chicago theatres will be able to use our platform to find artists from
+          the communities that their productions represent and invite them
+          directly to audition/apply, removing barriers in auditioning, casting,
+          and hiring.
+        </p>
+        <p>
+          Want to be the first to know when our platform launches? Scroll down
+          to sign up for email updates from our team!
+        </p>
+        <Nav.Link as={BuildButton} to="#">
+          COMING SOON
+        </Nav.Link>
       </WordBox>
     </TheaterRow>
   );
@@ -100,6 +108,7 @@ const TheaterRow = styled(Row)`
   padding: 35px 0;
   grid-template-columns: 1fr 1fr;
   grid-template-areas: "imgBox wordBox";
+
   div:nth-child(1),
   div:nth-child(2) {
     grid-area: imgBox;
@@ -112,7 +121,8 @@ const WordBox = styled.div`
   align-self: center;
 `;
 
-const BuildButton = styled(Button)`
+const BuildButton = styled(Link)`
+  color: white;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -125,6 +135,11 @@ const BuildButton = styled(Button)`
   border-radius: 20px;
   border: none;
   box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    color: white;
+    background: ${colors.mint}95;
+  }
 
   .nav-link {
     color: #fff;

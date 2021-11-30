@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Nav from 'react-bootstrap/Nav';
-import Button from 'react-bootstrap/Button';
 import { BlobBox, CardBox } from '../layout';
 import { redBlob, yellowBlob1 } from '../../images';
 import {
@@ -74,19 +73,21 @@ const ForArtists = () => {
         />
         <h2>FOR THEATRE ARTISTS</h2>
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
-          nulla ut suspendisse tincidunt adipiscing ac ornare. A, cursus turpis
-          sit pellentesque metus posuere. Neque, quisque mattis bibendum nibh
-          vitae, auctor viverra arcu. Vestibulum dui diam et varius. Integer
-          nibh aliquam elementum tempor enim turpis. Adipiscing magna ut
-          pulvinar potenti ipsum, at tortor vitae. In at euismod non consequat
-          id nec egestas in erat. Mi lacus feugiat et a proin.
+          At Chicago Artist Guide, we're reimagining how theatre talent finds,
+          auditions for, and gets casted for productions.
         </p>
-        <BuildButton>
-          <Nav.Link as={Link} to="/SignUp">
-            BUILD YOUR PROFILE
-          </Nav.Link>
-        </BuildButton>
+        <p>
+          We envision a more equitable, accessible way for diverse actors,
+          artists, and crew to connect directly with theatre groups, all in an
+          easy-to-use online network.
+        </p>
+        <p>
+          Want to be the first to know when our platform launches? Scroll down
+          to sign up for email updates from our team!
+        </p>
+        <Nav.Link as={BuildButton} to="#">
+          COMING SOON
+        </Nav.Link>
       </WordBox>
       <CardBox cards={cards} style={{ marginLeft: '70px' }} />
       <BlobBox blobs={blobs} />
@@ -100,6 +101,7 @@ const ArtistsRow = styled(Row)`
   padding: 35px 0;
   grid-template-columns: 1fr 1fr;
   grid-template-areas: "wordBox imgBox";
+
   div:nth-child(2),
   div:nth-child(3) {
     grid-area: imgBox;
@@ -112,7 +114,8 @@ const WordBox = styled.div`
   align-self: center;
 `;
 
-const BuildButton = styled(Button)`
+const BuildButton = styled(Link)`
+  color: white;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -125,6 +128,11 @@ const BuildButton = styled(Button)`
   border-radius: 20px;
   border: none;
   box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.05);
+
+  &:hover {
+    color: white;
+    background: ${colors.salmon}95;
+  }
 
   .nav-link {
     color: #fff;
