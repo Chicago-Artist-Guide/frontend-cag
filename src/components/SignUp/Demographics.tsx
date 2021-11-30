@@ -8,17 +8,16 @@ import InputField from '../../genericComponents/Input';
 import Form from 'react-bootstrap/Form';
 import { Title } from '../layout/Titles';
 import { Tagline, TitleThree } from '../layout/Titles';
-import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
-const unions = [
+/*const unions = [
   'I.A.T.S.E.',
   'United Scenic Artists',
   "Actors' Equity Association",
   'Stage Directors and Choreographers Society',
   "Actors' Equity Association - EMC",
   'Non-Union'
-];
+];*/
 
 const Demographics: React.FC<{
   setForm: any;
@@ -28,11 +27,9 @@ const Demographics: React.FC<{
   const {
     demographicsUnionStatus, // checkboxes for Unions or non-union
     demographicsAgency,
-    demographicsWebsites, // { url: string, websiteType: string }
-    demographicsBio
+    demographicsWebsites // { url: string, websiteType: string }
+    // demographicsBio
   } = formData;
-
-  console.log(demographicsWebsites)
 
   const onWebsiteInputChange = (
     fieldValue: string,
@@ -196,14 +193,6 @@ const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;
   max-width: 100%;
-`;
-
-const PrivacyPar = styled.p`
-  color: ${colors.mainFont};
-  font-family: ${fonts.lora};
-  font-size: 18px;
-  letter-spacing: 0px;
-  margin-top: 17px;
 `;
 
 export default Demographics;

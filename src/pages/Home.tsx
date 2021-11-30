@@ -2,130 +2,95 @@ import React from 'react';
 import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import PageContainer from '../components/layout/PageContainer';
-import { Tagline, Title, TitleThree } from '../components/layout/Titles';
-import WhoSquare from '../components/Home/WhoSquare';
-import SVGLayer from '../components/SVGLayer';
+import Button from 'react-bootstrap/Button';
+import Nav from 'react-bootstrap/Nav';
+import { Link } from 'react-router-dom';
+import { colors } from '../theme/styleVars';
 import Mailchimp from '../components/Home/Mailchimp';
-import yellowBlob1 from '../images/yellow_blob_1.svg';
-import homeDance from '../images/home_dance.svg';
-import greenBlob from '../images/green_blob.svg';
-import dance1 from '../images/wwww-1.svg';
-import redBlob from '../images/red_blob.svg';
-import dance2 from '../images/wwww-2.svg';
-import blueBlob1 from '../images/blue_blob.svg';
-import dance3 from '../images/wwww-3.svg';
+import {
+  BlobBox,
+  ForArtists,
+  ForTheatres,
+  PageContainer,
+  Tagline,
+  Title
+} from '../components/layout';
+import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
 
 const Home = () => {
-  const whoWeWorkWith = [
+  const blobs = [
     {
       id: 1,
-      title: 'Individual Artists',
-      points: [
-        {
-          id: 'a',
-          text: 'Connections to affordable help for artists'
-        },
-        {
-          id: 'b',
-          text: 'Create a business profile'
-        },
-        {
-          id: 'c',
-          text: 'Apply for jobs'
-        }
-      ],
-      blob: greenBlob,
-      dancer: dance1
+      blob: yellowBlob1,
+      opacity: 0.85,
+      transform: 'scale(0.6)',
+      translate: '-35rem, -45rem'
     },
     {
       id: 2,
-      title: 'Theatre Companies',
-      points: [
-        {
-          id: 'a',
-          text: 'Information for operations, resources, & best practices'
-        },
-        {
-          id: 'b',
-          text: 'Hire staff, designers, and crews'
-        },
-        {
-          id: 'c',
-          text: 'Cast your productions'
-        },
-        {
-          id: 'd',
-          text:
-            'Connect to local and nation businesses and educational organizations that support the arts'
-        }
-      ],
       blob: redBlob,
-      dancer: dance2
+      opacity: 0.6,
+      transform: 'scale(0.65)',
+      translate: '-15rem, -30rem'
     },
     {
       id: 3,
-      title: 'Communities',
-      points: [
-        {
-          id: 'a',
-          text: 'Connections to affordable help for artists'
-        },
-        {
-          id: 'b',
-          text: 'Create a business profile'
-        },
-        {
-          id: 'c',
-          text: 'Apply for jobs'
-        }
-      ],
-      blob: blueBlob1,
-      dancer: dance3
+      blob: greenBlob,
+      opacity: 0.7,
+      transform: 'scale(.5)',
+      translate: '30rem, -35rem'
+    },
+    {
+      id: 4,
+      blob: yellowBlob2,
+      opacity: 0.85,
+      transform: 'rotate(-124.79deg) scale(0.5)',
+      translate: '45rem, -25rem'
     }
   ];
 
   return (
-    <PageContainer>
-      <Row>
-        <Col lg={8}>
-          <Title>CHICAGO ARTIST GUIDE</Title>
-          <Tagline>We make connections. You make art.</Tagline>
-          <TitleThree>WHAT WE DO</TitleThree>
-          <p className="margin-container">
-            We provide affordable and free tools to help diversify theatre in
-            Chicago.
-          </p>
-        </Col>
-        <Col lg={4}>
-          <SVGLayer blob={yellowBlob1} dancer={homeDance} />
-        </Col>
-      </Row>
-      <TitleThree className="margin-top">WHO WE WORK WITH</TitleThree>
-      <Row>
-        {whoWeWorkWith.map(who => (
-          <MarginCol key={who.id} lg={true}>
-            <WhoSquare
-              blob={who.blob}
-              dancer={who.dancer}
-              points={who.points}
-              title={who.title}
-            />
-          </MarginCol>
-        ))}
-      </Row>
-      <Row>
-        <Col lg={12}>
-          <Mailchimp />
-        </Col>
-      </Row>
-    </PageContainer>
+    <>
+      <BlobBox blobs={blobs} />
+      <PageContainer>
+        <HomeRow>
+          <Col lg={8}>
+            <Title>CHICAGO ARTIST GUIDE</Title>
+            <Tagline>Diversifying theater one connection at a time.</Tagline>
+            <StartButton>
+              <Nav.Link as={Link} to="/login">
+                GET STARTED
+              </Nav.Link>
+            </StartButton>
+          </Col>
+        </HomeRow>
+        <ForArtists />
+        <ForTheatres />
+        <Mailchimp />
+      </PageContainer>
+    </>
   );
 };
 
-const MarginCol = styled(Col)`
-  margin-top: 2%;
-  margin-bottom: 2%;
+const StartButton = styled(Button)`
+  height: 40px;
+  width: 151px;
+  display: flex;
+  background: ${colors.slate};
+  border: 0;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+
+  .nav-link {
+    color: white;
+    flex-shrink: 0;
+  }
+`;
+
+const HomeRow = styled(Row)`
+  position: relative;
+  height: 30rem;
 `;
 
 export default Home;
