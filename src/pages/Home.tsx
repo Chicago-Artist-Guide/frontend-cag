@@ -2,7 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Button from 'react-bootstrap/Button';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
 import { colors } from '../theme/styleVars';
@@ -57,11 +56,9 @@ const Home = () => {
           <Col lg={8}>
             <Title>CHICAGO ARTIST GUIDE</Title>
             <Tagline>Diversifying theater one connection at a time.</Tagline>
-            <StartButton>
-              <Nav.Link as={Link} to="/login">
-                GET STARTED
-              </Nav.Link>
-            </StartButton>
+            <Nav.Link as={StartButton} to="/donate">
+              DONATE
+            </Nav.Link>
           </Col>
         </HomeRow>
         <ForArtists />
@@ -72,7 +69,8 @@ const Home = () => {
   );
 };
 
-const StartButton = styled(Button)`
+const StartButton = styled(Link)`
+  color: white;
   height: 40px;
   width: 151px;
   display: flex;
@@ -81,6 +79,11 @@ const StartButton = styled(Button)`
   border-radius: 20px;
   align-items: center;
   justify-content: center;
+
+  &:hover {
+    color: white;
+    background: ${colors.slate}95;
+  }
 
   .nav-link {
     color: white;

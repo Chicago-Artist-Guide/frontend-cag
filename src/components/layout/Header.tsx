@@ -5,7 +5,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import { getSessionCookie } from '../../utils/session';
 import { colors } from '../../theme/styleVars';
-import { ReactComponent as Logo } from '../../images/logoPlain.svg';
+import { ReactComponent as Logo } from '../../images/cagLogo1.svg';
 
 const Header = () => {
   const [session, setSession] = useState(getSessionCookie());
