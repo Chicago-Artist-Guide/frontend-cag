@@ -93,7 +93,10 @@ const StartButton = styled(Link)`
 
 const HomeRow = styled(Row)`
   position: relative;
-  height: 30rem;
+
+  @media (min-width: 768px) {
+    height: 30rem;
+  }
 `;
 
 export default Home;

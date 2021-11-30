@@ -230,8 +230,9 @@ const InTouchRow = styled(Row)`
   height: 960px;
   padding: 35px 0;
   margin: 0;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   grid-template-areas: "formBox imgBox";
+
   div:nth-child(2),
   div:nth-child(3) {
     grid-area: imgBox;
