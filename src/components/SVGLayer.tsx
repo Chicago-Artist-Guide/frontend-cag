@@ -2,12 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 
 const SVGLayer = (props: any) => {
-  const { blob, dancer } = props;
+  const { blob, image } = props;
 
   return (
     <>
       <BottomImg alt="" src={blob} />
-      <TopImg alt="" src={dancer} />
+      <TopImg alt="" src={image} />
     </>
   );
 };
