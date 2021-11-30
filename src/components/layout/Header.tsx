@@ -53,7 +53,7 @@ const Header = () => {
 
 const WhiteBackNav = styled(Navbar)`
   background-color: ${colors.white80a};
-  max-width: 90rem;
+  max-width: 100vw;
   padding: 0.875rem 5rem;
   backdrop-filter: blur(15px);
   position: fixed;

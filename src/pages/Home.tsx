@@ -24,28 +24,28 @@ const Home = () => {
       blob: yellowBlob1,
       opacity: 0.85,
       transform: 'scale(0.6)',
-      translate: '-35rem -45rem'
+      translate: '-35rem, -45rem'
     },
     {
       id: 2,
       blob: redBlob,
       opacity: 0.6,
       transform: 'scale(0.65)',
-      translate: '-15rem -30rem'
+      translate: '-15rem, -30rem'
     },
     {
       id: 3,
       blob: greenBlob,
       opacity: 0.7,
       transform: 'scale(.5)',
-      translate: '30rem -35rem'
+      translate: '30rem, -35rem'
     },
     {
       id: 4,
       blob: yellowBlob2,
       opacity: 0.85,
       transform: 'rotate(-124.79deg) scale(0.5)',
-      translate: '45rem -25rem'
+      translate: '45rem, -25rem'
     }
   ];
 

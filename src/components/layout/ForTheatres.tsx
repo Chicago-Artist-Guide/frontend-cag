@@ -22,14 +22,14 @@ const ForTheatres = () => {
       blob: yellowBlob1,
       opacity: 0.85,
       transform: 'rotate(315deg) scale(1)',
-      translate: '0 10rem'
+      translate: '0, 10rem'
     },
     {
       id: 2,
       blob: greenBlob,
       opacity: 0.6,
       transform: 'rotate(-7deg) scale(1)',
-      translate: '0 10rem'
+      translate: '0, 10rem'
     }
   ];
 

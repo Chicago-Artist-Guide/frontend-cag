@@ -13,7 +13,7 @@ const Mailchimp = () => {
       blob: emailWhiteIcon,
       opacity: 1,
       transform: 'scale(1.4)',
-      translate: '12vw 43vh',
+      translate: '12vw, 43vh',
       zIndex: '1'
     },
     {
@@ -21,14 +21,14 @@ const Mailchimp = () => {
       blob: yellowBlob1,
       opacity: 0.85,
       transform: 'rotate(315deg) scale(1)',
-      translate: '-1vw 25vh'
+      translate: '-1vw, 25vh'
     },
     {
       id: 3,
       blob: redBlob,
       opacity: 0.6,
       transform: 'rotate(-7deg) scale(1.1)',
-      translate: '-1vw 20vh'
+      translate: '-1vw, 20vh'
     }
   ];
 
