@@ -13,7 +13,7 @@ import { Checkbox, DividerBar, InputField } from '../../genericComponents';
 const InTouch = () => {
   const blobs = [
     {
-      id: '1',
+      id: 1,
       blob: emailWhiteIcon,
       opacity: 1,
       transform: 'scale(1.4)',

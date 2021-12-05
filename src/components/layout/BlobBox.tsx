@@ -1,6 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
+interface BlobBoxType {
+  id: number;
+  blob: string;
+  opacity: number;
+  transform: string;
+  translate: string;
+}
+
+interface BlobBoxProps {
+  blobs: BlobBoxType[];
+}
+
 const outputBlobs = (blobs: any) =>
   blobs.map(
     (blob: any, bi: number) =>
@@ -16,7 +28,7 @@ const outputBlobs = (blobs: any) =>
     `
   );
 
-const BlobBox = (props: any) => {
+const BlobBox = (props: BlobBoxProps) => {
   const { blobs } = props;
 
   const Blobs = styled.div`
@@ -38,7 +50,7 @@ const BlobBox = (props: any) => {
 
   return (
     <Blobs>
-      {blobs.map((blob: any, bi: number) => {
+      {blobs.map((blob: BlobBoxType, bi: number) => {
         return (
           <img
             alt=""
