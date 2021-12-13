@@ -1,7 +1,6 @@
 import React from 'react';
 import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
+import { Col, Form, Row } from 'react-bootstrap';
 import { Tagline, Title } from '../layout/Titles';
 
 const Upcoming: React.FC<{
@@ -10,11 +9,31 @@ const Upcoming: React.FC<{
 }> = props => {
   return (
     <Container>
-      <Row>
-        <Col lg="12">
+      <Row lg="12">
+        <Col>
           <Title>GOT AN UPCOMING FEATURE?</Title>
           <Tagline>Promote your next performance!</Tagline>
         </Col>
+      </Row>
+      <Row lg="3">
+        <Col>
+          <Form.Text>Save and add another upcoming feature</Form.Text>
+        </Col>
+        <Form>
+          <Form.Group controlId="show-title">
+            <Form.Control placeholder="Show Title" type="text" />
+          </Form.Group>
+
+          <Form.Group controlId="show-synopsis">
+            <Form.Control as="textarea" placeholder="Show synopsis" />
+          </Form.Group>
+          <Form.Group controlId="industry-code">
+            <Form.Control placeholder="Industry code" type="text" />
+          </Form.Group>
+          <Form.Group controlId="link-to-site-tickets">
+            <Form.Control placeholder="Link to Website/Tickets" type="text" />
+          </Form.Group>
+        </Form>
       </Row>
     </Container>
   );
