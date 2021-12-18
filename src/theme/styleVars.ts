@@ -6,6 +6,7 @@ const colors = {
   secondaryFontColor: '#2F4550',
   primary: '#82B29A',
   darkPrimary: '#425B4E',
+  dark: '#3B4448',
   italicColor: '#537C8C',
   black: '#000000',
   scrollOrange: '#F0960E',

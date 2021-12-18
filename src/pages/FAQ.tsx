@@ -1,8 +1,10 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import styled from 'styled-components';
+import { colors } from '../theme/styleVars';
 import PageContainer from '../components/layout/PageContainer';
-import { Tagline, Title, TitleThree } from '../components/layout/Titles';
+import { Tagline, Title } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';
 import blueBlob from '../images/blue_blob.svg';
 import streamingDance from '../images/streaming_dance.svg';
@@ -109,34 +111,42 @@ const FAQ = () => {
         <Col lg={8}>
           <Title>FREQUENTLY ASKED QUESTIONS</Title>
           <Tagline>Find out what we're all about</Tagline>
-          <h3>About Chicago Artist Guide</h3>
-          {aboutQ.map(qa => (
-            <div className="margin-team" key={qa.id}>
-              <TitleThree>{qa.question}</TitleThree>
-              <p>{qa.answer}</p>
-            </div>
-          ))}
-          <h3>Our Platform</h3>
-          {platformQ.map(qa => (
-            <div className="margin-team" key={qa.id}>
-              <TitleThree>{qa.question}</TitleThree>
-              <p>{qa.answer}</p>
-            </div>
-          ))}
-          <h3>Privacy</h3>
-          {privacyQ.map(qa => (
-            <div className="margin-team" key={qa.id}>
-              <TitleThree>{qa.question}</TitleThree>
-              <p>{qa.answer}</p>
-            </div>
-          ))}
-          <h3>Identity</h3>
-          {identityQ.map(qa => (
-            <div className="margin-team" key={qa.id}>
-              <TitleThree>{qa.question}</TitleThree>
-              <p>{qa.answer}</p>
-            </div>
-          ))}
+          <Section>
+            <h2>About Chicago Artist Guide</h2>
+            {aboutQ.map(qa => (
+              <div className="" key={qa.id}>
+                <Question>{qa.question}</Question>
+                <p>{qa.answer}</p>
+              </div>
+            ))}
+          </Section>
+          <Section>
+            <h2>Our Platform</h2>
+            {platformQ.map(qa => (
+              <div className="" key={qa.id}>
+                <Question>{qa.question}</Question>
+                <p>{qa.answer}</p>
+              </div>
+            ))}
+          </Section>
+          <Section>
+            <h2>Privacy</h2>
+            {privacyQ.map(qa => (
+              <div className="" key={qa.id}>
+                <Question>{qa.question}</Question>
+                <p>{qa.answer}</p>
+              </div>
+            ))}
+          </Section>
+          <Section>
+            <h2>Identity</h2>
+            {identityQ.map(qa => (
+              <div className="" key={qa.id}>
+                <Question>{qa.question}</Question>
+                <p>{qa.answer}</p>
+              </div>
+            ))}
+          </Section>
         </Col>
         <Col lg={4}>
           <SVGLayer blob={blueBlob} dancer={streamingDance} />
@@ -145,5 +155,15 @@ const FAQ = () => {
     </PageContainer>
   );
 };
+
+const Section = styled.div`
+  margin-top: 4rem;
+`;
+
+const Question = styled.div`
+  font-weight: 700;
+  font-color: ${colors.dark};
+  text-transform: uppercase;
+`;
 
 export default FAQ;
