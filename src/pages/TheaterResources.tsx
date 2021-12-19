@@ -13,14 +13,38 @@ const TheaterResources = () => {
       <Row>
         <Col lg={8}>
           <Title>THEATER RESOURCES</Title>
-          <Tagline>Helpful Resources</Tagline>
+          <Tagline>Submit or view a resource!</Tagline>
           <p className="margin-container">
             Our collection of useful links and resources for actors, directors,
             producers and crew. Do you have a resource you think belongs on this
             list? Add it to our list by clicking
             <a href="https://forms.gle/eCHjeDGphFBr7y4W6"> here </a>
-            or fill out the form below:
+            or filling out the form below.
           </p>
+          <table className="table">
+            <thead>
+              <tr>
+                <th scope="col">Organization</th>
+                <th scope="col">Description</th>
+                <th scope="col">Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <a href="https://www.techsoup.org/"> Tech Soup (Mock)</a>
+                </td>
+                <td>
+                  Discounts on software and technology for nonprofits from
+                  leading brands
+                </td>
+                <td>Technology</td>
+              </tr>
+              <tr></tr>
+              <tr></tr>
+            </tbody>
+          </table>
+          <br></br>
           <iframe
             frameBorder="0"
             height="300px"
