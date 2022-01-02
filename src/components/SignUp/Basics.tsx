@@ -26,16 +26,15 @@ const Privacy: React.FC<{
 
   const passwordErrors = () => {
     let passwordError = '';
-    const reg = new RegExp(
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/g
-    );
 
     if (basicsPassword === '') passwordError = '';
     else if (basicsPassword !== basicsPasswordConfirm) {
       passwordError = 'Passwords must match';
     } else if (basicsPassword.length < 8) {
       passwordError = 'Password must be at least 8 characters';
-    } else if (reg.test(basicsPassword)) {
+    } else if (
+      !basicsPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/)
+    ) {
       passwordError =
         'Passwords must contain at least one uppercase letter, number, and special character';
     }
