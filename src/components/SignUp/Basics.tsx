@@ -20,8 +20,26 @@ const Privacy: React.FC<{
     basicsLastName,
     basicsEmailAddress,
     basicsPassword,
+    basicsPasswordConfirm,
     basics18Plus
   } = formData;
+
+  const passwordErrors = () => {
+    let passwordError = '';
+
+    if (basicsPassword === '') passwordError = '';
+    else if (basicsPassword !== basicsPasswordConfirm) {
+      passwordError = 'Passwords must match';
+    } else if (basicsPassword.length < 8) {
+      passwordError = 'Password must be at least 8 characters';
+    } else if (
+      !basicsPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/)
+    ) {
+      passwordError =
+        'Passwords must contain at least one uppercase letter, number, and special character';
+    }
+    return passwordError;
+  };
 
   return (
     <Container>
@@ -54,6 +72,16 @@ const Privacy: React.FC<{
               onChange={setForm}
               value={basicsPassword || ''}
             />
+            <InputField
+              fieldType="password"
+              label="Confirm Password"
+              name="basicsPasswordConfirm"
+              onChange={setForm}
+              value={basicsPasswordConfirm || ''}
+            />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {passwordErrors()}
+            </span>
             <Checkbox
               checked={basics18Plus || false}
               fieldType="checkbox"
