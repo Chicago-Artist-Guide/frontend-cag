@@ -54,6 +54,10 @@ const Privacy: React.FC<{
               onChange={setForm}
               value={basicsPassword || ''}
             />
+            <PasswordReq>
+              Minimum 8 characters, one uppercase, one lowercase, a number and
+              special character.
+            </PasswordReq>
             <Checkbox
               checked={basics18Plus || false}
               fieldType="checkbox"
@@ -87,6 +91,11 @@ const LoginLink = styled.p`
   a {
     color: ${colors.orange};
   }
+`;
+
+const PasswordReq = styled.p`
+  font-size: 10px;
+  font-style: italic;
 `;
 
 export default Privacy;
