@@ -72,7 +72,7 @@ const GlobalStyle = createGlobalStyle`
     font-weight: 400;
     letter-spacing: 0.5px;
     line-height: 24px;
-    size: 16px;
+    font-size: 16px;
   }
 
   .button {
