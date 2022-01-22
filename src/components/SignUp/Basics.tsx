@@ -41,6 +41,24 @@ const Privacy: React.FC<{
     return passwordError;
   };
 
+  const firstNameError = () => {
+    if (basicsFirstName === '') {
+      return 'first name is required';
+    }
+  };
+
+  const lastNameError = () => {
+    if (basicsLastName === '') {
+      return 'last name is required';
+    }
+  };
+
+  const emailAddressError = () => {
+    if (basicsEmailAddress === '') {
+      return 'email required';
+    }
+  };
+
   return (
     <Container>
       <Row>
@@ -53,18 +71,27 @@ const Privacy: React.FC<{
               onChange={setForm}
               value={basicsFirstName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {firstNameError()}
+            </span>
             <InputField
               label="Last"
               name="basicsLastName"
               onChange={setForm}
               value={basicsLastName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {lastNameError()}
+            </span>
             <InputField
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
               value={basicsEmailAddress || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {emailAddressError()}
+            </span>
             <InputField
               fieldType="password"
               label="Password"
