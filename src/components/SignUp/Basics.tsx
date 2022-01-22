@@ -71,6 +71,7 @@ const Privacy: React.FC<{
     setFormErrors(newFormErrorsObj);
   };
 
+<<<<<<< HEAD
   // this is the custom error func for password matching
   // we only need to give this to the basicsPasswordConfirm field
   // and it goes in the InputField array "validationFuncMessages" attribute
@@ -96,6 +97,25 @@ const Privacy: React.FC<{
   useEffect(() => {
     customErrorCallback(!Object.values(formErrors).every(v => !v));
   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+=======
+  const firstNameError = () => {
+    if (basicsFirstName === '') {
+      return 'first name is required';
+    }
+  };
+
+  const lastNameError = () => {
+    if (basicsLastName === '') {
+      return 'last name is required';
+    }
+  };
+
+  const emailAddressError = () => {
+    if (basicsEmailAddress === '') {
+      return 'email required';
+    }
+  };
+>>>>>>> b15d034 (added validation for signup, first/last name, email)
 
   return (
     <Container>
@@ -112,6 +132,9 @@ const Privacy: React.FC<{
               requiredLabel="First name"
               value={basicsFirstName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {firstNameError()}
+            </span>
             <InputField
               hasErrorCallback={customErrorCallbackField}
               label="Last"
@@ -121,6 +144,9 @@ const Privacy: React.FC<{
               requiredLabel="Last name"
               value={basicsLastName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {lastNameError()}
+            </span>
             <InputField
               hasErrorCallback={customErrorCallbackField}
               label="Email Address"
@@ -132,6 +158,9 @@ const Privacy: React.FC<{
               validationRegexName="emailAddress"
               value={basicsEmailAddress || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {emailAddressError()}
+            </span>
             <InputField
               fieldType="password"
               hasErrorCallback={customErrorCallbackField}
