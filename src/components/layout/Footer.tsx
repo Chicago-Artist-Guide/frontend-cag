@@ -19,7 +19,6 @@ import Medium from '../../images/icons-footer/social_medium.png';
 
 const Footer = () => (
   <FooterNavbar className="container justify-content-center nav" expand="sm">
-
     <FooterContainer>
       <Row>
         <EdgeCols
@@ -96,6 +95,11 @@ const Footer = () => (
             <Nav.Item>
               <Nav.Link as={Link} to="/faq">
                 FAQ
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link as={Link} to="/theater-resources">
+                THEATER RESOURCES
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>

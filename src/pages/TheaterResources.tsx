@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
@@ -21,7 +22,7 @@ const TheaterResources = () => {
             <a href="https://forms.gle/eCHjeDGphFBr7y4W6"> here </a>
             or filling out the form below.
           </p>
-          <table className="table">
+          <ResourcesTable className="table">
             <thead>
               <tr>
                 <th scope="col">Organization</th>
@@ -43,8 +44,7 @@ const TheaterResources = () => {
               <tr></tr>
               <tr></tr>
             </tbody>
-          </table>
-          <br></br>
+          </ResourcesTable>
           <iframe
             frameBorder="0"
             height="300px"
@@ -63,5 +63,9 @@ const TheaterResources = () => {
     </PageContainer>
   );
 };
+
+const ResourcesTable = styled.table`
+  margin-bottom: 2em;
+`;
 
 export default TheaterResources;
