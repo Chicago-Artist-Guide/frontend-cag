@@ -2,7 +2,6 @@
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Davila from '../../images/who-we-are/board/Board_Davila.jpg';
 import Quixito from '../../images/who-we-are/board/Board_Quixito.jpg';
-import Butler from '../../images/who-we-are/board/Board_Butler.jpg';
 import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
@@ -10,19 +9,23 @@ import Richardson from '../../images/who-we-are/board/Board_Richardson.jpg';
 import White from '../../images/who-we-are/board/Board_White.jpg';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
+import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
+import Frazier from '../../images/who-we-are/board/Board_Frazier.jpeg';
+import Marshall from '../../images/who-we-are/board/Board_Marshall.jpg';
+import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
+import Moran from '../../images/who-we-are/board/Board_Moran.jpg';
 
 //Artists Images
-import Donterrio from '../../images/who-we-are/artists/Artist_Board_Donterrio.jpg';
-import Morales from '../../images/who-we-are/artists/Artist_Board_Morales.jpg';
-import Ledesma from '../../images/who-we-are/artists/Artist_Board_Ledesma.jpg';
+import Moorman from '../../images/who-we-are/operations/Staff_Moorman.jpg';
+import Salemi from '../../images/who-we-are/artists/Staff_Salemi.jpg';
 
 //Operations Images
 import Morris from '../../images/who-we-are/operations/Staff_Morris.jpg';
 import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpg';
 import Birkner from '../../images/who-we-are/operations/Staff_Birkner.jpg';
-import Moorman from '../../images/who-we-are/operations/Staff_Moorman.jpg';
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
+import Robasson from '../../images/who-we-are/operations/Staff_Robasson.jpeg';
 
 //Technical Images
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
@@ -33,7 +36,6 @@ import Chimura from '../../images/who-we-are/technical/Staff_Chimura.jpg';
 import Chowdhury from '../../images/who-we-are/technical/Staff_Chowdhury.png';
 import Oie from '../../images/who-we-are/technical/Staff_Oie.jpg';
 import Rebollar from '../../images/who-we-are/technical/Staff_Rebollar.jpg';
-import Salemi from '../../images/who-we-are/technical/Staff_Salemi.jpg';
 import Turner from '../../images/who-we-are/technical/Staff_Turner.png';
 import Walters from '../../images/who-we-are/technical/Staff_Walters.png';
 import Wilson from '../../images/who-we-are/technical/Staff_Wilson.jpg';
@@ -97,17 +99,6 @@ const bios = {
       linkedin: 'annaschutz',
       bio:
         "holds a BFA in Acting from the University of Illinois Urbana-Champaign and has worked in Chicago as a performer, playwright, and producer for over a decade. She co-founded the storefront theatre Brown Paper Box Co. and served as Managing Director during its 11 years of operation. Anna completed her Master of Nonprofit Management at DePaul University where her research was on Representation in Nonprofit Performing Arts Leadership. During that time she was the manager of DePaul’s Undergraduate Admission daily operations and guest experience where she had the privilege of leading a team of students, focusing on their professional development. ​She served twice as the TA for DePaul's Women in Chicago Theatre course exposing first year students to intersectional feminist theory through field trips to performances around the city. Previously, Anna facilitated technical and customer service training during her 6 years with Apple Inc. in its Chicago stores and around the world on its Global Retail Training team. She founded Chicago Artist Guide with the belief that technology can create access, and theatre can create change. Sunday in the Park with George will never not make her cry. More info at www.annaschutz.com."
-    },
-    {
-      id: 5,
-      name: 'Lamar B. Butler',
-      role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation: 'Partner, ​Midwest Legacy Group',
-      image: Butler,
-      linkedin: 'lamarbutler',
-      bio:
-        "has spent over a decade helping families and business owners to become better informed, organized and prepared for their future financial needs. \n\nBefore joining the Midwest Legacy Group, Lamar supported clients as a financial strategist with two industry-leading mutual firms. In addition to his strong financial services background, Lamar’s previous experience as a high-frequency trader, with a focus on commodity futures, has afforded him a nontraditional market perspective. \n\nAs a father, Lamar believes that commitment to family and engagement within the community is paramount. He has supported legislative changes and programs designed to promote workplace equality. Through his partnerships with multiple special needs organizations, Lamar has dedicated his time to helping families in these communities prepare for periods of transition. \n\nLamar has also cultivated strong working relationships with thriving professional women's networks. Even though women have been invaluable to the growth and development of countless corporations, businesses and Fortune 500 companies, they are a demographic that has been historically underserved. Lamar is committed to being a supporter for this community. \n\nLamar holds three degrees from his alma mater, DePaul University: a bachelor’s in advertising, a master's in computer science with a focus on information technology, as well as a master's in social science and management. During his tenure at DePaul, he was a letterman for the men's basketball team and made appearances in the NIT and NCAA Tournament. Following his collegiate career, Lamar spent several seasons playing professional basketball internationally."
     },
     {
       id: 9,
@@ -189,32 +180,62 @@ const bios = {
       image: Birkner,
       linkedin: 'jamiehartbirkner',
       bio:
-        "has built a career in content, integrated marketing and campaign strategy supporting national nonprofits based in Chicago like the American Dental Association and Northwestern Memorial Hospital. She has also performed for some of Chicago's storefront theaters, including Three Cats Productions, The Agency Theater Company, Rebekah Theater Project and On The Spot Theater Company. She is excited to join the Chicago Artist Guide because she wants to help Chicago theater arts thrive and reflect the voices of the amazing communities that live here. "
-    }
-  ],
-  artists: [
+        "has built a career in content, integrated marketing and campaign strategy supporting national nonprofits based in Chicago like the American Dental Association and Northwestern Memorial Hospital. She has also performed for some of Chicago's storefront theaters, including Three Cats Productions, The Agency Theater Company, Rebekah Theater Project and On The Spot Theater Company. She is excited to join the Chicago Artist Guide because she wants to help Chicago theater arts thrive and reflect the voices of the amazing communities that live here."
+    },
     {
       id: 13,
-      name: 'Donterrio',
-      role: null,
+      name: 'Zeke Dolezalek',
+      role: 'Advisory Board Member',
       pronouns: 'he/him',
-      affiliation: null,
-      image: Donterrio,
-      linkedin: 'donterriolive',
-      bio:
-        'is a Chicago-based theatre artist with a Bachelor of Fine Arts focused in Musical Theatre from the American Musical and Dramatic Academy. With a demonstrated history of work both onstage and off in the performing arts industry. He is skilled in Singing, Acting, Tap Dance, and Stage Direction. Donterrio is the former Artistic Director of the LGBTQIA+ theatre company PrideArts (formerly know as Pride Films and Plays). With a strong media and communication background, he is an advocate for the multi-hyphenated artist. You can find Donterrio on all social media platforms @donterriolive'
+      affiliation: 'People & Culture Manager, What If Syndicate',
+      image: Dolezalek,
+      linkedin: 'iamzeked',
+      bio: null
     },
     {
       id: 14,
-      name: 'Jennifer Ledesma',
-      role: null,
+      name: 'Cheryl Frazier',
+      role: 'Advisory Board Member',
       pronouns: 'she/her',
-      affiliation: null,
-      image: Ledesma,
-      linkedin: 'jenniferledesma',
-      bio:
-        'is a Mexican American performer currently based in Chicago. She grew up in Orange County, California and completed her Bachelor of Arts in Musical Theatre at Columbia College Chicago. \n\nFavorite credits include The Hunchback of Notre Dame (Music Theatre Works), Bright Star (Boho Theatre), Grand Hotel (Kokandy Productions), BITE: A Pucking Queer Cabaret (Pride Films and Plays), If/Then (Brown Paper Box Co.), Simply Maria or the American Dream (Haven Chicago), and Little Miss Sunshine (Chicago Theatre Workshop), along with understudying at Theatre at the Center, Raven Theatre, Theo Ubique Cabaret Theatre, and Refuge Theatre Project. She has also been featured in New Faces Sing Broadway 1956 at Porchlight Music Theatre, and is proudly represented by Big Mouth Talent. \n\nOffstage, Jennifer is passionate about accessibility, representation, and equality in the arts community. She is a team member of The Joy Jackson Initiative, an organization that works towards systematic equity in the arts by providing anti-racism resources to theaters. Recently, she also became a Board Member at Chicago Arts Access, which makes the arts more accessible to the Chicago community. From volunteering for these organizations to singing in benefit concerts for other nonprofits like Illinois Coalition for Immigrant and Refugee Rights, Urban Gateways, and My Block My Hood My City, she hopes to use her artistry to share marginalized stories onstage and give back to her community.'
+      affiliation:
+        'Director of Test Adjudication, Southland College Prep Charter HS',
+      image: Frazier,
+      linkedin: 'cheryl-frazier-28938154',
+      bio: null
     },
+    {
+      id: 16,
+      name: 'Sarah Hope Marshall',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Principal & Founder, Profound Hope Industries',
+      image: Marshall,
+      linkedin: 'sarahhopemarshall',
+      bio:
+        'is an accomplished speaker and experienced community development consultant. She brings vast diversity and social impact experience to her consulting work, having spent almost two decades in various forms of community development work. Sarah earned her MBA from North Park University in 2010, with a self-designed concentration in community development. Her professional resume includes work in direct service, faith-based organizations, community organizing and social enterprise before becoming involved in economic empowerment work in 2012, when she joined the credit union industry. \n\nSarah assumed increasing responsibility as a credit union employee until she took over as CEO of a CDFI credit union focused on serving the financial needs of those experiencing financial crisis or poverty. During her tenure, she regularly participated in consumer advocacy work and served on an advisory committee for the Consumer Financial Protection Bureau, a federal agency. She is currently completing a Masters of Liberal Arts degree at the University of Chicago. Sarah is personally passionate about fair and equitable finance, and sits on the Illinois State Comptroller’s Bank On Advisory Committee. Sarah’s perspective as a person living with phenylketonuria, a rare and lifelong metabolic disease, informs her work around diversity, equity, and inclusion. \n\nIn 2021, she founded Profound Hope Industries, a social impact consulting agency. Her clients include credit unions, small businesses, non-profits, and CDFIs. She now uses her unique skill set to help socially focused organizations build or improve their business models for increased profitability and greater community impact.'
+    },
+    {
+      id: 37,
+      name: 'Erin Mitchell',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Business Consultant, Erin Mitchell Consulting',
+      image: Mitchell,
+      linkedin: 'erin-m-6749b28',
+      bio: null
+    },
+    {
+      id: 38,
+      name: 'Erin Moran',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Partner, The Solas Group',
+      image: Moran,
+      linkedin: 'erin-moran-212a8612',
+      bio: null
+    }
+  ],
+  artists: [
     {
       id: 15,
       name: 'Alexandria Alyse Moorman',
@@ -227,15 +248,15 @@ const bios = {
         'holds a BFA in Acting from Emerson College and is a proud recipient of the Isabel Sanford Award. While working in partnership with Cacique Youth Learning Center in the South End of Boston she helped lead and coordinate a classroom of Pre-K students through artistic workshops culminating in producing presentations of their original work. \n\nAlexandria’s credits as a performer/writer/poet/ improviser have been in collaboration with and on the stages of The MCA, iO (Diversity Scholar recipient), The Haitian American Museum, The Second City, The Den Theater, Brown Paper Box Co., Stage 773, The Annoyance, MPAACT Theater, Rough House Theater Co. among others. She is an ensemble member of The Not That Late Show, a monthly late night style talk show. She can also be heard as a recurring guest on the podcast Lifetime Uncorked, which was featured in O Magazine last year. \n\nFilm credits include How to Re-caulk Your Tub (Elevated FF - Audience Award Winner, Calgary Underground FF - Best Int. Short Winner), Mid 30’s Martyr (Austin Revolution FF - Best Actress Short Winner, Cindependent FF, San Angelo Revolution FF - Best Actress nom.), Ponytail (Shortcut 100 Int. FF - Winner: Audience Choice, Best Chicago Made, Female Filmmaker). When not dreaming of winning the lottery, she enjoys watching Bravo TV for all that nonsense, flexing her mixology skills, traveling and eating well with her partner John.'
     },
     {
-      id: 16,
-      name: 'Julia Morales',
+      id: 30,
+      name: 'Kaitlyn Salemi',
       role: null,
       pronouns: 'she/her',
       affiliation: null,
-      image: Morales,
-      linkedin: null,
+      image: Salemi,
+      linkedin: 'kaitlynsalemi',
       bio:
-        'is a performer, writer, and teacher originally from Houston, Texas. She is the Founder and active Executive Director of the Stepping Stone Theater in Chicago with its mission to uplift talented, diverse voices by giving them a platform to present their artistic excellence. She is an alumni of the American Musical and Dramatic Academy (AMDA). She is also a 2018 Second City Bob Curry Fellow and writes and performs with The Second City Touring Company. For almost 15 years, Julia has studied, performed, and taught improv and sketch comedy in Los Angeles, Houston, New York and Chicago. She has participated in countless comedy festivals and workshops all over the nation. She is also currently represented by Paonessa Talent. \n\nWhen she isn’t trying to change the world for the better, she can either be found at the gym, playing the Sims, or watching movies from her massive DVD collection. Yes, DVDs still exist. For all the current info on what the team at Stepping Stone Theater is up to, check out www.steppingstonechicago.com  '
+        'holds a Bachelor of Music in Music Business and Theater from Elmhurst University and works as a Stage Manager in the Chicagoland Area. Kaitlyn is excited to be able to give back to the Chicago Theater Community with the Chicago Artist Guide and hopes to continue to empower theater makers through technology in the future.'
     }
   ],
   operations: [
@@ -304,6 +325,17 @@ const bios = {
       linkedin: 'briannamwalton',
       bio:
         'is a Digital Marketing enthusiast who enjoys creating written and visual content. She has always been an extremely passionate writer and a social justice advocate. Brianna was able to explore these interests during her studies at Agnes Scott College where she earned a Bachelor of Arts degree in International Relations and Business Management. Previously, she was active in student organizations including Her Campus (as a Content Creator and Campus Correspondent) and Mortar Board (as a Director of Communications). She was also a Marketing intern at CARE USA, which allowed her to gain experience in website content accessibility. She is motivated by the idea of helping other people have equitable access to opportunities and resources that will allow them to pursue their life goals. During her free time, Brianna enjoys listening to music of pretty much any genre, sketching, painting, and spending time outdoors. She is also an animal lover and enjoys spending time caring for her two pet turtles along with almost any other animals she happens to cross paths with.'
+    },
+    {
+      id: 5,
+      name: 'Emmanuela Robasson',
+      role: 'Executive Assistant',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Robasson,
+      linkedin: 'emmanuela-robasson',
+      bio:
+        'Recent graduate of Clark Atlanta University, with a B.A in Business Management and a minor in Political Science. I seek to utilize both my B.A and A.A to become a resource for social programs and projects. I plan to achieve this through a combination of political aspirations, entrepreneurial innovation, education, and hard work. I am drawn to non profit environments, however my true passion is helping others.'
     }
   ],
   technical: [
@@ -394,17 +426,6 @@ const bios = {
       linkedin: 'prebollar',
       bio:
         "is a Wisconsin native that moved to Chicago for college (Go Pack!). He is a DePaul Double Demon that majored in Biology for undergrad and Software Engineering for his Masters. Pedro's goal is to combine his knowledge of healthcare and software engineering to help the Latin community. To prepare me for that, he joined Chicago Artist Guide to use his engineering skills to make a positive impact within the theater community. \n\nBefore the pandemic hit, Pedro loved to explore the city through its food and events.  Now, he goes for runs and rides his bike along the lakefront to explore new places. Pedro also recently adopted a puppy named Lambo and he's been a bundle of joy to have around."
-    },
-    {
-      id: 30,
-      name: 'Kaitlyn Salemi',
-      role: 'Developer',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Salemi,
-      linkedin: 'kaitlynsalemi',
-      bio:
-        "holds a Bachelor of Music in Music Business and Theater from Elmhurst University and works as a Stage Manager in the Chicagoland Area. \n\nLast year, Kaitlyn received a certification in Full-Stack Web Development from Northwestern University.  Kaitlyn is excited to be able to give back to the Chicago Theater Community with the Chicago Artist Guide and hopes to continue to empower theater makers through technology in the future. You can learn more about Kaitlyn's projects at kaitlynsalemi.com"
     },
     {
       id: 31,
