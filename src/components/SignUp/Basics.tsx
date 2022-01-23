@@ -41,6 +41,39 @@ const Privacy: React.FC<{
     return passwordError;
   };
 
+  const firstNameError = () => {
+    if (basicsFirstName === '') {
+      return 'first name is required';
+    }
+  };
+
+  const lastNameError = () => {
+    if (basicsLastName === '') {
+      return 'last name is required';
+    }
+  };
+
+  const emailAddressError = () => {
+    let emailAddressError = '';
+
+    if (basicsEmailAddress === '') {
+      emailAddressError = 'email required';
+    } else if (
+      // eslint-disable-next-line
+      !basicsEmailAddress.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+    ) {
+      emailAddressError = 'not valid email format';
+    }
+
+    return emailAddressError;
+  };
+
+  const check18PlusError = () => {
+    if (basics18Plus === false) {
+      return 'Need to verify over 18';
+    }
+  };
+
   return (
     <Container>
       <Row>
@@ -53,18 +86,27 @@ const Privacy: React.FC<{
               onChange={setForm}
               value={basicsFirstName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {firstNameError()}
+            </span>
             <InputField
               label="Last"
               name="basicsLastName"
               onChange={setForm}
               value={basicsLastName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {lastNameError()}
+            </span>
             <InputField
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
               value={basicsEmailAddress || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {emailAddressError()}
+            </span>
             <InputField
               fieldType="password"
               label="Password"
@@ -93,6 +135,9 @@ const Privacy: React.FC<{
               name="basics18Plus"
               onChange={setForm}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {check18PlusError()}
+            </span>
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>
