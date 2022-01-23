@@ -111,8 +111,23 @@ const Privacy: React.FC<{
   };
 
   const emailAddressError = () => {
+    let emailAddressError = '';
+
     if (basicsEmailAddress === '') {
-      return 'email required';
+      emailAddressError = 'email required';
+    } else if (
+      // eslint-disable-next-line
+      !basicsEmailAddress.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+    ) {
+      emailAddressError = 'not valid email format';
+    }
+
+    return emailAddressError;
+  };
+
+  const check18PlusError = () => {
+    if (basics18Plus === false) {
+      return 'Need to verify over 18';
     }
   };
 >>>>>>> b15d034 (added validation for signup, first/last name, email)
@@ -196,6 +211,9 @@ const Privacy: React.FC<{
               name="basics18Plus"
               onChange={setForm}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {check18PlusError()}
+            </span>
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>
