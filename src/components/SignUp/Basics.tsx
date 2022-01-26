@@ -20,8 +20,59 @@ const Privacy: React.FC<{
     basicsLastName,
     basicsEmailAddress,
     basicsPassword,
+    basicsPasswordConfirm,
     basics18Plus
   } = formData;
+
+  const passwordErrors = () => {
+    let passwordError = '';
+
+    if (basicsPassword === '') passwordError = '';
+    else if (basicsPassword !== basicsPasswordConfirm) {
+      passwordError = 'Passwords must match';
+    } else if (basicsPassword.length < 8) {
+      passwordError = 'Password must be at least 8 characters';
+    } else if (
+      !basicsPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/)
+    ) {
+      passwordError =
+        'Passwords must contain at least one uppercase letter, number, and special character';
+    }
+    return passwordError;
+  };
+
+  const firstNameError = () => {
+    if (basicsFirstName === '') {
+      return 'first name is required';
+    }
+  };
+
+  const lastNameError = () => {
+    if (basicsLastName === '') {
+      return 'last name is required';
+    }
+  };
+
+  const emailAddressError = () => {
+    let emailAddressError = '';
+
+    if (basicsEmailAddress === '') {
+      emailAddressError = 'email required';
+    } else if (
+      // eslint-disable-next-line
+      !basicsEmailAddress.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
+    ) {
+      emailAddressError = 'not valid email format';
+    }
+
+    return emailAddressError;
+  };
+
+  const check18PlusError = () => {
+    if (basics18Plus === false) {
+      return 'Need to verify over 18';
+    }
+  };
 
   return (
     <Container>
@@ -35,18 +86,27 @@ const Privacy: React.FC<{
               onChange={setForm}
               value={basicsFirstName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {firstNameError()}
+            </span>
             <InputField
               label="Last"
               name="basicsLastName"
               onChange={setForm}
               value={basicsLastName || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {lastNameError()}
+            </span>
             <InputField
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
               value={basicsEmailAddress || ''}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {emailAddressError()}
+            </span>
             <InputField
               fieldType="password"
               label="Password"
@@ -54,6 +114,20 @@ const Privacy: React.FC<{
               onChange={setForm}
               value={basicsPassword || ''}
             />
+            <PasswordReq>
+              Minimum 8 characters, one uppercase, one lowercase, a number and
+              special character.
+            </PasswordReq>
+            <InputField
+              fieldType="password"
+              label="Confirm Password"
+              name="basicsPasswordConfirm"
+              onChange={setForm}
+              value={basicsPasswordConfirm || ''}
+            />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {passwordErrors()}
+            </span>
             <Checkbox
               checked={basics18Plus || false}
               fieldType="checkbox"
@@ -61,6 +135,9 @@ const Privacy: React.FC<{
               name="basics18Plus"
               onChange={setForm}
             />
+            <span style={{ color: 'red', fontSize: '12px' }}>
+              {check18PlusError()}
+            </span>
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>
@@ -87,6 +164,11 @@ const LoginLink = styled.p`
   a {
     color: ${colors.orange};
   }
+`;
+
+const PasswordReq = styled.p`
+  font-size: 10px;
+  font-style: italic;
 `;
 
 export default Privacy;
