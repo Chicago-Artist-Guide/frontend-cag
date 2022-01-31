@@ -81,10 +81,78 @@ const Profile: React.FC<{
         <Col lg={8}>
           <ProfileCard />
         </Col>
-        <ImageCol lg="4">
-          <Image alt="" src={yellow_blob} />
-        </ImageCol>
-      </Row>
+        <Col lg={8}>
+          <Row>EDIT MODE: Save Profile button</Row>
+          Name, pronouns
+          <br />
+          Titles, EDIT MODE: Edit Titles button
+          <br />
+          EDIT MODE: Add Production Titles button
+          <br />
+          Bio write-up
+          <br />
+          (paragraphs)
+          <br />
+          Training
+          <br />
+          Institution
+          <br />
+          Location - Degree/Certification
+          <br />
+          Description
+          <br />
+          EDIT MODE: Add Training button
+          <br />
+          Upcoming Performances
+          <Row>
+            <Col lg={3}>Poster image (left)</Col>
+            <Col lg={6}>
+              Title(right)
+              <br />
+              Description
+              <br />
+              Industry Code
+              <br />
+              Website
+            </Col>
+            EDIT MODE: Add Upcoming button
+          </Row>
+          Additional Skills
+          <br />
+          (tags)
+          <br />
+          EDIT MODE: Add Additional Skills button
+          <br />
+          Credits
+          <br />
+          Name (date)
+          <br />
+          Theater
+          <br />
+          Location
+          <br />
+          Role
+          <br />
+          Website
+          <br />
+          Director
+          <br />
+          Musical Director
+          <br />
+          Recognition
+          <br />
+          EDIT MODE: Add Credits button
+          <br />
+          Awards & Recognitions
+          <br />
+          (card)Award Title
+          <br />
+          Award Role
+          <br />
+          EDIT MODE: Add Awards & Recognitions button
+          <br />
+      </Col>
+    </Row>
     </PageContainer>
   );
 };
