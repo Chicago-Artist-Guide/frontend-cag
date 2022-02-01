@@ -3,20 +3,61 @@ import { Link } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
+import PhotoRing from '../components/layout/PhotoRing';
 import styled from 'styled-components';
 import { Tagline } from '../components/layout/Titles';
+import {
+  Jewell,
+  Moorman,
+  Morris,
+  Robasson,
+  Walton,
+  Zacks
+} from '../images/who-we-are/operations'; //TODO: Replace with user images from profile
 
 const Profile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
+  const photos = [
+    {
+      id: 1,
+      src: Jewell,
+      text: 'Ops: Jewell'
+    },
+    {
+      id: 2,
+      src: Moorman,
+      text: 'Ops: Moorman'
+    },
+    {
+      id: 3,
+      src: Morris,
+      text: 'Ops: Morris'
+    },
+    {
+      id: 4,
+      src: Robasson,
+      text: 'Ops: Robasson'
+    },
+    {
+      id: 5,
+      src: Walton,
+      text: 'Ops: Walton'
+    },
+    {
+      id: 6,
+      src: Zacks,
+      text: 'Ops: Zacks'
+    }
+  ];
+
   return (
     <PageContainer>
       <Tagline>Your Profile</Tagline>
       <Row>
         <Col lg={4}>
           <Photos>
-            [Main Photo] <br />
-            [Additional Photos 2x3]
+            <PhotoRing photos={photos} />
             <Row>EDIT MODE: Edit Photos button</Row>
           </Photos>
           <Details>
@@ -117,11 +158,11 @@ const Profile: React.FC<{
 };
 
 const Photos = styled.div`
-  margin-bottom: 1rem;
+  transform-style: preserve-3d;
 `;
 
 const Details = styled.div`
-  margin-bottom: 1rem;
+  margin-left: 136px;
 `;
 
 export default Profile;
