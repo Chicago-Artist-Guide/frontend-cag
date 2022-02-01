@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+<<<<<<< HEAD
 
 const Photo = (props: any) => {
   const { src, text, title } = props;
@@ -27,6 +28,34 @@ const PhotoHolder = styled.div`
 
   &:hover {
     opacity: 1;
+=======
+//TODO: Add a placeholder image to import
+
+const Photo = (props: any) => {
+  const { src, text } = props;
+  return (
+    <PhotoContainer>
+      <PhotoHolder>
+        <img alt={text} src={src} />
+      </PhotoHolder>
+    </PhotoContainer>
+  );
+};
+
+const PhotoContainer = styled.div`
+  perspective: 2000px;
+  width: 350px;
+  height: 900px;
+`;
+
+const PhotoHolder = styled.div`
+  width: 100%;
+  transform-style: preserve-3d;
+
+  img {
+    max-width: 95px;
+    transform-style: preserve-3d;
+>>>>>>> bf02689 (Created generic and specific components; created ops index for easier photo export-import; sized photo and details columns, main photo)
   }
 `;
 
