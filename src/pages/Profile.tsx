@@ -54,7 +54,7 @@ const Profile: React.FC<{
   return (
     <PageContainer>
       <Tagline>Your Profile</Tagline>
-      <Row>
+      <Row style={{ columnGap: '5rem', flexWrap: 'nowrap' }}>
         <Col lg={4}>
           <Photos>
             <PhotoRing photos={photos} />
@@ -158,7 +158,7 @@ const Profile: React.FC<{
 };
 
 const Photos = styled.div`
-  transform-style: preserve-3d;
+  width: 100%;
 `;
 
 const Details = styled.div`

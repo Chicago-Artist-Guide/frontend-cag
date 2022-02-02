@@ -23,16 +23,18 @@ const PhotoRing = (props: any) => {
 const PhotoRingContainer = styled.div``;
 
 const MainPic = styled.div`
-  max-width: 312px;
-
-  img {
-    max-width: inherit;
-  }
+  width: inherit;
+  overflow-x: hidden;
 `;
 
 const Ring = styled.div`
   width: 100%;
   transform-style: preserve-3d;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  row-gap: 10px;
+  margin: 10px 0;
 `;
 
 export default PhotoRing;

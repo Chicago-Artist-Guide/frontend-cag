@@ -14,18 +14,15 @@ const Photo = (props: any) => {
 };
 
 const PhotoContainer = styled.div`
-  perspective: 2000px;
-  width: 350px;
-  height: 900px;
+  width: 95px;
 `;
 
 const PhotoHolder = styled.div`
-  width: 100%;
-  transform-style: preserve-3d;
+  max-height: 95px;
+  overflow: hidden;
 
   img {
     max-width: 95px;
-    transform-style: preserve-3d;
   }
 `;
 
