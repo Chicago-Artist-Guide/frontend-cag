@@ -21,8 +21,8 @@ const Profile: React.FC<{
           {previewMode && (
             <>
               <Preview>
-                We’ll notify you via email once we’re ready to launch our beta
-                version of the platform, at which time you’ll be able to add
+                We'll notify you via email once we're ready to launch our beta
+                version of the platform, at which time you'll be able to add
                 more detail to your profile, like your bio, education and
                 training, as well as past credits. Stay tuned!
               </Preview>
