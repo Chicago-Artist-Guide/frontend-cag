@@ -93,6 +93,31 @@ const ActorInfo2: React.FC<{
 
     setForm({ target });
   };
+  /*
+  const heightError = () => {
+    if (actorInfo2HeightNoAnswer === false) {
+      return 'select height';
+    }
+  };
+*/
+
+  const ageError = () => {
+    if (actorInfo2AgeRanges === false) {
+      return 'select age';
+    }
+  };
+
+  const actorInfo2GenderRolesError = () => {
+    if (actorInfo2GenderRoles === '') {
+      return 'select option';
+    }
+  };
+
+  const actorInfo2GenderTransitionError = () => {
+    if (actorInfo2GenderTransition === '') {
+      return 'select option';
+    }
+  };
 
   return (
     <Container>
@@ -168,6 +193,9 @@ const ActorInfo2: React.FC<{
                   />
                 ))}
               </Form.Group>
+              <span style={{ color: 'red', fontSize: '12px' }}>
+                {ageError()}
+              </span>
               <Form.Group>
                 <CAGLabel>
                   Gender Identity <PrivateLabel />
@@ -215,6 +243,9 @@ const ActorInfo2: React.FC<{
                   />
                 ))}
               </Form.Group>
+              <span style={{ color: 'red', fontSize: '12px' }}>
+                {actorInfo2GenderRolesError()}
+              </span>
             </Col>
             <Col lg="6">
               <Form.Group>
@@ -239,6 +270,9 @@ const ActorInfo2: React.FC<{
                   value="No"
                 />
               </Form.Group>
+              <span style={{ color: 'red', fontSize: '12px' }}>
+                {actorInfo2GenderTransitionError()}
+              </span>
             </Col>
           </Row>
         </Col>

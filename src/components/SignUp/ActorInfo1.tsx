@@ -91,6 +91,24 @@ const ActorInfo1: React.FC<{
     setForm({ target });
   };
 
+  const pronounsError = () => {
+    if (actorInfo1Pronouns === '') {
+      return 'Pronoun required';
+    }
+  };
+
+  const infoLGBTQError = () => {
+    if (actorInfo1LGBTQ === '') {
+      return 'Please select option';
+    }
+  };
+
+  const actorInfoEthnicitiesError = () => {
+    if (actorInfo1Ethnicities === 0) {
+      return 'Please select option';
+    }
+  };
+
   return (
     <Container>
       <Row>
@@ -117,6 +135,9 @@ const ActorInfo1: React.FC<{
                           </option>
                         ))}
                       </Form.Control>
+                      <span style={{ color: 'red', fontSize: '12px' }}>
+                        {pronounsError()}
+                      </span>
                     </Col>
                     <Col lg="6">
                       <CAGLabel>Other</CAGLabel>
@@ -162,6 +183,9 @@ const ActorInfo1: React.FC<{
                   value="I do not wish to respond"
                 />
               </Form.Group>
+              <span style={{ color: 'red', fontSize: '12px' }}>
+                {infoLGBTQError()}
+              </span>
               <Form.Group>
                 <CAGLabel>Do you identify as any of the following:</CAGLabel>
                 <PrivacyPar>
@@ -202,6 +226,9 @@ const ActorInfo1: React.FC<{
                   </React.Fragment>
                 ))}
               </Form.Group>
+              <span style={{ color: 'red', fontSize: '12px' }}>
+                {actorInfoEthnicitiesError()}
+              </span>
             </Col>
           </Row>
         </Col>
