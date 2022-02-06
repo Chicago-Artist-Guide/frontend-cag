@@ -11,7 +11,13 @@ const Training: React.FC<{
   formData: any;
 }> = props => {
   const { setForm, formData } = props;
-  const { trainingInstitution, trainingCity, trainingDegree } = formData;
+  const {
+    trainingInstitution,
+    trainingCity,
+    trainingState,
+    trainingDegree,
+    trainingDetails
+  } = formData;
   return (
     <Container>
       <Row>
@@ -42,7 +48,12 @@ const Training: React.FC<{
           />
         </Col>
         <Col className="mt-4" lg="2">
-          <Form.Control as="select">
+          <Form.Control
+            as="select"
+            name="trainingState"
+            onChange={setForm}
+            value={trainingState || ''}
+          >
             <option>State</option>
             <option value="AL">Alabama</option>
             <option value="AK">Alaska</option>
@@ -114,8 +125,11 @@ const Training: React.FC<{
           <Form.Group controlId="formControlTextarea1">
             <Form.Control
               as="textarea"
+              name="trainingDetails"
+              onChange={setForm}
               placeholder="Provide any additional information here"
               rows={6}
+              value={trainingDetails || ''}
             />
           </Form.Group>
         </Col>
