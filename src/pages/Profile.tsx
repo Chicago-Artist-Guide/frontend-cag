@@ -81,6 +81,9 @@ const Profile: React.FC<{
         <Col lg={8}>
           <ProfileCard />
         </Col>
+        <ImageCol lg="4">
+          <Image alt="" src={yellow_blob} />
+        </ImageCol>
       </Row>
     </PageContainer>
   );
