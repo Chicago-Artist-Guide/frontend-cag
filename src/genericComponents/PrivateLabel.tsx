@@ -1,13 +1,14 @@
 import React from 'react';
-import { Badge as styledBadge } from 'react-bootstrap';
+import { Badge } from 'react-bootstrap';
 import styled from 'styled-components';
 import { colors, fonts } from '../theme/styleVars';
 
-const PrivateLabel = () => {
-  return <CAGLabel>private</CAGLabel>;
+const PrivateLabel = (props: any) => {
+  const { ...rest } = props;
+  return <CAGPrivLabel {...rest}>private</CAGPrivLabel>;
 };
 
-const CAGLabel = styled(styledBadge)`
+const CAGPrivLabel = styled(Badge)`
   border-radius: 7px;
   font-family: ${fonts.montserrat};
   color: ${colors.secondaryFontColor};

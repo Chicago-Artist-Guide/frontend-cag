@@ -199,7 +199,7 @@ const ActorInfo2: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   I would also be comfortable playing roles usually played by:{' '}
-                  <PrivateLabel />
+                  <CustomPrivate />
                 </CAGLabel>
 
                 {genderRoles.map(g => (
@@ -220,7 +220,7 @@ const ActorInfo2: React.FC<{
               <Form.Group>
                 <CAGLabel>
                   I would be comfortable playing a character through all phases
-                  of their transition: <PrivateLabel />
+                  of their transition: <CustomPrivate />
                 </CAGLabel>
                 <Checkbox
                   checked={actorInfo2GenderTransition === 'Yes'}
@@ -249,6 +249,10 @@ const ActorInfo2: React.FC<{
     </Container>
   );
 };
+
+const CustomPrivate = styled(PrivateLabel)`
+  font-size: 55%;
+`;
 
 const PaddingTitle = styled(Title)`
   padding: 20px 0px;
