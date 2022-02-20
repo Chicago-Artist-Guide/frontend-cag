@@ -1,28 +1,34 @@
 import React from 'react';
 import styled from 'styled-components';
-//TODO: Add a placeholder image to import
 
 const Photo = (props: any) => {
-  const { src, text } = props;
+  const { src, text, title } = props;
+  // function handleClick(e: any) {
+  // 	console.log('Clicked on: ' + e.target.src);
+  // }
   return (
-    <PhotoContainer>
-      <PhotoHolder>
-        <img alt={text} src={src} />
-      </PhotoHolder>
-    </PhotoContainer>
+    <PhotoHolder /*onClick={handleClick}*/>
+      <img alt={text} src={src} title={title} />
+    </PhotoHolder>
   );
 };
 
-const PhotoContainer = styled.div`
-  width: 95px;
-`;
-
 const PhotoHolder = styled.div`
-  max-height: 95px;
+  height: 95px;
+  width: 95px;
   overflow: hidden;
-
+  opacity: 0.7;
+  transition: opacity 0.3s linear;
+  cursor: pointer;
+  --radius: 1rem;
+  border-radius: var(--radius);
   img {
-    max-width: 95px;
+    width: 95px;
+    height: auto;
+  }
+
+  &:hover {
+    opacity: 1;
   }
 `;
 

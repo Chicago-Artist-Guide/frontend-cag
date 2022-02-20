@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
-import PhotoRing from '../components/layout/PhotoRing';
+import PhotoRow from '../components/layout/PhotoRow';
 import styled from 'styled-components';
 import { Tagline } from '../components/layout/Titles';
 import {
@@ -57,7 +57,7 @@ const Profile: React.FC<{
       <Row style={{ columnGap: '5rem', flexWrap: 'nowrap' }}>
         <Col lg={4}>
           <Photos>
-            <PhotoRing photos={photos} />
+            <PhotoRow photos={photos} />
             <Row>EDIT MODE: Edit Photos button</Row>
           </Photos>
           <Details>
