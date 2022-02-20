@@ -54,8 +54,8 @@ const Profile: React.FC<{
   return (
     <PageContainer>
       <Tagline>Your Profile</Tagline>
-      <Row style={{ columnGap: '5rem', flexWrap: 'nowrap' }}>
-        <Col lg={4}>
+      <Row style={{ columnGap: '1rem', flexWrap: 'nowrap' }}>
+        <PhotoCol lg={4}>
           <Photos>
             <PhotoRow photos={photos} />
             <Row>EDIT MODE: Edit Photos button</Row>
@@ -74,7 +74,7 @@ const Profile: React.FC<{
             Agency: [agency]
           </Details>
           <Row>EDIT MODE: Edit Identity Details button</Row>
-        </Col>
+        </PhotoCol>
         <Col lg={8}>
           <Row>EDIT MODE: Save Profile button</Row>
           Name, pronouns
@@ -159,6 +159,15 @@ const Profile: React.FC<{
 
 const Photos = styled.div`
   width: 100%;
+`;
+
+const PhotoCol = styled(Col)`
+  max-width: 425px;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Details = styled.div`

@@ -3,11 +3,9 @@ import styled from 'styled-components';
 
 const Photo = (props: any) => {
   const { src, text, title } = props;
-  // function handleClick(e: any) {
-  // 	console.log('Clicked on: ' + e.target.src);
-  // }
+
   return (
-    <PhotoHolder /*onClick={handleClick}*/>
+    <PhotoHolder>
       <img alt={text} src={src} title={title} />
     </PhotoHolder>
   );

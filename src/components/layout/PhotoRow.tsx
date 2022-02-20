@@ -10,6 +10,8 @@ const PhotoRow = (props: any) => {
     let clicked = e.target.src;
     let swap = document.getElementById('main')?.getAttribute('src');
     console.log('Clicked on: ' + clicked + '\nSwapped with: ' + swap);
+    document.getElementById('main')?.setAttribute('src', clicked);
+    e.target.src = swap;
   }
 
   return (
@@ -31,18 +33,27 @@ const PhotoRow = (props: any) => {
   );
 };
 
-const PhotoRowContainer = styled.div``;
+const PhotoRowContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 450px;
+  overflow: hidden;
+`;
 
 const MainPic = styled.div`
-  width: inherit;
-  overflow-x: hidden;
+  img {
+    max-width: 450px;
+    height: auto;
+  }
 `;
 
 const Row = styled.div`
-  width: 100%;
+  max-width: 425px;
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
+  justify-content: space-evenly;
   gap: 1rem;
   margin: 1rem 0;
   align-items: center;
