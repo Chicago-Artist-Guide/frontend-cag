@@ -30,8 +30,7 @@ const defaultSteps = [
 ];
 
 // flatten our step id's into a single array
-const flatSteps = (stepsArrObj: any) =>
-  defaultSteps.map((step: any) => step.id);
+const flatSteps = (stepsArrObj: any) => stepsArrObj.map((step: any) => step.id);
 
 // establish our form data structure
 // assign defaults
@@ -76,29 +75,66 @@ const defaultData = {
 };
 
 const SignUp = () => {
-  const [steps, setSteps] = useState(defaultSteps);
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
-  const { step, navigation } = useStep({
-    steps: flatSteps(steps) as any
-  }); // defaults for our defaultSteps
+  const [steps, setSteps] = useState(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
 
+  // defaults for our defaultSteps
+  const { step, navigation } = useStep({
+    steps: flatSteps(steps) as any
+  });
+
   useEffect(() => {
-    const newSteps = [...steps];
-    const stageRole = formData.stageRole;
+    let newSteps = [...steps];
 
-    if (stageRole === '') {
-      return;
+    const { stageRole } = formData;
+    const indexForOffstageRoles = newSteps.findIndex(
+      nS => nS.id === 'offstageRoles'
+    );
+    const indexForActorInfo2 = newSteps.findIndex(nS => nS.id === 'actorInfo2');
+    const indexForActorInfo1 = newSteps.findIndex(nS => nS.id === 'actorInfo1');
+
+    // Rules:
+    // a. If the user selects "on-stage" then they see actor info 2 but not offstage roles
+    // b. If the user selects "off-stage" then they see offstage roles but not actor info 2
+    // c. If the user selects "both-stage" then they see both actor info 2 and offstage roles
+
+    switch (stageRole) {
+      case 'on-stage':
+        // if we can't find the index for the step to remove, the user probably just went back
+        if (indexForOffstageRoles > -1) {
+          newSteps.splice(indexForOffstageRoles, 1);
+        }
+
+        // if we can't find the step we need here, we need to re-add it
+        if (indexForActorInfo2 === -1 && indexForActorInfo1 > -1) {
+          newSteps.splice(indexForActorInfo1 + 1, 0, { id: 'actorInfo2' });
+        }
+
+        break;
+      case 'off-stage':
+        // if we can't find the index for the step to remove, the user probably just went back
+        if (indexForActorInfo2 > -1) {
+          newSteps.splice(indexForActorInfo2, 1);
+        }
+
+        // if we can't find the step we need here, we need to re-add it
+        if (indexForOffstageRoles === -1 && indexForActorInfo1 > -1) {
+          newSteps.splice(indexForActorInfo1 + 1, 0, { id: 'offstageRoles' });
+        }
+
+        break;
+      default:
+        // let's just restore all of the steps
+        newSteps = defaultSteps;
+        break;
     }
 
-    if (stageRole === 'on-stage') {
-      newSteps.splice(5, 1);
-    } else if (stageRole === 'off-stage') {
-      newSteps.splice(4, 1);
+    // no need to change state if we have no changes to steps
+    if (JSON.stringify(steps) !== JSON.stringify(newSteps)) {
+      setSteps(newSteps);
     }
-
-    setSteps(newSteps);
-  }, [formData.stageRole]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [formData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setPrivacyAgree = () => {
     const target = {
@@ -196,7 +232,6 @@ const SignUp = () => {
             landingStep={landingStep}
             landingType={formData.landingType}
             navigation={navigation}
-            setForm={setForm}
             setLandingStep={setLandingStep}
             step={step}
             steps={steps}
