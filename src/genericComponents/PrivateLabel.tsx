@@ -23,7 +23,8 @@ const CAGLabel = styled(Badge)`
   background-color: ${colors.grayishLightGreen};
 
   &.small-size {
-    font-size: 55%;
+    font-size: 60%;
+    padding: 9.5px 16.48px;
   }
 `;
 
