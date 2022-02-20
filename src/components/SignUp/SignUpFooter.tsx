@@ -9,7 +9,6 @@ const SignUpFooter: React.FC<{
   landingStep: any;
   landingType: string;
   navigation: any;
-  setForm: any;
   setLandingStep: any;
   step: any;
   steps: any;
@@ -18,7 +17,6 @@ const SignUpFooter: React.FC<{
   landingStep,
   landingType,
   navigation,
-  setForm,
   setLandingStep,
   step,
   steps,
