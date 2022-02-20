@@ -4,11 +4,15 @@ import styled from 'styled-components';
 import { colors, fonts } from '../theme/styleVars';
 
 const PrivateLabel = (props: any) => {
-  const { ...rest } = props;
-  return <CAGPrivLabel {...rest}>private</CAGPrivLabel>;
+  const { size, ...rest } = props;
+  return (
+    <CAGLabel className={`${size}-size`} size={size} {...rest}>
+      private
+    </CAGLabel>
+  );
 };
 
-const CAGPrivLabel = styled(Badge)`
+const CAGLabel = styled(Badge)`
   border-radius: 7px;
   font-family: ${fonts.montserrat};
   color: ${colors.secondaryFontColor};
@@ -17,6 +21,10 @@ const CAGPrivLabel = styled(Badge)`
   padding: 8px 10px;
   text-transform: uppercase;
   background-color: ${colors.grayishLightGreen};
+
+  &.small-size {
+    font-size: 55%;
+  }
 `;
 
 export default PrivateLabel;
