@@ -69,7 +69,6 @@ const InputField = (props: any) => {
   // based on the props provided to the field and the logical prioritization if multiple exist
   useEffect(() => {
     // 0. if we're still pristine, don't show error messaging yet
-    //    however, we may need to handle a pristine error callback
     if (isPristine) {
       // find out when we need to unset pristine onChange of field
       if (value.length > 0) {
@@ -81,6 +80,7 @@ const InputField = (props: any) => {
         }
       }
 
+      // just return here because the messaging doesn't matter if the field hasn't been touched yet
       return;
     }
 
