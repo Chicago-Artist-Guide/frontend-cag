@@ -25,6 +25,8 @@ const Privacy: React.FC<{
     basicsPasswordConfirm,
     basics18Plus
   } = formData;
+
+  // create an array of the required field names
   const requiredFields = [
     'basicsFirstName',
     'basicsLastName',
@@ -33,6 +35,10 @@ const Privacy: React.FC<{
     'basicsPasswordConfirm',
     'basics18Plus'
   ];
+
+  // create a default object of required field values for state
+  // the format is: fieldName: true (has error) | false (does not have error)
+  // we default this for now based on if they are empty '' or false
   const createDefaultFormErrorsData = () => {
     const formErrorsObj: { [key: string]: boolean } = {};
 
@@ -43,12 +49,18 @@ const Privacy: React.FC<{
 
     return formErrorsObj;
   };
+
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
   const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
 
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "basics" everywhere
   const customErrorCallback = (hasErrors: boolean) => {
     hasErrorCallback('basics', hasErrors);
   };
 
+  // this is the callback we pass down for each input to update for its error state
+  // it's used in the InputField "hasErrorCallback" attribute
   const customErrorCallbackField = (name: string, hasErrors: boolean) => {
     const newFormErrorsObj: typeof formErrors = { ...formErrors };
 
@@ -59,6 +71,9 @@ const Privacy: React.FC<{
     setFormErrors(newFormErrorsObj);
   };
 
+  // this is the custom error func for password matching
+  // we only need to give this to the basicsPasswordConfirm field
+  // and it goes in the InputField array "validationFuncMessages" attribute
   const customPasswordErrorFunc = () => {
     if (basicsPassword !== basicsPasswordConfirm) {
       return false;
@@ -67,12 +82,17 @@ const Privacy: React.FC<{
     return true;
   };
 
+  // create a separate function just for checking our 18+ checkbox
+  // since we can't handle this the same way as other inputs
   const setFormErrors18Agree = () => {
     setFormErrors({ ...formErrors, basics18Plus: !basics18Plus });
   };
 
+  // special effect just for 18+ checkbox using setFormErrors18Agree
   useEffect(setFormErrors18Agree, [basics18Plus]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
   useEffect(() => {
     customErrorCallback(!Object.values(formErrors).every(v => !v));
   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps

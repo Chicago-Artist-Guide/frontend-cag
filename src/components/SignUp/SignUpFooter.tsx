@@ -38,6 +38,8 @@ const SignUpFooter: React.FC<{
     4. We need to set our form field "privacyAgreement" to true if we Agree & Continue in the Privacy step
     5. We don't want to show our Next button if we're on the last step (Awards)
       - We'll show "Go to Profile" when we tackle that step in development
+    6. We disable the Next button if we have form validation errors or req fields not filled in 
+      - Done using stepErrors prop for current step (stepErrors[step])
   */
   const { next, previous } = navigation;
   const showBackButton = step !== ('landing' as any) || landingStep === 2;

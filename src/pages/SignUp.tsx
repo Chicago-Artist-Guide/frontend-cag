@@ -74,8 +74,13 @@ const defaultData = {
   demographicsBio: ''
 };
 
+// default object to track a boolean true/false for which steps have form validation error states
 const createDefaultStepErrorsObj = (stepNames: any) => {
   const stepErrorsObj: { [key: string]: boolean } = {};
+
+  // default all of our steps to false
+  // because the pages will update this themselves
+  // when errors or empty req fields arise or exist
   stepNames.forEach((stepName: string) => {
     stepErrorsObj[stepName] = false;
   });
@@ -87,6 +92,8 @@ const SignUp = () => {
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
+
+  // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
     createDefaultStepErrorsObj(flatSteps(steps))
   );
@@ -96,6 +103,8 @@ const SignUp = () => {
     steps: flatSteps(steps) as any
   });
 
+  // this large effect deals with conditional steps based on "roles" question
+  // see Rules comment below for details
   useEffect(() => {
     let newSteps = [...steps];
 
@@ -106,7 +115,7 @@ const SignUp = () => {
     const indexForActorInfo2 = newSteps.findIndex(nS => nS.id === 'actorInfo2');
     const indexForActorInfo1 = newSteps.findIndex(nS => nS.id === 'actorInfo1');
 
-    // Rules:
+    // Rules for conditional steps:
     // a. If the user selects "on-stage" then they see actor info 2 but not offstage roles
     // b. If the user selects "off-stage" then they see offstage roles but not actor info 2
     // c. If the user selects "both-stage" then they see both actor info 2 and offstage roles
@@ -148,6 +157,8 @@ const SignUp = () => {
     }
   }, [formData]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // we are just manually assuming they've agreed to this right now
+  // remove once we clean this up
   const setPrivacyAgree = () => {
     const target = {
       name: 'privacyAgreement',
@@ -157,6 +168,7 @@ const SignUp = () => {
     setForm({ target });
   };
 
+  // submit basics to server, get response, set session
   const submitBasics = async () => {
     // set privacy agree even though it won't work for the payload yet
     setPrivacyAgree();
@@ -187,6 +199,7 @@ const SignUp = () => {
   };
 
   // callback function for updating if a step has errors
+  // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
     const newStepErrorsObj = { ...stepErrors };
 
