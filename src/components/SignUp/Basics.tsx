@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
@@ -9,12 +9,14 @@ import { Title } from '../layout/Titles';
 import InputField from '../../genericComponents/Input';
 import Checkbox from '../../genericComponents/Checkbox';
 import { colors } from '../../theme/styleVars';
+import { ErrorMessage } from '../../utils/validation';
 
 const Privacy: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { setForm, formData } = props;
+  const { setForm, formData, hasErrorCallback } = props;
   const {
     basicsFirstName,
     basicsLastName,
@@ -23,56 +25,57 @@ const Privacy: React.FC<{
     basicsPasswordConfirm,
     basics18Plus
   } = formData;
+  const requiredFields = [
+    'basicsFirstName',
+    'basicsLastName',
+    'basicsEmailAddress',
+    'basicsPassword',
+    'basicsPasswordConfirm',
+    'basics18Plus'
+  ];
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
 
-  const passwordErrors = () => {
-    let passwordError = '';
+    requiredFields.forEach((fieldName: string) => {
+      formErrorsObj[fieldName] =
+        formData[fieldName] === '' || formData[fieldName] === false;
+    });
 
-    if (basicsPassword === '') passwordError = '';
-    else if (basicsPassword !== basicsPasswordConfirm) {
-      passwordError = 'Passwords must match';
-    } else if (basicsPassword.length < 8) {
-      passwordError = 'Password must be at least 8 characters';
-    } else if (
-      !basicsPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/)
-    ) {
-      passwordError =
-        'Passwords must contain at least one uppercase letter, number, and special character';
-    }
-    return passwordError;
+    return formErrorsObj;
+  };
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  const customErrorCallback = (hasErrors: boolean) => {
+    hasErrorCallback('basics', hasErrors);
   };
 
-  const firstNameError = () => {
-    if (basicsFirstName === '') {
-      return 'first name is required';
-    }
-  };
+  const customErrorCallbackField = (name: string, hasErrors: boolean) => {
+    const newFormErrorsObj: typeof formErrors = { ...formErrors };
 
-  const lastNameError = () => {
-    if (basicsLastName === '') {
-      return 'last name is required';
-    }
-  };
-
-  const emailAddressError = () => {
-    let emailAddressError = '';
-
-    if (basicsEmailAddress === '') {
-      emailAddressError = 'email required';
-    } else if (
-      // eslint-disable-next-line
-      !basicsEmailAddress.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
-    ) {
-      emailAddressError = 'not valid email format';
+    if (name in newFormErrorsObj) {
+      newFormErrorsObj[name] = hasErrors;
     }
 
-    return emailAddressError;
+    setFormErrors(newFormErrorsObj);
   };
 
-  const check18PlusError = () => {
-    if (basics18Plus === false) {
-      return 'Need to verify over 18';
+  const customPasswordErrorFunc = () => {
+    if (basicsPassword !== basicsPasswordConfirm) {
+      return false;
     }
+
+    return true;
   };
+
+  const setFormErrors18Agree = () => {
+    setFormErrors({ ...formErrors, basics18Plus: !basics18Plus });
+  };
+
+  useEffect(setFormErrors18Agree, [basics18Plus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container>
@@ -81,53 +84,62 @@ const Privacy: React.FC<{
         <Col lg="4">
           <Form>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="First"
               name="basicsFirstName"
               onChange={setForm}
+              required={true}
+              requiredLabel="First name"
               value={basicsFirstName || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {firstNameError()}
-            </span>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="Last"
               name="basicsLastName"
               onChange={setForm}
+              required={true}
+              requiredLabel="Last name"
               value={basicsLastName || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {lastNameError()}
-            </span>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
+              required={true}
+              requiredLabel="Email address"
+              validationRegexMessage={ErrorMessage.EmailFormat}
+              validationRegexName="emailAddress"
               value={basicsEmailAddress || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {emailAddressError()}
-            </span>
             <InputField
               fieldType="password"
+              hasErrorCallback={customErrorCallbackField}
               label="Password"
               name="basicsPassword"
               onChange={setForm}
+              required={true}
+              requiredLabel="Password"
+              validationRegexMessage={ErrorMessage.PasswordsRules}
+              validationRegexName="password"
               value={basicsPassword || ''}
             />
             <PasswordReq>
-              Minimum 8 characters, one uppercase, one lowercase, a number and
-              special character.
+              Minimum 8 characters, one uppercase letter, one lowercase letter,
+              one number, and one special character.
             </PasswordReq>
             <InputField
               fieldType="password"
+              hasErrorCallback={customErrorCallbackField}
               label="Confirm Password"
               name="basicsPasswordConfirm"
               onChange={setForm}
+              required={true}
+              requiredLabel="Password confirmation"
+              validationFuncMessages={[ErrorMessage.PasswordsMatch]}
+              validationFuncs={[customPasswordErrorFunc]}
               value={basicsPasswordConfirm || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {passwordErrors()}
-            </span>
             <Checkbox
               checked={basics18Plus || false}
               fieldType="checkbox"
@@ -135,9 +147,6 @@ const Privacy: React.FC<{
               name="basics18Plus"
               onChange={setForm}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {check18PlusError()}
-            </span>
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>

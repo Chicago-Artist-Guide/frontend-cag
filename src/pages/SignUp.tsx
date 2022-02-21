@@ -74,10 +74,22 @@ const defaultData = {
   demographicsBio: ''
 };
 
+const createDefaultStepErrorsObj = (stepNames: any) => {
+  const stepErrorsObj: { [key: string]: boolean } = {};
+  stepNames.forEach((stepName: string) => {
+    stepErrorsObj[stepName] = false;
+  });
+
+  return stepErrorsObj;
+};
+
 const SignUp = () => {
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
+  const [stepErrors, setStepErrors] = useState(
+    createDefaultStepErrorsObj(flatSteps(steps))
+  );
 
   // defaults for our defaultSteps
   const { step, navigation } = useStep({
@@ -174,6 +186,17 @@ const SignUp = () => {
     }
   };
 
+  // callback function for updating if a step has errors
+  const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
+    const newStepErrorsObj = { ...stepErrors };
+
+    if (step in newStepErrorsObj) {
+      newStepErrorsObj[step] = hasErrors;
+    }
+
+    setStepErrors(newStepErrorsObj);
+  };
+
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
@@ -190,7 +213,9 @@ const SignUp = () => {
         );
         break;
       case 'basics' as any:
-        returnStep = <Basics {...props} />;
+        returnStep = (
+          <Basics {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
         break;
       case 'privacy' as any:
         returnStep = <Privacy {...props} />;
@@ -234,6 +259,7 @@ const SignUp = () => {
             navigation={navigation}
             setLandingStep={setLandingStep}
             step={step}
+            stepErrors={stepErrors}
             steps={steps}
             submitBasics={submitBasics}
           />

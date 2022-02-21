@@ -13,6 +13,7 @@ const SignUpFooter: React.FC<{
   step: any;
   steps: any;
   submitBasics: any;
+  stepErrors: { [key: string]: boolean };
 }> = ({
   landingStep,
   landingType,
@@ -20,7 +21,8 @@ const SignUpFooter: React.FC<{
   setLandingStep,
   step,
   steps,
-  submitBasics
+  submitBasics,
+  stepErrors
 }) => {
   /*
     SPECIAL CASES:
@@ -81,6 +83,7 @@ const SignUpFooter: React.FC<{
       <ButtonCol lg="4">
         {step !== ('awards' as any) && (
           <Button
+            disabled={stepErrors[step]}
             onClick={
               navigationNext
                 ? next
