@@ -197,10 +197,10 @@ const ActorInfo2: React.FC<{
           <Row>
             <Col lg="6">
               <Form.Group>
-                <CAGLabel>
+                <CAGLabelSmaller>
                   I would also be comfortable playing roles usually played by:{' '}
                   <PrivateLabel />
-                </CAGLabel>
+                </CAGLabelSmaller>
 
                 {genderRoles.map(g => (
                   <Checkbox
@@ -218,10 +218,10 @@ const ActorInfo2: React.FC<{
             </Col>
             <Col lg="6">
               <Form.Group>
-                <CAGLabel>
+                <CAGLabelSmaller>
                   I would be comfortable playing a character through all phases
                   of their transition: <PrivateLabel />
-                </CAGLabel>
+                </CAGLabelSmaller>
                 <Checkbox
                   checked={actorInfo2GenderTransition === 'Yes'}
                   fieldType="radio"
@@ -264,6 +264,10 @@ const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+`;
+
+const CAGLabelSmaller = styled(CAGLabel as any)`
+  font-size: 16px;
 `;
 
 export default ActorInfo2;
