@@ -25,7 +25,7 @@ const colors = {
   yellow: '#EFC93D',
   orange: '#E17B60',
   mint: '#3EB489',
-  cornflower: '#4C7180' // TODO: add the right hex value here
+  cornflower: '#4C7180'
 };
 
 const fonts = {

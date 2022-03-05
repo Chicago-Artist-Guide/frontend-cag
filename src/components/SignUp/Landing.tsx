@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
-import { cardHeight, colors } from '../../theme/styleVars';
+import { cardHeight, colors, fonts } from '../../theme/styleVars';
 import Group from '../../images/icons-signup/group.svg';
 import Individual from '../../images/icons-signup/individual.svg';
 import OnStage from '../../images/icons-signup/on-stage.svg';
@@ -316,7 +316,7 @@ const SelectDirections = styled.p`
   text-align: left;
   font-size: 14px/18px;
   letter-spacing: 0.14px;
-  font-family: Montserrat;
+  font: ${fonts.montserrat};
 `;
 
 const LoginLink = styled.p`
@@ -333,7 +333,7 @@ const LoginLink = styled.p`
 
 const CardHeading = styled.h3`
   width: 225px;
-  font-family: Montserrat;
+  font: ${fonts.montserrat}
   font-weight: 500;
   font-size: 24px;
   line-height: 28px;
