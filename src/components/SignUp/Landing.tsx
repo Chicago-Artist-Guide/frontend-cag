@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
-import { cardHeight, colors } from '../../theme/styleVars';
+import { cardHeight, colors, fonts } from '../../theme/styleVars';
 import Group from '../../images/icons-signup/group.svg';
 import Individual from '../../images/icons-signup/individual.svg';
 import OnStage from '../../images/icons-signup/on-stage.svg';
@@ -212,9 +212,14 @@ const Landing: React.FC<{
           </Title>
           <Tagline>
             {landingStep === 1
-              ? 'Join the community today for new opportunities'
+              ? 'Join the community today for new opportunities.'
               : 'On-Stage? Off-Stage? Both?'}
           </Tagline>
+        </Col>
+      </Row>
+      <Row>
+        <Col lg={12}>
+          <SelectDirections>Select one to continue</SelectDirections>
         </Col>
       </Row>
       <Row>
@@ -240,7 +245,8 @@ const Landing: React.FC<{
 const StyledCard = styled(Col)`
   width: 273px;
   height: ${cardHeight};
-  margin-right: 20px;
+  margin-left: 14px;
+  margin-right: 6px;
   box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
   background-color: ${colors.bodyBg};
@@ -306,21 +312,28 @@ const StyledCard = styled(Col)`
   }
 `;
 
-const LoginLink = styled.p`
+const SelectDirections = styled.p`
   text-align: left;
   font-size: 14px/18px;
-  font-style: italic;
+  letter-spacing: 0.14px;
+  font: ${fonts.montserrat};
+`;
+
+const LoginLink = styled.p`
+  text-align: left;
+  font-family: Montserrat;
+  font-size: 14px/18px;
   letter-spacing: 0.14px;
   margin-top: 40px;
 
   a {
-    color: ${colors.orange};
+    color: ${colors.cornflower};
   }
 `;
 
 const CardHeading = styled.h3`
   width: 225px;
-  font-family: Montserrat;
+  font: ${fonts.montserrat}
   font-weight: 500;
   font-size: 24px;
   line-height: 28px;
