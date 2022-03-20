@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import Accordion from 'react-bootstrap/Accordion';
 import { fonts } from '../../theme/styleVars';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -201,6 +202,8 @@ const OffstageRoles: React.FC<{
     setForm({ target });
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <Container>
       <Row>
@@ -211,21 +214,26 @@ const OffstageRoles: React.FC<{
           <TitleFourth>Select all applicable positions</TitleFourth>
         </Col>
       </Row>
-      {Object.keys(offstageRolesObj).map(objKey => {
-        const currObjKey = (offstageRolesObj as any)[objKey as any];
-        const {
-          sectionStateValue,
-          sectionStateName,
-          textHeader,
-          role,
-          checkboxes
-        } = currObjKey;
+      <Row>
+        <Col lg="10">
+          <StyledAccordion defaultActiveKey="0"></StyledAccordion>
+          {Object.keys(offstageRolesObj).map(objKey => {
+            const currObjKey = (offstageRolesObj as any)[objKey as any];
+            if (objKey === 'general') {
+              setIsOpen(!isOpen);
+            }
+            const {
+              sectionStateValue,
+              sectionStateName,
+              textHeader,
+              role,
+              checkboxes
+            } = currObjKey;
 
-        return (
-          <Row key={`accordion-row-${textHeader}`}>
-            <Col lg="10">
+            return (
               <GenericAccordion
-                key={`accordion-${textHeader}`}
+                // eventKey={objI}
+                key={`accordion-item-${textHeader}`}
                 textHeader={textHeader}
               >
                 <Row>
@@ -260,10 +268,10 @@ const OffstageRoles: React.FC<{
                   </ImageCol>
                 </Row>
               </GenericAccordion>
-            </Col>
-          </Row>
-        );
-      })}
+            );
+          })}
+        </Col>
+      </Row>
     </Container>
   );
 };
@@ -282,6 +290,12 @@ const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;
   max-width: 100%;
+`;
+
+const StyledAccordion = styled(Accordion)`
+  box-shadow: 2px 2px 10px #00000029;
+  border-radius: 8px;
+  opacity: 1;
 `;
 
 export default OffstageRoles;
