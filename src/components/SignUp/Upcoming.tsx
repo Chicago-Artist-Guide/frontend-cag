@@ -2,6 +2,11 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import { Col, Form, Row } from 'react-bootstrap';
 import { Tagline, Title } from '../layout/Titles';
+import { colors } from '../../theme/styleVars';
+import Button from '../../genericComponents/Button';
+import { faImage } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import styled from 'styled-components';
 
 const Upcoming: React.FC<{
   setForm: any;
@@ -15,11 +20,23 @@ const Upcoming: React.FC<{
           <Tagline>Promote your next performance!</Tagline>
         </Col>
       </Row>
-      <Row lg="3">
+      <Row lg="8">
         <Col>
-          <Form.Text>Save and add another upcoming feature</Form.Text>
+          <Form.Group>
+            <PhotoContainer>
+              <FontAwesomeIcon className="bod-icon" icon={faImage} size="lg" />
+            </PhotoContainer>
+
+            <Button
+              onClick={() => {}}
+              text="Choose File"
+              type="button"
+              variant="secondary"
+            />
+          </Form.Group>
         </Col>
-        <Form>
+
+        <Col>
           <Form.Group controlId="show-title">
             <Form.Control placeholder="Show Title" type="text" />
           </Form.Group>
@@ -33,10 +50,21 @@ const Upcoming: React.FC<{
           <Form.Group controlId="link-to-site-tickets">
             <Form.Control placeholder="Link to Website/Tickets" type="text" />
           </Form.Group>
-        </Form>
+        </Col>
       </Row>
     </Container>
   );
 };
+
+const PhotoContainer = styled.div`
+  align-items: center;
+  background: ${colors.lightGrey};
+  color: white;
+  display: flex;
+  font-size: 68px;
+  height: 300px;
+  justify-content: center;
+  width: 100%;
+`;
 
 export default Upcoming;
