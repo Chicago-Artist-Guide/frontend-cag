@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -10,6 +10,7 @@ import Checkbox from '../../genericComponents/Checkbox';
 import PrivateLabel from '../../genericComponents/PrivateLabel';
 import { colors, fonts } from '../../theme/styleVars';
 import yellow_blob from '../../images/yellow_blob_2.svg';
+import { ErrorMessage } from '../../utils/validation';
 
 const ageRanges = [
   '18-22',
@@ -38,14 +39,22 @@ const genderRoles = ['Women', 'Men', 'Neither'];
 const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { formData, setForm } = props;
+  const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo2AgeRanges,
     actorInfo2GenderRoles,
     actorInfo2GenderTransition,
     actorInfo2HeightNoAnswer
   } = formData;
+
+  const requiredFields = [
+    'actorInfo2AgeRanges',
+    'actorInfo2GenderRoles',
+    'actorInfo2GenderTransition',
+    'actorInfo2HeightNoAnswer'
+  ];
 
   const isAgeRangeInAgeRanges = (ageRange: string) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
@@ -93,31 +102,65 @@ const ActorInfo2: React.FC<{
 
     setForm({ target });
   };
-  /*
-  const heightError = () => {
-    if (actorInfo2HeightNoAnswer === false) {
-      return 'select height';
-    }
-  };
-*/
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
 
-  const ageError = () => {
-    if (actorInfo2AgeRanges === false) {
-      return 'select age';
-    }
+    requiredFields.forEach((fieldName: string) => {
+      formErrorsObj[fieldName] =
+        formData[fieldName] === '' || formData[fieldName] === false;
+    });
+
+    return formErrorsObj;
   };
 
-  const actorInfo2GenderRolesError = () => {
-    if (actorInfo2GenderRoles === '') {
-      return 'select option';
-    }
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "basics" everywhere
+  const customErrorCallback = (hasErrors: boolean) => {
+    //hasErrorCallback('basics', hasErrors);
+    hasErrorCallback('actorInfo2', hasErrors);
   };
 
-  const actorInfo2GenderTransitionError = () => {
-    if (actorInfo2GenderTransition === '') {
-      return 'select option';
+  // this is the callback we pass down for each input to update for its error state
+  // it's used in the InputField "hasErrorCallback" attribute
+  const customErrorCallbackField = (name: string, hasErrors: boolean) => {
+    const newFormErrorsObj: typeof formErrors = { ...formErrors };
+
+    if (name in newFormErrorsObj) {
+      newFormErrorsObj[name] = hasErrors;
     }
+
+    setFormErrors(newFormErrorsObj);
   };
+
+  const setFormErrorsisGenderRoleInGenderRoles = () => {
+    setFormErrors({
+      ...formErrors,
+      actorInfo2GenderRoles: !actorInfo2GenderRoles
+    });
+  };
+
+  const customactorInfo2GenderTransitionErrorFunc = () => {
+    if (
+      actorInfo2GenderTransition !== 'Yes' ||
+      actorInfo2GenderTransition !== 'No'
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+
+  //special effect for gender roles
+  useEffect(setFormErrorsisGenderRoleInGenderRoles, [actorInfo2GenderRoles]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container>
@@ -184,6 +227,7 @@ const ActorInfo2: React.FC<{
                   <Checkbox
                     checked={isAgeRangeInAgeRanges(ageRange)}
                     fieldType="checkbox"
+                    hasErrorCallback={customErrorCallbackField}
                     key={`age-range-chk-${ageRange}`}
                     label={ageRange}
                     name="actorInfo2AgeRanges"
@@ -193,9 +237,6 @@ const ActorInfo2: React.FC<{
                   />
                 ))}
               </Form.Group>
-              <span style={{ color: 'red', fontSize: '12px' }}>
-                {ageError()}
-              </span>
               <Form.Group>
                 <CAGLabel>
                   Gender Identity <PrivateLabel />
@@ -211,6 +252,8 @@ const ActorInfo2: React.FC<{
                   defaultValue=""
                   name="actorInfo2Gender"
                   onChange={setForm}
+                  required={true}
+                  //requiredLabel="Gender"
                 >
                   <option value={undefined}>Select</option>
                   {genders.map(g => (
@@ -232,20 +275,20 @@ const ActorInfo2: React.FC<{
 
                 {genderRoles.map(g => (
                   <Checkbox
-                    checked={isGenderRoleInGenderRoles(g)}
+                    checked={isGenderRoleInGenderRoles(g) || false}
                     fieldType="checkbox"
+                    hasErrorCallback={customErrorCallbackField}
                     key={`gender-chk-${g}`}
                     label={g}
                     name="actorInfo2GenderRoles"
                     onChange={(e: any) =>
                       genderRoleChange(e.currentTarget.checked, g)
                     }
+                    required={true}
+                    requiredLabel="Gender Roles"
                   />
                 ))}
               </Form.Group>
-              <span style={{ color: 'red', fontSize: '12px' }}>
-                {actorInfo2GenderRolesError()}
-              </span>
             </Col>
             <Col lg="6">
               <Form.Group>
@@ -259,6 +302,8 @@ const ActorInfo2: React.FC<{
                   label="Yes"
                   name="actorInfo2GenderTransition"
                   onChange={setForm}
+                  validationFuncMessages={[ErrorMessage.Default]}
+                  validationFuncs={[customactorInfo2GenderTransitionErrorFunc]}
                   value="Yes"
                 />
                 <Checkbox
@@ -267,12 +312,11 @@ const ActorInfo2: React.FC<{
                   label="No"
                   name="actorInfo2GenderTransition"
                   onChange={setForm}
+                  validationFuncMessages={[ErrorMessage.Default]}
+                  validationFuncs={[customactorInfo2GenderTransitionErrorFunc]}
                   value="No"
                 />
               </Form.Group>
-              <span style={{ color: 'red', fontSize: '12px' }}>
-                {actorInfo2GenderTransitionError()}
-              </span>
             </Col>
           </Row>
         </Col>

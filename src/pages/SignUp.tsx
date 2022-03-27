@@ -234,10 +234,14 @@ const SignUp = () => {
         returnStep = <Privacy {...props} />;
         break;
       case 'actorInfo1' as any:
-        returnStep = <ActorInfo1 {...props} />;
+        returnStep = (
+          <ActorInfo1 {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
         break;
       case 'actorInfo2' as any:
-        returnStep = <ActorInfo2 {...props} />;
+        returnStep = (
+          <ActorInfo2 {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
         break;
       case 'offstageRoles' as any:
         returnStep = <OffstageRoles {...props} />;
