@@ -38,7 +38,7 @@ const PhotoRowContainer = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  max-width: 450px;
+  max-width: 100%;
   overflow: hidden;
 `;
 
@@ -53,8 +53,8 @@ const Row = styled.div`
   max-width: 425px;
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-evenly;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.35rem;
   margin: 1rem 0;
   align-items: center;
 `;

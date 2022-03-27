@@ -1,0 +1,52 @@
+diff a/src/genericComponents/Photo.tsx b/src/genericComponents/Photo.tsx	(rejected hunks)
+@@ -5,9 +5,9 @@ const Photo = (props: any) => {
+-	const { src, text, title } = props;
+-	// function handleClick(e: any) {
+-	// 	console.log('Clicked on: ' + e.target.src);
+-	// }
+-	return (
+-		<PhotoHolder /*onClick={handleClick}*/>
+-			<img alt={text} src={src} title={title} />
+-		</PhotoHolder>
+-	);
++  const { src, text, title } = props;
++  // function handleClick(e: any) {
++  // 	console.log('Clicked on: ' + e.target.src);
++  // }
++  return (
++    <PhotoHolder /*onClick={handleClick}*/>
++      <img alt={text} src={src} title={title} />
++    </PhotoHolder>
++  );
+@@ -17,12 +17,12 @@ const PhotoHolder = styled.div`
+-	height: 95px;
+-	width: 95px;
+-	overflow: hidden;
+-	opacity: 0.7;
+-	transition: opacity 0.3s linear;
+-	cursor: pointer;
+-	--radius: 1rem;
+-	border-radius: var(--radius);
+-	img {
+-		width: 95px;
+-		height: auto;
+-	}
++  height: 95px;
++  width: 95px;
++  overflow: hidden;
++  opacity: 0.7;
++  transition: opacity 0.3s linear;
++  cursor: pointer;
++  --radius: 1rem;
++  border-radius: var(--radius);
++  img {
++    width: 95px;
++    height: auto;
++  }
+@@ -30,3 +30,3 @@ const PhotoHolder = styled.div`
+-	&:hover {
+-		opacity: 1;
+-	}
++  &:hover {
++    opacity: 1;
++  }

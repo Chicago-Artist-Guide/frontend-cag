@@ -14,6 +14,7 @@ import {
   Walton,
   Zacks
 } from '../images/who-we-are/operations'; //TODO: Replace with user images from profile
+import DetailsCard from '../components/layout/DetailsCard';
 
 const Profile: React.FC<{
   previewMode?: boolean;
@@ -60,19 +61,12 @@ const Profile: React.FC<{
             <PhotoRow photos={photos} />
             <Row>EDIT MODE: Edit Photos button</Row>
           </Photos>
-          <Details>
-            Age: [age]
-            <br />
-            Height: [height]
-            <br />
-            Ethnicity: [ethnicity]
-            <br />
-            Union: [union]
-            <br />
-            Gender: [gender]
-            <br />
-            Agency: [agency]
-          </Details>
+          <DetailsCard>
+            <h3>
+              Age: [age] Height: [height] Ethnicity: [ethnicity] Union: [union]
+              Gender: [gender] Agency: [agency]
+            </h3>
+          </DetailsCard>
           <Row>EDIT MODE: Edit Identity Details button</Row>
         </PhotoCol>
         <Col lg={8}>
@@ -168,10 +162,10 @@ const PhotoCol = styled(Col)`
   flex-wrap: nowrap;
   justify-content: center;
   align-items: center;
-`;
 
-const Details = styled.div`
-  margin-left: 136px;
+  .card {
+    width: 100%;
+  }
 `;
 
 export default Profile;

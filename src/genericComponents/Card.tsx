@@ -40,7 +40,6 @@ const CAGCard = styled(BSCard)`
   position: relative;
   right: 0.37%;
   bottom: 0.35%;
-  width: 272px;
   height: 352px;
   border-radius: 8px;
   background-color: #ffffff;

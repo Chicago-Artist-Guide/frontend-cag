@@ -31,6 +31,10 @@ const Cards = styled.div`
     padding-top: 0;
     height: 850px;
 
+    .card {
+      width: 272px;
+    }
+
     .card:nth-of-type(2) {
       margin-bottom: 75px;
     }

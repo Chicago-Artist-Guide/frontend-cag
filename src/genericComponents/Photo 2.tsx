@@ -3,25 +3,27 @@ import styled from 'styled-components';
 
 const Photo = (props: any) => {
   const { src, text, title } = props;
-
+  // function handleClick(e: any) {
+  // 	console.log('Clicked on: ' + e.target.src);
+  // }
   return (
-    <PhotoHolder>
+    <PhotoHolder /*onClick={handleClick}*/>
       <img alt={text} src={src} title={title} />
     </PhotoHolder>
   );
 };
 
 const PhotoHolder = styled.div`
-  height: 125px;
-  width: 125px;
+  height: 95px;
+  width: 95px;
   overflow: hidden;
   opacity: 0.7;
   transition: opacity 0.3s linear;
   cursor: pointer;
-  --radius: 0.5rem;
+  --radius: 1rem;
   border-radius: var(--radius);
   img {
-    width: 125px;
+    width: 95px;
     height: auto;
   }
 
