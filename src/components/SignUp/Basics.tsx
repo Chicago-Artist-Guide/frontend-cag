@@ -55,9 +55,8 @@ const Privacy: React.FC<{
 
   // calls the custom callback for the sign up page errors state object
   // we just make this so we don't need to repeat "basics" everywhere
-  const customErrorCallback = (hasErrors: boolean) => {
+  const customErrorCallback = (hasErrors: boolean) =>
     hasErrorCallback('basics', hasErrors);
-  };
 
   // this is the callback we pass down for each input to update for its error state
   // it's used in the InputField "hasErrorCallback" attribute
