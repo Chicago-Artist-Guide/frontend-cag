@@ -74,6 +74,41 @@ const ActorInfo1: React.FC<{
     'actorInfo1Ethnicities'
   ];
 
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
+
+    requiredFields.forEach((fieldName: string) => {
+      if (Array.isArray(formData[fieldName])) {
+        formErrorsObj[fieldName] = !formData[fieldName].length;
+      } else {
+        formErrorsObj[fieldName] =
+          formData[fieldName] === '' || formData[fieldName] === false;
+      }
+    });
+
+    return formErrorsObj;
+  };
+
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "actorInfo1" everywhere
+  const customErrorCallback = (hasErrors: boolean) =>
+    hasErrorCallback('actorInfo1', hasErrors);
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // re-check there's a value when required fields update
+  useEffect(() => {
+    setFormErrors(createDefaultFormErrorsData());
+  }, [actorInfo1Pronouns, actorInfo1LGBTQ, actorInfo1Ethnicities]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // updating ethnicity fields
   const isEthnicityInEthnicities = (ethnicityType: string) =>
     actorInfo1Ethnicities.indexOf(ethnicityType) > -1;
 
@@ -98,56 +133,6 @@ const ActorInfo1: React.FC<{
     setForm({ target });
   };
 
-  const createDefaultFormErrorsData = () => {
-    const formErrorsObj: { [key: string]: boolean } = {};
-
-    requiredFields.forEach((fieldName: string) => {
-      formErrorsObj[fieldName] =
-        formData[fieldName] === '' || formData[fieldName] === false;
-    });
-
-    return formErrorsObj;
-  };
-
-  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
-  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
-
-  // calls the custom callback for the sign up page errors state object
-  // we just make this so we don't need to repeat "basics" everywhere
-  const customErrorCallback = (hasErrors: boolean) => {
-    //hasErrorCallback('basics', hasErrors);
-    hasErrorCallback('actorInfo1', hasErrors);
-  };
-
-  // this is the callback we pass down for each input to update for its error state
-  // it's used in the InputField "hasErrorCallback" attribute
-  const customErrorCallbackField = (name: string, hasErrors: boolean) => {
-    const newFormErrorsObj: typeof formErrors = { ...formErrors };
-
-    if (name in newFormErrorsObj) {
-      newFormErrorsObj[name] = hasErrors;
-    }
-
-    setFormErrors(newFormErrorsObj);
-  };
-
-  const customactorInfo1LGBTQErrorFunc = () => {
-    if (
-      actorInfo1LGBTQ !== 'Yes' ||
-      actorInfo1LGBTQ !== 'No' ||
-      actorInfo1LGBTQ !== 'I do not wish to respond'
-    ) {
-      return false;
-    }
-    return true;
-  };
-
-  // effect for updating the sign up page errors state for this page
-  // every time formErrors is updated
-  useEffect(() => {
-    customErrorCallback(!Object.values(formErrors).every(v => !v));
-  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <Container>
       <Row>
@@ -164,10 +149,8 @@ const ActorInfo1: React.FC<{
                         aria-label="pronouns"
                         as="select"
                         defaultValue={actorInfo1Pronouns}
-                        //hasErrorCallback={customErrorCallbackField}
                         name="actorInfo1Pronouns"
                         onChange={setForm}
-                        //required={true}
                       >
                         <option value={undefined}>Choose...</option>
                         {pronouns.map(noun => (
@@ -199,31 +182,25 @@ const ActorInfo1: React.FC<{
                 <Checkbox
                   checked={actorInfo1LGBTQ === 'Yes'}
                   fieldType="radio"
-                  hasErrorCallback={customErrorCallbackField}
                   label="Yes"
                   name="actorInfo1LGBTQ"
                   onChange={setForm}
-                  //validationFuncs={[customactorInfo1LGBTQErrorFunc]}
                   value="Yes"
                 />
                 <Checkbox
                   checked={actorInfo1LGBTQ === 'No'}
                   fieldType="radio"
-                  hasErrorCallback={customErrorCallbackField}
                   label="No"
                   name="actorInfo1LGBTQ"
                   onChange={setForm}
-                  //validationFuncs={[customactorInfo1LGBTQErrorFunc]}
                   value="No"
                 />
                 <Checkbox
                   checked={actorInfo1LGBTQ === 'I do not wish to respond'}
                   fieldType="radio"
-                  hasErrorCallback={customErrorCallbackField}
                   label="I do not wish to respond"
                   name="actorInfo1LGBTQ"
                   onChange={setForm}
-                  validationFuncs={[customactorInfo1LGBTQErrorFunc]}
                   value="I do not wish to respond"
                 />
               </Form.Group>
@@ -241,7 +218,6 @@ const ActorInfo1: React.FC<{
                     <Checkbox
                       checked={isEthnicityInEthnicities(eth.name)}
                       fieldType="checkbox"
-                      hasErrorCallback={customErrorCallbackField}
                       key={`first-level-chk-${eth.name}`}
                       label={eth.name}
                       name="actorInfo1Ethnicities"
