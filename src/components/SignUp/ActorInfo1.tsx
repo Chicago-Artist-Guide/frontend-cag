@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 import { Title } from '../layout/Titles';
 import Checkbox from '../../genericComponents/Checkbox';
 import PrivateLabel from '../../genericComponents/PrivateLabel';
@@ -101,12 +101,12 @@ const ActorInfo1: React.FC<{
   // every time formErrors is updated
   useEffect(() => {
     customErrorCallback(!Object.values(formErrors).every(v => !v));
-  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [formErrors]);
 
   // re-check there's a value when required fields update
   useEffect(() => {
     setFormErrors(createDefaultFormErrorsData());
-  }, [actorInfo1Pronouns, actorInfo1LGBTQ, actorInfo1Ethnicities]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [actorInfo1Pronouns, actorInfo1LGBTQ, actorInfo1Ethnicities]);
 
   // updating ethnicity fields
   const isEthnicityInEthnicities = (ethnicityType: string) =>
@@ -275,7 +275,7 @@ const PrivacyPar = styled.p`
   color: ${colors.mainFont};
   font-family: ${fonts.lora};
   font-size: 18px;
-  letter-spacing: 0px;
+  letter-spacing: 0;
   margin-top: 17px;
 `;
 
