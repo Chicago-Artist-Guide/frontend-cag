@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -38,14 +38,52 @@ const genderRoles = ['Women', 'Men', 'Neither'];
 const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { formData, setForm } = props;
+  const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo2AgeRanges,
+    actorInfo2Gender,
     actorInfo2GenderRoles,
     actorInfo2GenderTransition,
     actorInfo2HeightNoAnswer
   } = formData;
+
+  const requiredFields = ['actorInfo2AgeRanges', 'actorInfo2Gender'];
+
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
+
+    requiredFields.forEach((fieldName: string) => {
+      if (Array.isArray(formData[fieldName])) {
+        formErrorsObj[fieldName] = !formData[fieldName].length;
+      } else {
+        formErrorsObj[fieldName] =
+          formData[fieldName] === '' || formData[fieldName] === false;
+      }
+    });
+
+    return formErrorsObj;
+  };
+
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "actorInfo2" everywhere
+  const customErrorCallback = (hasErrors: boolean) =>
+    hasErrorCallback('actorInfo2', hasErrors);
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // re-check there's a value when required fields update
+  useEffect(() => {
+    setFormErrors(createDefaultFormErrorsData());
+  }, [actorInfo2AgeRanges, actorInfo2Gender]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isAgeRangeInAgeRanges = (ageRange: string) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
@@ -201,7 +239,6 @@ const ActorInfo2: React.FC<{
                   I would also be comfortable playing roles usually played by:{' '}
                   <PrivateLabel />
                 </CAGLabelSmaller>
-
                 {genderRoles.map(g => (
                   <Checkbox
                     checked={isGenderRoleInGenderRoles(g)}
