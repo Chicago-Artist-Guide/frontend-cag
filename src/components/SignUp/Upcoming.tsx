@@ -14,19 +14,18 @@ const Upcoming: React.FC<{
 }> = props => {
   return (
     <Container>
-      <Row lg="12">
-        <Col>
+      <Row>
+        <Col lg="12">
           <Title>GOT AN UPCOMING FEATURE?</Title>
           <Tagline>Promote your next performance!</Tagline>
         </Col>
       </Row>
-      <Row lg="8">
-        <Col>
+      <Row>
+        <Col lg="4">
           <Form.Group>
             <PhotoContainer>
               <FontAwesomeIcon className="bod-icon" icon={faImage} size="lg" />
             </PhotoContainer>
-
             <Button
               onClick={() => {}}
               text="Choose File"
@@ -35,12 +34,10 @@ const Upcoming: React.FC<{
             />
           </Form.Group>
         </Col>
-
-        <Col>
+        <Col lg="8">
           <Form.Group controlId="show-title">
             <Form.Control placeholder="Show Title" type="text" />
           </Form.Group>
-
           <Form.Group controlId="show-synopsis">
             <Form.Control as="textarea" placeholder="Show synopsis" />
           </Form.Group>
