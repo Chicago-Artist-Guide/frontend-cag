@@ -24,7 +24,8 @@ const colors = {
   white80a: 'rgba(255, 255, 255, 0.8)',
   yellow: '#EFC93D',
   orange: '#E17B60',
-  mint: '#3EB489' // TODO: add the right hex value here
+  mint: '#3EB489',
+  cornflower: '#4C7180'
 };
 
 const fonts = {

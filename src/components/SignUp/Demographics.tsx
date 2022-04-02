@@ -37,7 +37,6 @@ const Demographics: React.FC<{
     i: any
   ) => {
     // indexing to assign each website value a number
-
     const newWebsiteValues = [...demographicsWebsites];
     newWebsiteValues[i][fieldName] = fieldValue;
 
@@ -163,7 +162,7 @@ const Demographics: React.FC<{
                             value={demographicsWebsites[i]['websiteType']}
                           />
                           {numWebsites > 1 && (
-                            <a href="#" onClick={removeWebsiteInput}>
+                            <a href="#" onClick={() => removeWebsiteInput(i)}>
                               X
                             </a>
                           )}
@@ -172,7 +171,7 @@ const Demographics: React.FC<{
                     ))}
                     <div>
                       <a href="#" onClick={addWebsiteInput}>
-                        Add Website
+                        + Add Website
                       </a>
                     </div>
                   </Col>
