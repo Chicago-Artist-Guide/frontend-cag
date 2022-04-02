@@ -29,7 +29,9 @@ const defaultData = {
 
   pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
-  upcoming: [], // { title, synopsis, industryCode, url, imageUrl }
+  upcoming: [
+    { title: '', synopsis: '', industryCode: '', url: '', imageUrl: '' }
+  ], // { title, synopsis, industryCode, url, imageUrl }
 
   additionalSkillsCheckboxes: [],
   additionalSkillsManual: [],

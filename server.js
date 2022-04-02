@@ -12,7 +12,7 @@ app.post('/api/user/register', function(req, res) {
     last_name: req.body.last_name,
     email: req.body.email,
     active_status: true,
-    session_id: "0x12345",
+    session_id: '0x12345',
     img_url: null,
     agreed_18: true,
     agreed_privacy: true
