@@ -12,7 +12,6 @@ import Individual from '../../images/icons-signup/individual.svg';
 import OnStage from '../../images/icons-signup/on-stage.svg';
 import OffStage from '../../images/icons-signup/off-stage.svg';
 import BothStage from '../../images/icons-signup/both-stage.svg';
-import { Link } from 'react-router-dom';
 
 const Landing: React.FC<{
   setForm: any;
@@ -231,13 +230,6 @@ const Landing: React.FC<{
           </Row>
         </Col>
       </Row>
-      <Row>
-        <Col lg={12}>
-          <LoginLink>
-            Already a member? <Link to="/login">Log in here</Link>
-          </LoginLink>
-        </Col>
-      </Row>
     </Container>
   );
 };
@@ -317,18 +309,6 @@ const SelectDirections = styled.p`
   font-size: 14px/18px;
   letter-spacing: 0.14px;
   font: ${fonts.montserrat};
-`;
-
-const LoginLink = styled.p`
-  text-align: left;
-  font-family: Montserrat;
-  font-size: 14px/18px;
-  letter-spacing: 0.14px;
-  margin-top: 40px;
-
-  a {
-    color: ${colors.cornflower};
-  }
 `;
 
 const CardHeading = styled.h3`
