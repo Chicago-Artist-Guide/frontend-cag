@@ -40,7 +40,7 @@ const Privacy: React.FC<{
             View our full terms and privacy policy
           </TermsPrivacyLink>
           <PrivacyPar>
-            Tap the button below to agree with our terms and privacy policy
+          Tap the green “Accept & Continue” button to agree with our terms and privacy policy.
           </PrivacyPar>
         </Col>
         <ImageCol lg="4">
