@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
@@ -9,19 +9,92 @@ import { Title } from '../layout/Titles';
 import InputField from '../../genericComponents/Input';
 import Checkbox from '../../genericComponents/Checkbox';
 import { colors } from '../../theme/styleVars';
+import { ErrorMessage } from '../../utils/validation';
 
 const Privacy: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { setForm, formData } = props;
+  const { setForm, formData, hasErrorCallback } = props;
   const {
     basicsFirstName,
     basicsLastName,
     basicsEmailAddress,
     basicsPassword,
+    basicsPasswordConfirm,
     basics18Plus
   } = formData;
+
+  // create an array of the required field names
+  const requiredFields = [
+    'basicsFirstName',
+    'basicsLastName',
+    'basicsEmailAddress',
+    'basicsPassword',
+    'basicsPasswordConfirm',
+    'basics18Plus'
+  ];
+
+  // create a default object of required field values for state
+  // the format is: fieldName: true (has error) | false (does not have error)
+  // we default this for now based on if they are empty '' or false
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
+
+    requiredFields.forEach((fieldName: string) => {
+      formErrorsObj[fieldName] =
+        formData[fieldName] === '' || formData[fieldName] === false;
+    });
+
+    return formErrorsObj;
+  };
+
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "basics" everywhere
+  const customErrorCallback = (hasErrors: boolean) =>
+    hasErrorCallback('basics', hasErrors);
+
+  // this is the callback we pass down for each input to update for its error state
+  // it's used in the InputField "hasErrorCallback" attribute
+  const customErrorCallbackField = (name: string, hasErrors: boolean) => {
+    const newFormErrorsObj: typeof formErrors = { ...formErrors };
+
+    if (name in newFormErrorsObj) {
+      newFormErrorsObj[name] = hasErrors;
+    }
+
+    setFormErrors(newFormErrorsObj);
+  };
+
+  // this is the custom error func for password matching
+  // we only need to give this to the basicsPasswordConfirm field
+  // and it goes in the InputField array "validationFuncMessages" attribute
+  const customPasswordErrorFunc = () => {
+    if (basicsPassword !== basicsPasswordConfirm) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // create a separate function just for checking our 18+ checkbox
+  // since we can't handle this the same way as other inputs
+  const setFormErrors18Agree = () => {
+    setFormErrors({ ...formErrors, basics18Plus: !basics18Plus });
+  };
+
+  // special effect just for 18+ checkbox using setFormErrors18Agree
+  useEffect(setFormErrors18Agree, [basics18Plus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container>
@@ -30,29 +103,61 @@ const Privacy: React.FC<{
         <Col lg="4">
           <Form>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="First"
               name="basicsFirstName"
               onChange={setForm}
+              required={true}
+              requiredLabel="First name"
               value={basicsFirstName || ''}
             />
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="Last"
               name="basicsLastName"
               onChange={setForm}
+              required={true}
+              requiredLabel="Last name"
               value={basicsLastName || ''}
             />
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
+              required={true}
+              requiredLabel="Email address"
+              validationRegexMessage={ErrorMessage.EmailFormat}
+              validationRegexName="emailAddress"
               value={basicsEmailAddress || ''}
             />
             <InputField
               fieldType="password"
+              hasErrorCallback={customErrorCallbackField}
               label="Password"
               name="basicsPassword"
               onChange={setForm}
+              required={true}
+              requiredLabel="Password"
+              validationRegexMessage={ErrorMessage.PasswordsRules}
+              validationRegexName="password"
               value={basicsPassword || ''}
+            />
+            <PasswordReq>
+              Minimum 8 characters, one uppercase letter, one lowercase letter,
+              one number, and one special character.
+            </PasswordReq>
+            <InputField
+              fieldType="password"
+              hasErrorCallback={customErrorCallbackField}
+              label="Confirm Password"
+              name="basicsPasswordConfirm"
+              onChange={setForm}
+              required={true}
+              requiredLabel="Password confirmation"
+              validationFuncMessages={[ErrorMessage.PasswordsMatch]}
+              validationFuncs={[customPasswordErrorFunc]}
+              value={basicsPasswordConfirm || ''}
             />
             <Checkbox
               checked={basics18Plus || false}
@@ -87,6 +192,11 @@ const LoginLink = styled.p`
   a {
     color: ${colors.orange};
   }
+`;
+
+const PasswordReq = styled.p`
+  font-size: 10px;
+  font-style: italic;
 `;
 
 export default Privacy;

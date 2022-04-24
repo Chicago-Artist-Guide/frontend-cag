@@ -1,6 +1,6 @@
 import axios, { AxiosPromise } from 'axios';
 
-const base = 'https://cag-backend-api.herokuapp.com/';
+const base = 'http://Test-env.eba-r3h3emtw.us-east-2.elasticbeanstalk.com/';
 const headers = {
   authKey: 'mockAuthKey'
 };

@@ -6,13 +6,12 @@ import Col from 'react-bootstrap/Col';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Image from 'react-bootstrap/Image';
 import { Tagline, Title } from '../layout/Titles';
-import { cardHeight, colors } from '../../theme/styleVars';
+import { cardHeight, colors, fonts } from '../../theme/styleVars';
 import Group from '../../images/icons-signup/group.svg';
 import Individual from '../../images/icons-signup/individual.svg';
 import OnStage from '../../images/icons-signup/on-stage.svg';
 import OffStage from '../../images/icons-signup/off-stage.svg';
 import BothStage from '../../images/icons-signup/both-stage.svg';
-import { Link } from 'react-router-dom';
 
 const Landing: React.FC<{
   setForm: any;
@@ -20,7 +19,7 @@ const Landing: React.FC<{
   landingStep: any;
   setLandingStep: any;
 }> = ({ setForm, formData, landingStep, setLandingStep }) => {
-  const { landingType, performType } = formData;
+  const { landingType, stageRole } = formData;
 
   const Card: React.FC<{
     icon: any;
@@ -47,7 +46,7 @@ const Landing: React.FC<{
     if (landingStep === 1) {
       selected = landingType === name;
     } else {
-      selected = performType === name;
+      selected = stageRole === name;
     }
 
     return (
@@ -135,13 +134,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'performType',
+          name: 'stageRole',
           value: 'on-stage'
         },
         input: (
           <ToggleButton
-            checked={performType === 'on-stage'}
-            name="performType"
+            checked={stageRole === 'on-stage'}
+            name="stageRole"
             onChange={setForm}
             type="radio"
             value="on-stage"
@@ -160,13 +159,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'performType',
+          name: 'stageRole',
           value: 'off-stage'
         },
         input: (
           <ToggleButton
-            checked={performType === 'off-stage'}
-            name="performType"
+            checked={stageRole === 'off-stage'}
+            name="stageRole"
             onChange={setForm}
             type="radio"
             value="off-stage"
@@ -185,13 +184,13 @@ const Landing: React.FC<{
         ),
         setForm,
         target: {
-          name: 'performType',
+          name: 'stageRole',
           value: 'both-stage'
         },
         input: (
           <ToggleButton
-            checked={performType === 'both-stage'}
-            name="performType"
+            checked={stageRole === 'both-stage'}
+            name="stageRole"
             onChange={setForm}
             type="radio"
             value="both-stage"
@@ -212,9 +211,14 @@ const Landing: React.FC<{
           </Title>
           <Tagline>
             {landingStep === 1
-              ? 'Join the community today for new opportunities'
+              ? 'Join the community today for new opportunities.'
               : 'On-Stage? Off-Stage? Both?'}
           </Tagline>
+        </Col>
+      </Row>
+      <Row>
+        <Col lg={12}>
+          <SelectDirections>Select one to continue</SelectDirections>
         </Col>
       </Row>
       <Row>
@@ -226,13 +230,6 @@ const Landing: React.FC<{
           </Row>
         </Col>
       </Row>
-      <Row>
-        <Col lg={12}>
-          <LoginLink>
-            Already a member? <Link to="/login">Log in here</Link>
-          </LoginLink>
-        </Col>
-      </Row>
     </Container>
   );
 };
@@ -240,7 +237,8 @@ const Landing: React.FC<{
 const StyledCard = styled(Col)`
   width: 273px;
   height: ${cardHeight};
-  margin-right: 20px;
+  margin-left: 14px;
+  margin-right: 6px;
   box-shadow: 2px 2px 10px rgba(0, 0, 29, 0.1);
   border-radius: 8px;
   background-color: ${colors.bodyBg};
@@ -306,21 +304,16 @@ const StyledCard = styled(Col)`
   }
 `;
 
-const LoginLink = styled.p`
+const SelectDirections = styled.p`
   text-align: left;
   font-size: 14px/18px;
-  font-style: italic;
   letter-spacing: 0.14px;
-  margin-top: 40px;
-
-  a {
-    color: ${colors.orange};
-  }
+  font: ${fonts.montserrat};
 `;
 
 const CardHeading = styled.h3`
   width: 225px;
-  font-family: Montserrat;
+  font: ${fonts.montserrat}
   font-weight: 500;
   font-size: 24px;
   line-height: 28px;

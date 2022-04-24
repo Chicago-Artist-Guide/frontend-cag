@@ -16,6 +16,11 @@ const Checkbox = (props: any) => {
 const CAGCheckbox = styled(Form.Group)`
   label {
     font: ${fonts.mainFont} ${colors.mainFont};
+    font-weight: 400;
+  }
+  checkbox {
+    height: 25px;
+    width: 25px;
   }
 `;
 
