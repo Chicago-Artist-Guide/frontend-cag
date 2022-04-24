@@ -36,7 +36,7 @@ const defaultData = {
   additionalSkillsCheckboxes: [],
   additionalSkillsManual: [],
 
-  awards: [] // { title, year, url, description }
+  awards: [{ title: '', year: '', url:'', description:''}] // { title, year, url, description }
 };
 
 const SignUp2 = () => {

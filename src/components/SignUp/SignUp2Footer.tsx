@@ -13,6 +13,7 @@ const SignUpFooter: React.FC<{
   const { next, previous } = navigation;
   const showBackButton = step !== ('training' as any);
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
+  const showContinueButton = step !== ('awards' as any);
 
   return (
     <PageFooterRow>
@@ -39,13 +40,21 @@ const SignUpFooter: React.FC<{
         </Pagination>
       </Col>
       <ButtonCol lg="4">
-        {step !== ('awards' as any) && (
+        {showContinueButton && (
           <Button
             onClick={next}
             text="Continue"
             type="button"
             variant="primary"
           />
+        )}
+        {!showContinueButton && (
+        <Button
+          onClick={next}
+          text="Go to Profile"
+          type="button"
+          variant="primary"
+        />
         )}
       </ButtonCol>
     </PageFooterRow>
