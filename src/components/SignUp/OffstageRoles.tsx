@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Accordion from 'react-bootstrap/Accordion';
 import { fonts } from '../../theme/styleVars';
@@ -202,8 +202,6 @@ const OffstageRoles: React.FC<{
     setForm({ target });
   };
 
-  const [isOpen, setIsOpen] = useState(false);
-
   return (
     <Container>
       <Row>
@@ -216,60 +214,58 @@ const OffstageRoles: React.FC<{
       </Row>
       <Row>
         <Col lg="10">
-          <StyledAccordion defaultActiveKey="0"></StyledAccordion>
-          {Object.keys(offstageRolesObj).map(objKey => {
-            const currObjKey = (offstageRolesObj as any)[objKey as any];
-            if (objKey === 'general') {
-              setIsOpen(!isOpen);
-            }
-            const {
-              sectionStateValue,
-              sectionStateName,
-              textHeader,
-              role,
-              checkboxes
-            } = currObjKey;
+          <StyledAccordion defaultActiveKey="0">
+            {Object.keys(offstageRolesObj).map((objKey, objI) => {
+              const currObjKey = (offstageRolesObj as any)[objKey as any];
+              const {
+                sectionStateValue,
+                sectionStateName,
+                textHeader,
+                role,
+                checkboxes
+              } = currObjKey;
 
-            return (
-              <GenericAccordion
-                // eventKey={objI}
-                key={`accordion-item-${textHeader}`}
-                textHeader={textHeader}
-              >
-                <Row>
-                  <Col lg="7">
-                    {checkboxes.map((chk: { label: any; value: any }) => {
-                      const { label: chkLabel, value: chkValue } = chk;
+              return (
+                <GenericAccordion
+                  eventKey={objI}
+                  key={`accordion-item-${textHeader}`}
+                  textHeader={textHeader}
+                >
+                  <Row>
+                    <Col lg="7">
+                      {checkboxes.map((chk: { label: any; value: any }) => {
+                        const { label: chkLabel, value: chkValue } = chk;
 
-                      return (
-                        <Checkbox
-                          checked={isRoleInRolesSection(
-                            sectionStateValue,
-                            chk.value
-                          )}
-                          fieldType="checkbox"
-                          key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
-                          label={chkLabel}
-                          onChange={(e: any) =>
-                            rolesSectionChange(
-                              e.currentTarget.checked,
-                              role,
-                              sectionStateName,
-                              sectionStateValue
-                            )
-                          }
-                          value={chkValue}
-                        />
-                      );
-                    })}
-                  </Col>
-                  <ImageCol lg="4">
-                    <Image src={yellow_blob_1} />
-                  </ImageCol>
-                </Row>
-              </GenericAccordion>
-            );
-          })}
+                        return (
+                          <Checkbox
+                            checked={isRoleInRolesSection(
+                              sectionStateValue,
+                              chk.value
+                            )}
+                            fieldType="checkbox"
+                            key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
+                            label={chkLabel}
+                            onChange={(e: any) =>
+                              rolesSectionChange(
+                                e.currentTarget.checked,
+                                role,
+                                sectionStateName,
+                                sectionStateValue
+                              )
+                            }
+                            value={chkValue}
+                          />
+                        );
+                      })}
+                    </Col>
+                    <ImageCol lg="4">
+                      <Image src={yellow_blob_1} />
+                    </ImageCol>
+                  </Row>
+                </GenericAccordion>
+              );
+            })}
+          </StyledAccordion>
         </Col>
       </Row>
     </Container>
