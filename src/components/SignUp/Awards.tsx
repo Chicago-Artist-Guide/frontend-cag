@@ -14,10 +14,10 @@ const Awards: React.FC<{
   const { setForm, formData } = props;
   const { awards } = formData;
 
-  // add options for year dropdown 
+  // add options for year dropdown
   const yearOptions = [] as any[];
-  for(let i = 1949; i < 2023; i++) {
-    yearOptions.push(i)
+  for (let i = 1949; i < 2023; i++) {
+    yearOptions.push(i);
   }
 
   const onAwardInputChange = (
@@ -41,7 +41,7 @@ const Awards: React.FC<{
 
     newAwardInputs.push({
       title: '',
-      year: '', 
+      year: '',
       url: '',
       description: ''
     });
@@ -83,11 +83,7 @@ const Awards: React.FC<{
                   as="input"
                   name="title"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'title',
-                      i
-                    )
+                    onAwardInputChange(e.target.value || '', 'title', i)
                   }
                   placeholder="Award or Recognition"
                   value={awards[i]['title']}
@@ -96,28 +92,22 @@ const Awards: React.FC<{
                   as="select"
                   name="year"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'year',
-                      i
-                    )
+                    onAwardInputChange(e.target.value || '', 'year', i)
                   }
                   value={awards[i]['year']}
                 >
-                <option value="" selected disabled>Year Received</option>
-                {yearOptions.map(year => {
-                  return <option value={year}>{year}</option>
-                })}
+                  <option disabled selected value="">
+                    Year Received
+                  </option>
+                  {yearOptions.map(year => {
+                    return <option value={year}>{year}</option>;
+                  })}
                 </CAGFormControl>
                 <CAGFormControl
                   as="input"
                   name="url"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'url',
-                      i
-                    )
+                    onAwardInputChange(e.target.value || '', 'url', i)
                   }
                   placeholder="Web Link"
                   value={awards[i]['url']}
@@ -128,27 +118,30 @@ const Awards: React.FC<{
                   as="textarea"
                   name="description"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'description',
-                      i
-                    )
+                    onAwardInputChange(e.target.value || '', 'description', i)
                   }
                   placeholder="Description/Notes"
                   rows={6}
                   value={awards[i]['description']}
                 />
               </Col>
-            {numAwards > 1 && (
-              <CAGButton>
-                 <button className="delete" onClick={() => removeAwardInput(i)}>x</button>
-                 <p>Delete recognition</p>
-              </CAGButton>
-            )}
+              {numAwards > 1 && (
+                <CAGButton>
+                  <button
+                    className="delete"
+                    onClick={() => removeAwardInput(i)}
+                  >
+                    x
+                  </button>
+                  <p>Delete recognition</p>
+                </CAGButton>
+              )}
             </div>
           ))}
           <CAGButton>
-            <button className="add" onClick={addAwardInput}>+</button>
+            <button className="add" onClick={addAwardInput}>
+              +
+            </button>
             <p>Add another recognition</p>
           </CAGButton>
         </Col>
@@ -163,8 +156,8 @@ const CAGButton = styled.div`
     border: none;
     background-color: unset;
     cursor: pointer;
-    
-    &.add { 
+
+    &.add {
       color: ${colors.darkGreen};
       font-size: 30px;
     }
@@ -179,7 +172,7 @@ const CAGButton = styled.div`
     font-family: ${fonts.mainFont};
     display: inline;
   }
-`
+`;
 
 const CAGFormControl = styled(Form.Control)`
   margin-top: 2em;
@@ -190,8 +183,5 @@ const CAGFormControl = styled(Form.Control)`
   padding-left: 10px;
   width: 100%;
 `;
-
-
-
 
 export default Awards;

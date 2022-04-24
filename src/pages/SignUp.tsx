@@ -1,7 +1,11 @@
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, addDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { useAuthValue } from '../context/AuthContext';
+import { useFirebaseContext } from '../context/FirebaseContext';
 import PageContainer from '../components/layout/PageContainer';
 import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
@@ -13,8 +17,6 @@ import OffstageRoles from '../components/SignUp/OffstageRoles';
 import ProfilePhoto from '../components/SignUp/ProfilePhoto';
 import Demographics from '../components/SignUp/Demographics';
 import Profile from '../pages/Profile';
-import { submitSignUpStep } from '../api/endpoints';
-import { setSessionCookie } from '../utils/session';
 
 // Establish our steps
 const defaultSteps = [
@@ -89,6 +91,8 @@ const createDefaultStepErrorsObj = (stepNames: any) => {
 };
 
 const SignUp = () => {
+  const { currentUser } = useAuthValue();
+  const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
@@ -170,7 +174,7 @@ const SignUp = () => {
 
   // submit basics to server, get response, set session
   const submitBasics = async () => {
-    // set privacy agree even though it won't work for the payload yet
+    // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
 
     const {
@@ -181,21 +185,29 @@ const SignUp = () => {
       basics18Plus
     } = formData;
 
-    try {
-      const getResp = await submitSignUpStep({
-        basicsFirstName,
-        basicsLastName,
-        basicsEmailAddress,
-        basicsPassword,
-        basics18Plus,
-        privacyAgreement: true // must be set manually for now
-      });
+    await createUserWithEmailAndPassword(
+      firebaseAuth,
+      basicsEmailAddress,
+      basicsPassword
+    )
+      .then(async res => {
+        try {
+          const userId = res.user.uid;
 
-      console.log(getResp);
-      setSessionCookie({ ...getResp });
-    } catch (err) {
-      console.log(err);
-    }
+          await addDoc(collection(firebaseFirestore, 'accounts'), {
+            basics_18_plus: basics18Plus,
+            first_name: basicsFirstName,
+            last_name: basicsLastName,
+            privacy_agreement: true,
+            uid: userId
+          });
+        } catch (e) {
+          console.error('Error adding document:', e);
+        }
+      })
+      .catch(err => {
+        console.log('Error creating user:', err);
+      });
   };
 
   // callback function for updating if a step has errors
