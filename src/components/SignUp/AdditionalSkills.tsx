@@ -97,7 +97,7 @@ const AdditionalSkills: React.FC<{
           <Title>ANY SPECIAL SKILLS?</Title>
           <CAGTagline>Tell us more about what you can do.</CAGTagline>
           {/* checkbox default skills*/}
-          <Form.Group>
+          <CAGFormGroup>
             <BoldP>I am interested in roles that require:</BoldP>
             {skillCheckboxes.map(skill => (
               <CAGCheckbox
@@ -111,10 +111,9 @@ const AdditionalSkills: React.FC<{
                 }
               />
             ))}
-          </Form.Group>
-          <br />
+          </CAGFormGroup>
           {/* manually entered skills */}
-          <Form.Group>
+          <CAGFormGroup>
             <BoldP>Additional Skills</BoldP>
             <CAGInput>
               <input
@@ -140,7 +139,7 @@ const AdditionalSkills: React.FC<{
                 </CAGTag>
               ))}
             </CAGContainer>
-          </Form.Group>
+          </CAGFormGroup>
         </Col>
       </Row>
     </Container>
@@ -217,6 +216,10 @@ const CAGTagline = styled(Tagline)`
 
 const CAGCheckbox = styled(Checkbox)`
   color: ${colors.secondaryFontColor};
+`;
+
+const CAGFormGroup = styled(Form.Group)`
+  margin-bottom: 2em;
 `;
 
 export default AdditionalSkills;
