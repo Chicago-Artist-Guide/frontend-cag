@@ -96,7 +96,6 @@ const SignUp = () => {
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
-  const [userId, setUserId] = useState<any>(null);
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -192,35 +191,24 @@ const SignUp = () => {
       basicsPassword
     )
       .then(async res => {
-        console.log(res.user);
-        setUserId(res.user.uid);
-
         try {
-          const docRef = await addDoc(
-            collection(firebaseFirestore, 'accounts'),
-            {
-              basics_18_plus: basics18Plus,
-              first_name: basicsFirstName,
-              last_name: basicsLastName,
-              privacy_agreement: true,
-              uid: res.user.uid
-            }
-          );
+          const userId = res.user.uid;
 
-          console.log('userId', userId);
-          console.log('Document written with ID:', docRef.id);
+          await addDoc(collection(firebaseFirestore, 'accounts'), {
+            basics_18_plus: basics18Plus,
+            first_name: basicsFirstName,
+            last_name: basicsLastName,
+            privacy_agreement: true,
+            uid: userId
+          });
         } catch (e) {
           console.error('Error adding document:', e);
         }
       })
       .catch(err => {
-        console.log(err);
+        console.log('Error creating user:', err);
       });
   };
-
-  useEffect(() => {
-    console.log('currentUser changed', currentUser);
-  }, [currentUser]);
 
   // callback function for updating if a step has errors
   // we pass this down in the "hasErrorCallback" prop for the step

@@ -40,8 +40,6 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MID
 };
 
-console.log(firebaseConfig);
-
 const CAG = () => (
   <Router>
     <ScrollToTop />
