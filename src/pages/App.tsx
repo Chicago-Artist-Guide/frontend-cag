@@ -1,3 +1,8 @@
+import { initializeApp } from 'firebase/app';
+import { getAnalytics } from 'firebase/analytics';
+import { getAuth } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 import React from 'react';
 import {
   Redirect,
@@ -5,6 +10,7 @@ import {
   BrowserRouter as Router,
   Switch
 } from 'react-router-dom';
+import { FirebaseContext } from '../context/FirebaseContext';
 import Home from './Home';
 import Donate from './Donate';
 import FAQ from './FAQ';
@@ -22,6 +28,18 @@ import Footer from '../components/layout/Footer';
 import ScrollToTop from '../components/ScrollToTop';
 import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
+
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
+  authDomain: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
+  storageBucket: `${process.env.REACT_APP_FIREBASE_PROJECT_ID}.appspot.com`,
+  messagingSenderId: process.env.REACT_APP_FIREBASE_SENDER_ID,
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
+  measurementId: process.env.REACT_APP_FIREBASE_MID
+};
+
+console.log(firebaseConfig);
 
 const CAG = () => (
   <Router>
@@ -51,10 +69,28 @@ const CAG = () => (
   </Router>
 );
 
-const App = () => (
-  <main id="cag-frontend-app">
-    <CAG />
-  </main>
-);
+const App = () => {
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+  const storage = getStorage(app);
+
+  return (
+    <FirebaseContext.Provider
+      value={{
+        firebaseApp: app,
+        firebaseAnalytics: analytics,
+        firebaseAuth: auth,
+        firebaseFirestore: firestore,
+        firebaseStorage: storage
+      }}
+    >
+      <main id="cag-frontend-app">
+        <CAG />
+      </main>
+    </FirebaseContext.Provider>
+  );
+};
 
 export default App;
