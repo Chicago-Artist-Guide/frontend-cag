@@ -35,7 +35,7 @@ const ProfilePhoto: React.FC<{
             </Col>
             <ButtonCol lg="4">
               <Button
-                onClick={() => {}}
+                onClick={() => null}
                 text="Choose File"
                 type="button"
                 variant="secondary"

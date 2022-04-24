@@ -84,7 +84,7 @@ const Upcoming: React.FC<{
                 />
               </PhotoContainer>
               <Button
-                onClick={() => {}}
+                onClick={() => null}
                 text="Choose File"
                 type="button"
                 variant="secondary"

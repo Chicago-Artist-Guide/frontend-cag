@@ -1,15 +1,16 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { getAuth } from 'firebase/auth';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Redirect,
   Route,
   BrowserRouter as Router,
   Switch
 } from 'react-router-dom';
+import { AuthProvider } from '../context/AuthContext';
 import { FirebaseContext } from '../context/FirebaseContext';
 import Home from './Home';
 import Donate from './Donate';
@@ -70,11 +71,16 @@ const CAG = () => (
 );
 
 const App = () => {
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
   const firestore = getFirestore(app);
   const storage = getStorage(app);
+
+  useEffect(() => {
+    onAuthStateChanged(auth, user => setCurrentUser(user));
+  }, []);
 
   return (
     <FirebaseContext.Provider
@@ -86,9 +92,11 @@ const App = () => {
         firebaseStorage: storage
       }}
     >
-      <main id="cag-frontend-app">
-        <CAG />
-      </main>
+      <AuthProvider value={{ currentUser }}>
+        <main id="cag-frontend-app">
+          <CAG />
+        </main>
+      </AuthProvider>
     </FirebaseContext.Provider>
   );
 };
