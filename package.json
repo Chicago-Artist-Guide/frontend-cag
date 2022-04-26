@@ -30,7 +30,7 @@
     "react-redux": "^7.2.1",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^5.0.0",
+    "react-scripts": "^5.0.1",
     "react-transition-group": "^4.4.1",
     "react-view-slider": "^4.3.2",
     "styled-bootstrap-grid": "^3.1.0",
@@ -55,7 +55,7 @@
     "typescript": "^3.9.7"
   },
   "scripts": {
-    "start": "react-scripts start & node server",
+    "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -113,6 +113,5 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "proxy": "http://localhost:5000"
+  }
 }
