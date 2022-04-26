@@ -172,7 +172,7 @@ const SignUp = () => {
     setForm({ target });
   };
 
-  // submit basics to server, get response, set session
+  // submit basics to Firebase, get response, set session
   const submitBasics = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
