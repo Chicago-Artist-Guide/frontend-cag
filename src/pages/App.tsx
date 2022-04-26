@@ -12,6 +12,7 @@ import {
 } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
 import { FirebaseContext } from '../context/FirebaseContext';
+import { ProfileContext } from '../context/ProfileContext';
 import Home from './Home';
 import Donate from './Donate';
 import FAQ from './FAQ';
@@ -70,6 +71,8 @@ const CAG = () => (
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [accountRef, setAccountRef] = useState<any>(null);
+  const [profileRef, setProfileRef] = useState<any>(null);
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
@@ -79,6 +82,11 @@ const App = () => {
   useEffect(() => {
     onAuthStateChanged(auth, user => setCurrentUser(user));
   }, []);
+
+  useEffect(() => {
+    // get user account doc if exists
+    // get user profile doc if exists
+  }, [currentUser]);
 
   return (
     <FirebaseContext.Provider
@@ -90,10 +98,14 @@ const App = () => {
         firebaseStorage: storage
       }}
     >
-      <AuthProvider value={{ currentUser }}>
-        <main id="cag-frontend-app">
-          <CAG />
-        </main>
+      <AuthProvider value={{ currentUser, setCurrentUser }}>
+        <ProfileContext.Provider
+          value={{ accountRef, setAccountRef, profileRef, setProfileRef }}
+        >
+          <main id="cag-frontend-app">
+            <CAG />
+          </main>
+        </ProfileContext.Provider>
       </AuthProvider>
     </FirebaseContext.Provider>
   );

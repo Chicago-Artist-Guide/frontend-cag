@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useAuthValue } from '../context/AuthContext';
 import { useFirebaseContext } from '../context/FirebaseContext';
+import { useProfileContext } from '../context/ProfileContext';
 import PageContainer from '../components/layout/PageContainer';
 import SignUpFooter from '../components/SignUp/SignUpFooter';
 import Landing from '../components/SignUp/Landing';
@@ -91,8 +91,8 @@ const createDefaultStepErrorsObj = (stepNames: any) => {
 };
 
 const SignUp = () => {
-  const { currentUser } = useAuthValue();
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
+  const { setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
@@ -172,7 +172,7 @@ const SignUp = () => {
     setForm({ target });
   };
 
-  // submit basics to server, get response, set session
+  // submit basics to Firebase, get response, set session
   const submitBasics = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
@@ -182,7 +182,8 @@ const SignUp = () => {
       basicsLastName,
       basicsEmailAddress,
       basicsPassword,
-      basics18Plus
+      basics18Plus,
+      stageRole
     } = formData;
 
     await createUserWithEmailAndPassword(
@@ -194,13 +195,28 @@ const SignUp = () => {
         try {
           const userId = res.user.uid;
 
-          await addDoc(collection(firebaseFirestore, 'accounts'), {
-            basics_18_plus: basics18Plus,
-            first_name: basicsFirstName,
-            last_name: basicsLastName,
-            privacy_agreement: true,
-            uid: userId
-          });
+          const accountRef = await addDoc(
+            collection(firebaseFirestore, 'accounts'),
+            {
+              basics_18_plus: basics18Plus,
+              first_name: basicsFirstName,
+              last_name: basicsLastName,
+              privacy_agreement: true,
+              uid: userId
+            }
+          );
+
+          const profileRef = await addDoc(
+            collection(firebaseFirestore, 'profiles'),
+            {
+              uuid: userId,
+              account_id: accountRef.id,
+              stage_role: stageRole
+            }
+          );
+
+          setAccountRef(accountRef);
+          setProfileRef(profileRef);
         } catch (e) {
           console.error('Error adding document:', e);
         }
