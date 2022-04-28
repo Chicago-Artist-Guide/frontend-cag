@@ -1,11 +1,8 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import PageContainer from '../components/layout/PageContainer';
-import PhotoRow from '../components/layout/PhotoRow';
+import Button from '../genericComponents/Button';
 import styled from 'styled-components';
-import { Tagline } from '../components/layout/Titles';
 import {
   Jewell,
   Moorman,
@@ -14,7 +11,13 @@ import {
   Walton,
   Zacks
 } from '../images/who-we-are/operations'; //TODO: Replace with user images from profile
-import DetailsCard from '../components/layout/DetailsCard';
+import {
+  DetailsCard,
+  PageContainer,
+  PhotoContainer,
+  ProfileCard,
+  Tagline
+} from '../components/layout';
 
 const Profile: React.FC<{
   previewMode?: boolean;
@@ -52,99 +55,54 @@ const Profile: React.FC<{
     }
   ];
 
+  const about = [
+    {
+      id: 1,
+      age: '25-29',
+      height: "5'6",
+      ethnicity: 'N/A',
+      gender: 'NB',
+      union: 'SAG',
+      agency: 'none'
+    }
+  ];
+
+  const profile = [
+    {
+      id: 1,
+      name: 'John Johnson',
+      pronouns: 'he/him',
+      titles: 'Actor, Singer',
+      bio: 'Lorem ipsum',
+      institution: 'University of Illinois',
+      certification: 'BFA, Dance',
+      description: 'Dancem ipsum',
+      upTitle: 'Wicked',
+      upDesc: 'Witchem ipsum',
+      upCode: 'TICKETTOOZ',
+      upWeb: 'www.tickettooz.com',
+      skills: 'Dancing, Singing, Acting',
+      credits:
+        'John Johnson (2017), Custodian #2, The Antheum Theater, Chicago, IL, Website: website, Director: That Guy, Musical Director: That Gal, Recognition: That Thing',
+      awards: 'Best Actor, Best Actress'
+    }
+  ];
+
   return (
     <PageContainer>
       <Tagline>Your Profile</Tagline>
       <Row style={{ columnGap: '1rem', flexWrap: 'nowrap' }}>
         <PhotoCol lg={4}>
           <Photos>
-            <PhotoRow photos={photos} />
-            <Row>EDIT MODE: Edit Photos button</Row>
+            <PhotoContainer photos={photos} />
+            <Button>EDIT MODE: Edit Photos button</Button>
           </Photos>
-          <DetailsCard>
-            <h3>
-              Age: [age] Height: [height] Ethnicity: [ethnicity] Union: [union]
-              Gender: [gender] Agency: [agency]
-            </h3>
-          </DetailsCard>
-          <Row>EDIT MODE: Edit Identity Details button</Row>
+          <DetailsCard about={about} />
+          <Button>EDIT MODE: Edit Identity Details button</Button>
         </PhotoCol>
         <Col lg={8}>
-          <Row>EDIT MODE: Save Profile button</Row>
-          Name, pronouns
-          <br />
-          Titles, EDIT MODE: Edit Titles button
-          <br />
-          EDIT MODE: Add Production Titles button
-          <br />
-          Bio write-up
-          <br />
-          (paragraphs)
-          <br />
-          Training
-          <br />
-          Institution
-          <br />
-          Location - Degree/Certification
-          <br />
-          Description
-          <br />
-          EDIT MODE: Add Training button
-          <br />
-          Upcoming Performances
-          <Row>
-            <Col lg={3}>Poster image (left)</Col>
-            <Col lg={6}>
-              Title(right)
-              <br />
-              Description
-              <br />
-              Industry Code
-              <br />
-              Website
-            </Col>
-            EDIT MODE: Add Upcoming button
-          </Row>
-          Additional Skills
-          <br />
-          (tags)
-          <br />
-          EDIT MODE: Add Additional Skills button
-          <br />
-          Credits
-          <br />
-          Name (date)
-          <br />
-          Theater
-          <br />
-          Location
-          <br />
-          Role
-          <br />
-          Website
-          <br />
-          Director
-          <br />
-          Musical Director
-          <br />
-          Recognition
-          <br />
-          EDIT MODE: Add Credits button
-          <br />
-          Awards & Recognitions
-          <br />
-          (card)Award Title
-          <br />
-          Award Role
-          <br />
-          EDIT MODE: Add Awards & Recognitions button
-          <br />
-          {previewMode && (
-            <>
-              <p>Preview Mode</p>
-              <Link to="/sign-up-2">Continue to Sign Up 2</Link>
-            </>
-          )}
+          <Button>EDIT MODE: Save Profile button</Button>
+          <ProfileCard profile={profile} />
         </Col>
       </Row>
     </PageContainer>

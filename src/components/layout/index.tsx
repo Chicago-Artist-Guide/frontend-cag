@@ -7,6 +7,8 @@ import ForTheatres from './ForTheatres';
 import Header from './Header';
 import InTouch from './InTouch';
 import PageContainer from './PageContainer';
+import PhotoContainer from './PhotoContainer';
+import ProfileCard from './ProfileCard';
 import { Tagline, Title, TitleThree, TitleTwo } from './Titles';
 
 export {
@@ -19,6 +21,8 @@ export {
   Header,
   InTouch,
   PageContainer,
+  PhotoContainer,
+  ProfileCard,
   Tagline,
   Title,
   TitleThree,

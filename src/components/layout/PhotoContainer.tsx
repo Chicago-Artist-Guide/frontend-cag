@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Photo from '../../genericComponents/Photo';
 import { Birkner } from '../../images/who-we-are/operations';
 
-const PhotoRow = (props: any) => {
+const PhotoContainer = (props: any) => {
   const { photos } = props;
 
   function handleClick(e: any) {
@@ -59,4 +59,4 @@ const Row = styled.div`
   align-items: center;
 `;
 
-export default PhotoRow;
+export default PhotoContainer;
