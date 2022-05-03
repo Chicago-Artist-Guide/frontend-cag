@@ -1,4 +1,5 @@
 import blueBlob from './blue_blob.svg';
+import CFA from './CFAPoster.png';
 import footerBackground from './footer-background.png';
 import greenBlob from './green_blob.svg';
 import homeDance from './home_dance.svg';
@@ -14,6 +15,7 @@ import yellowBlob2 from './yellow_blob_2.svg';
 
 export {
   blueBlob,
+  CFA,
   footerBackground,
   greenBlob,
   homeDance,

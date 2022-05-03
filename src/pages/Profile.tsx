@@ -67,27 +67,6 @@ const Profile: React.FC<{
     }
   ];
 
-  const profile = [
-    {
-      id: 1,
-      name: 'John Johnson',
-      pronouns: 'he/him',
-      titles: 'Actor, Singer',
-      bio: 'Lorem ipsum',
-      institution: 'University of Illinois',
-      certification: 'BFA, Dance',
-      description: 'Dancem ipsum',
-      upTitle: 'Wicked',
-      upDesc: 'Witchem ipsum',
-      upCode: 'TICKETTOOZ',
-      upWeb: 'www.tickettooz.com',
-      skills: 'Dancing, Singing, Acting',
-      credits:
-        'John Johnson (2017), Custodian #2, The Antheum Theater, Chicago, IL, Website: website, Director: That Guy, Musical Director: That Gal, Recognition: That Thing',
-      awards: 'Best Actor, Best Actress'
-    }
-  ];
-
   return (
     <PageContainer>
       <Tagline>Your Profile</Tagline>
@@ -95,14 +74,12 @@ const Profile: React.FC<{
         <PhotoCol lg={4}>
           <Photos>
             <PhotoContainer photos={photos} />
-            <Button>EDIT MODE: Edit Photos button</Button>
+            <Button>Edit Photos</Button>
           </Photos>
           <DetailsCard about={about} />
-          <Button>EDIT MODE: Edit Identity Details button</Button>
         </PhotoCol>
         <Col lg={8}>
-          <Button>EDIT MODE: Save Profile button</Button>
-          <ProfileCard profile={profile} />
+          <ProfileCard />
         </Col>
       </Row>
     </PageContainer>
@@ -118,7 +95,7 @@ const PhotoCol = styled(Col)`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
 
   .card {
