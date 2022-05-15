@@ -153,7 +153,6 @@ const InputField = (props: any) => {
 };
 
 const CAGInput = styled(Form.Group)`
-  box-shadow: 0px 13px 21px -10px rgba(0, 0, 0, 0);
   margin: 0px;
 `;
 
