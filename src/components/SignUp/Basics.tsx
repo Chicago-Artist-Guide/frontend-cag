@@ -159,7 +159,7 @@ const Privacy: React.FC<{
               validationFuncs={[customPasswordErrorFunc]}
               value={basicsPasswordConfirm || ''}
             />
-            <Checkbox
+            <CAGCheckbox
               checked={basics18Plus || false}
               fieldType="checkbox"
               label="I confirm that I am at least 18 years of age or older"
@@ -197,6 +197,10 @@ const LoginLink = styled.p`
 const PasswordReq = styled.p`
   font-size: 10px;
   font-style: italic;
+`;
+
+const CAGCheckbox = styled(Checkbox)`
+  margin-top: 2em;
 `;
 
 export default Privacy;
