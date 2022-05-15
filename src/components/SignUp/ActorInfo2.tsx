@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -39,6 +39,7 @@ const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
 }> = props => {
+  const [cisChosen, setCisChosen] = useState(false);
   const { formData, setForm } = props;
   const {
     actorInfo2AgeRanges,
@@ -46,6 +47,13 @@ const ActorInfo2: React.FC<{
     actorInfo2GenderTransition,
     actorInfo2HeightNoAnswer
   } = formData;
+
+  const genderSelection = (e: any) => {
+    if (e.target.value !== 'Cis Male' || 'Cis Female') setCisChosen(true);
+    else {
+      setCisChosen(false);
+    }
+  };
 
   const isAgeRangeInAgeRanges = (ageRange: string) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
@@ -182,7 +190,7 @@ const ActorInfo2: React.FC<{
                   as="select"
                   defaultValue=""
                   name="actorInfo2Gender"
-                  onChange={setForm}
+                  onChange={genderSelection}
                 >
                   <option value={undefined}>Select</option>
                   {genders.map(g => (
@@ -194,53 +202,56 @@ const ActorInfo2: React.FC<{
               </Form.Group>
             </Col>
           </Row>
-          <Row>
-            <Col lg="6">
-              <Form.Group>
-                <CAGLabel>
-                  I would also be comfortable playing roles usually played by:{' '}
-                  <PrivateLabel />
-                </CAGLabel>
+          {cisChosen && (
+            <Row>
+              <Col lg="6">
+                <Form.Group>
+                  <CAGLabel>
+                    I would also be comfortable playing roles usually played by:{' '}
+                    <PrivateLabel />
+                  </CAGLabel>
 
-                {genderRoles.map(g => (
+                  {genderRoles.map(g => (
+                    <Checkbox
+                      checked={isGenderRoleInGenderRoles(g)}
+                      fieldType="checkbox"
+                      key={`gender-chk-${g}`}
+                      label={g}
+                      name="actorInfo2GenderRoles"
+                      onChange={(e: any) =>
+                        genderRoleChange(e.currentTarget.checked, g)
+                      }
+                    />
+                  ))}
+                </Form.Group>
+              </Col>
+
+              <Col lg="6">
+                <Form.Group>
+                  <CAGLabel>
+                    I would be comfortable playing a character through all
+                    phases of their transition: <PrivateLabel />
+                  </CAGLabel>
                   <Checkbox
-                    checked={isGenderRoleInGenderRoles(g)}
-                    fieldType="checkbox"
-                    key={`gender-chk-${g}`}
-                    label={g}
-                    name="actorInfo2GenderRoles"
-                    onChange={(e: any) =>
-                      genderRoleChange(e.currentTarget.checked, g)
-                    }
+                    checked={actorInfo2GenderTransition === 'Yes'}
+                    fieldType="radio"
+                    label="Yes"
+                    name="actorInfo2GenderTransition"
+                    onChange={setForm}
+                    value="Yes"
                   />
-                ))}
-              </Form.Group>
-            </Col>
-            <Col lg="6">
-              <Form.Group>
-                <CAGLabel>
-                  I would be comfortable playing a character through all phases
-                  of their transition: <PrivateLabel />
-                </CAGLabel>
-                <Checkbox
-                  checked={actorInfo2GenderTransition === 'Yes'}
-                  fieldType="radio"
-                  label="Yes"
-                  name="actorInfo2GenderTransition"
-                  onChange={setForm}
-                  value="Yes"
-                />
-                <Checkbox
-                  checked={actorInfo2GenderTransition === 'No'}
-                  fieldType="radio"
-                  label="No"
-                  name="actorInfo2GenderTransition"
-                  onChange={setForm}
-                  value="No"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+                  <Checkbox
+                    checked={actorInfo2GenderTransition === 'No'}
+                    fieldType="radio"
+                    label="No"
+                    name="actorInfo2GenderTransition"
+                    onChange={setForm}
+                    value="No"
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
         </Col>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
