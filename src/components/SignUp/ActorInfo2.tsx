@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -43,17 +43,23 @@ const ActorInfo2: React.FC<{
   const { formData, setForm } = props;
   const {
     actorInfo2AgeRanges,
+    actorInfo2Gender,
     actorInfo2GenderRoles,
     actorInfo2GenderTransition,
     actorInfo2HeightNoAnswer
   } = formData;
 
-  const genderSelection = (e: any) => {
-    if (e.target.value !== 'Cis Male' || 'Cis Female') setCisChosen(true);
-    else {
+  useEffect(() => {
+    if (
+      actorInfo2Gender === 'Trans Male' ||
+      'Trans Female' ||
+      'Non Binary/Agender'
+    ) {
+      setCisChosen(true);
+    } else {
       setCisChosen(false);
     }
-  };
+  }, [actorInfo2Gender]);
 
   const isAgeRangeInAgeRanges = (ageRange: string) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
@@ -190,7 +196,7 @@ const ActorInfo2: React.FC<{
                   as="select"
                   defaultValue=""
                   name="actorInfo2Gender"
-                  onChange={genderSelection}
+                  onChange={setForm}
                 >
                   <option value={undefined}>Select</option>
                   {genders.map(g => (
