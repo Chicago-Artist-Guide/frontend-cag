@@ -40,7 +40,6 @@ import Rebollar from '../../images/who-we-are/technical/Staff_Rebollar.jpg';
 import Turner from '../../images/who-we-are/technical/Staff_Turner.png';
 import Walters from '../../images/who-we-are/technical/Staff_Walters.png';
 import Wilson from '../../images/who-we-are/technical/Staff_Wilson.jpg';
-// import { NodePlusFill } from 'react-bootstrap-icons';
 
 const bios = {
   board: [
