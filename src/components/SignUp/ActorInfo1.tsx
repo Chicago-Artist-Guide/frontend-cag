@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 import { Title } from '../layout/Titles';
 import Checkbox from '../../genericComponents/Checkbox';
 import PrivateLabel from '../../genericComponents/PrivateLabel';
@@ -59,14 +59,56 @@ const ethnicityTypes = [
 const ActorInfo1: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { formData, setForm } = props;
+  const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo1Pronouns,
     actorInfo1LGBTQ,
     actorInfo1Ethnicities
   } = formData;
 
+  const requiredFields = [
+    'actorInfo1Pronouns',
+    'actorInfo1LGBTQ',
+    'actorInfo1Ethnicities'
+  ];
+
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
+
+    requiredFields.forEach((fieldName: string) => {
+      if (Array.isArray(formData[fieldName])) {
+        formErrorsObj[fieldName] = !formData[fieldName].length;
+      } else {
+        formErrorsObj[fieldName] =
+          formData[fieldName] === '' || formData[fieldName] === false;
+      }
+    });
+
+    return formErrorsObj;
+  };
+
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "actorInfo1" everywhere
+  const customErrorCallback = (hasErrors: boolean) =>
+    hasErrorCallback('actorInfo1', hasErrors);
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]);
+
+  // re-check there's a value when required fields update
+  useEffect(() => {
+    setFormErrors(createDefaultFormErrorsData());
+  }, [actorInfo1Pronouns, actorInfo1LGBTQ, actorInfo1Ethnicities]);
+
+  // updating ethnicity fields
   const isEthnicityInEthnicities = (ethnicityType: string) =>
     actorInfo1Ethnicities.indexOf(ethnicityType) > -1;
 
@@ -233,7 +275,7 @@ const PrivacyPar = styled.p`
   color: ${colors.mainFont};
   font-family: ${fonts.lora};
   font-size: 18px;
-  letter-spacing: 0px;
+  letter-spacing: 0;
   margin-top: 17px;
 `;
 

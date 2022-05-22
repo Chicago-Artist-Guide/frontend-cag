@@ -1,14 +1,23 @@
+import { signOut } from 'firebase/auth';
 import React, { useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import Cookies from 'js-cookie';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { useFirebaseContext } from '../context/FirebaseContext';
 import PageContainer from '../components/layout/PageContainer';
 import { Title } from '../components/layout/Titles';
 
 const Logout = () => {
+  const { firebaseAuth } = useFirebaseContext();
+
   useEffect(() => {
-    Cookies.remove('session');
+    signOut(firebaseAuth)
+      .then(() => {
+        console.log('Sign out successful');
+      })
+      .catch(err => {
+        console.log('Sign out error', err);
+      });
   }, []);
 
   return (

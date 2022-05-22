@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
@@ -9,12 +9,14 @@ import { Title } from '../layout/Titles';
 import InputField from '../../genericComponents/Input';
 import Checkbox from '../../genericComponents/Checkbox';
 import { colors } from '../../theme/styleVars';
+import { ErrorMessage } from '../../utils/validation';
 
 const Privacy: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { setForm, formData } = props;
+  const { setForm, formData, hasErrorCallback } = props;
   const {
     basicsFirstName,
     basicsLastName,
@@ -24,55 +26,75 @@ const Privacy: React.FC<{
     basics18Plus
   } = formData;
 
-  const passwordErrors = () => {
-    let passwordError = '';
+  // create an array of the required field names
+  const requiredFields = [
+    'basicsFirstName',
+    'basicsLastName',
+    'basicsEmailAddress',
+    'basicsPassword',
+    'basicsPasswordConfirm',
+    'basics18Plus'
+  ];
 
-    if (basicsPassword === '') passwordError = '';
-    else if (basicsPassword !== basicsPasswordConfirm) {
-      passwordError = 'Passwords must match';
-    } else if (basicsPassword.length < 8) {
-      passwordError = 'Password must be at least 8 characters';
-    } else if (
-      !basicsPassword.match(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/)
-    ) {
-      passwordError =
-        'Passwords must contain at least one uppercase letter, number, and special character';
-    }
-    return passwordError;
+  // create a default object of required field values for state
+  // the format is: fieldName: true (has error) | false (does not have error)
+  // we default this for now based on if they are empty '' or false
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
+
+    requiredFields.forEach((fieldName: string) => {
+      formErrorsObj[fieldName] =
+        formData[fieldName] === '' || formData[fieldName] === false;
+    });
+
+    return formErrorsObj;
   };
 
-  const firstNameError = () => {
-    if (basicsFirstName === '') {
-      return 'first name is required';
-    }
-  };
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
 
-  const lastNameError = () => {
-    if (basicsLastName === '') {
-      return 'last name is required';
-    }
-  };
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "basics" everywhere
+  const customErrorCallback = (hasErrors: boolean) =>
+    hasErrorCallback('basics', hasErrors);
 
-  const emailAddressError = () => {
-    let emailAddressError = '';
+  // this is the callback we pass down for each input to update for its error state
+  // it's used in the InputField "hasErrorCallback" attribute
+  const customErrorCallbackField = (name: string, hasErrors: boolean) => {
+    const newFormErrorsObj: typeof formErrors = { ...formErrors };
 
-    if (basicsEmailAddress === '') {
-      emailAddressError = 'email required';
-    } else if (
-      // eslint-disable-next-line
-      !basicsEmailAddress.match(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/)
-    ) {
-      emailAddressError = 'not valid email format';
+    if (name in newFormErrorsObj) {
+      newFormErrorsObj[name] = hasErrors;
     }
 
-    return emailAddressError;
+    setFormErrors(newFormErrorsObj);
   };
 
-  const check18PlusError = () => {
-    if (basics18Plus === false) {
-      return 'Need to verify over 18';
+  // this is the custom error func for password matching
+  // we only need to give this to the basicsPasswordConfirm field
+  // and it goes in the InputField array "validationFuncMessages" attribute
+  const customPasswordErrorFunc = () => {
+    if (basicsPassword !== basicsPasswordConfirm) {
+      return false;
     }
+
+    return true;
   };
+
+  // create a separate function just for checking our 18+ checkbox
+  // since we can't handle this the same way as other inputs
+  const setFormErrors18Agree = () => {
+    setFormErrors({ ...formErrors, basics18Plus: !basics18Plus });
+  };
+
+  // special effect just for 18+ checkbox using setFormErrors18Agree
+  useEffect(setFormErrors18Agree, [basics18Plus]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <Container>
@@ -81,63 +103,69 @@ const Privacy: React.FC<{
         <Col lg="4">
           <Form>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="First"
               name="basicsFirstName"
               onChange={setForm}
+              required={true}
+              requiredLabel="First name"
               value={basicsFirstName || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {firstNameError()}
-            </span>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="Last"
               name="basicsLastName"
               onChange={setForm}
+              required={true}
+              requiredLabel="Last name"
               value={basicsLastName || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {lastNameError()}
-            </span>
             <InputField
+              hasErrorCallback={customErrorCallbackField}
               label="Email Address"
               name="basicsEmailAddress"
               onChange={setForm}
+              required={true}
+              requiredLabel="Email address"
+              validationRegexMessage={ErrorMessage.EmailFormat}
+              validationRegexName="emailAddress"
               value={basicsEmailAddress || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {emailAddressError()}
-            </span>
             <InputField
               fieldType="password"
+              hasErrorCallback={customErrorCallbackField}
               label="Password"
               name="basicsPassword"
               onChange={setForm}
+              required={true}
+              requiredLabel="Password"
+              validationRegexMessage={ErrorMessage.PasswordsRules}
+              validationRegexName="password"
               value={basicsPassword || ''}
             />
             <PasswordReq>
-              Minimum 8 characters, one uppercase, one lowercase, a number and
-              special character.
+              Minimum 8 characters, one uppercase letter, one lowercase letter,
+              one number, and one special character.
             </PasswordReq>
             <InputField
               fieldType="password"
+              hasErrorCallback={customErrorCallbackField}
               label="Confirm Password"
               name="basicsPasswordConfirm"
               onChange={setForm}
+              required={true}
+              requiredLabel="Password confirmation"
+              validationFuncMessages={[ErrorMessage.PasswordsMatch]}
+              validationFuncs={[customPasswordErrorFunc]}
               value={basicsPasswordConfirm || ''}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {passwordErrors()}
-            </span>
-            <Checkbox
+            <CAGCheckbox
               checked={basics18Plus || false}
               fieldType="checkbox"
               label="I confirm that I am at least 18 years of age or older"
               name="basics18Plus"
               onChange={setForm}
             />
-            <span style={{ color: 'red', fontSize: '12px' }}>
-              {check18PlusError()}
-            </span>
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>
@@ -169,6 +197,10 @@ const LoginLink = styled.p`
 const PasswordReq = styled.p`
   font-size: 10px;
   font-style: italic;
+`;
+
+const CAGCheckbox = styled(Checkbox)`
+  margin-top: 2em;
 `;
 
 export default Privacy;
