@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -39,7 +39,6 @@ const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
 }> = props => {
-  const [cisChosen, setCisChosen] = useState(false);
   const { formData, setForm } = props;
   const {
     actorInfo2AgeRanges,
@@ -48,18 +47,6 @@ const ActorInfo2: React.FC<{
     actorInfo2GenderTransition,
     actorInfo2HeightNoAnswer
   } = formData;
-
-  useEffect(() => {
-    if (
-      actorInfo2Gender === 'Trans Male' ||
-      'Trans Female' ||
-      'Non Binary/Agender'
-    ) {
-      setCisChosen(true);
-    } else {
-      setCisChosen(false);
-    }
-  }, [actorInfo2Gender]);
 
   const isAgeRangeInAgeRanges = (ageRange: string) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
@@ -208,7 +195,7 @@ const ActorInfo2: React.FC<{
               </Form.Group>
             </Col>
           </Row>
-          {cisChosen && (
+          {actorInfo2Gender !== '' && !actorInfo2Gender.includes('Cis') && (
             <Row>
               <Col lg="6">
                 <Form.Group>
