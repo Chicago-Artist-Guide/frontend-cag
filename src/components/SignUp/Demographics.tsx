@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -10,14 +10,19 @@ import { Title } from '../layout/Titles';
 import { Tagline, TitleThree } from '../layout/Titles';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 
-/*const unions = [
-  'I.A.T.S.E.',
-  'United Scenic Artists',
-  "Actors' Equity Association",
-  'Stage Directors and Choreographers Society',
-  "Actors' Equity Association - EMC",
-  'Non-Union'
-];*/
+const websiteTypeOptions = [
+  'Personal/Portfolio',
+  'Blog',
+  'Media',
+  'Social - Linktree',
+  'Social - Instagram',
+  'Social - Twitter',
+  'Social - YouTube',
+  'Social - LinkedIn',
+  'Social - Facebook',
+  'Social - TikTok',
+  'Social - Other'
+];
 
 const Demographics: React.FC<{
   setForm: any;
@@ -28,40 +33,48 @@ const Demographics: React.FC<{
     demographicsUnionStatus, // checkboxes for Unions or non-union
     demographicsAgency,
     demographicsWebsites // { url: string, websiteType: string }
-    // demographicsBio
   } = formData;
+  const [websiteId, setWebsiteId] = useState(1);
 
   const onWebsiteInputChange = (
     fieldValue: string,
     fieldName: string,
-    i: any
+    id: any
   ) => {
-    // indexing to assign each website value a number
     const newWebsiteValues = [...demographicsWebsites];
-    newWebsiteValues[i][fieldName] = fieldValue;
+    const findIndex = newWebsiteValues.findIndex(web => web.id === id);
+    newWebsiteValues[findIndex][fieldName] = fieldValue;
 
     const target = {
       name: 'demographicsWebsites',
       value: newWebsiteValues
     };
+
     setForm({ target });
   };
 
-  const removeWebsiteInput = (i: any) => {
+  const removeWebsiteInput = (e: any, id: any) => {
+    e.preventDefault();
+
     const newWebsiteValues = [...demographicsWebsites];
-    newWebsiteValues.splice(i, 1);
+    const findIndex = newWebsiteValues.findIndex(web => web.id === id);
+    newWebsiteValues.splice(findIndex, 1);
+
     const target = {
       name: 'demographicsWebsites',
       value: newWebsiteValues
     };
+
     setForm({ target });
   };
 
   const addWebsiteInput = (e: any) => {
     e.preventDefault();
+    const newWebsiteId = websiteId + 1;
     const newWebsiteInputs = [...demographicsWebsites];
 
     newWebsiteInputs.push({
+      id: newWebsiteId,
       url: '',
       websiteType: ''
     });
@@ -71,6 +84,7 @@ const Demographics: React.FC<{
       value: newWebsiteInputs
     };
 
+    setWebsiteId(newWebsiteId);
     setForm({ target });
   };
 
@@ -96,19 +110,17 @@ const Demographics: React.FC<{
                       onChange={setForm}
                     >
                       <option value={undefined}>Select</option>
-                      <option value={undefined}>Union</option>
-                      <option value={undefined}>Non-Union</option>
-                      <option value={undefined}>Other</option>
+                      <option value="Union">Union</option>
+                      <option value="Non-Union">Non-Union</option>
+                      <option value="Other">Other</option>
                     </Form.Control>
                   </Col>
                   <Col lg="5">
                     <Form.Control
                       aria-label="union"
                       defaultValue=""
-                      disabled={
-                        demographicsUnionStatus === 'Other' ? false : true
-                      }
-                      name="demographicsUnionStatus"
+                      disabled={demographicsUnionStatus !== 'Other'}
+                      name="demographicsUnionStatusOther"
                       onChange={setForm}
                       placeholder="Other"
                     ></Form.Control>
@@ -134,8 +146,8 @@ const Demographics: React.FC<{
               <Container>
                 <Row>
                   <Col lg="10">
-                    {demographicsWebsites.map((websiteRow: number, i: any) => (
-                      <div key={`website-row-${i}`}>
+                    {demographicsWebsites.map((websiteRow: any, i: any) => (
+                      <div key={`website-row-${websiteRow.id}`}>
                         <Col lg="12">
                           <InputField
                             label="URL"
@@ -144,25 +156,36 @@ const Demographics: React.FC<{
                               onWebsiteInputChange(
                                 e.target.value || '',
                                 'url',
-                                i
+                                websiteRow.id
                               )
                             }
-                            value={demographicsWebsites[i]['url']}
+                            value={websiteRow.url}
                           />
-                          <InputField
-                            label="Type"
+                          <Form.Control
+                            aria-label="website type"
+                            as="select"
+                            defaultValue={websiteRow.websiteType}
                             name="websiteType"
                             onChange={(e: any) =>
                               onWebsiteInputChange(
                                 e.target.value || '',
                                 'websiteType',
-                                i
+                                websiteRow.id
                               )
                             }
-                            value={demographicsWebsites[i]['websiteType']}
-                          />
+                          >
+                            <option value={undefined}>Select Type</option>
+                            {websiteTypeOptions.map(wT => (
+                              <option value={wT}>{wT}</option>
+                            ))}
+                          </Form.Control>
                           {numWebsites > 1 && (
-                            <a href="#" onClick={() => removeWebsiteInput(i)}>
+                            <a
+                              href="#"
+                              onClick={(e: any) =>
+                                removeWebsiteInput(e, websiteRow.id)
+                              }
+                            >
                               X
                             </a>
                           )}

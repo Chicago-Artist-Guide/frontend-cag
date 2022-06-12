@@ -5,6 +5,9 @@ import Col from 'react-bootstrap/Col';
 import Button from '../../genericComponents/Button';
 import { colors } from '../../theme/styleVars';
 
+// for dev
+const FORM_VALIDATION_ON = false;
+
 const SignUpFooter: React.FC<{
   landingStep: any;
   landingType: string;
@@ -85,7 +88,7 @@ const SignUpFooter: React.FC<{
       <ButtonCol lg="4">
         {step !== ('awards' as any) && (
           <Button
-            disabled={stepErrors[step]}
+            disabled={stepErrors[step] && FORM_VALIDATION_ON}
             onClick={
               navigationNext
                 ? next

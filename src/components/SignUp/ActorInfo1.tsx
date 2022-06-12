@@ -53,6 +53,10 @@ const ethnicityTypes = [
   {
     name: 'White',
     values: []
+  },
+  {
+    name: 'I do not wish to respond',
+    values: []
   }
 ];
 
@@ -165,8 +169,8 @@ const ActorInfo1: React.FC<{
                       <Form.Control
                         aria-label="pronouns"
                         defaultValue=""
-                        disabled={actorInfo1Pronouns === 'Other' ? false : true}
-                        name="actorInfo1Pronouns"
+                        disabled={actorInfo1Pronouns !== 'Other'}
+                        name="actorInfo1PronounsOther"
                         onChange={setForm}
                       ></Form.Control>
                     </Col>
