@@ -49,12 +49,12 @@ const SignUpFooter: React.FC<{
           />
         )}
         {!showContinueButton && (
-        <Button
-          onClick={next}
-          text="Go to Profile"
-          type="button"
-          variant="primary"
-        />
+          <Button
+            onClick={next}
+            text="Go to Profile"
+            type="button"
+            variant="primary"
+          />
         )}
       </ButtonCol>
     </PageFooterRow>
