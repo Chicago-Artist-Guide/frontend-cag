@@ -74,7 +74,7 @@ const defaultData = {
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
   demographicsAgency: '',
-  demographicsWebsites: [{ url: '', websiteType: '' }], // { url, websiteType }
+  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
   demographicsBio: ''
 };
 

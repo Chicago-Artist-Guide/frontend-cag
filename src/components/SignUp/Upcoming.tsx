@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { faImage } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
@@ -15,15 +15,17 @@ const Upcoming: React.FC<{
 }> = props => {
   const { setForm, formData } = props;
   const { upcoming } = formData;
+  const [showId, setShowId] = useState(1);
 
   const onUpcomingInputChange = (
     fieldValue: string,
     fieldName: string,
-    i: any
+    id: any
   ) => {
     // indexing to assign each upcoming show value a number
     const newUpcomingShowValues = [...upcoming];
-    newUpcomingShowValues[i][fieldName] = fieldValue;
+    const findIndex = newUpcomingShowValues.findIndex(show => show.id === id);
+    newUpcomingShowValues[findIndex][fieldName] = fieldValue;
 
     const target = {
       name: 'upcoming',
@@ -33,9 +35,11 @@ const Upcoming: React.FC<{
     setForm({ target });
   };
 
-  const removeUpcomingInput = (i: any) => {
+  const removeUpcomingInput = (e: any, id: any) => {
+    e.preventDefault();
     const newUpcomingShowValues = [...upcoming];
-    newUpcomingShowValues.splice(i, 1);
+    const findIndex = newUpcomingShowValues.findIndex(show => show.id === id);
+    newUpcomingShowValues.splice(findIndex, 1);
 
     const target = {
       name: 'upcoming',
@@ -48,10 +52,15 @@ const Upcoming: React.FC<{
   const addUpcomingInput = (e: any) => {
     e.preventDefault();
     const newUpcomingShowValues = [...upcoming];
+    const newShowId = showId + 1;
 
     newUpcomingShowValues.push({
+      id: newShowId,
+      title: '',
+      synopsis: '',
+      industryCode: '',
       url: '',
-      websiteType: ''
+      imageUrl: ''
     });
 
     const target = {
@@ -59,6 +68,7 @@ const Upcoming: React.FC<{
       value: newUpcomingShowValues
     };
 
+    setShowId(newShowId);
     setForm({ target });
   };
 
@@ -72,8 +82,8 @@ const Upcoming: React.FC<{
           <Tagline>Promote your next performance!</Tagline>
         </Col>
       </Row>
-      {upcoming.map((upcomingRow: number, i: any) => (
-        <Row key={`upcoming-show-row-${i}`}>
+      {upcoming.map((upcomingRow: any, i: any) => (
+        <Row key={`upcoming-show-row-${upcomingRow.id}`}>
           <Col lg="4">
             <Form.Group>
               <PhotoContainer>
@@ -96,40 +106,59 @@ const Upcoming: React.FC<{
               label="Show Title"
               name="title"
               onChange={(e: any) =>
-                onUpcomingInputChange(e.target.value || '', 'title', i)
+                onUpcomingInputChange(
+                  e.target.value || '',
+                  'title',
+                  upcomingRow.id
+                )
               }
-              value={upcoming[i]['title'] || ''}
+              value={upcomingRow.title}
             />
             <Form.Group controlId="show-synopsis">
               <Form.Control
                 as="textarea"
                 name="synopsis"
                 onChange={(e: any) =>
-                  onUpcomingInputChange(e.target.value || '', 'synopsis', i)
+                  onUpcomingInputChange(
+                    e.target.value || '',
+                    'synopsis',
+                    upcomingRow.id
+                  )
                 }
                 placeholder="Show Synopsis"
-                value={upcoming[i]['synopsis'] || ''}
+                value={upcomingRow.synopsis}
               />
             </Form.Group>
             <InputField
               label="Industry Code"
               name="industryCode"
               onChange={(e: any) =>
-                onUpcomingInputChange(e.target.value || '', 'industryCode', i)
+                onUpcomingInputChange(
+                  e.target.value || '',
+                  'industryCode',
+                  upcomingRow.id
+                )
               }
-              value={upcoming[i]['industryCode'] || ''}
+              value={upcomingRow.industryCode}
             />
             <InputField
               label="Link to Website/Tickets"
               name="url"
               onChange={(e: any) =>
-                onUpcomingInputChange(e.target.value || '', 'url', i)
+                onUpcomingInputChange(
+                  e.target.value || '',
+                  'url',
+                  upcomingRow.id
+                )
               }
               placeholder="http://"
-              value={upcoming[i]['url'] || ''}
+              value={upcomingRow.url}
             />
             {numUpcomingShows > 1 && (
-              <a href="#" onClick={() => removeUpcomingInput(i)}>
+              <a
+                href="#"
+                onClick={(e: any) => removeUpcomingInput(e, upcomingRow.id)}
+              >
                 X
               </a>
             )}
