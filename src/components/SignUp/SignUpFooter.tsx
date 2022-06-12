@@ -4,7 +4,7 @@ import Button from '../../genericComponents/Button';
 import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
 
 // for dev
-const FORM_VALIDATION_ON = false;
+const FORM_VALIDATION_ON = true;
 
 const SignUpFooter: React.FC<{
   landingStep: any;
