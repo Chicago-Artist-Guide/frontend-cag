@@ -95,6 +95,9 @@ const BottomRow = styled(Row)`
 
 const PersonImg = styled(Image)`
   border-radius: 5px;
+  object-fit: cover;
+  height: 7.5rem;
+  width: 7.5rem;
 `;
 
 const MarginTeam = styled.div`

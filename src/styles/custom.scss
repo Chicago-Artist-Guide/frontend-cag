@@ -15,6 +15,10 @@ body {
     background-color: $body-bg;
 }
 
+main {
+    overflow-x: hidden;
+}
+
 .margin-identity-cards {
     margin-right: 2%;
     margin-top: 10px;

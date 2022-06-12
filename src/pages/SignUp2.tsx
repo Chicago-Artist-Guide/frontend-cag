@@ -29,12 +29,14 @@ const defaultData = {
 
   pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
-  upcoming: [], // { title, synopsis, industryCode, url, imageUrl }
+  upcoming: [
+    { title: '', synopsis: '', industryCode: '', url: '', imageUrl: '' }
+  ], // { title, synopsis, industryCode, url, imageUrl }
 
   additionalSkillsCheckboxes: [],
   additionalSkillsManual: [],
 
-  awards: [] // { title, year, url, description }
+  awards: [{ title: '', year: '', url: '', description: '' }] // { title, year, url, description }
 };
 
 const SignUp2 = () => {

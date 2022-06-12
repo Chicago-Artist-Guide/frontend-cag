@@ -9,20 +9,20 @@ const SignUpFooter: React.FC<{
   landingStep: any;
   landingType: string;
   navigation: any;
-  setForm: any;
   setLandingStep: any;
   step: any;
   steps: any;
   submitBasics: any;
+  stepErrors: { [key: string]: boolean };
 }> = ({
   landingStep,
   landingType,
   navigation,
-  setForm,
   setLandingStep,
   step,
   steps,
-  submitBasics
+  submitBasics,
+  stepErrors
 }) => {
   /*
     SPECIAL CASES:
@@ -38,6 +38,8 @@ const SignUpFooter: React.FC<{
     4. We need to set our form field "privacyAgreement" to true if we Agree & Continue in the Privacy step
     5. We don't want to show our Next button if we're on the last step (Awards)
       - We'll show "Go to Profile" when we tackle that step in development
+    6. We disable the Next button if we have form validation errors or req fields not filled in 
+      - Done using stepErrors prop for current step (stepErrors[step])
   */
   const { next, previous } = navigation;
   const showBackButton = step !== ('landing' as any) || landingStep === 2;
@@ -83,6 +85,7 @@ const SignUpFooter: React.FC<{
       <ButtonCol lg="4">
         {step !== ('awards' as any) && (
           <Button
+            disabled={stepErrors[step]}
             onClick={
               navigationNext
                 ? next

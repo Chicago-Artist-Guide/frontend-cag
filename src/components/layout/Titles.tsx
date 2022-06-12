@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { fonts } from '../../theme/styleVars';
+import { colors, fonts } from '../../theme/styleVars';
 
 const Title = (props: any) => {
   const { children, ...rest } = props;
@@ -28,7 +28,8 @@ const TitleH2 = styled.h2`
   font-weight: 400;
   font-style: italic;
   line-height: 28px;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.08em;
+  color: ${colors.cornflower};
 `;
 
 const TaglineH2 = styled(TitleH2 as any)`

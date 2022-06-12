@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -38,8 +38,9 @@ const genderRoles = ['Women', 'Men', 'Neither'];
 const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
-  const { formData, setForm } = props;
+  const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo2AgeRanges,
     actorInfo2Gender,
@@ -47,6 +48,42 @@ const ActorInfo2: React.FC<{
     actorInfo2GenderTransition,
     actorInfo2HeightNoAnswer
   } = formData;
+
+  const requiredFields = ['actorInfo2AgeRanges', 'actorInfo2Gender'];
+
+  const createDefaultFormErrorsData = () => {
+    const formErrorsObj: { [key: string]: boolean } = {};
+
+    requiredFields.forEach((fieldName: string) => {
+      if (Array.isArray(formData[fieldName])) {
+        formErrorsObj[fieldName] = !formData[fieldName].length;
+      } else {
+        formErrorsObj[fieldName] =
+          formData[fieldName] === '' || formData[fieldName] === false;
+      }
+    });
+
+    return formErrorsObj;
+  };
+
+  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
+  const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
+
+  // calls the custom callback for the sign up page errors state object
+  // we just make this so we don't need to repeat "actorInfo2" everywhere
+  const customErrorCallback = (hasErrors: boolean) =>
+    hasErrorCallback('actorInfo2', hasErrors);
+
+  // effect for updating the sign up page errors state for this page
+  // every time formErrors is updated
+  useEffect(() => {
+    customErrorCallback(!Object.values(formErrors).every(v => !v));
+  }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // re-check there's a value when required fields update
+  useEffect(() => {
+    setFormErrors(createDefaultFormErrorsData());
+  }, [actorInfo2AgeRanges, actorInfo2Gender]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isAgeRangeInAgeRanges = (ageRange: string) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
@@ -195,56 +232,52 @@ const ActorInfo2: React.FC<{
               </Form.Group>
             </Col>
           </Row>
-          {actorInfo2Gender !== '' && !actorInfo2Gender.includes('Cis') && (
-            <Row>
-              <Col lg="6">
-                <Form.Group>
-                  <CAGLabel>
-                    I would also be comfortable playing roles usually played by:{' '}
-                    <PrivateLabel />
-                  </CAGLabel>
-
-                  {genderRoles.map(g => (
-                    <Checkbox
-                      checked={isGenderRoleInGenderRoles(g)}
-                      fieldType="checkbox"
-                      key={`gender-chk-${g}`}
-                      label={g}
-                      name="actorInfo2GenderRoles"
-                      onChange={(e: any) =>
-                        genderRoleChange(e.currentTarget.checked, g)
-                      }
-                    />
-                  ))}
-                </Form.Group>
-              </Col>
-
-              <Col lg="6">
-                <Form.Group>
-                  <CAGLabel>
-                    I would be comfortable playing a character through all
-                    phases of their transition: <PrivateLabel />
-                  </CAGLabel>
+          <Row>
+            <Col lg="6">
+              <Form.Group>
+                <CAGLabelSmaller>
+                  I would also be comfortable playing roles usually played by:{' '}
+                  <PrivateLabel />
+                </CAGLabelSmaller>
+                {genderRoles.map(g => (
                   <Checkbox
-                    checked={actorInfo2GenderTransition === 'Yes'}
-                    fieldType="radio"
-                    label="Yes"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="Yes"
+                    checked={isGenderRoleInGenderRoles(g)}
+                    fieldType="checkbox"
+                    key={`gender-chk-${g}`}
+                    label={g}
+                    name="actorInfo2GenderRoles"
+                    onChange={(e: any) =>
+                      genderRoleChange(e.currentTarget.checked, g)
+                    }
                   />
-                  <Checkbox
-                    checked={actorInfo2GenderTransition === 'No'}
-                    fieldType="radio"
-                    label="No"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="No"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-          )}
+                ))}
+              </Form.Group>
+            </Col>
+            <Col lg="6">
+              <Form.Group>
+                <CAGLabelSmaller>
+                  I would be comfortable playing a character through all phases
+                  of their transition: <PrivateLabel />
+                </CAGLabelSmaller>
+                <Checkbox
+                  checked={actorInfo2GenderTransition === 'Yes'}
+                  fieldType="radio"
+                  label="Yes"
+                  name="actorInfo2GenderTransition"
+                  onChange={setForm}
+                  value="Yes"
+                />
+                <Checkbox
+                  checked={actorInfo2GenderTransition === 'No'}
+                  fieldType="radio"
+                  label="No"
+                  name="actorInfo2GenderTransition"
+                  onChange={setForm}
+                  value="No"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
         </Col>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
@@ -268,6 +301,10 @@ const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+`;
+
+const CAGLabelSmaller = styled(CAGLabel as any)`
+  font-size: 16px;
 `;
 
 export default ActorInfo2;

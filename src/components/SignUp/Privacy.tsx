@@ -34,13 +34,17 @@ const Privacy: React.FC<{
             inform our search algorithm, we won't display this information on
             your profile, or to producers and casting directors. If you'd like
             to learn more about the measures we take to secure your data,{' '}
-            <Link to="/faq">click here</Link>.
+            <Link to="/faq" target="_blank">
+              click here
+            </Link>
+            .
           </PrivacyPar>
           <TermsPrivacyLink to="/terms-of-service">
             View our full terms and privacy policy
           </TermsPrivacyLink>
           <PrivacyPar>
-            Tap the button below to agree with our terms and privacy policy
+            Tap the green "Accept &amp; Continue" button to agree with our terms
+            and privacy policy.
           </PrivacyPar>
         </Col>
         <ImageCol lg="4">
