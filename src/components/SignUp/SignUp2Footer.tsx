@@ -1,9 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from '../../genericComponents/Button';
-import { colors } from '../../theme/styleVars';
+import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
 
 const SignUpFooter: React.FC<{
   navigation: any;
@@ -60,41 +58,5 @@ const SignUpFooter: React.FC<{
     </PageFooterRow>
   );
 };
-
-const PageFooterRow = styled(Row)`
-  padding-top: 100px;
-`;
-
-const ButtonCol = styled(Col)`
-  align-items: center;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const Pagination = styled.ul`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: space-between;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-
-  li {
-    border: 1px solid ${colors.darkGreen};
-    border-radius: 50%;
-    height: 21px;
-    list-style-type: none;
-    width: 21px;
-
-    &.complete {
-      background: ${colors.darkGreen}50;
-    }
-
-    &.active {
-      background: ${colors.darkGreen};
-    }
-  }
-`;
 
 export default SignUpFooter;

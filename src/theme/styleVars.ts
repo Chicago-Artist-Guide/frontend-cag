@@ -18,6 +18,7 @@ const colors = {
   grayishLightGreen: '#b8d8c7',
   lightestGrey: '#EFEFEF',
   lightGrey: '#D1D1D1',
+  paginationGray: '#D4D6DF',
   peach: '#F5AF19',
   salmon: '#E17B60',
   veryDarkGrayBlue: '#4D5055',
@@ -25,7 +26,9 @@ const colors = {
   yellow: '#EFC93D',
   orange: '#E17B60',
   mint: '#3EB489',
-  cornflower: '#4C7180'
+  cornflower: '#4C7180',
+  banana: '#F9E9B1',
+  butter: '#E9C268'
 };
 
 const fonts = {

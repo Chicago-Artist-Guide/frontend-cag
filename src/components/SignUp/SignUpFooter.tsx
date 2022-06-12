@@ -1,12 +1,10 @@
 import React from 'react';
-import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from '../../genericComponents/Button';
-import { colors } from '../../theme/styleVars';
+import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
 
 // for dev
-const FORM_VALIDATION_ON = false;
+const FORM_VALIDATION_ON = true;
 
 const SignUpFooter: React.FC<{
   landingStep: any;
@@ -63,7 +61,7 @@ const SignUpFooter: React.FC<{
 
   return (
     <PageFooterRow>
-      <Col lg="4">
+      <Col lg="2">
         {showBackButton && (
           <Button
             onClick={backButtonLandingStep ? () => setLandingStep(1) : previous}
@@ -73,7 +71,7 @@ const SignUpFooter: React.FC<{
           />
         )}
       </Col>
-      <Col lg="4">
+      <Col lg="8">
         <Pagination>
           {steps.map((s: any, i: number) => (
             <li
@@ -81,11 +79,13 @@ const SignUpFooter: React.FC<{
                 i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
               }
               key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
-            />
+            >
+              <span>{i + 1}</span>
+            </li>
           ))}
         </Pagination>
       </Col>
-      <ButtonCol lg="4">
+      <ButtonCol lg="2">
         {step !== ('awards' as any) && (
           <Button
             disabled={stepErrors[step] && FORM_VALIDATION_ON}
@@ -105,41 +105,5 @@ const SignUpFooter: React.FC<{
     </PageFooterRow>
   );
 };
-
-const PageFooterRow = styled(Row)`
-  padding-top: 100px;
-`;
-
-const ButtonCol = styled(Col)`
-  align-items: center;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const Pagination = styled.ul`
-  align-items: center;
-  display: flex;
-  height: 100%;
-  justify-content: space-between;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-
-  li {
-    border: 1px solid ${colors.darkGreen};
-    border-radius: 50%;
-    height: 21px;
-    list-style-type: none;
-    width: 21px;
-
-    &.complete {
-      background: ${colors.darkGreen}50;
-    }
-
-    &.active {
-      background: ${colors.darkGreen};
-    }
-  }
-`;
 
 export default SignUpFooter;
