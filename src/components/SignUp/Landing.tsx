@@ -178,8 +178,7 @@ const Landing: React.FC<{
         name: 'both-stage',
         text: (
           <>
-            <CardHeading>Both</CardHeading>{' '}
-            <p>(Directors, Designers, Dancers)</p>
+            <CardHeading>Both</CardHeading> <p>All of the Above</p>
           </>
         ),
         setForm,
