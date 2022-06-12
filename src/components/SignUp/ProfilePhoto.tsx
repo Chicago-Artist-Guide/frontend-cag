@@ -40,7 +40,7 @@ const ProfilePhoto: React.FC<{
                 type="button"
                 variant="secondary"
               />
-              <p>File size restrictions?</p>
+              <p>File size limit: 5MB</p>
             </ButtonCol>
             <ImageCol lg="4">
               <Image alt="" src={yellow_blob} />
