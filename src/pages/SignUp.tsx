@@ -50,6 +50,7 @@ const defaultData = {
   privacyAgreement: false,
 
   actorInfo1Pronouns: '',
+  actorInfo1PronounsOther: '',
   actorInfo1LGBTQ: '',
   actorInfo1Ethnicities: [],
 
@@ -71,6 +72,7 @@ const defaultData = {
   profilePhotoUrl: '',
 
   demographicsUnionStatus: '',
+  demographicsUnionStatusOther: '',
   demographicsAgency: '',
   demographicsWebsites: [{ url: '', websiteType: '' }], // { url, websiteType }
   demographicsBio: ''

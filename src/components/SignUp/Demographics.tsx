@@ -119,10 +119,8 @@ const Demographics: React.FC<{
                     <Form.Control
                       aria-label="union"
                       defaultValue=""
-                      disabled={
-                        demographicsUnionStatus === 'Other' ? false : true
-                      }
-                      name="demographicsUnionStatus"
+                      disabled={demographicsUnionStatus !== 'Other'}
+                      name="demographicsUnionStatusOther"
                       onChange={setForm}
                       placeholder="Other"
                     ></Form.Control>
