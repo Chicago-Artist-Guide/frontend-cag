@@ -19,6 +19,20 @@ import yellow_blob from '../../images/yellow_blob_2.svg';
   'Non-Union'
 ];*/
 
+const websiteTypeOptions = [
+  'Personal/Portfolio',
+  'Blog',
+  'Media',
+  'Social - Linktree',
+  'Social - Instagram',
+  'Social - Twitter',
+  'Social - YouTube',
+  'Social - LinkedIn',
+  'Social - Facebook',
+  'Social - TikTok',
+  'Social - Other'
+];
+
 const Demographics: React.FC<{
   setForm: any;
   formData: any;
@@ -96,9 +110,9 @@ const Demographics: React.FC<{
                       onChange={setForm}
                     >
                       <option value={undefined}>Select</option>
-                      <option value={undefined}>Union</option>
-                      <option value={undefined}>Non-Union</option>
-                      <option value={undefined}>Other</option>
+                      <option value="Union">Union</option>
+                      <option value="Non-Union">Non-Union</option>
+                      <option value="Other">Other</option>
                     </Form.Control>
                   </Col>
                   <Col lg="5">
@@ -149,6 +163,26 @@ const Demographics: React.FC<{
                             }
                             value={demographicsWebsites[i]['url']}
                           />
+                          <Form.Control
+                            aria-label="website type"
+                            as="select"
+                            defaultValue={
+                              demographicsWebsites[i]['websiteType']
+                            }
+                            name="websiteType"
+                            onChange={(e: any) =>
+                              onWebsiteInputChange(
+                                e.target.value || '',
+                                'websiteType',
+                                i
+                              )
+                            }
+                          >
+                            <option value={undefined}>Select</option>
+                            {websiteTypeOptions.map(wT => (
+                              <option value={wT}>{wT}</option>
+                            ))}
+                          </Form.Control>
                           <InputField
                             label="Type"
                             name="websiteType"
