@@ -53,6 +53,10 @@ const ethnicityTypes = [
   {
     name: 'White',
     values: []
+  },
+  {
+    name: 'I do not wish to respond',
+    values: []
   }
 ];
 
