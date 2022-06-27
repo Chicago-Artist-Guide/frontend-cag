@@ -53,6 +53,10 @@ const ethnicityTypes = [
   {
     name: 'White',
     values: []
+  },
+  {
+    name: 'I do not wish to respond',
+    values: []
   }
 ];
 
@@ -143,7 +147,7 @@ const ActorInfo1: React.FC<{
               <Form.Group>
                 <Container>
                   <Row>
-                    <Col lg="6">
+                    <PaddedCol lg="6">
                       <CAGLabel>Pronouns</CAGLabel>
                       <Form.Control
                         aria-label="pronouns"
@@ -159,17 +163,17 @@ const ActorInfo1: React.FC<{
                           </option>
                         ))}
                       </Form.Control>
-                    </Col>
-                    <Col lg="6">
+                    </PaddedCol>
+                    <PaddedCol lg="6">
                       <CAGLabel>Other</CAGLabel>
                       <Form.Control
                         aria-label="pronouns"
                         defaultValue=""
-                        disabled={actorInfo1Pronouns === 'Other' ? false : true}
-                        name="actorInfo1Pronouns"
+                        disabled={actorInfo1Pronouns !== 'Other'}
+                        name="actorInfo1PronounsOther"
                         onChange={setForm}
                       ></Form.Control>
-                    </Col>
+                    </PaddedCol>
                   </Row>
                 </Container>
               </Form.Group>
@@ -280,5 +284,9 @@ const PrivacyPar = styled.p`
 `;
 
 const InnerEthnicities = styled(Checkbox)``;
+
+const PaddedCol = styled(Col)`
+  padding-left: 0;
+`;
 
 export default ActorInfo1;

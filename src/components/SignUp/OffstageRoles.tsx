@@ -226,43 +226,45 @@ const OffstageRoles: React.FC<{
               } = currObjKey;
 
               return (
-                <GenericAccordion
-                  eventKey={objI}
-                  key={`accordion-item-${textHeader}`}
-                  textHeader={textHeader}
-                >
-                  <Row>
-                    <Col lg="7">
-                      {checkboxes.map((chk: { label: any; value: any }) => {
-                        const { label: chkLabel, value: chkValue } = chk;
+                <StyledDiv>
+                  <GenericAccordion
+                    eventKey={objI}
+                    key={`accordion-item-${textHeader}`}
+                    textHeader={textHeader}
+                  >
+                    <Row>
+                      <Col lg="7">
+                        {checkboxes.map((chk: { label: any; value: any }) => {
+                          const { label: chkLabel, value: chkValue } = chk;
 
-                        return (
-                          <Checkbox
-                            checked={isRoleInRolesSection(
-                              sectionStateValue,
-                              chk.value
-                            )}
-                            fieldType="checkbox"
-                            key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
-                            label={chkLabel}
-                            onChange={(e: any) =>
-                              rolesSectionChange(
-                                e.currentTarget.checked,
-                                role,
-                                sectionStateName,
-                                sectionStateValue
-                              )
-                            }
-                            value={chkValue}
-                          />
-                        );
-                      })}
-                    </Col>
-                    <ImageCol lg="4">
-                      <Image src={yellow_blob_1} />
-                    </ImageCol>
-                  </Row>
-                </GenericAccordion>
+                          return (
+                            <Checkbox
+                              checked={isRoleInRolesSection(
+                                sectionStateValue,
+                                chk.value
+                              )}
+                              fieldType="checkbox"
+                              key={`${textHeader}-chk-${chkLabel}-${chkValue}`}
+                              label={chkLabel}
+                              onChange={(e: any) =>
+                                rolesSectionChange(
+                                  e.currentTarget.checked,
+                                  role,
+                                  sectionStateName,
+                                  sectionStateValue
+                                )
+                              }
+                              value={chkValue}
+                            />
+                          );
+                        })}
+                      </Col>
+                      <ImageCol lg="4">
+                        <Image src={yellow_blob_1} />
+                      </ImageCol>
+                    </Row>
+                  </GenericAccordion>
+                </StyledDiv>
               );
             })}
           </StyledAccordion>
@@ -289,9 +291,12 @@ const ImageCol = styled(Col)`
 `;
 
 const StyledAccordion = styled(Accordion)`
-  box-shadow: 2px 2px 10px #00000029;
   border-radius: 8px;
   opacity: 1;
+`;
+
+const StyledDiv = styled.div`
+  padding-bottom: 2em;
 `;
 
 export default OffstageRoles;

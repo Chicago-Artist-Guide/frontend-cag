@@ -12,7 +12,8 @@ import Team from './Team';
 const Department = () => {
   const sectionTitles = {
     board: 'BOARD OF DIRECTORS',
-    artists: 'ARTIST ADVISORY BOARD',
+    artistAdvisory: 'ARTIST ADVISORY BOARD',
+    artists: 'ARTIST BOARD',
     operations: 'BUSINESS OPERATIONS',
     technical: 'SITE DEVELOPMENT TEAM'
   };
