@@ -88,7 +88,7 @@ const SignUpFooter: React.FC<{
       <ButtonCol lg="2">
         {step !== ('awards' as any) && (
           <Button
-            disabled={stepErrors[step] && FORM_VALIDATION_ON}
+            disabled={stepErrors[step]}
             onClick={
               navigationNext
                 ? next

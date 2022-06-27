@@ -39,8 +39,9 @@ const Demographics: React.FC<{
   const onWebsiteInputChange = (
     fieldValue: string,
     fieldName: string,
-    id: any
+    id: string
   ) => {
+    // indexing to assign each website value a number
     const newWebsiteValues = [...demographicsWebsites];
     const findIndex = newWebsiteValues.findIndex(web => web.id === id);
     newWebsiteValues[findIndex][fieldName] = fieldValue;
@@ -182,9 +183,7 @@ const Demographics: React.FC<{
                           {numWebsites > 1 && (
                             <a
                               href="#"
-                              onClick={(e: any) =>
-                                removeWebsiteInput(e, websiteRow.id)
-                              }
+                              onClick={() => removeWebsiteInput(websiteRow, i)}
                             >
                               X
                             </a>

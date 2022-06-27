@@ -1,7 +1,7 @@
-import React from 'react';
-import { Card as BSCard } from 'react-bootstrap';
-import styled from 'styled-components';
-import DividerBar from './DividerBar';
+import React from "react";
+import { Card as BSCard } from "react-bootstrap";
+import styled from "styled-components";
+import DividerBar from "./DividerBar";
 
 const Card = (props: any) => {
   const { header, src, text } = props;
@@ -13,7 +13,7 @@ const Card = (props: any) => {
         </SVGHolder>
         <DividerBar
           style={{
-            backgroundColor: '#000000'
+            backgroundColor: "#000000"
           }}
         />
         <h3>{header}</h3>
@@ -40,7 +40,6 @@ const CAGCard = styled(BSCard)`
   position: relative;
   right: 0.37%;
   bottom: 0.35%;
-  width: 272px;
   height: 352px;
   border-radius: 8px;
   background-color: #ffffff;

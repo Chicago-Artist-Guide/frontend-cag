@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { colors, fonts } from '../../theme/styleVars';
 import Container from 'react-bootstrap/Container';
@@ -13,7 +13,6 @@ const Awards: React.FC<{
 }> = props => {
   const { setForm, formData } = props;
   const { awards } = formData;
-  const [awardId, setAwardId] = useState(1);
 
   // add options for year dropdown
   const yearOptions = [] as any[];
@@ -24,27 +23,23 @@ const Awards: React.FC<{
   const onAwardInputChange = (
     fieldValue: string,
     fieldName: string,
-    id: any
+    i: any
   ) => {
     const newAwardValues = [...awards];
-    const findIndex = newAwardValues.findIndex(award => award.id === id);
-    newAwardValues[findIndex][fieldName] = fieldValue;
+    newAwardValues[i][fieldName] = fieldValue;
 
     const target = {
       name: 'awards',
       value: newAwardValues
     };
-
     setForm({ target });
   };
 
   const addAwardInput = (e: any) => {
     e.preventDefault();
-    const newAwardId = awardId + 1;
     const newAwardInputs = [...awards];
 
     newAwardInputs.push({
-      id: newAwardId,
       title: '',
       year: '',
       url: '',
@@ -56,22 +51,16 @@ const Awards: React.FC<{
       value: newAwardInputs
     };
 
-    setAwardId(newAwardId);
     setForm({ target });
   };
 
-  const removeAwardInput = (e: any, id: any) => {
-    e.preventDefault();
-
+  const removeAwardInput = (i: any) => {
     const newAwardValues = [...awards];
-    const findIndex = newAwardValues.findIndex(award => award.id === id);
-    newAwardValues.splice(findIndex, 1);
-
+    newAwardValues.splice(i, 1);
     const target = {
       name: 'awards',
       value: newAwardValues
     };
-
     setForm({ target });
   };
 
@@ -87,33 +76,25 @@ const Awards: React.FC<{
       </Row>
       <Row>
         <Col lg="12">
-          {awards.map((awardRow: any, i: any) => (
-            <div key={`award-row-${awardRow.id}`}>
+          {awards.map((awardRow: number, i: any) => (
+            <div key={`award-row-${i}`}>
               <Col lg="4">
                 <CAGFormControl
                   as="input"
                   name="title"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'title',
-                      awardRow.id
-                    )
+                    onAwardInputChange(e.target.value || '', 'title', i)
                   }
                   placeholder="Award or Recognition"
-                  value={awardRow.title}
+                  value={awards[i]['title']}
                 />
                 <CAGFormControl
                   as="select"
                   name="year"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'year',
-                      awardRow.id
-                    )
+                    onAwardInputChange(e.target.value || '', 'year', i)
                   }
-                  value={awardRow.year}
+                  value={awards[i]['year']}
                 >
                   <option disabled selected value="">
                     Year Received
@@ -126,10 +107,10 @@ const Awards: React.FC<{
                   as="input"
                   name="url"
                   onChange={(e: any) =>
-                    onAwardInputChange(e.target.value || '', 'url', awardRow.id)
+                    onAwardInputChange(e.target.value || '', 'url', i)
                   }
                   placeholder="Web Link"
-                  value={awardRow.url}
+                  value={awards[i]['url']}
                 />
               </Col>
               <Col lg="6">
@@ -137,22 +118,18 @@ const Awards: React.FC<{
                   as="textarea"
                   name="description"
                   onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'description',
-                      awardRow.id
-                    )
+                    onAwardInputChange(e.target.value || '', 'description', i)
                   }
                   placeholder="Description/Notes"
                   rows={6}
-                  value={awardRow.description}
+                  value={awards[i]['description']}
                 />
               </Col>
               {numAwards > 1 && (
                 <CAGButton>
                   <button
                     className="delete"
-                    onClick={(e: any) => removeAwardInput(e, awardRow.id)}
+                    onClick={() => removeAwardInput(i)}
                   >
                     x
                   </button>

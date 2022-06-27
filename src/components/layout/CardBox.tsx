@@ -1,6 +1,6 @@
-import React from 'react';
-import styled from 'styled-components';
-import Card from '../../genericComponents/Card';
+import React from "react";
+import styled from "styled-components";
+import Card from "../../genericComponents/Card";
 
 const CardBox = (props: any) => {
   const { cards } = props;
@@ -30,6 +30,10 @@ const Cards = styled.div`
     flex-wrap: wrap;
     padding-top: 0;
     height: 850px;
+
+    .card {
+      width: 272px;
+    }
 
     .card:nth-of-type(2) {
       margin-bottom: 75px;

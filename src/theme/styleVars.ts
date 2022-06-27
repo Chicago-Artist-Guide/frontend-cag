@@ -26,9 +26,7 @@ const colors = {
   yellow: '#EFC93D',
   orange: '#E17B60',
   mint: '#3EB489',
-  cornflower: '#4C7180',
-  banana: '#F9E9B1',
-  butter: '#E9C268'
+  cornflower: '#4C7180'
 };
 
 const fonts = {

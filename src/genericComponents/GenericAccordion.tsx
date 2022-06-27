@@ -28,7 +28,6 @@ const GenericAccordion = (props: any) => {
 };
 
 const CardHolder = styled(Card)`
-  box-shadow: 2px 2px 10px #00000029;
   flex-direction: column-reverse;
   .show + .card-header {
     button svg {

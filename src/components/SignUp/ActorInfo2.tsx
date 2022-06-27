@@ -232,34 +232,14 @@ const ActorInfo2: React.FC<{
               </Form.Group>
             </Col>
           </Row>
-          {actorInfo2Gender !== '' && !actorInfo2Gender.includes('Cis') && (
-            <Row>
-              <Col lg="6">
-                <Form.Group>
-                  <CAGLabelSmaller>
-                    I would also be comfortable playing roles usually played by:{' '}
-                    <PrivateLabel />
-                  </CAGLabelSmaller>
-                  {genderRoles.map(g => (
-                    <Checkbox
-                      checked={isGenderRoleInGenderRoles(g)}
-                      fieldType="checkbox"
-                      key={`gender-chk-${g}`}
-                      label={g}
-                      name="actorInfo2GenderRoles"
-                      onChange={(e: any) =>
-                        genderRoleChange(e.currentTarget.checked, g)
-                      }
-                    />
-                  ))}
-                </Form.Group>
-              </Col>
-              <Col lg="6">
-                <Form.Group>
-                  <CAGLabelSmaller>
-                    I would be comfortable playing a character through all
-                    phases of their transition: <PrivateLabel />
-                  </CAGLabelSmaller>
+          <Row>
+            <Col lg="6">
+              <Form.Group>
+                <CAGLabelSmaller>
+                  I would also be comfortable playing roles usually played by:{' '}
+                  <PrivateLabel />
+                </CAGLabelSmaller>
+                {genderRoles.map(g => (
                   <Checkbox
                     checked={actorInfo2GenderTransition === 'Yes'}
                     fieldType="radio"
@@ -268,18 +248,34 @@ const ActorInfo2: React.FC<{
                     onChange={setForm}
                     value="Yes"
                   />
-                  <Checkbox
-                    checked={actorInfo2GenderTransition === 'No'}
-                    fieldType="radio"
-                    label="No"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="No"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-          )}
+                ))}
+              </Form.Group>
+            </Col>
+            <Col lg="6">
+              <Form.Group>
+                <CAGLabelSmaller>
+                  I would be comfortable playing a character through all phases
+                  of their transition: <PrivateLabel />
+                </CAGLabelSmaller>
+                <Checkbox
+                  checked={actorInfo2GenderTransition === 'Yes'}
+                  fieldType="radio"
+                  label="Yes"
+                  name="actorInfo2GenderTransition"
+                  onChange={setForm}
+                  value="Yes"
+                />
+                <Checkbox
+                  checked={actorInfo2GenderTransition === 'No'}
+                  fieldType="radio"
+                  label="No"
+                  name="actorInfo2GenderTransition"
+                  onChange={setForm}
+                  value="No"
+                />
+              </Form.Group>
+            </Col>
+          </Row>
         </Col>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
