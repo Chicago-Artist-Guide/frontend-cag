@@ -1,7 +1,7 @@
-import React from "react";
-import { Button as BSButton } from "react-bootstrap";
-import styled from "styled-components";
-import { colors, fonts } from "../theme/styleVars";
+import React from 'react';
+import { Button as BSButton } from 'react-bootstrap';
+import styled from 'styled-components';
+import { colors, fonts } from '../theme/styleVars';
 
 const Button = (props: any) => {
   const { onClick, text, variant, ...rest } = props;

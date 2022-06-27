@@ -1,7 +1,7 @@
-import React from "react";
-import { colors } from "../theme/styleVars";
+import React from 'react';
+import { colors } from '../theme/styleVars';
 //import { Card as BSCard } from 'react-bootstrap';
-import styled from "styled-components";
+import styled from 'styled-components';
 //import DividerBar from './DividerBar';
 
 const FAQCard = (props: any) => {
@@ -17,7 +17,7 @@ const FAQCard = (props: any) => {
 };
 
 const vars = {
-  easing: "cubic - bezier(0.645, 0.045, 0.355, 1)"
+  easing: 'cubic - bezier(0.645, 0.045, 0.355, 1)'
 };
 
 const CardBody = styled.div`

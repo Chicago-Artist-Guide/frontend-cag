@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import { Card as BSCard } from "react-bootstrap";
+import React from 'react';
+import styled from 'styled-components';
+import { Card as BSCard } from 'react-bootstrap';
 //import Button from '../../../genericComponents/Button';
 
 const Awards = (props: any) => {

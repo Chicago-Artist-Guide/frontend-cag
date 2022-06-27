@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import Card from "../../genericComponents/Card";
+import React from 'react';
+import styled from 'styled-components';
+import Card from '../../genericComponents/Card';
 
 const CardBox = (props: any) => {
   const { cards } = props;

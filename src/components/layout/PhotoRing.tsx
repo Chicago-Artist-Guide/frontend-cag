@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import Photo from "../../genericComponents/Photo";
-import { Birkner } from "../../images/who-we-are/operations";
+import React from 'react';
+import styled from 'styled-components';
+import Photo from '../../genericComponents/Photo';
+import { Birkner } from '../../images/who-we-are/operations';
 
 const PhotoRing = (props: any) => {
   const { photos } = props;

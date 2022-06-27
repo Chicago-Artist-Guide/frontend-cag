@@ -1,16 +1,16 @@
-import React from "react";
-import styled from "styled-components";
-import Photo from "../../genericComponents/Photo";
-import { Birkner } from "../../images/who-we-are/operations";
+import React from 'react';
+import styled from 'styled-components';
+import Photo from '../../genericComponents/Photo';
+import { Birkner } from '../../images/who-we-are/operations';
 
 const PhotoContainer = (props: any) => {
   const { photos } = props;
 
   function handleClick(e: any) {
-    let clicked = e.target.src;
-    let swap = document.getElementById("main")?.getAttribute("src");
-    console.log("Clicked on: " + clicked + "\nSwapped with: " + swap);
-    document.getElementById("main")?.setAttribute("src", clicked);
+    const clicked = e.target.src;
+    const swap = document.getElementById('main')?.getAttribute('src');
+    console.log('Clicked on: ' + clicked + '\nSwapped with: ' + swap);
+    document.getElementById('main')?.setAttribute('src', clicked);
     e.target.src = swap;
   }
 

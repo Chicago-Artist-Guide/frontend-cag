@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import { Card as BSCard } from "react-bootstrap";
-import DividerBar from "../../genericComponents/DividerBar";
+import React from 'react';
+import styled from 'styled-components';
+import { Card as BSCard } from 'react-bootstrap';
+import DividerBar from '../../genericComponents/DividerBar';
 
 const DetailsCard = (props: any) => {
   const { about } = props;
@@ -10,7 +10,7 @@ const DetailsCard = (props: any) => {
       <h3>Personal Details</h3>
       <DividerBar
         style={{
-          backgroundImage: "linear-gradient(90deg,#EFC93D 0%, #82B29A 100%)"
+          backgroundImage: 'linear-gradient(90deg,#EFC93D 0%, #82B29A 100%)'
         }}
       />
       {about.map((about: any) => (

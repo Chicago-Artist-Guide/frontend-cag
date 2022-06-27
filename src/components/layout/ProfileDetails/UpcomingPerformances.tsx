@@ -1,7 +1,7 @@
-import React from "react";
-import styled from "styled-components";
-import { Col, Row } from "react-bootstrap";
-import { CFA } from "../../../images";
+import React from 'react';
+import styled from 'styled-components';
+import { Col, Row } from 'react-bootstrap';
+import { CFA } from '../../../images';
 //import Button from '../../../genericComponents/Button';
 
 const UpcomingPerformances = (props: any) => {

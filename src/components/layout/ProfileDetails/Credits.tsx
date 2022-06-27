@@ -1,6 +1,6 @@
-import React from "react";
-import styled from "styled-components";
-import { Col } from "react-bootstrap";
+import React from 'react';
+import styled from 'styled-components';
+import { Col } from 'react-bootstrap';
 //import Button from '../../../genericComponents/Button';
 
 const Credits = (props: any) => {
