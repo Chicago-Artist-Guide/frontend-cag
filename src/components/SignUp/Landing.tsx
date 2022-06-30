@@ -13,10 +13,23 @@ import OnStage from '../../images/icons-signup/on-stage.svg';
 import OffStage from '../../images/icons-signup/off-stage.svg';
 import BothStage from '../../images/icons-signup/both-stage.svg';
 
+interface Card {
+  icon: string;
+  className: string;
+  name: string;
+  text: JSX.Element;
+  setForm: any;
+  target: {
+    name: string;
+    value: string;
+  };
+  input: JSX.Element;
+}
+
 const Landing: React.FC<{
   setForm: any;
   formData: any;
-  landingStep: any;
+  landingStep: number;
   setLandingStep: any;
 }> = ({ setForm, formData, landingStep, setLandingStep }) => {
   const { landingType, stageRole } = formData;
@@ -64,7 +77,7 @@ const Landing: React.FC<{
     );
   };
 
-  const cards = [
+  const cards: Card[][] = [
     [
       {
         icon: Individual,
@@ -97,7 +110,7 @@ const Landing: React.FC<{
         name: 'group',
         text: (
           <>
-            <CardHeading>Theatre Group</CardHeading>{' '}
+            <CardHeading>Theatre Group</CardHeading>
             <p>
               Urna gravida tellus nullam nulla. Tempor sollicitudin sed sed enim
               morbi amet bibendum massa. Consequat feugiat in pulvinar id
@@ -223,7 +236,7 @@ const Landing: React.FC<{
       <Row>
         <Col lg={7}>
           <Row style={{ flexWrap: 'nowrap' }}>
-            {(cards as any)[landingStep - 1].map((card: any, i: any) => {
+            {cards[landingStep - 1].map((card: any, i: any) => {
               return <Card {...card} key={`card-${landingStep}-${i}`} />;
             })}
           </Row>
@@ -324,7 +337,7 @@ const CardHeading = styled.h3`
 const CardText = styled.div`
   height: calc(${cardHeight} / 2);
   margin-top: 5px;
-  overflow: auto;
+  overflow: hidden;
 `;
 
 export default Landing;

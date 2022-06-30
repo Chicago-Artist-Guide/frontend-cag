@@ -1,7 +1,7 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { collection, addDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { useForm, useStep } from 'react-hooks-helper';
+import { Step, useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { useFirebaseContext } from '../context/FirebaseContext';
@@ -31,8 +31,8 @@ const defaultSteps = [
   { id: 'profilePreview' }
 ];
 
-// flatten our step id's into a single array
-const flatSteps = (stepsArrObj: any) => stepsArrObj.map((step: any) => step.id);
+// // flatten our step id's into a single array
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 // establish our form data structure
 // assign defaults
@@ -79,7 +79,7 @@ const defaultData = {
 };
 
 // default object to track a boolean true/false for which steps have form validation error states
-const createDefaultStepErrorsObj = (stepNames: any) => {
+const createDefaultStepErrorsObj = (stepNames: string[]) => {
   const stepErrorsObj: { [key: string]: boolean } = {};
 
   // default all of our steps to false
@@ -96,7 +96,7 @@ const SignUp = () => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
-  const [steps, setSteps] = useState(defaultSteps);
+  const [steps, setSteps] = useState<Step[]>(defaultSteps);
   const [landingStep, setLandingStep] = useState(1); // Landing has two defaultSteps internally, based on if "individual"
 
   // default state for form validation error states per step
@@ -106,8 +106,12 @@ const SignUp = () => {
 
   // defaults for our defaultSteps
   const { step, navigation } = useStep({
-    steps: flatSteps(steps) as any
+    steps: steps
   });
+  const stepId = (step as Step).id;
+
+  console.log('step', step);
+  console.log('landingStep', landingStep);
 
   // this large effect deals with conditional steps based on "roles" question
   // see Rules comment below for details
@@ -231,6 +235,7 @@ const SignUp = () => {
   // callback function for updating if a step has errors
   // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
+    console.log('step error', step);
     const newStepErrorsObj = { ...stepErrors };
 
     if (step in newStepErrorsObj) {
@@ -245,8 +250,8 @@ const SignUp = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
 
-    switch (step) {
-      case 'landing' as any:
+    switch (stepId) {
+      case 'landing':
         returnStep = (
           <Landing
             {...props}
@@ -255,34 +260,34 @@ const SignUp = () => {
           />
         );
         break;
-      case 'basics' as any:
+      case 'basics':
         returnStep = (
           <Basics {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
-      case 'privacy' as any:
+      case 'privacy':
         returnStep = <Privacy {...props} />;
         break;
-      case 'actorInfo1' as any:
+      case 'actorInfo1':
         returnStep = (
           <ActorInfo1 {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
-      case 'actorInfo2' as any:
+      case 'actorInfo2':
         returnStep = (
           <ActorInfo2 {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
-      case 'offstageRoles' as any:
+      case 'offstageRoles':
         returnStep = <OffstageRoles {...props} />;
         break;
-      case 'profilePhoto' as any:
+      case 'profilePhoto':
         returnStep = <ProfilePhoto {...props} />;
         break;
-      case 'demographics' as any:
+      case 'demographics':
         returnStep = <Demographics {...props} />;
         break;
-      case 'profilePreview' as any:
+      case 'profilePreview':
         returnStep = <Profile previewMode={true} />;
         break;
       default:
@@ -293,24 +298,27 @@ const SignUp = () => {
     return returnStep;
   };
 
+  // if no Landing type is selected or it's profile preview, don't show navigation yet
+  const showSignUpFooter =
+    formData.landingType !== '' && stepId !== 'profilePreview';
+
   return (
     <PageContainer>
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
       </Row>
-      {formData.landingType !== '' &&
-      step !== ('profilePreview' as any) && ( // if no Landing type is selected or it's profile preview, don't show navigation yet
-          <SignUpFooter
-            landingStep={landingStep}
-            landingType={formData.landingType}
-            navigation={navigation}
-            setLandingStep={setLandingStep}
-            step={step}
-            stepErrors={stepErrors}
-            steps={steps}
-            submitBasics={submitBasics}
-          />
-        )}
+      {showSignUpFooter && (
+        <SignUpFooter
+          landingStep={landingStep}
+          landingType={formData.landingType}
+          navigation={navigation}
+          setLandingStep={setLandingStep}
+          currentStep={stepId}
+          stepErrors={stepErrors}
+          steps={steps}
+          submitBasics={submitBasics}
+        />
+      )}
     </PageContainer>
   );
 };
