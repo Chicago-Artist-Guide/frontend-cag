@@ -215,7 +215,7 @@ const ActorInfo1: React.FC<{
                   of selecting your identity is to help cast roles that call for
                   a certain demographic. Please select as may options as you
                   feel fits your identity. More info on our process{' '}
-                  <Link to="#">here</Link>.
+                  <Link to="/faq" target="_blank">here</Link>.
                 </PrivacyPar>
                 {ethnicityTypes.map(eth => (
                   <React.Fragment key={`parent-frag-chk-${eth.name}`}>
