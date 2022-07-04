@@ -101,7 +101,7 @@ const Demographics: React.FC<{
               <TitleThree>Union</TitleThree>
               <Container>
                 <Row>
-                  <Col lg="5">
+                  <PaddedCol lg="5">
                     <Form.Control
                       aria-label="union"
                       as="select"
@@ -114,8 +114,8 @@ const Demographics: React.FC<{
                       <option value="Non-Union">Non-Union</option>
                       <option value="Other">Other</option>
                     </Form.Control>
-                  </Col>
-                  <Col lg="5">
+                  </PaddedCol>
+                  <PaddedCol lg="5">
                     <Form.Control
                       aria-label="union"
                       defaultValue=""
@@ -124,12 +124,12 @@ const Demographics: React.FC<{
                       onChange={setForm}
                       placeholder="Other"
                     ></Form.Control>
-                  </Col>
+                  </PaddedCol>
                 </Row>
               </Container>
               <Container>
                 <Row>
-                  <Col lg="8">
+                  <PaddedCol lg="8">
                     <Form.Group>
                       <Form.Control
                         aria-label="agency"
@@ -139,16 +139,16 @@ const Demographics: React.FC<{
                         placeholder="Agency"
                       ></Form.Control>
                     </Form.Group>
-                  </Col>
+                  </PaddedCol>
                 </Row>
               </Container>
               <TitleThree>Website Links</TitleThree>
               <Container>
                 <Row>
-                  <Col lg="10">
+                  <PaddedCol lg="10">
                     {demographicsWebsites.map((websiteRow: any, i: any) => (
                       <div key={`website-row-${websiteRow.id}`}>
-                        <Col lg="12">
+                        <PaddedCol lg="12">
                           <InputField
                             label="URL"
                             name="websiteUrl"
@@ -189,7 +189,7 @@ const Demographics: React.FC<{
                               X
                             </a>
                           )}
-                        </Col>
+                        </PaddedCol>
                       </div>
                     ))}
                     <div>
@@ -197,7 +197,7 @@ const Demographics: React.FC<{
                         + Add Website
                       </a>
                     </div>
-                  </Col>
+                  </PaddedCol>
                 </Row>
               </Container>
             </Col>
@@ -215,6 +215,10 @@ const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;
   max-width: 100%;
+`;
+
+const PaddedCol = styled(Col)`
+  padding-left: 0;
 `;
 
 export default Demographics;

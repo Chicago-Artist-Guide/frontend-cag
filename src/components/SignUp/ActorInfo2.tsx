@@ -143,7 +143,7 @@ const ActorInfo2: React.FC<{
                 <CAGLabel>Height</CAGLabel>
                 <Container>
                   <Row>
-                    <Col lg="3">
+                    <PaddedCol lg="3">
                       <Form.Control
                         aria-label="height feet"
                         as="select"
@@ -157,8 +157,8 @@ const ActorInfo2: React.FC<{
                           </option>
                         ))}
                       </Form.Control>
-                    </Col>
-                    <Col lg="3">
+                    </PaddedCol>
+                    <PaddedCol lg="3">
                       <Form.Control
                         aria-label="height inches"
                         as="select"
@@ -175,8 +175,8 @@ const ActorInfo2: React.FC<{
                           </option>
                         ))}
                       </Form.Control>
-                    </Col>
-                    <Col lg="6">
+                    </PaddedCol>
+                    <PaddedCol lg="6">
                       <Checkbox
                         checked={actorInfo2HeightNoAnswer}
                         fieldType="checkbox"
@@ -184,7 +184,7 @@ const ActorInfo2: React.FC<{
                         name="actorInfo2HeightNoAnswer"
                         onChange={setForm}
                       />
-                    </Col>
+                    </PaddedCol>
                   </Row>
                 </Container>
               </Form.Group>
@@ -307,6 +307,10 @@ const CAGLabel = styled(Form.Label)`
 
 const CAGLabelSmaller = styled(CAGLabel as any)`
   font-size: 16px;
+`;
+
+const PaddedCol = styled(Col)`
+  padding-left: 0;
 `;
 
 export default ActorInfo2;
