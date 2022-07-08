@@ -2,31 +2,27 @@ import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
 import Button from '../../genericComponents/Button';
-import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
+import { ButtonCol, PageFooterRow, Pagination } from './SignUpFooterStyles';
 
 // for dev
 const FORM_VALIDATION_ON = true;
 
 const SignUpFooter: React.FC<{
   landingStep: number;
-  landingType: string;
   navigation: NavigationProps;
   setLandingStep: (x: number) => void;
   currentStep: string;
-  step: any;
-  steps: any[];
+  steps: Step[];
   submitBasics: () => void;
   stepErrors: { [key: string]: boolean };
 }> = ({
-  currentStep,
   landingStep,
-  landingType,
   navigation,
   setLandingStep,
-  step,
-  stepErrors,
+  currentStep,
   steps,
-  submitBasics
+  submitBasics,
+  stepErrors
 }) => {
   /*
     SPECIAL CASES:
@@ -45,12 +41,12 @@ const SignUpFooter: React.FC<{
     6. We disable the Next button if we have form validation errors or req fields not filled in
       - Done using stepErrors prop for current step (stepErrors[step])
   */
+
+  // console.log('SignUpFooter', { currentStep, landingStep, steps, stepErrors });
+
   const { next, previous } = navigation;
-  const showBackButton = currentStep !== 'landing' || landingStep === 2;
-  const backButtonLandingStep = currentStep === 'landing' && landingStep === 2;
   const navigationNext =
-    (currentStep === 'landing' &&
-      (landingStep === 2 || landingType === 'group')) ||
+    (currentStep === 'landing' && landingStep === 2) ||
     (currentStep !== 'landing' && currentStep !== 'privacy');
   const stepIndex = steps.findIndex(step => step.id === currentStep);
   const continueText =
@@ -64,14 +60,12 @@ const SignUpFooter: React.FC<{
   return (
     <PageFooterRow>
       <Col lg="2">
-        {showBackButton && (
-          <Button
-            onClick={backButtonLandingStep ? () => setLandingStep(1) : previous}
-            text="Back"
-            type="button"
-            variant="secondary"
-          />
-        )}
+        <Button
+          onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
+          text="Back"
+          type="button"
+          variant="secondary"
+        />
       </Col>
       <Col lg="8">
         <Pagination>
@@ -88,9 +82,9 @@ const SignUpFooter: React.FC<{
         </Pagination>
       </Col>
       <ButtonCol lg="2">
-        {step !== ('awards' as any) && (
+        {currentStep !== ('awards' as any) && (
           <Button
-            disabled={stepErrors[step] && FORM_VALIDATION_ON}
+            disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
             onClick={
               navigationNext
                 ? next

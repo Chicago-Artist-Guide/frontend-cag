@@ -5,14 +5,14 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
-import { Title } from '../layout/Titles';
-import InputField from '../../genericComponents/Input';
-import Checkbox from '../../genericComponents/Checkbox';
-import { colors } from '../../theme/styleVars';
-import { ErrorMessage } from '../../utils/validation';
+import { Title } from '../../layout/Titles';
+import InputField from '../../../genericComponents/Input';
+import Checkbox from '../../../genericComponents/Checkbox';
+import { colors } from '../../../theme/styleVars';
+import { ErrorMessage } from '../../../utils/validation';
 import { SetForm } from 'react-hooks-helper';
 
-const Basics: React.FC<{
+const IndividualBasics: React.FC<{
   setForm: SetForm;
   formData: { [key: string]: any };
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
@@ -203,4 +203,4 @@ const CAGCheckbox = styled(Checkbox)`
   margin-top: 2em;
 `;
 
-export default Basics;
+export default IndividualBasics;

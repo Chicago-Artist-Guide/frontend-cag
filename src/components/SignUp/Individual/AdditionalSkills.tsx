@@ -4,9 +4,9 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-import Checkbox from '../../genericComponents/Checkbox';
-import { Tagline, Title } from '../layout/Titles';
-import { colors, fonts } from '../../theme/styleVars';
+import Checkbox from '../../../genericComponents/Checkbox';
+import { Tagline, Title } from '../../layout/Titles';
+import { colors, fonts } from '../../../theme/styleVars';
 
 const skillCheckboxes = ['Dancing', 'Singing'];
 

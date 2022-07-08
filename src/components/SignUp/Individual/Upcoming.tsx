@@ -4,10 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import { Col, Form, Row } from 'react-bootstrap';
-import { Tagline, Title } from '../layout/Titles';
-import Button from '../../genericComponents/Button';
-import InputField from '../../genericComponents/Input';
-import { colors } from '../../theme/styleVars';
+import { Tagline, Title } from '../../layout/Titles';
+import Button from '../../../genericComponents/Button';
+import InputField from '../../../genericComponents/Input';
+import { colors } from '../../../theme/styleVars';
 
 const Upcoming: React.FC<{
   setForm: any;

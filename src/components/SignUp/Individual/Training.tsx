@@ -2,9 +2,9 @@ import React from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Tagline, Title } from '../layout/Titles';
+import { Tagline, Title } from '../../layout/Titles';
 import Form from 'react-bootstrap/Form';
-import InputField from '../../genericComponents/Input';
+import InputField from '../../../genericComponents/Input';
 
 const Training: React.FC<{
   setForm: any;

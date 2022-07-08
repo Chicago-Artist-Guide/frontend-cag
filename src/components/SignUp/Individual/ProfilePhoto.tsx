@@ -6,10 +6,10 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Tagline, Title } from '../layout/Titles';
-import Button from '../../genericComponents/Button';
-import { colors } from '../../theme/styleVars';
-import yellow_blob from '../../images/yellow_blob_2.svg';
+import { Tagline, Title } from '../../layout/Titles';
+import Button from '../../../genericComponents/Button';
+import { colors } from '../../../theme/styleVars';
+import yellow_blob from '../../../images/yellow_blob_2.svg';
 
 const ProfilePhoto: React.FC<{
   setForm: any;
