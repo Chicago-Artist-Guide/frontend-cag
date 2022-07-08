@@ -45,9 +45,7 @@ const SignUpFooter: React.FC<{
   // console.log('SignUpFooter', { currentStep, landingStep, steps, stepErrors });
 
   const { next, previous } = navigation;
-  const navigationNext =
-    (currentStep === 'landing' && landingStep === 2) ||
-    (currentStep !== 'landing' && currentStep !== 'privacy');
+  const navigationNext = landingStep === 2 || currentStep !== 'privacy';
   const stepIndex = steps.findIndex(step => step.id === currentStep);
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';

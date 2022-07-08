@@ -56,7 +56,9 @@ const SignUp: React.FC = () => {
   }
 
   if (accountType === 'group') {
-    <GroupSignUp currentStep={currentStep} setCurrentStep={setCurrentStep} />;
+    return (
+      <GroupSignUp currentStep={currentStep} setCurrentStep={setCurrentStep} />
+    );
   }
 
   return <div>Something went wrong.</div>;
