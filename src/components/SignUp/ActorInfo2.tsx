@@ -190,7 +190,7 @@ const ActorInfo2: React.FC<{
               </Form.Group>
               <Form.Group>
                 <CAGLabel>
-                  Age Range <PrivateLabel />
+                  What age range do you play? <PrivateLabel />
                 </CAGLabel>
                 <p>Select up to 3 ranges</p>
                 {ageRanges.map(ageRange => (
