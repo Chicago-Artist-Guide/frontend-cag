@@ -102,7 +102,7 @@ const Demographics: React.FC<{
               <TitleThree>Union</TitleThree>
               <Container>
                 <Row>
-                  <Col lg="5">
+                  <PaddedCol lg="5">
                     <CAGFormControl
                       aria-label="union"
                       as="select"
@@ -115,8 +115,8 @@ const Demographics: React.FC<{
                       <option value="Non-Union">Non-Union</option>
                       <option value="Other">Other</option>
                     </CAGFormControl>
-                  </Col>
-                  <Col lg="5">
+                  </PaddedCol>
+                  <PaddedCol lg="5">
                     <CAGFormControl
                       aria-label="union"
                       defaultValue=""
@@ -125,12 +125,12 @@ const Demographics: React.FC<{
                       onChange={setForm}
                       placeholder="Other"
                     ></CAGFormControl>
-                  </Col>
+                  </PaddedCol>
                 </Row>
               </Container>
               <Container>
                 <Row>
-                  <Col lg="10">
+                  <PaddedCol lg="10">
                     <Form.Group>
                       <CAGFormControl
                         aria-label="agency"
@@ -140,13 +140,13 @@ const Demographics: React.FC<{
                         placeholder="Select Agency"
                       ></CAGFormControl>
                     </Form.Group>
-                  </Col>
+                  </PaddedCol>
                 </Row>
               </Container>
               <TitleThree>Website Links</TitleThree>
               <Container>
                 <Row>
-                  <Col lg="10">
+                  <PaddedCol lg="10">
                     {demographicsWebsites.map((websiteRow: any, i: any) => (
                       <div key={`website-row-${websiteRow.id}`}>
                         <CAGFormControl
@@ -198,7 +198,7 @@ const Demographics: React.FC<{
                         + Add Website
                       </a>
                     </div>
-                  </Col>
+                  </PaddedCol>
                 </Row>
               </Container>
             </Col>
@@ -226,6 +226,10 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
+`;
+
+const PaddedCol = styled(Col)`
+  padding-left: 0;
 `;
 
 export default Demographics;
