@@ -9,6 +9,7 @@ import Form from 'react-bootstrap/Form';
 import { Title } from '../layout/Titles';
 import { Tagline, TitleThree } from '../layout/Titles';
 import yellow_blob from '../../images/yellow_blob_2.svg';
+import { colors, fonts } from '../../theme/styleVars';
 
 const websiteTypeOptions = [
   'Personal/Portfolio',
@@ -102,42 +103,42 @@ const Demographics: React.FC<{
               <Container>
                 <Row>
                   <Col lg="5">
-                    <Form.Control
+                    <CAGFormControl
                       aria-label="union"
                       as="select"
                       defaultValue={demographicsUnionStatus}
                       name="demographicsUnionStatus"
                       onChange={setForm}
                     >
-                      <option value={undefined}>Select</option>
+                      <option value={undefined}>Select union status</option>
                       <option value="Union">Union</option>
                       <option value="Non-Union">Non-Union</option>
                       <option value="Other">Other</option>
-                    </Form.Control>
+                    </CAGFormControl>
                   </Col>
                   <Col lg="5">
-                    <Form.Control
+                    <CAGFormControl
                       aria-label="union"
                       defaultValue=""
                       disabled={demographicsUnionStatus !== 'Other'}
                       name="demographicsUnionStatusOther"
                       onChange={setForm}
                       placeholder="Other"
-                    ></Form.Control>
+                    ></CAGFormControl>
                   </Col>
                 </Row>
               </Container>
               <Container>
                 <Row>
-                  <Col lg="8">
+                  <Col lg="10">
                     <Form.Group>
-                      <Form.Control
+                      <CAGFormControl
                         aria-label="agency"
                         defaultValue={demographicsAgency}
                         name="demographicsAgency"
                         onChange={setForm}
-                        placeholder="Agency"
-                      ></Form.Control>
+                        placeholder="Select Agency"
+                      ></CAGFormControl>
                     </Form.Group>
                   </Col>
                 </Row>
@@ -148,48 +149,48 @@ const Demographics: React.FC<{
                   <Col lg="10">
                     {demographicsWebsites.map((websiteRow: any, i: any) => (
                       <div key={`website-row-${websiteRow.id}`}>
-                        <Col lg="12">
-                          <InputField
-                            label="URL"
-                            name="websiteUrl"
-                            onChange={(e: any) =>
-                              onWebsiteInputChange(
-                                e.target.value || '',
-                                'url',
-                                websiteRow.id
-                              )
-                            }
-                            value={websiteRow.url}
-                          />
-                          <Form.Control
-                            aria-label="website type"
-                            as="select"
-                            defaultValue={websiteRow.websiteType}
-                            name="websiteType"
-                            onChange={(e: any) =>
-                              onWebsiteInputChange(
-                                e.target.value || '',
-                                'websiteType',
-                                websiteRow.id
-                              )
+                        <CAGFormControl
+                          aria-label="URL"
+                          as="input"
+                          name="websiteUrl"
+                          onChange={(e: any) =>
+                            onWebsiteInputChange(
+                              e.target.value || '',
+                              'url',
+                              websiteRow.id
+                            )
+                          }
+                          placeholder="URL"
+                          value={websiteRow.url}
+                        />
+                        <CAGFormControl
+                          aria-label="website type"
+                          as="select"
+                          defaultValue={websiteRow.websiteType}
+                          name="websiteType"
+                          onChange={(e: any) =>
+                            onWebsiteInputChange(
+                              e.target.value || '',
+                              'websiteType',
+                              websiteRow.id
+                            )
+                          }
+                        >
+                          <option value={undefined}>Select Type</option>
+                          {websiteTypeOptions.map(wT => (
+                            <option value={wT}>{wT}</option>
+                          ))}
+                        </CAGFormControl>
+                        {numWebsites > 1 && (
+                          <a
+                            href="#"
+                            onClick={(e: any) =>
+                              removeWebsiteInput(e, websiteRow.id)
                             }
                           >
-                            <option value={undefined}>Select Type</option>
-                            {websiteTypeOptions.map(wT => (
-                              <option value={wT}>{wT}</option>
-                            ))}
-                          </Form.Control>
-                          {numWebsites > 1 && (
-                            <a
-                              href="#"
-                              onClick={(e: any) =>
-                                removeWebsiteInput(e, websiteRow.id)
-                              }
-                            >
-                              X
-                            </a>
-                          )}
-                        </Col>
+                            X
+                          </a>
+                        )}
                       </div>
                     ))}
                     <div>
@@ -215,6 +216,16 @@ const ImageCol = styled(Col)`
   display: flex;
   max-height: 100%;
   max-width: 100%;
+`;
+
+const CAGFormControl = styled(Form.Control)`
+  margin-bottom: 1em;
+  border: 1px solid ${colors.lightGrey};
+  border-radius: 7px;
+  font-family: ${fonts.mainFont};
+  padding: 5px;
+  padding-left: 10px;
+  width: 100%;
 `;
 
 export default Demographics;
