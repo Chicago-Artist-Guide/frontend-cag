@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
@@ -70,7 +70,7 @@ const CAG = () => (
 );
 
 const App = () => {
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [accountRef, setAccountRef] = useState<any>(null);
   const [profileRef, setProfileRef] = useState<any>(null);
   const app = initializeApp(firebaseConfig);

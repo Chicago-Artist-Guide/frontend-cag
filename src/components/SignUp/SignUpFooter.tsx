@@ -1,26 +1,25 @@
 import React from 'react';
 import Col from 'react-bootstrap/Col';
+import { NavigationProps, Step } from 'react-hooks-helper';
 import Button from '../../genericComponents/Button';
-import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
+import { ButtonCol, PageFooterRow, Pagination } from './SignUpFooterStyles';
 
 // for dev
 const FORM_VALIDATION_ON = true;
 
 const SignUpFooter: React.FC<{
-  landingStep: any;
-  landingType: string;
-  navigation: any;
-  setLandingStep: any;
-  step: any;
-  steps: any;
-  submitBasics: any;
+  landingStep: number;
+  navigation: NavigationProps;
+  setLandingStep: (x: number) => void;
+  currentStep: string;
+  steps: Step[];
+  submitBasics: () => void;
   stepErrors: { [key: string]: boolean };
 }> = ({
   landingStep,
-  landingType,
   navigation,
   setLandingStep,
-  step,
+  currentStep,
   steps,
   submitBasics,
   stepErrors
@@ -35,24 +34,21 @@ const SignUpFooter: React.FC<{
       - Past the 1st step of the Landing step OR
       - A Theater Group was selected (meaning no 2nd internal Landing step)
       - Not on the Privacy Step (we have a different callback for Privacy in order to set agreement)
-    3. We need to show different button text for the Privacy Agreement step 
+    3. We need to show different button text for the Privacy Agreement step
     4. We need to set our form field "privacyAgreement" to true if we Agree & Continue in the Privacy step
     5. We don't want to show our Next button if we're on the last step (Awards)
       - We'll show "Go to Profile" when we tackle that step in development
-    6. We disable the Next button if we have form validation errors or req fields not filled in 
+    6. We disable the Next button if we have form validation errors or req fields not filled in
       - Done using stepErrors prop for current step (stepErrors[step])
   */
+
+  // console.log('SignUpFooter', { currentStep, landingStep, steps, stepErrors });
+
   const { next, previous } = navigation;
-  const showBackButton = step !== ('landing' as any) || landingStep === 2;
-  const backButtonLandingStep =
-    step === ('landing' as any) && landingStep === 2;
-  const navigationNext =
-    (step === ('landing' as any) &&
-      (landingStep === 2 || landingType === 'group')) ||
-    (step !== ('landing' as any) && step !== ('privacy' as any));
-  const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
+  const navigationNext = landingStep === 2 || currentStep !== 'privacy';
+  const stepIndex = steps.findIndex(step => step.id === currentStep);
   const continueText =
-    step === ('privacy' as any) ? 'Accept & Continue' : 'Continue';
+    currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
   const privacyAgree = () => {
     submitBasics();
@@ -62,18 +58,16 @@ const SignUpFooter: React.FC<{
   return (
     <PageFooterRow>
       <Col lg="2">
-        {showBackButton && (
-          <Button
-            onClick={backButtonLandingStep ? () => setLandingStep(1) : previous}
-            text="Back"
-            type="button"
-            variant="secondary"
-          />
-        )}
+        <Button
+          onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
+          text="Back"
+          type="button"
+          variant="secondary"
+        />
       </Col>
       <Col lg="8">
         <Pagination>
-          {steps.map((s: any, i: number) => (
+          {steps.map((_step, i: number) => (
             <li
               className={
                 i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
@@ -86,13 +80,13 @@ const SignUpFooter: React.FC<{
         </Pagination>
       </Col>
       <ButtonCol lg="2">
-        {step !== ('awards' as any) && (
+        {currentStep !== ('awards' as any) && (
           <Button
-            disabled={stepErrors[step] && FORM_VALIDATION_ON}
+            disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
             onClick={
               navigationNext
                 ? next
-                : step === ('privacy' as any)
+                : currentStep === 'privacy'
                 ? privacyAgree
                 : () => setLandingStep(2)
             }

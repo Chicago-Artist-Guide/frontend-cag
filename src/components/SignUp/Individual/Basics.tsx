@@ -5,15 +5,16 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
-import { Title } from '../layout/Titles';
-import InputField from '../../genericComponents/Input';
-import Checkbox from '../../genericComponents/Checkbox';
-import { colors } from '../../theme/styleVars';
-import { ErrorMessage } from '../../utils/validation';
+import { Title } from '../../layout/Titles';
+import InputField from '../../../genericComponents/Input';
+import Checkbox from '../../../genericComponents/Checkbox';
+import { colors } from '../../../theme/styleVars';
+import { ErrorMessage } from '../../../utils/validation';
+import { SetForm } from 'react-hooks-helper';
 
-const Privacy: React.FC<{
-  setForm: any;
-  formData: any;
+const IndividualBasics: React.FC<{
+  setForm: SetForm;
+  formData: { [key: string]: any };
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = props => {
   const { setForm, formData, hasErrorCallback } = props;
@@ -41,7 +42,6 @@ const Privacy: React.FC<{
   // we default this for now based on if they are empty '' or false
   const createDefaultFormErrorsData = () => {
     const formErrorsObj: { [key: string]: boolean } = {};
-
     requiredFields.forEach((fieldName: string) => {
       formErrorsObj[fieldName] =
         formData[fieldName] === '' || formData[fieldName] === false;
@@ -203,4 +203,4 @@ const CAGCheckbox = styled(Checkbox)`
   margin-top: 2em;
 `;
 
-export default Privacy;
+export default IndividualBasics;

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import Col from 'react-bootstrap/Col';
-import { colors, fonts } from '../../theme/styleVars';
+import { colors, fonts } from '../../../theme/styleVars';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
-import { Tagline, Title } from '../layout/Titles';
+import { Tagline, Title } from '../../layout/Titles';
 
 const Awards: React.FC<{
   setForm: any;

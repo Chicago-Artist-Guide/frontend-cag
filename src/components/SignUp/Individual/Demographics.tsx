@@ -4,12 +4,12 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import styled from 'styled-components';
 import Image from 'react-bootstrap/Image';
-import InputField from '../../genericComponents/Input';
+import InputField from '../../../genericComponents/Input';
 import Form from 'react-bootstrap/Form';
-import { Title } from '../layout/Titles';
-import { Tagline, TitleThree } from '../layout/Titles';
-import yellow_blob from '../../images/yellow_blob_2.svg';
-import { colors, fonts } from '../../theme/styleVars';
+import { Title } from '../../layout/Titles';
+import { Tagline, TitleThree } from '../../layout/Titles';
+import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { colors, fonts } from '../../../theme/styleVars';
 
 const websiteTypeOptions = [
   'Personal/Portfolio',

@@ -6,11 +6,11 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
-import { Title } from '../layout/Titles';
-import Checkbox from '../../genericComponents/Checkbox';
-import PrivateLabel from '../../genericComponents/PrivateLabel';
-import { colors, fonts } from '../../theme/styleVars';
-import yellow_blob from '../../images/yellow_blob_2.svg';
+import { Title } from '../../layout/Titles';
+import Checkbox from '../../../genericComponents/Checkbox';
+import PrivateLabel from '../../../genericComponents/PrivateLabel';
+import { colors, fonts } from '../../../theme/styleVars';
+import yellow_blob from '../../../images/yellow_blob_2.svg';
 
 const pronouns = [
   'He/Him/His',

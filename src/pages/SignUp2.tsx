@@ -4,11 +4,11 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import PageContainer from '../components/layout/PageContainer';
 import SignUp2Footer from '../components/SignUp/SignUp2Footer';
-import Training from '../components/SignUp/Training';
-import Credits from '../components/SignUp/Credits';
-import Upcoming from '../components/SignUp/Upcoming';
-import AdditionalSkills from '../components/SignUp/AdditionalSkills';
-import Awards from '../components/SignUp/Awards';
+import Training from '../components/SignUp/Individual/Training';
+import Credits from '../components/SignUp/Individual/Credits';
+import Upcoming from '../components/SignUp/Individual/Upcoming';
+import AdditionalSkills from '../components/SignUp/Individual/AdditionalSkills';
+import Awards from '../components/SignUp/Individual/Awards';
 
 // Establish our steps
 const steps = [
