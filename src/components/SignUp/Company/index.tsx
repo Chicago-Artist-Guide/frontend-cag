@@ -5,16 +5,10 @@ import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
-import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
-import ActorInfo1 from '../Individual/ActorInfo1';
-import ActorInfo2 from '../Individual/ActorInfo2';
-import IndividualBasics from '../Individual/Basics';
-import Demographics from '../Individual/Demographics';
-import OffstageRoles from '../Individual/OffstageRoles';
-import ProfilePhoto from '../Individual/ProfilePhoto';
 import Privacy from '../Privacy';
 import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
+import CompanyBasics from './Basics';
 
 const GroupSignUp: React.FC<{
   currentStep: number;
@@ -52,18 +46,9 @@ const GroupSignUp: React.FC<{
   const submitBasics: () => Promise<SubmitBasicsResp> = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
-
-    // reset any sort of previous error response
     setSubmitBasicsErr(undefined);
 
-    const {
-      basicsFirstName,
-      basicsLastName,
-      basicsEmailAddress,
-      basicsPassword,
-      basics18Plus
-      // stageRole
-    } = formData;
+    const { basicsTheatreName, basicsEmailAddress, basicsPassword } = formData;
 
     await createUserWithEmailAndPassword(
       firebaseAuth,
@@ -71,30 +56,23 @@ const GroupSignUp: React.FC<{
       basicsPassword
     )
       .then(async res => {
-        try {
-          const userId = res.user.uid;
+        const userId = res.user.uid;
+        const accountRef = await addDoc(
+          collection(firebaseFirestore, 'accounts'),
+          {
+            theater_name: basicsTheatreName,
+            privacy_agreement: true,
+            uid: userId
+          }
+        );
 
-          // create doc for account (extra fields not in auth)
-          const accountRef = await addDoc(
-            collection(firebaseFirestore, 'accounts'),
-            {
-              basics_18_plus: basics18Plus,
-              first_name: basicsFirstName,
-              last_name: basicsLastName,
-              privacy_agreement: true,
-              uid: userId
-            }
-          );
-
-          // create doc for profile
-          const profileRef = await addDoc(
-            collection(firebaseFirestore, 'profiles'),
-            {
-              uid: userId,
-              account_id: accountRef.id
-              // stage_role: stageRole
-            }
-          );
+        const profileRef = await addDoc(
+          collection(firebaseFirestore, 'profiles'),
+          {
+            uid: userId,
+            account_id: accountRef.id
+          }
+        );
 
           // store account and profile refs so we can update them later
           setAccountRef(accountRef);
@@ -134,60 +112,31 @@ const GroupSignUp: React.FC<{
   // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
     const newStepErrorsObj = { ...stepErrors };
-
     if (step in newStepErrorsObj) {
       newStepErrorsObj[step] = hasErrors;
     }
-
     setStepErrors(newStepErrorsObj);
   };
 
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
-    let returnStep;
-
     switch (stepId) {
       case 'basics':
-        returnStep = (
-          <IndividualBasics
+        return (
+          <CompanyBasics
             {...props}
+            setFormErrors={setStepErrors}
+            formErrors={stepErrors}
             hasErrorCallback={setStepErrorsCallback}
             submitBasicsErr={undefined}
           />
         );
-        break;
       case 'privacy':
-        returnStep = <Privacy {...props} />;
-        break;
-      case 'actorInfo1':
-        returnStep = (
-          <ActorInfo1 {...props} hasErrorCallback={setStepErrorsCallback} />
-        );
-        break;
-      case 'actorInfo2':
-        returnStep = (
-          <ActorInfo2 {...props} hasErrorCallback={setStepErrorsCallback} />
-        );
-        break;
-      case 'offstageRoles':
-        returnStep = <OffstageRoles {...props} />;
-        break;
-      case 'profilePhoto':
-        returnStep = <ProfilePhoto {...props} />;
-        break;
-      case 'demographics':
-        returnStep = <Demographics {...props} />;
-        break;
-      case 'profilePreview':
-        returnStep = <Profile previewMode={true} />;
-        break;
+        return <Privacy {...props} />;
       default:
-        returnStep = <></>;
-        break;
+        return <>Something went wrong</>;
     }
-
-    return returnStep;
   };
 
   // if no Landing type is selected or it's profile preview, don't show navigation yet
@@ -231,46 +180,13 @@ const createDefaultStepErrorsObj = (stepNames: string[]) => {
 // // flatten our step id's into a single array
 const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
-const defaultSteps: Step[] = [
-  { id: 'basics' },
-  { id: 'privacy' },
-  { id: 'actorInfo1' },
-  { id: 'actorInfo2' },
-  { id: 'offstageRoles' },
-  { id: 'profilePhoto' },
-  { id: 'demographics' },
-  { id: 'profilePreview' }
-];
+const defaultSteps: Step[] = [{ id: 'basics' }, { id: 'privacy' }];
 
 const defaultData = {
-  actorInfo1Ethnicities: [],
-  actorInfo1LGBTQ: '',
-  actorInfo1Pronouns: '',
-  actorInfo1PronounsOther: '',
-  actorInfo2AgeRanges: [],
-  actorInfo2Gender: '',
-  actorInfo2GenderRoles: [],
-  actorInfo2GenderTransition: '',
-  actorInfo2HeightFt: 0,
-  actorInfo2HeightIn: 0,
-  actorInfo2HeightNoAnswer: false,
-  basics18Plus: false,
+  basicsTheatreName: '',
   basicsEmailAddress: '',
-  basicsFirstName: '',
-  basicsLastName: '',
   basicsPassword: '',
   basicsPasswordConfirm: '',
-  demographicsAgency: '',
-  demographicsBio: '',
-  demographicsUnionStatus: '',
-  demographicsUnionStatusOther: '',
-  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
-  offstageRolesGeneral: [],
-  offstageRolesHairMakeupCostumes: [],
-  offstageRolesLighting: [],
-  offstageRolesProduction: [],
-  offstageRolesScenicAndProperties: [],
-  offstageRolesSound: [],
   privacyAgreement: false,
   profilePhotoUrl: ''
 };

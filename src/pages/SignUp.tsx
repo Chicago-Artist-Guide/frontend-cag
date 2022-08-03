@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import PageContainer from '../components/layout/PageContainer';
 import AccountType from '../components/SignUp/AccountType';
-import GroupSignUp from '../components/SignUp/Group';
+import CompanySignUp from '../components/SignUp/Company';
 import IndividualSignUp from '../components/SignUp/Individual';
 import {
   ButtonCol,
@@ -57,7 +57,10 @@ const SignUp: React.FC = () => {
 
   if (accountType === 'group') {
     return (
-      <GroupSignUp currentStep={currentStep} setCurrentStep={setCurrentStep} />
+      <CompanySignUp
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+      />
     );
   }
 
