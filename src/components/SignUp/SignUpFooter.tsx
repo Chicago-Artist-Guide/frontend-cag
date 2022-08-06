@@ -47,36 +47,34 @@ const SignUpFooter: React.FC<{
   // console.log('SignUpFooter', { currentStep, landingStep, steps, stepErrors });
 
   const { next, previous } = navigation;
-  const navigationNext =
-    landingStep === 2 ||
-    (currentStep !== 'privacy' && currentStep !== 'demographics');
+  const navigationNext = landingStep === 2 || currentStep !== 'privacy';
   const stepIndex = steps.findIndex(step => step.id === currentStep);
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
-  const privacyAgree = () => {
-    submitBasics();
-    next();
-  };
+  const nextButtonAction = (navNext: boolean, currStep: string) => {
+    console.log(landingStep, navNext, currStep);
 
-  const nextButtonAction = () => {
-    if (navigationNext) {
-      return next;
+    if (currStep === 'privacy') {
+      console.log('privacy footer');
+      submitBasics();
+      return next();
     }
 
-    if (currentStep === 'privacy') {
-      return privacyAgree;
+    if (currStep === 'demographics') {
+      console.log('demographics footer');
+      submitSignUpProfile();
+      return next();
     }
 
-    if (currentStep === 'demographics') {
-      return () => {
-        submitSignUpProfile();
-        next();
-      };
+    if (navNext) {
+      console.log('navigationNext footer');
+      return next();
     }
 
     // we're still in step 1
-    return () => setLandingStep(2);
+    console.log('go to landing step 2');
+    return setLandingStep(2);
   };
 
   return (
@@ -107,7 +105,7 @@ const SignUpFooter: React.FC<{
         {currentStep !== ('awards' as any) && (
           <Button
             disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
-            onClick={nextButtonAction()}
+            onClick={() => nextButtonAction(navigationNext, currentStep)}
             text={continueText}
             type="button"
             variant="primary"

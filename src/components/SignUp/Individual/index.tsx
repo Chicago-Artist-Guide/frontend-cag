@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
@@ -108,6 +108,8 @@ const IndividualSignUp: React.FC<{
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
 
+    console.log('submitBasics getting run');
+
     const {
       basicsFirstName,
       basicsLastName,
@@ -146,7 +148,7 @@ const IndividualSignUp: React.FC<{
             }
           );
 
-          console.log(profileRef);
+          console.log('profileRef in submitBasics', profileRef);
 
           setAccountRef(accountRef);
           setProfileRef(profileRef);
@@ -188,7 +190,7 @@ const IndividualSignUp: React.FC<{
 
     const finalProfileData = {
       // actor info 1
-      pronounds:
+      pronouns:
         actorInfo1Pronouns !== 'Other'
           ? actorInfo1Pronouns
           : actorInfo1PronounsOther,
@@ -233,7 +235,7 @@ const IndividualSignUp: React.FC<{
     try {
       console.log(profileRef);
       if (profileRef) {
-        await profileRef.update(finalProfileData);
+        await updateDoc(profileRef, { ...finalProfileData });
       } else {
         // no profileRef
         // look up?
