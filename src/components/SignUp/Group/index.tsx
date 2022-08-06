@@ -172,6 +172,7 @@ const GroupSignUp: React.FC<{
           landingStep={index}
           navigation={navigation}
           setLandingStep={setCurrentStep}
+          submitSignUpProfile={() => null}
           currentStep={stepId}
           stepErrors={stepErrors}
           steps={defaultSteps}

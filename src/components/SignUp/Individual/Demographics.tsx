@@ -128,6 +128,7 @@ const Demographics: React.FC<{
                   </PaddedCol>
                 </Row>
               </Container>
+              <TitleThree>Agency</TitleThree>
               <Container>
                 <Row>
                   <PaddedCol lg="10">
@@ -137,7 +138,7 @@ const Demographics: React.FC<{
                         defaultValue={demographicsAgency}
                         name="demographicsAgency"
                         onChange={setForm}
-                        placeholder="Select Agency"
+                        placeholder="Agency"
                       ></CAGFormControl>
                     </Form.Group>
                   </PaddedCol>
@@ -178,7 +179,9 @@ const Demographics: React.FC<{
                         >
                           <option value={undefined}>Select Type</option>
                           {websiteTypeOptions.map(wT => (
-                            <option value={wT}>{wT}</option>
+                            <option value={wT} key={wT}>
+                              {wT}
+                            </option>
                           ))}
                         </CAGFormControl>
                         {numWebsites > 1 && (

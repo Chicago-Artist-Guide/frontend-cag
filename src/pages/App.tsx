@@ -86,6 +86,7 @@ const App = () => {
   useEffect(() => {
     // get user account doc if exists
     // get user profile doc if exists
+    console.log('user changed', currentUser);
   }, [currentUser]);
 
   return (

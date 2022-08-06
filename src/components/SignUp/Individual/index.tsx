@@ -22,7 +22,7 @@ const IndividualSignUp: React.FC<{
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { setAccountRef, setProfileRef } = useProfileContext();
+  const { profileRef, setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
@@ -146,6 +146,8 @@ const IndividualSignUp: React.FC<{
             }
           );
 
+          console.log(profileRef);
+
           setAccountRef(accountRef);
           setProfileRef(profileRef);
         } catch (e) {
@@ -155,6 +157,90 @@ const IndividualSignUp: React.FC<{
       .catch(err => {
         console.log('Error creating user:', err);
       });
+  };
+
+  // submit full sign up flow 1 profile data
+  const submitSignUpProfile = async () => {
+    const {
+      actorInfo1Ethnicities,
+      actorInfo1LGBTQ,
+      actorInfo1Pronouns,
+      actorInfo1PronounsOther,
+      actorInfo2AgeRanges,
+      actorInfo2Gender,
+      actorInfo2GenderRoles,
+      actorInfo2GenderTransition,
+      actorInfo2HeightFt,
+      actorInfo2HeightIn,
+      actorInfo2HeightNoAnswer,
+      demographicsAgency,
+      demographicsUnionStatus,
+      demographicsUnionStatusOther,
+      demographicsWebsites, // { id, url, websiteType }
+      offstageRolesGeneral,
+      offstageRolesHairMakeupCostumes,
+      offstageRolesLighting,
+      offstageRolesProduction,
+      offstageRolesScenicAndProperties,
+      offstageRolesSound,
+      profilePhotoUrl
+    } = formData;
+
+    const finalProfileData = {
+      // actor info 1
+      pronounds:
+        actorInfo1Pronouns !== 'Other'
+          ? actorInfo1Pronouns
+          : actorInfo1PronounsOther,
+      lgbtqia: actorInfo1LGBTQ,
+      ethnicities: actorInfo1Ethnicities,
+
+      // actor info 2
+      height: {
+        feet: actorInfo2HeightFt,
+        inches: actorInfo2HeightIn,
+        no_answer: actorInfo2HeightNoAnswer
+      },
+      age_ranges: actorInfo2AgeRanges,
+      gender: {
+        identity: actorInfo2Gender,
+        roles: actorInfo2GenderRoles,
+        transition: actorInfo2GenderTransition
+      },
+
+      // off-stage
+      offstage_roles: {
+        general: offstageRolesGeneral,
+        production: offstageRolesProduction,
+        scenic_and_properties: offstageRolesScenicAndProperties,
+        lighting: offstageRolesLighting,
+        sound: offstageRolesSound,
+        hair_makeup_costumes: offstageRolesHairMakeupCostumes
+      },
+
+      // profile picture
+      profile_image_url: profilePhotoUrl,
+
+      // demographics
+      union: {
+        status: demographicsUnionStatus,
+        other: demographicsUnionStatusOther
+      },
+      agency: demographicsAgency,
+      websites: demographicsWebsites
+    };
+
+    try {
+      console.log(profileRef);
+      if (profileRef) {
+        await profileRef.update(finalProfileData);
+      } else {
+        // no profileRef
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
   };
 
   // callback function for updating if a step has errors
@@ -234,6 +320,7 @@ const IndividualSignUp: React.FC<{
           landingStep={index}
           navigation={navigation}
           setLandingStep={setCurrentStep}
+          submitSignUpProfile={submitSignUpProfile}
           currentStep={stepId}
           stepErrors={stepErrors}
           steps={steps}
@@ -243,6 +330,7 @@ const IndividualSignUp: React.FC<{
     </PageContainer>
   );
 };
+
 export default IndividualSignUp;
 
 // default object to track a boolean true/false for which steps have form validation error states
@@ -292,7 +380,6 @@ const defaultData = {
   basicsPassword: '',
   basicsPasswordConfirm: '',
   demographicsAgency: '',
-  demographicsBio: '',
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
   demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }

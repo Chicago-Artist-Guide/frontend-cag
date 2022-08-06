@@ -195,7 +195,7 @@ const OffstageRoles: React.FC<{
     }
 
     const target = {
-      name: 'offstageRolesGeneral',
+      name: fieldName,
       value: sectionRoles
     };
 
@@ -221,12 +221,11 @@ const OffstageRoles: React.FC<{
                 sectionStateValue,
                 sectionStateName,
                 textHeader,
-                role,
                 checkboxes
               } = currObjKey;
 
               return (
-                <StyledDiv>
+                <StyledDiv key={`div-accordion-item-${textHeader}`}>
                   <GenericAccordion
                     eventKey={objI}
                     key={`accordion-item-${textHeader}`}
@@ -249,7 +248,7 @@ const OffstageRoles: React.FC<{
                               onChange={(e: any) =>
                                 rolesSectionChange(
                                   e.currentTarget.checked,
-                                  role,
+                                  chkValue,
                                   sectionStateName,
                                   sectionStateValue
                                 )
