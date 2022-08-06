@@ -44,8 +44,6 @@ const SignUpFooter: React.FC<{
       - Done using stepErrors prop for current step (stepErrors[step])
   */
 
-  // console.log('SignUpFooter', { currentStep, landingStep, steps, stepErrors });
-
   const { next, previous } = navigation;
   const navigationNext = landingStep === 2 || currentStep !== 'privacy';
   const stepIndex = steps.findIndex(step => step.id === currentStep);
@@ -53,27 +51,21 @@ const SignUpFooter: React.FC<{
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
   const nextButtonAction = (navNext: boolean, currStep: string) => {
-    console.log(landingStep, navNext, currStep);
-
     if (currStep === 'privacy') {
-      console.log('privacy footer');
       submitBasics();
       return next();
     }
 
     if (currStep === 'demographics') {
-      console.log('demographics footer');
       submitSignUpProfile();
       return next();
     }
 
     if (navNext) {
-      console.log('navigationNext footer');
       return next();
     }
 
     // we're still in step 1
-    console.log('go to landing step 2');
     return setLandingStep(2);
   };
 

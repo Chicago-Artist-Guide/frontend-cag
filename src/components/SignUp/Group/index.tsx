@@ -29,7 +29,6 @@ const GroupSignUp: React.FC<{
     createDefaultStepErrorsObj(flatSteps(defaultSteps))
   );
 
-  // console.log('formData', { formData });
   // defaults for our defaultSteps
   const { step, index, navigation } = useStep({
     initialStep: currentStep,
@@ -101,7 +100,6 @@ const GroupSignUp: React.FC<{
   // callback function for updating if a step has errors
   // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
-    // console.log('step error', step, stepErrors);
     const newStepErrorsObj = { ...stepErrors };
 
     if (step in newStepErrorsObj) {
@@ -113,7 +111,6 @@ const GroupSignUp: React.FC<{
 
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
-    // console.log('stepFrame', stepId);
     const props = { formData, setForm, navigation };
     let returnStep;
 

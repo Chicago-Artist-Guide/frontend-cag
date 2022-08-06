@@ -55,7 +55,7 @@ const ProfilePhoto: React.FC<{
         setPercent(percent);
       },
       err => {
-        console.log(err);
+        console.log('Error uploading image', err);
         setUploadInProgress(false);
       },
       () => {
@@ -63,7 +63,7 @@ const ProfilePhoto: React.FC<{
 
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then(url => {
-          console.log(url);
+          console.log('Uploaded image url:', url);
           setImgUrl(url);
         });
       }

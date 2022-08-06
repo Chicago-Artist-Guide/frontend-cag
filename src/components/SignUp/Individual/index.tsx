@@ -31,7 +31,6 @@ const IndividualSignUp: React.FC<{
     createDefaultStepErrorsObj(flatSteps(steps))
   );
 
-  // console.log('formData', { formData });
   // defaults for our defaultSteps
   const { step, index, navigation } = useStep({
     initialStep: currentStep,
@@ -108,8 +107,6 @@ const IndividualSignUp: React.FC<{
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
 
-    console.log('submitBasics getting run');
-
     const {
       basicsFirstName,
       basicsLastName,
@@ -128,6 +125,7 @@ const IndividualSignUp: React.FC<{
         try {
           const userId = res.user.uid;
 
+          // create doc for account (extra fields not in auth)
           const accountRef = await addDoc(
             collection(firebaseFirestore, 'accounts'),
             {
@@ -139,6 +137,7 @@ const IndividualSignUp: React.FC<{
             }
           );
 
+          // create doc for profile
           const profileRef = await addDoc(
             collection(firebaseFirestore, 'profiles'),
             {
@@ -148,8 +147,7 @@ const IndividualSignUp: React.FC<{
             }
           );
 
-          console.log('profileRef in submitBasics', profileRef);
-
+          // store account and profile refs so we can update them later
           setAccountRef(accountRef);
           setProfileRef(profileRef);
         } catch (e) {
@@ -190,50 +188,39 @@ const IndividualSignUp: React.FC<{
 
     const finalProfileData = {
       // actor info 1
-      pronouns:
-        actorInfo1Pronouns !== 'Other'
-          ? actorInfo1Pronouns
-          : actorInfo1PronounsOther,
+      pronouns: actorInfo1Pronouns,
+      pronouns_other: actorInfo1PronounsOther,
       lgbtqia: actorInfo1LGBTQ,
       ethnicities: actorInfo1Ethnicities,
 
       // actor info 2
-      height: {
-        feet: actorInfo2HeightFt,
-        inches: actorInfo2HeightIn,
-        no_answer: actorInfo2HeightNoAnswer
-      },
+      height_ft: actorInfo2HeightFt,
+      height_in: actorInfo2HeightIn,
+      height_no_answer: actorInfo2HeightNoAnswer,
       age_ranges: actorInfo2AgeRanges,
-      gender: {
-        identity: actorInfo2Gender,
-        roles: actorInfo2GenderRoles,
-        transition: actorInfo2GenderTransition
-      },
+      gender_identity: actorInfo2Gender,
+      gender_roles: actorInfo2GenderRoles,
+      gender_transition: actorInfo2GenderTransition,
 
       // off-stage
-      offstage_roles: {
-        general: offstageRolesGeneral,
-        production: offstageRolesProduction,
-        scenic_and_properties: offstageRolesScenicAndProperties,
-        lighting: offstageRolesLighting,
-        sound: offstageRolesSound,
-        hair_makeup_costumes: offstageRolesHairMakeupCostumes
-      },
+      offstage_roles_general: offstageRolesGeneral,
+      offstage_roles_production: offstageRolesProduction,
+      offstage_roles_scenic_and_properties: offstageRolesScenicAndProperties,
+      offstage_roles_lighting: offstageRolesLighting,
+      offstage_roles_sound: offstageRolesSound,
+      offstage_roles_hair_makeup_costumes: offstageRolesHairMakeupCostumes,
 
       // profile picture
       profile_image_url: profilePhotoUrl,
 
       // demographics
-      union: {
-        status: demographicsUnionStatus,
-        other: demographicsUnionStatusOther
-      },
+      union_status: demographicsUnionStatus,
+      union_other: demographicsUnionStatusOther,
       agency: demographicsAgency,
       websites: demographicsWebsites
     };
 
     try {
-      console.log(profileRef);
       if (profileRef) {
         await updateDoc(profileRef, { ...finalProfileData });
       } else {
@@ -248,7 +235,6 @@ const IndividualSignUp: React.FC<{
   // callback function for updating if a step has errors
   // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
-    // console.log('step error', step, stepErrors);
     const newStepErrorsObj = { ...stepErrors };
 
     if (step in newStepErrorsObj) {
@@ -260,7 +246,6 @@ const IndividualSignUp: React.FC<{
 
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
-    // console.log('stepFrame', stepId);
     const props = { formData, setForm, navigation };
     let returnStep;
 
