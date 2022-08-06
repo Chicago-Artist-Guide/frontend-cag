@@ -1,5 +1,5 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
@@ -22,7 +22,7 @@ const IndividualSignUp: React.FC<{
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { setAccountRef, setProfileRef } = useProfileContext();
+  const { profileRef, setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
@@ -31,7 +31,6 @@ const IndividualSignUp: React.FC<{
     createDefaultStepErrorsObj(flatSteps(steps))
   );
 
-  // console.log('formData', { formData });
   // defaults for our defaultSteps
   const { step, index, navigation } = useStep({
     initialStep: currentStep,
@@ -126,6 +125,7 @@ const IndividualSignUp: React.FC<{
         try {
           const userId = res.user.uid;
 
+          // create doc for account (extra fields not in auth)
           const accountRef = await addDoc(
             collection(firebaseFirestore, 'accounts'),
             {
@@ -137,6 +137,7 @@ const IndividualSignUp: React.FC<{
             }
           );
 
+          // create doc for profile
           const profileRef = await addDoc(
             collection(firebaseFirestore, 'profiles'),
             {
@@ -146,6 +147,7 @@ const IndividualSignUp: React.FC<{
             }
           );
 
+          // store account and profile refs so we can update them later
           setAccountRef(accountRef);
           setProfileRef(profileRef);
         } catch (e) {
@@ -157,10 +159,82 @@ const IndividualSignUp: React.FC<{
       });
   };
 
+  // submit full sign up flow 1 profile data
+  const submitSignUpProfile = async () => {
+    const {
+      actorInfo1Ethnicities,
+      actorInfo1LGBTQ,
+      actorInfo1Pronouns,
+      actorInfo1PronounsOther,
+      actorInfo2AgeRanges,
+      actorInfo2Gender,
+      actorInfo2GenderRoles,
+      actorInfo2GenderTransition,
+      actorInfo2HeightFt,
+      actorInfo2HeightIn,
+      actorInfo2HeightNoAnswer,
+      demographicsAgency,
+      demographicsUnionStatus,
+      demographicsUnionStatusOther,
+      demographicsWebsites, // { id, url, websiteType }
+      offstageRolesGeneral,
+      offstageRolesHairMakeupCostumes,
+      offstageRolesLighting,
+      offstageRolesProduction,
+      offstageRolesScenicAndProperties,
+      offstageRolesSound,
+      profilePhotoUrl
+    } = formData;
+
+    const finalProfileData = {
+      // actor info 1
+      pronouns: actorInfo1Pronouns,
+      pronouns_other: actorInfo1PronounsOther,
+      lgbtqia: actorInfo1LGBTQ,
+      ethnicities: actorInfo1Ethnicities,
+
+      // actor info 2
+      height_ft: actorInfo2HeightFt,
+      height_in: actorInfo2HeightIn,
+      height_no_answer: actorInfo2HeightNoAnswer,
+      age_ranges: actorInfo2AgeRanges,
+      gender_identity: actorInfo2Gender,
+      gender_roles: actorInfo2GenderRoles,
+      gender_transition: actorInfo2GenderTransition,
+
+      // off-stage
+      offstage_roles_general: offstageRolesGeneral,
+      offstage_roles_production: offstageRolesProduction,
+      offstage_roles_scenic_and_properties: offstageRolesScenicAndProperties,
+      offstage_roles_lighting: offstageRolesLighting,
+      offstage_roles_sound: offstageRolesSound,
+      offstage_roles_hair_makeup_costumes: offstageRolesHairMakeupCostumes,
+
+      // profile picture
+      profile_image_url: profilePhotoUrl,
+
+      // demographics
+      union_status: demographicsUnionStatus,
+      union_other: demographicsUnionStatusOther,
+      agency: demographicsAgency,
+      websites: demographicsWebsites
+    };
+
+    try {
+      if (profileRef) {
+        await updateDoc(profileRef, { ...finalProfileData });
+      } else {
+        // no profileRef
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
+
   // callback function for updating if a step has errors
   // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
-    // console.log('step error', step, stepErrors);
     const newStepErrorsObj = { ...stepErrors };
 
     if (step in newStepErrorsObj) {
@@ -172,7 +246,6 @@ const IndividualSignUp: React.FC<{
 
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
-    // console.log('stepFrame', stepId);
     const props = { formData, setForm, navigation };
     let returnStep;
 
@@ -234,6 +307,7 @@ const IndividualSignUp: React.FC<{
           landingStep={index}
           navigation={navigation}
           setLandingStep={setCurrentStep}
+          submitSignUpProfile={submitSignUpProfile}
           currentStep={stepId}
           stepErrors={stepErrors}
           steps={steps}
@@ -243,6 +317,7 @@ const IndividualSignUp: React.FC<{
     </PageContainer>
   );
 };
+
 export default IndividualSignUp;
 
 // default object to track a boolean true/false for which steps have form validation error states
@@ -292,7 +367,6 @@ const defaultData = {
   basicsPassword: '',
   basicsPasswordConfirm: '',
   demographicsAgency: '',
-  demographicsBio: '',
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
   demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }

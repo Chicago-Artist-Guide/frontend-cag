@@ -10,6 +10,7 @@ const CardBox = (props: any) => {
         <Card
           divider={cards.divider}
           header={cards.header}
+          key={`${cards.img}-${cards.text}`}
           src={cards.image}
           text={cards.text}
         />

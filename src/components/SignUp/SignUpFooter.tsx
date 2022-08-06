@@ -14,6 +14,7 @@ const SignUpFooter: React.FC<{
   currentStep: string;
   steps: Step[];
   submitBasics: () => void;
+  submitSignUpProfile: () => void;
   stepErrors: { [key: string]: boolean };
 }> = ({
   landingStep,
@@ -22,6 +23,7 @@ const SignUpFooter: React.FC<{
   currentStep,
   steps,
   submitBasics,
+  submitSignUpProfile,
   stepErrors
 }) => {
   /*
@@ -42,22 +44,34 @@ const SignUpFooter: React.FC<{
       - Done using stepErrors prop for current step (stepErrors[step])
   */
 
-  // console.log('SignUpFooter', { currentStep, landingStep, steps, stepErrors });
-
   const { next, previous } = navigation;
   const navigationNext = landingStep === 2 || currentStep !== 'privacy';
   const stepIndex = steps.findIndex(step => step.id === currentStep);
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
-  const privacyAgree = () => {
-    submitBasics();
-    next();
+  const nextButtonAction = (navNext: boolean, currStep: string) => {
+    if (currStep === 'privacy') {
+      submitBasics();
+      return next();
+    }
+
+    if (currStep === 'demographics') {
+      submitSignUpProfile();
+      return next();
+    }
+
+    if (navNext) {
+      return next();
+    }
+
+    // we're still in step 1
+    return setLandingStep(2);
   };
 
   return (
     <PageFooterRow>
-      <Col lg="2">
+      <Col lg="3">
         <Button
           onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
           text="Back"
@@ -65,7 +79,7 @@ const SignUpFooter: React.FC<{
           variant="secondary"
         />
       </Col>
-      <Col lg="8">
+      <Col lg="6">
         <Pagination>
           {steps.map((_step, i: number) => (
             <li
@@ -79,17 +93,11 @@ const SignUpFooter: React.FC<{
           ))}
         </Pagination>
       </Col>
-      <ButtonCol lg="2">
+      <ButtonCol lg="3">
         {currentStep !== ('awards' as any) && (
           <Button
             disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
-            onClick={
-              navigationNext
-                ? next
-                : currentStep === 'privacy'
-                ? privacyAgree
-                : () => setLandingStep(2)
-            }
+            onClick={() => nextButtonAction(navigationNext, currentStep)}
             text={continueText}
             type="button"
             variant="primary"
