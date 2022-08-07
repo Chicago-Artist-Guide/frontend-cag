@@ -174,6 +174,7 @@ const IndividualSignUp: React.FC<{
       actorInfo2HeightIn,
       actorInfo2HeightNoAnswer,
       demographicsAgency,
+      demographicsBio,
       demographicsUnionStatus,
       demographicsUnionStatusOther,
       demographicsWebsites, // { id, url, websiteType }
@@ -217,7 +218,8 @@ const IndividualSignUp: React.FC<{
       union_status: demographicsUnionStatus,
       union_other: demographicsUnionStatusOther,
       agency: demographicsAgency,
-      websites: demographicsWebsites
+      websites: demographicsWebsites,
+      bio: demographicsBio
     };
 
     try {
@@ -367,6 +369,7 @@ const defaultData = {
   basicsPassword: '',
   basicsPasswordConfirm: '',
   demographicsAgency: '',
+  demographicsBio: '',
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
   demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }

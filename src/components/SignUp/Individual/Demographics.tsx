@@ -204,6 +204,22 @@ const Demographics: React.FC<{
                   </PaddedCol>
                 </Row>
               </Container>
+              <TitleThree>Personal Bio (max 1000 char.)</TitleThree>
+              <Container>
+                <Row>
+                  <PaddedCol lg="10">
+                    <Form.Group>
+                      <Form.Control
+                        as="textarea"
+                        name="demographicsBio"
+                        onChange={setForm}
+                        rows={5}
+                        maxLength={1000}
+                      />
+                    </Form.Group>
+                  </PaddedCol>
+                </Row>
+              </Container>
             </Col>
           </Row>
         </Col>
