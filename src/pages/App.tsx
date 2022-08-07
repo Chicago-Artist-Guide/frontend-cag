@@ -1,7 +1,14 @@
 import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import {
+  getFirestore,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where
+} from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import {
@@ -84,9 +91,39 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    // get user account doc if exists
-    // get user profile doc if exists
-  }, [currentUser]);
+    if (!currentUser || !firestore) {
+      return;
+    }
+
+    const queryAccountAndProfile = async () => {
+      if (!profileRef || !accountRef) {
+        const accountsRef = collection(firestore, 'accounts');
+        const profilesRef = collection(firestore, 'profiles');
+
+        const userAccount = query(
+          accountsRef,
+          where('uid', '==', currentUser.uid)
+        );
+        const userProfile = query(
+          profilesRef,
+          where('uid', '==', currentUser.uid)
+        );
+
+        const queryAccountSnapshot = await getDocs(userAccount);
+        const queryAccountProfile = await getDocs(userProfile);
+
+        queryAccountSnapshot.forEach(acc => {
+          setAccountRef(acc.ref);
+        });
+
+        queryAccountProfile.forEach(prof => {
+          setProfileRef(prof.ref);
+        });
+      }
+    };
+
+    queryAccountAndProfile();
+  }, [profileRef, accountRef, currentUser, firestore]);
 
   return (
     <FirebaseContext.Provider

@@ -21,14 +21,19 @@ const Profile: React.FC<{
 
   useEffect(() => {
     const getProfileData = async () => {
+      if (!profileRef || !accountRef) {
+        return;
+      }
+
       const profileData = await getDoc(profileRef);
-      setProfile(profileData.data());
       const accountData = await getDoc(accountRef);
+
+      setProfile(profileData.data());
       setAccount(accountData.data());
     };
 
     getProfileData();
-  }, [profileRef]);
+  }, [accountRef, profileRef]);
 
   const PageWrapper = previewMode ? Container : PageContainer;
 
