@@ -1,10 +1,13 @@
-import React from 'react';
+import { getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 import styled from 'styled-components';
 import PageContainer from '../components/layout/PageContainer';
+import { useProfileContext } from '../context/ProfileContext';
 import Button from '../genericComponents/Button';
 import { colors, fonts } from '../theme/styleVars';
 
@@ -12,10 +15,26 @@ const Profile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
   const history = useHistory();
+  const { accountRef, profileRef } = useProfileContext();
+  const [account, setAccount] = useState<any>({});
+  const [profile, setProfile] = useState<any>({});
+
+  useEffect(() => {
+    const getProfileData = async () => {
+      const profileData = await getDoc(profileRef);
+      setProfile(profileData.data());
+      const accountData = await getDoc(accountRef);
+      setAccount(accountData.data());
+    };
+
+    getProfileData();
+  }, [profileRef]);
+
+  const PageWrapper = previewMode ? Container : PageContainer;
 
   return (
     <>
-      <PageContainer>
+      <PageWrapper>
         <Row>
           <Col lg={12}>
             <Title>YOUR PROFILE</Title>
@@ -23,40 +42,41 @@ const Profile: React.FC<{
         </Row>
         <Row>
           <Col lg={4}>
-            <ProfileImage
-              src="https://firebasestorage.googleapis.com/v0/b/chicago-artist-guide-dev.appspot.com/o/files%2Falex.jpg?alt=media&token=a576a7b2-c2c7-4f52-aa1e-504af4a50deb"
-              fluid
-            />
+            <ProfileImage src={profile.profile_image_url} fluid />
             <DetailsCard>
               <DetailsColTitle>Personal Details</DetailsColTitle>
               <p>
-                Age Range: 18-29
+                Age Range: {profile.age_ranges.join(', ')}
                 <br />
-                Height: 5’-3”
+                Height:{' '}
+                {profile.height_no_answer ? (
+                  'N/A'
+                ) : (
+                  <>
+                    {profile.height_ft}’-{profile.height_in}”
+                  </>
+                )}
                 <br />
-                Gender Identity: Nonbinary
+                Gender Identity: {profile.gender_identity}
                 <br />
-                Ethnicity: Native American
+                Ethnicity: {profile.ethnicities.join(', ')}
                 <br />
-                Union: None
+                Union: {profile.union_status || profile.union_other}
                 <br />
-                Agency: Chi Stars Agency
+                Agency: {profile.agency}
               </p>
             </DetailsCard>
           </Col>
           <Col lg={8}>
             <div>
-              <div>
-                <h2>Alex Jewell</h2>
-                <p>they/them</p>
-              </div>
+              <HeaderNamePronouns>
+                <h2>
+                  {account.first_name} {account.last_name}
+                </h2>
+                <p>{profile.pronouns || profile.pronouns_other}</p>
+              </HeaderNamePronouns>
               <h3>Actor, Magician, Singer</h3>
-              <p>
-                Classically trained, Camilla has played roles from Shakespeare
-                to Tennessee Williams, working in major American repertory
-                theaters, On- and Off-Broadway, as well as in dozens of contract
-                and recurring roles for daytime and primetime TV.
-              </p>
+              <p>{profile.bio}</p>
             </div>
             <div>
               <h4>Training</h4>
@@ -67,23 +87,25 @@ const Profile: React.FC<{
             </div>
           </Col>
         </Row>
-      </PageContainer>
-      <PreviewCard>
-        <h2>Your Profile is looking great!</h2>
-        <p>
-          We can walk you through the remaining steps or you can take it from
-          here
-        </p>
-        <div>
-          <Button
-            onClick={() => history.push('/sign-up-2')}
-            text="Keep Going"
-            type="button"
-            variant="secondary"
-          />
-          <a href="#">remind me later</a>
-        </div>
-      </PreviewCard>
+      </PageWrapper>
+      {previewMode && (
+        <PreviewCard>
+          <h2>Your Profile is looking great!</h2>
+          <p>
+            We can walk you through the remaining steps or you can take it from
+            here
+          </p>
+          <div>
+            <Button
+              onClick={() => history.push('/sign-up-2')}
+              text="Keep Going"
+              type="button"
+              variant="secondary"
+            />
+            <a href="#">remind me later</a>
+          </div>
+        </PreviewCard>
+      )}
     </>
   );
 };
@@ -121,6 +143,15 @@ const DetailsColTitle = styled.h2`
     height: 8px;
     background: linear-gradient(90deg, #efc93d 0%, #82b29a 100%);
     border-radius: 4px;
+  }
+`;
+
+const HeaderNamePronouns = styled.div`
+  display: flex;
+  align-items: flex-end;
+
+  p {
+    margin-left: 1.15rem;
   }
 `;
 
