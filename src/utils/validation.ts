@@ -14,8 +14,8 @@ export enum ErrorMessage {
 
 // object for our regex
 export const validationRegex: { password: RegExp; emailAddress: RegExp } = {
-  password: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/, // eslint-disable-line no-useless-escape
-  emailAddress: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ // eslint-disable-line no-useless-escape
+  password: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/, // eslint-disable-line no-useless-escape
+  emailAddress: /[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?/ // eslint-disable-line no-useless-escape
 } as const;
 
 // function for checking regex match

@@ -141,7 +141,7 @@ const IndividualSignUp: React.FC<{
           const profileRef = await addDoc(
             collection(firebaseFirestore, 'profiles'),
             {
-              uuid: userId,
+              uid: userId,
               account_id: accountRef.id,
               stage_role: stageRole
             }

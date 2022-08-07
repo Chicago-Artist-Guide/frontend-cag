@@ -98,7 +98,7 @@ const Demographics: React.FC<{
           <Title>ALMOST DONE!</Title>
           <Tagline>Just a few more questions.</Tagline>
           <Row>
-            <Col lg="10">
+            <Col lg="12">
               <TitleThree>Union</TitleThree>
               <Container>
                 <Row>
@@ -149,7 +149,7 @@ const Demographics: React.FC<{
                 <Row>
                   <PaddedCol lg="10">
                     {demographicsWebsites.map((websiteRow: any, i: any) => (
-                      <div key={`website-row-${websiteRow.id}`}>
+                      <WebsiteRow key={`website-row-${websiteRow.id}`}>
                         <CAGFormControl
                           aria-label="URL"
                           as="input"
@@ -194,7 +194,7 @@ const Demographics: React.FC<{
                             X
                           </a>
                         )}
-                      </div>
+                      </WebsiteRow>
                     ))}
                     <div>
                       <a href="#" onClick={addWebsiteInput}>
@@ -249,6 +249,18 @@ const CAGFormControl = styled(Form.Control)`
 
 const PaddedCol = styled(Col)`
   padding-left: 0;
+`;
+
+const WebsiteRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+
+  input,
+  select {
+    margin-right: 1rem;
+    margin-bottom: 0;
+  }
 `;
 
 export default Demographics;
