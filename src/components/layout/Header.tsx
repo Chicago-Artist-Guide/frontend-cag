@@ -4,11 +4,13 @@ import styled from 'styled-components';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import { useAuthValue } from '../../context/AuthContext';
+import { useProfileContext } from '../../context/ProfileContext';
 import { colors } from '../../theme/styleVars';
 import { ReactComponent as Logo } from '../../images/cagLogo1.svg';
 
 const Header = () => {
   const { currentUser } = useAuthValue();
+  const { profileRef } = useProfileContext();
 
   return (
     <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">
@@ -27,6 +29,11 @@ const Header = () => {
           <Nav.Link as={Link} to="/donate">
             DONATE
           </Nav.Link>
+          {profileRef !== null && (
+            <Nav.Link as={Link} to="/profile">
+              PROFILE
+            </Nav.Link>
+          )}
           {currentUser !== null && (
             <Nav.Link as={Link} to="/logout">
               LOGOUT

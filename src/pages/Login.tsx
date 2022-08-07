@@ -1,23 +1,51 @@
-import React, { useEffect } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useAuthValue } from '../context/AuthContext';
+import { useFirebaseContext } from '../context/FirebaseContext';
 import PageContainer from '../components/layout/PageContainer';
 import { Title } from '../components/layout/Titles';
 import Red_Blob from '../images/red_blob.svg';
 
 const Login = () => {
   const history = useHistory();
+  const { firebaseAuth } = useFirebaseContext();
   const { currentUser } = useAuthValue();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     if (currentUser) {
       history.push('/profile');
     }
   }, [currentUser]);
+
+  const updateEmail = (e: any) => {
+    const val = e.target.value;
+    setEmail(val);
+  };
+
+  const updatePassword = (e: any) => {
+    const val = e.target.value;
+    setPassword(val);
+  };
+
+  const onLogin = async () => {
+    if (email === '' || password === '') {
+      // error handling
+      return;
+    }
+
+    await signInWithEmailAndPassword(firebaseAuth, email, password)
+      .then(userCredential => {
+        console.log(userCredential.user);
+      })
+      .catch(err => console.log('Error logging in:', err));
+  };
 
   return (
     <PageContainer>
@@ -27,11 +55,11 @@ const Login = () => {
           <Form className="margin-team">
             <Form.Group controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
-              <Form.Control type="email" />
+              <Form.Control onChange={updateEmail} type="email" />
             </Form.Group>
             <Form.Group controlId="formBasicPassword">
               <Form.Label>Password</Form.Label>
-              <Form.Control type="password" />
+              <Form.Control onChange={updatePassword} type="password" />
             </Form.Group>
             <Form.Text className="text-muted">
               <p>
@@ -41,7 +69,7 @@ const Login = () => {
                 </a>
               </p>
             </Form.Text>
-            <Button href="/" type="submit" variant="primary">
+            <Button onClick={onLogin} type="button" variant="primary">
               LOG IN
             </Button>
           </Form>
