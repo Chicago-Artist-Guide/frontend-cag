@@ -46,7 +46,7 @@ const Profile: React.FC<{
             <DetailsCard>
               <DetailsColTitle>Personal Details</DetailsColTitle>
               <p>
-                Age Range: {profile.age_ranges.join(', ')}
+                Age Range: {profile.age_ranges?.join(', ')}
                 <br />
                 Height:{' '}
                 {profile.height_no_answer ? (
@@ -59,7 +59,7 @@ const Profile: React.FC<{
                 <br />
                 Gender Identity: {profile.gender_identity}
                 <br />
-                Ethnicity: {profile.ethnicities.join(', ')}
+                Ethnicity: {profile.ethnicities?.join(', ')}
                 <br />
                 Union: {profile.union_status || profile.union_other}
                 <br />
