@@ -114,19 +114,19 @@ const Title = styled.h1`
   font-family: ${fonts.montserrat};
   font-size: 48px;
   font-weight: bold;
-  margin-bottom: 100px;
+  margin-bottom: 76px;
 `;
 
 const ProfileImage = styled(Image)`
   display: block;
-  box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
 `;
 
 const DetailsCard = styled.div`
   margin-top: 47px;
-  background: white;
-  box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.05);
+  background: ${colors.white};
+  box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   padding: 25px 21px;
 `;
@@ -141,7 +141,11 @@ const DetailsColTitle = styled.h2`
     content: '';
     display: block;
     height: 8px;
-    background: linear-gradient(90deg, #efc93d 0%, #82b29a 100%);
+    background: linear-gradient(
+      90deg,
+      ${colors.yellow} 0%,
+      ${colors.darkGreen} 100%
+    );
     border-radius: 4px;
   }
 `;
@@ -164,8 +168,8 @@ const PreviewCard = styled.div`
   height: auto;
   display: block;
   padding: 26px 12% 26px 32px;
-  background: #f7beb2;
-  border-radius: 8px 0px 0px 8px;
+  background: ${colors.lightPink};
+  border-radius: 8px 0 0 8px;
 
   h2 {
     font-family: ${fonts.montserrat};
@@ -193,7 +197,7 @@ const PreviewCard = styled.div`
     font-size: 14px;
     line-height: 16px;
     text-transform: uppercase;
-    color: #3b4448;
+    color: ${colors.dark};
     margin-left: 21px;
   }
 `;
