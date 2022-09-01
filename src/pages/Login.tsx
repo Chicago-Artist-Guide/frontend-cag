@@ -1,14 +1,15 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import Alert from 'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
 import { useAuthValue } from '../context/AuthContext';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import PageContainer from '../components/layout/PageContainer';
 import { Title } from '../components/layout/Titles';
+import Button from '../genericComponents/Button';
 import Red_Blob from '../images/red_blob.svg';
 
 const Login = () => {
@@ -17,6 +18,7 @@ const Login = () => {
   const { currentUser } = useAuthValue();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentUser) {
@@ -36,15 +38,19 @@ const Login = () => {
 
   const onLogin = async () => {
     if (email === '' || password === '') {
-      // error handling
+      setLoginError('Please enter a username and a password!');
       return;
     }
 
     await signInWithEmailAndPassword(firebaseAuth, email, password)
       .then(userCredential => {
+        setLoginError(null);
         console.log(userCredential.user);
       })
-      .catch(err => console.log('Error logging in:', err));
+      .catch(err => {
+        setLoginError('Incorrect username or password! Please try again.');
+        console.log('Error logging in:', err);
+      });
   };
 
   return (
@@ -52,6 +58,11 @@ const Login = () => {
       <Row>
         <Col lg={5}>
           <Title>WELCOME BACK</Title>
+          {loginError && (
+            <Alert key="danger" variant="danger">
+              {loginError}
+            </Alert>
+          )}
           <Form className="margin-team">
             <Form.Group controlId="formBasicEmail">
               <Form.Label>Email address</Form.Label>
@@ -69,9 +80,12 @@ const Login = () => {
                 </a>
               </p>
             </Form.Text>
-            <Button onClick={onLogin} type="button" variant="primary">
-              LOG IN
-            </Button>
+            <Button
+              onClick={onLogin}
+              text="LOG IN"
+              type="button"
+              variant="primary"
+            />
           </Form>
         </Col>
         <Col lg={2} />
