@@ -14,6 +14,7 @@
     "@types/js-cookie": "^2.2.6",
     "@types/react-hooks-helper": "^1.6.2",
     "axios": ">=0.21.1",
+    "better-npm-audit": "^3.7.3",
     "bootstrap": "^4.5.2",
     "bootstrap-icons": "^1.5.0",
     "clsx": "^1.2.1",
@@ -35,7 +36,7 @@
     "react-transition-group": "^4.4.1",
     "react-view-slider": "^4.3.2",
     "styled-bootstrap-grid": "^3.1.0",
-    "styled-components": "^5.2.0"
+    "styled-components": "^5.3.5"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
@@ -60,7 +61,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "lint": "eslint --fix --max-warnings=200"
+    "lint": "eslint --fix --max-warnings=200",
+    "audit": "better-npm-audit audit"
   },
   "eslintConfig": {
     "rules": {
