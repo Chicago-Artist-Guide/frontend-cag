@@ -8,7 +8,7 @@ import { useProfileContext } from '../../../context/ProfileContext';
 import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
-import SignUpFooter from '../SignUpFooter';
+import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
 import ActorInfo1 from './ActorInfo1';
 import ActorInfo2 from './ActorInfo2';
 import IndividualBasics from './Basics';
@@ -25,6 +25,9 @@ const IndividualSignUp: React.FC<{
   const { profileRef, setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
+  const [submitBasicsErr, setSubmitBasicsErr] = useState<
+    SubmitBasicsResp | undefined
+  >(undefined);
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -103,9 +106,12 @@ const IndividualSignUp: React.FC<{
   };
 
   // submit basics to Firebase, get response, set session
-  const submitBasics = async () => {
+  const submitBasics: () => Promise<SubmitBasicsResp> = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
+
+    // reset any sort of previous error response
+    setSubmitBasicsErr(undefined);
 
     const {
       basicsFirstName,
@@ -116,7 +122,7 @@ const IndividualSignUp: React.FC<{
       stageRole
     } = formData;
 
-    await createUserWithEmailAndPassword(
+    return await createUserWithEmailAndPassword(
       firebaseAuth,
       basicsEmailAddress,
       basicsPassword
@@ -150,12 +156,35 @@ const IndividualSignUp: React.FC<{
           // store account and profile refs so we can update them later
           setAccountRef(accountRef);
           setProfileRef(profileRef);
+
+          // successful case
+          const resp = { ok: true };
+          setSubmitBasicsErr(resp);
+          return resp;
         } catch (e) {
           console.error('Error adding document:', e);
+
+          const resp = {
+            ok: false,
+            code: 'profile-creation-error'
+          };
+
+          setSubmitBasicsErr(resp);
+
+          return resp;
         }
       })
       .catch(err => {
         console.log('Error creating user:', err);
+
+        const resp = {
+          ok: false,
+          code: err.code ?? 'unknown-user-creation-error'
+        };
+
+        setSubmitBasicsErr(resp);
+
+        return resp;
       });
   };
 
@@ -260,6 +289,7 @@ const IndividualSignUp: React.FC<{
           <IndividualBasics
             {...props}
             hasErrorCallback={setStepErrorsCallback}
+            submitBasicsErr={submitBasicsErr}
           />
         );
         break;

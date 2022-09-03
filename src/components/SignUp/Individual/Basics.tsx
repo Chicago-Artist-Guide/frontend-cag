@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import Alert from 'react-bootstrap/Alert';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
+import { SubmitBasicsResp } from '../SignUpFooter';
 import { Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
 import Checkbox from '../../../genericComponents/Checkbox';
@@ -16,8 +18,9 @@ const IndividualBasics: React.FC<{
   setForm: SetForm;
   formData: { [key: string]: any };
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
+  submitBasicsErr: SubmitBasicsResp | undefined;
 }> = props => {
-  const { setForm, formData, hasErrorCallback } = props;
+  const { setForm, formData, hasErrorCallback, submitBasicsErr } = props;
   const {
     basicsFirstName,
     basicsLastName,
@@ -42,6 +45,7 @@ const IndividualBasics: React.FC<{
   // we default this for now based on if they are empty '' or false
   const createDefaultFormErrorsData = () => {
     const formErrorsObj: { [key: string]: boolean } = {};
+
     requiredFields.forEach((fieldName: string) => {
       formErrorsObj[fieldName] =
         formData[fieldName] === '' || formData[fieldName] === false;
@@ -99,7 +103,16 @@ const IndividualBasics: React.FC<{
   return (
     <Container>
       <Row>
-        <PaddingTitle>LET'S GET TO KNOW EACH OTHER</PaddingTitle>
+        <Col lg="8">
+          <PaddingTitle>LET'S GET TO KNOW EACH OTHER</PaddingTitle>
+          {submitBasicsErr && (
+            <Alert key="danger" variant="danger">
+              <strong>Error signing up:</strong> {submitBasicsErr.code}
+            </Alert>
+          )}
+        </Col>
+      </Row>
+      <Row>
         <Col lg="4">
           <Form>
             <InputField

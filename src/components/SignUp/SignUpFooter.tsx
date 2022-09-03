@@ -7,13 +7,18 @@ import { ButtonCol, PageFooterRow, Pagination } from './SignUpFooterStyles';
 // for dev
 const FORM_VALIDATION_ON = true;
 
+export type SubmitBasicsResp = {
+  ok: boolean;
+  code?: string;
+};
+
 const SignUpFooter: React.FC<{
   landingStep: number;
   navigation: NavigationProps;
   setLandingStep: (x: number) => void;
   currentStep: string;
   steps: Step[];
-  submitBasics: () => void;
+  submitBasics: () => Promise<SubmitBasicsResp>;
   submitSignUpProfile: () => void;
   stepErrors: { [key: string]: boolean };
 }> = ({
@@ -50,10 +55,12 @@ const SignUpFooter: React.FC<{
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
-  const nextButtonAction = (navNext: boolean, currStep: string) => {
+  const nextButtonAction = async (navNext: boolean, currStep: string) => {
     if (currStep === 'privacy') {
-      submitBasics();
-      return next();
+      const submitted = await submitBasics();
+      const prev = previous ? previous : () => null;
+
+      return submitted.ok ? next() : prev();
     }
 
     if (currStep === 'demographics') {
