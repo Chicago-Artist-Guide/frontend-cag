@@ -1,10 +1,12 @@
 import React from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { Tagline, Title } from '../../layout/Titles';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import styled from 'styled-components';
+import { Tagline, Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
+import { colors } from '../../../theme/styleVars';
 
 const Training: React.FC<{
   setForm: any;
@@ -121,7 +123,7 @@ const Training: React.FC<{
       </Row>
       <Row>
         <Col className="mt-4" lg="6">
-          <Tagline>Notes/Details</Tagline>
+          <SmallTitle>Notes/Details</SmallTitle>
           <Form.Group controlId="formControlTextarea1">
             <Form.Control
               as="textarea"
@@ -137,5 +139,12 @@ const Training: React.FC<{
     </Container>
   );
 };
+
+const SmallTitle = styled.h3`
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: ${colors.dark};
+`;
 
 export default Training;

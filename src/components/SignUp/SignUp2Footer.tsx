@@ -1,17 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Col from 'react-bootstrap/Col';
+import { NavigationProps, Step } from 'react-hooks-helper';
+import { useHistory } from 'react-router-dom';
 import Button from '../../genericComponents/Button';
 import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
 
-const SignUpFooter: React.FC<{
-  navigation: any;
+const SignUp2Footer: React.FC<{
+  navigation: NavigationProps;
   step: any;
-  steps: any;
-}> = ({ navigation, step, steps }) => {
+  steps: Step[];
+  currentStep: string;
+  submitSignUp2Profile: () => Promise<void>;
+}> = ({ navigation, step, steps, currentStep, submitSignUp2Profile }) => {
+  const history = useHistory();
   const { next, previous } = navigation;
-  const showBackButton = step !== ('training' as any);
+  const [nextBtnText, setNextBtnText] = useState<string>('Continue');
+  const showBackButton = currentStep !== 'training';
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
-  const showContinueButton = step !== ('awards' as any);
+
+  const nextButtonAction = async (currStep: string) => {
+    if (currStep === 'awards') {
+      setNextBtnText('Go to Profile');
+      await submitSignUp2Profile();
+      history.push('/profile');
+    }
+
+    return next();
+  };
 
   return (
     <PageFooterRow>
@@ -27,36 +42,28 @@ const SignUpFooter: React.FC<{
       </Col>
       <Col lg="4">
         <Pagination>
-          {steps.map((s: any, i: number) => (
+          {steps.map((_step, i: number) => (
             <li
               className={
                 i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
               }
               key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
-            />
+            >
+              <span>{i + 1}</span>
+            </li>
           ))}
         </Pagination>
       </Col>
       <ButtonCol lg="4">
-        {showContinueButton && (
-          <Button
-            onClick={next}
-            text="Continue"
-            type="button"
-            variant="primary"
-          />
-        )}
-        {!showContinueButton && (
-          <Button
-            onClick={next}
-            text="Go to Profile"
-            type="button"
-            variant="primary"
-          />
-        )}
+        <Button
+          onClick={() => nextButtonAction(currentStep)}
+          text={nextBtnText}
+          type="button"
+          variant="primary"
+        />
       </ButtonCol>
     </PageFooterRow>
   );
 };
 
-export default SignUpFooter;
+export default SignUp2Footer;

@@ -19,7 +19,7 @@ const SignUpFooter: React.FC<{
   currentStep: string;
   steps: Step[];
   submitBasics: () => Promise<SubmitBasicsResp>;
-  submitSignUpProfile: () => void;
+  submitSignUpProfile: () => Promise<void>;
   stepErrors: { [key: string]: boolean };
 }> = ({
   landingStep,
@@ -64,7 +64,7 @@ const SignUpFooter: React.FC<{
     }
 
     if (currStep === 'demographics') {
-      submitSignUpProfile();
+      await submitSignUpProfile();
       return next();
     }
 
@@ -78,7 +78,7 @@ const SignUpFooter: React.FC<{
 
   return (
     <PageFooterRow>
-      <Col lg="3">
+      <Col lg="4">
         <Button
           onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
           text="Back"
@@ -86,7 +86,7 @@ const SignUpFooter: React.FC<{
           variant="secondary"
         />
       </Col>
-      <Col lg="6">
+      <Col lg="4">
         <Pagination>
           {steps.map((_step, i: number) => (
             <li
@@ -100,7 +100,7 @@ const SignUpFooter: React.FC<{
           ))}
         </Pagination>
       </Col>
-      <ButtonCol lg="3">
+      <ButtonCol lg="4">
         {currentStep !== ('awards' as any) && (
           <Button
             disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}

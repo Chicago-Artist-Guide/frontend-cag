@@ -17,6 +17,68 @@ import OffstageRoles from './OffstageRoles';
 import ProfilePhoto from './ProfilePhoto';
 import IndividualRole from './Role';
 
+// default object to track a boolean true/false for which steps have form validation error states
+const createDefaultStepErrorsObj = (stepNames: string[]) => {
+  const stepErrorsObj: { [key: string]: boolean } = {};
+  // default all of our steps to false
+  // because the pages will update this themselves
+  // when errors or empty req fields arise or exist
+  stepNames.forEach((stepName: string) => {
+    stepErrorsObj[stepName] = false;
+  });
+
+  return stepErrorsObj;
+};
+
+// // flatten our step id's into a single array
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
+
+const defaultSteps: Step[] = [
+  { id: 'role' },
+  { id: 'basics' },
+  { id: 'privacy' },
+  { id: 'actorInfo1' },
+  { id: 'actorInfo2' },
+  { id: 'offstageRoles' },
+  { id: 'profilePhoto' },
+  { id: 'demographics' },
+  { id: 'profilePreview' }
+];
+
+const defaultData = {
+  actorInfo1Ethnicities: [],
+  actorInfo1LGBTQ: '',
+  actorInfo1Pronouns: '',
+  actorInfo1PronounsOther: '',
+  actorInfo2AgeRanges: [],
+  actorInfo2Gender: '',
+  actorInfo2GenderRoles: [],
+  actorInfo2GenderTransition: '',
+  actorInfo2HeightFt: 0,
+  actorInfo2HeightIn: 0,
+  actorInfo2HeightNoAnswer: false,
+  basics18Plus: false,
+  basicsEmailAddress: '',
+  basicsFirstName: '',
+  basicsLastName: '',
+  basicsPassword: '',
+  basicsPasswordConfirm: '',
+  demographicsAgency: '',
+  demographicsBio: '',
+  demographicsUnionStatus: '',
+  demographicsUnionStatusOther: '',
+  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
+  offstageRolesGeneral: [],
+  offstageRolesHairMakeupCostumes: [],
+  offstageRolesLighting: [],
+  offstageRolesProduction: [],
+  offstageRolesScenicAndProperties: [],
+  offstageRolesSound: [],
+  privacyAgreement: false,
+  profilePhotoUrl: '',
+  stageRole: ''
+};
+
 const IndividualSignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
@@ -351,65 +413,3 @@ const IndividualSignUp: React.FC<{
 };
 
 export default IndividualSignUp;
-
-// default object to track a boolean true/false for which steps have form validation error states
-const createDefaultStepErrorsObj = (stepNames: string[]) => {
-  const stepErrorsObj: { [key: string]: boolean } = {};
-  // default all of our steps to false
-  // because the pages will update this themselves
-  // when errors or empty req fields arise or exist
-  stepNames.forEach((stepName: string) => {
-    stepErrorsObj[stepName] = false;
-  });
-
-  return stepErrorsObj;
-};
-
-// // flatten our step id's into a single array
-const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
-
-const defaultSteps: Step[] = [
-  { id: 'role' },
-  { id: 'basics' },
-  { id: 'privacy' },
-  { id: 'actorInfo1' },
-  { id: 'actorInfo2' },
-  { id: 'offstageRoles' },
-  { id: 'profilePhoto' },
-  { id: 'demographics' },
-  { id: 'profilePreview' }
-];
-
-const defaultData = {
-  actorInfo1Ethnicities: [],
-  actorInfo1LGBTQ: '',
-  actorInfo1Pronouns: '',
-  actorInfo1PronounsOther: '',
-  actorInfo2AgeRanges: [],
-  actorInfo2Gender: '',
-  actorInfo2GenderRoles: [],
-  actorInfo2GenderTransition: '',
-  actorInfo2HeightFt: 0,
-  actorInfo2HeightIn: 0,
-  actorInfo2HeightNoAnswer: false,
-  basics18Plus: false,
-  basicsEmailAddress: '',
-  basicsFirstName: '',
-  basicsLastName: '',
-  basicsPassword: '',
-  basicsPasswordConfirm: '',
-  demographicsAgency: '',
-  demographicsBio: '',
-  demographicsUnionStatus: '',
-  demographicsUnionStatusOther: '',
-  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
-  offstageRolesGeneral: [],
-  offstageRolesHairMakeupCostumes: [],
-  offstageRolesLighting: [],
-  offstageRolesProduction: [],
-  offstageRolesScenicAndProperties: [],
-  offstageRolesSound: [],
-  privacyAgreement: false,
-  profilePhotoUrl: '',
-  stageRole: ''
-};
