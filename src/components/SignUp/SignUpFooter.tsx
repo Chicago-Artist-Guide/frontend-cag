@@ -7,14 +7,19 @@ import { ButtonCol, PageFooterRow, Pagination } from './SignUpFooterStyles';
 // for dev
 const FORM_VALIDATION_ON = true;
 
+export type SubmitBasicsResp = {
+  ok: boolean;
+  code?: string;
+};
+
 const SignUpFooter: React.FC<{
   landingStep: number;
   navigation: NavigationProps;
   setLandingStep: (x: number) => void;
   currentStep: string;
   steps: Step[];
-  submitBasics: () => void;
-  submitSignUpProfile: () => void;
+  submitBasics: () => Promise<SubmitBasicsResp>;
+  submitSignUpProfile: () => Promise<void>;
   stepErrors: { [key: string]: boolean };
 }> = ({
   landingStep,
@@ -50,14 +55,16 @@ const SignUpFooter: React.FC<{
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
-  const nextButtonAction = (navNext: boolean, currStep: string) => {
+  const nextButtonAction = async (navNext: boolean, currStep: string) => {
     if (currStep === 'privacy') {
-      submitBasics();
-      return next();
+      const submitted = await submitBasics();
+      const prev = previous ? previous : () => null;
+
+      return submitted.ok ? next() : prev();
     }
 
     if (currStep === 'demographics') {
-      submitSignUpProfile();
+      await submitSignUpProfile();
       return next();
     }
 
@@ -71,7 +78,7 @@ const SignUpFooter: React.FC<{
 
   return (
     <PageFooterRow>
-      <Col lg="3">
+      <Col lg="4">
         <Button
           onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
           text="Back"
@@ -79,7 +86,7 @@ const SignUpFooter: React.FC<{
           variant="secondary"
         />
       </Col>
-      <Col lg="6">
+      <Col lg="4">
         <Pagination>
           {steps.map((_step, i: number) => (
             <li
@@ -93,7 +100,7 @@ const SignUpFooter: React.FC<{
           ))}
         </Pagination>
       </Col>
-      <ButtonCol lg="3">
+      <ButtonCol lg="4">
         {currentStep !== ('awards' as any) && (
           <Button
             disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}

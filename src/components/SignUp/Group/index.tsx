@@ -14,7 +14,7 @@ import Demographics from '../Individual/Demographics';
 import OffstageRoles from '../Individual/OffstageRoles';
 import ProfilePhoto from '../Individual/ProfilePhoto';
 import Privacy from '../Privacy';
-import SignUpFooter from '../SignUpFooter';
+import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
 
 const GroupSignUp: React.FC<{
   currentStep: number;
@@ -23,6 +23,9 @@ const GroupSignUp: React.FC<{
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
+  const [submitBasicsErr, setSubmitBasicsErr] = useState<
+    SubmitBasicsResp | undefined
+  >(undefined);
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -46,9 +49,12 @@ const GroupSignUp: React.FC<{
   };
 
   // submit basics to Firebase, get response, set session
-  const submitBasics = async () => {
+  const submitBasics: () => Promise<SubmitBasicsResp> = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
+
+    // reset any sort of previous error response
+    setSubmitBasicsErr(undefined);
 
     const {
       basicsFirstName,
@@ -56,6 +62,7 @@ const GroupSignUp: React.FC<{
       basicsEmailAddress,
       basicsPassword,
       basics18Plus
+      // stageRole
     } = formData;
 
     await createUserWithEmailAndPassword(
@@ -67,6 +74,7 @@ const GroupSignUp: React.FC<{
         try {
           const userId = res.user.uid;
 
+          // create doc for account (extra fields not in auth)
           const accountRef = await addDoc(
             collection(firebaseFirestore, 'accounts'),
             {
@@ -78,23 +86,48 @@ const GroupSignUp: React.FC<{
             }
           );
 
+          // create doc for profile
           const profileRef = await addDoc(
             collection(firebaseFirestore, 'profiles'),
             {
-              uuid: userId,
+              uid: userId,
               account_id: accountRef.id
+              // stage_role: stageRole
             }
           );
 
+          // store account and profile refs so we can update them later
           setAccountRef(accountRef);
           setProfileRef(profileRef);
         } catch (e) {
           console.error('Error adding document:', e);
+
+          const resp = {
+            ok: false,
+            code: 'profile-creation-error'
+          };
+
+          setSubmitBasicsErr(resp);
+
+          return resp;
         }
       })
       .catch(err => {
         console.log('Error creating user:', err);
+
+        const resp = {
+          ok: false,
+          code: err.code ?? 'unknown-user-creation-error'
+        };
+
+        setSubmitBasicsErr(resp);
+
+        return resp;
       });
+
+    const resp = { ok: true };
+    setSubmitBasicsErr(resp);
+    return resp;
   };
 
   // callback function for updating if a step has errors
@@ -120,6 +153,7 @@ const GroupSignUp: React.FC<{
           <IndividualBasics
             {...props}
             hasErrorCallback={setStepErrorsCallback}
+            submitBasicsErr={undefined}
           />
         );
         break;
@@ -169,7 +203,7 @@ const GroupSignUp: React.FC<{
           landingStep={index}
           navigation={navigation}
           setLandingStep={setCurrentStep}
-          submitSignUpProfile={() => null}
+          submitSignUpProfile={() => new Promise(resolve => null)}
           currentStep={stepId}
           stepErrors={stepErrors}
           steps={defaultSteps}

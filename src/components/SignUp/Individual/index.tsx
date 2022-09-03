@@ -8,7 +8,7 @@ import { useProfileContext } from '../../../context/ProfileContext';
 import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
-import SignUpFooter from '../SignUpFooter';
+import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
 import ActorInfo1 from './ActorInfo1';
 import ActorInfo2 from './ActorInfo2';
 import IndividualBasics from './Basics';
@@ -16,6 +16,68 @@ import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import ProfilePhoto from './ProfilePhoto';
 import IndividualRole from './Role';
+
+// default object to track a boolean true/false for which steps have form validation error states
+const createDefaultStepErrorsObj = (stepNames: string[]) => {
+  const stepErrorsObj: { [key: string]: boolean } = {};
+  // default all of our steps to false
+  // because the pages will update this themselves
+  // when errors or empty req fields arise or exist
+  stepNames.forEach((stepName: string) => {
+    stepErrorsObj[stepName] = false;
+  });
+
+  return stepErrorsObj;
+};
+
+// // flatten our step id's into a single array
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
+
+const defaultSteps: Step[] = [
+  { id: 'role' },
+  { id: 'basics' },
+  { id: 'privacy' },
+  { id: 'actorInfo1' },
+  { id: 'actorInfo2' },
+  { id: 'offstageRoles' },
+  { id: 'profilePhoto' },
+  { id: 'demographics' },
+  { id: 'profilePreview' }
+];
+
+const defaultData = {
+  actorInfo1Ethnicities: [],
+  actorInfo1LGBTQ: '',
+  actorInfo1Pronouns: '',
+  actorInfo1PronounsOther: '',
+  actorInfo2AgeRanges: [],
+  actorInfo2Gender: '',
+  actorInfo2GenderRoles: [],
+  actorInfo2GenderTransition: '',
+  actorInfo2HeightFt: 0,
+  actorInfo2HeightIn: 0,
+  actorInfo2HeightNoAnswer: false,
+  basics18Plus: false,
+  basicsEmailAddress: '',
+  basicsFirstName: '',
+  basicsLastName: '',
+  basicsPassword: '',
+  basicsPasswordConfirm: '',
+  demographicsAgency: '',
+  demographicsBio: '',
+  demographicsUnionStatus: '',
+  demographicsUnionStatusOther: '',
+  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
+  offstageRolesGeneral: [],
+  offstageRolesHairMakeupCostumes: [],
+  offstageRolesLighting: [],
+  offstageRolesProduction: [],
+  offstageRolesScenicAndProperties: [],
+  offstageRolesSound: [],
+  privacyAgreement: false,
+  profilePhotoUrl: '',
+  stageRole: ''
+};
 
 const IndividualSignUp: React.FC<{
   currentStep: number;
@@ -25,6 +87,9 @@ const IndividualSignUp: React.FC<{
   const { profileRef, setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
+  const [submitBasicsErr, setSubmitBasicsErr] = useState<
+    SubmitBasicsResp | undefined
+  >(undefined);
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -103,9 +168,12 @@ const IndividualSignUp: React.FC<{
   };
 
   // submit basics to Firebase, get response, set session
-  const submitBasics = async () => {
+  const submitBasics: () => Promise<SubmitBasicsResp> = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
+
+    // reset any sort of previous error response
+    setSubmitBasicsErr(undefined);
 
     const {
       basicsFirstName,
@@ -116,7 +184,7 @@ const IndividualSignUp: React.FC<{
       stageRole
     } = formData;
 
-    await createUserWithEmailAndPassword(
+    return await createUserWithEmailAndPassword(
       firebaseAuth,
       basicsEmailAddress,
       basicsPassword
@@ -150,12 +218,35 @@ const IndividualSignUp: React.FC<{
           // store account and profile refs so we can update them later
           setAccountRef(accountRef);
           setProfileRef(profileRef);
+
+          // successful case
+          const resp = { ok: true };
+          setSubmitBasicsErr(resp);
+          return resp;
         } catch (e) {
           console.error('Error adding document:', e);
+
+          const resp = {
+            ok: false,
+            code: 'profile-creation-error'
+          };
+
+          setSubmitBasicsErr(resp);
+
+          return resp;
         }
       })
       .catch(err => {
         console.log('Error creating user:', err);
+
+        const resp = {
+          ok: false,
+          code: err.code ?? 'unknown-user-creation-error'
+        };
+
+        setSubmitBasicsErr(resp);
+
+        return resp;
       });
   };
 
@@ -260,6 +351,7 @@ const IndividualSignUp: React.FC<{
           <IndividualBasics
             {...props}
             hasErrorCallback={setStepErrorsCallback}
+            submitBasicsErr={submitBasicsErr}
           />
         );
         break;
@@ -321,65 +413,3 @@ const IndividualSignUp: React.FC<{
 };
 
 export default IndividualSignUp;
-
-// default object to track a boolean true/false for which steps have form validation error states
-const createDefaultStepErrorsObj = (stepNames: string[]) => {
-  const stepErrorsObj: { [key: string]: boolean } = {};
-  // default all of our steps to false
-  // because the pages will update this themselves
-  // when errors or empty req fields arise or exist
-  stepNames.forEach((stepName: string) => {
-    stepErrorsObj[stepName] = false;
-  });
-
-  return stepErrorsObj;
-};
-
-// // flatten our step id's into a single array
-const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
-
-const defaultSteps: Step[] = [
-  { id: 'role' },
-  { id: 'basics' },
-  { id: 'privacy' },
-  { id: 'actorInfo1' },
-  { id: 'actorInfo2' },
-  { id: 'offstageRoles' },
-  { id: 'profilePhoto' },
-  { id: 'demographics' },
-  { id: 'profilePreview' }
-];
-
-const defaultData = {
-  actorInfo1Ethnicities: [],
-  actorInfo1LGBTQ: '',
-  actorInfo1Pronouns: '',
-  actorInfo1PronounsOther: '',
-  actorInfo2AgeRanges: [],
-  actorInfo2Gender: '',
-  actorInfo2GenderRoles: [],
-  actorInfo2GenderTransition: '',
-  actorInfo2HeightFt: 0,
-  actorInfo2HeightIn: 0,
-  actorInfo2HeightNoAnswer: false,
-  basics18Plus: false,
-  basicsEmailAddress: '',
-  basicsFirstName: '',
-  basicsLastName: '',
-  basicsPassword: '',
-  basicsPasswordConfirm: '',
-  demographicsAgency: '',
-  demographicsBio: '',
-  demographicsUnionStatus: '',
-  demographicsUnionStatusOther: '',
-  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
-  offstageRolesGeneral: [],
-  offstageRolesHairMakeupCostumes: [],
-  offstageRolesLighting: [],
-  offstageRolesProduction: [],
-  offstageRolesScenicAndProperties: [],
-  offstageRolesSound: [],
-  privacyAgreement: false,
-  profilePhotoUrl: '',
-  stageRole: ''
-};

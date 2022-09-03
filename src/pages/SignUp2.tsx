@@ -1,7 +1,9 @@
+import { updateDoc } from 'firebase/firestore';
 import React from 'react';
-import { useForm, useStep } from 'react-hooks-helper';
+import { Step, useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import { useProfileContext } from '../context/ProfileContext';
 import PageContainer from '../components/layout/PageContainer';
 import SignUp2Footer from '../components/SignUp/SignUp2Footer';
 import Training from '../components/SignUp/Individual/Training';
@@ -11,7 +13,7 @@ import AdditionalSkills from '../components/SignUp/Individual/AdditionalSkills';
 import Awards from '../components/SignUp/Individual/Awards';
 
 // Establish our steps
-const steps = [
+const steps: Step[] = [
   { id: 'training' },
   { id: 'credits' },
   { id: 'upcoming' },
@@ -25,7 +27,11 @@ const flatSteps = steps.map(step => step.id);
 // establish our form data structure
 // assign defaults
 const defaultData = {
-  training: [], // { institution, locationCity, locationState, locationCountry, degree, yearStart, yearEnd, notes }
+  trainingInstitution: '',
+  trainingCity: '',
+  trainingState: '',
+  trainingDegree: '',
+  trainingDetails: '',
 
   pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
@@ -40,8 +46,59 @@ const defaultData = {
 };
 
 const SignUp2 = () => {
+  const { profileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
+  const stepId = (step as Step).id;
+
+  // submit full sign up flow 2 profile data
+  const submitSignUp2Profile = async () => {
+    const {
+      trainingInstitution,
+      trainingCity,
+      trainingState,
+      trainingDegree,
+      trainingDetails,
+      pastPerformances, // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
+      upcoming, // { id, title, synopsis, industryCode, url, imageUrl }
+      additionalSkillsCheckboxes,
+      additionalSkillsManual,
+      awards // { id, title, year, url, description }
+    } = formData;
+
+    const finalProfileData = {
+      // training
+      training_institution: trainingInstitution,
+      training_city: trainingCity,
+      training_state: trainingState,
+      training_degree: trainingDegree,
+      training_details: trainingDetails,
+
+      // past perf
+      past_performances: pastPerformances,
+
+      // upcoming perf
+      upcoming_performances: upcoming,
+
+      // additional skills
+      additional_skills_checkboxes: additionalSkillsCheckboxes,
+      additional_skills_manual: additionalSkillsManual,
+
+      // awards
+      awards
+    };
+
+    try {
+      if (profileRef) {
+        await updateDoc(profileRef, { ...finalProfileData });
+      } else {
+        // no profileRef
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
 
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
@@ -77,7 +134,13 @@ const SignUp2 = () => {
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
       </Row>
-      <SignUp2Footer navigation={navigation} step={step} steps={steps} />
+      <SignUp2Footer
+        navigation={navigation}
+        step={step}
+        steps={steps}
+        currentStep={stepId}
+        submitSignUp2Profile={submitSignUp2Profile}
+      />
     </PageContainer>
   );
 };
