@@ -56,7 +56,8 @@ const SignUpFooter: React.FC<{
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
   const nextButtonAction = async (navNext: boolean, currStep: string) => {
-    if (currStep === 'privacy') {
+    console.log('currentStep', currentStep);
+    if (currStep === 'basics') {
       const submitted = await submitBasics();
       const prev = previous ? previous : () => null;
 

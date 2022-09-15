@@ -19,7 +19,7 @@ type Card = {
 
 type Props = {
   accountType: string | null;
-  setAccountType: (x: 'individual' | 'group' | null) => void;
+  setAccountType: (x: 'individual' | 'company' | null) => void;
 };
 
 const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
@@ -39,7 +39,7 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
       <Row>
         <Col lg={7}>
           <Row style={{ flexWrap: 'nowrap' }}>
-            {cards.map(({ className, icon, text, input, name }: any) => (
+            {cards.map(({ className, icon, text, name }: any) => (
               <StyledCard
                 key={name}
                 className={clsx(className, accountType === name && 'selected')}
@@ -81,7 +81,7 @@ const cards: Card[] = [
   {
     icon: Group,
     className: 'red-shadow-hover',
-    name: 'group',
+    name: 'company',
     text: (
       <>
         <CardHeading>Theatre Group</CardHeading>

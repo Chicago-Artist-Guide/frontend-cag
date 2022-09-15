@@ -13,9 +13,9 @@ import Button from '../genericComponents/Button';
 
 const SignUp: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(-1);
-  const [accountType, setAccountType] = useState<'individual' | 'group' | null>(
-    null
-  );
+  const [accountType, setAccountType] = useState<
+    'individual' | 'company' | null
+  >(null);
 
   if (currentStep === -1) {
     return (
@@ -55,7 +55,7 @@ const SignUp: React.FC = () => {
     );
   }
 
-  if (accountType === 'group') {
+  if (accountType === 'company') {
     return (
       <CompanySignUp
         currentStep={currentStep}

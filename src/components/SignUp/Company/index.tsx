@@ -9,17 +9,27 @@ import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
 import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
 import CompanyBasics from './Basics';
+import CompanyDetails from './Details';
+import CompanyPhoto from './Photo';
+import { CompanyFormData } from './types';
 
-const GroupSignUp: React.FC<{
+const CompanySignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { setAccountRef, setProfileRef } = useProfileContext();
-  const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
+  const {
+    accountRef,
+    profileRef,
+    setAccountRef,
+    setProfileRef
+  } = useProfileContext();
+  const [formData, setForm] = useForm<CompanyFormData>(defaultData); // useForm is an extension of React hooks to manage form state
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
     SubmitBasicsResp | undefined
   >(undefined);
+
+  console.log({ accountRef, profileRef });
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -48,7 +58,13 @@ const GroupSignUp: React.FC<{
     setPrivacyAgree();
     setSubmitBasicsErr(undefined);
 
-    const { basicsTheatreName, basicsEmailAddress, basicsPassword } = formData;
+    console.log('Submit Basics', { formData });
+
+    const {
+      theatreName: basicsTheatreName,
+      emailAddress: basicsEmailAddress,
+      password: basicsPassword
+    } = formData;
 
     await createUserWithEmailAndPassword(
       firebaseAuth,
@@ -56,51 +72,48 @@ const GroupSignUp: React.FC<{
       basicsPassword
     )
       .then(async res => {
-        const userId = res.user.uid;
-        const accountRef = await addDoc(
-          collection(firebaseFirestore, 'accounts'),
-          {
-            theater_name: basicsTheatreName,
-            privacy_agreement: true,
-            uid: userId
-          }
-        );
+        try {
+          const userId = res.user.uid;
+          const account = await addDoc(
+            collection(firebaseFirestore, 'accounts'),
+            {
+              uid: userId,
+              type: 'company',
+              theater_name: basicsTheatreName,
+              privacy_agreement: true
+            }
+          );
 
-        const profileRef = await addDoc(
-          collection(firebaseFirestore, 'profiles'),
-          {
-            uid: userId,
-            account_id: accountRef.id
-          }
-        );
+          const company = await addDoc(
+            collection(firebaseFirestore, 'companies'),
+            {
+              uid: userId,
+              account_id: account.id
+            }
+          );
+
+          console.log('Company', { company });
+          console.log('Account', { account });
 
           // store account and profile refs so we can update them later
-          setAccountRef(accountRef);
-          setProfileRef(profileRef);
+          setAccountRef(account);
+          setProfileRef(company);
         } catch (e) {
           console.error('Error adding document:', e);
-
           const resp = {
             ok: false,
             code: 'profile-creation-error'
           };
-
           setSubmitBasicsErr(resp);
-
-          return resp;
         }
       })
       .catch(err => {
         console.log('Error creating user:', err);
-
         const resp = {
           ok: false,
           code: err.code ?? 'unknown-user-creation-error'
         };
-
         setSubmitBasicsErr(resp);
-
-        return resp;
       });
 
     const resp = { ok: true };
@@ -121,6 +134,7 @@ const GroupSignUp: React.FC<{
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
+    console.log({ stepId });
     switch (stepId) {
       case 'basics':
         return (
@@ -129,15 +143,35 @@ const GroupSignUp: React.FC<{
             setFormErrors={setStepErrors}
             formErrors={stepErrors}
             hasErrorCallback={setStepErrorsCallback}
-            submitBasicsErr={undefined}
+            // submitBasicsErr={undefined}
           />
         );
       case 'privacy':
         return <Privacy {...props} />;
+      case 'details':
+        return (
+          <CompanyDetails
+            {...props}
+            setFormErrors={setStepErrors}
+            formErrors={stepErrors}
+            hasErrorCallback={setStepErrorsCallback}
+          />
+        );
+      case 'photo':
+        return (
+          <CompanyPhoto
+            {...props}
+            setFormErrors={setStepErrors}
+            formErrors={stepErrors}
+            hasErrorCallback={setStepErrorsCallback}
+          />
+        );
       default:
         return <>Something went wrong</>;
     }
   };
+
+  console.log('SignUp Index', { stepId });
 
   // if no Landing type is selected or it's profile preview, don't show navigation yet
   const showSignUpFooter = stepId !== 'profilePreview';
@@ -162,7 +196,8 @@ const GroupSignUp: React.FC<{
     </PageContainer>
   );
 };
-export default GroupSignUp;
+
+export default CompanySignUp;
 
 // default object to track a boolean true/false for which steps have form validation error states
 const createDefaultStepErrorsObj = (stepNames: string[]) => {
@@ -180,13 +215,22 @@ const createDefaultStepErrorsObj = (stepNames: string[]) => {
 // // flatten our step id's into a single array
 const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
-const defaultSteps: Step[] = [{ id: 'basics' }, { id: 'privacy' }];
+const defaultSteps: Step[] = [
+  { id: 'basics' },
+  { id: 'details' },
+  { id: 'privacy' },
+  { id: 'photo' }
+];
 
 const defaultData = {
-  basicsTheatreName: '',
-  basicsEmailAddress: '',
-  basicsPassword: '',
-  basicsPasswordConfirm: '',
+  theatreName: '',
+  emailAddress: '',
+  password: '',
+  passwordConfirm: '',
+  numberOfMembers: '',
+  primaryContact: '',
+  location: '',
+  description: '',
   privacyAgreement: false,
   profilePhotoUrl: ''
 };
