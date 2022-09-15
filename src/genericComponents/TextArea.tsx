@@ -1,0 +1,102 @@
+import React, { useEffect, useState } from 'react';
+import { Form, FormProps } from 'react-bootstrap';
+import styled from 'styled-components';
+import {
+  CAGError,
+  CAGFormControl,
+  CAGHelperText,
+  CAGFormGroup,
+  CAGLabel
+} from '../components/SignUp/SignUpStyles';
+import { colors, fonts } from '../theme/styleVars';
+import {
+  ErrorMessage,
+  requiredFieldMessage,
+  validateRegex,
+  validationRegex
+} from '../utils/validation';
+
+/*
+
+Field Validation Prop Breakdown:
+
+Required:
+- required: boolean - field is required
+- requiredLabel: string - name that goes into required error message. Should always have this with required prop
+
+Regex
+- validationRegexName: string - name of regex from validationRegex object in validation utils
+- validationRegexMessage: string - message to show if value fails regex match (should use value from ErrorMessage enum)
+
+Custom Validation Functions
+- validationFuncs: function[] - an array of custom validation functions to check in order. Currenly, they do not take
+    any params, but you should have access to any specific data you need on the step page itself
+- validationFuncMessages: string[] - an array of strings for the corresponding error messages for the validationFuncs.
+    Should be in the same order as the validationFuncs
+
+Parent Page
+- hasErrorCallback: function - callback function to update the parent step page's error state object for required fields
+
+*/
+
+type Props = {
+  fieldType?: string;
+  hasErrorCallback?: (name: string, hasError: boolean) => void;
+  helperText?: string;
+  label?: string;
+  name?: string;
+  onChange?: any;
+  placeholder?: string;
+  required?: boolean;
+  requiredLabel?: string;
+  validationFuncMessages?: string[];
+  validationFuncs?: any;
+  validationRegexMessage?: string;
+  validationRegexName?: keyof typeof validationRegex;
+  value?: string | number;
+} & Omit<FormProps, 'onChange'>;
+
+const TextArea = (props: Props) => {
+  const {
+    fieldType,
+    label,
+    name = '',
+    onChange,
+    placeholder,
+    required = false,
+    requiredLabel = '',
+    validationRegexName,
+    validationRegexMessage = '',
+    validationFuncs,
+    validationFuncMessages = [],
+    hasErrorCallback,
+    helperText,
+    value
+  } = props;
+  const hasError = false;
+  const errorMessage = '';
+
+  return (
+    <>
+      <CAGFormGroup controlId={name}>
+        <CAGLabel>{label}</CAGLabel>
+        <CAGFormControl
+          as="textarea"
+          aria-label={label}
+          name={name}
+          onChange={onChange}
+          placeholder={placeholder}
+          rows={5}
+          style={{
+            border: '1px solid #ced4da',
+            maxWidth: 440
+          }}
+        />
+      </CAGFormGroup>
+      {hasError && <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>}
+      {helperText && <CAGHelperText>{helperText}</CAGHelperText>}
+    </>
+  );
+};
+
+export default TextArea;

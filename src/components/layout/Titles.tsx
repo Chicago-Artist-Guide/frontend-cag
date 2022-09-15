@@ -4,7 +4,7 @@ import { colors, fonts } from '../../theme/styleVars';
 
 const Title = (props: any) => {
   const { children, ...rest } = props;
-  return <h1 {...rest}>{children}</h1>;
+  return <TitleH1 {...rest}>{children}</TitleH1>;
 };
 
 const TitleTwo = (props: any) => {
@@ -21,6 +21,10 @@ const TitleThree = (props: any) => {
   const { children, ...rest } = props;
   return <TitleH3 {...rest}>{children}</TitleH3>;
 };
+
+const TitleH1 = styled.h1`
+  text-transform: uppercase;
+`;
 
 const TitleH2 = styled.h2`
   font-family: ${fonts.lora};

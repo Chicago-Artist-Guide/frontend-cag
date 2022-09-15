@@ -1,4 +1,4 @@
-import { Col } from 'react-bootstrap';
+import { Col, Form } from 'react-bootstrap';
 import styled from 'styled-components';
 import { cardHeight, colors, fonts } from '../../theme/styleVars';
 
@@ -94,4 +94,39 @@ export const SelectDirections = styled.p`
   font-size: 14px/18px;
   letter-spacing: 0.14px;
   font: ${fonts.montserrat};
+`;
+
+export const CAGFormControl = styled(Form.Control)`
+  left: 0px;
+  top: 28px;
+  border-radius: 4px;
+  padding: 8px 13px 8px 13px;
+`;
+
+export const CAGFormGroup = styled(Form.Group)`
+  margin: 6px 0 0;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const CAGLabel = styled(Form.Label)`
+  color: ${colors.mainFont};
+  font-family: ${fonts.mainFont};
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  text-align: left;
+`;
+
+export const CAGError = styled.span`
+  color: red;
+  font-size: 12px;
+`;
+
+export const CAGHelperText = styled.div`
+  font-size: 0.675rem;
+  font-style: italic;
+  margin-left: 0.25rem;
+  margin-top: 0.25rem;
 `;

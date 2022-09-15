@@ -6,32 +6,27 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Checkbox from '../../../genericComponents/Checkbox';
 import InputField from '../../../genericComponents/Input';
 import { colors } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
-import { Title } from '../../layout/Titles';
+import SignUpHeader from '../shared/Header';
+import { CompanyFormData } from './types';
 
 const CompanyBasics: React.FC<{
   setForm: SetForm;
-  formData: { [key: string]: any };
+  formData: CompanyFormData;
   formErrors: any;
   setFormErrors: (x: any) => void;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = ({ setForm, formData, setFormErrors, formErrors, hasErrorCallback }) => {
-  const {
-    basicsTheatreName,
-    basicsEmailAddress,
-    basicsPassword,
-    basicsPasswordConfirm
-  } = formData;
+  const { theatreName, emailAddress, password, passwordConfirm } = formData;
 
   // create an array of the required field names
   const requiredFields = [
-    'basicsTheatreName',
-    'basicsEmailAddress',
-    'basicsPassword',
-    'basicsPasswordConfirm'
+    'theatreName',
+    'emailAddress',
+    'password',
+    'passwordConfirm'
   ];
 
   // create a default object of required field values for state
@@ -39,10 +34,10 @@ const CompanyBasics: React.FC<{
   // we default this for now based on if they are empty '' or false
   const createDefaultFormErrorsData = () => {
     const formErrorsObj: { [key: string]: boolean } = {};
-    requiredFields.forEach((fieldName: string) => {
-      formErrorsObj[fieldName] =
-        formData[fieldName] === '' || formData[fieldName] === false;
-    });
+    // TODO: Finish validation and error checking
+    // requiredFields.forEach((fieldName: string) => {
+    //   formErrorsObj[fieldName] = !formData[fieldName];
+    // });
 
     return formErrorsObj;
   };
@@ -78,7 +73,7 @@ const CompanyBasics: React.FC<{
   // we only need to give this to the basicsPasswordConfirm field
   // and it goes in the InputField array "validationFuncMessages" attribute
   const checkIfPasswordsMatch = () => {
-    return basicsPassword === basicsPasswordConfirm;
+    return password === passwordConfirm;
   };
 
   // effect for updating the sign up page errors state for this page
@@ -91,58 +86,58 @@ const CompanyBasics: React.FC<{
   return (
     <Container>
       <Row>
-        <PaddingTitle>LET'S GET STARTED</PaddingTitle>
+        <SignUpHeader
+          title="LET'S GET STARTED"
+          subtitle="This is a subheader that may or may not be used on any given page"
+        />
       </Row>
       <Row>
         <Col lg="4">
           <Form>
             <InputField
+              required
+              placeholder="Theatre Name"
               hasErrorCallback={hasErrorCallback}
-              label="Theatre Name"
-              name="basicsTheatreName"
+              name="theatreName"
               onChange={setForm}
-              required={true}
               requiredLabel="Theatre name"
-              value={basicsTheatreName || ''}
+              value={theatreName || ''}
             />
             <InputField
+              required
               hasErrorCallback={hasErrorCallback}
-              label="Email Address"
-              name="basicsEmailAddress"
+              placeholder="Email Address"
+              name="emailAddress"
               onChange={setForm}
-              required={true}
               requiredLabel="Email address"
               validationRegexMessage={ErrorMessage.EmailFormat}
               validationRegexName="emailAddress"
-              value={basicsEmailAddress || ''}
+              value={emailAddress || ''}
             />
             <InputField
+              required
               fieldType="password"
               hasErrorCallback={hasErrorCallback}
-              label="Password"
-              name="basicsPassword"
+              placeholder="Password"
+              name="password"
               onChange={setForm}
-              required={true}
               requiredLabel="Password"
               validationRegexMessage={ErrorMessage.PasswordsRules}
               validationRegexName="password"
-              value={basicsPassword || ''}
+              value={password || ''}
+              helperText="Minimum 8 characters, one uppercase letter, one lowercase letter, one number, and one special character."
             />
-            <PasswordReq>
-              Minimum 8 characters, one uppercase letter, one lowercase letter,
-              one number, and one special character.
-            </PasswordReq>
             <InputField
+              required
               fieldType="password"
               hasErrorCallback={hasErrorCallback}
-              label="Confirm Password"
-              name="basicsPasswordConfirm"
+              placeholder="Confirm Password"
+              name="passwordConfirm"
               onChange={setForm}
-              required={true}
               requiredLabel="Password confirmation"
               validationFuncMessages={[ErrorMessage.PasswordsMatch]}
               validationFuncs={[checkIfPasswordsMatch]}
-              value={basicsPasswordConfirm || ''}
+              value={passwordConfirm || ''}
             />
           </Form>
           <LoginLink>
@@ -156,29 +151,14 @@ const CompanyBasics: React.FC<{
   );
 };
 
-const PaddingTitle = styled(Title)`
-  padding: 48px 0px;
-`;
-
 const LoginLink = styled.p`
-  text-align: left;
-  font-size: 14px/18px;
-  font-style: italic;
+  font-size: 0.875rem;
+  font-weight: 520;
   letter-spacing: 0.14px;
-  margin-top: 40px;
-
+  margin-top: 10px;
   a {
     color: ${colors.orange};
   }
-`;
-
-const PasswordReq = styled.p`
-  font-size: 10px;
-  font-style: italic;
-`;
-
-const CAGCheckbox = styled(Checkbox)`
-  margin-top: 2em;
 `;
 
 export default CompanyBasics;
