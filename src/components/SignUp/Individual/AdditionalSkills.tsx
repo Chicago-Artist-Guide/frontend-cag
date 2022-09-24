@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -15,11 +15,15 @@ const AdditionalSkills: React.FC<{
   formData: any;
 }> = props => {
   const { formData, setForm } = props;
-  const { additionalSkillsCheckboxes } = formData;
+  const { additionalSkillsCheckboxes, additionalSkillsManual } = formData;
 
   const [input, setInput] = useState('');
-  const [skillTags, setTags] = useState([] as string[]);
+  const [skillTags, setTags] = useState([
+    ...additionalSkillsManual
+  ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
+
+  console.log('additionalSkillsManual', additionalSkillsManual);
 
   const isAdditionalSkillsCheckboxes = (skillOption: string) =>
     additionalSkillsCheckboxes.indexOf(skillOption) > -1;
@@ -89,6 +93,17 @@ const AdditionalSkills: React.FC<{
   const onKeyUp = () => {
     setIsKeyReleased(true);
   };
+
+  useEffect(() => {
+    const allSkills = [...skillTags];
+
+    const target = {
+      name: 'additionalSkillsManual',
+      value: allSkills
+    };
+
+    setForm({ target });
+  }, [skillTags]);
 
   return (
     <Container>

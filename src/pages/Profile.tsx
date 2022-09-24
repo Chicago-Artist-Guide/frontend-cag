@@ -36,6 +36,9 @@ const Profile: React.FC<{
   }, [accountRef, profileRef]);
 
   const PageWrapper = previewMode ? Container : PageContainer;
+  const showSignUp2Link = previewMode || !profile.completed_profile_2;
+
+  console.log(account, profile);
 
   return (
     <>
@@ -93,7 +96,7 @@ const Profile: React.FC<{
           </Col>
         </Row>
       </PageWrapper>
-      {previewMode && (
+      {showSignUp2Link && (
         <PreviewCard>
           <h2>Your Profile is looking great!</h2>
           <p>

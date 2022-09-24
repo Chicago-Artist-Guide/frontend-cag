@@ -30,9 +30,6 @@ const createDefaultStepErrorsObj = (stepNames: string[]) => {
   return stepErrorsObj;
 };
 
-// // flatten our step id's into a single array
-const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
-
 const defaultSteps: Step[] = [
   { id: 'role' },
   { id: 'basics' },
@@ -44,6 +41,9 @@ const defaultSteps: Step[] = [
   { id: 'demographics' },
   { id: 'profilePreview' }
 ];
+
+// flatten our step id's into a single array
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 const defaultData = {
   actorInfo1Ethnicities: [],

@@ -21,6 +21,8 @@ const Training: React.FC<{
     trainingDetails
   } = formData;
 
+  console.log(trainingInstitution, trainingCity);
+
   return (
     <Container>
       <Row>

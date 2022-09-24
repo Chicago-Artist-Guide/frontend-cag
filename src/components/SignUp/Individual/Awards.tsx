@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import { colors, fonts } from '../../../theme/styleVars';
 import Container from 'react-bootstrap/Container';
@@ -14,12 +14,17 @@ const Awards: React.FC<{
   const { setForm, formData } = props;
   const { awards } = formData;
   const [awardId, setAwardId] = useState(1);
+  const [yearOptions, setYearOptions] = useState([] as number[]);
 
-  // add options for year dropdown
-  const yearOptions = [] as any[];
-  for (let i = 1949; i < 2023; i++) {
-    yearOptions.push(i);
-  }
+  useEffect(() => {
+    const newYears = [] as number[];
+
+    for (let i = 2023; i > 1949; i--) {
+      newYears.push(i);
+    }
+
+    setYearOptions(newYears);
+  }, []);
 
   const onAwardInputChange = (
     fieldValue: string,

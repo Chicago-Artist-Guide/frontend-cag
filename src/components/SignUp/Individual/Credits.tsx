@@ -85,7 +85,7 @@ const Credits: React.FC<{
               <InputField
                 name="title"
                 onChange={(e: any) =>
-                  onCreditFieldChange('title', e.target.value, i)
+                  onCreditFieldChange('title', e.target.value, credit.id)
                 }
                 placeholder="Show Title"
                 value={credit.title}
@@ -93,15 +93,15 @@ const Credits: React.FC<{
               <InputField
                 name="group"
                 onChange={(e: any) =>
-                  onCreditFieldChange('group', e.target.value, i)
+                  onCreditFieldChange('location', e.target.value, credit.id)
                 }
                 placeholder="Theatre or Location"
-                value={credit.group}
+                value={credit.location}
               />
               <InputField
                 name="url"
                 onChange={(e: any) =>
-                  onCreditFieldChange('url', e.target.value, i)
+                  onCreditFieldChange('url', e.target.value, credit.id)
                 }
                 placeholder="Web Link"
                 value={credit.url}
@@ -109,7 +109,7 @@ const Credits: React.FC<{
               <InputField
                 name="role"
                 onChange={(e: any) =>
-                  onCreditFieldChange('role', e.target.value, i)
+                  onCreditFieldChange('role', e.target.value, credit.id)
                 }
                 placeholder="Role"
                 value={credit.role}
@@ -117,7 +117,7 @@ const Credits: React.FC<{
               <InputField
                 name="director"
                 onChange={(e: any) =>
-                  onCreditFieldChange('director', e.target.value, i)
+                  onCreditFieldChange('director', e.target.value, credit.id)
                 }
                 placeholder="Director"
                 value={credit.director}
@@ -125,7 +125,11 @@ const Credits: React.FC<{
               <InputField
                 name="musicalDirector"
                 onChange={(e: any) =>
-                  onCreditFieldChange('musicalDirector', e.target.value, i)
+                  onCreditFieldChange(
+                    'musicalDirector',
+                    e.target.value,
+                    credit.id
+                  )
                 }
                 placeholder="Musical Director"
                 value={credit.musicalDirector}
@@ -144,7 +148,7 @@ const Credits: React.FC<{
             <InputField
               name="group"
               onChange={(e: any) =>
-                onCreditFieldChange('group', e.target.value, i)
+                onCreditFieldChange('group', e.target.value, credit.id)
               }
               placeholder="Theatre Group"
               value={credit.group}
@@ -155,7 +159,7 @@ const Credits: React.FC<{
                 name="startDate"
                 onChange={(date: any) => {
                   const dateString = new Date(date).toLocaleDateString();
-                  onCreditFieldChange('startDate', dateString, i);
+                  onCreditFieldChange('startDate', dateString, credit.id);
                 }}
                 value={credit.startDate}
               />
@@ -164,7 +168,7 @@ const Credits: React.FC<{
                 name="endDate"
                 onChange={(date: any) => {
                   const dateString = new Date(date).toLocaleDateString();
-                  onCreditFieldChange('endDate', dateString, i);
+                  onCreditFieldChange('endDate', dateString, credit.id);
                 }}
                 value={credit.endDate}
               />
