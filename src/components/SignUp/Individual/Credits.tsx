@@ -4,9 +4,10 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import styled from 'styled-components';
 import { Tagline, Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
-import Button from '../../../genericComponents/Button';
+import { colors } from '../../../theme/styleVars';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const Credits: React.FC<{
@@ -15,37 +16,45 @@ const Credits: React.FC<{
 }> = props => {
   const { setForm, formData } = props;
   const { pastPerformances } = formData;
-  const [startDate, setStartDate] = useState(new Date() as any);
-  const [endDate, setEndDate] = useState(new Date() as any);
+  const [showId, setShowId] = useState(1);
 
   const setCreditInputs = (creditInputBlocks: any) => {
     const target = {
-      name: pastPerformances,
+      name: 'pastPerformances',
       value: creditInputBlocks
     };
+
     setForm({ target });
   };
 
   const onCreditFieldChange = (
     fieldName: string,
     fieldValue: string,
-    i: number
+    id: number
   ) => {
     const newCredits = [...pastPerformances];
-    newCredits[i][fieldName] = fieldValue;
+    const findIndex = newCredits.findIndex(show => show.id === id);
+    newCredits[findIndex][fieldName] = fieldValue;
+
     setCreditInputs(newCredits);
   };
 
-  const removeCreditBlock = (i: number) => {
+  const removeCreditBlock = (e: any, id: number) => {
+    e.preventDefault();
     const newCredits = [...pastPerformances];
-    newCredits.splice(i, 1);
+    const findIndex = newCredits.findIndex(show => show.id === id);
+    newCredits.splice(findIndex, 1);
+
     setCreditInputs(newCredits);
   };
 
   const addCreditBlock = () => {
+    const newShowId = showId + 1;
+
     setCreditInputs([
       ...pastPerformances,
       {
+        id: newShowId,
         title: '',
         group: '',
         location: '',
@@ -57,6 +66,8 @@ const Credits: React.FC<{
         musicalDirector: ''
       }
     ]);
+
+    setShowId(newShowId);
   };
 
   return (
@@ -68,89 +79,148 @@ const Credits: React.FC<{
         </Col>
       </Row>
       {pastPerformances.map((credit: any, i: number) => (
-        <Row>
+        <PerfRow key={`credit-${credit.id}`}>
           <Col lg="4">
             <Form>
               <InputField
                 name="title"
-                onChange={setForm}
+                onChange={(e: any) =>
+                  onCreditFieldChange('title', e.target.value, i)
+                }
                 placeholder="Show Title"
-                value={pastPerformances.title}
+                value={credit.title}
               />
               <InputField
                 name="group"
-                onChange={setForm}
+                onChange={(e: any) =>
+                  onCreditFieldChange('group', e.target.value, i)
+                }
                 placeholder="Theatre or Location"
-                value={pastPerformances.group}
+                value={credit.group}
               />
               <InputField
                 name="url"
-                onChange={setForm}
+                onChange={(e: any) =>
+                  onCreditFieldChange('url', e.target.value, i)
+                }
                 placeholder="Web Link"
-                value={pastPerformances.url}
+                value={credit.url}
               />
               <InputField
                 name="role"
-                onChange={setForm}
+                onChange={(e: any) =>
+                  onCreditFieldChange('role', e.target.value, i)
+                }
                 placeholder="Role"
-                value={pastPerformances.role}
+                value={credit.role}
               />
               <InputField
                 name="director"
-                onChange={setForm}
+                onChange={(e: any) =>
+                  onCreditFieldChange('director', e.target.value, i)
+                }
                 placeholder="Director"
-                value={pastPerformances.director}
+                value={credit.director}
               />
               <InputField
                 name="musicalDirector"
-                onChange={setForm}
+                onChange={(e: any) =>
+                  onCreditFieldChange('musicalDirector', e.target.value, i)
+                }
                 placeholder="Musical Director"
-                value={pastPerformances.musicalDirector}
+                value={credit.musicalDirector}
               />
             </Form>
-            <Button
-              onClick={addCreditBlock}
-              text="Save and add another past performance"
-            />
+            {i ? (
+              <DeleteRowLink
+                href="#"
+                onClick={(e: any) => removeCreditBlock(e, credit.id)}
+              >
+                X Delete
+              </DeleteRowLink>
+            ) : null}
           </Col>
           <Col lg="4">
             <InputField
               name="group"
-              onChange={setForm}
+              onChange={(e: any) =>
+                onCreditFieldChange('group', e.target.value, i)
+              }
               placeholder="Theatre Group"
-              value={pastPerformances.group}
+              value={credit.group}
             />
-            <h5>Running Dates</h5>
-            <DatePicker
-              name="startDate"
-              onChange={startDate => setStartDate(startDate)}
-              selected={startDate}
-              value={pastPerformances.startDate}
-            />
-            <h6>through</h6>
-            <DatePicker
-              name="endDate"
-              onChange={endDate => setEndDate(endDate)}
-              selected={endDate}
-              value={pastPerformances.endDate}
-            />
-            <div>{credit.title}</div>
-            <input
-              name="creditTitle"
-              onChange={e => onCreditFieldChange('title', e.target.value, i)}
-              type="text"
-              value={credit.title}
-            />
-            {i ? (
-              <a href="#" onClick={() => removeCreditBlock(i)}>
-                Delete
-              </a>
-            ) : null}
+            <DateRowTitle>Running Dates</DateRowTitle>
+            <DateRow>
+              <DatePicker
+                name="startDate"
+                onChange={(date: any) => {
+                  const dateString = new Date(date).toLocaleDateString();
+                  onCreditFieldChange('startDate', dateString, i);
+                }}
+                value={credit.startDate}
+              />
+              <h6>through</h6>
+              <DatePicker
+                name="endDate"
+                onChange={(date: any) => {
+                  const dateString = new Date(date).toLocaleDateString();
+                  onCreditFieldChange('endDate', dateString, i);
+                }}
+                value={credit.endDate}
+              />
+            </DateRow>
           </Col>
-        </Row>
+        </PerfRow>
       ))}
+      <Row>
+        <Col lg="10">
+          <SaveAndAddLink
+            href="#"
+            onClick={(e: any) => {
+              e.preventDefault();
+              addCreditBlock();
+            }}
+          >
+            + Save and add another past performance
+          </SaveAndAddLink>
+        </Col>
+      </Row>
     </Container>
   );
 };
+
+const PerfRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
+
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const SaveAndAddLink = styled.a`
+  display: block;
+  margin-top: 1em;
+`;
+
+const DeleteRowLink = styled.a`
+  color: ${colors.salmon};
+  display: block;
+  margin-top: 1em;
+
+  &:hover {
+    color: ${colors.salmon};
+  }
+`;
+
+const DateRowTitle = styled.h5`
+  margin-top: 20px;
+  padding-bottom: 8px;
+`;
+
+const DateRow = styled.div`
+  display: flex;
+  gap: 1em;
+`;
 
 export default Credits;

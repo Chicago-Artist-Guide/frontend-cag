@@ -20,6 +20,7 @@ const Training: React.FC<{
     trainingDegree,
     trainingDetails
   } = formData;
+
   return (
     <Container>
       <Row>

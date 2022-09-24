@@ -33,7 +33,21 @@ const defaultData = {
   trainingDegree: '',
   trainingDetails: '',
 
-  pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
+  pastPerformances: [
+    {
+      id: 1,
+      title: '',
+      group: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      url: '',
+      role: '',
+      director: '',
+      musicalDirector: '',
+      recognition: ''
+    }
+  ], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
   upcoming: [
     { id: 1, title: '', synopsis: '', industryCode: '', url: '', imageUrl: '' }
@@ -50,6 +64,8 @@ const SignUp2 = () => {
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
   const stepId = (step as Step).id;
+
+  console.log(formData);
 
   // submit full sign up flow 2 profile data
   const submitSignUp2Profile = async () => {
@@ -85,7 +101,10 @@ const SignUp2 = () => {
       additional_skills_manual: additionalSkillsManual,
 
       // awards
-      awards
+      awards,
+
+      // completed profile 2
+      completed_profile_2: true
     };
 
     try {
