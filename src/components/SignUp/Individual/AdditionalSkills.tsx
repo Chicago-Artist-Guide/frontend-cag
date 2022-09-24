@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -15,10 +15,12 @@ const AdditionalSkills: React.FC<{
   formData: any;
 }> = props => {
   const { formData, setForm } = props;
-  const { additionalSkillsCheckboxes } = formData;
+  const { additionalSkillsCheckboxes, additionalSkillsManual } = formData;
 
   const [input, setInput] = useState('');
-  const [skillTags, setTags] = useState([] as string[]);
+  const [skillTags, setTags] = useState([
+    ...additionalSkillsManual
+  ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
   const isAdditionalSkillsCheckboxes = (skillOption: string) =>
@@ -90,6 +92,17 @@ const AdditionalSkills: React.FC<{
     setIsKeyReleased(true);
   };
 
+  useEffect(() => {
+    const allSkills = [...skillTags];
+
+    const target = {
+      name: 'additionalSkillsManual',
+      value: allSkills
+    };
+
+    setForm({ target });
+  }, [skillTags]);
+
   return (
     <Container>
       <Row>
@@ -131,7 +144,7 @@ const AdditionalSkills: React.FC<{
             </CAGInput>
             <CAGContainer>
               {skillTags.map((tag, index) => (
-                <CAGTag>
+                <CAGTag key={`${tag}-${index}`}>
                   <div className="tag">
                     {tag}
                     <button onClick={() => deleteTag(index)}>x</button>
@@ -148,6 +161,7 @@ const AdditionalSkills: React.FC<{
 
 const CAGInput = styled.div`
   position: relative;
+
   input {
     border: 1px solid ${colors.lightGrey};
     border-radius: 7px;

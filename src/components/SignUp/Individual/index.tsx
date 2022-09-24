@@ -30,9 +30,6 @@ const createDefaultStepErrorsObj = (stepNames: string[]) => {
   return stepErrorsObj;
 };
 
-// // flatten our step id's into a single array
-const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
-
 const defaultSteps: Step[] = [
   { id: 'role' },
   { id: 'basics' },
@@ -44,6 +41,9 @@ const defaultSteps: Step[] = [
   { id: 'demographics' },
   { id: 'profilePreview' }
 ];
+
+// flatten our step id's into a single array
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 const defaultData = {
   actorInfo1Ethnicities: [],
@@ -211,7 +211,12 @@ const IndividualSignUp: React.FC<{
             {
               uid: userId,
               account_id: accountRef.id,
-              stage_role: stageRole
+              stage_role: stageRole,
+
+              // init progress in signup flow
+              completed_signup: true,
+              completed_profile_1: false,
+              completed_profile_2: false
             }
           );
 
@@ -310,7 +315,10 @@ const IndividualSignUp: React.FC<{
       union_other: demographicsUnionStatusOther,
       agency: demographicsAgency,
       websites: demographicsWebsites,
-      bio: demographicsBio
+      bio: demographicsBio,
+
+      // completed profile
+      completed_profile_1: true
     };
 
     try {

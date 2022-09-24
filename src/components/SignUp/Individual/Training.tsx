@@ -20,6 +20,9 @@ const Training: React.FC<{
     trainingDegree,
     trainingDetails
   } = formData;
+
+  console.log(trainingInstitution, trainingCity);
+
   return (
     <Container>
       <Row>

@@ -1,5 +1,5 @@
 import { updateDoc } from 'firebase/firestore';
-import React from 'react';
+import React, { useState } from 'react';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -13,7 +13,7 @@ import AdditionalSkills from '../components/SignUp/Individual/AdditionalSkills';
 import Awards from '../components/SignUp/Individual/Awards';
 
 // Establish our steps
-const steps: Step[] = [
+const defaultSteps: Step[] = [
   { id: 'training' },
   { id: 'credits' },
   { id: 'upcoming' },
@@ -22,7 +22,7 @@ const steps: Step[] = [
 ];
 
 // flatten our step id's into a single array
-const flatSteps = steps.map(step => step.id);
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 // establish our form data structure
 // assign defaults
@@ -33,7 +33,21 @@ const defaultData = {
   trainingDegree: '',
   trainingDetails: '',
 
-  pastPerformances: [], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
+  pastPerformances: [
+    {
+      id: 1,
+      title: '',
+      group: '',
+      location: '',
+      startDate: '',
+      endDate: '',
+      url: '',
+      role: '',
+      director: '',
+      musicalDirector: '',
+      recognition: ''
+    }
+  ], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
   upcoming: [
     { id: 1, title: '', synopsis: '', industryCode: '', url: '', imageUrl: '' }
@@ -48,7 +62,10 @@ const defaultData = {
 const SignUp2 = () => {
   const { profileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
-  const { step, navigation } = useStep({ steps: flatSteps as any }); // defaults for our steps
+  const [steps, setSteps] = useState<Step[]>(defaultSteps);
+
+  // defaults for our defaultSteps
+  const { step, index, navigation } = useStep({ steps: steps });
   const stepId = (step as Step).id;
 
   // submit full sign up flow 2 profile data
@@ -85,7 +102,10 @@ const SignUp2 = () => {
       additional_skills_manual: additionalSkillsManual,
 
       // awards
-      awards
+      awards,
+
+      // completed profile 2
+      completed_profile_2: true
     };
 
     try {
@@ -105,20 +125,20 @@ const SignUp2 = () => {
     const props = { formData, setForm, navigation };
     let returnStep;
 
-    switch (step) {
-      case 'training' as any:
+    switch (stepId) {
+      case 'training':
         returnStep = <Training {...props} />;
         break;
-      case 'credits' as any:
+      case 'credits':
         returnStep = <Credits {...props} />;
         break;
-      case 'upcoming' as any:
+      case 'upcoming':
         returnStep = <Upcoming {...props} />;
         break;
-      case 'additionalSkills' as any:
+      case 'additionalSkills':
         returnStep = <AdditionalSkills {...props} />;
         break;
-      case 'awards' as any:
+      case 'awards':
         returnStep = <Awards {...props} />;
         break;
       default:

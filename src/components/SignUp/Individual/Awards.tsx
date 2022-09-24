@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import { colors, fonts } from '../../../theme/styleVars';
 import Container from 'react-bootstrap/Container';
@@ -14,12 +14,17 @@ const Awards: React.FC<{
   const { setForm, formData } = props;
   const { awards } = formData;
   const [awardId, setAwardId] = useState(1);
+  const [yearOptions, setYearOptions] = useState([] as number[]);
 
-  // add options for year dropdown
-  const yearOptions = [] as any[];
-  for (let i = 1949; i < 2023; i++) {
-    yearOptions.push(i);
-  }
+  useEffect(() => {
+    const newYears = [] as number[];
+
+    for (let i = 2023; i > 1949; i--) {
+      newYears.push(i);
+    }
+
+    setYearOptions(newYears);
+  }, []);
 
   const onAwardInputChange = (
     fieldValue: string,
@@ -85,87 +90,78 @@ const Awards: React.FC<{
           <Tagline>Don't be shy, brag about it.</Tagline>
         </Col>
       </Row>
-      <Row>
-        <Col lg="12">
-          {awards.map((awardRow: any, i: any) => (
-            <div key={`award-row-${awardRow.id}`}>
-              <Col lg="4">
-                <CAGFormControl
-                  as="input"
-                  name="title"
-                  onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'title',
-                      awardRow.id
-                    )
-                  }
-                  placeholder="Award or Recognition"
-                  value={awardRow.title}
-                />
-                <CAGFormControl
-                  as="select"
-                  name="year"
-                  onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'year',
-                      awardRow.id
-                    )
-                  }
-                  value={awardRow.year}
+      {awards.map((awardRow: any, i: any) => (
+        <AwardRow key={`award-row-${awardRow.id}`}>
+          <Col lg="4">
+            <CAGFormControl
+              as="input"
+              name="title"
+              onChange={(e: any) =>
+                onAwardInputChange(e.target.value || '', 'title', awardRow.id)
+              }
+              placeholder="Award or Recognition"
+              value={awardRow.title}
+            />
+            <CAGFormControl
+              as="select"
+              name="year"
+              onChange={(e: any) =>
+                onAwardInputChange(e.target.value || '', 'year', awardRow.id)
+              }
+              value={awardRow.year}
+            >
+              <option disabled selected value="">
+                Year Received
+              </option>
+              {yearOptions.map(year => {
+                return <option value={year}>{year}</option>;
+              })}
+            </CAGFormControl>
+            <CAGFormControl
+              as="input"
+              name="url"
+              onChange={(e: any) =>
+                onAwardInputChange(e.target.value || '', 'url', awardRow.id)
+              }
+              placeholder="Web Link"
+              value={awardRow.url}
+            />
+            {numAwards > 1 && (
+              <CAGButton>
+                <a
+                  href="#"
+                  className="delete"
+                  onClick={(e: any) => removeAwardInput(e, awardRow.id)}
                 >
-                  <option disabled selected value="">
-                    Year Received
-                  </option>
-                  {yearOptions.map(year => {
-                    return <option value={year}>{year}</option>;
-                  })}
-                </CAGFormControl>
-                <CAGFormControl
-                  as="input"
-                  name="url"
-                  onChange={(e: any) =>
-                    onAwardInputChange(e.target.value || '', 'url', awardRow.id)
-                  }
-                  placeholder="Web Link"
-                  value={awardRow.url}
-                />
-              </Col>
-              <Col lg="6">
-                <CAGFormControl
-                  as="textarea"
-                  name="description"
-                  onChange={(e: any) =>
-                    onAwardInputChange(
-                      e.target.value || '',
-                      'description',
-                      awardRow.id
-                    )
-                  }
-                  placeholder="Description/Notes"
-                  rows={6}
-                  value={awardRow.description}
-                />
-              </Col>
-              {numAwards > 1 && (
-                <CAGButton>
-                  <button
-                    className="delete"
-                    onClick={(e: any) => removeAwardInput(e, awardRow.id)}
-                  >
-                    x
-                  </button>
-                  <p>Delete recognition</p>
-                </CAGButton>
-              )}
-            </div>
-          ))}
+                  X Delete Recognition
+                </a>
+              </CAGButton>
+            )}
+          </Col>
+          <Col lg="6">
+            <CAGFormControl
+              as="textarea"
+              name="description"
+              onChange={(e: any) =>
+                onAwardInputChange(
+                  e.target.value || '',
+                  'description',
+                  awardRow.id
+                )
+              }
+              placeholder="Description/Notes"
+              rows={6}
+              value={awardRow.description}
+            />
+          </Col>
+        </AwardRow>
+      ))}
+      <Row>
+        <Col lg="10">
           <CAGButton>
-            <button className="add" onClick={addAwardInput}>
-              +
-            </button>
-            <p>Add another recognition</p>
+            <a href="#" onClick={addAwardInput}>
+              + Add another recognition
+            </a>
           </CAGButton>
         </Col>
       </Row>
@@ -173,27 +169,23 @@ const Awards: React.FC<{
   );
 };
 
-const CAGButton = styled.div`
-  button {
-    padding: 4px;
-    border: none;
-    background-color: unset;
-    cursor: pointer;
+const AwardRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
 
-    &.add {
-      color: ${colors.darkGreen};
-      font-size: 30px;
-    }
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const CAGButton = styled.div`
+  a {
+    display: block;
+    margin: 1em 0;
 
     &.delete {
       color: ${colors.salmon};
-      font-size: 20px;
     }
-  }
-
-  p {
-    font-family: ${fonts.mainFont};
-    display: inline;
   }
 `;
 

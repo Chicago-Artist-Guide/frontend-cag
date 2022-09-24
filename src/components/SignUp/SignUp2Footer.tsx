@@ -16,13 +16,14 @@ const SignUp2Footer: React.FC<{
   const { next, previous } = navigation;
   const [nextBtnText, setNextBtnText] = useState<string>('Continue');
   const showBackButton = currentStep !== 'training';
-  const stepIndex = steps.findIndex((s: any) => s.id === (step as any));
+  const stepIndex = steps.findIndex((s: any) => s.id === (step as any).id);
 
   const nextButtonAction = async (currStep: string) => {
     if (currStep === 'awards') {
       setNextBtnText('Go to Profile');
       await submitSignUp2Profile();
       history.push('/profile');
+      return;
     }
 
     return next();

@@ -140,6 +140,7 @@ const InputField = (props: any) => {
           onChange={onChange}
           placeholder={placeholder}
           type={fieldType}
+          value={value}
           {...rest}
         />
       </CAGInput>
