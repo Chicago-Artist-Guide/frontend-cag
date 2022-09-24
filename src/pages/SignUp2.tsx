@@ -68,8 +68,6 @@ const SignUp2 = () => {
   const { step, index, navigation } = useStep({ steps: steps });
   const stepId = (step as Step).id;
 
-  console.log(stepId, formData);
-
   // submit full sign up flow 2 profile data
   const submitSignUp2Profile = async () => {
     const {

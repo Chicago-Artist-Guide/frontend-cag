@@ -38,8 +38,6 @@ const Profile: React.FC<{
   const PageWrapper = previewMode ? Container : PageContainer;
   const showSignUp2Link = previewMode || !profile.completed_profile_2;
 
-  console.log(account, profile);
-
   return (
     <>
       <PageWrapper>

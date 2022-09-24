@@ -23,8 +23,6 @@ const AdditionalSkills: React.FC<{
   ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
-  console.log('additionalSkillsManual', additionalSkillsManual);
-
   const isAdditionalSkillsCheckboxes = (skillOption: string) =>
     additionalSkillsCheckboxes.indexOf(skillOption) > -1;
 
