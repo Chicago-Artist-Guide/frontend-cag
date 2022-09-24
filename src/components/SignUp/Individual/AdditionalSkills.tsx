@@ -131,7 +131,7 @@ const AdditionalSkills: React.FC<{
             </CAGInput>
             <CAGContainer>
               {skillTags.map((tag, index) => (
-                <CAGTag>
+                <CAGTag key={`${tag}-${index}`}>
                   <div className="tag">
                     {tag}
                     <button onClick={() => deleteTag(index)}>x</button>
@@ -148,6 +148,7 @@ const AdditionalSkills: React.FC<{
 
 const CAGInput = styled.div`
   position: relative;
+
   input {
     border: 1px solid ${colors.lightGrey};
     border-radius: 7px;
