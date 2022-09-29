@@ -24,7 +24,7 @@ const CompanySignUp: React.FC<{
     setAccountRef,
     setProfileRef
   } = useProfileContext();
-  const [formData, setForm] = useForm<CompanyFormData>(defaultData); // useForm is an extension of React hooks to manage form state
+  const [formData, setForm] = useForm<CompanyFormData>(defaultData);
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
     SubmitBasicsResp | undefined
   >(undefined);
@@ -60,6 +60,8 @@ const CompanySignUp: React.FC<{
 
     console.log('Submit Basics', { formData });
 
+    console.log('Submit Basics', { formData });
+
     const {
       theatreName: basicsTheatreName,
       emailAddress: basicsEmailAddress,
@@ -91,6 +93,9 @@ const CompanySignUp: React.FC<{
               account_id: account.id
             }
           );
+
+          console.log('Company', { company });
+          console.log('Account', { account });
 
           console.log('Company', { company });
           console.log('Account', { account });
@@ -143,7 +148,7 @@ const CompanySignUp: React.FC<{
             setFormErrors={setStepErrors}
             formErrors={stepErrors}
             hasErrorCallback={setStepErrorsCallback}
-            // submitBasicsErr={undefined}
+            // // submitBasicsErr={undefined}
           />
         );
       case 'privacy':
@@ -170,6 +175,8 @@ const CompanySignUp: React.FC<{
         return <>Something went wrong</>;
     }
   };
+
+  console.log('SignUp Index', { stepId });
 
   console.log('SignUp Index', { stepId });
 
@@ -217,6 +224,7 @@ const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 const defaultSteps: Step[] = [
   { id: 'basics' },
+  { id: 'details' },
   { id: 'details' },
   { id: 'privacy' },
   { id: 'photo' }

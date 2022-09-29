@@ -8,14 +8,16 @@ const Button = (props: any) => {
 
   return (
     <>
-      <CAGButton
-        className={`${variant}-class`}
-        onClick={onClick}
-        variant={variant}
-        {...rest}
-      >
-        {text}
-      </CAGButton>
+      <>
+        <CAGButton
+          className={`${variant}-class`}
+          onClick={onClick}
+          variant={variant}
+          {...rest}
+        >
+          {text}
+        </CAGButton>
+      </>
     </>
   );
 };
@@ -31,6 +33,17 @@ const CAGButton = styled(BSButton)`
   padding: 16px 24px;
   text-align: center;
   text-transform: uppercase;
+  box-shadow: 0px 0px 8px 4px #0000000d;
+  height: 40px;
+  left: 754px;
+  top: 383.0390625px;
+  border-radius: 20px;
+  padding: 12px 18px 12px 18px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+  letter-spacing: 0.1em;
+  text-align: center;
 
   &.primary-class {
     background: ${colors.primary};

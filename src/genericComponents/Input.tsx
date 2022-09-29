@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Form, FormProps } from 'react-bootstrap';
-import styled from 'styled-components';
+import { FormProps } from 'react-bootstrap';
 import {
   CAGError,
   CAGFormControl,
-  CAGHelperText,
   CAGFormGroup,
+  CAGHelperText,
   CAGLabel
 } from '../components/SignUp/SignUpStyles';
-import { colors, fonts } from '../theme/styleVars';
 import {
   ErrorMessage,
   requiredFieldMessage,
@@ -135,7 +133,7 @@ const InputField = (props: Props) => {
       hasErrorsCall(numFuncErrors > 0);
     } else if (validationRegexName) {
       // 2. then care about regex
-      if (!validateRegex(validationRegexName, value as string)) {
+      if (!validateRegex(validationRegexName, (value as string) as string)) {
         setHasError(true);
         setErrorMessage(validationRegexMessage || ErrorMessage.Default);
         hasErrorsCall(true);
