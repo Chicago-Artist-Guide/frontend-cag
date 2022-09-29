@@ -182,7 +182,7 @@ const Upcoming: React.FC<{
       {upcoming.map((upcomingRow: any, i: any) => (
         <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
           <Col lg="4">
-            <Form.Group>
+            <Form.Group className="form-group">
               <PhotoContainer
                 style={{
                   backgroundImage:
@@ -199,12 +199,15 @@ const Upcoming: React.FC<{
                   />
                 )}
               </PhotoContainer>
-              <Form.Group>
+              <Form.Group className="form-group">
                 <Form.Label>File size limit: 5MB</Form.Label>
                 <Form.Control
                   accept="image/*"
                   onChange={(e: any) => onFileChange(e, upcomingRow.id)}
-                  size="lg"
+                  style={{
+                    padding: 0,
+                    border: 'none'
+                  }}
                   type="file"
                 />
               </Form.Group>

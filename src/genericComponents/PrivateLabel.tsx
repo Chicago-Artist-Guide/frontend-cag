@@ -4,7 +4,11 @@ import styled from 'styled-components';
 import { colors, fonts } from '../theme/styleVars';
 
 const PrivateLabel = () => {
-  return <CAGLabel>private</CAGLabel>;
+  return (
+    <CAGLabel as="span" className="badge">
+      private
+    </CAGLabel>
+  );
 };
 
 const CAGLabel = styled(Badge)`

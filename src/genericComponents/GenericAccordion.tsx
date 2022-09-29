@@ -7,27 +7,26 @@ import styled from 'styled-components';
 
 const GenericAccordion = (props: any) => {
   const { children, textHeader, eventKey } = props;
+  console.log({ props });
 
   return (
     <CardHolder>
-      <Accordion.Collapse eventKey={eventKey || '0'}>
-        <Card.Body>{children}</Card.Body>
-      </Accordion.Collapse>
-      <CardHeader>
-        {textHeader}
-        <Accordion.Toggle
-          as={Button}
-          eventKey={eventKey || '0'}
-          variant="button"
-        >
-          <CaretDownFill />
-        </Accordion.Toggle>
-      </CardHeader>
+      <Accordion.Item eventKey={eventKey || '0'}>
+        <CardHeader>
+          {textHeader}
+          <Accordion.Button as={Button} variant="button">
+            <CaretDownFill />
+          </Accordion.Button>
+        </CardHeader>
+        <Accordion.Body>
+          <Card.Body>{children}</Card.Body>
+        </Accordion.Body>
+      </Accordion.Item>
     </CardHolder>
   );
 };
 
-const CardHolder = styled(Card)`
+const CardHolder = styled(Accordion.Item)`
   box-shadow: 2px 2px 10px #00000029;
   flex-direction: column-reverse;
   .show + .card-header {

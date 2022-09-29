@@ -6,7 +6,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
-import { SubmitBasicsResp } from '../SignUpFooter';
+import { SubmitBasicsResp } from './SignUpFooter';
 import { Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
 import Checkbox from '../../../genericComponents/Checkbox';
@@ -171,6 +171,7 @@ const IndividualBasics: React.FC<{
               validationFuncMessages={[ErrorMessage.PasswordsMatch]}
               validationFuncs={[customPasswordErrorFunc]}
               value={basicsPasswordConfirm || ''}
+              className="form-group"
             />
             <CAGCheckbox
               checked={basics18Plus || false}

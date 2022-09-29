@@ -88,7 +88,9 @@ const TextArea = (props: Props) => {
           placeholder={placeholder}
           rows={5}
           style={{
-            border: '1px solid #ced4da',
+            border: `1px solid ${colors.lightGrey}`,
+            color: value ? colors.secondaryFontColor : colors.lightGrey,
+            fontWeight: 400,
             maxWidth: 440
           }}
         />

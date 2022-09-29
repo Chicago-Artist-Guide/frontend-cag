@@ -8,7 +8,7 @@ import { useProfileContext } from '../../../context/ProfileContext';
 import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
-import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
+import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
 import ActorInfo1 from './ActorInfo1';
 import ActorInfo2 from './ActorInfo2';
 import IndividualBasics from './Basics';

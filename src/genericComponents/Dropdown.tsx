@@ -4,6 +4,7 @@ import {
   CAGFormGroup,
   CAGLabel
 } from '../components/SignUp/SignUpStyles';
+import { colors } from '../theme/styleVars';
 
 interface Props {
   controlId?: string;
@@ -18,10 +19,13 @@ interface Value {
   value: string;
 }
 
-const DropdownMenu = (props: Props) => {
-  const { controlId, label, onChange, value, options } = props;
-  console.log('selectedValue', value, controlId);
-
+const DropdownMenu = ({
+  controlId,
+  label,
+  onChange,
+  value,
+  options
+}: Props) => {
   return (
     <CAGFormGroup controlId={controlId}>
       <CAGLabel>{label}</CAGLabel>
@@ -33,8 +37,9 @@ const DropdownMenu = (props: Props) => {
         onChange={onChange}
         placeholder="Choose one..."
         style={{
-          border: '1px solid #ced4da',
-          color: !value ? '#D4D6DF' : '#495057',
+          border: `1px solid ${colors.lightGrey}`,
+          color: value ? colors.secondaryFontColor : colors.lightGrey,
+          fontWeight: 400,
           height: 40,
           maxWidth: 256
         }}

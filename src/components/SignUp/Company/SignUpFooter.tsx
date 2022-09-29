@@ -1,8 +1,8 @@
 import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
-import Button from '../../genericComponents/Button';
-import { ButtonCol, PageFooterRow, Pagination } from './SignUpFooterStyles';
+import Button from '../../../genericComponents/Button';
+import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
 
 // for dev
 const FORM_VALIDATION_ON = true;
@@ -56,7 +56,6 @@ const SignUpFooter: React.FC<{
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
   const nextButtonAction = async (navNext: boolean, currStep: string) => {
-    console.log('currentStep', currentStep);
     if (currStep === 'basics') {
       const submitted = await submitBasics();
       const prev = previous ? previous : () => null;

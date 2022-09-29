@@ -26,7 +26,7 @@ const CompanyPhoto: React.FC<{
       <Row>
         <Col lg="4">
           <Form>
-            <Form.Group>
+            <Form.Group className="form-group">
               <PhotoContainer>
                 <FontAwesomeIcon className="camera" icon={faCamera} size="lg" />
               </PhotoContainer>
@@ -80,7 +80,7 @@ const HelperText = styled.div`
   font-style: italic;
   font-weight: 500;
   line-height: 14px;
-  letter-spacing: 0.4000000059604645px;
+  letter-spacing: 0.4px;
   margin-top: 17px;
 `;
 

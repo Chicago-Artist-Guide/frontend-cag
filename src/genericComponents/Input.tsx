@@ -168,7 +168,7 @@ const InputField = (props: Props) => {
           type={fieldType}
           value={value}
           {...rest}
-          style={{ height: 40, maxWidth: 256 }}
+          style={{ height: 40 }}
         />
       </CAGFormGroup>
       {hasError && <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>}

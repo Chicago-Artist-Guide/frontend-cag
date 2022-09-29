@@ -97,8 +97,11 @@ export const SelectDirections = styled.p`
 `;
 
 export const CAGFormControl = styled(Form.Control)`
-  left: 0px;
-  top: 28px;
+  border-radius: 0.25rem;
+  padding: 8px 13px 8px 13px;
+`;
+
+export const CAGFormSelect = styled(Form.Select)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
 `;

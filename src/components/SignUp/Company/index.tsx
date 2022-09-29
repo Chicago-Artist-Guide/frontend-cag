@@ -7,7 +7,7 @@ import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
-import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
+import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
 import CompanyBasics from './Basics';
 import CompanyDetails from './Details';
 import CompanyPhoto from './Photo';

@@ -144,7 +144,7 @@ const ActorInfo1: React.FC<{
           <PaddingTitle>LET'S GET SOME DETAILS</PaddingTitle>
           <Row>
             <Col lg="12">
-              <Form.Group>
+              <Form.Group className="form-group">
                 <Container>
                   <Row>
                     <PaddedCol lg="6">
@@ -172,12 +172,12 @@ const ActorInfo1: React.FC<{
                         disabled={actorInfo1Pronouns !== 'Other'}
                         name="actorInfo1PronounsOther"
                         onChange={setForm}
-                      ></Form.Control>
+                      />
                     </PaddedCol>
                   </Row>
                 </Container>
               </Form.Group>
-              <Form.Group>
+              <Form.Group className="form-group">
                 <CAGLabel>
                   Do you identify as part of the LGBTQIA+ community?{' '}
                   <PrivateLabel />
@@ -208,7 +208,7 @@ const ActorInfo1: React.FC<{
                   value="I do not wish to respond"
                 />
               </Form.Group>
-              <Form.Group>
+              <Form.Group className="form-group">
                 <CAGLabel>Do you identify as any of the following:</CAGLabel>
                 <PrivacyPar>
                   Note: This list is not exhaustive nor hyper-specific. The goal
@@ -233,7 +233,7 @@ const ActorInfo1: React.FC<{
                       }
                     />
                     {eth.values.length > 0 && (
-                      <InnerEthnicities>
+                      <InnerEthnicities style={{ paddingLeft: '1.25rem' }}>
                         {eth.values.map(ethV => (
                           <Checkbox
                             checked={isEthnicityInEthnicities(ethV)}
