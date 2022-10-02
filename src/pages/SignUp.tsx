@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import { useHistory } from 'react-router-dom';
+import { useAuthValue } from '../context/AuthContext';
 import PageContainer from '../components/layout/PageContainer';
 import AccountType from '../components/SignUp/AccountType';
 import CompanySignUp from '../components/SignUp/Company';
@@ -12,10 +14,18 @@ import {
 import Button from '../genericComponents/Button';
 
 const SignUp: React.FC = () => {
+  const history = useHistory();
+  const { currentUser } = useAuthValue();
   const [currentStep, setCurrentStep] = useState(-1);
   const [accountType, setAccountType] = useState<
     'individual' | 'company' | null
   >(null);
+
+  useEffect(() => {
+    if (currentUser) {
+      history.push('/profile');
+    }
+  }, [currentUser]);
 
   if (currentStep === -1) {
     return (
@@ -30,8 +40,8 @@ const SignUp: React.FC = () => {
         </Row>
         {accountType && (
           <PageFooterRow>
-            <Col lg="2"></Col>
-            <Col lg="8"></Col>
+            <Col lg="2" />
+            <Col lg="8" />
             <ButtonCol lg="2" offset={10}>
               <Button
                 onClick={() => setCurrentStep(0)}
