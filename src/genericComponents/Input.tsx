@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import { Form } from 'react-bootstrap';
-import { colors, fonts } from '../theme/styleVars';
+import { FormProps } from 'react-bootstrap';
+import {
+  CAGError,
+  CAGFormControl,
+  CAGFormGroup,
+  CAGHelperText,
+  CAGLabel
+} from '../components/SignUp/SignUpStyles';
 import {
   ErrorMessage,
   requiredFieldMessage,
-  validateRegex
+  validateRegex,
+  validationRegex
 } from '../utils/validation';
 
 /*
@@ -21,7 +27,7 @@ Regex
 - validationRegexMessage: string - message to show if value fails regex match (should use value from ErrorMessage enum)
 
 Custom Validation Functions
-- validationFuncs: function[] - an array of custom validation functions to check in order. Currenly, they do not take 
+- validationFuncs: function[] - an array of custom validation functions to check in order. Currenly, they do not take
     any params, but you should have access to any specific data you need on the step page itself
 - validationFuncMessages: string[] - an array of strings for the corresponding error messages for the validationFuncs.
     Should be in the same order as the validationFuncs
@@ -31,20 +37,38 @@ Parent Page
 
 */
 
-const InputField = (props: any) => {
+type Props = {
+  fieldType?: string;
+  hasErrorCallback?: (name: string, hasError: boolean) => void;
+  helperText?: string;
+  label?: string;
+  name?: string;
+  onChange?: any;
+  placeholder?: string;
+  required?: boolean;
+  requiredLabel?: string;
+  validationFuncMessages?: string[];
+  validationFuncs?: any;
+  validationRegexMessage?: string;
+  validationRegexName?: keyof typeof validationRegex;
+  value?: string | number;
+} & Omit<FormProps, 'onChange'>;
+
+const InputField = (props: Props) => {
   const {
     fieldType,
     label,
-    name,
+    name = '',
     onChange,
     placeholder,
-    required,
-    requiredLabel,
+    required = false,
+    requiredLabel = '',
     validationRegexName,
-    validationRegexMessage,
+    validationRegexMessage = '',
     validationFuncs,
-    validationFuncMessages,
+    validationFuncMessages = [],
     hasErrorCallback,
+    helperText,
     value,
     ...rest
   } = props;
@@ -71,7 +95,7 @@ const InputField = (props: any) => {
     // 0. if we're still pristine, don't show error messaging yet
     if (isPristine) {
       // find out when we need to unset pristine onChange of field
-      if (value.length > 0) {
+      if ((value as string)?.length > 0) {
         setIsPristine(false);
         hasErrorsCall(false);
       } else {
@@ -109,7 +133,7 @@ const InputField = (props: any) => {
       hasErrorsCall(numFuncErrors > 0);
     } else if (validationRegexName) {
       // 2. then care about regex
-      if (!validateRegex(validationRegexName, value)) {
+      if (!validateRegex(validationRegexName, (value as string) as string)) {
         setHasError(true);
         setErrorMessage(validationRegexMessage || ErrorMessage.Default);
         hasErrorsCall(true);
@@ -118,7 +142,7 @@ const InputField = (props: any) => {
       }
     } else if (required) {
       // 3. finally, care if it's required
-      if (value.length < 1) {
+      if ((value as string)?.length < 1) {
         setHasError(true);
         setErrorMessage(
           requiredFieldMessage(requiredLabel) || ErrorMessage.Default
@@ -132,9 +156,9 @@ const InputField = (props: any) => {
 
   return (
     <>
-      <CAGInput>
+      <CAGFormGroup controlId={name}>
         <CAGLabel>{label}</CAGLabel>
-        <Form.Control
+        <CAGFormControl
           aria-label={label}
           name={name}
           onChange={onChange}
@@ -142,31 +166,13 @@ const InputField = (props: any) => {
           type={fieldType}
           value={value}
           {...rest}
+          style={{ height: 40 }}
         />
-      </CAGInput>
-      {hasError ? (
-        <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>
-      ) : (
-        <></>
-      )}
+      </CAGFormGroup>
+      {hasError && <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>}
+      {helperText && <CAGHelperText>{helperText}</CAGHelperText>}
     </>
   );
 };
-
-const CAGInput = styled(Form.Group)`
-  margin: 0px;
-`;
-
-const CAGLabel = styled(Form.Label)`
-  color: ${colors.mainFont};
-  font-family: ${fonts.mainFont};
-  font-size: 20px;
-  margin: 0px;
-`;
-
-const CAGError = styled.span`
-  color: red;
-  font-size: 12px;
-`;
 
 export default InputField;

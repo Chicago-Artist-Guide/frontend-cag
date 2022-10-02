@@ -1,13 +1,13 @@
 import React from 'react';
-import styled from 'styled-components';
-import Image from 'react-bootstrap/Image';
-import Card from 'react-bootstrap/Card';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Accordion from 'react-bootstrap/Accordion';
-import LinkedinLogo from '../../images/icons-footer/social_linkedin.png';
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Image from 'react-bootstrap/Image';
 import Nav from 'react-bootstrap/Nav';
+import Row from 'react-bootstrap/Row';
 import { media } from 'styled-bootstrap-grid';
+import styled from 'styled-components';
+import LinkedinLogo from '../../images/icons-footer/social_linkedin.png';
 import { colors } from '../../theme/styleVars';
 
 const Team = (props: any) => {
@@ -15,7 +15,7 @@ const Team = (props: any) => {
 
   return (
     <MarginTeam key={id}>
-      <Accordion defaultActiveKey="0">
+      <Accordion>
         <PersonCard>
           <TopRow className="align-items-center justify-content-center">
             <Col md={5} xs={5}>
@@ -36,14 +36,14 @@ const Team = (props: any) => {
                   </Nav.Link>
                 )}
                 {bio != null && (
-                  <Accordion.Toggle className="button" eventKey={id}>
+                  <Accordion.Button className="button">
                     View Bio
-                  </Accordion.Toggle>
+                  </Accordion.Button>
                 )}
               </Card.Body>
             </Col>
           </TopRow>
-          <Accordion.Collapse eventKey={id}>
+          <Accordion.Body>
             <BottomRow>
               <BioCol>
                 <BioText className="caption">
@@ -52,7 +52,7 @@ const Team = (props: any) => {
                 </BioText>
               </BioCol>
             </BottomRow>
-          </Accordion.Collapse>
+          </Accordion.Body>
         </PersonCard>
       </Accordion>
     </MarginTeam>

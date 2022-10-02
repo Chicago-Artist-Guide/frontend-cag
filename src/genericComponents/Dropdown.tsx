@@ -1,31 +1,56 @@
 import React from 'react';
-import { Col, Form } from 'react-bootstrap';
+import {
+  CAGFormControl,
+  CAGFormGroup,
+  CAGLabel
+} from '../components/SignUp/SignUpStyles';
+import { colors } from '../theme/styleVars';
 
-const DropdownMenu = (props: any) => {
-  const {
-    defaultFormValue,
-    controlId,
-    label,
-    onChange,
-    selectedValue,
-    values
-  } = props;
+interface Props {
+  controlId?: string;
+  label?: string;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value?: string;
+  options: Value[];
+}
 
+interface Value {
+  name: string;
+  value: string;
+}
+
+const DropdownMenu = ({
+  controlId,
+  label,
+  onChange,
+  value,
+  options
+}: Props) => {
   return (
-    <Form.Group as={Col} controlId={controlId}>
-      <Form.Label>{label}</Form.Label>
-      <Form.Control
+    <CAGFormGroup controlId={controlId}>
+      <CAGLabel>{label}</CAGLabel>
+      <CAGFormControl
         as="select"
-        defaultValue={defaultFormValue}
+        name={controlId}
+        aria-label={label}
+        defaultValue={value}
         onChange={onChange}
+        placeholder="Choose one..."
+        style={{
+          border: `1px solid ${colors.lightGrey}`,
+          color: value ? colors.secondaryFontColor : colors.lightGrey,
+          fontWeight: 400,
+          height: 40,
+          maxWidth: 256
+        }}
       >
-        {values.map((name: string, value: string) => (
-          <option selected={value === selectedValue} value={value}>
-            {value}
+        {options.map(option => (
+          <option selected={option.value === value} value={value}>
+            {option.name}
           </option>
         ))}
-      </Form.Control>
-    </Form.Group>
+      </CAGFormControl>
+    </CAGFormGroup>
   );
 };
 

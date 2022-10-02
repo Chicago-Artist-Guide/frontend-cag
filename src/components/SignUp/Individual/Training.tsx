@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { Tagline, Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
 import { colors } from '../../../theme/styleVars';
+import { CAGFormGroup, CAGFormSelect } from '../SignUpStyles';
 
 const Training: React.FC<{
   setForm: any;
@@ -52,14 +53,21 @@ const Training: React.FC<{
             value={trainingCity || ''}
           />
         </Col>
-        <Col className="mt-4" lg="2">
-          <Form.Control
-            as="select"
+        <Col lg="2">
+          <CAGFormSelect
             name="trainingState"
             onChange={setForm}
             value={trainingState || ''}
+            style={{
+              height: 40,
+              marginTop: 13,
+              border: `1px solid ${colors.lightGrey}`,
+              color: trainingState
+                ? colors.secondaryFontColor
+                : colors.lightGrey
+            }}
           >
-            <option>State</option>
+            <option value="">State</option>
             <option value="AL">Alabama</option>
             <option value="AK">Alaska</option>
             <option value="AZ">Arizona</option>
@@ -111,7 +119,7 @@ const Training: React.FC<{
             <option value="WV">West Virginia</option>
             <option value="WI">Wisconsin</option>
             <option value="WY">Wyoming</option>
-          </Form.Control>
+          </CAGFormSelect>
         </Col>
       </Row>
       <Row>

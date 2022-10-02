@@ -8,7 +8,12 @@ const Checkbox = (props: any) => {
 
   return (
     <CAGCheckbox>
-      <Form.Check label={label} type={fieldType} {...rest} />
+      <Form.Check
+        label={label}
+        type={fieldType}
+        {...rest}
+        className="form-group"
+      />
     </CAGCheckbox>
   );
 };

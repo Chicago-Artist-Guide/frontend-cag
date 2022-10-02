@@ -107,13 +107,16 @@ const ProfilePhoto: React.FC<{
               </PhotoContainer>
             </Col>
             <ButtonCol lg="4">
-              <Form.Group>
+              <Form.Group className="form-group">
                 <Form.Label>File size limit: 5MB</Form.Label>
                 <Form.Control
                   accept="image/*"
                   onChange={onFileChange}
-                  size="lg"
                   type="file"
+                  style={{
+                    padding: 0,
+                    border: 'none'
+                  }}
                 />
               </Form.Group>
               <div>

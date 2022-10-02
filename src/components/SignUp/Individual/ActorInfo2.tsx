@@ -138,7 +138,7 @@ const ActorInfo2: React.FC<{
           <PaddingTitle>LET'S GET SOME DETAILS</PaddingTitle>
           <Row>
             <Col lg="12">
-              <Form.Group>
+              <Form.Group className="form-group">
                 <CAGLabel>Height</CAGLabel>
                 <Container>
                   <Row>
@@ -187,7 +187,7 @@ const ActorInfo2: React.FC<{
                   </Row>
                 </Container>
               </Form.Group>
-              <Form.Group>
+              <Form.Group className="form-group">
                 <CAGLabel>
                   What age range do you play? <PrivateLabel />
                 </CAGLabel>
@@ -205,7 +205,7 @@ const ActorInfo2: React.FC<{
                   />
                 ))}
               </Form.Group>
-              <Form.Group>
+              <Form.Group className="form-group">
                 <CAGLabel>
                   Gender Identity <PrivateLabel />
                 </CAGLabel>
@@ -234,7 +234,7 @@ const ActorInfo2: React.FC<{
           {actorInfo2Gender !== '' && !actorInfo2Gender.includes('Cis') && (
             <Row>
               <Col lg="6">
-                <Form.Group>
+                <Form.Group className="form-group">
                   <CAGLabelSmaller>
                     I would also be comfortable playing roles usually played by:{' '}
                     <PrivateLabel />
@@ -254,7 +254,7 @@ const ActorInfo2: React.FC<{
                 </Form.Group>
               </Col>
               <Col lg="6">
-                <Form.Group>
+                <Form.Group className="form-group">
                   <CAGLabelSmaller>
                     I would be comfortable playing a character through all
                     phases of their transition: <PrivateLabel />

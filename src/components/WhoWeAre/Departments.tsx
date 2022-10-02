@@ -40,32 +40,33 @@ const Department = () => {
     <AccordionSection className="container">
       {sections.map((sect, index) => (
         <Accordion defaultActiveKey="0" key={index}>
-          <Accordion.Toggle
-            className="accordion-header row"
-            eventKey={index.toString()}
-            onClick={() => toggleActive(index)}
-          >
-            <h2 className="section-text">
-              {sect.title}
-              <FontAwesomeIcon
-                className="bod-icon"
-                icon={activeID === index ? faAngleUp : faAngleDown}
-                pull="right"
-                size="lg"
-              />
-            </h2>
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey={index.toString()}>
-            <Masonry
-              breakpointCols={breakpointColumnsObj}
-              className="my-masonry-grid"
-              columnClassName="my-masonry-grid_column"
+          <Accordion.Item eventKey={index.toString()}>
+            <Accordion.Button
+              className="accordion-header row"
+              onClick={() => toggleActive(index)}
             >
-              {sect.bios.map((who: any) => (
-                <Team {...who} />
-              ))}
-            </Masonry>
-          </Accordion.Collapse>
+              <h2 className="section-text">
+                {sect.title}
+                <FontAwesomeIcon
+                  className="bod-icon"
+                  icon={activeID === index ? faAngleUp : faAngleDown}
+                  pull="right"
+                  size="lg"
+                />
+              </h2>
+            </Accordion.Button>
+            <Accordion.Body>
+              <Masonry
+                breakpointCols={breakpointColumnsObj}
+                className="my-masonry-grid"
+                columnClassName="my-masonry-grid_column"
+              >
+                {sect.bios.map((who: any) => (
+                  <Team {...who} key={who.name} />
+                ))}
+              </Masonry>
+            </Accordion.Body>
+          </Accordion.Item>
           <HrLine />
         </Accordion>
       ))}

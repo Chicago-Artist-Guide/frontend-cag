@@ -132,7 +132,7 @@ const Demographics: React.FC<{
               <Container>
                 <Row>
                   <PaddedCol lg="10">
-                    <Form.Group>
+                    <Form.Group className="form-group">
                       <CAGFormControl
                         aria-label="agency"
                         defaultValue={demographicsAgency}
@@ -208,7 +208,7 @@ const Demographics: React.FC<{
               <Container>
                 <Row>
                   <PaddedCol lg="10">
-                    <Form.Group>
+                    <Form.Group className="form-group">
                       <Form.Control
                         as="textarea"
                         name="demographicsBio"

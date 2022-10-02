@@ -5,27 +5,31 @@ import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
-import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
-import ActorInfo1 from '../Individual/ActorInfo1';
-import ActorInfo2 from '../Individual/ActorInfo2';
-import IndividualBasics from '../Individual/Basics';
-import Demographics from '../Individual/Demographics';
-import OffstageRoles from '../Individual/OffstageRoles';
-import ProfilePhoto from '../Individual/ProfilePhoto';
 import Privacy from '../Privacy';
-import SignUpFooter, { SubmitBasicsResp } from '../SignUpFooter';
+import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
+import CompanyBasics from './Basics';
+import CompanyDetails from './Details';
+import CompanyPhoto from './Photo';
+import { CompanyFormData } from './types';
 
-const GroupSignUp: React.FC<{
+const CompanySignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { setAccountRef, setProfileRef } = useProfileContext();
-  const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
+  const {
+    accountRef,
+    profileRef,
+    setAccountRef,
+    setProfileRef
+  } = useProfileContext();
+  const [formData, setForm] = useForm<CompanyFormData>(defaultData);
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
     SubmitBasicsResp | undefined
   >(undefined);
+
+  console.log({ accountRef, profileRef });
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -52,17 +56,16 @@ const GroupSignUp: React.FC<{
   const submitBasics: () => Promise<SubmitBasicsResp> = async () => {
     // we only get here if they've agreed to the privacy agreement
     setPrivacyAgree();
-
-    // reset any sort of previous error response
     setSubmitBasicsErr(undefined);
 
+    console.log('Submit Basics', { formData });
+
+    console.log('Submit Basics', { formData });
+
     const {
-      basicsFirstName,
-      basicsLastName,
-      basicsEmailAddress,
-      basicsPassword,
-      basics18Plus
-      // stageRole
+      theatreName: basicsTheatreName,
+      emailAddress: basicsEmailAddress,
+      password: basicsPassword
     } = formData;
 
     await createUserWithEmailAndPassword(
@@ -73,56 +76,49 @@ const GroupSignUp: React.FC<{
       .then(async res => {
         try {
           const userId = res.user.uid;
-
-          // create doc for account (extra fields not in auth)
-          const accountRef = await addDoc(
+          const account = await addDoc(
             collection(firebaseFirestore, 'accounts'),
             {
-              basics_18_plus: basics18Plus,
-              first_name: basicsFirstName,
-              last_name: basicsLastName,
-              privacy_agreement: true,
-              uid: userId
+              uid: userId,
+              type: 'company',
+              theater_name: basicsTheatreName,
+              privacy_agreement: true
             }
           );
 
-          // create doc for profile
-          const profileRef = await addDoc(
-            collection(firebaseFirestore, 'profiles'),
+          const company = await addDoc(
+            collection(firebaseFirestore, 'companies'),
             {
               uid: userId,
-              account_id: accountRef.id
-              // stage_role: stageRole
+              account_id: account.id
             }
           );
 
+          console.log('Company', { company });
+          console.log('Account', { account });
+
+          console.log('Company', { company });
+          console.log('Account', { account });
+
           // store account and profile refs so we can update them later
-          setAccountRef(accountRef);
-          setProfileRef(profileRef);
+          setAccountRef(account);
+          setProfileRef(company);
         } catch (e) {
           console.error('Error adding document:', e);
-
           const resp = {
             ok: false,
             code: 'profile-creation-error'
           };
-
           setSubmitBasicsErr(resp);
-
-          return resp;
         }
       })
       .catch(err => {
         console.log('Error creating user:', err);
-
         const resp = {
           ok: false,
           code: err.code ?? 'unknown-user-creation-error'
         };
-
         setSubmitBasicsErr(resp);
-
-        return resp;
       });
 
     const resp = { ok: true };
@@ -134,61 +130,55 @@ const GroupSignUp: React.FC<{
   // we pass this down in the "hasErrorCallback" prop for the step
   const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
     const newStepErrorsObj = { ...stepErrors };
-
     if (step in newStepErrorsObj) {
       newStepErrorsObj[step] = hasErrors;
     }
-
     setStepErrors(newStepErrorsObj);
   };
 
   // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
     const props = { formData, setForm, navigation };
-    let returnStep;
-
+    console.log({ stepId });
     switch (stepId) {
       case 'basics':
-        returnStep = (
-          <IndividualBasics
+        return (
+          <CompanyBasics
             {...props}
+            setFormErrors={setStepErrors}
+            formErrors={stepErrors}
             hasErrorCallback={setStepErrorsCallback}
-            submitBasicsErr={undefined}
+            // // submitBasicsErr={undefined}
           />
         );
-        break;
       case 'privacy':
-        returnStep = <Privacy {...props} />;
-        break;
-      case 'actorInfo1':
-        returnStep = (
-          <ActorInfo1 {...props} hasErrorCallback={setStepErrorsCallback} />
+        return <Privacy {...props} />;
+      case 'details':
+        return (
+          <CompanyDetails
+            {...props}
+            setFormErrors={setStepErrors}
+            formErrors={stepErrors}
+            hasErrorCallback={setStepErrorsCallback}
+          />
         );
-        break;
-      case 'actorInfo2':
-        returnStep = (
-          <ActorInfo2 {...props} hasErrorCallback={setStepErrorsCallback} />
+      case 'photo':
+        return (
+          <CompanyPhoto
+            {...props}
+            setFormErrors={setStepErrors}
+            formErrors={stepErrors}
+            hasErrorCallback={setStepErrorsCallback}
+          />
         );
-        break;
-      case 'offstageRoles':
-        returnStep = <OffstageRoles {...props} />;
-        break;
-      case 'profilePhoto':
-        returnStep = <ProfilePhoto {...props} />;
-        break;
-      case 'demographics':
-        returnStep = <Demographics {...props} />;
-        break;
-      case 'profilePreview':
-        returnStep = <Profile previewMode={true} />;
-        break;
       default:
-        returnStep = <></>;
-        break;
+        return <>Something went wrong</>;
     }
-
-    return returnStep;
   };
+
+  console.log('SignUp Index', { stepId });
+
+  console.log('SignUp Index', { stepId });
 
   // if no Landing type is selected or it's profile preview, don't show navigation yet
   const showSignUpFooter = stepId !== 'profilePreview';
@@ -213,7 +203,8 @@ const GroupSignUp: React.FC<{
     </PageContainer>
   );
 };
-export default GroupSignUp;
+
+export default CompanySignUp;
 
 // default object to track a boolean true/false for which steps have form validation error states
 const createDefaultStepErrorsObj = (stepNames: string[]) => {
@@ -233,44 +224,21 @@ const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 const defaultSteps: Step[] = [
   { id: 'basics' },
+  { id: 'details' },
+  { id: 'details' },
   { id: 'privacy' },
-  { id: 'actorInfo1' },
-  { id: 'actorInfo2' },
-  { id: 'offstageRoles' },
-  { id: 'profilePhoto' },
-  { id: 'demographics' },
-  { id: 'profilePreview' }
+  { id: 'photo' }
 ];
 
 const defaultData = {
-  actorInfo1Ethnicities: [],
-  actorInfo1LGBTQ: '',
-  actorInfo1Pronouns: '',
-  actorInfo1PronounsOther: '',
-  actorInfo2AgeRanges: [],
-  actorInfo2Gender: '',
-  actorInfo2GenderRoles: [],
-  actorInfo2GenderTransition: '',
-  actorInfo2HeightFt: 0,
-  actorInfo2HeightIn: 0,
-  actorInfo2HeightNoAnswer: false,
-  basics18Plus: false,
-  basicsEmailAddress: '',
-  basicsFirstName: '',
-  basicsLastName: '',
-  basicsPassword: '',
-  basicsPasswordConfirm: '',
-  demographicsAgency: '',
-  demographicsBio: '',
-  demographicsUnionStatus: '',
-  demographicsUnionStatusOther: '',
-  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
-  offstageRolesGeneral: [],
-  offstageRolesHairMakeupCostumes: [],
-  offstageRolesLighting: [],
-  offstageRolesProduction: [],
-  offstageRolesScenicAndProperties: [],
-  offstageRolesSound: [],
+  theatreName: '',
+  emailAddress: '',
+  password: '',
+  passwordConfirm: '',
+  numberOfMembers: '',
+  primaryContact: '',
+  location: '',
+  description: '',
   privacyAgreement: false,
   profilePhotoUrl: ''
 };
