@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
 import { useHistory } from 'react-router-dom';
-import Button from '../../genericComponents/Button';
-import { goToTop } from '../../utils/goToTop';
-import { PageFooterRow, ButtonCol, Pagination } from './SignUpFooterStyles';
+import Button from '../../../genericComponents/Button';
+import { goToTop } from '../../../utils/goToTop';
+import { PageFooterRow, ButtonCol, Pagination } from '../SignUpFooterStyles';
 
 const SignUp2Footer: React.FC<{
   navigation: NavigationProps;

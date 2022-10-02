@@ -3,7 +3,6 @@ import { getAnalytics } from 'firebase/analytics';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import {
   getFirestore,
-  getDoc,
   getDocs,
   collection,
   query,
@@ -30,7 +29,7 @@ import Login from './Login';
 import Logout from './Logout';
 import Profile from './Profile';
 import SignUp from './SignUp';
-import SignUp2 from './SignUp2';
+import SignUp2 from '../components/SignUp/Individual/SignUp2';
 import TheaterResources from './TheaterResources';
 import Header from '../components/layout/Header';
 import Footer from '../components/layout/Footer';

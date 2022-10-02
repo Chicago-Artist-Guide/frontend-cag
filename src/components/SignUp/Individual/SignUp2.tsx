@@ -3,26 +3,23 @@ import React, { useState } from 'react';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useProfileContext } from '../context/ProfileContext';
-import PageContainer from '../components/layout/PageContainer';
-import SignUp2Footer from '../components/SignUp/SignUp2Footer';
-import Training from '../components/SignUp/Individual/Training';
-import Credits from '../components/SignUp/Individual/Credits';
-import Upcoming from '../components/SignUp/Individual/Upcoming';
-import AdditionalSkills from '../components/SignUp/Individual/AdditionalSkills';
-import Awards from '../components/SignUp/Individual/Awards';
+import { useProfileContext } from '../../../context/ProfileContext';
+import PageContainer from '../../layout/PageContainer';
+import SignUp2Footer from './SignUp2Footer';
+import Training from './Training';
+import Credits from './Credits';
+import Upcoming from './Upcoming';
+import AdditionalSkills from './AdditionalSkills';
+import Awards from './Awards';
 
 // Establish our steps
-const defaultSteps: Step[] = [
+const steps: Step[] = [
   { id: 'training' },
   { id: 'credits' },
   { id: 'upcoming' },
   { id: 'additionalSkills' },
   { id: 'awards' }
 ];
-
-// flatten our step id's into a single array
-const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
 
 // establish our form data structure
 // assign defaults
@@ -62,9 +59,8 @@ const defaultData = {
 const SignUp2 = () => {
   const { profileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
-  const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
-  // defaults for our defaultSteps
+  // defaults for our steps
   const { step, index, navigation } = useStep({ steps: steps });
   const stepId = (step as Step).id;
 
