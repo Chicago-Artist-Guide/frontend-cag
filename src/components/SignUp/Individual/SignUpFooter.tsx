@@ -2,6 +2,7 @@ import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
 import Button from '../../../genericComponents/Button';
+import { goToTop } from '../../../utils/goToTop';
 import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
 
 // for dev
@@ -55,7 +56,15 @@ const SignUpFooter: React.FC<{
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
+  const prevButtonAction = (landingStep: number) => {
+    goToTop();
+
+    return landingStep === 0 ? () => setLandingStep(-1) : previous;
+  };
+
   const nextButtonAction = async (navNext: boolean, currStep: string) => {
+    goToTop();
+
     if (currStep === 'basics') {
       const submitted = await submitBasics();
       const prev = previous ? previous : () => null;
@@ -80,7 +89,7 @@ const SignUpFooter: React.FC<{
     <PageFooterRow>
       <Col lg="4">
         <Button
-          onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
+          onClick={() => prevButtonAction(landingStep)}
           text="Back"
           type="button"
           variant="secondary"
