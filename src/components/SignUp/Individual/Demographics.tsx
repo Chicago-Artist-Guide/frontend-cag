@@ -206,7 +206,7 @@ const Demographics: React.FC<{
                   </PaddedCol>
                 </Row>
               </Container>
-              <TitleThree>Personal Bio (max 1000 char.)</TitleThree>
+              <TitleThree>Profile Headline &amp; Personal Bio</TitleThree>
               <Container>
                 <Row>
                   <PaddedCol lg="10">
@@ -226,7 +226,6 @@ const Demographics: React.FC<{
                         name="demographicsBio"
                         onChange={setForm}
                         rows={5}
-                        maxLength={1000}
                       />
                     </Form.Group>
                   </PaddedCol>
