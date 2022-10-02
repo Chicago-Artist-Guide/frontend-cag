@@ -33,7 +33,9 @@ const Demographics: React.FC<{
   const {
     demographicsUnionStatus, // checkboxes for Unions or non-union
     demographicsAgency,
-    demographicsWebsites // { url: string, websiteType: string }
+    demographicsWebsites, // { url: string, websiteType: string }
+    demographicsBioHeadline,
+    demographicsBio
   } = formData;
   const [websiteId, setWebsiteId] = useState(1);
 
@@ -89,7 +91,7 @@ const Demographics: React.FC<{
     setForm({ target });
   };
 
-  const numWebsites = demographicsWebsites.length;
+  const numWebsites = demographicsWebsites?.length;
 
   return (
     <Container>
@@ -148,7 +150,7 @@ const Demographics: React.FC<{
               <Container>
                 <Row>
                   <PaddedCol lg="10">
-                    {demographicsWebsites.map((websiteRow: any, i: any) => (
+                    {demographicsWebsites?.map((websiteRow: any, i: any) => (
                       <WebsiteRow key={`website-row-${websiteRow.id}`}>
                         <CAGFormControl
                           aria-label="URL"
@@ -209,8 +211,18 @@ const Demographics: React.FC<{
                 <Row>
                   <PaddedCol lg="10">
                     <Form.Group className="form-group">
+                      <CAGFormControl
+                        aria-label="bio headline"
+                        defaultValue={demographicsBioHeadline}
+                        name="demographicsBioHeadline"
+                        onChange={setForm}
+                        placeholder="Profile Headline (ex: Actor, Musician, Dancer)"
+                      />
+                    </Form.Group>
+                    <Form.Group className="form-group">
                       <Form.Control
                         as="textarea"
+                        defaultValue={demographicsBio}
                         name="demographicsBio"
                         onChange={setForm}
                         rows={5}
