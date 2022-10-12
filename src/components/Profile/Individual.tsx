@@ -62,7 +62,7 @@ const IndividualProfile: React.FC<{
             <div>
               <HeaderNamePronouns>
                 <h2>
-                  {account.first_name} {account.last_name}
+                  {account?.first_name} {account?.last_name}
                 </h2>
                 <p>{profile?.pronouns || profile?.pronouns_other}</p>
               </HeaderNamePronouns>

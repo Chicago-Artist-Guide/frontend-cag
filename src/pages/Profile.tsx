@@ -43,11 +43,7 @@ const Profile: React.FC<{
     return <CompanyProfile previewMode={previewMode} />;
   }
 
-  if (account?.type === 'individual') {
-    return <IndividualProfile previewMode={previewMode} />;
-  }
-
-  return <div>Loading</div>;
+  return <IndividualProfile previewMode={previewMode} />;
 };
 
 export default Profile;
