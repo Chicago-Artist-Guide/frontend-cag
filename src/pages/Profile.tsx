@@ -127,6 +127,9 @@ const ProfileImage = styled(Image)`
   display: block;
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
+  background: ${colors.lightGrey};
+  minheight: 250px;
+  width: 100%;
 `;
 
 const DetailsCard = styled.div`

@@ -64,6 +64,7 @@ const defaultData = {
   basicsPassword: '',
   basicsPasswordConfirm: '',
   demographicsAgency: '',
+  demographicsBioHeadline: '',
   demographicsBio: '',
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
@@ -270,6 +271,7 @@ const IndividualSignUp: React.FC<{
       actorInfo2HeightIn,
       actorInfo2HeightNoAnswer,
       demographicsAgency,
+      demographicsBioHeadline,
       demographicsBio,
       demographicsUnionStatus,
       demographicsUnionStatusOther,
@@ -315,6 +317,7 @@ const IndividualSignUp: React.FC<{
       union_other: demographicsUnionStatusOther,
       agency: demographicsAgency,
       websites: demographicsWebsites,
+      headline: demographicsBioHeadline,
       bio: demographicsBio,
 
       // completed profile
