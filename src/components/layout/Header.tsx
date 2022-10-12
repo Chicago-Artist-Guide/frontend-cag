@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
 import { useAuthValue } from '../../context/AuthContext';
 import { useProfileContext } from '../../context/ProfileContext';
-import { colors } from '../../theme/styleVars';
 import { ReactComponent as Logo } from '../../images/cagLogo1.svg';
+import { colors } from '../../theme/styleVars';
 
 const Header = () => {
   const { currentUser } = useAuthValue();
-  const { profileRef } = useProfileContext();
+  const {
+    profile: { ref: profileRef }
+  } = useProfileContext();
 
   return (
     <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">
