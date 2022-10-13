@@ -34,11 +34,11 @@ const Donate = () => (
             </p>
             <iframe
               frameBorder="0"
-              height="615px"
+              height="650px"
               name="givebutter"
               scrolling="no"
               seamless
-              src="https://givebutter.com/embed/c/chicagoartistguide"
+              src="https://givebutter.com/embed/c/caglaunch"
               title="Donate to Chicago Artist Guide online via GiveButter"
               width="100%"
             />
