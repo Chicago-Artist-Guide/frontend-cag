@@ -20,7 +20,7 @@ const ProfilePhoto: React.FC<{
 }> = props => {
   const { setForm } = props;
   const { firebaseStorage } = useFirebaseContext();
-  const [file, setFile] = useState<any>('');
+  const [file, setFile] = useState<File | null>(null);
   const [percent, setPercent] = useState(0);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState(false);
@@ -121,7 +121,7 @@ const ProfilePhoto: React.FC<{
               </Form.Group>
               <div>
                 <Button
-                  disabled={uploadInProgress || file === ''}
+                  disabled={uploadInProgress || !file}
                   onClick={uploadFile}
                   text="Upload File"
                   type="button"

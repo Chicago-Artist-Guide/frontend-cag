@@ -22,7 +22,7 @@ const SignUp: React.FC = () => {
   >(null);
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && currentStep === -1) {
       history.push('/profile');
     }
   }, [currentUser]);

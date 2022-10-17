@@ -97,7 +97,7 @@ export const SelectDirections = styled.p`
 `;
 
 export const CAGFormControl = styled(Form.Control)`
-  border-radius: 0.25rem;
+  border-radius: 4px;
   padding: 8px 13px 8px 13px;
 `;
 
@@ -107,7 +107,7 @@ export const CAGFormSelect = styled(Form.Select)`
 `;
 
 export const CAGFormGroup = styled(Form.Group)`
-  margin: 6px 0 0;
+  margin: 25px 0 0;
   display: flex;
   flex-direction: column;
 `;
@@ -128,8 +128,8 @@ export const CAGError = styled.span`
 `;
 
 export const CAGHelperText = styled.div`
-  font-size: 0.675rem;
+  font-size: 11px;
   font-style: italic;
-  margin-left: 0.25rem;
-  margin-top: 0.25rem;
+  margin-left: 5px;
+  margin-top: 8px;
 `;

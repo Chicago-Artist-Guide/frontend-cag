@@ -18,7 +18,7 @@ const CompanyProfile: React.FC<{
   const { account, profile } = useProfileContext();
   const profileData = profile?.data;
   const PageWrapper = previewMode ? Container : PageContainer;
-  const showSignUp2Link = previewMode || !profile?.data.completed_profile_2;
+  const showSignUp2Link = previewMode || !profile?.data?.completed_profile_2;
 
   return (
     <>

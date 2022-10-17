@@ -1,20 +1,87 @@
-import { faCamera, faImage } from '@fortawesome/free-solid-svg-icons';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useRef, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
+import { useFirebaseContext } from '../../../context/FirebaseContext';
 import Button from '../../../genericComponents/Button';
 import { colors, fonts } from '../../../theme/styleVars';
+import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
+import { FormValues } from './types';
 
 const CompanyPhoto: React.FC<{
   setForm: SetForm;
-  formData: { [key: string]: any };
+  formValues: FormValues;
   formErrors: any;
   setFormErrors: (x: any) => void;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = () => {
+}> = props => {
+  const { setForm } = props;
+  const { firebaseStorage } = useFirebaseContext();
+  const [file, setFile] = useState<File | null>(null);
+  const [percent, setPercent] = useState(0);
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [uploadInProgress, setUploadInProgress] = useState(false);
+  const fileInput = useRef<HTMLInputElement | null>(null);
+
+  console.log('formValues', props.formValues);
+
+  const uploadFile = () => {
+    if (!file) {
+      return;
+    }
+
+    // start upload
+    setUploadInProgress(true);
+
+    const storageRef = ref(firebaseStorage, `/files/${file.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on(
+      'state_changed',
+      snapshot => {
+        const percent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        setPercent(percent);
+      },
+      err => {
+        console.log('Error uploading image', err);
+        setUploadInProgress(false);
+      },
+      () => {
+        setUploadInProgress(false);
+
+        getDownloadURL(uploadTask.snapshot.ref).then(url => {
+          console.log('Uploaded image url:', url);
+          setImgUrl(url);
+          const target = {
+            name: 'profilePhotoUrl',
+            value: url
+          };
+          setForm({ target });
+        });
+      }
+    );
+  };
+
+  const onFileChange = (e: any) => {
+    const imgFile = e.target.files[0];
+    if (imgFile) {
+      setFile(imgFile);
+      setImgUrl(URL.createObjectURL(imgFile));
+    }
+  };
+
+  const handleFileInput = () => {
+    if (fileInput.current) {
+      fileInput.current.click();
+    }
+  };
+
   return (
     <Container>
       <Row>
@@ -24,38 +91,56 @@ const CompanyPhoto: React.FC<{
         />
       </Row>
       <Row>
-        <Col lg="4">
-          <Form>
-            <Form.Group className="form-group">
-              <PhotoContainer>
+        <SignUpBody lg="4">
+          <Form.Group className="form-group">
+            <PhotoContainer
+              onClick={handleFileInput}
+              style={{
+                backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
+              }}
+            >
+              {!imgUrl && (
                 <FontAwesomeIcon className="camera" icon={faCamera} size="lg" />
-              </PhotoContainer>
-            </Form.Group>
-          </Form>
-        </Col>
+              )}
+            </PhotoContainer>
+          </Form.Group>
+        </SignUpBody>
         <ButtonColumn lg="4">
           <Row style={{ minHeight: '50%' }}>
             <Col style={{ height: 'auto' }}>
+              <input
+                accept="image/*"
+                id="icon-button-file"
+                type="file"
+                style={{ display: 'none' }}
+                ref={fileInput}
+                onChange={onFileChange}
+              />
               <Button
-                onClick={() => null}
+                onClick={handleFileInput}
                 text="Choose File"
                 type="button"
                 variant="secondary"
               />
-
-              <HelperText>File size restrictions?</HelperText>
+              <HelperText>File size limit: 5MB</HelperText>
             </Col>
           </Row>
           <Row style={{ minHeight: '50%' }}>
             <Col style={{ position: 'relative' }}>
               <div style={{ position: 'absolute', bottom: 0 }}>
-                <FileName>file_name.jpg</FileName>
-                <Button
-                  onClick={() => null}
-                  text="Upload"
-                  type="button"
-                  variant="secondary"
-                />
+                <FileName>{file && file.name}</FileName>
+                <UploadRow>
+                  <Button
+                    disabled={uploadInProgress || !file}
+                    onClick={uploadFile}
+                    text="Upload"
+                    type="button"
+                    variant="secondary"
+                  />
+                  {uploadInProgress && (
+                    <Progress>Upload progress: {percent}%</Progress>
+                  )}
+                </UploadRow>
               </div>
             </Col>
           </Row>
@@ -64,6 +149,18 @@ const CompanyPhoto: React.FC<{
     </Container>
   );
 };
+
+const UploadRow = styled(Row)`
+  padding-left: 15px;
+  display: flex;
+  align-items: center;
+`;
+
+const Progress = styled.div`
+  font-weight: 200;
+  font-size: 16px;
+  margin-left: 10px;
+`;
 
 const ButtonColumn = styled(Col)`
   max-height: 300px;
@@ -85,6 +182,7 @@ const HelperText = styled.div`
 `;
 
 const PhotoContainer = styled.div`
+  cursor: pointer;
   align-items: center;
   background: ${colors.lightGrey};
   color: white;
@@ -94,6 +192,8 @@ const PhotoContainer = styled.div`
   height: 300px;
   width: 300px;
   border-radius: 8px;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
 `;
 
 export default CompanyPhoto;

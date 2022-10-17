@@ -7,27 +7,24 @@ import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import InputField from '../../../genericComponents/Input';
-import { colors } from '../../../theme/styleVars';
+import { colors, fonts } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
+import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
-import { CompanyFormData } from './types';
+import { FormValues } from './types';
 
 const CompanyBasics: React.FC<{
   setForm: SetForm;
-  formData: CompanyFormData;
+  formValues: FormValues;
   formErrors: any;
   setFormErrors: (x: any) => void;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = ({ setForm, formData, setFormErrors, formErrors, hasErrorCallback }) => {
-  const { theatreName, emailAddress, password, passwordConfirm } = formData;
+}> = ({ setForm, formValues, setFormErrors, formErrors, hasErrorCallback }) => {
+  const { theatreName, emailAddress, password } = formValues;
 
+  console.log({ formValues });
   // create an array of the required field names
-  const requiredFields = [
-    'theatreName',
-    'emailAddress',
-    'password',
-    'passwordConfirm'
-  ];
+  const requiredFields = ['theatreName', 'emailAddress', 'password'];
 
   // create a default object of required field values for state
   // the format is: fieldName: true (has error) | false (does not have error)
@@ -36,7 +33,7 @@ const CompanyBasics: React.FC<{
     const formErrorsObj: { [key: string]: boolean } = {};
     // TODO: Finish validation and error checking
     // requiredFields.forEach((fieldName: string) => {
-    //   formErrorsObj[fieldName] = !formData[fieldName];
+    //   formErrorsObj[fieldName] = !formValues[fieldName];
     // });
 
     return formErrorsObj;
@@ -72,9 +69,6 @@ const CompanyBasics: React.FC<{
   // this is the custom error func for password matching
   // we only need to give this to the basicsPasswordConfirm field
   // and it goes in the InputField array "validationFuncMessages" attribute
-  const checkIfPasswordsMatch = () => {
-    return password === passwordConfirm;
-  };
 
   // effect for updating the sign up page errors state for this page
   // every time formErrors is updated
@@ -92,7 +86,7 @@ const CompanyBasics: React.FC<{
         />
       </Row>
       <Row>
-        <Col lg="4">
+        <SignUpBody lg="4">
           <Form>
             <InputField
               required
@@ -127,23 +121,11 @@ const CompanyBasics: React.FC<{
               value={password || ''}
               helperText="Minimum 8 characters, one uppercase letter, one lowercase letter, one number, and one special character."
             />
-            <InputField
-              required
-              fieldType="password"
-              hasErrorCallback={hasErrorCallback}
-              placeholder="Confirm Password"
-              name="passwordConfirm"
-              onChange={setForm}
-              requiredLabel="Password confirmation"
-              validationFuncMessages={[ErrorMessage.PasswordsMatch]}
-              validationFuncs={[checkIfPasswordsMatch]}
-              value={passwordConfirm || ''}
-            />
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>
           </LoginLink>
-        </Col>
+        </SignUpBody>
         <Col lg="4"></Col>
         <Col lg="4"></Col>
       </Row>
@@ -152,10 +134,13 @@ const CompanyBasics: React.FC<{
 };
 
 const LoginLink = styled.p`
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 520;
   letter-spacing: 0.14px;
+  font-style: italic;
   margin-top: 10px;
+  margin-left: 4px;
+  font-family: ${fonts.lora};
   a {
     color: ${colors.orange};
   }

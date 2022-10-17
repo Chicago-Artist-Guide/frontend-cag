@@ -1,8 +1,10 @@
 import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
+import { useHistory } from 'react-router-dom';
 import Button from '../../../genericComponents/Button';
 import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
+import { FormStep } from './types';
 
 // for dev
 const FORM_VALIDATION_ON = true;
@@ -13,74 +15,59 @@ export type SubmitBasicsResp = {
 };
 
 const SignUpFooter: React.FC<{
-  landingStep: number;
   navigation: NavigationProps;
   setLandingStep: (x: number) => void;
-  currentStep: string;
+  formStep: FormStep;
   steps: Step[];
   submitBasics: () => Promise<SubmitBasicsResp>;
-  submitSignUpProfile: () => Promise<void>;
+  completeSignUp: () => Promise<void>;
   stepErrors: { [key: string]: boolean };
 }> = ({
-  landingStep,
   navigation,
   setLandingStep,
-  currentStep,
+  formStep,
   steps,
   submitBasics,
-  submitSignUpProfile,
-  stepErrors
+  stepErrors,
+  completeSignUp
 }) => {
-  /*
-    SPECIAL CASES:
-    1. We don't want a back button unless we're:
-      - Past the Landing step OR
-      - Past the 1st step of the Landing step
-    2. We don't want to show our global navigation next button unless we're:
-      - Past the Landing step OR
-      - Past the 1st step of the Landing step OR
-      - A Theater Group was selected (meaning no 2nd internal Landing step)
-      - Not on the Privacy Step (we have a different callback for Privacy in order to set agreement)
-    3. We need to show different button text for the Privacy Agreement step
-    4. We need to set our form field "privacyAgreement" to true if we Agree & Continue in the Privacy step
-    5. We don't want to show our Next button if we're on the last step (Awards)
-      - We'll show "Go to Profile" when we tackle that step in development
-    6. We disable the Next button if we have form validation errors or req fields not filled in
-      - Done using stepErrors prop for current step (stepErrors[step])
-  */
-
+  const history = useHistory();
   const { next, previous } = navigation;
-  const navigationNext = landingStep === 2 || currentStep !== 'privacy';
-  const stepIndex = steps.findIndex(step => step.id === currentStep);
-  const continueText =
-    currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
+  const stepIndex = steps.findIndex(step => step.id === formStep);
+  const nextText = formStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
-  const nextButtonAction = async (navNext: boolean, currStep: string) => {
-    if (currStep === 'basics') {
+  const onNextClick = async () => {
+    if (formStep === 'basics') {
       const submitted = await submitBasics();
-      const prev = previous ? previous : () => null;
-
-      return submitted.ok ? next() : prev();
+      if (submitted.ok) {
+        next();
+        return;
+      }
+      previous?.();
     }
 
-    if (currStep === 'demographics') {
-      await submitSignUpProfile();
-      return next();
+    if (formStep === 'photo') {
+      await completeSignUp();
+      history.push('/profile');
+      return;
     }
 
-    if (navNext) {
-      return next();
-    }
+    next();
+  };
 
-    // we're still in step 1
-    return setLandingStep(2);
+  const onPreviousClick = () => {
+    if (formStep === 'basics') {
+      setLandingStep(-1);
+      return;
+    }
+    previous?.();
   };
 
   return (
     <PageFooterRow>
       <Col lg="4">
         <Button
-          onClick={landingStep === 0 ? () => setLandingStep(-1) : previous}
+          onClick={onPreviousClick}
           text="Back"
           type="button"
           variant="secondary"
@@ -101,11 +88,11 @@ const SignUpFooter: React.FC<{
         </Pagination>
       </Col>
       <ButtonCol lg="4">
-        {currentStep !== ('awards' as any) && (
+        {formStep !== ('awards' as any) && (
           <Button
-            disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
-            onClick={() => nextButtonAction(navigationNext, currentStep)}
-            text={continueText}
+            disabled={stepErrors[formStep] && FORM_VALIDATION_ON}
+            onClick={onNextClick}
+            text={nextText}
             type="button"
             variant="primary"
           />
