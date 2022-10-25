@@ -13,43 +13,10 @@ interface BlobBoxProps {
   blobs: BlobBoxType[];
 }
 
-const outputBlobs = (blobs: any) =>
-  blobs.map(
-    (blob: any, bi: number) =>
-      `
-      &.blob-${blob.id}-${bi} {
-        opacity: ${blob.opacity};
-        -moz-transform: ${`translate(${blob.translate})`} ${blob.transform};
-        -ms-transform: ${`translate(${blob.translate})`} ${blob.transform};
-        -webkit-transform: ${`translate(${blob.translate})`} ${blob.transform};
-        transform: ${`translate(${blob.translate})`} ${blob.transform};
-        z-index: ${blob.zIndex};
-      }
-    `
-  );
-
 const BlobBox = (props: BlobBoxProps) => {
   const { blobs } = props;
-
-  const Blobs = styled.div`
-    display: none;
-    z-index: -1;
-    transform-style: preserve-3d;
-
-    @media (min-width: 768px) {
-      display: block;
-    }
-
-    img {
-      position: absolute;
-      overflow: visible;
-
-      ${outputBlobs(blobs)}
-    }
-  `;
-
   return (
-    <Blobs>
+    <Blobs blobs={blobs}>
       {blobs.map((blob: BlobBoxType, bi: number) => {
         return (
           <img
@@ -63,5 +30,39 @@ const BlobBox = (props: BlobBoxProps) => {
     </Blobs>
   );
 };
+
+const outputBlobs = (blobs: any) =>
+  blobs.map(
+    (blob: any, bi: number) =>
+      `
+        &.blob-${blob.id}-${bi} {
+          opacity: ${blob.opacity};
+          -moz-transform: ${`translate(${blob.translate})`} ${blob.transform};
+          -ms-transform: ${`translate(${blob.translate})`} ${blob.transform};
+          -webkit-transform: ${`translate(${blob.translate})`} ${
+        blob.transform
+      };
+          transform: ${`translate(${blob.translate})`} ${blob.transform};
+          z-index: ${blob.zIndex};
+        }
+      `
+  );
+
+const Blobs = styled.div<{ blobs: any }>`
+  display: none;
+  z-index: -1;
+  transform-style: preserve-3d;
+
+  @media (min-width: 768px) {
+    display: block;
+  }
+
+  img {
+    position: absolute;
+    overflow: visible;
+
+    ${({ blobs }) => outputBlobs(blobs)}
+  }
+`;
 
 export default BlobBox;
