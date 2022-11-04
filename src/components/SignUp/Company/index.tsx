@@ -19,8 +19,8 @@ const CompanySignUp: React.FC<{
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const {
-    accountRef,
-    profileRef,
+    account,
+    profile,
     setAccountRef,
     setProfileRef
   } = useProfileContext();
@@ -28,8 +28,6 @@ const CompanySignUp: React.FC<{
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
     SubmitBasicsResp | undefined
   >(undefined);
-
-  console.log({ accountRef, profileRef });
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(

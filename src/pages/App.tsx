@@ -1,41 +1,42 @@
-import { initializeApp } from 'firebase/app';
 import { getAnalytics } from 'firebase/analytics';
+import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged, User } from 'firebase/auth';
 import {
-  getFirestore,
-  getDocs,
   collection,
+  getDocs,
+  getFirestore,
+  limit,
   query,
   where
 } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import {
+  BrowserRouter as Router,
   Redirect,
   Route,
-  BrowserRouter as Router,
   Switch
 } from 'react-router-dom';
+import Footer from '../components/layout/Footer';
+import Header from '../components/layout/Header';
+import ScrollToTop from '../components/ScrollToTop';
+import SignUp2 from '../components/SignUp/Individual/SignUp2';
 import { AuthProvider } from '../context/AuthContext';
 import { FirebaseContext } from '../context/FirebaseContext';
-import { ProfileContext } from '../context/ProfileContext';
-import Home from './Home';
-import Donate from './Donate';
-import FAQ from './FAQ';
-import NotFound from './NotFound';
-import TOS from './TOS';
-import WhoWeAre from './WhoWeAre';
-import Login from './Login';
-import Logout from './Logout';
-import Profile from './Profile';
-import SignUp from './SignUp';
-import SignUp2 from '../components/SignUp/Individual/SignUp2';
-import TheaterResources from './TheaterResources';
-import Header from '../components/layout/Header';
-import Footer from '../components/layout/Footer';
-import ScrollToTop from '../components/ScrollToTop';
+import { Document, ProfileContext } from '../context/ProfileContext';
 import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
+import Donate from './Donate';
+import FAQ from './FAQ';
+import Home from './Home';
+import Login from './Login';
+import Logout from './Logout';
+import NotFound from './NotFound';
+import Profile from './Profile';
+import SignUp from './SignUp';
+import TheaterResources from './TheaterResources';
+import TOS from './TOS';
+import WhoWeAre from './WhoWeAre';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -77,8 +78,14 @@ const CAG = () => (
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [accountRef, setAccountRef] = useState<any>(null);
-  const [profileRef, setProfileRef] = useState<any>(null);
+  const [account, setAccount] = useState<Document>({
+    ref: null,
+    data: null
+  });
+  const [profile, setProfile] = useState<Document>({
+    ref: null,
+    data: null
+  });
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
   const auth = getAuth(app);
@@ -93,36 +100,45 @@ const App = () => {
     if (!currentUser || !firestore) {
       return;
     }
+    queryAccountAndProfile();
+  }, [currentUser, firestore]);
 
-    const queryAccountAndProfile = async () => {
-      if (!profileRef || !accountRef) {
-        const accountsRef = collection(firestore, 'accounts');
-        const profilesRef = collection(firestore, 'profiles');
+  const queryAccountAndProfile = async () => {
+    if (!profile?.ref || !account?.ref) {
+      const accountQuery = query(
+        collection(firestore, 'accounts'),
+        where('uid', '==', currentUser?.uid),
+        limit(1)
+      );
+      const queryAccountSnapshot = await getDocs(accountQuery);
 
-        const userAccount = query(
-          accountsRef,
-          where('uid', '==', currentUser.uid)
-        );
-        const userProfile = query(
-          profilesRef,
-          where('uid', '==', currentUser.uid)
-        );
+      const profileQuery = query(
+        collection(firestore, 'profiles'),
+        where('uid', '==', currentUser?.uid),
+        limit(1)
+      );
+      const queryProfileSnapshot = await getDocs(profileQuery);
 
-        const queryAccountSnapshot = await getDocs(userAccount);
-        const queryAccountProfile = await getDocs(userProfile);
-
-        queryAccountSnapshot.forEach(acc => {
-          setAccountRef(acc.ref);
-        });
-
-        queryAccountProfile.forEach(prof => {
-          setProfileRef(prof.ref);
+      // Since we are basing this on the current user, we should only be
+      // expecting to see one result. If it is possible for more than one then
+      // this would need to be adjusted.
+      if (!queryAccountSnapshot.empty) {
+        // Since this is not empty, we know there is at least one result and
+        // therefore we grab the first array item
+        setAccount({
+          ref: queryAccountSnapshot.docs[0].ref,
+          data: queryAccountSnapshot.docs[0].data()
         });
       }
-    };
 
-    queryAccountAndProfile();
-  }, [profileRef, accountRef, currentUser, firestore]);
+      if (!queryProfileSnapshot.empty) {
+        setProfile({
+          ref: queryProfileSnapshot.docs[0].ref,
+          data: queryProfileSnapshot.docs[0].data()
+        });
+      }
+    }
+  };
 
   return (
     <FirebaseContext.Provider
@@ -136,7 +152,16 @@ const App = () => {
     >
       <AuthProvider value={{ currentUser, setCurrentUser }}>
         <ProfileContext.Provider
-          value={{ accountRef, setAccountRef, profileRef, setProfileRef }}
+          value={{
+            account: account,
+            setAccountRef: ref => setAccount(prev => ({ ...prev, ref: ref })),
+            setAccountData: data =>
+              setAccount(prev => ({ ...prev, data: data })),
+            profile: profile,
+            setProfileRef: ref => setProfile(prev => ({ ...prev, ref: ref })),
+            setProfileData: data =>
+              setProfile(prev => ({ ...prev, data: data }))
+          }}
         >
           <main id="cag-frontend-app">
             <CAG />

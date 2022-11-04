@@ -57,7 +57,7 @@ const defaultData = {
 };
 
 const SignUp2 = () => {
-  const { profileRef } = useProfileContext();
+  const { profile } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
 
   // defaults for our steps
@@ -105,8 +105,8 @@ const SignUp2 = () => {
     };
 
     try {
-      if (profileRef) {
-        await updateDoc(profileRef, { ...finalProfileData });
+      if (profile?.ref) {
+        await updateDoc(profile.ref, { ...finalProfileData });
       } else {
         // no profileRef
         // look up?

@@ -6,14 +6,24 @@ import Col from 'react-bootstrap/Col';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import PageContainer from '../components/layout/PageContainer';
 import { Title } from '../components/layout/Titles';
+import { useProfileContext } from '../context/ProfileContext';
 
 const Logout = () => {
   const { firebaseAuth } = useFirebaseContext();
+  const {
+    setAccountRef,
+    setAccountData,
+    setProfileRef,
+    setProfileData
+  } = useProfileContext();
 
   useEffect(() => {
     signOut(firebaseAuth)
       .then(() => {
-        console.log('Sign out successful');
+        setAccountRef(null);
+        setAccountData(null);
+        setProfileRef(null);
+        setProfileData(null);
       })
       .catch(err => {
         console.log('Sign out error', err);

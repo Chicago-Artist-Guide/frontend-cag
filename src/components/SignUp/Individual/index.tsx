@@ -85,7 +85,7 @@ const IndividualSignUp: React.FC<{
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { profileRef, setAccountRef, setProfileRef } = useProfileContext();
+  const { profile, setAccountRef, setProfileRef } = useProfileContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
@@ -325,8 +325,8 @@ const IndividualSignUp: React.FC<{
     };
 
     try {
-      if (profileRef) {
-        await updateDoc(profileRef, { ...finalProfileData });
+      if (profile?.ref) {
+        await updateDoc(profile.ref, { ...finalProfileData });
       } else {
         // no profileRef
         // look up?
