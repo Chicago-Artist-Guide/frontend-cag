@@ -5,9 +5,9 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { useProfileContext } from 'context/ProfileContext';
-import Button from 'genericComponents/Button';
-import { colors, fonts } from 'theme/styleVars';
+import { useProfileContext } from '../../context/ProfileContext';
+import Button from '../../genericComponents/Button';
+import { colors, fonts } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
 
 const CompanyProfile: React.FC<{
@@ -109,7 +109,7 @@ const ProfileImage = styled(Image)`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   background: ${colors.lightGrey};
-  minheight: 250px;
+  min-height: 250px;
   width: 100%;
 `;
 

@@ -5,12 +5,11 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
-import PageContainer from 'components/layout/PageContainer';
-import { Title } from 'components/layout/Titles';
-import { useAuthValue } from 'context/AuthContext';
-import { useFirebaseContext } from 'context/FirebaseContext';
-import Button from 'genericComponents/Button';
-import Red_Blob from 'images/red_blob.svg';
+import { PageContainer, Title } from '../components/layout';
+import { useAuthValue } from '../context/AuthContext';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import Button from '../genericComponents/Button';
+import Red_Blob from '../images/red_blob.svg';
 
 const Login = () => {
   const history = useHistory();

@@ -4,22 +4,17 @@ import { NavigationProps, Step } from 'react-hooks-helper';
 import { useHistory } from 'react-router-dom';
 import Button from '../../../genericComponents/Button';
 import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
-import { FormStep } from './types';
+import { FormStep, SubmitResponse } from './types';
 
 // for dev
 const FORM_VALIDATION_ON = true;
-
-export type SubmitBasicsResp = {
-  ok: boolean;
-  code?: string;
-};
 
 const SignUpFooter: React.FC<{
   navigation: NavigationProps;
   setLandingStep: (x: number) => void;
   formStep: FormStep;
   steps: Step[];
-  submitBasics: () => Promise<SubmitBasicsResp>;
+  submitBasics: () => Promise<SubmitResponse>;
   completeSignUp: () => Promise<void>;
   stepErrors: { [key: string]: boolean };
 }> = ({
@@ -35,6 +30,8 @@ const SignUpFooter: React.FC<{
   const { next, previous } = navigation;
   const stepIndex = steps.findIndex(step => step.id === formStep);
   const nextText = formStep === 'privacy' ? 'Accept & Continue' : 'Continue';
+
+  console.log('stepErrors', { stepErrors, formStep });
 
   const onNextClick = async () => {
     if (formStep === 'basics') {
@@ -88,15 +85,13 @@ const SignUpFooter: React.FC<{
         </Pagination>
       </Col>
       <ButtonCol lg="4">
-        {formStep !== ('awards' as any) && (
-          <Button
-            disabled={stepErrors[formStep] && FORM_VALIDATION_ON}
-            onClick={onNextClick}
-            text={nextText}
-            type="button"
-            variant="primary"
-          />
-        )}
+        <Button
+          disabled={stepErrors[formStep] && FORM_VALIDATION_ON}
+          onClick={onNextClick}
+          text={nextText}
+          type="button"
+          variant="primary"
+        />
       </ButtonCol>
     </PageFooterRow>
   );

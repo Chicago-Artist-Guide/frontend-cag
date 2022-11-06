@@ -5,10 +5,10 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import Button from 'genericComponents/Button';
-import { colors, fonts } from 'theme/styleVars';
+import { useProfileContext } from '../../context/ProfileContext';
+import Button from '../../genericComponents/Button';
+import { fonts, colors } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
-import { useProfileContext } from 'context/ProfileContext';
 
 const IndividualProfile: React.FC<{
   previewMode?: boolean;

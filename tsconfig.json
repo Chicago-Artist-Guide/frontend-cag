@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": "src",
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -18,5 +17,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "src"]
+  "include": ["src"]
 }
