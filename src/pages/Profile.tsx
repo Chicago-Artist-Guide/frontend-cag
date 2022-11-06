@@ -2,9 +2,9 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
 import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import CompanyProfile from '@/components/Profile/Company';
-import IndividualProfile from '@/components/Profile/Individual';
-import { useProfileContext } from '@/context/ProfileContext';
+import CompanyProfile from 'components/Profile/Company';
+import IndividualProfile from 'components/Profile/Individual';
+import { useProfileContext } from 'context/ProfileContext';
 
 const Profile: React.FC<{
   previewMode?: boolean;

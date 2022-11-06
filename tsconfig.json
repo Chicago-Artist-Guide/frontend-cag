@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"]
-    },
+    "baseUrl": "src",
     "target": "es5",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -21,5 +18,5 @@
     "noFallthroughCasesInSwitch": true
   },
   "exclude": ["node_modules"],
-  "include": ["src", "**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx", "src"]
 }
