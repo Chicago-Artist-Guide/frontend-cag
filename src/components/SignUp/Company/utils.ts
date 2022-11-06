@@ -16,6 +16,12 @@ export const defaultErrorState = formSteps.reduce(
   [key: string]: boolean;
 };
 
+export const checkForErrors = <T>(requiredFields: string[], formValues: T) => {
+  return requiredFields.some(field => {
+    return !formValues[field as keyof T] as boolean;
+  });
+};
+
 export const defaultFormState = {
   theatreName: '',
   emailAddress: '',

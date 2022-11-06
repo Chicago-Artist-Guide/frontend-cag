@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import { Dropdown } from '../../../genericComponents';
@@ -8,14 +8,16 @@ import { neighborhoods } from '../../../utils/lookups';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 import { FormValues } from './types';
+import { checkForErrors } from './utils';
+
+const requiredFields = ['numberOfMembers', 'primaryContact', 'description'];
 
 const CompanyDetails: React.FC<{
+  stepId: string;
   setForm: SetForm;
   formValues: FormValues;
-  formErrors: any;
-  setFormErrors: (x: any) => void;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = ({ setForm, formValues, hasErrorCallback }) => {
+  setStepErrors: (step: string, hasErrors: boolean) => void;
+}> = ({ setForm, stepId, formValues, setStepErrors }) => {
   const locations = [
     { name: 'Choose one...', value: 'choose' },
     ...neighborhoods.map(neighborhood => ({
@@ -23,6 +25,13 @@ const CompanyDetails: React.FC<{
       value: neighborhood
     }))
   ];
+
+  useEffect(() => {
+    if (requiredFields.length > 0) {
+      const hasErrors = checkForErrors(requiredFields, formValues);
+      setStepErrors(stepId, hasErrors);
+    }
+  }, [formValues]);
 
   return (
     <Container>
@@ -39,7 +48,7 @@ const CompanyDetails: React.FC<{
             name="numberOfMembers"
             label="Number of Members"
             placeholder="Enter approx. number"
-            hasErrorCallback={hasErrorCallback}
+            hasErrorCallback={setStepErrors}
             onChange={setForm}
             requiredLabel="numberOfMembers"
             value={formValues.numberOfMembers ?? ''}
@@ -49,7 +58,7 @@ const CompanyDetails: React.FC<{
             name="primaryContact"
             label="Primary Contact"
             placeholder="First and Last Name"
-            hasErrorCallback={hasErrorCallback}
+            hasErrorCallback={setStepErrors}
             onChange={setForm}
             requiredLabel="primaryContact"
             value={formValues.primaryContact ?? ''}
@@ -66,7 +75,7 @@ const CompanyDetails: React.FC<{
             name="description"
             label="Theatre Group Description"
             placeholder="Tell us more about who you are, the kinds of shows you do, or any other relevant details."
-            hasErrorCallback={hasErrorCallback}
+            hasErrorCallback={setStepErrors}
             onChange={setForm}
             requiredLabel="description"
             value={formValues.description ?? ''}

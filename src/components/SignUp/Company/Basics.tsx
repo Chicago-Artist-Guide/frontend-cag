@@ -12,70 +12,24 @@ import { ErrorMessage } from '../../../utils/validation';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 import { FormValues } from './types';
+import { checkForErrors } from './utils';
+
+const requiredFields = ['theatreName', 'emailAddress', 'password'];
 
 const CompanyBasics: React.FC<{
+  stepId: string;
   setForm: SetForm;
   formValues: FormValues;
-  formErrors: any;
-  setFormErrors: (x: any) => void;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = ({ setForm, formValues, setFormErrors, formErrors, hasErrorCallback }) => {
+  setStepErrors: (step: string, hasErrors: boolean) => void;
+}> = ({ stepId, setForm, formValues, setStepErrors }) => {
   const { theatreName, emailAddress, password } = formValues;
 
-  console.log({ formValues });
-  // create an array of the required field names
-  const requiredFields = ['theatreName', 'emailAddress', 'password'];
-
-  // create a default object of required field values for state
-  // the format is: fieldName: true (has error) | false (does not have error)
-  // we default this for now based on if they are empty '' or false
-  const createDefaultFormErrorsData = () => {
-    const formErrorsObj: { [key: string]: boolean } = {};
-    // TODO: Finish validation and error checking
-    // requiredFields.forEach((fieldName: string) => {
-    //   formErrorsObj[fieldName] = !formValues[fieldName];
-    // });
-
-    return formErrorsObj;
-  };
-
   useEffect(() => {
-    setFormErrors(createDefaultFormErrorsData);
-    console.log('object.values', !Object.values(formErrors).every(v => !v));
-    customErrorCallback(
-      !Object.values(createDefaultFormErrorsData).every(v => !v)
-    );
-  }, []);
-
-  console.log('formErrors', formErrors);
-  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
-  //   const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
-
-  // calls the custom callback for the sign up page errors state object
-  // we just make this so we don't need to repeat "basics" everywhere
-  const customErrorCallback = (hasErrors: boolean) =>
-    hasErrorCallback('basics', hasErrors);
-
-  // this is the callback we pass down for each input to update for its error state
-  // it's used in the InputField "hasErrorCallback" attribute
-  //   const customErrorCallbackField = (name: string, hasErrors: boolean) => {
-  //     const newFormErrorsObj: typeof formErrors = { ...formErrors };
-  //     if (name in newFormErrorsObj) {
-  //       newFormErrorsObj[name] = hasErrors;
-  //     }
-  //     setFormErrors(newFormErrorsObj);
-  //   };
-
-  // this is the custom error func for password matching
-  // we only need to give this to the basicsPasswordConfirm field
-  // and it goes in the InputField array "validationFuncMessages" attribute
-
-  // effect for updating the sign up page errors state for this page
-  // every time formErrors is updated
-  //   useEffect(() => {
-  //     console.lo
-  //     customErrorCallback(!Object.values(formErrors).every(v => !v));
-  //   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (requiredFields.length > 0) {
+      const hasErrors = checkForErrors(requiredFields, formValues);
+      setStepErrors(stepId, hasErrors);
+    }
+  }, [formValues]);
 
   return (
     <Container>
@@ -91,7 +45,7 @@ const CompanyBasics: React.FC<{
             <InputField
               required
               placeholder="Theatre Name"
-              hasErrorCallback={hasErrorCallback}
+              hasErrorCallback={setStepErrors}
               name="theatreName"
               onChange={setForm}
               requiredLabel="Theatre name"
@@ -99,7 +53,7 @@ const CompanyBasics: React.FC<{
             />
             <InputField
               required
-              hasErrorCallback={hasErrorCallback}
+              hasErrorCallback={setStepErrors}
               placeholder="Email Address"
               name="emailAddress"
               onChange={setForm}
@@ -111,7 +65,7 @@ const CompanyBasics: React.FC<{
             <InputField
               required
               fieldType="password"
-              hasErrorCallback={hasErrorCallback}
+              hasErrorCallback={setStepErrors}
               placeholder="Password"
               name="password"
               onChange={setForm}

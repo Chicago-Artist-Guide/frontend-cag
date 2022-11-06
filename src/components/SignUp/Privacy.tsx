@@ -84,10 +84,4 @@ const TermsPrivacyLink = styled(Link)`
   margin-top: 26px;
 `;
 
-const Title = styled.h1`
-  font-family: ${fonts.montserrat};
-  font-size: 48px;
-  font-weight: bold;
-`;
-
 export default Privacy;

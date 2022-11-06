@@ -1,4 +1,4 @@
-export interface FormValues {
+export type FormValues = {
   theatreName: string;
   emailAddress: string;
   password: string;
@@ -9,7 +9,7 @@ export interface FormValues {
   description: string;
   privacyAgreement: boolean;
   profilePhotoUrl: string;
-}
+};
 
 export type FormStep = 'basics' | 'details' | 'privacy' | 'photo';
 

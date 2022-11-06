@@ -15,11 +15,8 @@ import { FormValues } from './types';
 const CompanyPhoto: React.FC<{
   setForm: SetForm;
   formValues: FormValues;
-  formErrors: any;
-  setFormErrors: (x: any) => void;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = props => {
-  const { setForm } = props;
+  setStepErrors: (step: string, hasErrors: boolean) => void;
+}> = ({ setForm }) => {
   const { firebaseStorage } = useFirebaseContext();
   const [file, setFile] = useState<File | null>(null);
   const [percent, setPercent] = useState(0);
@@ -27,14 +24,11 @@ const CompanyPhoto: React.FC<{
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
-  console.log('formValues', props.formValues);
-
   const uploadFile = () => {
     if (!file) {
       return;
     }
 
-    // start upload
     setUploadInProgress(true);
 
     const storageRef = ref(firebaseStorage, `/files/${file.name}`);
@@ -54,7 +48,6 @@ const CompanyPhoto: React.FC<{
       },
       () => {
         setUploadInProgress(false);
-
         getDownloadURL(uploadTask.snapshot.ref).then(url => {
           console.log('Uploaded image url:', url);
           setImgUrl(url);

@@ -6,7 +6,6 @@ import Button from '../../../genericComponents/Button';
 import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
 import { FormStep, SubmitResponse } from './types';
 
-// for dev
 const FORM_VALIDATION_ON = true;
 
 const SignUpFooter: React.FC<{
@@ -31,8 +30,6 @@ const SignUpFooter: React.FC<{
   const stepIndex = steps.findIndex(step => step.id === formStep);
   const nextText = formStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
-  console.log('stepErrors', { stepErrors, formStep });
-
   const onNextClick = async () => {
     if (formStep === 'basics') {
       const submitted = await submitBasics();
@@ -48,7 +45,6 @@ const SignUpFooter: React.FC<{
       history.push('/profile');
       return;
     }
-
     next();
   };
 
@@ -59,6 +55,8 @@ const SignUpFooter: React.FC<{
     }
     previous?.();
   };
+
+  const isDisabled = stepErrors[formStep] && FORM_VALIDATION_ON;
 
   return (
     <PageFooterRow>
@@ -86,11 +84,12 @@ const SignUpFooter: React.FC<{
       </Col>
       <ButtonCol lg="4">
         <Button
-          disabled={stepErrors[formStep] && FORM_VALIDATION_ON}
+          disabled={isDisabled}
           onClick={onNextClick}
           text={nextText}
           type="button"
           variant="primary"
+          style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
         />
       </ButtonCol>
     </PageFooterRow>

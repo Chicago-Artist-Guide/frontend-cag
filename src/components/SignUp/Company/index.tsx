@@ -7,12 +7,12 @@ import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
-import SignUpFooter from './SignUpFooter';
 import CompanyBasics from './Basics';
 import CompanyDetails from './Details';
 import CompanyPhoto from './Photo';
-import { FormValues, FormStep, SubmitResponse } from './types';
-import { defaultSteps, defaultErrorState, defaultFormState } from './utils';
+import SignUpFooter from './SignUpFooter';
+import { FormStep, FormValues, SubmitResponse } from './types';
+import { defaultErrorState, defaultFormState, defaultSteps } from './utils';
 
 const CompanySignUp: React.FC<{
   currentStep: number;
@@ -20,21 +20,18 @@ const CompanySignUp: React.FC<{
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useProfileContext();
-  const [formValues, setFormValue] = useForm<FormValues>(defaultFormState);
-  const [submitError, setSubmitError] = useState<SubmitResponse | undefined>();
+  const [formValues, setFormValues] = useForm<FormValues>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);
+  const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
   const { step, navigation } = useStep({
     initialStep: currentStep,
-    steps: defaultSteps
+    steps: steps
   });
   const stepId = (step as Step).id as FormStep;
 
   const handleSubmitBasics: () => Promise<SubmitResponse> = async () => {
     try {
-      setSubmitError(undefined);
-      console.log('handleSubmitBasics', { formValues });
-
       const { emailAddress, password, theatreName } = formValues;
       const response = await createUserWithEmailAndPassword(
         firebaseAuth,
@@ -56,17 +53,12 @@ const CompanySignUp: React.FC<{
 
       setAccountRef(account);
       setProfileRef(profile);
+      const nextSteps = steps.filter(s => s.id !== 'basics');
+      setSteps(nextSteps);
     } catch (e) {
       console.error('Error adding document:', e);
-      setSubmitError({
-        ok: false,
-        code: 'profile-creation-error'
-      });
     }
-
-    const resp = { ok: true };
-    setSubmitError(resp);
-    return resp;
+    return { ok: true };
   };
 
   const completeSignUp = async () => {
@@ -83,50 +75,36 @@ const CompanySignUp: React.FC<{
     }
   };
 
-  // callback function for updating if a step has errors
-  // we pass this down in the "hasErrorCallback" prop for the step
-  const setStepErrorsCallback = (step: string, hasErrors: boolean) => {
-    console.log('setStepErrorsCallback', { step, hasErrors });
-    const newStepErrorsObj = { ...stepErrors };
-    if (step in newStepErrorsObj) {
-      newStepErrorsObj[step] = hasErrors;
+  const setStepErrorsCallback = (
+    currentStep: string = stepId,
+    hasErrors: boolean
+  ) => {
+    if (stepErrors[currentStep] !== undefined) {
+      console.log({
+        currentStep,
+        stepErrors
+      });
+      setStepErrors(prev => ({ ...prev, [currentStep]: hasErrors }));
     }
-    setStepErrors(newStepErrorsObj);
   };
 
-  // based on which step we're on, return a different step component and pass it the props it needs
   const stepFrame = () => {
-    const props = { formValues, setForm: setFormValue, navigation };
+    const props = {
+      stepId,
+      navigation,
+      formValues,
+      setForm: setFormValues,
+      setStepErrors: setStepErrorsCallback
+    };
     switch (stepId) {
       case 'basics':
-        return (
-          <CompanyBasics
-            {...props}
-            setFormErrors={setStepErrors}
-            formErrors={stepErrors}
-            hasErrorCallback={setStepErrorsCallback}
-          />
-        );
+        return <CompanyBasics {...props} />;
       case 'privacy':
         return <Privacy {...props} formData={formValues} />;
       case 'details':
-        return (
-          <CompanyDetails
-            {...props}
-            setFormErrors={setStepErrors}
-            formErrors={stepErrors}
-            hasErrorCallback={setStepErrorsCallback}
-          />
-        );
+        return <CompanyDetails {...props} />;
       case 'photo':
-        return (
-          <CompanyPhoto
-            {...props}
-            setFormErrors={setStepErrors}
-            formErrors={stepErrors}
-            hasErrorCallback={setStepErrorsCallback}
-          />
-        );
+        return <CompanyPhoto {...props} />;
       default:
         return <>Something went wrong</>;
     }
