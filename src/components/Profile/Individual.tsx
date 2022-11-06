@@ -1,14 +1,13 @@
-import { getDoc } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { useProfileContext } from '../../context/ProfileContext';
-import Button from '../../genericComponents/Button';
-import { colors, fonts } from '../../theme/styleVars';
+import { useProfileContext } from '@/context/ProfileContext';
+import Button from '@/genericComponents/Button';
+import { colors, fonts } from '@/theme/styleVars';
 import PageContainer from '../layout/PageContainer';
 
 const IndividualProfile: React.FC<{
@@ -62,7 +61,7 @@ const IndividualProfile: React.FC<{
             <div>
               <HeaderNamePronouns>
                 <h2>
-                  {account?.first_name} {account?.last_name}
+                  {account.first_name} {account.last_name}
                 </h2>
                 <p>{profile?.pronouns || profile?.pronouns_other}</p>
               </HeaderNamePronouns>
