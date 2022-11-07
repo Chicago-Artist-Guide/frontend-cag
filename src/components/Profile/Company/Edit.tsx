@@ -1,21 +1,22 @@
-import { DocumentReference, updateDoc, getDoc } from '@firebase/firestore';
+import { getDoc, updateDoc } from '@firebase/firestore';
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
 import React, { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button } from '../../../genericComponents';
-import { colors, fonts } from '../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import { neighborhoods } from '../../../utils/lookups';
 import PageContainer from '../../layout/PageContainer';
+import AdditionalPhoto from '../Form/AdditionalPhoto';
 import { FormInput, FormSelect, FormTextArea, Input } from '../Form/Inputs';
 import FormPhoto from '../Form/Photo';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
+import AddAward from './AddAward';
 import { Profile } from './types';
 
 const CompanyProfileEdit: React.FC<{
@@ -26,6 +27,7 @@ const CompanyProfileEdit: React.FC<{
     setProfileData
   } = useProfileContext();
   const [formValues, setFormValues] = useForm<Profile>({
+    additional_photos: {},
     ...data
   });
   const locations = [
@@ -51,15 +53,19 @@ const CompanyProfileEdit: React.FC<{
 
   const handleSubmit = async () => {
     if (ref && JSON.stringify(data) !== JSON.stringify(formValues)) {
-      await updateDoc(ref, {
+      const nextData = {
         ...data,
         ...formValues
-      });
+      };
+      console.log({ nextData });
+      await updateDoc(ref, nextData);
       const profileData = await getDoc(ref);
       setProfileData(profileData.data());
     }
     toggleEdit(false);
   };
+
+  const images = Array(6).fill(1);
 
   return (
     <PageContainer>
@@ -79,12 +85,23 @@ const CompanyProfileEdit: React.FC<{
           </Col>
         </Row>
         <Row>
-          <Col lg={4}>
+          <LeftCol lg={4}>
             <FormPhoto
               src={formValues?.profile_image_url}
               name="profile_image_url"
               onChange={setFormValues}
             />
+            <AdditionalPhotos className="d-flex flex-wrap justify-content-between">
+              {images.map((_, index) => (
+                <AdditionalPhoto
+                  key={index}
+                  index={index}
+                  src={formValues?.additional_photos?.[index]}
+                  name={`additional_photos.${index}`}
+                  onChange={setFormValues}
+                />
+              ))}
+            </AdditionalPhotos>
             <DetailsCard>
               <DetailsColTitle>Basic Group Info</DetailsColTitle>
               <div>
@@ -117,7 +134,7 @@ const CompanyProfileEdit: React.FC<{
                 </DetailsCardItem>
               </div>
             </DetailsCard>
-          </Col>
+          </LeftCol>
           <Col lg={{ span: 7, offset: 1 }}>
             <FormInput
               name="theatre_name"
@@ -143,7 +160,7 @@ const CompanyProfileEdit: React.FC<{
             />
 
             <DetailSection title="Awards & Recognition">
-              <DetailAdd text="Add an award or recognition" />
+              <AddAward />
             </DetailSection>
             <DetailSection title="Active Shows">
               <DetailAdd text="Add a new show" />
@@ -158,12 +175,26 @@ const CompanyProfileEdit: React.FC<{
   );
 };
 
+const LeftCol = styled(Col)`
+  @media (min-width: ${breakpoints.lg}) {
+    max-width: 362px;
+  }
+`;
+
 const Title = styled.h1`
   font-family: ${fonts.montserrat};
   font-size: 48px;
   font-weight: bold;
   margin-bottom: 76px;
   text-transform: uppercase;
+`;
+
+const AdditionalPhotos = styled.div`
+  margin-top: 20px;
+
+  @media (min-width: ${breakpoints.lg}) {
+    max-width: 332px;
+  }
 `;
 
 const DetailsCard = styled.div`

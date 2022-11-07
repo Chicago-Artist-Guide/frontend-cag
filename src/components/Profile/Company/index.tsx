@@ -3,11 +3,10 @@ import React, { useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button } from '../../../genericComponents';
-import { colors, fonts } from '../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import PageContainer from '../../layout/PageContainer';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
@@ -24,6 +23,8 @@ const CompanyProfile: React.FC<{
   if (isEditing) {
     return <CompanyProfileEdit toggleEdit={setIsEditing} />;
   }
+
+  const images = Array(6).fill(1);
 
   return (
     <>
@@ -43,8 +44,19 @@ const CompanyProfile: React.FC<{
           </Col>
         </Row>
         <Row>
-          <Col lg={4}>
+          <LeftCol lg={4}>
             <ProfileImage src={profileData?.profile_image_url} fluid />
+            {profileData?.additional_photos && (
+              <AdditionalPhotos className="d-flex flex-wrap justify-content-between">
+                {images.map((_, index) => (
+                  <AdditionalImage
+                    key={index}
+                    src={profileData?.additional_photos?.[index]}
+                    fluid
+                  />
+                ))}
+              </AdditionalPhotos>
+            )}
             <DetailsCard>
               <DetailsColTitle>Basic Group Info</DetailsColTitle>
               <div>
@@ -59,7 +71,7 @@ const CompanyProfile: React.FC<{
                 </DetailsCardItem>
               </div>
             </DetailsCard>
-          </Col>
+          </LeftCol>
           <Col lg={{ span: 7, offset: 1 }}>
             <TheatreName>{profileData?.theatre_name}</TheatreName>
 
@@ -84,6 +96,12 @@ const CompanyProfile: React.FC<{
     </>
   );
 };
+
+const LeftCol = styled(Col)`
+  @media (min-width: ${breakpoints.lg}) {
+    max-width: 362px;
+  }
+`;
 
 const Title = styled.h1`
   font-family: ${fonts.montserrat};
@@ -122,6 +140,14 @@ const Bio = styled.div`
   margin-top: 15px;
 `;
 
+const AdditionalPhotos = styled.div`
+  margin-top: 20px;
+
+  @media (min-width: ${breakpoints.lg}) {
+    max-width: 332px;
+  }
+`;
+
 const ProfileImage = styled(Image)`
   display: block;
   box-shadow: 0 0 8px 4px ${colors.black05a};
@@ -129,6 +155,24 @@ const ProfileImage = styled(Image)`
   background: ${colors.lightGrey};
   min-height: 312px;
   width: 100%;
+
+  @media (min-width: ${breakpoints.lg}) {
+    max-width: 332px;
+  }
+`;
+
+const AdditionalImage = styled(Image)`
+  display: block;
+  box-shadow: 0 0 8px 4px ${colors.black05a};
+  border-radius: 8px;
+  background: ${colors.lightGrey};
+  height: 95px;
+  width: 96px;
+  margin-bottom: 10px;
+
+  @media (min-width: ${breakpoints.lg}) {
+    max-width: 332px;
+  }
 `;
 
 const DetailsCard = styled.div`

@@ -6,6 +6,7 @@ import { Col, Container, Form, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
+import { useProfileContext } from '../../../context/ProfileContext';
 import Button from '../../../genericComponents/Button';
 import { colors, fonts } from '../../../theme/styleVars';
 import SignUpBody from '../shared/Body';
@@ -18,6 +19,9 @@ const CompanyPhoto: React.FC<{
   setStepErrors: (step: string, hasErrors: boolean) => void;
 }> = ({ setForm }) => {
   const { firebaseStorage } = useFirebaseContext();
+  const {
+    profile: { data }
+  } = useProfileContext();
   const [file, setFile] = useState<File | null>(null);
   const [percent, setPercent] = useState(0);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
@@ -31,7 +35,10 @@ const CompanyPhoto: React.FC<{
 
     setUploadInProgress(true);
 
-    const storageRef = ref(firebaseStorage, `/files/${file.name}`);
+    const storageRef = ref(
+      firebaseStorage,
+      `/files-${data.account_id}/${file.name}`
+    );
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(

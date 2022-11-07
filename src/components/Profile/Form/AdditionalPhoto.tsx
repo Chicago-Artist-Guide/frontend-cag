@@ -6,14 +6,15 @@ import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
-import { breakpoints, colors } from '../../../theme/styleVars';
+import { colors } from '../../../theme/styleVars';
 import { Profile } from '../Company/types';
 
-const FormPhoto: React.FC<{
+const AdditionalPhoto: React.FC<{
+  index: number;
   name: string;
   src?: string;
   onChange: SetForm;
-}> = ({ src, name, onChange }) => {
+}> = ({ index, src, name, onChange }) => {
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
@@ -33,7 +34,7 @@ const FormPhoto: React.FC<{
       setImgUrl(URL.createObjectURL(file));
       const storageRef = ref(
         firebaseStorage,
-        `/files/${data.account_id}/${file.name}`
+        `/files-${data.account_id}/${file.name}`
       );
       const uploadTask = uploadBytesResumable(storageRef, file);
 
@@ -53,19 +54,15 @@ const FormPhoto: React.FC<{
 
   return (
     <>
-      <ProfileImage
+      <Image
         onClick={handleFileInput}
         style={{
           backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
         }}
-      >
-        {!imgUrl && (
-          <FontAwesomeIcon className="camera" icon={faCamera} size="lg" />
-        )}
-      </ProfileImage>
+      />
       <input
         accept="image/*"
-        id="icon-button-file"
+        id={`icon-button-file_${index}`}
         type="file"
         style={{ display: 'none' }}
         ref={fileInput}
@@ -75,7 +72,7 @@ const FormPhoto: React.FC<{
   );
 };
 
-const ProfileImage = styled.div`
+const Image = styled.div`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   cursor: pointer;
   align-items: center;
@@ -84,15 +81,12 @@ const ProfileImage = styled.div`
   display: flex;
   font-size: 86px;
   justify-content: center;
-  height: 312px;
-  width: 100%;
+  height: 95px;
+  width: 96px;
+  margin-bottom: 10px;
   border-radius: 8px;
   background-size: 100% 100%;
   background-repeat: no-repeat;
-
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 332px;
-  }
 `;
 
-export default FormPhoto;
+export default AdditionalPhoto;

@@ -7,7 +7,7 @@ export type Profile = {
   primary_contact?: string;
   primary_contact_email?: string;
   profile_image_url?: string;
-  additional_photos?: string[];
+  additional_photos?: { [key: string]: string };
   theatre_name: string;
   uid: string;
 };

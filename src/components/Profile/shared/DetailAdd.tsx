@@ -4,10 +4,10 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
 
-const DetailAdd: React.FC<{ text: string; onClick?: () => void }> = ({
-  text,
-  onClick
-}) => {
+const DetailAdd: React.FC<{
+  text: string;
+  onClick?: () => void;
+}> = ({ text, onClick }) => {
   return (
     <Button className="d-flex align-items-center ml-1" onClick={onClick}>
       <Icon icon={faPlus} />
@@ -21,7 +21,7 @@ const Button = styled.div`
 `;
 
 const Icon = styled(FontAwesomeIcon)`
-  color: ${colors.primary};
+  color: ${colors.cornflower};
   margin-right: 5px;
 `;
 
