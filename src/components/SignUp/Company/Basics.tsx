@@ -11,7 +11,7 @@ import { colors, fonts } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
-import { FormValues } from './types';
+import { CompanyData } from './types';
 import { checkForErrors } from './utils';
 
 const requiredFields = ['theatreName', 'emailAddress', 'password'];
@@ -19,7 +19,7 @@ const requiredFields = ['theatreName', 'emailAddress', 'password'];
 const CompanyBasics: React.FC<{
   stepId: string;
   setForm: SetForm;
-  formValues: FormValues;
+  formValues: CompanyData;
   setStepErrors: (step: string, hasErrors: boolean) => void;
 }> = ({ stepId, setForm, formValues, setStepErrors }) => {
   const { theatreName, emailAddress, password } = formValues;

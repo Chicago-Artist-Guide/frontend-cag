@@ -34,7 +34,7 @@ const DropdownMenu = ({ name, label, onChange, value, options }: Props) => {
           color: value ? colors.secondaryFontColor : colors.lightGrey,
           fontWeight: 400,
           height: 40,
-          maxWidth: 256
+          maxWidth: 300
         }}
       >
         {options.map(option => (

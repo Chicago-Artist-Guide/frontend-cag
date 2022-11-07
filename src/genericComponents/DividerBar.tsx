@@ -1,4 +1,5 @@
 import styled from 'styled-components';
+import { breakpoints } from '../theme/styleVars';
 
 const DividerBar = styled.div`
   width: 105px;
@@ -6,7 +7,7 @@ const DividerBar = styled.div`
   border-radius: 4px;
   margin: 12px auto;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     margin: 12px 0;
   }
 `;

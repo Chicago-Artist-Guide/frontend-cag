@@ -10,11 +10,11 @@ import Button from '../../../genericComponents/Button';
 import { colors, fonts } from '../../../theme/styleVars';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
-import { FormValues } from './types';
+import { CompanyData } from './types';
 
 const CompanyPhoto: React.FC<{
   setForm: SetForm;
-  formValues: FormValues;
+  formValues: CompanyData;
   setStepErrors: (step: string, hasErrors: boolean) => void;
 }> = ({ setForm }) => {
   const { firebaseStorage } = useFirebaseContext();
@@ -49,7 +49,6 @@ const CompanyPhoto: React.FC<{
       () => {
         setUploadInProgress(false);
         getDownloadURL(uploadTask.snapshot.ref).then(url => {
-          console.log('Uploaded image url:', url);
           setImgUrl(url);
           const target = {
             name: 'profilePhotoUrl',

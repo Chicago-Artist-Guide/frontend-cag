@@ -11,7 +11,7 @@ import {
   receiveNotices,
   submitToJobs
 } from '../../images/icons-home';
-import { colors } from '../../theme/styleVars';
+import { breakpoints, colors } from '../../theme/styleVars';
 import { DividerBar } from '../../genericComponents';
 
 const ForArtists = () => {
@@ -103,9 +103,9 @@ const ArtistsRow = styled(Row)`
   margin-right: 0;
   margin-left: 0;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     display: grid;
-    grid-template-areas: "wordBox imgBox";
+    grid-template-areas: 'wordBox imgBox';
     grid-template-columns: repeat(2, 1fr);
     margin-right: -15px;
     margin-left: -15px;
@@ -126,7 +126,7 @@ const WordBox = styled.div`
   align-items: center;
   flex-direction: column;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     margin-right: 70px;
     text-align: left;
     padding: 0;
@@ -148,7 +148,7 @@ const BuildButton = styled(Link)`
   border: none;
   box-shadow: 0px 0px 8px 4px rgba(0, 0, 0, 0.05);
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     position: absolute;
   }
 

@@ -40,4 +40,10 @@ const fonts = {
   mainFont: '"Open Sans", sans-serif'
 };
 
-export { cardHeight, colors, fonts };
+const breakpoints = {
+  sm: '576px',
+  md: '768px',
+  lg: '992px'
+};
+
+export { cardHeight, colors, fonts, breakpoints };

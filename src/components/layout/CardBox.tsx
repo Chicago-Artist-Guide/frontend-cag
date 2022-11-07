@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import Card from '../../genericComponents/Card';
+import { breakpoints } from '../../theme/styleVars';
 
 const CardBox = (props: any) => {
   const { cards } = props;
@@ -27,7 +28,7 @@ const Cards = styled.div`
   align-items: center;
   padding-top: 35px;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     flex-wrap: wrap;
     padding-top: 0;
     height: 850px;

@@ -7,7 +7,7 @@ import TextArea from '../../../genericComponents/TextArea';
 import { neighborhoods } from '../../../utils/lookups';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
-import { FormValues } from './types';
+import { CompanyData } from './types';
 import { checkForErrors } from './utils';
 
 const requiredFields = ['numberOfMembers', 'primaryContact', 'description'];
@@ -15,7 +15,7 @@ const requiredFields = ['numberOfMembers', 'primaryContact', 'description'];
 const CompanyDetails: React.FC<{
   stepId: string;
   setForm: SetForm;
-  formValues: FormValues;
+  formValues: CompanyData;
   setStepErrors: (step: string, hasErrors: boolean) => void;
 }> = ({ setForm, stepId, formValues, setStepErrors }) => {
   const locations = [

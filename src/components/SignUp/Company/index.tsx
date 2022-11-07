@@ -11,7 +11,7 @@ import CompanyBasics from './Basics';
 import CompanyDetails from './Details';
 import CompanyPhoto from './Photo';
 import SignUpFooter from './SignUpFooter';
-import { FormStep, FormValues, SubmitResponse } from './types';
+import { FormStep, CompanyData, SubmitResponse } from './types';
 import { defaultErrorState, defaultFormState, defaultSteps } from './utils';
 
 const CompanySignUp: React.FC<{
@@ -20,7 +20,7 @@ const CompanySignUp: React.FC<{
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useProfileContext();
-  const [formValues, setFormValues] = useForm<FormValues>(defaultFormState);
+  const [formValues, setFormValues] = useForm<CompanyData>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
@@ -42,6 +42,7 @@ const CompanySignUp: React.FC<{
       const account = await addDoc(collection(firebaseFirestore, 'accounts'), {
         uid: userId,
         type: 'company',
+        email: emailAddress,
         theater_name: theatreName,
         privacy_agreement: true
       });
@@ -80,10 +81,6 @@ const CompanySignUp: React.FC<{
     hasErrors: boolean
   ) => {
     if (stepErrors[currentStep] !== undefined) {
-      console.log({
-        currentStep,
-        stepErrors
-      });
       setStepErrors(prev => ({ ...prev, [currentStep]: hasErrors }));
     }
   };

@@ -4,7 +4,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
-import { colors } from '../theme/styleVars';
+import { breakpoints, colors } from '../theme/styleVars';
 import Mailchimp from '../components/Home/Mailchimp';
 import {
   BlobBox,
@@ -94,7 +94,7 @@ const StartButton = styled(Link)`
 const HomeRow = styled(Row)`
   position: relative;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     height: 30rem;
   }
 `;
