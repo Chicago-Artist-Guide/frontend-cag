@@ -5,10 +5,8 @@ import { Form } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
-import styled from 'styled-components';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button } from '../../../genericComponents';
-import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import { neighborhoods } from '../../../utils/lookups';
 import PageContainer from '../../layout/PageContainer';
 import AdditionalPhoto from '../Form/AdditionalPhoto';
@@ -17,6 +15,15 @@ import FormPhoto from '../Form/Photo';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
 import AddAward from './AddAward';
+import {
+  AdditionalPhotos,
+  DetailsCard,
+  DetailsCardItem,
+  DetailsColTitle,
+  LeftCol,
+  RightCol,
+  Title
+} from './ProfileStyles';
 import { Profile } from './types';
 
 const CompanyProfileEdit: React.FC<{
@@ -135,7 +142,7 @@ const CompanyProfileEdit: React.FC<{
               </div>
             </DetailsCard>
           </LeftCol>
-          <Col lg={{ span: 7, offset: 1 }}>
+          <RightCol lg={{ span: 7, offset: 1 }}>
             <FormInput
               name="theatre_name"
               label="Group Name"
@@ -168,71 +175,11 @@ const CompanyProfileEdit: React.FC<{
             <DetailSection title="Inactive Shows">
               <DetailAdd text="Add a new show" />
             </DetailSection>
-          </Col>
+          </RightCol>
         </Row>
       </Form>
     </PageContainer>
   );
 };
-
-const LeftCol = styled(Col)`
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 362px;
-  }
-`;
-
-const Title = styled.h1`
-  font-family: ${fonts.montserrat};
-  font-size: 48px;
-  font-weight: bold;
-  margin-bottom: 76px;
-  text-transform: uppercase;
-`;
-
-const AdditionalPhotos = styled.div`
-  margin-top: 20px;
-
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 332px;
-  }
-`;
-
-const DetailsCard = styled.div`
-  margin-top: 47px;
-  background: ${colors.white};
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  border-radius: 8px;
-  padding: 25px 21px;
-`;
-
-const DetailsCardItem = styled.h6`
-  font-family: ${fonts.montserrat};
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.07em;
-  margin-top: 5px;
-`;
-
-const DetailsColTitle = styled.h2`
-  font-family: ${fonts.montserrat};
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 24px;
-
-  &::after {
-    content: '';
-    margin-top: 8px;
-    display: block;
-    height: 8px;
-    background: linear-gradient(
-      90deg,
-      ${colors.yellow} 0%,
-      ${colors.darkGreen} 100%
-    );
-    border-radius: 4px;
-  }
-`;
 
 export default CompanyProfileEdit;

@@ -1,5 +1,3 @@
-import { faCamera } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import React, { useRef, useState } from 'react';
 import { SetForm } from 'react-hooks-helper';

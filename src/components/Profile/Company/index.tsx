@@ -11,6 +11,15 @@ import PageContainer from '../../layout/PageContainer';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
 import CompanyProfileEdit from './Edit';
+import {
+  AdditionalPhotos,
+  DetailsCard,
+  DetailsCardItem,
+  DetailsColTitle,
+  LeftCol,
+  RightCol,
+  Title
+} from './ProfileStyles';
 import { Profile } from './types';
 
 const CompanyProfile: React.FC<{
@@ -72,7 +81,7 @@ const CompanyProfile: React.FC<{
               </div>
             </DetailsCard>
           </LeftCol>
-          <Col lg={{ span: 7, offset: 1 }}>
+          <RightCol lg={{ span: 7, offset: 1 }}>
             <TheatreName>{profileData?.theatre_name}</TheatreName>
 
             {profileData?.location && (
@@ -90,25 +99,12 @@ const CompanyProfile: React.FC<{
             <DetailSection title="Inactive Shows">
               <DetailAdd text="Add a new show" />
             </DetailSection>
-          </Col>
+          </RightCol>
         </Row>
       </PageContainer>
     </>
   );
 };
-
-const LeftCol = styled(Col)`
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 362px;
-  }
-`;
-
-const Title = styled.h1`
-  font-family: ${fonts.montserrat};
-  font-size: 48px;
-  font-weight: bold;
-  margin-bottom: 76px;
-`;
 
 const TheatreName = styled.h2`
   font-family: ${fonts.montserrat};
@@ -140,21 +136,15 @@ const Bio = styled.div`
   margin-top: 15px;
 `;
 
-const AdditionalPhotos = styled.div`
-  margin-top: 20px;
-
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 332px;
-  }
-`;
-
 const ProfileImage = styled(Image)`
   display: block;
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   background: ${colors.lightGrey};
   min-height: 312px;
-  width: 100%;
+  width: 312px;
+  margin-left: auto;
+  margin-right: auto;
 
   @media (min-width: ${breakpoints.lg}) {
     max-width: 332px;
@@ -172,44 +162,6 @@ const AdditionalImage = styled(Image)`
 
   @media (min-width: ${breakpoints.lg}) {
     max-width: 332px;
-  }
-`;
-
-const DetailsCard = styled.div`
-  margin-top: 47px;
-  background: ${colors.white};
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  border-radius: 8px;
-  padding: 25px 21px;
-`;
-
-const DetailsCardItem = styled.h6`
-  font-family: ${fonts.montserrat};
-  font-style: normal;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 24px;
-  letter-spacing: 0.07em;
-  margin-top: 5px;
-`;
-
-const DetailsColTitle = styled.h2`
-  font-family: ${fonts.montserrat};
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 24px;
-
-  &::after {
-    content: '';
-    margin-top: 8px;
-    display: block;
-    height: 8px;
-    background: linear-gradient(
-      90deg,
-      ${colors.yellow} 0%,
-      ${colors.darkGreen} 100%
-    );
-    border-radius: 4px;
   }
 `;
 

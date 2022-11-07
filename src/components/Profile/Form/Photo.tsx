@@ -85,7 +85,9 @@ const ProfileImage = styled.div`
   font-size: 86px;
   justify-content: center;
   height: 312px;
-  width: 100%;
+  width: 312px;
+  margin-left: auto;
+  margin-right: auto;
   border-radius: 8px;
   background-size: 100% 100%;
   background-repeat: no-repeat;
