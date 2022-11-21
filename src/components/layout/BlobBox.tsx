@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { breakpoints } from '../../theme/styleVars';
 
 interface BlobBoxType {
   id: number;
@@ -53,14 +54,12 @@ const Blobs = styled.div<{ blobs: any }>`
   z-index: -1;
   transform-style: preserve-3d;
 
-  @media (min-width: 768px) {
+  @media (min-width: ${breakpoints.md}) {
     display: block;
   }
 
   img {
     position: absolute;
-    overflow: visible;
-
     ${({ blobs }) => outputBlobs(blobs)}
   }
 `;

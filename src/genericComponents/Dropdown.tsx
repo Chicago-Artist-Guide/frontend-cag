@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-  CAGFormControl,
   CAGFormGroup,
+  CAGFormSelect,
   CAGLabel
 } from '../components/SignUp/SignUpStyles';
 import { colors } from '../theme/styleVars';
 
 interface Props {
-  controlId?: string;
+  name?: string;
   label?: string;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   value?: string;
@@ -19,19 +19,12 @@ interface Value {
   value: string;
 }
 
-const DropdownMenu = ({
-  controlId,
-  label,
-  onChange,
-  value,
-  options
-}: Props) => {
+const DropdownMenu = ({ name, label, onChange, value, options }: Props) => {
   return (
-    <CAGFormGroup controlId={controlId}>
+    <CAGFormGroup controlId={name}>
       <CAGLabel>{label}</CAGLabel>
-      <CAGFormControl
-        as="select"
-        name={controlId}
+      <CAGFormSelect
+        name={name}
         aria-label={label}
         defaultValue={value}
         onChange={onChange}
@@ -41,15 +34,19 @@ const DropdownMenu = ({
           color: value ? colors.secondaryFontColor : colors.lightGrey,
           fontWeight: 400,
           height: 40,
-          maxWidth: 256
+          maxWidth: 300
         }}
       >
         {options.map(option => (
-          <option selected={option.value === value} value={value}>
+          <option
+            key={option.value}
+            selected={option.value === value}
+            value={option.value}
+          >
             {option.name}
           </option>
         ))}
-      </CAGFormControl>
+      </CAGFormSelect>
     </CAGFormGroup>
   );
 };

@@ -1,26 +1,29 @@
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Button as BSButton } from 'react-bootstrap';
 import styled from 'styled-components';
 import { colors, fonts } from '../theme/styleVars';
 
 const Button = (props: any) => {
-  const { onClick, text, variant, ...rest } = props;
+  const { onClick, text, variant, icon, ...rest } = props;
 
   return (
-    <>
-      <>
-        <CAGButton
-          className={`${variant}-class`}
-          onClick={onClick}
-          variant={variant}
-          {...rest}
-        >
-          {text}
-        </CAGButton>
-      </>
-    </>
+    <CAGButton
+      className={`${variant}-class d-flex align-items-center`}
+      onClick={onClick}
+      variant={variant}
+      {...rest}
+    >
+      {icon && <Icon icon={icon} />}
+      {text}
+    </CAGButton>
   );
 };
+
+const Icon = styled(FontAwesomeIcon)`
+  color: ${colors.dark};
+  margin-right: 5px;
+`;
 
 const CAGButton = styled(BSButton)`
   border-radius: 25px;
@@ -35,8 +38,6 @@ const CAGButton = styled(BSButton)`
   text-transform: uppercase;
   box-shadow: 0px 0px 8px 4px #0000000d;
   height: 40px;
-  left: 754px;
-  top: 383.0390625px;
   border-radius: 20px;
   padding: 12px 18px 12px 18px;
   font-size: 14px;

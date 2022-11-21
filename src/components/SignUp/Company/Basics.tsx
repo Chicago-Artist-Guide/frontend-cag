@@ -7,81 +7,29 @@ import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import InputField from '../../../genericComponents/Input';
-import { colors } from '../../../theme/styleVars';
+import { colors, fonts } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
+import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
-import { CompanyFormData } from './types';
+import { CompanyData } from './types';
+import { checkForErrors } from './utils';
+
+const requiredFields = ['theatreName', 'emailAddress', 'password'];
 
 const CompanyBasics: React.FC<{
+  stepId: string;
   setForm: SetForm;
-  formData: CompanyFormData;
-  formErrors: any;
-  setFormErrors: (x: any) => void;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = ({ setForm, formData, setFormErrors, formErrors, hasErrorCallback }) => {
-  const { theatreName, emailAddress, password, passwordConfirm } = formData;
-
-  // create an array of the required field names
-  const requiredFields = [
-    'theatreName',
-    'emailAddress',
-    'password',
-    'passwordConfirm'
-  ];
-
-  // create a default object of required field values for state
-  // the format is: fieldName: true (has error) | false (does not have error)
-  // we default this for now based on if they are empty '' or false
-  const createDefaultFormErrorsData = () => {
-    const formErrorsObj: { [key: string]: boolean } = {};
-    // TODO: Finish validation and error checking
-    // requiredFields.forEach((fieldName: string) => {
-    //   formErrorsObj[fieldName] = !formData[fieldName];
-    // });
-
-    return formErrorsObj;
-  };
+  formValues: CompanyData;
+  setStepErrors: (step: string, hasErrors: boolean) => void;
+}> = ({ stepId, setForm, formValues, setStepErrors }) => {
+  const { theatreName, emailAddress, password } = formValues;
 
   useEffect(() => {
-    setFormErrors(createDefaultFormErrorsData);
-    console.log('object.values', !Object.values(formErrors).every(v => !v));
-    customErrorCallback(
-      !Object.values(createDefaultFormErrorsData).every(v => !v)
-    );
-  }, []);
-
-  console.log('formErrors', formErrors);
-  // then use createDefaultFormErrorsData() to fill our initial formErrors state for this page
-  //   const [formErrors, setFormErrors] = useState(createDefaultFormErrorsData());
-
-  // calls the custom callback for the sign up page errors state object
-  // we just make this so we don't need to repeat "basics" everywhere
-  const customErrorCallback = (hasErrors: boolean) =>
-    hasErrorCallback('basics', hasErrors);
-
-  // this is the callback we pass down for each input to update for its error state
-  // it's used in the InputField "hasErrorCallback" attribute
-  //   const customErrorCallbackField = (name: string, hasErrors: boolean) => {
-  //     const newFormErrorsObj: typeof formErrors = { ...formErrors };
-  //     if (name in newFormErrorsObj) {
-  //       newFormErrorsObj[name] = hasErrors;
-  //     }
-  //     setFormErrors(newFormErrorsObj);
-  //   };
-
-  // this is the custom error func for password matching
-  // we only need to give this to the basicsPasswordConfirm field
-  // and it goes in the InputField array "validationFuncMessages" attribute
-  const checkIfPasswordsMatch = () => {
-    return password === passwordConfirm;
-  };
-
-  // effect for updating the sign up page errors state for this page
-  // every time formErrors is updated
-  //   useEffect(() => {
-  //     console.lo
-  //     customErrorCallback(!Object.values(formErrors).every(v => !v));
-  //   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (requiredFields.length > 0) {
+      const hasErrors = checkForErrors(requiredFields, formValues);
+      setStepErrors(stepId, hasErrors);
+    }
+  }, [formValues]);
 
   return (
     <Container>
@@ -92,12 +40,12 @@ const CompanyBasics: React.FC<{
         />
       </Row>
       <Row>
-        <Col lg="4">
+        <SignUpBody lg="4">
           <Form>
             <InputField
               required
               placeholder="Theatre Name"
-              hasErrorCallback={hasErrorCallback}
+              hasErrorCallback={setStepErrors}
               name="theatreName"
               onChange={setForm}
               requiredLabel="Theatre name"
@@ -105,7 +53,7 @@ const CompanyBasics: React.FC<{
             />
             <InputField
               required
-              hasErrorCallback={hasErrorCallback}
+              hasErrorCallback={setStepErrors}
               placeholder="Email Address"
               name="emailAddress"
               onChange={setForm}
@@ -117,7 +65,7 @@ const CompanyBasics: React.FC<{
             <InputField
               required
               fieldType="password"
-              hasErrorCallback={hasErrorCallback}
+              hasErrorCallback={setStepErrors}
               placeholder="Password"
               name="password"
               onChange={setForm}
@@ -127,23 +75,11 @@ const CompanyBasics: React.FC<{
               value={password || ''}
               helperText="Minimum 8 characters, one uppercase letter, one lowercase letter, one number, and one special character."
             />
-            <InputField
-              required
-              fieldType="password"
-              hasErrorCallback={hasErrorCallback}
-              placeholder="Confirm Password"
-              name="passwordConfirm"
-              onChange={setForm}
-              requiredLabel="Password confirmation"
-              validationFuncMessages={[ErrorMessage.PasswordsMatch]}
-              validationFuncs={[checkIfPasswordsMatch]}
-              value={passwordConfirm || ''}
-            />
           </Form>
           <LoginLink>
             Already a member? <Link to="/login">Log in here</Link>
           </LoginLink>
-        </Col>
+        </SignUpBody>
         <Col lg="4"></Col>
         <Col lg="4"></Col>
       </Row>
@@ -152,10 +88,13 @@ const CompanyBasics: React.FC<{
 };
 
 const LoginLink = styled.p`
-  font-size: 0.875rem;
+  font-size: 14px;
   font-weight: 520;
   letter-spacing: 0.14px;
+  font-style: italic;
   margin-top: 10px;
+  margin-left: 4px;
+  font-family: ${fonts.lora};
   a {
     color: ${colors.orange};
   }

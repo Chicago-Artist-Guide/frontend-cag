@@ -1,14 +1,13 @@
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import Alert from 'react-bootstrap/Alert';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import { useHistory } from 'react-router-dom';
+import { PageContainer, Title } from '../components/layout';
 import { useAuthValue } from '../context/AuthContext';
 import { useFirebaseContext } from '../context/FirebaseContext';
-import PageContainer from '../components/layout/PageContainer';
-import { Title } from '../components/layout/Titles';
 import Button from '../genericComponents/Button';
 import Red_Blob from '../images/red_blob.svg';
 

@@ -52,6 +52,7 @@ type Props = {
   validationRegexMessage?: string;
   validationRegexName?: keyof typeof validationRegex;
   value?: string | number;
+  first?: boolean;
 } & Omit<FormProps, 'onChange'>;
 
 const InputField = (props: Props) => {
@@ -70,6 +71,7 @@ const InputField = (props: Props) => {
     hasErrorCallback,
     helperText,
     value,
+    first = false,
     ...rest
   } = props;
   const [isPristine, setIsPristine] = useState(true);
@@ -154,9 +156,11 @@ const InputField = (props: Props) => {
     }
   }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const marginTop = first ? '0' : '25px';
+
   return (
     <>
-      <CAGFormGroup controlId={name}>
+      <CAGFormGroup controlId={name} style={{ marginTop: marginTop }}>
         <CAGLabel>{label}</CAGLabel>
         <CAGFormControl
           aria-label={label}
@@ -166,7 +170,7 @@ const InputField = (props: Props) => {
           type={fieldType}
           value={value}
           {...rest}
-          style={{ height: 40 }}
+          style={{ height: 52 }}
         />
       </CAGFormGroup>
       {hasError && <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>}

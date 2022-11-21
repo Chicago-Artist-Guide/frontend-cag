@@ -16,5 +16,6 @@
     "jsx": "react",
     "noFallthroughCasesInSwitch": true
   },
+  "exclude": ["node_modules"],
   "include": ["src"]
 }

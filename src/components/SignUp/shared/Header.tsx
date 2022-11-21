@@ -1,17 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Title, TitleTwo } from '../../layout';
+import { Title, TitleThree, TitleTwo } from '../../layout';
 
 type Props = {
+  pre?: string;
   title?: string;
   subtitle?: string;
 };
 
-const SignUpHeader: React.FC<Props> = ({ title, subtitle }) => {
+const SignUpHeader: React.FC<Props> = ({ pre, title, subtitle }) => {
   return (
     <PaddingHeader className="header">
+      {pre && <TitleThree>{pre}</TitleThree>}
       <Title>{title}</Title>
-      <TitleTwo>{subtitle}</TitleTwo>
+      {subtitle && <TitleTwo>{subtitle}</TitleTwo>}
     </PaddingHeader>
   );
 };

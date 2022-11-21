@@ -198,6 +198,7 @@ const IndividualSignUp: React.FC<{
           const accountRef = await addDoc(
             collection(firebaseFirestore, 'accounts'),
             {
+              type: 'individual',
               basics_18_plus: basics18Plus,
               first_name: basicsFirstName,
               last_name: basicsLastName,

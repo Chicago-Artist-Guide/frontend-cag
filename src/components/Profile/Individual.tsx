@@ -1,5 +1,4 @@
-import { getDoc } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
@@ -8,7 +7,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { useProfileContext } from '../../context/ProfileContext';
 import Button from '../../genericComponents/Button';
-import { colors, fonts } from '../../theme/styleVars';
+import { fonts, colors } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
 
 const IndividualProfile: React.FC<{

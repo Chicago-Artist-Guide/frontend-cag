@@ -1,4 +1,4 @@
-export interface CompanyFormData {
+export type CompanyData = {
   theatreName: string;
   emailAddress: string;
   password: string;
@@ -9,4 +9,11 @@ export interface CompanyFormData {
   description: string;
   privacyAgreement: boolean;
   profilePhotoUrl: string;
-}
+};
+
+export type FormStep = 'basics' | 'details' | 'privacy' | 'photo';
+
+export type SubmitResponse = {
+  ok: boolean;
+  code?: string;
+};

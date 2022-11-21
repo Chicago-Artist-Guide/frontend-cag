@@ -1,17 +1,19 @@
 import React from 'react';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
-import { Tagline, TitleThree } from '../layout/Titles';
-import { colors, fonts } from '../../theme/styleVars';
-import yellow_blob from '../../images/yellow_blob_2.svg';
 import PrivateLabel from '../../genericComponents/PrivateLabel';
+import yellow_blob from '../../images/yellow_blob_2.svg';
+import { colors, fonts } from '../../theme/styleVars';
+import SignUpBody from './shared/Body';
+import SignUpHeader from './shared/Header';
 
 const Privacy: React.FC<{
-  setForm: any;
+  setForm: SetForm;
   formData: any;
 }> = props => {
   const { formData } = props;
@@ -19,10 +21,16 @@ const Privacy: React.FC<{
   return (
     <Container>
       <Row>
-        <Col lg="8">
-          <TitleThree>Hi, {formData.basicsFirstName || 'member'}!</TitleThree>
-          <Title>LET'S TALK PRIVACY</Title>
-          <Tagline>Your privacy is our top concern. Always.</Tagline>
+        <SignUpHeader
+          title="Let's talk privacy"
+          subtitle="Your privacy is our top concern. Always."
+          pre={`Hi, ${formData.basicsFirstName ||
+            formData.theatreName ||
+            'member'}!`}
+        />
+      </Row>
+      <Row>
+        <SignUpBody lg="8">
           <PrivacyPar>
             We take privacy seriously (seriously). We will never share, sell, or
             otherwise distribute your information to a third party. We also know
@@ -46,7 +54,7 @@ const Privacy: React.FC<{
             Tap the green "Accept &amp; Continue" button to agree with our terms
             and privacy policy.
           </PrivacyPar>
-        </Col>
+        </SignUpBody>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
         </ImageCol>
@@ -66,7 +74,6 @@ const PrivacyPar = styled.p`
   font-family: ${fonts.mainFont};
   font-size: 20px;
   letter-spacing: 0px;
-  margin-top: 17px;
 `;
 
 const TermsPrivacyLink = styled(Link)`
@@ -75,12 +82,6 @@ const TermsPrivacyLink = styled(Link)`
   font-size: 14px;
   margin-bottom: 18px;
   margin-top: 26px;
-`;
-
-const Title = styled.h1`
-  font-family: ${fonts.montserrat};
-  font-size: 48px;
-  font-weight: bold;
 `;
 
 export default Privacy;
