@@ -112,10 +112,11 @@ export const Select = styled(Form.Select)`
 `;
 
 export const TextArea = styled(Form.Control)`
-	border-radius: 4px;
-	padding: 8px 13px 8px 13px;
-	border: 1px solid ${colors.lightGrey};
-	color: defaultValue ? colors.secondaryFontColor : colors.lightGrey;
-	fontWeight: 400;
-	maxWidth: 800px
+  border-radius: 4px;
+  padding: 8px 13px 8px 13px;
+  border: 1px solid ${colors.lightGrey};
+  color: ${props =>
+    props.defaultValue ? colors.secondaryFontColor : colors.lightGrey};
+  fontweight: 400;
+  maxwidth: 800px;
 `;
