@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
@@ -18,9 +18,15 @@ const IndividualProfile: React.FC<{
     account: { data: account },
     profile: { data: profile }
   } = useProfileContext();
-
+  const [showSignUp2Link, setShowUp2Link] = useState(
+    previewMode || !profile?.completed_profile_2
+  );
   const PageWrapper = previewMode ? Container : PageContainer;
-  const showSignUp2Link = previewMode || !profile?.completed_profile_2;
+
+  const hideShowUpLink = (e: any) => {
+    e.preventDefault();
+    setShowUp2Link(false);
+  };
 
   return (
     <>
@@ -92,7 +98,9 @@ const IndividualProfile: React.FC<{
               type="button"
               variant="secondary"
             />
-            <a href="#">remind me later</a>
+            <a href="#" onClick={hideShowUpLink}>
+              remind me later
+            </a>
           </div>
         </PreviewCard>
       )}
