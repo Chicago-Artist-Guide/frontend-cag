@@ -12,7 +12,7 @@ interface SelectValue {
 export const FormTextArea: React.FC<{
   name: string;
   label: string;
-  defaultValue: any;
+  defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   style?: CSSProperties;
 }> = ({ name, label, defaultValue, onChange, ...rest }) => {
@@ -34,7 +34,7 @@ export const FormTextArea: React.FC<{
 export const FormInput: React.FC<{
   name: string;
   label: string;
-  defaultValue: any;
+  defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   style?: CSSProperties;
 }> = ({ name, label, defaultValue, onChange, ...rest }) => {
@@ -54,7 +54,7 @@ export const FormInput: React.FC<{
 export const FormSelect: React.FC<{
   name: string;
   label: string;
-  defaultValue: any;
+  defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   options: SelectValue[];
 }> = ({ name, label, defaultValue, onChange, options }) => {

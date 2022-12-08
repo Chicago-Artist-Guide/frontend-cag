@@ -23,7 +23,7 @@ const IndividualProfile: React.FC<{
   );
   const PageWrapper = previewMode ? Container : PageContainer;
 
-  const hideShowUpLink = (e: any) => {
+  const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setShowUp2Link(false);
   };
