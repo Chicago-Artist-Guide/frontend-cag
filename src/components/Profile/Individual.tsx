@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
@@ -18,85 +18,93 @@ const IndividualProfile: React.FC<{
     account: { data: account },
     profile: { data: profile }
   } = useProfileContext();
-
+  const [showSignUp2Link, setShowUp2Link] = useState(
+    previewMode || !profile?.completed_profile_2
+  );
   const PageWrapper = previewMode ? Container : PageContainer;
-  const showSignUp2Link = previewMode || !profile?.completed_profile_2;
+
+  const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    setShowUp2Link(false);
+  };
 
   return (
-    <>
-      <PageWrapper>
-        <Row>
-          <Col lg={12}>
-            <Title>YOUR PROFILE</Title>
-          </Col>
-        </Row>
-        <Row>
-          <Col lg={4}>
-            <ProfileImage src={profile?.profile_image_url} fluid />
-            <DetailsCard>
-              <DetailsColTitle>Personal Details</DetailsColTitle>
-              <p>
-                Age Range: {profile?.age_ranges?.join(', ')}
-                <br />
-                Height:{' '}
-                {profile?.height_no_answer ? (
-                  'N/A'
-                ) : (
-                  <>
-                    {profile?.height_ft}’-{profile?.height_in}”
-                  </>
-                )}
-                <br />
-                Gender Identity: {profile?.gender_identity}
-                <br />
-                Ethnicity: {profile?.ethnicities?.join(', ')}
-                <br />
-                Union: {profile?.union_status || profile?.union_other}
-                <br />
-                Agency: {profile?.agency}
-              </p>
-            </DetailsCard>
-          </Col>
-          <Col lg={8}>
-            <div>
-              <HeaderNamePronouns>
-                <h2>
-                  {account.first_name} {account.last_name}
-                </h2>
-                <p>{profile?.pronouns || profile?.pronouns_other}</p>
-              </HeaderNamePronouns>
-              <h3>Actor, Magician, Singer</h3>
-              <p>{profile?.bio}</p>
-            </div>
-            <div>
-              <h4>Training</h4>
-              <h4>Past Performances</h4>
-              <h4>Upcoming Features</h4>
-              <h4>Special Skills</h4>
-              <h4>Awards &amp; Recognition</h4>
-            </div>
-          </Col>
-        </Row>
-      </PageWrapper>
+    <PageWrapper>
       {showSignUp2Link && (
-        <PreviewCard>
-          <h2>Your Profile is looking great!</h2>
-          <p>
-            We can walk you through the remaining steps or you can take it from
-            here
-          </p>
-          <div>
-            <Button
-              onClick={() => history.push('/sign-up-2')}
-              text="Keep Going"
-              type="button"
-              variant="secondary"
-            />
-            <a href="#">remind me later</a>
-          </div>
-        </PreviewCard>
+        <Row>
+          <PreviewCard>
+            <h2>Your Profile is looking great!</h2>
+            <p>
+              We can walk you through the remaining steps or you can take it
+              from here
+            </p>
+            <div>
+              <Button
+                onClick={() => history.push('/sign-up-2')}
+                text="Keep Going"
+                type="button"
+                variant="secondary"
+              />
+              <a href="#" onClick={hideShowUpLink}>
+                remind me later
+              </a>
+            </div>
+          </PreviewCard>
+        </Row>
       )}
-    </>
+      <Row>
+        <Col lg={12}>
+          <Title>YOUR PROFILE</Title>
+        </Col>
+      </Row>
+      <Row>
+        <Col lg={4}>
+          <ProfileImage src={profile?.profile_image_url} fluid />
+          <DetailsCard>
+            <DetailsColTitle>Personal Details</DetailsColTitle>
+            <p>
+              Age Range: {profile?.age_ranges?.join(', ')}
+              <br />
+              Height:{' '}
+              {profile?.height_no_answer ? (
+                'N/A'
+              ) : (
+                <>
+                  {profile?.height_ft}’-{profile?.height_in}”
+                </>
+              )}
+              <br />
+              Gender Identity: {profile?.gender_identity}
+              <br />
+              Ethnicity: {profile?.ethnicities?.join(', ')}
+              <br />
+              Union: {profile?.union_status || profile?.union_other}
+              <br />
+              Agency: {profile?.agency}
+            </p>
+          </DetailsCard>
+        </Col>
+        <Col lg={8}>
+          <div>
+            <HeaderNamePronouns>
+              <h2>
+                {account.first_name} {account.last_name}
+              </h2>
+              <p>{profile?.pronouns || profile?.pronouns_other}</p>
+            </HeaderNamePronouns>
+            <h3>Actor, Magician, Singer</h3>
+            <p>{profile?.bio}</p>
+          </div>
+          <div>
+            <h4>Training</h4>
+            <h4>Past Performances</h4>
+            <h4>Upcoming Features</h4>
+            <h4>Special Skills</h4>
+            <h4>Awards &amp; Recognition</h4>
+          </div>
+        </Col>
+      </Row>
+    </PageWrapper>
   );
 };
 
@@ -153,16 +161,12 @@ const HeaderNamePronouns = styled.div`
 `;
 
 const PreviewCard = styled.div`
-  position: fixed;
-  right: 0;
-  bottom: 33%;
-  transform: translateY(-50%);
-  width: 39%;
   height: auto;
   display: block;
   padding: 26px 12% 26px 32px;
   background: ${colors.lightPink};
-  border-radius: 8px 0 0 8px;
+  border-radius: 8px;
+  margin-bottom: 45px;
 
   h2 {
     font-family: ${fonts.montserrat};

@@ -12,7 +12,7 @@ interface SelectValue {
 export const FormTextArea: React.FC<{
   name: string;
   label: string;
-  defaultValue: any;
+  defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   style?: CSSProperties;
 }> = ({ name, label, defaultValue, onChange, ...rest }) => {
@@ -34,7 +34,7 @@ export const FormTextArea: React.FC<{
 export const FormInput: React.FC<{
   name: string;
   label: string;
-  defaultValue: any;
+  defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   style?: CSSProperties;
 }> = ({ name, label, defaultValue, onChange, ...rest }) => {
@@ -54,7 +54,7 @@ export const FormInput: React.FC<{
 export const FormSelect: React.FC<{
   name: string;
   label: string;
-  defaultValue: any;
+  defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   options: SelectValue[];
 }> = ({ name, label, defaultValue, onChange, options }) => {
@@ -112,10 +112,11 @@ export const Select = styled(Form.Select)`
 `;
 
 export const TextArea = styled(Form.Control)`
-	border-radius: 4px;
-	padding: 8px 13px 8px 13px;
-	border: 1px solid ${colors.lightGrey};
-	color: defaultValue ? colors.secondaryFontColor : colors.lightGrey;
-	fontWeight: 400;
-	maxWidth: 800px
+  border-radius: 4px;
+  padding: 8px 13px 8px 13px;
+  border: 1px solid ${colors.lightGrey};
+  color: ${props =>
+    props.defaultValue ? colors.secondaryFontColor : colors.lightGrey};
+  fontweight: 400;
+  maxwidth: 800px;
 `;

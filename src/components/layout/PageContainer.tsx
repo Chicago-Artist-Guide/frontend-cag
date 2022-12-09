@@ -8,7 +8,7 @@ const PageContainer: React.FC<{ className?: string }> = ({
 }) => <StyledContainer className={className}>{children}</StyledContainer>;
 
 const StyledContainer = styled(Container)`
-  margin-top: calc(7% + 130px);
+  margin-top: calc(3% + 130px);
 `;
 
 export default PageContainer;
