@@ -14,7 +14,7 @@ import { FormInput, FormSelect, FormTextArea, Input } from '../Form/Inputs';
 import FormPhoto from '../Form/Photo';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
-import AddAward from './AddAward';
+import AddAwardButton from './AddAwardButton';
 import {
   AdditionalPhotos,
   DetailsCard,
@@ -27,7 +27,7 @@ import {
 import { Profile } from './types';
 
 const CompanyProfileEdit: React.FC<{
-  toggleEdit: (isEditing: boolean) => void;
+  toggleEdit: () => void;
 }> = ({ toggleEdit }) => {
   const {
     profile: { ref, data },
@@ -64,12 +64,11 @@ const CompanyProfileEdit: React.FC<{
         ...data,
         ...formValues
       };
-      console.log({ nextData });
       await updateDoc(ref, nextData);
       const profileData = await getDoc(ref);
       setProfileData(profileData.data());
     }
-    toggleEdit(false);
+    toggleEdit();
   };
 
   const images = Array(6).fill(1);
@@ -167,7 +166,7 @@ const CompanyProfileEdit: React.FC<{
             />
 
             <DetailSection title="Awards & Recognition">
-              <AddAward />
+              <AddAwardButton />
             </DetailSection>
             <DetailSection title="Active Shows">
               <DetailAdd text="Add a new show" />

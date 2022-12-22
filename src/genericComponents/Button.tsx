@@ -21,7 +21,6 @@ const Button = (props: any) => {
 };
 
 const Icon = styled(FontAwesomeIcon)`
-  color: ${colors.dark};
   margin-right: 5px;
 `;
 

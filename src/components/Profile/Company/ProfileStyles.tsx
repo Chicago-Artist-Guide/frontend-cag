@@ -15,6 +15,7 @@ export const RightCol = styled(Col)`
 `;
 
 export const Title = styled.h1`
+  text-transform: uppercase;
   font-family: ${fonts.montserrat};
   font-size: 48px;
   font-weight: bold;

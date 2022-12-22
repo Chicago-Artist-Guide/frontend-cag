@@ -10,6 +10,7 @@ import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import PageContainer from '../../layout/PageContainer';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
+import CompanyAddShow from './AddShow';
 import CompanyProfileEdit from './Edit';
 import {
   AdditionalPhotos,
@@ -22,15 +23,35 @@ import {
 } from './ProfileStyles';
 import { Profile } from './types';
 
+type Edit = 'profile' | 'add-show' | 'edit-show' | null;
+
 const CompanyProfile: React.FC<{
   previewMode?: boolean;
 }> = () => {
   const { profile } = useProfileContext();
-  const [isEditing, setIsEditing] = useState(false);
+  const [editing, setEditing] = useState<Edit>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const profileData = profile?.data as Profile;
 
-  if (isEditing) {
-    return <CompanyProfileEdit toggleEdit={setIsEditing} />;
+  function editShow(id: string) {
+    setEditingId(id);
+    setEditing('edit-show');
+  }
+
+  function toggleEdit() {
+    setEditingId(null);
+    setEditing(null);
+  }
+
+  if (editing !== null) {
+    switch (editing) {
+      case 'profile':
+        return <CompanyProfileEdit toggleEdit={toggleEdit} />;
+      case 'add-show':
+        return <CompanyAddShow toggleEdit={toggleEdit} />;
+      default:
+        setEditing(null);
+    }
   }
 
   const images = Array(6).fill(1);
@@ -43,7 +64,7 @@ const CompanyProfile: React.FC<{
             <div className="d-flex flex-row justify-content-between">
               <Title>YOUR PROFILE</Title>
               <Button
-                onClick={() => setIsEditing(true)}
+                onClick={() => setEditing('profile')}
                 text="Edit Profile"
                 icon={faPenToSquare}
                 type="button"
@@ -94,10 +115,16 @@ const CompanyProfile: React.FC<{
               <DetailAdd text="Add an award or recognition" />
             </DetailSection>
             <DetailSection title="Active Shows">
-              <DetailAdd text="Add a new show" />
+              <DetailAdd
+                text="Add a new show"
+                onClick={() => setEditing('add-show')}
+              />
             </DetailSection>
             <DetailSection title="Inactive Shows">
-              <DetailAdd text="Add a new show" />
+              <DetailAdd
+                text="Add a new show"
+                onClick={() => setEditing('add-show')}
+              />
             </DetailSection>
           </RightCol>
         </Row>

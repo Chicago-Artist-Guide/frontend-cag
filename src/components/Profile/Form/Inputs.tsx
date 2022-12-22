@@ -79,6 +79,44 @@ export const FormSelect: React.FC<{
   );
 };
 
+export const FormRadio: React.FC<{
+  name: string;
+  label: string;
+  checked?: string;
+  onChange: SetForm;
+  options: SelectValue[];
+}> = ({ name, label, checked, onChange, options }) => {
+  console.log('checked', checked);
+  const handleChange = (e: any) => {
+    e.persist();
+    console.log(e.target.value);
+    onChange({
+      target: {
+        name: name,
+        value: e.target.value
+      }
+    });
+  };
+
+  return (
+    <FormGroup controlId={name}>
+      <Label>{label}</Label>
+      {options.map(option => (
+        <Radio
+          type="radio"
+          onChange={handleChange}
+          key={option.value}
+          id={name}
+          value={option.value}
+          label={option.name}
+          aria-label={option.name}
+          checked={checked === option.value}
+        />
+      ))}
+    </FormGroup>
+  );
+};
+
 export const FormGroup = styled(Form.Group)`
   margin: 25px 0 0;
   display: flex;
@@ -109,6 +147,19 @@ export const Select = styled(Form.Select)`
   fontweight: 400;
   height: 52px;
   max-width: 300px;
+`;
+
+export const Radio = styled(Form.Check)`
+  color: ${colors.dark};
+  font-family: ${fonts.mainFont};
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  font-weight: 400;
+
+  input[type='radio'] {
+    height: 24px;
+    width: 24px;
+  }
 `;
 
 export const TextArea = styled(Form.Control)`

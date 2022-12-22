@@ -7,7 +7,7 @@ import styled from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
 import Ribbon from '../../../images/icons-profile/ribbon.svg';
 
-const AddAward: React.FC<{
+const AddAwardButton: React.FC<{
   onClick?: () => void;
 }> = ({ onClick }) => {
   return (
@@ -52,4 +52,4 @@ const Text = styled.span`
   letter-spacing: 0.4px;
 `;
 
-export default AddAward;
+export default AddAwardButton;
