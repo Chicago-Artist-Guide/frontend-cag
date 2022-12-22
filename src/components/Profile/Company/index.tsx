@@ -10,7 +10,7 @@ import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import PageContainer from '../../layout/PageContainer';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
-import CompanyAddShow from './AddShow';
+import CompanyAddShow from './Show/AddShow';
 import CompanyProfileEdit from './Edit';
 import {
   AdditionalPhotos,
@@ -22,6 +22,8 @@ import {
   Title
 } from './ProfileStyles';
 import { Profile } from './types';
+import ActiveShow from './Show/ActiveShow';
+import InactiveShow from './Show/InactiveShow';
 
 type Edit = 'profile' | 'add-show' | 'edit-show' | null;
 
@@ -56,80 +58,84 @@ const CompanyProfile: React.FC<{
 
   const images = Array(6).fill(1);
 
+  console.log('profile', profile);
+
   return (
-    <>
-      <PageContainer>
-        <Row>
-          <Col lg={12}>
-            <div className="d-flex flex-row justify-content-between">
-              <Title>YOUR PROFILE</Title>
-              <Button
-                onClick={() => setEditing('profile')}
-                text="Edit Profile"
-                icon={faPenToSquare}
-                type="button"
-                variant="secondary"
-              />
+    <PageContainer>
+      <Row>
+        <Col lg={12}>
+          <div className="d-flex flex-row justify-content-between">
+            <Title>YOUR PROFILE</Title>
+            <Button
+              onClick={() => setEditing('profile')}
+              text="Edit Profile"
+              icon={faPenToSquare}
+              type="button"
+              variant="secondary"
+            />
+          </div>
+        </Col>
+      </Row>
+      <Row>
+        <LeftCol lg={4}>
+          <ProfileImage src={profileData?.profile_image_url} fluid />
+          {profileData?.additional_photos && (
+            <AdditionalPhotos className="d-flex flex-wrap justify-content-between">
+              {images.map((_, index) => (
+                <AdditionalImage
+                  key={index}
+                  src={profileData?.additional_photos?.[index]}
+                  fluid
+                />
+              ))}
+            </AdditionalPhotos>
+          )}
+          <DetailsCard>
+            <DetailsColTitle>Basic Group Info</DetailsColTitle>
+            <div>
+              <DetailsCardItem>
+                Number of Members: {profileData?.number_of_members || '0'}
+              </DetailsCardItem>
+              <DetailsCardItem>
+                Primary Contact: {profileData?.primary_contact || 'N/A'}
+              </DetailsCardItem>
+              <DetailsCardItem>
+                Email Address: {profileData?.primary_contact_email || 'N/A'}
+              </DetailsCardItem>
             </div>
-          </Col>
-        </Row>
-        <Row>
-          <LeftCol lg={4}>
-            <ProfileImage src={profileData?.profile_image_url} fluid />
-            {profileData?.additional_photos && (
-              <AdditionalPhotos className="d-flex flex-wrap justify-content-between">
-                {images.map((_, index) => (
-                  <AdditionalImage
-                    key={index}
-                    src={profileData?.additional_photos?.[index]}
-                    fluid
-                  />
-                ))}
-              </AdditionalPhotos>
-            )}
-            <DetailsCard>
-              <DetailsColTitle>Basic Group Info</DetailsColTitle>
-              <div>
-                <DetailsCardItem>
-                  Number of Members: {profileData?.number_of_members || '0'}
-                </DetailsCardItem>
-                <DetailsCardItem>
-                  Primary Contact: {profileData?.primary_contact || 'N/A'}
-                </DetailsCardItem>
-                <DetailsCardItem>
-                  Email Address: {profileData?.primary_contact_email || 'N/A'}
-                </DetailsCardItem>
-              </div>
-            </DetailsCard>
-          </LeftCol>
-          <RightCol lg={{ span: 7, offset: 1 }}>
-            <TheatreName>{profileData?.theatre_name}</TheatreName>
+          </DetailsCard>
+        </LeftCol>
+        <RightCol lg={{ span: 7, offset: 1 }}>
+          <TheatreName>{profileData?.theatre_name}</TheatreName>
 
-            {profileData?.location && (
-              <Location>{profileData.location}</Location>
-            )}
+          {profileData?.location && <Location>{profileData.location}</Location>}
 
-            {profileData?.description && <Bio>{profileData.description}</Bio>}
+          {profileData?.description && <Bio>{profileData.description}</Bio>}
 
-            <DetailSection title="Awards & Recognition">
-              <DetailAdd text="Add an award or recognition" />
-            </DetailSection>
-            <DetailSection title="Active Shows">
-              <DetailAdd
-                text="Add a new show"
-                onClick={() => setEditing('add-show')}
-              />
-            </DetailSection>
-            <DetailSection title="Inactive Shows">
-              <DetailAdd
-                text="Add a new show"
-                onClick={() => setEditing('add-show')}
-              />
-            </DetailSection>
-          </RightCol>
-        </Row>
-      </PageContainer>
-    </>
+          <DetailSection title="Awards & Recognition">
+            <DetailAdd text="Add an award or recognition" />
+          </DetailSection>
+          <DetailSection title="Active Shows">
+            {profileData?.shows?.map(show => (
+              <ActiveShow key={show.show_id} show={show} />
+            ))}
+            <DetailAdd
+              text="Add a new show"
+              onClick={() => setEditing('add-show')}
+            />
+          </DetailSection>
+          <DetailSection title="Inactive Shows">
+            {profileData?.shows?.map(show => (
+              <InactiveShow key={show.show_id} show={show} />
+            ))}
+            <DetailAdd
+              text="Add a new show"
+              onClick={() => setEditing('add-show')}
+            />
+          </DetailSection>
+        </RightCol>
+      </Row>
+    </PageContainer>
   );
 };
 

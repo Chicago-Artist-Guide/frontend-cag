@@ -3,6 +3,9 @@ import { Form } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled, { CSSProperties } from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
+import DatePicker from 'react-datepicker';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface SelectValue {
   name: string;
@@ -86,10 +89,8 @@ export const FormRadio: React.FC<{
   onChange: SetForm;
   options: SelectValue[];
 }> = ({ name, label, checked, onChange, options }) => {
-  console.log('checked', checked);
   const handleChange = (e: any) => {
     e.persist();
-    console.log(e.target.value);
     onChange({
       target: {
         name: name,
@@ -114,6 +115,57 @@ export const FormRadio: React.FC<{
         />
       ))}
     </FormGroup>
+  );
+};
+
+export const FormDateRange: React.FC<{
+  name: string;
+  label: string;
+  startValue?: string;
+  endValue?: string;
+  onChange: SetForm;
+}> = ({ name, label, startValue, endValue, onChange }) => {
+  return (
+    <FormGroup controlId={name}>
+      <Label>{label}</Label>
+      <DateRange>
+        <FormDatePicker
+          name={`${name}_start`}
+          onChange={onChange}
+          defaultValue={startValue}
+        />
+        <Thru>thru</Thru>
+        <FormDatePicker
+          name={`${name}_end`}
+          onChange={onChange}
+          defaultValue={endValue}
+        />
+      </DateRange>
+    </FormGroup>
+  );
+};
+
+const FormDatePicker: React.FC<{
+  name: string;
+  defaultValue?: string;
+  onChange: SetForm;
+}> = ({ name, defaultValue, onChange }) => {
+  const handleChange = (date: any) => {
+    const dateString = new Date(date).toLocaleDateString();
+    onChange({
+      target: {
+        name: name,
+        value: dateString
+      }
+    });
+  };
+  return (
+    <DatePickerInput
+      name={name}
+      onChange={handleChange}
+      value={defaultValue}
+      placeholderText="mm/dd/yyyy"
+    />
   );
 };
 
@@ -155,11 +207,6 @@ export const Radio = styled(Form.Check)`
   line-height: 24px;
   letter-spacing: 0.5px;
   font-weight: 400;
-
-  input[type='radio'] {
-    height: 24px;
-    width: 24px;
-  }
 `;
 
 export const TextArea = styled(Form.Control)`
@@ -169,4 +216,30 @@ export const TextArea = styled(Form.Control)`
 	color: defaultValue ? colors.secondaryFontColor : colors.lightGrey;
 	fontWeight: 400;
 	maxWidth: 800px
+`;
+
+const DateRange = styled.div`
+  display: flex;
+  gap: 0.75em;
+  align-items: center;
+`;
+
+const DatePickerInput = styled(DatePicker)`
+  height: 40px;
+  width: 148px;
+  border-radius: 4px;
+  border: 1px solid #d4d6df;
+  padding-left: 10px;
+  letter-spacing: 0.5px;
+  color: ${colors.mainFont};
+  opacity: 0.5;
+`;
+
+const Thru = styled.h6`
+  color: ${colors.italicColor};
+  font-family: ${fonts.mainFont};
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  margin-bottom: 0;
 `;

@@ -27,7 +27,6 @@ const ProfilePhoto: React.FC<{
 
   const onFileChange = (e: any) => {
     const imgFile = e.target.files[0];
-
     if (imgFile) {
       setFile(imgFile);
     }

@@ -10,26 +10,28 @@ export type Profile = {
   additional_photos?: { [key: string]: string };
   theatre_name: string;
   uid: string;
+  shows?: Show[];
 };
 
 export type Show = {
+  show_id: string;
   production_name: string;
   production_image_url?: string;
-  type?: 'musical' | 'play' | 'other';
+  type?: 'Musical' | 'Play' | 'Other';
   type_other?: string;
-  status?: 'open_casting' | 'auditioning' | 'production';
+  status?: 'Open Casting' | 'Auditioning' | 'Production';
   description?: string;
   director?: string;
   musical_director?: string;
-  equity?: 'union' | 'non-union';
-  audition_dates?: ShowDate;
-  callback_dates?: ShowDate;
-  rehearsal_dates?: ShowDate;
-  tech_week_dates?: ShowDate;
-  open_and_close_dates?: ShowDate;
-};
-
-type ShowDate = {
-  start: Date;
-  end: Date;
+  equity?: 'Union' | 'Non-Union';
+  audition_start?: string;
+  audition_end?: string;
+  callback_start?: string;
+  callback_end?: string;
+  rehearsal_start?: string;
+  rehearsal_end?: string;
+  tech_week_start?: string;
+  tech_week_end?: string;
+  open_and_close_start?: string;
+  open_and_close_end?: string;
 };

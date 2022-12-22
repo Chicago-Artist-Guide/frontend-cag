@@ -25,25 +25,17 @@ const Icon = styled(FontAwesomeIcon)`
 `;
 
 const CAGButton = styled(BSButton)`
-  border-radius: 25px;
-  box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.29);
+  border-radius: 20px;
+  box-shadow: 0px 0px 8px 4px #0000000d;
   font-family: ${fonts.montserrat};
   font-size: 14px;
   font-weight: 700;
+  height: 40px;
   letter-spacing: 0.1em;
   line-height: 16px;
-  padding: 16px 24px;
+  padding: 12px 18px;
   text-align: center;
   text-transform: uppercase;
-  box-shadow: 0px 0px 8px 4px #0000000d;
-  height: 40px;
-  border-radius: 20px;
-  padding: 12px 18px 12px 18px;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 16px;
-  letter-spacing: 0.1em;
-  text-align: center;
 
   &.primary-class {
     background: ${colors.primary};
@@ -60,6 +52,11 @@ const CAGButton = styled(BSButton)`
     background: white;
     border-color: white;
     color: ${colors.darkGrey};
+  }
+
+  &.danger-class {
+    background: ${colors.salmon};
+    border-color: ${colors.salmon};
   }
 `;
 
