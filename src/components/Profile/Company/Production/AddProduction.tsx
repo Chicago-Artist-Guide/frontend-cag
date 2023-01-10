@@ -1,5 +1,5 @@
-import { getDoc, updateDoc } from '@firebase/firestore';
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
+import { doc, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
+import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useProfileContext } from '../../../../context/ProfileContext';
 import { Button } from '../../../../genericComponents';
 import { colors, fonts } from '../../../../theme/styleVars';
@@ -18,8 +19,8 @@ import {
   FormTextArea
 } from '../../Form/Inputs';
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
-import { Show } from '../types';
-import ShowPhoto from './ShowPhoto';
+import { Production } from '../types';
+import ProductionPhoto from './ProductionPhoto';
 
 const types = ['Musical', 'Play', 'Other'];
 const statuses = ['Open Casting', 'Auditioning', 'Production'];
@@ -35,12 +36,13 @@ function getOptions(options: string[]) {
 const CompanyAddShow: React.FC<{
   toggleEdit: () => void;
 }> = ({ toggleEdit }) => {
+  const { firebaseFirestore: db } = useFirebaseContext();
   const {
-    profile: { ref, data },
-    setProfileData
+    account: { data: accountData }
   } = useProfileContext();
-  const [formValues, setFormValues] = useForm<Show>({
-    show_id: uuidv4(),
+  const [formValues, setFormValues] = useForm<Production>({
+    account_id: accountData?.uid,
+    production_id: '',
     production_name: '',
     production_image_url: '',
     type: undefined,
@@ -58,16 +60,11 @@ const CompanyAddShow: React.FC<{
   }, [formValues.type]);
 
   const handleSubmit = async () => {
-    if (ref && JSON.stringify(data) !== JSON.stringify(formValues)) {
-      const shows = data?.shows || [];
-      const nextData = {
-        ...data,
-        shows: [...shows, formValues]
-      };
-      await updateDoc(ref, nextData);
-      const profileData = await getDoc(ref);
-      setProfileData(profileData.data());
-    }
+    const productionId = uuidv4();
+    await setDoc(doc(db, 'productions', productionId), {
+      ...formValues,
+      production_id: productionId
+    });
     toggleEdit();
   };
 
@@ -90,7 +87,7 @@ const CompanyAddShow: React.FC<{
         </Row>
         <Row>
           <LeftCol lg={4}>
-            <ShowPhoto
+            <ProductionPhoto
               src={formValues?.production_image_url}
               name="production_image_url"
               onChange={setFormValues}

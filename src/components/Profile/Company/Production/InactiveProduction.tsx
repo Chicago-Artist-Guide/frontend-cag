@@ -1,11 +1,16 @@
 import React from 'react';
 import { Col, Image, Row } from 'react-bootstrap';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '../../../../genericComponents';
-import { breakpoints, colors, fonts } from '../../../../theme/styleVars';
-import { Show } from '../types';
+import { colors, fonts } from '../../../../theme/styleVars';
+import { Production } from '../types';
 
-const ActiveShow: React.FC<{ show: Show }> = ({ show }) => {
+const InactiveShow: React.FC<{ show: Production }> = ({ show }) => {
+  const history = useHistory();
+  const manageProduction = () => {
+    history.push(`production/${show.production_id}/manage`);
+  };
   return (
     <ShowCard>
       <Row>
@@ -17,21 +22,14 @@ const ActiveShow: React.FC<{ show: Show }> = ({ show }) => {
             <div className="flex-grow-1">
               <ShowName>{show?.production_name}</ShowName>
               <ShowStatus>{show?.status}</ShowStatus>
-              <ShowDescription>{show?.description}</ShowDescription>
             </div>
             <div
               className="d-flex flex-row flex-shrink-1"
               style={{ gap: '1em' }}
             >
               <ShowButton
-                onClick={() => alert('this will manage')}
+                onClick={manageProduction}
                 text="Manage"
-                type="button"
-                variant="primary"
-              />
-              <ShowButton
-                onClick={() => alert('this will view matches')}
-                text="View Matches"
                 type="button"
                 variant="primary"
               />
@@ -44,22 +42,12 @@ const ActiveShow: React.FC<{ show: Show }> = ({ show }) => {
 };
 
 export const RightCol = styled(Col)`
-  padding: 20px 0;
+  padding: 10px 0;
 `;
 
 const ShowButton = styled(Button)`
   background: ${colors.slate};
   border-color: ${colors.slate};
-`;
-
-const ShowDescription = styled.div`
-  font-family: ${fonts.mainFont};
-  font-style: normal;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 20px;
-  letter-spacing: 0.25px;
-  max-width: 294px;
 `;
 
 const ShowStatus = styled.h3`
@@ -86,14 +74,10 @@ const ShowImage = styled(Image)`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   background: ${colors.lightGrey};
-  min-height: 360px;
-  width: 202px;
+  min-height: 144px;
+  width: 81px;
   margin-left: auto;
   margin-right: auto;
-
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 332px;
-  }
 `;
 
 export const ShowCard = styled.div`
@@ -102,6 +86,7 @@ export const ShowCard = styled.div`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   padding: 25px 21px;
+  max-width: 50%;
 `;
 
-export default ActiveShow;
+export default InactiveShow;

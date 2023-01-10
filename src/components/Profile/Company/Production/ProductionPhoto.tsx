@@ -1,7 +1,7 @@
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Form, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
@@ -10,7 +10,7 @@ import { useProfileContext } from '../../../../context/ProfileContext';
 import Button from '../../../../genericComponents/Button';
 import { colors, fonts } from '../../../../theme/styleVars';
 
-const ShowPhoto: React.FC<{
+const ProductionPhoto: React.FC<{
   name: string;
   src?: string;
   onChange: SetForm;
@@ -19,8 +19,14 @@ const ShowPhoto: React.FC<{
   const {
     profile: { data }
   } = useProfileContext();
-  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [imgUrl, setImgUrl] = useState<string | null>(src || null);
   const fileInput = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (src) {
+      setImgUrl(src);
+    }
+  }, [src]);
 
   const handleFileInput = () => {
     if (fileInput.current) {
@@ -110,4 +116,4 @@ const PhotoContainer = styled.div`
   background-repeat: no-repeat;
 `;
 
-export default ShowPhoto;
+export default ProductionPhoto;

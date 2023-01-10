@@ -10,11 +10,12 @@ export type Profile = {
   additional_photos?: { [key: string]: string };
   theatre_name: string;
   uid: string;
-  shows?: Show[];
+  shows?: Production[];
 };
 
-export type Show = {
-  show_id: string;
+export type Production = {
+  account_id: string;
+  production_id: string;
   production_name: string;
   production_image_url?: string;
   type?: 'Musical' | 'Play' | 'Other';
@@ -34,4 +35,16 @@ export type Show = {
   tech_week_end?: string;
   open_and_close_start?: string;
   open_and_close_end?: string;
+  writers?: string;
+  roles?: Role[];
+};
+
+export type Role = {
+  role_name: string;
+  description?: string;
+  gender_identity: string[];
+  ethnicity: string[];
+  role_status: 'Open' | 'Closed';
+  age_range: string[];
+  additional_requirements?: string[];
 };
