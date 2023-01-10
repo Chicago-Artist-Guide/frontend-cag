@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { FormInput, FormRadio, FormTextArea } from '../../Form/Inputs';
-import { LeftCol, RightCol } from '../ProfileStyles';
-import { Production } from '../types';
-import ProductionPhoto from './ProductionPhoto';
+import { FormInput, FormRadio, FormTextArea } from '../../../Form/Inputs';
+import { LeftCol, RightCol } from '../../ProfileStyles';
+import { Production } from '../../types';
+import ProductionPhoto from '../ProductionPhoto';
 
 const types = ['Musical', 'Play', 'Other'];
 const statuses = ['Open Casting', 'Auditioning', 'Production'];

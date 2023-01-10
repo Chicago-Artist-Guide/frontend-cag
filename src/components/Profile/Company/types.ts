@@ -40,6 +40,7 @@ export type Production = {
 };
 
 export type Role = {
+  type: 'on-stage' | 'off-stage';
   role_name: string;
   description?: string;
   gender_identity: string[];

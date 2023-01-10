@@ -19,7 +19,7 @@ import {
 } from 'react-router-dom';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
-import ManageProduction from '../components/Profile/Company/Production/ManageProduction';
+import ManageProduction from '../components/Profile/Company/Production/Manage/ManageProduction';
 import ScrollToTop from '../components/ScrollToTop';
 import SignUp2 from '../components/SignUp/Individual/SignUp2';
 import { AuthProvider } from '../context/AuthContext';

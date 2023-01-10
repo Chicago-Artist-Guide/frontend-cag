@@ -51,7 +51,8 @@ const CompanyAddShow: React.FC<{
     description: '',
     director: '',
     musical_director: '',
-    equity: undefined
+    equity: undefined,
+    roles: []
   });
   const [showOtherType, setShowOtherType] = useState(false);
 

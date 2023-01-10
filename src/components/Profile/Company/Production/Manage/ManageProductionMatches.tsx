@@ -1,7 +1,6 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
-import { FormDateRange } from '../../Form/Inputs';
-import { Production } from '../types';
+import { Production } from '../../types';
 
 const ManageProductionMatches: React.FC<{
   formValues: Production;
