@@ -18,13 +18,14 @@ export const FormTextArea: React.FC<{
   defaultValue: any;
   onChange: SetForm;
   style?: CSSProperties;
-}> = ({ name, label, defaultValue, onChange, ...rest }) => {
+  rows?: number;
+}> = ({ name, label, defaultValue, onChange, rows = 10, ...rest }) => {
   return (
     <FormGroup controlId={name} {...rest}>
       <Label>{label}</Label>
       <TextArea
         as="textarea"
-        rows={10}
+        rows={rows}
         aria-label={name}
         name={name}
         onChange={onChange}

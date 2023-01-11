@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
-import { v4 as uuidv4 } from 'uuid';
+import { uuidv4 } from '@firebase/util';
 import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useProfileContext } from '../../../../context/ProfileContext';
 import { Button } from '../../../../genericComponents';
@@ -52,7 +52,8 @@ const CompanyAddShow: React.FC<{
     director: '',
     musical_director: '',
     equity: undefined,
-    roles: []
+    onStageRoles: [],
+    offStageRoles: []
   });
   const [showOtherType, setShowOtherType] = useState(false);
 

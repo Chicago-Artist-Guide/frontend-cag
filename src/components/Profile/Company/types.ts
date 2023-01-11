@@ -36,16 +36,18 @@ export type Production = {
   open_and_close_start?: string;
   open_and_close_end?: string;
   writers?: string;
-  roles?: Role[];
+  onStageRoles?: Role[];
+  offStageRoles?: Role[];
 };
 
 export type Role = {
-  type: 'on-stage' | 'off-stage';
-  role_name: string;
+  type?: 'on-stage' | 'off-stage';
+  role_id?: string;
+  role_name?: string;
   description?: string;
-  gender_identity: string[];
-  ethnicity: string[];
-  role_status: 'Open' | 'Closed';
-  age_range: string[];
+  gender_identity?: string[];
+  ethnicity?: string[];
+  role_status?: 'Open' | 'Closed';
+  age_range?: string[];
   additional_requirements?: string[];
 };

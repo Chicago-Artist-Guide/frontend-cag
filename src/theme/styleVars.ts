@@ -19,6 +19,7 @@ const colors = {
   grayishLightGreen: '#b8d8c7',
   lightestGrey: '#EFEFEF',
   lightGrey: '#D1D1D1',
+  lighterGrey: '#C4C4C4',
   paginationGray: '#D4D6DF',
   peach: '#F5AF19',
   salmon: '#E17B60',

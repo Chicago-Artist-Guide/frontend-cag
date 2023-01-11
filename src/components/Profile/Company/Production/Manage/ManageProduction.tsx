@@ -1,7 +1,7 @@
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-import { Form, Nav, Tab, Tabs } from 'react-bootstrap';
+import React, { useEffect } from 'react';
+import { Form, Tab, Tabs } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
@@ -12,7 +12,6 @@ import { useProfileContext } from '../../../../../context/ProfileContext';
 import { Button } from '../../../../../genericComponents';
 import { colors, fonts } from '../../../../../theme/styleVars';
 import PageContainer from '../../../../layout/PageContainer';
-
 import { Title } from '../../ProfileStyles';
 import { Production } from '../../types';
 import ManageProductionBasic from './ManageProductionBasic';
@@ -39,7 +38,9 @@ const ManageProduction: React.FC<null> = () => {
     director: '',
     musical_director: '',
     equity: undefined,
-    writers: ''
+    writers: '',
+    onStageRoles: [],
+    offStageRoles: []
   });
 
   useEffect(() => {
@@ -50,7 +51,7 @@ const ManageProduction: React.FC<null> = () => {
     const docRef = doc(db, 'productions', productionId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log('Document data:', docSnap.data());
+      // console.log('Document data:', docSnap.data());
       const data = docSnap.data() as Production;
       Object.entries(data).map(([key, value]) =>
         setFormValues({
