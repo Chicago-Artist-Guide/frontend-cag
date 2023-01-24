@@ -1,3 +1,11 @@
+import {
+  ProductionEquity,
+  ProductionStatus,
+  ProductionType,
+  RoleStatus,
+  StageRole
+} from '../shared/profile.types';
+
 export type Profile = {
   account_id: string;
   complete_profile: boolean;
@@ -18,13 +26,13 @@ export type Production = {
   production_id: string;
   production_name: string;
   production_image_url?: string;
-  type?: 'Musical' | 'Play' | 'Other';
+  type?: ProductionType;
   type_other?: string;
-  status?: 'Open Casting' | 'Auditioning' | 'Production';
+  status?: ProductionStatus;
   description?: string;
   director?: string;
   musical_director?: string;
-  equity?: 'Union' | 'Non-Union';
+  equity?: ProductionEquity;
   audition_start?: string;
   audition_end?: string;
   callback_start?: string;
@@ -41,13 +49,13 @@ export type Production = {
 };
 
 export type Role = {
-  type?: 'on-stage' | 'off-stage';
+  type?: StageRole;
   role_id?: string;
   role_name?: string;
   description?: string;
   gender_identity?: string[];
   ethnicity?: string[];
-  role_status?: 'Open' | 'Closed';
+  role_status?: RoleStatus;
   age_range?: string[];
   additional_requirements?: string[];
 };

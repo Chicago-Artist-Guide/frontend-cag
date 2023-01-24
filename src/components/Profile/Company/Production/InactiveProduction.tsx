@@ -74,10 +74,10 @@ const ShowImage = styled(Image)`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   background: ${colors.lightGrey};
-  min-height: 144px;
-  width: 81px;
+  position: absolute;
   margin-left: auto;
   margin-right: auto;
+  height: 100%;
 `;
 
 export const ShowCard = styled.div`

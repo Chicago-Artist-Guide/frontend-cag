@@ -6,7 +6,7 @@ import { Button } from '../../../../genericComponents';
 import { breakpoints, colors, fonts } from '../../../../theme/styleVars';
 import { Production } from '../types';
 
-const ActiveShow: React.FC<{ show: Production }> = ({ show }) => {
+const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
   const history = useHistory();
   const manageProduction = () => {
     history.push(`production/${show.production_id}/manage`);
@@ -57,7 +57,7 @@ const ShowButton = styled(Button)`
   border-color: ${colors.slate};
 `;
 
-const ShowDescription = styled.div`
+const ShowDescription = styled.p`
   font-family: ${fonts.mainFont};
   font-style: normal;
   font-weight: 400;
@@ -91,14 +91,10 @@ const ShowImage = styled(Image)`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   background: ${colors.lightGrey};
-  min-height: 360px;
-  width: 202px;
+  position: absolute;
   margin-left: auto;
   margin-right: auto;
-
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 332px;
-  }
+  height: 100%;
 `;
 
 export const ShowCard = styled.div`
@@ -109,4 +105,4 @@ export const ShowCard = styled.div`
   padding: 25px 21px;
 `;
 
-export default ActiveShow;
+export default ActiveProduction;

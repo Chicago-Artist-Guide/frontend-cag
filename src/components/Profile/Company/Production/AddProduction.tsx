@@ -21,17 +21,12 @@ import {
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
 import { Production } from '../types';
 import ProductionPhoto from './ProductionPhoto';
-
-const types = ['Musical', 'Play', 'Other'];
-const statuses = ['Open Casting', 'Auditioning', 'Production'];
-const equity = ['Union', 'Non-Union'];
-
-function getOptions(options: string[]) {
-  return options.map(option => ({
-    name: option,
-    value: option
-  }));
-}
+import { getOptionsFromEnum } from '../../../../utils/helpers';
+import {
+  ProductionEquity,
+  ProductionStatus,
+  ProductionType
+} from '../../shared/profile.types';
 
 const CompanyAddShow: React.FC<{
   toggleEdit: () => void;
@@ -107,7 +102,7 @@ const CompanyAddShow: React.FC<{
             <FormRadio
               name="type"
               label="Type"
-              options={getOptions(types)}
+              options={getOptionsFromEnum(ProductionType)}
               checked={formValues.type}
               onChange={setFormValues}
             />
@@ -125,7 +120,7 @@ const CompanyAddShow: React.FC<{
             <FormRadio
               name="status"
               label="Status"
-              options={getOptions(statuses)}
+              options={getOptionsFromEnum(ProductionStatus)}
               checked={formValues.status}
               onChange={setFormValues}
             />
@@ -154,7 +149,7 @@ const CompanyAddShow: React.FC<{
             <FormRadio
               name="equity"
               label="Equity"
-              options={getOptions(equity)}
+              options={getOptionsFromEnum(ProductionEquity)}
               checked={formValues.equity}
               onChange={setFormValues}
             />

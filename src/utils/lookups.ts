@@ -1,3 +1,10 @@
+import {
+  ProductionEquity,
+  ProductionStatus,
+  ProductionType
+} from '../components/Profile/shared/profile.types';
+import { getOptionsFromEnum } from './helpers';
+
 export const neighborhoods = [
   'Albany Park',
   'Archer Heights',

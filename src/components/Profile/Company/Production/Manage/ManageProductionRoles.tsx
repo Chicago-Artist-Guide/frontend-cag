@@ -1,6 +1,7 @@
 import { uuidv4 } from '@firebase/util';
 import React, { useState } from 'react';
 import { SetForm } from 'react-hooks-helper';
+import { StageRole } from '../../../shared/profile.types';
 import { Production, Role } from '../../types';
 import RoleCard from '../Roles/RoleCard';
 import RoleModal from '../Roles/RoleModal';
@@ -11,9 +12,7 @@ const ManageProductionRoles: React.FC<{
   setFormValues: SetForm;
 }> = ({ formValues, setFormValues }) => {
   const [showModal, setShowModal] = useState(false);
-  const [roleType, setRoleType] = useState<'on-stage' | 'off-stage'>(
-    'on-stage'
-  );
+  const [roleType, setRoleType] = useState<StageRole>(StageRole.OnStage);
   const [editRole, setEditRole] = useState<Role>();
 
   const onSaveRole = (role: Role) => {
@@ -24,7 +23,7 @@ const ManageProductionRoles: React.FC<{
     }
 
     let currentRoles =
-      roleType === 'on-stage'
+      roleType === StageRole.OnStage
         ? formValues.onStageRoles
         : formValues.offStageRoles;
     let nextRoles: Role[];
@@ -46,7 +45,7 @@ const ManageProductionRoles: React.FC<{
     }
     setFormValues({
       target: {
-        name: roleType === 'on-stage' ? 'onStageRoles' : 'offStageRoles',
+        name: roleType === StageRole.OnStage ? 'onStageRoles' : 'offStageRoles',
         value: nextRoles
       }
     });
@@ -56,13 +55,13 @@ const ManageProductionRoles: React.FC<{
 
   const onManageOnStageRole = (role: Role = {}) => {
     setEditRole(role);
-    setRoleType('on-stage');
+    setRoleType(StageRole.OnStage);
     setShowModal(true);
   };
 
   const onManageOffStageRole = (role: Role = {}) => {
     setEditRole(role);
-    setRoleType('off-stage');
+    setRoleType(StageRole.OffStage);
     setShowModal(true);
   };
 

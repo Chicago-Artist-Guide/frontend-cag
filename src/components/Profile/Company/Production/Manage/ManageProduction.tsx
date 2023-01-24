@@ -51,7 +51,6 @@ const ManageProduction: React.FC<null> = () => {
     const docRef = doc(db, 'productions', productionId);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      // console.log('Document data:', docSnap.data());
       const data = docSnap.data() as Production;
       Object.entries(data).map(([key, value]) =>
         setFormValues({
@@ -76,8 +75,6 @@ const ManageProduction: React.FC<null> = () => {
   const goToProfile = () => {
     history.push('/profile');
   };
-
-  // console.log('formValues', formValues);
 
   return (
     <PageContainer>
@@ -166,7 +163,7 @@ const TabRow = styled(Row)`
 `;
 
 const ProductionTabs = styled(Tabs)`
-  border-bottom: 1px solid #d4d6df;
+  border-bottom: 1px solid ${colors.paginationGray};
   li {
     font-family: ${fonts.montserrat};
     font-style: normal;

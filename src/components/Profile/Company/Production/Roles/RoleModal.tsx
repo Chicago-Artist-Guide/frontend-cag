@@ -1,13 +1,14 @@
 import { faClose } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Col, Form, Modal, Row } from 'react-bootstrap';
 import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, Dropdown } from '../../../../../genericComponents';
 import { colors } from '../../../../../theme/styleVars';
 import { FormInput, FormTextArea } from '../../../Form/Inputs';
-import { LeftCol, RightCol } from '../../ProfileStyles';
+import { RoleStatus, StageRole } from '../../../shared/profile.types';
+import { RightCol } from '../../ProfileStyles';
 import { Role } from '../../types';
 
 const statuses = ['Open', 'Closed'].map(status => ({
@@ -17,14 +18,14 @@ const statuses = ['Open', 'Closed'].map(status => ({
 
 const RoleModal: React.FC<{
   show: boolean;
-  type: 'on-stage' | 'off-stage';
+  type: StageRole;
   role?: Role;
   onSubmit: (x: Role) => void;
   onClose: () => void;
 }> = ({ show = false, type, role = {}, onSubmit, onClose }) => {
   const [formValues, setFormValues] = useForm<Role>({
     type: type,
-    role_status: 'Open'
+    role_status: RoleStatus.Open
   });
 
   useEffect(() => {
