@@ -19,6 +19,7 @@ const colors = {
   grayishLightGreen: '#b8d8c7',
   lightestGrey: '#EFEFEF',
   lightGrey: '#D1D1D1',
+  lighterGrey: '#C4C4C4',
   paginationGray: '#D4D6DF',
   peach: '#F5AF19',
   salmon: '#E17B60',
@@ -43,7 +44,8 @@ const fonts = {
 const breakpoints = {
   sm: '576px',
   md: '768px',
-  lg: '992px'
+  lg: '992px',
+  xl: '1200px'
 };
 
 export { cardHeight, colors, fonts, breakpoints };

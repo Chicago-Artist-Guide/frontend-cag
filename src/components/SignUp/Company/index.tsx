@@ -11,7 +11,7 @@ import CompanyBasics from './Basics';
 import CompanyDetails from './Details';
 import CompanyPhoto from './Photo';
 import SignUpFooter from './SignUpFooter';
-import { FormStep, CompanyData, SubmitResponse } from './types';
+import { CompanyData, FormStep, SubmitResponse } from './types';
 import { defaultErrorState, defaultFormState, defaultSteps } from './utils';
 
 const CompanySignUp: React.FC<{

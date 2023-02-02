@@ -19,6 +19,7 @@ import {
 } from 'react-router-dom';
 import Footer from '../components/layout/Footer';
 import Header from '../components/layout/Header';
+import ManageProduction from '../components/Profile/Company/Production/Manage/ManageProduction';
 import ScrollToTop from '../components/ScrollToTop';
 import SignUp2 from '../components/SignUp/Individual/SignUp2';
 import { AuthProvider } from '../context/AuthContext';
@@ -70,6 +71,10 @@ const CAG = () => (
       <Route component={SignUp} exact path="/sign-up" />
       <Route component={SignUp2} exact path="/sign-up-2" />
       <Route component={TheaterResources} exact path="/theater-resources" />
+      <Route
+        component={ManageProduction}
+        path="/production/:productionId/manage"
+      />
       <Route component={NotFound} />
     </Switch>
     <Footer />

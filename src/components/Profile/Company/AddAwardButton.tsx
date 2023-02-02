@@ -1,13 +1,12 @@
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import Image from 'react-bootstrap/Image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
+import Image from 'react-bootstrap/Image';
 import styled from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
 import Ribbon from '../../../images/icons-profile/ribbon.svg';
 
-const AddAward: React.FC<{
+const AddAwardButton: React.FC<{
   onClick?: () => void;
 }> = ({ onClick }) => {
   return (
@@ -52,4 +51,4 @@ const Text = styled.span`
   letter-spacing: 0.4px;
 `;
 
-export default AddAward;
+export default AddAwardButton;

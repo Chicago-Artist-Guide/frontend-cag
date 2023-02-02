@@ -3,6 +3,9 @@ import { Form } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled, { CSSProperties } from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
+import DatePicker from 'react-datepicker';
+
+import 'react-datepicker/dist/react-datepicker.css';
 
 interface SelectValue {
   name: string;
@@ -15,13 +18,14 @@ export const FormTextArea: React.FC<{
   defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   style?: CSSProperties;
-}> = ({ name, label, defaultValue, onChange, ...rest }) => {
+  rows?: number;
+}> = ({ name, label, defaultValue, onChange, rows = 10, ...rest }) => {
   return (
     <FormGroup controlId={name} {...rest}>
       <Label>{label}</Label>
       <TextArea
         as="textarea"
-        rows={10}
+        rows={rows}
         aria-label={name}
         name={name}
         onChange={onChange}
@@ -79,6 +83,93 @@ export const FormSelect: React.FC<{
   );
 };
 
+export const FormRadio: React.FC<{
+  name: string;
+  label: string;
+  checked?: string;
+  onChange: SetForm;
+  options: SelectValue[];
+}> = ({ name, label, checked, onChange, options }) => {
+  const handleChange = (e: any) => {
+    e.persist();
+    onChange({
+      target: {
+        name: name,
+        value: e.target.value
+      }
+    });
+  };
+
+  return (
+    <FormGroup controlId={name}>
+      <Label>{label}</Label>
+      {options.map(option => (
+        <Radio
+          type="radio"
+          onChange={handleChange}
+          key={option.value}
+          id={name}
+          value={option.value}
+          label={option.name}
+          aria-label={option.name}
+          checked={checked === option.value}
+        />
+      ))}
+    </FormGroup>
+  );
+};
+
+export const FormDateRange: React.FC<{
+  name: string;
+  label: string;
+  startValue?: string;
+  endValue?: string;
+  onChange: SetForm;
+}> = ({ name, label, startValue, endValue, onChange }) => {
+  return (
+    <FormGroup controlId={name}>
+      <Label>{label}</Label>
+      <DateRange>
+        <FormDatePicker
+          name={`${name}_start`}
+          onChange={onChange}
+          defaultValue={startValue}
+        />
+        <Thru>thru</Thru>
+        <FormDatePicker
+          name={`${name}_end`}
+          onChange={onChange}
+          defaultValue={endValue}
+        />
+      </DateRange>
+    </FormGroup>
+  );
+};
+
+const FormDatePicker: React.FC<{
+  name: string;
+  defaultValue?: string;
+  onChange: SetForm;
+}> = ({ name, defaultValue, onChange }) => {
+  const handleChange = (date: any) => {
+    const dateString = new Date(date).toLocaleDateString();
+    onChange({
+      target: {
+        name: name,
+        value: dateString
+      }
+    });
+  };
+  return (
+    <DatePickerInput
+      name={name}
+      onChange={handleChange}
+      value={defaultValue}
+      placeholderText="mm/dd/yyyy"
+    />
+  );
+};
+
 export const FormGroup = styled(Form.Group)`
   margin: 25px 0 0;
   display: flex;
@@ -111,6 +202,14 @@ export const Select = styled(Form.Select)`
   max-width: 300px;
 `;
 
+export const Radio = styled(Form.Check)`
+  color: ${colors.dark};
+  font-family: ${fonts.mainFont};
+  line-height: 24px;
+  letter-spacing: 0.5px;
+  font-weight: 400;
+`;
+
 export const TextArea = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
@@ -119,4 +218,30 @@ export const TextArea = styled(Form.Control)`
     props.defaultValue ? colors.secondaryFontColor : colors.lightGrey};
   fontweight: 400;
   maxwidth: 800px;
+`;
+
+const DateRange = styled.div`
+  display: flex;
+  gap: 0.75em;
+  align-items: center;
+`;
+
+const DatePickerInput = styled(DatePicker)`
+  height: 40px;
+  width: 148px;
+  border-radius: 4px;
+  border: 1px solid #d4d6df;
+  padding-left: 10px;
+  letter-spacing: 0.5px;
+  color: ${colors.mainFont};
+  opacity: 0.5;
+`;
+
+const Thru = styled.h6`
+  color: ${colors.italicColor};
+  font-family: ${fonts.mainFont};
+  font-size: 12px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  margin-bottom: 0;
 `;
