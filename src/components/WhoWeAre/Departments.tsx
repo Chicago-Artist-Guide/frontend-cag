@@ -14,7 +14,7 @@ const Department = () => {
     board: 'BOARD OF DIRECTORS',
     artists: 'ARTIST AUXILIARY BOARD',
     operations: 'BUSINESS OPERATIONS',
-    technical: 'SITE DEVELOPMENT TEAM',
+    technical: 'SITE DEVELOPMENT',
     artistAdvisory: 'ADVISORY BOARD'
   };
 
