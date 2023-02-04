@@ -36,6 +36,44 @@ const FAQ = () => {
         <a href="mailto:contact@chicagoartistguide.org">Email</a>,
         ' us for more information.'
       ]
+    },
+    {
+      id: 4,
+      question: "What is CAG's Diversity, Equity, and Inclusion Commitment?",
+      answer: [
+        'We acknowledge that there is no one perfect way to achieve equity, but we are willing to take risks because there is much work to do.',
+        <>
+          <br />
+          <br />
+        </>,
+        <>
+          <u>Anti-Racism</u>
+          <br />
+        </>,
+        'Racism is inherent to every aspect of our lives; it is woven into the fabric of society and  encompasses more than racial prejudices. Racism involves social, institutional and systemic powers. While we cannot separate ourselves from White Supremacy we are committed to challenging the traditionally biased processes for hiring and promoting artists both on and off stage. Chicago Artist Guide is dedicated to doing our part in creating equitable anti-racist representation in all areas of the performing arts. We at Chicago Artist Guide must be actively anti-racist. We absolutely and unapologetically denounce our racist systems and its proponents without exception.',
+        <>
+          <br />
+          <br />
+        </>,
+        <>
+          <u>Intersectionality</u>
+          <br />
+        </>,
+        'We stand for and protect the values of inclusion, participation, and compassion for everyone--regardless of race, class, religion, country of origin, immigration status, (dis)ability,  age, gender identity, or sexual orientation. ​(via ',
+        <a href="https://theghostlightproject.com/" target="_blank">
+          The Ghostlight Project
+        </a>,
+        ')',
+        <>
+          <br />
+          <br />
+        </>,
+        <>
+          <u>Our Pledge</u>
+          <br />
+        </>,
+        'We are committed to bettering ourselves, our services, and our industry through continued learning. We are thoughtfully researching and implementing this new platform for the artistic community, starting with an in-depth assessment of our services, policies and procedures. We are seeking out and listening to voices that have not been heard, and fully engaging under-represented populations in dialogue that will help us improve this technology.'
+      ]
     }
   ];
 
@@ -49,7 +87,7 @@ const FAQ = () => {
       id: 2,
       question: 'How do theater companies use our services?',
       answer:
-        'Theatre companies have access to see all profiles. Not all identity information is displayed on an individual’s profile, however theatre companies can use certain filters to search for people who fit the demographic in which they are searching.'
+        "Theatre companies have access to see all profiles. Not all identity information is displayed on an individual's profile, however theatre companies can use certain filters to search for people who fit the demographic in which they are searching."
     },
     {
       id: 3,
@@ -81,6 +119,26 @@ const FAQ = () => {
           Terms of Service
         </a>,
         ' for more details.'
+      ]
+    },
+    {
+      id: 4,
+      question: "What is CAG's Privacy Statement?",
+      answer: [
+        "The privacy of your data is of the utmost importance to us. We are committed to following, and (where we're able) exceeding industry standards and best practices with regard to safeguarding your information.",
+        <ul>
+          <li>
+            We are committed to full transparency with regard to what data we
+            collect from you, why we are collecting it, and, most importantly,
+            what will and will not be displayed publicly for on your profile or
+            elsewhere on our site.
+          </li>
+          <li>
+            We will never share your information without your explicit,
+            affirmative consent.
+          </li>
+          <li>We will never sell your data to a third party.</li>
+        </ul>
       ]
     }
   ];
