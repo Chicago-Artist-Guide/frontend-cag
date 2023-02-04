@@ -64,7 +64,7 @@ const CAG = () => (
       <Route component={Donate} exact path="/donate" />
       <Route component={FAQ} exact path="/faq" />
       <Route component={TOS} exact path="/terms-of-service" />
-      <Route component={WhoWeAre} exact path="/who-we-are" />
+      <Route component={WhoWeAre} exact path="/about-us" />
       <Route component={Login} exact path="/login" />
       <Route component={Logout} exact path="/logout" />
       <Route component={Profile} exact path="/profile" />
