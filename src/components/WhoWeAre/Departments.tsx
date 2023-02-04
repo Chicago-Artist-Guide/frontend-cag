@@ -12,10 +12,10 @@ import Team from './Team';
 const Department = () => {
   const sectionTitles = {
     board: 'BOARD OF DIRECTORS',
-    artistAdvisory: 'ARTIST ADVISORY BOARD',
-    artists: 'ARTIST BOARD',
+    artists: 'ARTIST AUXILIARY BOARD',
     operations: 'BUSINESS OPERATIONS',
-    technical: 'SITE DEVELOPMENT TEAM'
+    technical: 'SITE DEVELOPMENT TEAM',
+    artistAdvisory: 'ADVISORY BOARD'
   };
 
   const sections = Object.keys(bios).map(s => ({

@@ -18,9 +18,11 @@ const Team = (props: any) => {
       <Accordion>
         <PersonCard>
           <TopRow className="align-items-center justify-content-center">
-            <Col md={5} xs={5}>
-              <PersonImg fluid src={image} />
-            </Col>
+            {image !== null && (
+              <Col md={5} xs={5}>
+                <PersonImg fluid src={image} />
+              </Col>
+            )}
             <Col md={7} style={{ padding: 0 }} xs={7}>
               <Card.Body style={{ padding: 0 }}>
                 <PersonName>{name}</PersonName>
