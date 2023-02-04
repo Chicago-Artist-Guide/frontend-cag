@@ -76,13 +76,17 @@ const Department = () => {
 
 const AccordionSection = styled.div`
   padding: 0;
-  margin-top: 1rem;
+  margin-top: 2rem;
 
   .accordion-header {
     border: none;
     background: none;
     padding: 0;
     margin: 0;
+
+    h2 {
+      font-size: 21px;
+    }
   }
 
   .section-text {
@@ -121,4 +125,5 @@ const HrLine = styled.hr`
   padding: 0;
   width: 100%;
 `;
+
 export default Department;
