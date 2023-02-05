@@ -25,11 +25,7 @@ const WhoWeAre = () => {
                 for artists, producers, and community groups.
               </p>
               <p>
-                Learn more about us on our{' '}
-                <Link to="/faq" target="_blank">
-                  FAQ page
-                </Link>
-                .
+                Learn more about us on our <Link to="/faq">FAQ page</Link>.
               </p>
             </AboutSection>
             <MeetOurTeamTitle>Meet Our Team</MeetOurTeamTitle>

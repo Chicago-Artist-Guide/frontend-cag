@@ -1,10 +1,10 @@
 // Board Images
-import Bradford from '../../images/who-we-are/board/Board_Bradford.jpeg';
-import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.jpg';
+import Bradford from '../../images/who-we-are/board/Board_Bradford.jpg';
+import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
 import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
 import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
-import Henning from '../../images/who-we-are/board/Board_Henning.jpeg';
+import Henning from '../../images/who-we-are/board/Board_Henning.jpg';
 import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
@@ -13,13 +13,14 @@ import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
-import White from '../../images/who-we-are/board/Board_White.jpg';
+import White from '../../images/who-we-are/board/Board_White.png';
 
 // Operations Images
 import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
-import Zacks from '../../images/who-we-are/operations/Staff_Zacks.jpg';
+import Walz from '../../images/who-we-are/operations/Staff_Walz.png';
+import Zacks from '../../images/who-we-are/board/Board_Zacks.png';
 
 // Technical Images
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
@@ -29,7 +30,7 @@ import Nagra from '../../images/who-we-are/technical/Staff_Nagra.png';
 import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
 
 // Artists Images
-import Moorman from '../../images/who-we-are/operations/Staff_Moorman.jpg';
+import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Salemi from '../../images/who-we-are/artists/Staff_Salemi.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
 
@@ -319,7 +320,7 @@ const bios = {
       role: 'Grants and Development Specialist',
       pronouns: 'he/him',
       affilitation: null,
-      image: Brown,
+      image: Walz,
       linkedin: 'jacob-walz-81ba27163',
       bio:
         'is a nonprofit professional from Massachusetts who has been working for nonprofits since he was 19 years old. After earning his BA from Assumption University, where he worked for four different Nonprofits, he earned the Crown and Shield award for Outstanding Community Service. Jacob is well-versed in Grant Writing, Donor Relations, Communications, and Volunteer Recruitment and is dedicated to making Arts and Music more accessible. For fun, Jacob enjoys choral singing, basketball, stand-up comedy, and gardening.'
