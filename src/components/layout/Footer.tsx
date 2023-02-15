@@ -33,8 +33,8 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link as={Link} to="/who-we-are">
-                WHO WE ARE
+              <Nav.Link as={Link} to="/about-us">
+                ABOUT US
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>

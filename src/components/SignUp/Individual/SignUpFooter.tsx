@@ -59,7 +59,7 @@ const SignUpFooter: React.FC<{
   const prevButtonAction = (landingStep: number) => {
     goToTop();
 
-    return landingStep === 0 ? () => setLandingStep(-1) : previous;
+    return landingStep === 0 ? setLandingStep(-1) : previous?.();
   };
 
   const nextButtonAction = async (navNext: boolean, currStep: string) => {
