@@ -7,8 +7,6 @@ import SVGLayer from '../components/SVGLayer';
 import yellowBlob1 from '../images/yellow_blob_1.svg';
 import homeDance from '../images/home_dance.svg';
 
-const GIVE_BUTTER_URL = 'https://givebutter.com/embed/c/12XZ4A';
-
 const Donate = () => (
   <PageContainer>
     <Row>
@@ -40,7 +38,7 @@ const Donate = () => (
               name="givebutter"
               scrolling="no"
               seamless
-              src={GIVE_BUTTER_URL}
+              src="https://givebutter.com/embed/c/caglaunch"
               title="Donate to Chicago Artist Guide online via GiveButter"
               width="100%"
             />
