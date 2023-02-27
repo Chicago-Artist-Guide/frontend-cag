@@ -283,8 +283,25 @@ const IndividualSignUp: React.FC<{
       offstageRolesProduction,
       offstageRolesScenicAndProperties,
       offstageRolesSound,
-      profilePhotoUrl
+      profilePhotoUrl,
+      stageRole
     } = formData;
+
+    let profileTagline = '';
+
+    switch (stageRole) {
+      case 'on-stage':
+        profileTagline = 'Actor';
+        break;
+      case 'off-stage':
+        profileTagline = 'Offstage Professional';
+        break;
+      case 'both-stage':
+        profileTagline = 'Actor, Offstage Professional';
+        break;
+      default:
+        break;
+    }
 
     const finalProfileData = {
       // actor info 1
@@ -320,6 +337,9 @@ const IndividualSignUp: React.FC<{
       websites: demographicsWebsites,
       headline: demographicsBioHeadline,
       bio: demographicsBio,
+
+      // profile tagline
+      profile_tagline: profileTagline,
 
       // completed profile
       completed_profile_1: true

@@ -92,7 +92,7 @@ const IndividualProfile: React.FC<{
               </h2>
               <p>{profile?.pronouns || profile?.pronouns_other}</p>
             </HeaderNamePronouns>
-            <h3>Actor, Magician, Singer</h3>
+            {profile?.profile_tagline && <h3>{profile?.profile_tagline}</h3>}
             <p>{profile?.bio}</p>
           </div>
           <div>
