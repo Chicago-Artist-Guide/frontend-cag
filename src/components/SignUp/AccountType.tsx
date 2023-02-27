@@ -85,10 +85,7 @@ const cards: Card[] = [
     text: (
       <>
         <CardHeading>Theatre Group</CardHeading>
-        <p>
-          Urna gravida tellus nullam nulla. Tempor sollicitudin sed sed enim
-          morbi amet bibendum massa. Consequat feugiat in pulvinar id egestas.
-        </p>
+        <p>Tell prospective cast and crew about your company</p>
       </>
     )
   }

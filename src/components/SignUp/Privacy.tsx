@@ -47,7 +47,7 @@ const Privacy: React.FC<{
             </Link>
             .
           </PrivacyPar>
-          <TermsPrivacyLink to="/terms-of-service">
+          <TermsPrivacyLink to="/terms-of-service" target="_blank">
             View our full terms and privacy policy
           </TermsPrivacyLink>
           <PrivacyPar>
