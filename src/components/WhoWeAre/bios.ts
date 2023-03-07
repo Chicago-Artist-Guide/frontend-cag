@@ -1,17 +1,22 @@
 // Board Images
 import Bradford from '../../images/who-we-are/board/Board_Bradford.jpg';
+import David from '../../images/who-we-are/board/Board_David.png';
 import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
+import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
 import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
 import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
 import Henning from '../../images/who-we-are/board/Board_Henning.jpg';
 import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
+import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
 import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
+import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
+import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import White from '../../images/who-we-are/board/Board_White.png';
 
@@ -40,7 +45,7 @@ const bios = {
   board: [
     {
       id: bioId(),
-      name: 'J​oey M. McCall, Esq.',
+      name: 'Joey M. McCall, Esq.',
       role: 'President',
       pronouns: 'he/him',
       affiliation:
@@ -81,7 +86,8 @@ const bios = {
       affiliation: 'Educator, Chicago Public Schools',
       image: Bradford,
       linkedin: 'tommy-bradford-b77475a',
-      bio: null
+      bio:
+        "is a saxophonist, Entrepreneur and Educator. He is a focused musician and artistic leader with a proven record for fostering deep emotional connections through exceptional musical performance and artistic and professional leadership. This fundamental idea is what keeps him constantly developing his philosophy, knowledge and abilities to connect people. Growing up in Chicago, he's had the privilege of hearing a variety of music and has absorbed a tremendous amount of Chicago's artistic culture. As a youth, Tommy began his musical path in elementary school playing throughout high school and later graduating from Columbia College in Chicago, 2003, with a B.A in Music Business. In 2013, he received an MEd from the University of Illinois at Chicago in Instructional Leadership and has several State of Illinois certifications in teaching Middle School, ELL & Music Education. A portion of his focus has been in developing and implementing both curriculum and artistic programming in the Chicago school systems, and creating artistic partnerships that provide creative learning environments and outlets using music and art from diverse cultural backgrounds. He is presently the Director of General Music for Barry Elementary and is a recent appointee of the Board of Directors for the Chicago Artists Guide."
     },
     {
       id: bioId(),
@@ -115,7 +121,8 @@ const bios = {
       affiliation: 'Vice President, Havener Tech',
       image: Henning,
       linkedin: 'jeff-henning-63b2324',
-      bio: null
+      bio:
+        'has 35 Years of experience with VPSI/VRide a ride sharing development and fleet management firm. He was the president and CEO for 25 years. As the first employee of the firm, he assisted in the expansion and growth to cover 12 time zones (Alaska/ Hawaii to Europe) with several hundred employees. He oversaw three separate sales efforts to private investors & private equity firms. Additionally, he helped found and launch HavenerTech, a construction-related firm specializing in industrial expanding foam applications. The firm has grown consistently since 2013, serving a host of public and private clients throughout Michigan.'
     },
     {
       id: bioId(),
@@ -125,7 +132,8 @@ const bios = {
       affiliation: 'Business Consultant, Erin Mitchell Consulting',
       image: Mitchell,
       linkedin: 'erin-m-6749b28',
-      bio: null
+      bio:
+        "holds a bachelor's degree in Computer Information Systems from DeVry University. She worked with the American Red Cross in the Information Technology (IT) department for twelve years. In her twelve years with the Red Cross, she has gained experience from helpdesk support to project coordination. Wearing many hats, she has acquired skills such as relationship management, documentation development, problem-solving, organization and planning, and operations management. The skills she acquired during her time at the Red Cross has equipped her to excel in any role and position she steps into. Recently acquiring her master's degree in Nonprofit Management from DePaul University, Erin started her second business, Erin Mitchell Consulting, where she consults small businesses and nonprofit organizations in various capacities. The arts is an area in the nonprofit world that Erin is excited to learn more about and see how she can effectively support artists in the Chicagoland area. She is a member of the Chicago Women in Philanthropy. She was inducted into the Pi Alpha Alpha of Global Honor Society for Public Affairs and Administration and received the Degree Chair Award from DePaul University."
     },
     {
       id: bioId(),
@@ -158,9 +166,10 @@ const bios = {
       role: 'Artist Board Member',
       pronouns: 'she/her',
       affiliation: null,
-      image: null,
+      image: David,
       linkedin: null,
-      bio: null
+      bio:
+        "is a Louisiana Native and a Chicago transplant since 2012. As an actor/dancer/improviser, her Chicago credits include: Macbeth (The Arc Theatre), Everybody (Brown Paper Box Co.), The Fly Honey Show [9 & 10] (The Inconvenience) and Michael Glover Smith's indie films COOL APOCALYPSE (2015) and Rendezvous in Chicago (2018) to name a few! She was part of the original Chicago cast of Drunk Shakespeare Chicago and has toured around the United States with Windy City Players and Montana Shakespeare in the Parks. Currently, she has relocated to rural Montana to embark on work at a dude ranch but still holds Chicago quite close. Her goals for the Artistic Board are to be a positive voice as a member of the Visually Impaired Artistic Community and to be a proactive Mental Health Advocate for all artists."
     },
     {
       id: bioId(),
@@ -168,14 +177,15 @@ const bios = {
       role: 'Artist Board Member',
       pronouns: 'he/him',
       affiliation: null,
-      image: null,
+      image: Ferro,
       linkedin: null,
-      bio: null
+      bio:
+        'is honored to be part of the Artists Board at Chicago Artist Guide. He is a professional stage and screen actor in Chicago, IL who is passionate with finding ways to help make Chicago theater more diverse, as well as to support new work in theater. Recent selected theater collaboration with Oil Lamp Theater, Sigman Brothers, Three Cat Productions, and Act Your Page. Van also won two BroadwayWorld Chicago Awards for performance in 2021. @therealvanferro'
     },
     {
       id: bioId(),
       name: 'Celine Foster',
-      role: 'N/A',
+      role: 'Artist Board Member',
       pronouns: 'she/her',
       affiliation: '',
       image: Foster,
@@ -189,9 +199,10 @@ const bios = {
       role: 'Artist Board Member',
       pronouns: 'he/him',
       affiliation: null,
-      image: null,
+      image: Lewis,
       linkedin: null,
-      bio: null
+      bio:
+        'is a Chicago Actor and Dad originally from Connecticut. Excited to be apart of the Artist Board, his previous Chicago Theatre Credits: The Secret Council (First Folio Theatre), The Last Pair of Earlies (Raven Theatre), Short Changed (Factory Theatre), YPF at Pegasus (Pegasus Theatre), Titus Andronicus (Haven Theatre), Grace, Or the art of climbing (Brown Paper Box co). His TV credits include: 2 Broke Girls, True Blood and Real Husbands of Hollywood. James also attended The Theatre School at DePaul University for undergrad. James also is a writer and multi-instrumentalist but his greatest job is being a dad to the two greatest kids in the world, Amari and Naomi.'
     },
     {
       id: bioId(),
@@ -221,9 +232,10 @@ const bios = {
       role: 'Artist Board Member',
       pronouns: 'he/him',
       affiliation: null,
-      image: null,
+      image: Silva,
       linkedin: null,
-      bio: null
+      bio:
+        "is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ's Food Rocks."
     },
     {
       id: bioId(),
@@ -231,9 +243,10 @@ const bios = {
       role: 'Artist Board Member',
       pronouns: 'she/her',
       affiliation: null,
-      image: null,
+      image: Stiles,
       linkedin: null,
-      bio: null
+      bio:
+        "is a theatre professional and artist working in Milwaukee and Chicago with a specially in wigs and makeup. Her resume includes Lyric Opera of Chicago, Florentine Opera, Central City Opera, Broadway in Milwaukee, and The Milwaukee Rep, among others. A midwest girl at heart, her passion is helping people get a head's start in working in the arts, no matter their background. She created Stage Creatives Network to help theatre professionals find peace, prosperity and joy through the 4 pillars of a sustainable career: connection, financial literacy, work-life balance and self expression. If it's all about who you know, let's get to know each other!"
     }
   ],
   operations: [
