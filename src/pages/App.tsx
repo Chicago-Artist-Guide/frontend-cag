@@ -32,6 +32,7 @@ import FAQ from './FAQ';
 import Home from './Home';
 import Login from './Login';
 import Logout from './Logout';
+import ForgotPassword from './ForgotPassword';
 import NotFound from './NotFound';
 import Profile from './Profile';
 import SignUp from './SignUp';
@@ -67,6 +68,7 @@ const CAG = () => (
       <Route component={WhoWeAre} exact path="/about-us" />
       <Route component={Login} exact path="/login" />
       <Route component={Logout} exact path="/logout" />
+      <Route component={ForgotPassword} exact path="/forgot-password" />
       <Route component={Profile} exact path="/profile" />
       <Route component={SignUp} exact path="/sign-up" />
       <Route component={SignUp2} exact path="/sign-up-2" />

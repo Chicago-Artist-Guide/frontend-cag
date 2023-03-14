@@ -37,7 +37,7 @@ const Login = () => {
 
   const onLogin = async () => {
     if (email === '' || password === '') {
-      setLoginError('Please enter a username and a password!');
+      setLoginError('Please enter an email address and a password!');
       return;
     }
 
@@ -47,7 +47,7 @@ const Login = () => {
         console.log(userCredential.user);
       })
       .catch(err => {
-        setLoginError('Incorrect username or password! Please try again.');
+        setLoginError('Incorrect email address or password! Please try again.');
         console.log('Error logging in:', err);
       });
   };
@@ -76,6 +76,12 @@ const Login = () => {
                 Not a member yet?{' '}
                 <a className="orangeText" href="/sign-up">
                   Join Us
+                </a>
+              </p>
+              <p>
+                Forgot your password?{' '}
+                <a className="orangeText" href="/forgot-password">
+                  Reset it now
                 </a>
               </p>
             </Form.Text>
