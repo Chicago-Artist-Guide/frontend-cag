@@ -14,13 +14,47 @@ import {
   SelectDirections,
   StyledCard
 } from '../SignUpStyles';
+import type { IndividualRoles } from './types';
 
 interface Card {
   icon: string;
   className: string;
-  name: string;
+  name: IndividualRoles;
   text: JSX.Element;
 }
+
+const cards: Card[] = [
+  {
+    icon: OnStage,
+    className: 'green-shadow-hover',
+    name: 'on-stage',
+    text: (
+      <>
+        <CardHeading>On-Stage</CardHeading> <p>(Actors, Singers, Dancers)</p>
+      </>
+    )
+  },
+  {
+    icon: OffStage,
+    className: 'blue-shadow-hover',
+    name: 'off-stage',
+    text: (
+      <>
+        <CardHeading>Off-Stage</CardHeading> <p>(Directors, Designers, Crew)</p>
+      </>
+    )
+  },
+  {
+    icon: BothStage,
+    className: 'red-shadow-hover',
+    name: 'both-stage',
+    text: (
+      <>
+        <CardHeading>Both</CardHeading> <p>All of the Above</p>
+      </>
+    )
+  }
+];
 
 const IndividualRole: React.FC<{
   setForm: any;
@@ -62,38 +96,5 @@ const IndividualRole: React.FC<{
     </Container>
   );
 };
-
-const cards: Card[] = [
-  {
-    icon: OnStage,
-    className: 'green-shadow-hover',
-    name: 'on-stage',
-    text: (
-      <>
-        <CardHeading>On-Stage</CardHeading> <p>(Actors, Singers, Dancers)</p>
-      </>
-    )
-  },
-  {
-    icon: OffStage,
-    className: 'blue-shadow-hover',
-    name: 'off-stage',
-    text: (
-      <>
-        <CardHeading>Off-Stage</CardHeading> <p>(Directors, Designers, Crew)</p>
-      </>
-    )
-  },
-  {
-    icon: BothStage,
-    className: 'red-shadow-hover',
-    name: 'both-stage',
-    text: (
-      <>
-        <CardHeading>Both</CardHeading> <p>All of the Above</p>
-      </>
-    )
-  }
-];
 
 export default IndividualRole;

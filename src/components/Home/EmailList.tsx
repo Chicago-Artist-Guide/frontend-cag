@@ -36,7 +36,7 @@ const EmailList = () => {
       <div
         dangerouslySetInnerHTML={{
           __html:
-            '<iframe onload="window.parent.scrollTo(0,0)" height="1200" allowTransparency="true" allow="payment" frameborder="0" scrolling="no" style="width:100%;border:none" src="https://secure.lglforms.com/form_engine/s/Ew-TTf5s5CRphknzJKcqAg"><a href="https://secure.lglforms.com/form_engine/s/Ew-TTf5s5CRphknzJKcqAg">Fill out my LGL Form!</a></iframe>'
+            '<iframe onload="window.parent.scrollTo(0,0)" height="755" allowTransparency="true" allow="payment" frameborder="0" scrolling="no" style="width:100%;border:none" src="https://secure.lglforms.com/form_engine/s/RhWpXILLBg4_95e80UD-IQ"><a href="https://secure.lglforms.com/form_engine/s/RhWpXILLBg4_95e80UD-IQ">Fill out my LGL Form!</a></iframe>'
         }}
       />
       <BlobBox blobs={blobs} />

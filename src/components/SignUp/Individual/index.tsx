@@ -16,6 +16,16 @@ import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import ProfilePhoto from './ProfilePhoto';
 import IndividualRole from './Role';
+import type {
+  Gender,
+  IndividualAccountInit,
+  IndividualProfileInit,
+  IndividualData,
+  IndividualProfile,
+  IndividualRoles,
+  Pronouns,
+  WebsiteTypes
+} from './types';
 
 // default object to track a boolean true/false for which steps have form validation error states
 const createDefaultStepErrorsObj = (stepNames: string[]) => {
@@ -43,15 +53,15 @@ const defaultSteps: Step[] = [
 ];
 
 // flatten our step id's into a single array
-const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map(step => step.id);
+const flatSteps = (stepsArrObj: Step[]) => stepsArrObj.map((step) => step.id);
 
-const defaultData = {
+const defaultData: IndividualData = {
   actorInfo1Ethnicities: [],
   actorInfo1LGBTQ: '',
-  actorInfo1Pronouns: '',
+  actorInfo1Pronouns: '' as Pronouns,
   actorInfo1PronounsOther: '',
   actorInfo2AgeRanges: [],
-  actorInfo2Gender: '',
+  actorInfo2Gender: '' as Gender,
   actorInfo2GenderRoles: [],
   actorInfo2GenderTransition: '',
   actorInfo2HeightFt: 0,
@@ -68,7 +78,7 @@ const defaultData = {
   demographicsBio: '',
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
-  demographicsWebsites: [{ id: 1, url: '', websiteType: '' }], // { id, url, websiteType }
+  demographicsWebsites: [{ id: 1, url: '', websiteType: '' as WebsiteTypes }],
   offstageRolesGeneral: [],
   offstageRolesHairMakeupCostumes: [],
   offstageRolesLighting: [],
@@ -77,7 +87,7 @@ const defaultData = {
   offstageRolesSound: [],
   privacyAgreement: false,
   profilePhotoUrl: '',
-  stageRole: ''
+  stageRole: '' as IndividualRoles
 };
 
 const IndividualSignUp: React.FC<{
@@ -110,10 +120,14 @@ const IndividualSignUp: React.FC<{
     let newSteps = [...steps];
     const { stageRole } = formData;
     const indexForOffstageRoles = newSteps.findIndex(
-      nS => nS.id === 'offstageRoles'
+      (nS) => nS.id === 'offstageRoles'
     );
-    const indexForActorInfo1 = newSteps.findIndex(nS => nS.id === 'actorInfo1');
-    const indexForActorInfo2 = newSteps.findIndex(nS => nS.id === 'actorInfo2');
+    const indexForActorInfo1 = newSteps.findIndex(
+      (nS) => nS.id === 'actorInfo1'
+    );
+    const indexForActorInfo2 = newSteps.findIndex(
+      (nS) => nS.id === 'actorInfo2'
+    );
 
     // Rules for conditional steps:
     // a. If the user selects "on-stage" then they see actor info 2 but not offstage roles
@@ -190,36 +204,38 @@ const IndividualSignUp: React.FC<{
       basicsEmailAddress,
       basicsPassword
     )
-      .then(async res => {
+      .then(async (res) => {
         try {
           const userId = res.user.uid;
 
           // create doc for account (extra fields not in auth)
+          const accountInit: IndividualAccountInit = {
+            type: 'individual',
+            basics_18_plus: basics18Plus,
+            first_name: basicsFirstName,
+            last_name: basicsLastName,
+            privacy_agreement: true,
+            uid: userId
+          };
           const accountRef = await addDoc(
             collection(firebaseFirestore, 'accounts'),
-            {
-              type: 'individual',
-              basics_18_plus: basics18Plus,
-              first_name: basicsFirstName,
-              last_name: basicsLastName,
-              privacy_agreement: true,
-              uid: userId
-            }
+            accountInit
           );
 
           // create doc for profile
+          const profileInit: IndividualProfileInit = {
+            uid: userId,
+            account_id: accountRef.id,
+            stage_role: stageRole,
+
+            // init progress in signup flow
+            completed_signup: true,
+            completed_profile_1: false,
+            completed_profile_2: false
+          };
           const profileRef = await addDoc(
             collection(firebaseFirestore, 'profiles'),
-            {
-              uid: userId,
-              account_id: accountRef.id,
-              stage_role: stageRole,
-
-              // init progress in signup flow
-              completed_signup: true,
-              completed_profile_1: false,
-              completed_profile_2: false
-            }
+            profileInit
           );
 
           // store account and profile refs so we can update them later
@@ -243,7 +259,7 @@ const IndividualSignUp: React.FC<{
           return resp;
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.log('Error creating user:', err);
 
         const resp = {
@@ -303,7 +319,7 @@ const IndividualSignUp: React.FC<{
         break;
     }
 
-    const finalProfileData = {
+    const finalProfileData: IndividualProfile = {
       // actor info 1
       pronouns: actorInfo1Pronouns,
       pronouns_other: actorInfo1PronounsOther,

@@ -9,36 +9,13 @@ import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { Checkbox, PrivateLabel } from '../../../genericComponents';
 import { colors, fonts } from '../../../theme/styleVars';
 import { Title } from '../../layout';
-
-const ageRanges = [
-  '18-22',
-  '23-27',
-  '28-32',
-  '33-37',
-  '38-42',
-  '43-47',
-  '48-52',
-  '53-57',
-  '58-62',
-  '62+'
-];
-
-const genders = [
-  'Cis Female',
-  'Cis Male',
-  'Trans Female',
-  'Trans Male',
-  'Non Binary/Agender',
-  'I choose not to respond'
-];
-
-const genderRoles = ['Women', 'Men', 'Neither'];
+import { ageRanges, genders, genderRoles } from './types';
 
 const ActorInfo2: React.FC<{
   setForm: any;
   formData: any;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = props => {
+}> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo2AgeRanges,
@@ -76,7 +53,7 @@ const ActorInfo2: React.FC<{
   // effect for updating the sign up page errors state for this page
   // every time formErrors is updated
   useEffect(() => {
-    customErrorCallback(!Object.values(formErrors).every(v => !v));
+    customErrorCallback(!Object.values(formErrors).every((v) => !v));
   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // re-check there's a value when required fields update
@@ -99,7 +76,7 @@ const ActorInfo2: React.FC<{
       }
     } else {
       // uncheck age range value
-      newRanges = newRanges.filter(aR => aR !== range);
+      newRanges = newRanges.filter((aR) => aR !== range);
     }
 
     const target = {
@@ -120,7 +97,7 @@ const ActorInfo2: React.FC<{
       }
     } else {
       // uncheck gender role value
-      newRoles = newRoles.filter(gR => gR !== role);
+      newRoles = newRoles.filter((gR) => gR !== role);
     }
 
     const target = {
@@ -150,7 +127,7 @@ const ActorInfo2: React.FC<{
                         onChange={setForm}
                       >
                         <option value={undefined}>Feet</option>
-                        {[0, 1, 2, 3, 4, 5, 6, 7].map(ft => (
+                        {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
                           <option key={`ft-option-value-${ft}`} value={ft}>
                             {ft} ft
                           </option>
@@ -165,14 +142,16 @@ const ActorInfo2: React.FC<{
                         onChange={setForm}
                       >
                         <option value={undefined}>Inches</option>
-                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(inches => (
-                          <option
-                            key={`inch-option-value-${inches}`}
-                            value={inches}
-                          >
-                            {inches} in
-                          </option>
-                        ))}
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
+                          (inches) => (
+                            <option
+                              key={`inch-option-value-${inches}`}
+                              value={inches}
+                            >
+                              {inches} in
+                            </option>
+                          )
+                        )}
                       </Form.Control>
                     </PaddedCol>
                     <PaddedCol lg="6">
@@ -192,7 +171,7 @@ const ActorInfo2: React.FC<{
                   What age range do you play? <PrivateLabel />
                 </CAGLabel>
                 <p>Select up to 3 ranges</p>
-                {ageRanges.map(ageRange => (
+                {ageRanges.map((ageRange) => (
                   <Checkbox
                     checked={isAgeRangeInAgeRanges(ageRange)}
                     fieldType="checkbox"
@@ -222,7 +201,7 @@ const ActorInfo2: React.FC<{
                   onChange={setForm}
                 >
                   <option value={undefined}>Select</option>
-                  {genders.map(g => (
+                  {genders.map((g) => (
                     <option key={`gender-value-${g}`} value={g}>
                       {g}
                     </option>
@@ -239,7 +218,7 @@ const ActorInfo2: React.FC<{
                     I would also be comfortable playing roles usually played by:{' '}
                     <PrivateLabel />
                   </CAGLabelSmaller>
-                  {genderRoles.map(g => (
+                  {genderRoles.map((g) => (
                     <Checkbox
                       checked={isGenderRoleInGenderRoles(g)}
                       fieldType="checkbox"

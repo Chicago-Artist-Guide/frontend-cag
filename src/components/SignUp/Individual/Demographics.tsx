@@ -10,25 +10,12 @@ import { Title } from '../../layout/Titles';
 import { Tagline, TitleThree } from '../../layout/Titles';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../../theme/styleVars';
-
-const websiteTypeOptions = [
-  'Personal/Portfolio',
-  'Blog',
-  'Media',
-  'Social - Linktree',
-  'Social - Instagram',
-  'Social - Twitter',
-  'Social - YouTube',
-  'Social - LinkedIn',
-  'Social - Facebook',
-  'Social - TikTok',
-  'Social - Other'
-];
+import { websiteTypeOptions } from './types';
 
 const Demographics: React.FC<{
   setForm: any;
   formData: any;
-}> = props => {
+}> = (props) => {
   const { formData, setForm } = props;
   const {
     demographicsUnionStatus, // checkboxes for Unions or non-union
@@ -45,7 +32,7 @@ const Demographics: React.FC<{
     id: any
   ) => {
     const newWebsiteValues = [...demographicsWebsites];
-    const findIndex = newWebsiteValues.findIndex(web => web.id === id);
+    const findIndex = newWebsiteValues.findIndex((web) => web.id === id);
     newWebsiteValues[findIndex][fieldName] = fieldValue;
 
     const target = {
@@ -60,7 +47,7 @@ const Demographics: React.FC<{
     e.preventDefault();
 
     const newWebsiteValues = [...demographicsWebsites];
-    const findIndex = newWebsiteValues.findIndex(web => web.id === id);
+    const findIndex = newWebsiteValues.findIndex((web) => web.id === id);
     newWebsiteValues.splice(findIndex, 1);
 
     const target = {
@@ -180,7 +167,7 @@ const Demographics: React.FC<{
                           }
                         >
                           <option value={undefined}>Select Type</option>
-                          {websiteTypeOptions.map(wT => (
+                          {websiteTypeOptions.map((wT) => (
                             <option value={wT} key={wT}>
                               {wT}
                             </option>
