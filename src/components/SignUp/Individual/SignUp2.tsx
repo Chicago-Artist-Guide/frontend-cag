@@ -11,6 +11,8 @@ import Credits from './Credits';
 import Upcoming from './Upcoming';
 import AdditionalSkills from './AdditionalSkills';
 import Awards from './Awards';
+import type { USStateSymbol } from '../types';
+import type { IndividualProfile2Data, IndividualProfile2 } from './types';
 
 // Establish our steps
 const steps: Step[] = [
@@ -23,10 +25,10 @@ const steps: Step[] = [
 
 // establish our form data structure
 // assign defaults
-const defaultData = {
+const defaultData: IndividualProfile2Data = {
   trainingInstitution: '',
   trainingCity: '',
-  trainingState: '',
+  trainingState: '' as USStateSymbol,
   trainingDegree: '',
   trainingDetails: '',
 
@@ -79,7 +81,7 @@ const SignUp2 = () => {
       awards // { id, title, year, url, description }
     } = formData;
 
-    const finalProfileData = {
+    const finalProfileData: IndividualProfile2 = {
       // training
       training_institution: trainingInstitution,
       training_city: trainingCity,

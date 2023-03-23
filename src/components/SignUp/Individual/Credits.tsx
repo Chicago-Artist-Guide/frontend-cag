@@ -4,16 +4,18 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Tagline, Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
 import { colors } from '../../../theme/styleVars';
+import type { IndividualProfile2Data, PastPerformances } from './types';
 import 'react-datepicker/dist/react-datepicker.css';
 
 const Credits: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualProfile2Data;
+}> = (props) => {
   const { setForm, formData } = props;
   const { pastPerformances } = formData;
   const [showId, setShowId] = useState(1);
@@ -27,13 +29,13 @@ const Credits: React.FC<{
     setForm({ target });
   };
 
-  const onCreditFieldChange = (
-    fieldName: string,
-    fieldValue: string,
+  const onCreditFieldChange = <T extends keyof PastPerformances>(
+    fieldName: T,
+    fieldValue: PastPerformances[T],
     id: number
   ) => {
     const newCredits = [...pastPerformances];
-    const findIndex = newCredits.findIndex(show => show.id === id);
+    const findIndex = newCredits.findIndex((show) => show.id === id);
     newCredits[findIndex][fieldName] = fieldValue;
 
     setCreditInputs(newCredits);
@@ -42,7 +44,7 @@ const Credits: React.FC<{
   const removeCreditBlock = (e: any, id: number) => {
     e.preventDefault();
     const newCredits = [...pastPerformances];
-    const findIndex = newCredits.findIndex(show => show.id === id);
+    const findIndex = newCredits.findIndex((show) => show.id === id);
     newCredits.splice(findIndex, 1);
 
     setCreditInputs(newCredits);

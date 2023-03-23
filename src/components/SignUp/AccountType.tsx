@@ -9,6 +9,7 @@ import Individual from '../../images/icons-signup/individual.svg';
 import { fonts } from '../../theme/styleVars';
 import { Tagline, Title } from '../layout';
 import { CardHeading, StyledCard, CardText } from './SignUpStyles';
+import type { AccountTypeOptions } from './types';
 
 type Card = {
   icon: string;
@@ -19,7 +20,7 @@ type Card = {
 
 type Props = {
   accountType: string | null;
-  setAccountType: (x: 'individual' | 'company' | null) => void;
+  setAccountType: (x: AccountTypeOptions | null) => void;
 };
 
 const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {

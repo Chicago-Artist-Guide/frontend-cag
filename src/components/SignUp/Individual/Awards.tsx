@@ -4,13 +4,15 @@ import { colors, fonts } from '../../../theme/styleVars';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Tagline, Title } from '../../layout/Titles';
+import type { IndividualProfile2Data, ProfileAwards } from './types';
 
 const Awards: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualProfile2Data;
+}> = (props) => {
   const { setForm, formData } = props;
   const { awards } = formData;
   const [awardId, setAwardId] = useState(1);
@@ -26,13 +28,13 @@ const Awards: React.FC<{
     setYearOptions(newYears);
   }, []);
 
-  const onAwardInputChange = (
-    fieldValue: string,
-    fieldName: string,
-    id: any
+  const onAwardInputChange = <T extends keyof ProfileAwards>(
+    fieldValue: ProfileAwards[T],
+    fieldName: T,
+    id: number
   ) => {
-    const newAwardValues = [...awards];
-    const findIndex = newAwardValues.findIndex(award => award.id === id);
+    const newAwardValues = [...awards] as ProfileAwards[];
+    const findIndex = newAwardValues.findIndex((award) => award.id === id);
     newAwardValues[findIndex][fieldName] = fieldValue;
 
     const target = {
@@ -69,7 +71,7 @@ const Awards: React.FC<{
     e.preventDefault();
 
     const newAwardValues = [...awards];
-    const findIndex = newAwardValues.findIndex(award => award.id === id);
+    const findIndex = newAwardValues.findIndex((award) => award.id === id);
     newAwardValues.splice(findIndex, 1);
 
     const target = {
@@ -113,7 +115,7 @@ const Awards: React.FC<{
               <option disabled selected value="">
                 Year Received
               </option>
-              {yearOptions.map(year => {
+              {yearOptions.map((year) => {
                 return <option value={year}>{year}</option>;
               })}
             </CAGFormControl>

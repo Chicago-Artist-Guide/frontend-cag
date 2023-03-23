@@ -4,6 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import BothStage from '../../../images/icons-signup/both-stage.svg';
 import OffStage from '../../../images/icons-signup/off-stage.svg';
 import OnStage from '../../../images/icons-signup/on-stage.svg';
@@ -14,17 +15,51 @@ import {
   SelectDirections,
   StyledCard
 } from '../SignUpStyles';
+import type { IndividualRoles, IndividualData } from './types';
 
 interface Card {
   icon: string;
   className: string;
-  name: string;
+  name: IndividualRoles;
   text: JSX.Element;
 }
 
+const cards: Card[] = [
+  {
+    icon: OnStage,
+    className: 'green-shadow-hover',
+    name: 'on-stage',
+    text: (
+      <>
+        <CardHeading>On-Stage</CardHeading> <p>(Actors, Singers, Dancers)</p>
+      </>
+    )
+  },
+  {
+    icon: OffStage,
+    className: 'blue-shadow-hover',
+    name: 'off-stage',
+    text: (
+      <>
+        <CardHeading>Off-Stage</CardHeading> <p>(Directors, Designers, Crew)</p>
+      </>
+    )
+  },
+  {
+    icon: BothStage,
+    className: 'red-shadow-hover',
+    name: 'both-stage',
+    text: (
+      <>
+        <CardHeading>Both</CardHeading> <p>All of the Above</p>
+      </>
+    )
+  }
+];
+
 const IndividualRole: React.FC<{
-  setForm: any;
-  formData: any;
+  setForm: SetForm;
+  formData: IndividualData;
 }> = ({ setForm, formData }) => {
   const { stageRole } = formData;
   return (
@@ -62,38 +97,5 @@ const IndividualRole: React.FC<{
     </Container>
   );
 };
-
-const cards: Card[] = [
-  {
-    icon: OnStage,
-    className: 'green-shadow-hover',
-    name: 'on-stage',
-    text: (
-      <>
-        <CardHeading>On-Stage</CardHeading> <p>(Actors, Singers, Dancers)</p>
-      </>
-    )
-  },
-  {
-    icon: OffStage,
-    className: 'blue-shadow-hover',
-    name: 'off-stage',
-    text: (
-      <>
-        <CardHeading>Off-Stage</CardHeading> <p>(Directors, Designers, Crew)</p>
-      </>
-    )
-  },
-  {
-    icon: BothStage,
-    className: 'red-shadow-hover',
-    name: 'both-stage',
-    text: (
-      <>
-        <CardHeading>Both</CardHeading> <p>All of the Above</p>
-      </>
-    )
-  }
-];
 
 export default IndividualRole;

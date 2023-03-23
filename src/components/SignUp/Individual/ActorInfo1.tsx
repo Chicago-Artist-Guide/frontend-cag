@@ -6,71 +6,22 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import { Title } from '../../layout/Titles';
 import Checkbox from '../../../genericComponents/Checkbox';
 import PrivateLabel from '../../../genericComponents/PrivateLabel';
 import { colors, fonts } from '../../../theme/styleVars';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
-
-const pronouns = [
-  'He/Him/His',
-  'She/Her/Hers',
-  'They/Them/Theirs',
-  'Ze/Zir/Zirs',
-  'Other'
-];
-
-const ethnicityTypes = [
-  {
-    name: 'Asian',
-    values: [
-      'East Asian (ex. China, Korea, Japan)',
-      'Southeast Asian (ex. Cambodia, Thailand, Vietnam)',
-      'South Asian (ex. Bangladesh, India, Pakistan)',
-      'Central & West Asian (ex. Afghanistan, Iran, Uzbekistan)'
-    ]
-  },
-  {
-    name: 'Black or African American',
-    values: []
-  },
-  {
-    name: 'Indigenous',
-    values: []
-  },
-  {
-    name: 'Latinx',
-    values: []
-  },
-  {
-    name: 'MENA',
-    values: []
-  },
-  {
-    name: 'Native Hawaiian or Other Pacific Islander',
-    values: []
-  },
-  {
-    name: 'White',
-    values: []
-  },
-  {
-    name: 'I do not wish to respond',
-    values: []
-  }
-];
+import { ethnicityTypes, pronouns, IndividualData } from './types';
 
 const ActorInfo1: React.FC<{
-  setForm: any;
-  formData: any;
+  setForm: SetForm;
+  formData: IndividualData;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = props => {
+}> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
-  const {
-    actorInfo1Pronouns,
-    actorInfo1LGBTQ,
-    actorInfo1Ethnicities
-  } = formData;
+  const { actorInfo1Pronouns, actorInfo1LGBTQ, actorInfo1Ethnicities } =
+    formData;
 
   const requiredFields = [
     'actorInfo1Pronouns',
@@ -82,11 +33,12 @@ const ActorInfo1: React.FC<{
     const formErrorsObj: { [key: string]: boolean } = {};
 
     requiredFields.forEach((fieldName: string) => {
-      if (Array.isArray(formData[fieldName])) {
-        formErrorsObj[fieldName] = !formData[fieldName].length;
+      const fieldValue = formData[fieldName as keyof IndividualData];
+
+      if (Array.isArray(fieldValue)) {
+        formErrorsObj[fieldName] = !fieldValue.length;
       } else {
-        formErrorsObj[fieldName] =
-          formData[fieldName] === '' || formData[fieldName] === false;
+        formErrorsObj[fieldName] = fieldValue === '' || !fieldValue;
       }
     });
 
@@ -104,7 +56,7 @@ const ActorInfo1: React.FC<{
   // effect for updating the sign up page errors state for this page
   // every time formErrors is updated
   useEffect(() => {
-    customErrorCallback(!Object.values(formErrors).every(v => !v));
+    customErrorCallback(!Object.values(formErrors).every((v) => !v));
   }, [formErrors]);
 
   // re-check there's a value when required fields update
@@ -126,7 +78,7 @@ const ActorInfo1: React.FC<{
       }
     } else {
       // uncheck age range value
-      newEthnicities = newEthnicities.filter(aR => aR !== type);
+      newEthnicities = newEthnicities.filter((aR) => aR !== type);
     }
 
     const target = {
@@ -157,7 +109,7 @@ const ActorInfo1: React.FC<{
                         onChange={setForm}
                       >
                         <option value={undefined}>Choose...</option>
-                        {pronouns.map(noun => (
+                        {pronouns.map((noun) => (
                           <option key={`option-value-${noun}`} value={noun}>
                             {noun}
                           </option>
@@ -220,7 +172,7 @@ const ActorInfo1: React.FC<{
                   </Link>
                   .
                 </PrivacyPar>
-                {ethnicityTypes.map(eth => (
+                {ethnicityTypes.map((eth) => (
                   <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                     <Checkbox
                       checked={isEthnicityInEthnicities(eth.name)}
@@ -234,7 +186,7 @@ const ActorInfo1: React.FC<{
                     />
                     {eth.values.length > 0 && (
                       <InnerEthnicities style={{ paddingLeft: '1.25rem' }}>
-                        {eth.values.map(ethV => (
+                        {eth.values.map((ethV) => (
                           <Checkbox
                             checked={isEthnicityInEthnicities(ethV)}
                             fieldType="checkbox"

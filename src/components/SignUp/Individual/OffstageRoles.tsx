@@ -6,15 +6,17 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
+import { SetForm } from 'react-hooks-helper';
 import { Tagline, Title } from '../../layout/Titles';
 import GenericAccordion from '../../../genericComponents/GenericAccordion';
 import Checkbox from '../../../genericComponents/Checkbox';
 import yellow_blob_1 from '../../../images/yellow_blob_1.svg';
+import type { IndividualData } from './types';
 
 const OffstageRoles: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualData;
+}> = (props) => {
   const { formData, setForm } = props;
 
   const {
@@ -191,7 +193,7 @@ const OffstageRoles: React.FC<{
         sectionRoles.push(chk);
       }
     } else {
-      sectionRoles = sectionRoles.filter(rG => rG !== chk);
+      sectionRoles = sectionRoles.filter((rG) => rG !== chk);
     }
 
     const target = {

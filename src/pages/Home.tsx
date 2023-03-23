@@ -5,7 +5,7 @@ import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
 import { Link } from 'react-router-dom';
 import { breakpoints, colors } from '../theme/styleVars';
-import Mailchimp from '../components/Home/Mailchimp';
+import EmailList from '../components/Home/EmailList';
 import {
   BlobBox,
   ForArtists,
@@ -63,7 +63,7 @@ const Home = () => {
         </HomeRow>
         <ForArtists />
         <ForTheatres />
-        <Mailchimp />
+        <EmailList />
       </PageContainer>
     </>
   );

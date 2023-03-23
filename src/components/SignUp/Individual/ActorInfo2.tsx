@@ -5,40 +5,26 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Form from 'react-bootstrap/Form';
+import { SetForm } from 'react-hooks-helper';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { Checkbox, PrivateLabel } from '../../../genericComponents';
 import { colors, fonts } from '../../../theme/styleVars';
 import { Title } from '../../layout';
-
-const ageRanges = [
-  '18-22',
-  '23-27',
-  '28-32',
-  '33-37',
-  '38-42',
-  '43-47',
-  '48-52',
-  '53-57',
-  '58-62',
-  '62+'
-];
-
-const genders = [
-  'Cis Female',
-  'Cis Male',
-  'Trans Female',
-  'Trans Male',
-  'Non Binary/Agender',
-  'I choose not to respond'
-];
-
-const genderRoles = ['Women', 'Men', 'Neither'];
+import {
+  ageRanges,
+  genders,
+  genderRoles,
+  AgeRange,
+  IndividualData,
+  Gender,
+  GenderRole
+} from './types';
 
 const ActorInfo2: React.FC<{
-  setForm: any;
-  formData: any;
+  setForm: SetForm;
+  formData: IndividualData;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = props => {
+}> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo2AgeRanges,
@@ -54,11 +40,12 @@ const ActorInfo2: React.FC<{
     const formErrorsObj: { [key: string]: boolean } = {};
 
     requiredFields.forEach((fieldName: string) => {
-      if (Array.isArray(formData[fieldName])) {
-        formErrorsObj[fieldName] = !formData[fieldName].length;
+      const fieldValue = formData[fieldName as keyof IndividualData];
+
+      if (Array.isArray(fieldValue)) {
+        formErrorsObj[fieldName] = !fieldValue.length;
       } else {
-        formErrorsObj[fieldName] =
-          formData[fieldName] === '' || formData[fieldName] === false;
+        formErrorsObj[fieldName] = fieldValue === '' || !fieldValue;
       }
     });
 
@@ -76,7 +63,7 @@ const ActorInfo2: React.FC<{
   // effect for updating the sign up page errors state for this page
   // every time formErrors is updated
   useEffect(() => {
-    customErrorCallback(!Object.values(formErrors).every(v => !v));
+    customErrorCallback(!Object.values(formErrors).every((v) => !v));
   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // re-check there's a value when required fields update
@@ -84,12 +71,12 @@ const ActorInfo2: React.FC<{
     setFormErrors(createDefaultFormErrorsData());
   }, [actorInfo2AgeRanges, actorInfo2Gender]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isAgeRangeInAgeRanges = (ageRange: string) =>
+  const isAgeRangeInAgeRanges = (ageRange: AgeRange) =>
     actorInfo2AgeRanges.indexOf(ageRange) > -1;
-  const isGenderRoleInGenderRoles = (genderRole: string) =>
+  const isGenderRoleInGenderRoles = (genderRole: GenderRole) =>
     actorInfo2GenderRoles.indexOf(genderRole) > -1;
 
-  const ageRangeChange = (checkValue: any, range: string) => {
+  const ageRangeChange = (checkValue: boolean, range: AgeRange) => {
     let newRanges = [...actorInfo2AgeRanges];
 
     if (checkValue) {
@@ -99,7 +86,7 @@ const ActorInfo2: React.FC<{
       }
     } else {
       // uncheck age range value
-      newRanges = newRanges.filter(aR => aR !== range);
+      newRanges = newRanges.filter((aR) => aR !== range);
     }
 
     const target = {
@@ -110,7 +97,7 @@ const ActorInfo2: React.FC<{
     setForm({ target });
   };
 
-  const genderRoleChange = (checkValue: any, role: string) => {
+  const genderRoleChange = (checkValue: boolean, role: GenderRole) => {
     let newRoles = [...actorInfo2GenderRoles];
 
     if (checkValue) {
@@ -120,7 +107,7 @@ const ActorInfo2: React.FC<{
       }
     } else {
       // uncheck gender role value
-      newRoles = newRoles.filter(gR => gR !== role);
+      newRoles = newRoles.filter((gR) => gR !== role);
     }
 
     const target = {
@@ -150,7 +137,7 @@ const ActorInfo2: React.FC<{
                         onChange={setForm}
                       >
                         <option value={undefined}>Feet</option>
-                        {[0, 1, 2, 3, 4, 5, 6, 7].map(ft => (
+                        {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
                           <option key={`ft-option-value-${ft}`} value={ft}>
                             {ft} ft
                           </option>
@@ -165,14 +152,16 @@ const ActorInfo2: React.FC<{
                         onChange={setForm}
                       >
                         <option value={undefined}>Inches</option>
-                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(inches => (
-                          <option
-                            key={`inch-option-value-${inches}`}
-                            value={inches}
-                          >
-                            {inches} in
-                          </option>
-                        ))}
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
+                          (inches) => (
+                            <option
+                              key={`inch-option-value-${inches}`}
+                              value={inches}
+                            >
+                              {inches} in
+                            </option>
+                          )
+                        )}
                       </Form.Control>
                     </PaddedCol>
                     <PaddedCol lg="6">
@@ -192,7 +181,7 @@ const ActorInfo2: React.FC<{
                   What age range do you play? <PrivateLabel />
                 </CAGLabel>
                 <p>Select up to 3 ranges</p>
-                {ageRanges.map(ageRange => (
+                {ageRanges.map((ageRange) => (
                   <Checkbox
                     checked={isAgeRangeInAgeRanges(ageRange)}
                     fieldType="checkbox"
@@ -222,7 +211,7 @@ const ActorInfo2: React.FC<{
                   onChange={setForm}
                 >
                   <option value={undefined}>Select</option>
-                  {genders.map(g => (
+                  {genders.map((g) => (
                     <option key={`gender-value-${g}`} value={g}>
                       {g}
                     </option>
@@ -231,54 +220,55 @@ const ActorInfo2: React.FC<{
               </Form.Group>
             </Col>
           </Row>
-          {actorInfo2Gender !== '' && !actorInfo2Gender.includes('Cis') && (
-            <Row>
-              <Col lg="6">
-                <Form.Group className="form-group">
-                  <CAGLabelSmaller>
-                    I would also be comfortable playing roles usually played by:{' '}
-                    <PrivateLabel />
-                  </CAGLabelSmaller>
-                  {genderRoles.map(g => (
+          {actorInfo2Gender !== ('' as Gender) &&
+            !actorInfo2Gender.includes('Cis') && (
+              <Row>
+                <Col lg="6">
+                  <Form.Group className="form-group">
+                    <CAGLabelSmaller>
+                      I would also be comfortable playing roles usually played
+                      by: <PrivateLabel />
+                    </CAGLabelSmaller>
+                    {genderRoles.map((g) => (
+                      <Checkbox
+                        checked={isGenderRoleInGenderRoles(g)}
+                        fieldType="checkbox"
+                        key={`gender-chk-${g}`}
+                        label={g}
+                        name="actorInfo2GenderRoles"
+                        onChange={(e: any) =>
+                          genderRoleChange(e.currentTarget.checked, g)
+                        }
+                      />
+                    ))}
+                  </Form.Group>
+                </Col>
+                <Col lg="6">
+                  <Form.Group className="form-group">
+                    <CAGLabelSmaller>
+                      I would be comfortable playing a character through all
+                      phases of their transition: <PrivateLabel />
+                    </CAGLabelSmaller>
                     <Checkbox
-                      checked={isGenderRoleInGenderRoles(g)}
-                      fieldType="checkbox"
-                      key={`gender-chk-${g}`}
-                      label={g}
-                      name="actorInfo2GenderRoles"
-                      onChange={(e: any) =>
-                        genderRoleChange(e.currentTarget.checked, g)
-                      }
+                      checked={actorInfo2GenderTransition === 'Yes'}
+                      fieldType="radio"
+                      label="Yes"
+                      name="actorInfo2GenderTransition"
+                      onChange={setForm}
+                      value="Yes"
                     />
-                  ))}
-                </Form.Group>
-              </Col>
-              <Col lg="6">
-                <Form.Group className="form-group">
-                  <CAGLabelSmaller>
-                    I would be comfortable playing a character through all
-                    phases of their transition: <PrivateLabel />
-                  </CAGLabelSmaller>
-                  <Checkbox
-                    checked={actorInfo2GenderTransition === 'Yes'}
-                    fieldType="radio"
-                    label="Yes"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="Yes"
-                  />
-                  <Checkbox
-                    checked={actorInfo2GenderTransition === 'No'}
-                    fieldType="radio"
-                    label="No"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="No"
-                  />
-                </Form.Group>
-              </Col>
-            </Row>
-          )}
+                    <Checkbox
+                      checked={actorInfo2GenderTransition === 'No'}
+                      fieldType="radio"
+                      label="No"
+                      name="actorInfo2GenderTransition"
+                      onChange={setForm}
+                      value="No"
+                    />
+                  </Form.Group>
+                </Col>
+              </Row>
+            )}
         </Col>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />

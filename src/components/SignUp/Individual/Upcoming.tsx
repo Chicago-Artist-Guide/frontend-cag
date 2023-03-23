@@ -5,16 +5,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 import { Col, Form, Row } from 'react-bootstrap';
+import { SetForm } from 'react-hooks-helper';
 import { Tagline, Title } from '../../layout/Titles';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import Button from '../../../genericComponents/Button';
 import InputField from '../../../genericComponents/Input';
 import { colors } from '../../../theme/styleVars';
+import type { IndividualProfile2Data, UpcomingPerformances } from './types';
 
 const Upcoming: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualProfile2Data;
+}> = (props) => {
   const { setForm, formData } = props;
   const { upcoming } = formData;
   const [showId, setShowId] = useState(1);
@@ -52,7 +54,7 @@ const Upcoming: React.FC<{
 
     uploadTask.on(
       'state_changed',
-      snapshot => {
+      (snapshot) => {
         const currPercent = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
@@ -61,7 +63,7 @@ const Upcoming: React.FC<{
         const currProgress = { ...percent };
         setPercent({ ...currProgress, [id]: currPercent });
       },
-      err => {
+      (err) => {
         console.log('Error uploading image', err);
         setUploadInProgress({ ...currUploadProg, [id]: false });
       },
@@ -69,7 +71,7 @@ const Upcoming: React.FC<{
         setUploadInProgress({ ...currUploadProg, [id]: false });
 
         // download url
-        getDownloadURL(uploadTask.snapshot.ref).then(url => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log('Uploaded image url:', url);
           const currImgUrl = { ...imgUrl };
           setImgUrl({ ...currImgUrl, [id]: url });
@@ -78,14 +80,14 @@ const Upcoming: React.FC<{
     );
   };
 
-  const onUpcomingInputChange = (
-    fieldValue: string,
-    fieldName: string,
+  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
+    fieldValue: UpcomingPerformances[T],
+    fieldName: T,
     id: any
   ) => {
     // indexing to assign each upcoming show value a number
     const newUpcomingShowValues = [...upcoming];
-    const findIndex = newUpcomingShowValues.findIndex(show => show.id === id);
+    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
     newUpcomingShowValues[findIndex][fieldName] = fieldValue;
 
     const target = {
@@ -99,7 +101,7 @@ const Upcoming: React.FC<{
   const removeUpcomingInput = (e: any, id: any) => {
     e.preventDefault();
     const newUpcomingShowValues = [...upcoming];
-    const findIndex = newUpcomingShowValues.findIndex(show => show.id === id);
+    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
     newUpcomingShowValues.splice(findIndex, 1);
 
     const target = {

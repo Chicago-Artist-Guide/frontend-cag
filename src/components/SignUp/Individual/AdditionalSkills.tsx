@@ -4,16 +4,20 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
+import { SetForm } from 'react-hooks-helper';
 import Checkbox from '../../../genericComponents/Checkbox';
 import { Tagline, Title } from '../../layout/Titles';
 import { colors, fonts } from '../../../theme/styleVars';
-
-const skillCheckboxes = ['Dancing', 'Singing'];
+import {
+  skillCheckboxes,
+  IndividualProfile2Data,
+  SkillCheckbox
+} from './types';
 
 const AdditionalSkills: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualProfile2Data;
+}> = (props) => {
   const { formData, setForm } = props;
   const { additionalSkillsCheckboxes, additionalSkillsManual } = formData;
 
@@ -23,10 +27,10 @@ const AdditionalSkills: React.FC<{
   ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
-  const isAdditionalSkillsCheckboxes = (skillOption: string) =>
+  const isAdditionalSkillsCheckboxes = (skillOption: SkillCheckbox) =>
     additionalSkillsCheckboxes.indexOf(skillOption) > -1;
 
-  const skillOptionChange = (checkValue: any, skill: string) => {
+  const skillOptionChange = (checkValue: boolean, skill: SkillCheckbox) => {
     let newSkills = [...additionalSkillsCheckboxes];
 
     if (checkValue) {
@@ -36,7 +40,7 @@ const AdditionalSkills: React.FC<{
       }
     } else {
       // uncheck value
-      newSkills = newSkills.filter(sO => sO !== skill);
+      newSkills = newSkills.filter((sO) => sO !== skill);
     }
 
     const target = {
@@ -50,13 +54,13 @@ const AdditionalSkills: React.FC<{
   const addTag = () => {
     const trimmedInput = input.trim();
     if (trimmedInput.length && !skillTags.includes(trimmedInput)) {
-      setTags(prevState => [...prevState, trimmedInput]);
+      setTags((prevState) => [...prevState, trimmedInput]);
       setInput('');
     }
   };
 
   const deleteTag = (index: any) => {
-    setTags(prevState => prevState.filter((tag, i) => i !== index));
+    setTags((prevState) => prevState.filter((tag, i) => i !== index));
   };
 
   const onKeyDown = (e: any) => {
@@ -69,7 +73,7 @@ const AdditionalSkills: React.FC<{
       !skillTags.includes(trimmedInput)
     ) {
       e.preventDefault();
-      setTags(prevState => [...prevState, trimmedInput]);
+      setTags((prevState) => [...prevState, trimmedInput]);
       setInput('');
     }
 
@@ -112,7 +116,7 @@ const AdditionalSkills: React.FC<{
           {/* checkbox default skills*/}
           <CAGFormGroup>
             <BoldP>I am interested in roles that require:</BoldP>
-            {skillCheckboxes.map(skill => (
+            {skillCheckboxes.map((skill) => (
               <CAGCheckbox
                 checked={isAdditionalSkillsCheckboxes(skill)}
                 fieldType="checkbox"
