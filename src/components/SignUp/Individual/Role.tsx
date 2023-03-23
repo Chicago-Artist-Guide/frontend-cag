@@ -4,6 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import BothStage from '../../../images/icons-signup/both-stage.svg';
 import OffStage from '../../../images/icons-signup/off-stage.svg';
 import OnStage from '../../../images/icons-signup/on-stage.svg';
@@ -14,7 +15,7 @@ import {
   SelectDirections,
   StyledCard
 } from '../SignUpStyles';
-import type { IndividualRoles } from './types';
+import type { IndividualRoles, IndividualData } from './types';
 
 interface Card {
   icon: string;
@@ -57,8 +58,8 @@ const cards: Card[] = [
 ];
 
 const IndividualRole: React.FC<{
-  setForm: any;
-  formData: any;
+  setForm: SetForm;
+  formData: IndividualData;
 }> = ({ setForm, formData }) => {
   const { stageRole } = formData;
   return (

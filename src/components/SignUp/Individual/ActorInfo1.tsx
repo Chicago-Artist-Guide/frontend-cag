@@ -6,16 +6,17 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import { Title } from '../../layout/Titles';
 import Checkbox from '../../../genericComponents/Checkbox';
 import PrivateLabel from '../../../genericComponents/PrivateLabel';
 import { colors, fonts } from '../../../theme/styleVars';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
-import { ethnicityTypes, pronouns } from './types';
+import { ethnicityTypes, pronouns, IndividualData } from './types';
 
 const ActorInfo1: React.FC<{
-  setForm: any;
-  formData: any;
+  setForm: SetForm;
+  formData: IndividualData;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
@@ -32,11 +33,12 @@ const ActorInfo1: React.FC<{
     const formErrorsObj: { [key: string]: boolean } = {};
 
     requiredFields.forEach((fieldName: string) => {
-      if (Array.isArray(formData[fieldName])) {
-        formErrorsObj[fieldName] = !formData[fieldName].length;
+      const fieldValue = formData[fieldName as keyof IndividualData];
+
+      if (Array.isArray(fieldValue)) {
+        formErrorsObj[fieldName] = !fieldValue.length;
       } else {
-        formErrorsObj[fieldName] =
-          formData[fieldName] === '' || formData[fieldName] === false;
+        formErrorsObj[fieldName] = fieldValue === '' || !fieldValue;
       }
     });
 

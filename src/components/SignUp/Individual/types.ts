@@ -1,4 +1,4 @@
-import type { AccountTypeOptions } from '../types';
+import type { AccountTypeOptions, USStateSymbol } from '../types';
 
 export type IndividualRoles = 'on-stage' | 'off-stage' | 'both-stage';
 
@@ -187,4 +187,65 @@ export type IndividualProfile = {
   bio: string;
   profile_tagline: string;
   completed_profile_1: boolean;
+};
+
+export const skillCheckboxes = ['Dancing', 'Singing'] as const;
+export type SkillCheckbox = (typeof skillCheckboxes)[number];
+
+export type PastPerformances = {
+  id: number;
+  title: string;
+  group: string;
+  location: string;
+  startDate: string;
+  endDate: string;
+  url: string;
+  role: string;
+  director: string;
+  musicalDirector: string;
+  recognition: string;
+};
+
+export type UpcomingPerformances = {
+  id: number;
+  title: string;
+  synopsis: string;
+  industryCode: string;
+  url: string;
+  imageUrl: string;
+};
+
+export type ProfileAwards = {
+  id: number;
+  title: string;
+  year: string;
+  url: string;
+  description: string;
+};
+
+export type IndividualProfile2Data = {
+  trainingInstitution: string;
+  trainingCity: string;
+  trainingState: USStateSymbol;
+  trainingDegree: string;
+  trainingDetails: string;
+  pastPerformances: PastPerformances[];
+  upcoming: UpcomingPerformances[];
+  additionalSkillsCheckboxes: SkillCheckbox[];
+  additionalSkillsManual: string[];
+  awards: ProfileAwards[];
+};
+
+export type IndividualProfile2 = {
+  training_institution: string;
+  training_city: string;
+  training_state: USStateSymbol;
+  training_degree: string;
+  training_details: string;
+  past_performances: PastPerformances[];
+  upcoming_performances: UpcomingPerformances[];
+  additional_skills_checkboxes: SkillCheckbox[];
+  additional_skills_manual: string[];
+  awards: ProfileAwards[];
+  completed_profile_2: boolean;
 };

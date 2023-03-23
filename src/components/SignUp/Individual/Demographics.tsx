@@ -4,17 +4,22 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import styled from 'styled-components';
 import Image from 'react-bootstrap/Image';
-import InputField from '../../../genericComponents/Input';
 import Form from 'react-bootstrap/Form';
+import { SetForm } from 'react-hooks-helper';
 import { Title } from '../../layout/Titles';
 import { Tagline, TitleThree } from '../../layout/Titles';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../../theme/styleVars';
-import { websiteTypeOptions } from './types';
+import {
+  websiteTypeOptions,
+  IndividualData,
+  IndividualWebsite,
+  WebsiteTypes
+} from './types';
 
 const Demographics: React.FC<{
-  setForm: any;
-  formData: any;
+  setForm: SetForm;
+  formData: IndividualData;
 }> = (props) => {
   const { formData, setForm } = props;
   const {
@@ -26,10 +31,10 @@ const Demographics: React.FC<{
   } = formData;
   const [websiteId, setWebsiteId] = useState(1);
 
-  const onWebsiteInputChange = (
-    fieldValue: string,
-    fieldName: string,
-    id: any
+  const onWebsiteInputChange = <T extends keyof IndividualWebsite>(
+    fieldValue: IndividualWebsite[T],
+    fieldName: T,
+    id: number
   ) => {
     const newWebsiteValues = [...demographicsWebsites];
     const findIndex = newWebsiteValues.findIndex((web) => web.id === id);
@@ -66,7 +71,7 @@ const Demographics: React.FC<{
     newWebsiteInputs.push({
       id: newWebsiteId,
       url: '',
-      websiteType: ''
+      websiteType: '' as WebsiteTypes
     });
 
     const target = {

@@ -3,16 +3,18 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Tagline, Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
 import { colors } from '../../../theme/styleVars';
-import { CAGFormGroup, CAGFormSelect } from '../SignUpStyles';
+import { CAGFormSelect } from '../SignUpStyles';
+import type { IndividualProfile2Data } from './types';
 
 const Training: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualProfile2Data;
+}> = (props) => {
   const { setForm, formData } = props;
   const {
     trainingInstitution,
@@ -21,8 +23,6 @@ const Training: React.FC<{
     trainingDegree,
     trainingDetails
   } = formData;
-
-  console.log(trainingInstitution, trainingCity);
 
   return (
     <Container>

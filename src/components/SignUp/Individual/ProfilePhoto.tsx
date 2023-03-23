@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
+import { SetForm } from 'react-hooks-helper';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
@@ -13,11 +14,12 @@ import Button from '../../../genericComponents/Button';
 import { Tagline, Title } from '../../layout/Titles';
 import { colors } from '../../../theme/styleVars';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
+import type { IndividualData } from './types';
 
 const ProfilePhoto: React.FC<{
-  setForm: any;
-  formData: any;
-}> = props => {
+  setForm: SetForm;
+  formData: IndividualData;
+}> = (props) => {
   const { setForm } = props;
   const { firebaseStorage } = useFirebaseContext();
   const [file, setFile] = useState<File | null>(null);
@@ -45,7 +47,7 @@ const ProfilePhoto: React.FC<{
 
     uploadTask.on(
       'state_changed',
-      snapshot => {
+      (snapshot) => {
         const percent = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
@@ -53,7 +55,7 @@ const ProfilePhoto: React.FC<{
         // update progress
         setPercent(percent);
       },
-      err => {
+      (err) => {
         console.log('Error uploading image', err);
         setUploadInProgress(false);
       },
@@ -61,7 +63,7 @@ const ProfilePhoto: React.FC<{
         setUploadInProgress(false);
 
         // download url
-        getDownloadURL(uploadTask.snapshot.ref).then(url => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log('Uploaded image url:', url);
           setImgUrl(url);
         });

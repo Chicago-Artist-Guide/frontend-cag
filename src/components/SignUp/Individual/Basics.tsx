@@ -6,20 +6,21 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { Form } from 'react-bootstrap';
+import { SetForm } from 'react-hooks-helper';
 import { SubmitBasicsResp } from './SignUpFooter';
 import { Title } from '../../layout/Titles';
 import InputField from '../../../genericComponents/Input';
 import Checkbox from '../../../genericComponents/Checkbox';
 import { colors } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
-import { SetForm } from 'react-hooks-helper';
+import type { IndividualData } from './types';
 
 const IndividualBasics: React.FC<{
   setForm: SetForm;
-  formData: { [key: string]: any };
+  formData: IndividualData;
   hasErrorCallback: (step: string, hasErrors: boolean) => void;
   submitBasicsErr: SubmitBasicsResp | undefined;
-}> = props => {
+}> = (props) => {
   const { setForm, formData, hasErrorCallback, submitBasicsErr } = props;
   const {
     basicsFirstName,
@@ -48,7 +49,8 @@ const IndividualBasics: React.FC<{
 
     requiredFields.forEach((fieldName: string) => {
       formErrorsObj[fieldName] =
-        formData[fieldName] === '' || formData[fieldName] === false;
+        formData[fieldName as keyof IndividualData] === '' ||
+        !formData[fieldName as keyof IndividualData];
     });
 
     return formErrorsObj;
@@ -97,7 +99,7 @@ const IndividualBasics: React.FC<{
   // effect for updating the sign up page errors state for this page
   // every time formErrors is updated
   useEffect(() => {
-    customErrorCallback(!Object.values(formErrors).every(v => !v));
+    customErrorCallback(!Object.values(formErrors).every((v) => !v));
   }, [formErrors]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
