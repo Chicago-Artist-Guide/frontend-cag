@@ -36,8 +36,6 @@ const Profile: React.FC<{
     const profileData = await getDoc(profileRef);
     const accountData = await getDoc(accountRef);
 
-    console.log(profileData, accountData);
-
     setProfileData(profileData.data());
     setAccountData(accountData.data());
   };
