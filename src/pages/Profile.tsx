@@ -19,11 +19,12 @@ const Profile: React.FC<{
   } = useProfileContext();
 
   useEffect(() => {
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, (user) => {
       if (!user) {
         history.push('/login');
       }
     });
+
     getProfileData();
   }, [accountRef, profileRef]);
 

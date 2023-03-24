@@ -3,7 +3,7 @@ import { Col, Image, Row } from 'react-bootstrap';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '../../../../genericComponents';
-import { breakpoints, colors, fonts } from '../../../../theme/styleVars';
+import { colors, fonts } from '../../../../theme/styleVars';
 import { Production } from '../types';
 
 const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
@@ -11,6 +11,7 @@ const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
   const manageProduction = () => {
     history.push(`production/${show.production_id}/manage`);
   };
+
   return (
     <ShowCard>
       <Row>
@@ -57,7 +58,7 @@ const ShowButton = styled(Button)`
   border-color: ${colors.slate};
 `;
 
-const ShowDescription = styled.p`
+export const ShowDescription = styled.p`
   font-family: ${fonts.mainFont};
   font-style: normal;
   font-weight: 400;
@@ -67,7 +68,7 @@ const ShowDescription = styled.p`
   max-width: 294px;
 `;
 
-const ShowStatus = styled.h3`
+export const ShowStatus = styled.h3`
   height: 14px;
   font-family: ${fonts.lora};
   font-style: italic;
@@ -78,7 +79,7 @@ const ShowStatus = styled.h3`
   color: ${colors.slate};
 `;
 
-const ShowName = styled.h2`
+export const ShowName = styled.h2`
   font-family: ${fonts.montserrat};
   font-style: normal;
   font-weight: 500;
@@ -87,7 +88,7 @@ const ShowName = styled.h2`
   letter-spacing: 0.07em;
 `;
 
-const ShowImage = styled(Image)`
+export const ShowImage = styled(Image)`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   background: ${colors.lightGrey};

@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Image from 'react-bootstrap/Image';
@@ -9,6 +10,117 @@ import { useProfileContext } from '../../context/ProfileContext';
 import Button from '../../genericComponents/Button';
 import { fonts, colors } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
+import DetailSection from './shared/DetailSection';
+import type {
+  PastPerformances,
+  ProfileAwards,
+  UpcomingPerformances
+} from '../SignUp/Individual/types';
+import {
+  RightCol,
+  ShowCard,
+  ShowImage,
+  ShowName,
+  ShowDescription,
+  ShowStatus as ShowDates
+} from './Company/Production/ActiveProduction';
+import Ribbon from '../../images/icons-profile/ribbon.svg';
+
+const IndividualUpcomingShow: React.FC<{
+  show: UpcomingPerformances;
+}> = ({ show }) => {
+  return (
+    <ShowCard>
+      <Row>
+        <Col lg={4}>
+          <ShowImage src={show?.imageUrl} fluid />
+        </Col>
+        <RightCol lg={{ span: 7, offset: 1 }}>
+          <div className="d-flex flex-column" style={{ height: '100%' }}>
+            <div className="flex-grow-1">
+              <ShowName>{show?.title}</ShowName>
+              <ShowDescription>{show?.synopsis}</ShowDescription>
+              <ShowDescription>
+                <strong>Industry Code:</strong> {show?.industryCode}
+                <br />
+                <strong>Website:</strong>{' '}
+                <a href={show?.url} target="_blank">
+                  {show?.url}
+                </a>
+              </ShowDescription>
+            </div>
+          </div>
+        </RightCol>
+      </Row>
+    </ShowCard>
+  );
+};
+
+const IndividualCredits: React.FC<{
+  show: PastPerformances;
+}> = ({ show }) => {
+  return (
+    <ShowCard>
+      <Row>
+        <Col lg={6}>
+          <ShowName>{show?.title}</ShowName>
+          <ShowDates>
+            ({show?.startDate} - {show?.endDate})
+          </ShowDates>
+          <ShowDescription>
+            {show?.group}
+            <br />
+            {show?.location}
+          </ShowDescription>
+        </Col>
+        <Col lg={6}>
+          <ShowDescription>
+            <strong>Role:</strong> {show?.role}
+            <br />
+            <strong>Director:</strong> {show?.director}
+            <br />
+            <strong>Musical Director:</strong> {show?.musicalDirector}
+            <br />
+            <strong>Recognition:</strong> {show?.recognition}
+          </ShowDescription>
+        </Col>
+      </Row>
+      <Row>
+        <Col lg={8}>
+          <ShowDescription>
+            <a href={show?.url} target="_blank">
+              Visit Website &gt;
+            </a>
+          </ShowDescription>
+        </Col>
+      </Row>
+    </ShowCard>
+  );
+};
+
+const AwardCard: React.FC<{
+  award: ProfileAwards;
+}> = ({ award }) => {
+  return (
+    <AwardCardFlex>
+      <Row>
+        <Col lg={4}>
+          <AwardIconImage src={Ribbon} fluid />
+        </Col>
+        <Col lg={8}>
+          <AwardTitle>{award?.title}</AwardTitle>
+          <AwardP>{award?.year}</AwardP>
+          <AwardP>{award?.description}</AwardP>
+          <AwardP>
+            <a href={award?.url} target="_blank">
+              View Website
+            </a>
+          </AwardP>
+        </Col>
+      </Row>
+    </AwardCardFlex>
+  );
+};
 
 const IndividualProfile: React.FC<{
   previewMode?: boolean;
@@ -18,15 +130,17 @@ const IndividualProfile: React.FC<{
     account: { data: account },
     profile: { data: profile }
   } = useProfileContext();
-  const [showSignUp2Link, setShowUp2Link] = useState(
-    previewMode || !profile?.completed_profile_2
-  );
+  const [showSignUp2Link, setShowUp2Link] = useState(false);
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setShowUp2Link(false);
   };
+
+  useEffect(() => {
+    setShowUp2Link(previewMode || !profile?.completed_profile_2);
+  }, [profile]);
 
   return (
     <PageWrapper>
@@ -96,11 +210,63 @@ const IndividualProfile: React.FC<{
             <p>{profile?.bio}</p>
           </div>
           <div>
-            <h4>Training</h4>
-            <h4>Past Performances</h4>
-            <h4>Upcoming Features</h4>
-            <h4>Special Skills</h4>
-            <h4>Awards &amp; Recognition</h4>
+            <DetailSection title="Training">
+              {profile?.completed_profile_2 && (
+                <p>
+                  <strong>{profile?.trainingInstitution}</strong>
+                  <br />
+                  {profile?.training_city}, {profile?.training_state}
+                  <br />
+                  <em>{profile?.training_degree}</em>
+                  <br />
+                  <span>{profile?.training_details}</span>
+                </p>
+              )}
+            </DetailSection>
+            <DetailSection title="Upcoming Features">
+              {profile?.upcoming_performances?.length &&
+                profile?.upcoming_performances.map(
+                  (perf: UpcomingPerformances) => (
+                    <IndividualUpcomingShow
+                      key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
+                      show={perf}
+                    />
+                  )
+                )}
+            </DetailSection>
+            <DetailSection title="Past Performances">
+              {profile?.past_performances?.length &&
+                profile?.past_performances.map((perf: PastPerformances) => (
+                  <IndividualCredits
+                    key={`credits-shows-${perf.id}`}
+                    show={perf}
+                  />
+                ))}
+            </DetailSection>
+            <DetailSection title="Special Skills">
+              <ProfileFlex>
+                {profile?.additional_skills_checkboxes?.length &&
+                  profile?.additional_skills_checkboxes.map((skill: string) => (
+                    <Badge pill bg="primary" key={`skills-primary-${skill}`}>
+                      {skill}
+                    </Badge>
+                  ))}
+                {profile?.additional_skills_manual?.length &&
+                  profile?.additional_skills_manual.map((skill: string) => (
+                    <Badge pill bg="secondary" key={`skills-manual-${skill}`}>
+                      {skill}
+                    </Badge>
+                  ))}
+              </ProfileFlex>
+            </DetailSection>
+            <DetailSection title="Awards & Recognition">
+              <ProfileFlex>
+                {profile?.awards?.length &&
+                  profile?.awards.map((award: ProfileAwards) => (
+                    <AwardCard award={award} key={`award-${award?.title}`} />
+                  ))}
+              </ProfileFlex>
+            </DetailSection>
           </div>
         </Col>
       </Row>
@@ -197,6 +363,43 @@ const PreviewCard = styled.div`
     color: ${colors.dark};
     margin-left: 21px;
   }
+`;
+
+const ProfileFlex = styled.div`
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 24px;
+`;
+
+const AwardCardFlex = styled.div`
+  flex: 1 1 50%;
+  background: ${colors.white};
+  box-shadow: 0 0 8px 4px ${colors.black05a};
+  border-radius: 8px;
+  padding: 25px 21px;
+`;
+
+const AwardIconImage = styled(Image)`
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  height: 100%;
+`;
+
+const AwardTitle = styled.h3`
+  font-family: ${fonts.mainFont};
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+`;
+
+const AwardP = styled.p`
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 20px;
+  letter-spacing: 0.25px;
 `;
 
 export default IndividualProfile;
