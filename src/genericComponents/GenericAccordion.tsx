@@ -7,7 +7,6 @@ import styled from 'styled-components';
 
 const GenericAccordion = (props: any) => {
   const { children, textHeader, eventKey } = props;
-  console.log({ props });
 
   return (
     <CardHolder>

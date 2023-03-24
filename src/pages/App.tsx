@@ -100,13 +100,14 @@ const App = () => {
   const storage = getStorage(app);
 
   useEffect(() => {
-    onAuthStateChanged(auth, user => setCurrentUser(user));
+    onAuthStateChanged(auth, (user) => setCurrentUser(user));
   }, []);
 
   useEffect(() => {
     if (!currentUser || !firestore) {
       return;
     }
+
     queryAccountAndProfile();
   }, [currentUser, firestore]);
 
@@ -161,13 +162,15 @@ const App = () => {
         <ProfileContext.Provider
           value={{
             account: account,
-            setAccountRef: ref => setAccount(prev => ({ ...prev, ref: ref })),
-            setAccountData: data =>
-              setAccount(prev => ({ ...prev, data: data })),
+            setAccountRef: (ref) =>
+              setAccount((prev) => ({ ...prev, ref: ref })),
+            setAccountData: (data) =>
+              setAccount((prev) => ({ ...prev, data: data })),
             profile: profile,
-            setProfileRef: ref => setProfile(prev => ({ ...prev, ref: ref })),
-            setProfileData: data =>
-              setProfile(prev => ({ ...prev, data: data }))
+            setProfileRef: (ref) =>
+              setProfile((prev) => ({ ...prev, ref: ref })),
+            setProfileData: (data) =>
+              setProfile((prev) => ({ ...prev, data: data }))
           }}
         >
           <main id="cag-frontend-app">
