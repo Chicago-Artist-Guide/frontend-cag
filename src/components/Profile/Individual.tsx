@@ -35,7 +35,7 @@ const IndividualUpcomingShow: React.FC<{
         <Col lg={4}>
           <ShowImage src={show?.imageUrl} fluid />
         </Col>
-        <RightCol lg={{ span: 7, offset: 1 }}>
+        <RightCol lg={8}>
           <div className="d-flex flex-column" style={{ height: '100%' }}>
             <div className="flex-grow-1">
               <ShowName>{show?.title}</ShowName>
@@ -213,7 +213,7 @@ const IndividualProfile: React.FC<{
             <DetailSection title="Training">
               {profile?.completed_profile_2 && (
                 <p>
-                  <strong>{profile?.trainingInstitution}</strong>
+                  <strong>{profile?.training_institution}</strong>
                   <br />
                   {profile?.training_city}, {profile?.training_state}
                   <br />
@@ -247,13 +247,23 @@ const IndividualProfile: React.FC<{
               <ProfileFlex>
                 {profile?.additional_skills_checkboxes?.length &&
                   profile?.additional_skills_checkboxes.map((skill: string) => (
-                    <Badge pill bg="primary" key={`skills-primary-${skill}`}>
+                    <Badge
+                      pill
+                      bg="primary"
+                      key={`skills-primary-${skill}`}
+                      text="white"
+                    >
                       {skill}
                     </Badge>
                   ))}
                 {profile?.additional_skills_manual?.length &&
                   profile?.additional_skills_manual.map((skill: string) => (
-                    <Badge pill bg="secondary" key={`skills-manual-${skill}`}>
+                    <Badge
+                      pill
+                      bg="secondary"
+                      key={`skills-manual-${skill}`}
+                      text="white"
+                    >
                       {skill}
                     </Badge>
                   ))}
@@ -369,7 +379,7 @@ const ProfileFlex = styled.div`
   display: inline-flex;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 24px;
+  padding: 24px 0;
 `;
 
 const AwardCardFlex = styled.div`
@@ -393,6 +403,7 @@ const AwardTitle = styled.h3`
   font-weight: 600;
   line-height: 24px;
   letter-spacing: 0.5px;
+  margin-bottom: 2px;
 `;
 
 const AwardP = styled.p`
