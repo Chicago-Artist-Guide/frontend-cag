@@ -27,7 +27,7 @@ export const StyledCard = styled(Col)`
     margin: 12px 0px;
   }
 
-  &:hover {
+  &:hover:not(.disabled) {
     scale: 1.05;
     cursor: pointer;
 
@@ -65,6 +65,10 @@ export const StyledCard = styled(Col)`
     &.red-shadow-hover {
       background: rgba(229, 143, 120, 0.65);
     }
+  }
+
+  &.disabled {
+    opacity: 0.5;
   }
 
   label {

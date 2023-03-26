@@ -16,7 +16,38 @@ type Card = {
   className: string;
   name: string;
   text: React.ReactNode;
+  enabled: boolean;
 };
+
+const cards: Card[] = [
+  {
+    icon: Individual,
+    className: 'green-shadow-hover',
+    name: 'individual',
+    text: (
+      <>
+        <CardHeading>Individual Artist</CardHeading>{' '}
+        <p>Show off your skills and experience</p>
+      </>
+    ),
+    enabled: true
+  },
+  {
+    icon: Group,
+    className: 'red-shadow-hover',
+    name: 'company',
+    text: (
+      <>
+        <CardHeading>Theatre Group</CardHeading>
+        <p>
+          <strong>COMING SOON!</strong> Tell prospective cast and crew about
+          your company
+        </p>
+      </>
+    ),
+    enabled: false
+  }
+];
 
 type Props = {
   accountType: string | null;
@@ -40,12 +71,16 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
       <Row>
         <Col lg={7}>
           <Row style={{ flexWrap: 'nowrap' }}>
-            {cards.map(({ className, icon, text, name }: any) => (
+            {cards.map(({ className, icon, text, name, enabled }: any) => (
               <StyledCard
                 key={name}
-                className={clsx(className, accountType === name && 'selected')}
+                className={clsx(
+                  className,
+                  accountType === name && 'selected',
+                  !enabled && 'disabled'
+                )}
                 lg="5"
-                onClick={() => setAccountType(name)}
+                onClick={() => enabled ?? setAccountType(name)}
               >
                 <Image alt="" src={icon} />
                 <CardText>{text}</CardText>
@@ -58,8 +93,6 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
   );
 };
 
-export default AccountType;
-
 const SelectDirections = styled.p`
   text-align: left;
   font-size: 14px/18px;
@@ -67,27 +100,4 @@ const SelectDirections = styled.p`
   font: ${fonts.montserrat};
 `;
 
-const cards: Card[] = [
-  {
-    icon: Individual,
-    className: 'green-shadow-hover',
-    name: 'individual',
-    text: (
-      <>
-        <CardHeading>Individual Artist</CardHeading>{' '}
-        <p>Show off your skills and experience</p>
-      </>
-    )
-  },
-  {
-    icon: Group,
-    className: 'red-shadow-hover',
-    name: 'company',
-    text: (
-      <>
-        <CardHeading>Theatre Group</CardHeading>
-        <p>Tell prospective cast and crew about your company</p>
-      </>
-    )
-  }
-];
+export default AccountType;
