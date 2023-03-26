@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useAuthValue } from '../context/AuthContext';
 import PageContainer from '../components/layout/PageContainer';
 import AccountType from '../components/SignUp/AccountType';
@@ -12,6 +15,8 @@ import {
   PageFooterRow
 } from '../components/SignUp/SignUpFooterStyles';
 import Button from '../genericComponents/Button';
+import { breakpoints } from '../theme/styleVars';
+import { PreviewCard } from '../components/Profile/shared/styles';
 
 const SignUp: React.FC = () => {
   const history = useHistory();
@@ -32,6 +37,21 @@ const SignUp: React.FC = () => {
       <PageContainer>
         <Row>
           <Col lg={12}>
+            <MobileWarning>
+              <h2>
+                <FontAwesomeIcon
+                  style={{ marginRight: '12px' }}
+                  icon={faExclamationTriangle}
+                />{' '}
+                Mobile Sign-Up Not Supported
+              </h2>
+              <p>
+                We've detected you're using a mobile device to sign up. It is
+                suggested you use a desktop computer because this process has
+                not been designed for an enjoyable mobile experience yet. Mobile
+                sign-up is coming soon!
+              </p>
+            </MobileWarning>
             <AccountType
               accountType={accountType}
               setAccountType={setAccountType}
@@ -76,5 +96,13 @@ const SignUp: React.FC = () => {
 
   return <div>Something went wrong.</div>;
 };
+
+const MobileWarning = styled(PreviewCard as any)`
+  display: block;
+
+  @media (min-width: ${breakpoints.md}) {
+    display: none;
+  }
+`;
 
 export default SignUp;
