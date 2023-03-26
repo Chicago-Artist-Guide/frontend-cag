@@ -175,7 +175,7 @@ const IndividualProfile: React.FC<{
               <FontAwesomeIcon
                 style={{ marginRight: '12px' }}
                 icon={faCheckCircle}
-              />
+              />{' '}
               Profile Complete!
             </h2>
             <p>
