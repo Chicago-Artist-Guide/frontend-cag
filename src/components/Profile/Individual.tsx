@@ -6,6 +6,8 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useProfileContext } from '../../context/ProfileContext';
 import Button from '../../genericComponents/Button';
 import { fonts, colors } from '../../theme/styleVars';
@@ -163,6 +165,25 @@ const IndividualProfile: React.FC<{
                 remind me later
               </a>
             </div>
+          </PreviewCard>
+        </Row>
+      )}
+      {profile?.completed_profile_2 && (
+        <Row>
+          <PreviewCard>
+            <h2>
+              <FontAwesomeIcon
+                style={{ marginRight: '12px' }}
+                icon={faCheckCircle}
+              />
+              Profile Complete!
+            </h2>
+            <p>
+              Our platform is scheduled to go live this summer, so please watch
+              for any email announcements coming from us in the next few months.
+              We've got big things coming soon!
+            </p>
+            <p>Thanks - The Chicago Artist Guide Team</p>
           </PreviewCard>
         </Row>
       )}
