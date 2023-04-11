@@ -249,15 +249,19 @@ const IndividualSignUp: React.FC<{
           const resp = { ok: true };
           setSubmitBasicsErr(resp);
 
-          // submit to marketing
-          await submitLGLConstituent({
-            api_key: lglApiKey,
-            first_name: basicsFirstName,
-            last_name: basicsLastName,
-            email_address: basicsEmailAddress,
-            account_type: 'individual',
-            stage_role: stageRole
-          });
+          try {
+            // submit to marketing
+            await submitLGLConstituent({
+              api_key: lglApiKey,
+              first_name: basicsFirstName,
+              last_name: basicsLastName,
+              email_address: basicsEmailAddress,
+              account_type: 'individual',
+              stage_role: stageRole
+            });
+          } catch (e) {
+            console.error('LGL Error', e);
+          }
 
           return resp;
         } catch (e) {

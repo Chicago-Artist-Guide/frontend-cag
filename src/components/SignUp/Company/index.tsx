@@ -73,6 +73,7 @@ const CompanySignUp: React.FC<{
     } catch (e) {
       console.error('Error adding document:', e);
     }
+
     return { ok: true };
   };
 
