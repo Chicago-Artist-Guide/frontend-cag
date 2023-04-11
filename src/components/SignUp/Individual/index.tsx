@@ -5,6 +5,8 @@ import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
+import { useMarketingContext } from '../../../context/MarketingContext';
+import { submitLGLConstituent } from '../../../utils/marketing';
 import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
@@ -96,6 +98,7 @@ const IndividualSignUp: React.FC<{
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useProfileContext();
+  const { lglApiKey } = useMarketingContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
@@ -245,6 +248,17 @@ const IndividualSignUp: React.FC<{
           // successful case
           const resp = { ok: true };
           setSubmitBasicsErr(resp);
+
+          // submit to marketing
+          await submitLGLConstituent({
+            api_key: lglApiKey,
+            first_name: basicsFirstName,
+            last_name: basicsLastName,
+            email_address: basicsEmailAddress,
+            account_type: 'individual',
+            stage_role: stageRole
+          });
+
           return resp;
         } catch (e) {
           console.error('Error adding document:', e);

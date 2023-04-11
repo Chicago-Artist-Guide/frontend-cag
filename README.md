@@ -5,12 +5,23 @@ This is a React application using TypeScript, Bootstrap, and Styled-Components.
 
 ### Instructions
 
-Before you run this app, make sure you're using Node Version Manager (NVM) and are using at least Node v10.16.1 (`nvm install 10.16.1` and `nvm use 10.16.1`)
+Before you run this app, make sure you're using Node Version Manager (NVM) and are using at least Node v18.12.1 (`nvm install 18.12.1` and `nvm use 18.12.1`)
 
-Running this app:
+**Running this app:**
 1. `npm install`
 2. `npm run start`
 3. Now access the app at http://localhost:3000 (should open automatically). Editing files should automatically build and hot-reload the page
+
+**Environment Variables:**
+
+```
+REACT_APP_FIREBASE_API_KEY
+REACT_APP_FIREBASE_PROJECT_ID
+REACT_APP_FIREBASE_SENDER_ID
+REACT_APP_FIREBASE_APP_ID
+REACT_APP_FIREBASE_MID
+REACT_APP_LGL_API_KEY
+```
 
 ### Pull Requests (PRs)
 
@@ -37,5 +48,5 @@ PR tips:
 4. Please follow linting rules. Make sure indentation is 2 spaces, general code style is consistent/cohesive, attributes and properties are ordered alphabetically, and so forth
 5. Please remind tech leads and team members in Slack if you need reviews and haven't received any
 
-**Warning:** commits to master trigger a push and build on production in AWS. Do not merge if you have any concerns about the branch breaking something. In some cases, we may work off of specific feature branches as an extra layer of protection, so please pay attention in those situations to use the feature branches instead of master. 
+**Warning:** commits to master trigger a push and build on production in AWS. Do not merge if you have any concerns about the branch breaking something. In some cases, we may work off of specific feature branches as an extra layer of protection, so please pay attention in those situations to use the feature branches instead of master.
 
