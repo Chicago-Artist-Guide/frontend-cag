@@ -24,6 +24,7 @@ import ScrollToTop from '../components/ScrollToTop';
 import SignUp2 from '../components/SignUp/Individual/SignUp2';
 import { AuthProvider } from '../context/AuthContext';
 import { FirebaseContext } from '../context/FirebaseContext';
+import { MarketingContext } from '../context/MarketingContext';
 import { Document, ProfileContext } from '../context/ProfileContext';
 import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
@@ -49,6 +50,7 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_FIREBASE_APP_ID,
   measurementId: process.env.REACT_APP_FIREBASE_MID
 };
+const lglApiKey = process.env.REACT_APP_LGL_API_KEY || '';
 
 const CAG = () => (
   <Router>
@@ -173,9 +175,11 @@ const App = () => {
               setProfile((prev) => ({ ...prev, data: data }))
           }}
         >
-          <main id="cag-frontend-app">
-            <CAG />
-          </main>
+          <MarketingContext.Provider value={{ lglApiKey }}>
+            <main id="cag-frontend-app">
+              <CAG />
+            </main>
+          </MarketingContext.Provider>
         </ProfileContext.Provider>
       </AuthProvider>
     </FirebaseContext.Provider>

@@ -5,6 +5,8 @@ import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
+import { useMarketingContext } from '../../../context/MarketingContext';
+import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from '../Privacy';
 import CompanyBasics from './Basics';
@@ -20,6 +22,7 @@ const CompanySignUp: React.FC<{
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useProfileContext();
+  const { lglApiKey } = useMarketingContext();
   const [formValues, setFormValues] = useForm<CompanyData>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
@@ -54,11 +57,23 @@ const CompanySignUp: React.FC<{
 
       setAccountRef(account);
       setProfileRef(profile);
-      const nextSteps = steps.filter(s => s.id !== 'basics');
+
+      // submit to marketing
+      await submitLGLConstituent({
+        api_key: lglApiKey,
+        first_name: theatreName,
+        last_name: '',
+        email_address: emailAddress,
+        account_type: 'company',
+        org_name: theatreName
+      });
+
+      const nextSteps = steps.filter((s) => s.id !== 'basics');
       setSteps(nextSteps);
     } catch (e) {
       console.error('Error adding document:', e);
     }
+
     return { ok: true };
   };
 
@@ -81,7 +96,7 @@ const CompanySignUp: React.FC<{
     hasErrors: boolean
   ) => {
     if (stepErrors[currentStep] !== undefined) {
-      setStepErrors(prev => ({ ...prev, [currentStep]: hasErrors }));
+      setStepErrors((prev) => ({ ...prev, [currentStep]: hasErrors }));
     }
   };
 
