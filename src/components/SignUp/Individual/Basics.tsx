@@ -14,6 +14,7 @@ import Checkbox from '../../../genericComponents/Checkbox';
 import { colors } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
 import type { IndividualData } from './types';
+import Red_Blob from '../../../images/red_blob.svg';
 
 const IndividualBasics: React.FC<{
   setForm: SetForm;
@@ -28,7 +29,8 @@ const IndividualBasics: React.FC<{
     basicsEmailAddress,
     basicsPassword,
     basicsPasswordConfirm,
-    basics18Plus
+    basics18Plus,
+    emailListAgree
   } = formData;
 
   // create an array of the required field names
@@ -107,7 +109,7 @@ const IndividualBasics: React.FC<{
       <Row>
         <Col lg="8">
           <PaddingTitle>LET'S GET TO KNOW EACH OTHER</PaddingTitle>
-          {submitBasicsErr && (
+          {submitBasicsErr?.code && !submitBasicsErr.ok && (
             <Alert key="danger" variant="danger">
               <strong>Error signing up:</strong> {submitBasicsErr.code}
             </Alert>
@@ -175,6 +177,15 @@ const IndividualBasics: React.FC<{
               value={basicsPasswordConfirm || ''}
               className="form-group"
             />
+            <hr />
+            <CAGCheckbox
+              checked={emailListAgree || false}
+              fieldType="checkbox"
+              label="I agree to join the email list to stay up-to-date with Chicago Artist Guide!"
+              name="emailListAgree"
+              onChange={setForm}
+            />
+            <hr />
             <CAGCheckbox
               checked={basics18Plus || false}
               fieldType="checkbox"
@@ -187,8 +198,10 @@ const IndividualBasics: React.FC<{
             Already a member? <Link to="/login">Log in here</Link>
           </LoginLink>
         </Col>
-        <Col lg="4"></Col>
-        <Col lg="4"></Col>
+        <Col lg="2" />
+        <Col lg="6">
+          <img alt="Chicago Artist Guide" src={Red_Blob} />
+        </Col>
       </Row>
     </Container>
   );

@@ -25,6 +25,10 @@ export type LGLCustomAttrs = {
   value: 'individual' | 'company' | IndividualRoles;
 };
 
+export type LGLGroup = {
+  group_id: number;
+};
+
 export type SubmitLGLConstituentPayload = {
   is_org: boolean;
   first_name: string;
@@ -38,8 +42,8 @@ export type SubmitLGLConstituentPayload = {
   honorary_name: string; // first last
   date_added: string; // yyyy-mm-dd
   email_addresses: LGLEmailAddress[];
-  custom_attrs: LGLCustomAttrs[];
   org_name?: string;
+  groups: LGLGroup[];
 };
 
 export const submitLGLConstituent = async ({
@@ -48,7 +52,6 @@ export const submitLGLConstituent = async ({
   last_name,
   email_address,
   account_type,
-  stage_role,
   org_name
 }: SubmitLGLConstituentParams) => {
   if (
@@ -84,29 +87,31 @@ export const submitLGLConstituent = async ({
         is_preferred: true
       }
     ],
-    custom_attrs: [
-      {
-        id: 111,
-        key: 'account_type',
-        value: account_type
-      }
-    ]
+    groups: []
   };
-
-  if (stage_role) {
-    lglPayload.custom_attrs.push({
-      id: 222,
-      key: 'stage_role',
-      value: stage_role
-    });
-  }
 
   if (org_name) {
     lglPayload['org_name'] = org_name;
   }
 
-  const lglUrl = 'https://api.littlegreenlight.com/api/v1/constituents.json';
+  // get groups
+  const lglGroupsUrl =
+    'https://api.littlegreenlight.com/api/v1/groups.json?limit=25';
   const headers = { Authorization: `Bearer ${api_key}` };
+
+  const groupsResp = await axios.get(lglGroupsUrl, { headers });
+  const groupItems = groupsResp?.data?.items || [];
+
+  if (groupItems.length) {
+    const findKey = account_type === 'company' ? 'producing_company' : 'artist';
+    const constituentGroup = groupItems.find((i: any) => i.key === findKey);
+
+    if (constituentGroup) {
+      lglPayload.groups.push({ group_id: constituentGroup.id });
+    }
+  }
+
+  const lglUrl = 'https://api.littlegreenlight.com/api/v1/constituents.json';
 
   await axios
     .post(lglUrl, lglPayload, { headers })

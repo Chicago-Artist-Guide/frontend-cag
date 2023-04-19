@@ -10,7 +10,7 @@ const FORM_VALIDATION_ON = true;
 
 export type SubmitBasicsResp = {
   ok: boolean;
-  code?: string;
+  code?: string | number;
 };
 
 const SignUpFooter: React.FC<{
@@ -52,7 +52,7 @@ const SignUpFooter: React.FC<{
 
   const { next, previous } = navigation;
   const navigationNext = landingStep === 2 || currentStep !== 'privacy';
-  const stepIndex = steps.findIndex(step => step.id === currentStep);
+  const stepIndex = steps.findIndex((step) => step.id === currentStep);
   const continueText =
     currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 

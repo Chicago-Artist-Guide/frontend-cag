@@ -81,6 +81,7 @@ const defaultData: IndividualData = {
   demographicsUnionStatus: '',
   demographicsUnionStatusOther: '',
   demographicsWebsites: [{ id: 1, url: '', websiteType: '' as WebsiteTypes }],
+  emailListAgree: true,
   offstageRolesGeneral: [],
   offstageRolesHairMakeupCostumes: [],
   offstageRolesLighting: [],
@@ -199,6 +200,7 @@ const IndividualSignUp: React.FC<{
       basicsEmailAddress,
       basicsPassword,
       basics18Plus,
+      emailListAgree,
       stageRole
     } = formData;
 
@@ -215,6 +217,7 @@ const IndividualSignUp: React.FC<{
           const accountInit: IndividualAccountInit = {
             type: 'individual',
             basics_18_plus: basics18Plus,
+            email_list: emailListAgree,
             first_name: basicsFirstName,
             last_name: basicsLastName,
             privacy_agreement: true,
@@ -245,23 +248,24 @@ const IndividualSignUp: React.FC<{
           setAccountRef(accountRef);
           setProfileRef(profileRef);
 
+          // submit to marketing
+          if (emailListAgree) {
+            try {
+              await submitLGLConstituent({
+                api_key: lglApiKey,
+                first_name: basicsFirstName,
+                last_name: basicsLastName,
+                email_address: basicsEmailAddress,
+                account_type: 'individual'
+              });
+            } catch (e) {
+              console.error('LGL Error', e);
+            }
+          }
+
           // successful case
           const resp = { ok: true };
           setSubmitBasicsErr(resp);
-
-          try {
-            // submit to marketing
-            await submitLGLConstituent({
-              api_key: lglApiKey,
-              first_name: basicsFirstName,
-              last_name: basicsLastName,
-              email_address: basicsEmailAddress,
-              account_type: 'individual',
-              stage_role: stageRole
-            });
-          } catch (e) {
-            console.error('LGL Error', e);
-          }
 
           return resp;
         } catch (e) {
