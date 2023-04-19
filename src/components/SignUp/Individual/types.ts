@@ -131,6 +131,7 @@ export type IndividualData = {
   demographicsUnionStatus: string;
   demographicsUnionStatusOther: string;
   demographicsWebsites: IndividualWebsite[];
+  emailListAgree: boolean;
   offstageRolesGeneral: string[];
   offstageRolesHairMakeupCostumes: string[];
   offstageRolesLighting: string[];
@@ -145,6 +146,7 @@ export type IndividualData = {
 export type IndividualAccountInit = {
   type: Extract<AccountTypeOptions, 'individual'>;
   basics_18_plus: boolean;
+  email_list: boolean;
   first_name: string;
   last_name: string;
   privacy_agreement: boolean;
