@@ -85,8 +85,8 @@ const ForArtists = () => {
           Want to be the first to know when our platform launches? Scroll down
           to sign up for email updates from our team!
         </p>
-        <Nav.Link as={BuildButton} to="#">
-          COMING SOON
+        <Nav.Link as={BuildButton} to="/sign-up">
+          SIGN UP
         </Nav.Link>
       </WordBox>
       <CardBox cards={cards} style={{ marginLeft: '70px' }} />

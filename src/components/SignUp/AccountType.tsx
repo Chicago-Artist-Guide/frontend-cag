@@ -1,12 +1,13 @@
 import clsx from 'clsx';
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Container, Image } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import Group from '../../images/icons-signup/group.svg';
 import Individual from '../../images/icons-signup/individual.svg';
-import { fonts } from '../../theme/styleVars';
+import { colors, fonts } from '../../theme/styleVars';
 import { Tagline, Title } from '../layout';
 import { CardHeading, StyledCard, CardText } from './SignUpStyles';
 import type { AccountTypeOptions } from './types';
@@ -89,6 +90,13 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
           </Row>
         </Col>
       </Row>
+      <Row>
+        <Col lg="12">
+          <LoginLink>
+            Already a member? <Link to="/login">Log in here</Link>
+          </LoginLink>
+        </Col>
+      </Row>
     </Container>
   );
 };
@@ -98,6 +106,19 @@ const SelectDirections = styled.p`
   font-size: 14px/18px;
   letter-spacing: 0.14px;
   font: ${fonts.montserrat};
+`;
+
+const LoginLink = styled.p`
+  text-align: left;
+  font-size: 14px/18px;
+  font-style: italic;
+  letter-spacing: 0.14px;
+  margin-top: 40px;
+  margin-bottom: -40px;
+
+  a {
+    color: ${colors.orange};
+  }
 `;
 
 export default AccountType;

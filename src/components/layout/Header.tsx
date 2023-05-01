@@ -31,10 +31,19 @@ const Header = () => {
           <Nav.Link as={Link} to="/donate">
             DONATE
           </Nav.Link>
-          {profileRef !== null && (
+          {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">
               PROFILE
             </Nav.Link>
+          ) : (
+            <>
+              <Nav.Link as={Link} to="/sign-up">
+                SIGN UP
+              </Nav.Link>
+              <Nav.Link as={Link} to="/login">
+                LOGIN
+              </Nav.Link>
+            </>
           )}
           {currentUser !== null && (
             <Nav.Link as={Link} to="/logout">
