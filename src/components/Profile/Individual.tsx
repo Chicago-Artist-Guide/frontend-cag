@@ -229,11 +229,11 @@ const IndividualProfile: React.FC<{
               <p>{profile?.pronouns || profile?.pronouns_other}</p>
             </HeaderNamePronouns>
             {profile?.profile_tagline && <h3>{profile?.profile_tagline}</h3>}
-            <p>{profile?.bio}</p>
+            {profile?.bio && <p>{profile?.bio}</p>}
           </div>
           <div>
-            <DetailSection title="Training">
-              {profile?.completed_profile_2 && (
+            {profile?.completed_profile_2 && (
+              <DetailSection title="Training">
                 <p>
                   <strong>{profile?.training_institution}</strong>
                   <br />
@@ -243,11 +243,11 @@ const IndividualProfile: React.FC<{
                   <br />
                   <span>{profile?.training_details}</span>
                 </p>
-              )}
-            </DetailSection>
-            <DetailSection title="Upcoming Features">
-              {profile?.upcoming_performances?.length &&
-                profile?.upcoming_performances.map(
+              </DetailSection>
+            )}
+            {profile?.upcoming_performances?.length && (
+              <DetailSection title="Upcoming Features">
+                {profile?.upcoming_performances.map(
                   (perf: UpcomingPerformances) => (
                     <IndividualUpcomingShow
                       key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
@@ -255,50 +255,58 @@ const IndividualProfile: React.FC<{
                     />
                   )
                 )}
-            </DetailSection>
-            <DetailSection title="Past Performances">
-              {profile?.past_performances?.length &&
-                profile?.past_performances.map((perf: PastPerformances) => (
+              </DetailSection>
+            )}
+            {profile?.past_performances?.length && (
+              <DetailSection title="Past Performances">
+                {profile?.past_performances.map((perf: PastPerformances) => (
                   <IndividualCredits
                     key={`credits-shows-${perf.id}`}
                     show={perf}
                   />
                 ))}
-            </DetailSection>
-            <DetailSection title="Special Skills">
-              <ProfileFlex>
-                {profile?.additional_skills_checkboxes?.length &&
-                  profile?.additional_skills_checkboxes.map((skill: string) => (
-                    <Badge
-                      pill
-                      bg="primary"
-                      key={`skills-primary-${skill}`}
-                      text="white"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                {profile?.additional_skills_manual?.length &&
-                  profile?.additional_skills_manual.map((skill: string) => (
-                    <Badge
-                      pill
-                      bg="secondary"
-                      key={`skills-manual-${skill}`}
-                      text="white"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-              </ProfileFlex>
-            </DetailSection>
-            <DetailSection title="Awards & Recognition">
-              <ProfileFlex>
-                {profile?.awards?.length &&
-                  profile?.awards.map((award: ProfileAwards) => (
+              </DetailSection>
+            )}
+            {(profile?.additional_skills_checkboxes?.length ||
+              profile?.additional_skills_manual?.length) && (
+              <DetailSection title="Special Skills">
+                <ProfileFlex>
+                  {profile?.additional_skills_checkboxes?.length &&
+                    profile?.additional_skills_checkboxes.map(
+                      (skill: string) => (
+                        <Badge
+                          pill
+                          bg="primary"
+                          key={`skills-primary-${skill}`}
+                          text="white"
+                        >
+                          {skill}
+                        </Badge>
+                      )
+                    )}
+                  {profile?.additional_skills_manual?.length &&
+                    profile?.additional_skills_manual.map((skill: string) => (
+                      <Badge
+                        pill
+                        bg="secondary"
+                        key={`skills-manual-${skill}`}
+                        text="white"
+                      >
+                        {skill}
+                      </Badge>
+                    ))}
+                </ProfileFlex>
+              </DetailSection>
+            )}
+            {profile?.awards?.length && (
+              <DetailSection title="Awards & Recognition">
+                <ProfileFlex>
+                  {profile?.awards.map((award: ProfileAwards) => (
                     <AwardCard award={award} key={`award-${award?.title}`} />
                   ))}
-              </ProfileFlex>
-            </DetailSection>
+                </ProfileFlex>
+              </DetailSection>
+            )}
           </div>
         </Col>
       </Row>
