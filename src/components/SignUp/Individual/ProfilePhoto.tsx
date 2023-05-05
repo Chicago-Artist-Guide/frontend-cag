@@ -10,6 +10,7 @@ import { SetForm } from 'react-hooks-helper';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
+import { useProfileContext } from '../../../context/ProfileContext';
 import Button from '../../../genericComponents/Button';
 import { Tagline, Title } from '../../layout/Titles';
 import { colors } from '../../../theme/styleVars';
@@ -22,6 +23,9 @@ const ProfilePhoto: React.FC<{
 }> = (props) => {
   const { setForm } = props;
   const { firebaseStorage } = useFirebaseContext();
+  const {
+    profile: { data }
+  } = useProfileContext();
   const [file, setFile] = useState<File | null>(null);
   const [percent, setPercent] = useState(0);
   const [imgUrl, setImgUrl] = useState<string | null>(null);
@@ -42,7 +46,10 @@ const ProfilePhoto: React.FC<{
     // start upload
     setUploadInProgress(true);
 
-    const storageRef = ref(firebaseStorage, `/files/${file.name}`);
+    const storageRef = ref(
+      firebaseStorage,
+      `/files-${data.uid}/${data.account_id}-${file.name}`
+    );
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(

@@ -16,7 +16,8 @@ import DetailSection from './shared/DetailSection';
 import type {
   PastPerformances,
   ProfileAwards,
-  UpcomingPerformances
+  UpcomingPerformances,
+  IndividualWebsite
 } from '../SignUp/Individual/types';
 import {
   RightCol,
@@ -26,6 +27,7 @@ import {
   ShowDescription,
   ShowStatus as ShowDates
 } from './Company/Production/ActiveProduction';
+import { hasNonEmptyValues } from '../../utils/hasNonEmptyValues';
 import { PreviewCard } from './shared/styles';
 import Ribbon from '../../images/icons-profile/ribbon.svg';
 
@@ -199,25 +201,63 @@ const IndividualProfile: React.FC<{
           <DetailsCard>
             <DetailsColTitle>Personal Details</DetailsColTitle>
             <p>
-              Age Range: {profile?.age_ranges?.join(', ')}
-              <br />
-              Height:{' '}
-              {profile?.height_no_answer ? (
-                'N/A'
-              ) : (
+              {profile?.age_ranges.length && (
                 <>
-                  {profile?.height_ft}’-{profile?.height_in}”
+                  Age Range: {profile?.age_ranges?.join(', ')}
+                  <br />
                 </>
               )}
-              <br />
-              Gender Identity: {profile?.gender_identity}
-              <br />
-              Ethnicity: {profile?.ethnicities?.join(', ')}
-              <br />
-              Union: {profile?.union_status || profile?.union_other}
-              <br />
-              Agency: {profile?.agency}
+              {(profile?.height_no_answer ||
+                (profile?.height_ft && profile?.height_ft !== '')) && (
+                <>
+                  Height:{' '}
+                  {profile?.height_no_answer ? (
+                    'N/A'
+                  ) : (
+                    <>
+                      {profile?.height_ft}’-{profile?.height_in}”
+                    </>
+                  )}
+                  <br />
+                </>
+              )}
+              {profile?.gender_identity && profile?.gender_identity !== '' && (
+                <>
+                  Gender Identity: {profile?.gender_identity}
+                  <br />
+                </>
+              )}
+              {profile?.ethnicities.length && (
+                <>
+                  Ethnicity: {profile?.ethnicities?.join(', ')}
+                  <br />
+                </>
+              )}
+              {((profile?.union_status && profile?.union_status !== '') ||
+                (profile?.union_other && profile?.union_other !== '')) && (
+                <>
+                  Union: {profile?.union_status || profile?.union_other}
+                  <br />
+                </>
+              )}
+              {profile?.agency && profile?.agency !== '' && (
+                <>Agency: {profile?.agency}</>
+              )}
             </p>
+            {hasNonEmptyValues(profile?.websites) && (
+              <p>
+                <strong>Websites:</strong>
+                <br />
+                {profile?.websites.map((w: IndividualWebsite) => (
+                  <React.Fragment key={`personal-website-${w.id}`}>
+                    <a href={w.url} target="_blank">
+                      Visit Website (<em>{w.websiteType}</em>)
+                    </a>
+                    <br />
+                  </React.Fragment>
+                ))}
+              </p>
+            )}
           </DetailsCard>
         </Col>
         <Col lg={8}>
@@ -245,7 +285,7 @@ const IndividualProfile: React.FC<{
                 </p>
               </DetailSection>
             )}
-            {profile?.upcoming_performances?.length && (
+            {hasNonEmptyValues(profile?.upcoming_performances) && (
               <DetailSection title="Upcoming Features">
                 {profile?.upcoming_performances.map(
                   (perf: UpcomingPerformances) => (
@@ -257,7 +297,7 @@ const IndividualProfile: React.FC<{
                 )}
               </DetailSection>
             )}
-            {profile?.past_performances?.length && (
+            {hasNonEmptyValues(profile?.past_performances) && (
               <DetailSection title="Past Performances">
                 {profile?.past_performances.map((perf: PastPerformances) => (
                   <IndividualCredits
@@ -298,7 +338,7 @@ const IndividualProfile: React.FC<{
                 </ProfileFlex>
               </DetailSection>
             )}
-            {profile?.awards?.length && (
+            {hasNonEmptyValues(profile?.awards) && (
               <DetailSection title="Awards & Recognition">
                 <ProfileFlex>
                   {profile?.awards.map((award: ProfileAwards) => (

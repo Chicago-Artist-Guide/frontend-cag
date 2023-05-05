@@ -8,6 +8,7 @@ import { Col, Form, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import { Tagline, Title } from '../../layout/Titles';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
+import { useProfileContext } from '../../../context/ProfileContext';
 import Button from '../../../genericComponents/Button';
 import InputField from '../../../genericComponents/Input';
 import { colors } from '../../../theme/styleVars';
@@ -21,6 +22,9 @@ const Upcoming: React.FC<{
   const { upcoming } = formData;
   const [showId, setShowId] = useState(1);
   const { firebaseStorage } = useFirebaseContext();
+  const {
+    profile: { data }
+  } = useProfileContext();
   const [file, setFile] = useState<any>({ 1: '' });
   const [percent, setPercent] = useState({ 1: 0 });
   const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
@@ -49,7 +53,10 @@ const Upcoming: React.FC<{
     const currUploadProg = { ...uploadInProgress };
     setUploadInProgress({ ...currUploadProg, [id]: true });
 
-    const storageRef = ref(firebaseStorage, `/files/${currFile.name}`);
+    const storageRef = ref(
+      firebaseStorage,
+      `/files-${data.uid}/${data.account_id}-${currFile.name}`
+    );
     const uploadTask = uploadBytesResumable(storageRef, currFile);
 
     uploadTask.on(
