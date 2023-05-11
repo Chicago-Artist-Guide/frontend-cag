@@ -3,6 +3,8 @@ type ObjectWithStringValues = { [key: string]: string };
 export const hasNonEmptyValues = (
   objects: ObjectWithStringValues[]
 ): boolean => {
+  if (!objects) return false;
+
   let nonEmptyObjectFound = false;
 
   for (const object of objects) {
