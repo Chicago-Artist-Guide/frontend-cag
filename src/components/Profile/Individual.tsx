@@ -201,7 +201,7 @@ const IndividualProfile: React.FC<{
           <DetailsCard>
             <DetailsColTitle>Personal Details</DetailsColTitle>
             <p>
-              {profile?.age_ranges.length && (
+              {profile?.age_ranges?.length && (
                 <>
                   Age Range: {profile?.age_ranges?.join(', ')}
                   <br />
