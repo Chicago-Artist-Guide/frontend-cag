@@ -10,10 +10,12 @@ import RoleSection from '../Roles/RoleSection';
 const ManageProductionRoles: React.FC<{
   formValues: Production;
   setFormValues: SetForm;
-}> = ({ formValues, setFormValues }) => {
+  handleUpdate: (x: Production) => void;
+}> = ({ formValues, setFormValues, handleUpdate }) => {
   const [showModal, setShowModal] = useState(false);
   const [roleType, setRoleType] = useState<StageRole>(StageRole.OnStage);
   const [editRole, setEditRole] = useState<Role>();
+  const currentRoles = formValues.roles || [];
 
   const onSaveRole = (role: Role) => {
     if (!role.role_name) {
@@ -22,18 +24,10 @@ const ManageProductionRoles: React.FC<{
       return;
     }
 
-    let currentRoles =
-      roleType === StageRole.OnStage
-        ? formValues.onStageRoles
-        : formValues.offStageRoles;
     let nextRoles: Role[];
 
-    if (!currentRoles) {
-      currentRoles = [];
-    }
-
     if (role.role_id) {
-      nextRoles = currentRoles.map(r => {
+      nextRoles = currentRoles.map((r) => {
         if (r.role_id === role.role_id) {
           return role;
         }
@@ -43,14 +37,17 @@ const ManageProductionRoles: React.FC<{
       role.role_id = uuidv4();
       nextRoles = [...currentRoles, role];
     }
+
     setFormValues({
       target: {
-        name: roleType === StageRole.OnStage ? 'onStageRoles' : 'offStageRoles',
+        name: 'roles',
         value: nextRoles
       }
     });
+
     setEditRole(undefined);
     setShowModal(false);
+    handleUpdate({ ...formValues, roles: nextRoles });
   };
 
   const onManageOnStageRole = (role: Role = {}) => {
@@ -65,6 +62,18 @@ const ManageProductionRoles: React.FC<{
     setShowModal(true);
   };
 
+  const { onStageRoles, offStageRoles } = currentRoles.reduce(
+    (acc, role) => {
+      if (role.type === StageRole.OnStage) {
+        acc.onStageRoles.push(role);
+      } else if (role.type === StageRole.OffStage) {
+        acc.offStageRoles.push(role);
+      }
+      return acc;
+    },
+    { onStageRoles: [] as Role[], offStageRoles: [] as Role[] }
+  );
+
   return (
     <>
       <RoleModal
@@ -76,7 +85,7 @@ const ManageProductionRoles: React.FC<{
       />
       <div className="d-flex flex-column w-100" style={{ gap: '7.5em' }}>
         <RoleSection title="On-Stage" onClick={() => onManageOnStageRole()}>
-          {formValues.onStageRoles?.map(role => (
+          {onStageRoles?.map((role) => (
             <RoleCard
               key={role.role_id}
               role={role}
@@ -87,7 +96,7 @@ const ManageProductionRoles: React.FC<{
         </RoleSection>
         <div className="mt-45">
           <RoleSection title="Off-Stage" onClick={() => onManageOffStageRole()}>
-            {formValues.offStageRoles?.map(role => (
+            {offStageRoles?.map((role) => (
               <RoleCard
                 key={role.role_id}
                 role={role}

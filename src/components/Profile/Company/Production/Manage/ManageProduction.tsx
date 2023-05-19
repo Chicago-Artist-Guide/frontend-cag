@@ -39,8 +39,7 @@ const ManageProduction: React.FC<null> = () => {
     musical_director: '',
     equity: undefined,
     writers: '',
-    onStageRoles: [],
-    offStageRoles: []
+    roles: []
   });
 
   useEffect(() => {
@@ -66,9 +65,13 @@ const ManageProduction: React.FC<null> = () => {
     }
   };
 
-  const handleSubmit = async () => {
+  const handleUpdateDocument = async (values: Production) => {
     const docRef = doc(db, 'productions', productionId);
-    await updateDoc(docRef, formValues);
+    await updateDoc(docRef, values);
+  };
+
+  const handleSave = async () => {
+    await handleUpdateDocument(formValues);
     goToProfile();
   };
 
@@ -84,7 +87,7 @@ const ManageProduction: React.FC<null> = () => {
             <div className="d-flex flex-row justify-content-between">
               <Title>Manage Production</Title>
               <Button
-                onClick={handleSubmit}
+                onClick={handleUpdateDocument}
                 text="Save Show"
                 icon={faFloppyDisk}
                 type="button"
@@ -120,6 +123,7 @@ const ManageProduction: React.FC<null> = () => {
               <ManageProductionRoles
                 formValues={formValues}
                 setFormValues={setFormValues}
+                handleUpdate={handleUpdateDocument}
               />
             </TabRow>
           </Tab>
@@ -143,7 +147,7 @@ const ManageProduction: React.FC<null> = () => {
                 variant="danger"
               />
               <Button
-                onClick={handleSubmit}
+                onClick={handleSave}
                 text="Save Show"
                 icon={faFloppyDisk}
                 type="button"

@@ -12,6 +12,7 @@ interface Props {
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   value?: string;
   options: Value[];
+  style?: React.CSSProperties;
 }
 
 interface Value {
@@ -19,9 +20,16 @@ interface Value {
   value: string;
 }
 
-const DropdownMenu = ({ name, label, onChange, value, options }: Props) => {
+const DropdownMenu = ({
+  name,
+  label,
+  onChange,
+  value,
+  options,
+  style
+}: Props) => {
   return (
-    <CAGFormGroup controlId={name}>
+    <CAGFormGroup controlId={name} style={style}>
       <CAGLabel>{label}</CAGLabel>
       <CAGFormSelect
         name={name}
@@ -37,7 +45,7 @@ const DropdownMenu = ({ name, label, onChange, value, options }: Props) => {
           maxWidth: 300
         }}
       >
-        {options.map(option => (
+        {options.map((option) => (
           <option
             key={option.value}
             selected={option.value === value}
