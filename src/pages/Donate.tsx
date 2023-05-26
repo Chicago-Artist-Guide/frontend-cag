@@ -33,15 +33,17 @@ const Donate = () => (
               <strong>1. Online:</strong>
             </p>
             <iframe
+              height="1590"
+              allowTransparency
+              allow="payment"
               frameBorder="0"
-              height="650px"
-              name="givebutter"
-              scrolling="no"
-              seamless
-              src="https://givebutter.com/embed/c/caglaunch"
-              title="Donate to Chicago Artist Guide online via GiveButter"
-              width="100%"
-            />
+              style={{ width: '100%', border: 'none' }}
+              src="https://secure.lglforms.com/form_engine/s/wIPQhEmPD0vhxafb-oKAQQ"
+            >
+              <a href="https://secure.lglforms.com/form_engine/s/wIPQhEmPD0vhxafb-oKAQQ">
+                Fill out my LGL Form!
+              </a>
+            </iframe>
           </Col>
           <Col lg="4">
             <p>
