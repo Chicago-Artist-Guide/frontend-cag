@@ -83,7 +83,9 @@ const AccountType: React.FC<Props> = ({
                   !enabled && flag !== name && 'disabled'
                 )}
                 lg="5"
-                onClick={() => enabled && setAccountType(name)}
+                onClick={() =>
+                  (enabled || flag === name) && setAccountType(name)
+                }
               >
                 <Image alt="" src={icon} />
                 <CardText>{text}</CardText>
