@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
+import queryString from 'query-string';
 import styled from 'styled-components';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,11 +21,14 @@ import { PreviewCard } from '../components/Profile/shared/styles';
 
 const SignUp: React.FC = () => {
   const history = useHistory();
+  const { flag } = queryString.parse(location.search);
   const { currentUser } = useAuthValue();
   const [currentStep, setCurrentStep] = useState(-1);
   const [accountType, setAccountType] = useState<
     'individual' | 'company' | null
   >(null);
+
+  console.log('page flag', flag);
 
   useEffect(() => {
     if (currentUser && currentStep === -1) {
@@ -54,6 +58,7 @@ const SignUp: React.FC = () => {
             </MobileWarning>
             <AccountType
               accountType={accountType}
+              flag={flag || ''}
               setAccountType={setAccountType}
             />
           </Col>

@@ -29,6 +29,7 @@
     "history": "^4.10.1",
     "http-proxy-middleware": "^0.19.1",
     "node-sass": "^7.0.3",
+    "query-string": "^8.1.0",
     "react": "^16.13.1",
     "react-bootstrap": "^2.5.0",
     "react-bootstrap-icons": "^1.5.0",

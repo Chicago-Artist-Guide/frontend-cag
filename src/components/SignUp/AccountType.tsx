@@ -52,10 +52,15 @@ const cards: Card[] = [
 
 type Props = {
   accountType: string | null;
+  flag: string | (string | null)[] | null;
   setAccountType: (x: AccountTypeOptions | null) => void;
 };
 
-const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
+const AccountType: React.FC<Props> = ({
+  accountType,
+  flag,
+  setAccountType
+}) => {
   return (
     <Container className="margin-container">
       <Row>
@@ -78,7 +83,7 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
                 className={clsx(
                   className,
                   accountType === name && 'selected',
-                  !enabled && 'disabled'
+                  !enabled && flag !== name && 'disabled'
                 )}
                 lg="5"
                 onClick={() => enabled && setAccountType(name)}
