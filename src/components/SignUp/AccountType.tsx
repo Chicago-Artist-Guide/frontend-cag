@@ -40,10 +40,7 @@ const cards: Card[] = [
     text: (
       <>
         <CardHeading>Theatre Group</CardHeading>
-        <p>
-          <strong>COMING SOON!</strong> Tell prospective cast and crew about
-          your company
-        </p>
+        <p>Tell prospective cast and crew about your company</p>
       </>
     ),
     enabled: false
