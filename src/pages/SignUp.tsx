@@ -28,8 +28,6 @@ const SignUp: React.FC = () => {
     'individual' | 'company' | null
   >(null);
 
-  console.log('page flag', flag);
-
   useEffect(() => {
     if (currentUser && currentStep === -1) {
       history.push('/profile');
