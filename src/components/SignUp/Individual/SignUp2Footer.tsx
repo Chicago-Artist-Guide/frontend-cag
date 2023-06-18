@@ -20,8 +20,6 @@ const SignUp2Footer: React.FC<{
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any).id);
 
   const nextButtonAction = async (currStep: string) => {
-    goToTop();
-
     if (currStep === 'awards') {
       setNextBtnText('Go to Profile');
       await submitSignUp2Profile();
@@ -29,6 +27,7 @@ const SignUp2Footer: React.FC<{
       return;
     }
 
+    goToTop();
     return next();
   };
 
