@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
@@ -9,16 +10,20 @@ import styled from 'styled-components';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useProfileContext } from '../../context/ProfileContext';
-import Button from '../../genericComponents/Button';
+import { Button, Checkbox } from '../../genericComponents';
 import { fonts, colors } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
 import DetailSection from './shared/DetailSection';
-import type {
+import {
+  ageRanges,
+  ethnicityTypes,
+  genders,
   PastPerformances,
   ProfileAwards,
   UpcomingPerformances,
   IndividualWebsite
 } from '../SignUp/Individual/types';
+import type { EditModeSections } from './types';
 import {
   RightCol,
   ShowCard,
@@ -136,6 +141,11 @@ const IndividualProfile: React.FC<{
     profile: { data: profile }
   } = useProfileContext();
   const [showSignUp2Link, setShowUp2Link] = useState(false);
+  const [editMode, setEditMode] = useState<EditModeSections>({
+    personalDetails: false,
+    headline: false
+  });
+  const [editProfile, setEditProfile] = useState(profile);
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -145,7 +155,27 @@ const IndividualProfile: React.FC<{
 
   useEffect(() => {
     setShowUp2Link(previewMode || !profile?.completed_profile_2);
+    setEditProfile(profile);
   }, [profile]);
+
+  const onEditModeClick = (
+    e: React.MouseEvent<HTMLElement>,
+    editModeSection: keyof EditModeSections
+  ) => {
+    e.preventDefault();
+
+    setEditMode({
+      ...editMode,
+      [editModeSection]: true
+    });
+  };
+
+  const setProfileForm = (e: any, field: string, value: any) => {
+    setEditProfile({
+      ...editProfile,
+      [field]: value
+    });
+  };
 
   return (
     <PageWrapper>
@@ -199,64 +229,244 @@ const IndividualProfile: React.FC<{
         <Col lg={4}>
           <ProfileImage src={profile?.profile_image_url} fluid />
           <DetailsCard>
-            <DetailsColTitle>Personal Details</DetailsColTitle>
-            <p>
-              {profile?.age_ranges?.length && (
-                <>
-                  Age Range: {profile?.age_ranges?.join(', ')}
-                  <br />
-                </>
-              )}
-              {(profile?.height_no_answer ||
-                (profile?.height_ft && profile?.height_ft !== '')) && (
-                <>
-                  Height:{' '}
-                  {profile?.height_no_answer ? (
-                    'N/A'
-                  ) : (
+            <DetailsColTitle>
+              Personal Details
+              <a
+                href="#"
+                onClick={(e: React.MouseEvent<HTMLElement>) =>
+                  onEditModeClick(e, 'personalDetails')
+                }
+              >
+                Edit
+              </a>
+            </DetailsColTitle>
+            {editMode['personalDetails'] ? (
+              <>
+                <Form.Group className="form-group">
+                  <CAGLabel>Height</CAGLabel>
+                  <Container>
+                    <Row>
+                      <PaddedCol lg="6">
+                        <Form.Control
+                          aria-label="height feet"
+                          as="select"
+                          name="actorInfo2HeightFt"
+                          onChange={() => null}
+                        >
+                          <option value={undefined}>Feet</option>
+                          {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
+                            <option key={`ft-option-value-${ft}`} value={ft}>
+                              {ft} ft
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </PaddedCol>
+                      <PaddedCol lg="6">
+                        <Form.Control
+                          aria-label="height inches"
+                          as="select"
+                          name="actorInfo2HeightIn"
+                          onChange={() => null}
+                        >
+                          <option value={undefined}>Inches</option>
+                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
+                            (inches) => (
+                              <option
+                                key={`inch-option-value-${inches}`}
+                                value={inches}
+                              >
+                                {inches} in
+                              </option>
+                            )
+                          )}
+                        </Form.Control>
+                      </PaddedCol>
+                    </Row>
+                    <Row>
+                      <PaddedCol lg="12">
+                        <Checkbox
+                          checked={false}
+                          fieldType="checkbox"
+                          label="I do not wish to answer"
+                          name="actorInfo2HeightNoAnswer"
+                          onChange={() => null}
+                        />
+                      </PaddedCol>
+                    </Row>
+                  </Container>
+                </Form.Group>
+                <Form.Group className="form-group">
+                  <CAGLabel>What age range do you play?</CAGLabel>
+                  <p>Select up to 3 ranges</p>
+                  {ageRanges.map((ageRange) => (
+                    <Checkbox
+                      checked={false}
+                      fieldType="checkbox"
+                      key={`age-range-chk-${ageRange}`}
+                      label={ageRange}
+                      name="actorInfo2AgeRanges"
+                      onChange={() => null}
+                    />
+                  ))}
+                </Form.Group>
+                <Form.Group className="form-group">
+                  <CAGLabel>Gender Identity</CAGLabel>
+                  <p>
+                    First, choose your gender identity - additional options may
+                    be presented for casting purposes. If other, please select
+                    the option with which you most closely identify for casting
+                    purposes.
+                  </p>
+                  <Form.Control
+                    as="select"
+                    defaultValue=""
+                    name="actorInfo2Gender"
+                    onChange={() => null}
+                  >
+                    <option value={undefined}>Select</option>
+                    {genders.map((g) => (
+                      <option key={`gender-value-${g}`} value={g}>
+                        {g}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+                <Form.Group className="form-group">
+                  {ethnicityTypes.map((eth) => (
+                    <React.Fragment key={`parent-frag-chk-${eth.name}`}>
+                      <Checkbox
+                        checked={false}
+                        fieldType="checkbox"
+                        key={`first-level-chk-${eth.name}`}
+                        label={eth.name}
+                        name="actorInfo1Ethnicities"
+                        onChange={() => null}
+                      />
+                      {eth.values.length > 0 && (
+                        <Checkbox style={{ paddingLeft: '1.25rem' }}>
+                          {eth.values.map((ethV) => (
+                            <Checkbox
+                              checked={false}
+                              fieldType="checkbox"
+                              key={`${eth.name}-child-chk-${ethV}`}
+                              label={ethV}
+                              name="actorInfoEthnicities"
+                              onChange={() => null}
+                            />
+                          ))}
+                        </Checkbox>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </Form.Group>
+                <Form.Group>
+                  <CAGLabel>Union</CAGLabel>
+                  <Container>
+                    <Row>
+                      <PaddedCol lg="5">
+                        <CAGFormControl
+                          aria-label="union"
+                          as="select"
+                          name="demographicsUnionStatus"
+                          onChange={() => null}
+                        >
+                          <option value={undefined}>Select union status</option>
+                          <option value="Union">Union</option>
+                          <option value="Non-Union">Non-Union</option>
+                          <option value="Other">Other</option>
+                        </CAGFormControl>
+                      </PaddedCol>
+                      <PaddedCol lg="5">
+                        <CAGFormControl
+                          aria-label="union"
+                          defaultValue=""
+                          disabled={false}
+                          name="demographicsUnionStatusOther"
+                          onChange={() => null}
+                          placeholder="Other"
+                        ></CAGFormControl>
+                      </PaddedCol>
+                    </Row>
+                  </Container>
+                  <CAGLabel>Agency</CAGLabel>
+                  <Container>
+                    <Row>
+                      <PaddedCol lg="10">
+                        <Form.Group className="form-group">
+                          <CAGFormControl
+                            aria-label="agency"
+                            name="demographicsAgency"
+                            onChange={() => null}
+                            placeholder="Agency"
+                          ></CAGFormControl>
+                        </Form.Group>
+                      </PaddedCol>
+                    </Row>
+                  </Container>
+                </Form.Group>
+              </>
+            ) : (
+              <>
+                <p>
+                  {profile?.age_ranges?.length && (
                     <>
-                      {profile?.height_ft}’-{profile?.height_in}”
+                      Age Range: {profile?.age_ranges?.join(', ')}
+                      <br />
                     </>
                   )}
-                  <br />
-                </>
-              )}
-              {profile?.gender_identity && profile?.gender_identity !== '' && (
-                <>
-                  Gender Identity: {profile?.gender_identity}
-                  <br />
-                </>
-              )}
-              {profile?.ethnicities.length && (
-                <>
-                  Ethnicity: {profile?.ethnicities?.join(', ')}
-                  <br />
-                </>
-              )}
-              {((profile?.union_status && profile?.union_status !== '') ||
-                (profile?.union_other && profile?.union_other !== '')) && (
-                <>
-                  Union: {profile?.union_status || profile?.union_other}
-                  <br />
-                </>
-              )}
-              {profile?.agency && profile?.agency !== '' && (
-                <>Agency: {profile?.agency}</>
-              )}
-            </p>
-            {hasNonEmptyValues(profile?.websites) && (
-              <p>
-                <strong>Websites:</strong>
-                <br />
-                {profile?.websites.map((w: IndividualWebsite) => (
-                  <React.Fragment key={`personal-website-${w.id}`}>
-                    <a href={w.url} target="_blank">
-                      Visit Website (<em>{w.websiteType}</em>)
-                    </a>
+                  {(profile?.height_no_answer ||
+                    (profile?.height_ft && profile?.height_ft !== '')) && (
+                    <>
+                      Height:{' '}
+                      {profile?.height_no_answer ? (
+                        'N/A'
+                      ) : (
+                        <>
+                          {profile?.height_ft}’-{profile?.height_in}”
+                        </>
+                      )}
+                      <br />
+                    </>
+                  )}
+                  {profile?.gender_identity &&
+                    profile?.gender_identity !== '' && (
+                      <>
+                        Gender Identity: {profile?.gender_identity}
+                        <br />
+                      </>
+                    )}
+                  {profile?.ethnicities.length && (
+                    <>
+                      Ethnicity: {profile?.ethnicities?.join(', ')}
+                      <br />
+                    </>
+                  )}
+                  {((profile?.union_status && profile?.union_status !== '') ||
+                    (profile?.union_other && profile?.union_other !== '')) && (
+                    <>
+                      Union: {profile?.union_status || profile?.union_other}
+                      <br />
+                    </>
+                  )}
+                  {profile?.agency && profile?.agency !== '' && (
+                    <>Agency: {profile?.agency}</>
+                  )}
+                </p>
+                {hasNonEmptyValues(profile?.websites) && (
+                  <p>
+                    <strong>Websites:</strong>
                     <br />
-                  </React.Fragment>
-                ))}
-              </p>
+                    {profile?.websites.map((w: IndividualWebsite) => (
+                      <React.Fragment key={`personal-website-${w.id}`}>
+                        <a href={w.url} target="_blank">
+                          Visit Website (<em>{w.websiteType}</em>)
+                        </a>
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </p>
+                )}
+              </>
             )}
           </DetailsCard>
         </Col>
@@ -442,6 +652,26 @@ const AwardP = styled.p`
   font-weight: 400;
   line-height: 20px;
   letter-spacing: 0.25px;
+`;
+
+const CAGLabel = styled(Form.Label)`
+  color: ${colors.mainFont};
+  font-family: ${fonts.mainFont};
+  font-size: 20px;
+`;
+
+const PaddedCol = styled(Col)`
+  padding-left: 0;
+`;
+
+const CAGFormControl = styled(Form.Control)`
+  margin-bottom: 1em;
+  border: 1px solid ${colors.lightGrey};
+  border-radius: 7px;
+  font-family: ${fonts.mainFont};
+  padding: 5px;
+  padding-left: 10px;
+  width: 100%;
 `;
 
 export default IndividualProfile;
