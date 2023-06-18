@@ -24,6 +24,7 @@ const SignUp2Footer: React.FC<{
       setNextBtnText('Go to Profile');
       await submitSignUp2Profile();
       history.push('/profile');
+      goToTop();
       return;
     }
 
