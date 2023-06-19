@@ -13,6 +13,7 @@ const colors = {
   darkGreyBlue: '#355669',
   darkPrimary: '#425B4E',
   gray: '#4d5055',
+  grayishBlue: '#8A8A8A',
   grayishLightGreen: '#b8d8c7',
   italicColor: '#537C8C',
   lighterGrey: '#C4C4C4',
