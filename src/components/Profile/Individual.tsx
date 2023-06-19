@@ -243,6 +243,20 @@ const IndividualProfile: React.FC<{
             {editMode['personalDetails'] ? (
               <>
                 <Form.Group className="form-group">
+                  <CAGLabel>What age range do you play?</CAGLabel>
+                  <p>Select up to 3 ranges</p>
+                  {ageRanges.map((ageRange) => (
+                    <Checkbox
+                      checked={profile?.age_ranges?.includes(ageRange)}
+                      fieldType="checkbox"
+                      key={`age-range-chk-${ageRange}`}
+                      label={ageRange}
+                      name="actorInfo2AgeRanges"
+                      onChange={() => null}
+                    />
+                  ))}
+                </Form.Group>
+                <Form.Group className="form-group">
                   <CAGLabel>Height</CAGLabel>
                   <Container>
                     <Row>
@@ -250,6 +264,7 @@ const IndividualProfile: React.FC<{
                         <Form.Control
                           aria-label="height feet"
                           as="select"
+                          value={profile?.height_ft}
                           name="actorInfo2HeightFt"
                           onChange={() => null}
                         >
@@ -265,6 +280,7 @@ const IndividualProfile: React.FC<{
                         <Form.Control
                           aria-label="height inches"
                           as="select"
+                          value={profile?.height_in}
                           name="actorInfo2HeightIn"
                           onChange={() => null}
                         >
@@ -285,7 +301,7 @@ const IndividualProfile: React.FC<{
                     <Row>
                       <PaddedCol lg="12">
                         <Checkbox
-                          checked={false}
+                          checked={profile?.height_no_answer}
                           fieldType="checkbox"
                           label="I do not wish to answer"
                           name="actorInfo2HeightNoAnswer"
@@ -294,20 +310,6 @@ const IndividualProfile: React.FC<{
                       </PaddedCol>
                     </Row>
                   </Container>
-                </Form.Group>
-                <Form.Group className="form-group">
-                  <CAGLabel>What age range do you play?</CAGLabel>
-                  <p>Select up to 3 ranges</p>
-                  {ageRanges.map((ageRange) => (
-                    <Checkbox
-                      checked={false}
-                      fieldType="checkbox"
-                      key={`age-range-chk-${ageRange}`}
-                      label={ageRange}
-                      name="actorInfo2AgeRanges"
-                      onChange={() => null}
-                    />
-                  ))}
                 </Form.Group>
                 <Form.Group className="form-group">
                   <CAGLabel>Gender Identity</CAGLabel>
@@ -319,7 +321,7 @@ const IndividualProfile: React.FC<{
                   </p>
                   <Form.Control
                     as="select"
-                    defaultValue=""
+                    value={profile?.gender_identity}
                     name="actorInfo2Gender"
                     onChange={() => null}
                   >
@@ -332,10 +334,11 @@ const IndividualProfile: React.FC<{
                   </Form.Control>
                 </Form.Group>
                 <Form.Group className="form-group">
+                  <CAGLabel>Ethnicity</CAGLabel>
                   {ethnicityTypes.map((eth) => (
                     <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                       <Checkbox
-                        checked={false}
+                        checked={profile?.ethnicities.includes(eth.name)}
                         fieldType="checkbox"
                         key={`first-level-chk-${eth.name}`}
                         label={eth.name}
@@ -346,7 +349,7 @@ const IndividualProfile: React.FC<{
                         <Checkbox style={{ paddingLeft: '1.25rem' }}>
                           {eth.values.map((ethV) => (
                             <Checkbox
-                              checked={false}
+                              checked={profile?.ethnicities.includes(ethV)}
                               fieldType="checkbox"
                               key={`${eth.name}-child-chk-${ethV}`}
                               label={ethV}
@@ -368,6 +371,7 @@ const IndividualProfile: React.FC<{
                           aria-label="union"
                           as="select"
                           name="demographicsUnionStatus"
+                          value={profile?.union_status}
                           onChange={() => null}
                         >
                           <option value={undefined}>Select union status</option>
@@ -379,12 +383,12 @@ const IndividualProfile: React.FC<{
                       <PaddedCol lg="5">
                         <CAGFormControl
                           aria-label="union"
-                          defaultValue=""
+                          defaultValue={profile?.union_other}
                           disabled={false}
                           name="demographicsUnionStatusOther"
                           onChange={() => null}
                           placeholder="Other"
-                        ></CAGFormControl>
+                        />
                       </PaddedCol>
                     </Row>
                   </Container>
@@ -395,10 +399,11 @@ const IndividualProfile: React.FC<{
                         <Form.Group className="form-group">
                           <CAGFormControl
                             aria-label="agency"
+                            defaultValue={profile?.agency}
                             name="demographicsAgency"
                             onChange={() => null}
                             placeholder="Agency"
-                          ></CAGFormControl>
+                          />
                         </Form.Group>
                       </PaddedCol>
                     </Row>
