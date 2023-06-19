@@ -7,18 +7,9 @@ import styled from 'styled-components';
 import { Button as BSButton } from 'react-bootstrap';
 
 import Poster from '../images/events/cag-baret.png';
+import Group from '../images/icons-signup/group.svg';
 import { redBlob2, redBlob3, yellowBlob1, yellowBlob3 } from '../images';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
-
-const event: Event = {
-  title: 'A night at the Cag-baret',
-  tagline: 'Launch Part Fundraiser'
-};
-
-type Event = {
-  title: string;
-  tagline: string;
-};
 
 const blobs = [
   {
@@ -40,7 +31,7 @@ const blobs = [
     blob: yellowBlob1,
     opacity: 1,
     transform: 'scale(.8)',
-    translate: '-15rem, 140rem'
+    translate: '-15rem, 125rem'
   },
   {
     id: 5,
@@ -58,13 +49,13 @@ const EventPage = () => {
       <PageContainer>
         <Row>
           <Col>
-            <Title>{event.title}</Title>
-            <Tagline>{event.tagline}</Tagline>
+            <Title>A night at the Cag-baret</Title>
+            <Tagline>Launch Party Fundraiser</Tagline>
             <div style={{ textAlign: 'center', paddingTop: 45 }}>
               <Image
                 src={Poster}
                 alt="A night at the CAG-baret"
-                height={1114}
+                height={1000}
               />
               <div id="tickets" style={{ paddingTop: 50 }}>
                 <iframe
@@ -73,7 +64,7 @@ const EventPage = () => {
                   allow="payment"
                   frameBorder="0"
                   scrolling="no"
-                  style={{ width: 788, border: 'none', overflow: 'hidden' }}
+                  style={{ width: 700, border: 'none', overflow: 'hidden' }}
                   src="https://secure.lglforms.com/form_engine/s/Ggqb-vmkrb6sWyeyD-TL9Q"
                 >
                   <a href="https://secure.lglforms.com/form_engine/s/Ggqb-vmkrb6sWyeyD-TL9Q">
@@ -120,6 +111,44 @@ const EventPage = () => {
                 </a>
               }
             />
+
+            <Row style={{ margin: '55px auto', width: 850 }}>
+              <Col>
+                <InfoCard style={{ margin: '0 auto' }}>
+                  <Image alt="" src={Group} />
+                  <InfoCardTitle>Program</InfoCardTitle>
+                  <InfoCardDetail>
+                    7:30-8pm <br />
+                    Jazz Group led by Board Member <br />
+                    Tommy Bradford
+                  </InfoCardDetail>
+                  <InfoCardDetail>
+                    8-9pm <br />
+                    Chicago Artists' Performances
+                  </InfoCardDetail>
+                  <InfoCardDetail>
+                    7:30-9:30pm <br />
+                    Silent Auction throughout the evening
+                  </InfoCardDetail>
+                </InfoCard>
+              </Col>
+              <Col>
+                <InfoCard style={{ margin: '150px auto 0' }}>
+                  <Image alt="" src={Group} />
+                  <InfoCardTitle>Ticket Pricing</InfoCardTitle>
+                  <InfoCardDetail>
+                    $30 includes one beverage* of your choice
+                    <br />
+                    *Beverage: soda, wine, water, beer
+                  </InfoCardDetail>
+                  <InfoCardDetail>
+                    Additional beverages available for purchase Snacks, hors
+                    d'oeuvres, apps will be provided
+                  </InfoCardDetail>
+                </InfoCard>
+              </Col>
+            </Row>
+
             <CelebrateDivider />
             <div style={{ textAlign: 'center' }}>
               <InfoTitle>Come celebrate with us!</InfoTitle>
@@ -132,8 +161,35 @@ const EventPage = () => {
   );
 };
 
-const Info = styled.div`
-  margin: 75px 20px 0;
+const InfoCard = styled.div`
+  max-height: 475px;
+  width: 325px;
+  border-radius: 8px;
+  background-color: ${colors.white};
+  box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(7.5px);
+  border-radius: 8px;
+  padding: 50px 30px;
+`;
+
+const InfoCardTitle = styled.div`
+  font-family: ${fonts.montserrat};
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 18px;
+  letter-spacing: 0.07em;
+  margin-top: 10px;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+`;
+
+const InfoCardDetail = styled.div`
+  margin-top: 15px;
+  color: ${colors.black};
+  font-weight: 400;
+  font-family: ${fonts.mainFont};
+  font-size: 16px;
+  line-height: 22px;
 `;
 
 const InfoPanel = ({
@@ -153,11 +209,15 @@ const InfoPanel = ({
 };
 
 const CelebrateDivider = styled.div`
-  width: 850px;
+  width: 700px;
   height: 8px;
   border-radius: 4px;
   margin: 75px auto 15px;
   background-image: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
+`;
+
+const Info = styled.div`
+  margin: 60px 75px 0;
 `;
 
 const InfoBar = styled.div`
@@ -174,21 +234,20 @@ const InfoBar = styled.div`
 const InfoTitle = styled.h1`
   font-family: ${fonts.montserrat};
   font-weight: 700;
-  font-size: 48px;
+  font-size: 34px;
   color: ${colors.black};
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  line-height: 48px;
+  line-height: 38px;
 `;
 
 const InfoDetail = styled.div`
   font-family: ${fonts.montserrat};
   font-weight: 500;
-  font-size: 28px;
+  font-size: 18px;
   color: ${colors.black};
   letter-spacing: 0.07em;
   line-height: 28px;
-  padding-top: 5px;
 `;
 
 const DividerBar = styled.div`
@@ -207,7 +266,7 @@ const Card = styled.div`
   background: ${colors.white};
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
-  width: 1100px;
+  width: 1000px;
   margin: 55px auto 0;
   padding: 50px 50px;
 `;
@@ -221,11 +280,11 @@ const CardTitle = styled.h2`
 `;
 
 const CardDetail = styled.div`
-  padding-top: 25px;
+  padding-top: 15px;
   font-family: ${fonts.lora};
   font-style: italic;
-  font-size: 35px;
-  line-height: 48px;
+  font-size: 28px;
+  line-height: 38px;
   color: ${colors.slate};
   letter-spacing: 0.01em;
   font-weight: 400;
