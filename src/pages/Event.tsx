@@ -230,6 +230,7 @@ const CardDetail = styled.div`
 
 const Button = styled(BSButton)`
   margin: 35px auto 0;
+  border: none;
   border-radius: 43px;
   box-shadow: 0px 0px 8px 4px #0000000d;
   font-family: ${fonts.montserrat};
