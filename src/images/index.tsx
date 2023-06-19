@@ -5,6 +5,7 @@ import homeDance from './home_dance.svg';
 import logoPlain from './logoPlain.svg';
 import redBlob from './red_blob.svg';
 import redBlob2 from './red_blob_2.svg';
+import redBlob3 from './red_blob_3.svg';
 import streamingDance from './streaming_dance.svg';
 import wawDance from './waw_dance.svg';
 import wwww1 from './wwww-1.svg';
@@ -22,6 +23,7 @@ export {
   logoPlain,
   redBlob,
   redBlob2,
+  redBlob3,
   streamingDance,
   wawDance,
   wwww1,

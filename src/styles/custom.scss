@@ -9,6 +9,8 @@ $body-bg: #F8F9FA;
 $primary: #82B29A;
 $orange: #E17B60;
 
+html{scroll-behavior:smooth}
+
 body {
     color: $main-font-color;
     letter-spacing: 0.07em;
