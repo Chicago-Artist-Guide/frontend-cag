@@ -40,6 +40,7 @@ import SignUp from './SignUp';
 import TheaterResources from './TheaterResources';
 import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
+import EventPage from './Event';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -75,6 +76,7 @@ const CAG = () => (
       <Route component={SignUp} exact path="/sign-up" />
       <Route component={SignUp2} exact path="/sign-up-2" />
       <Route component={TheaterResources} exact path="/theater-resources" />
+      <Route component={EventPage} exact path="/night-at-the-cag-baret" />
       <Route
         component={ManageProduction}
         path="/production/:productionId/manage"
