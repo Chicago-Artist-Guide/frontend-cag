@@ -6,7 +6,7 @@ import { Image } from 'react-bootstrap';
 import styled from 'styled-components';
 import { Button as BSButton } from 'react-bootstrap';
 
-import Poster from '../images/events/cag-baret.png';
+import CagBaret from '../images/events/cag-baret.png';
 import Group from '../images/icons-signup/group.svg';
 import { redBlob2, redBlob3, yellowBlob1, yellowBlob3 } from '../images';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
@@ -52,25 +52,18 @@ const EventPage = () => {
             <Title>A night at the Cag-baret</Title>
             <Tagline>Launch Party Fundraiser</Tagline>
             <div style={{ textAlign: 'center', paddingTop: 45 }}>
-              <Image
-                src={Poster}
-                alt="A night at the CAG-baret"
-                height={1000}
-              />
+              <Poster src={CagBaret} alt="A night at the CAG-baret" />
               <div id="tickets" style={{ paddingTop: 50 }}>
-                <iframe
-                  height={1150}
-                  allowTransparency
+                <IFrame
                   allow="payment"
                   frameBorder="0"
                   scrolling="no"
-                  style={{ width: 700, border: 'none', overflow: 'hidden' }}
                   src="https://secure.lglforms.com/form_engine/s/Ggqb-vmkrb6sWyeyD-TL9Q"
                 >
                   <a href="https://secure.lglforms.com/form_engine/s/Ggqb-vmkrb6sWyeyD-TL9Q">
                     Fill out my LGL Form!
                   </a>
-                </iframe>
+                </IFrame>
               </div>
             </div>
             <Card>
@@ -112,9 +105,9 @@ const EventPage = () => {
               }
             />
 
-            <Row style={{ margin: '55px auto', width: 850 }}>
-              <Col>
-                <InfoCard style={{ margin: '0 auto' }}>
+            <InfoRow>
+              <Col lg="6" xs="12">
+                <LeftInfoCard>
                   <Image alt="" src={Group} />
                   <InfoCardTitle>Program</InfoCardTitle>
                   <InfoCardDetail>
@@ -130,10 +123,10 @@ const EventPage = () => {
                     7:30-9:30pm <br />
                     Silent Auction throughout the evening
                   </InfoCardDetail>
-                </InfoCard>
+                </LeftInfoCard>
               </Col>
-              <Col>
-                <InfoCard style={{ margin: '150px auto 0' }}>
+              <Col lg="6" xs="12">
+                <RightInfoCard>
                   <Image alt="" src={Group} />
                   <InfoCardTitle>Ticket Pricing</InfoCardTitle>
                   <InfoCardDetail>
@@ -145,9 +138,9 @@ const EventPage = () => {
                     Additional beverages available for purchase Snacks, hors
                     d'oeuvres, apps will be provided
                   </InfoCardDetail>
-                </InfoCard>
+                </RightInfoCard>
               </Col>
-            </Row>
+            </InfoRow>
 
             <CelebrateDivider />
             <div style={{ textAlign: 'center' }}>
@@ -161,7 +154,49 @@ const EventPage = () => {
   );
 };
 
-const InfoCard = styled.div`
+const InfoPanel = ({
+  title,
+  detail
+}: {
+  title: string;
+  detail: React.ReactNode;
+}) => {
+  return (
+    <Info>
+      <InfoBar />
+      <InfoTitle>{title}</InfoTitle>
+      <InfoDetail>{detail}</InfoDetail>
+    </Info>
+  );
+};
+
+const IFrame = styled.iframe`
+  height: 1150px;
+  width: 700px;
+  border: none;
+  overflow: hidden;
+  @media (max-width: ${breakpoints.md}) {
+    width: auto;
+    height: 1450px;
+  }
+`;
+
+const Poster = styled(Image)`
+  height: 1000px;
+  @media (max-width: ${breakpoints.md}) {
+    height: 600px;
+  }
+  @media (max-width: ${breakpoints.sm}) {
+    height: 500px;
+  }
+`;
+
+const InfoRow = styled(Row)`
+  margin: 55px auto;
+  width: 850px;
+`;
+
+const LeftInfoCard = styled.div`
   max-height: 475px;
   width: 325px;
   border-radius: 8px;
@@ -170,6 +205,27 @@ const InfoCard = styled.div`
   backdrop-filter: blur(7.5px);
   border-radius: 8px;
   padding: 50px 30px;
+  margin: 0 auto;
+
+  @media (max-width: ${breakpoints.sm}) {
+    margin: 25px 0 0;
+  }
+`;
+
+const RightInfoCard = styled.div`
+  margin: 150px auto 0;
+  max-height: 475px;
+  width: 325px;
+  border-radius: 8px;
+  background-color: ${colors.white};
+  box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(7.5px);
+  border-radius: 8px;
+  padding: 50px 30px;
+
+  @media (max-width: ${breakpoints.sm}) {
+    margin: 75px 0 0;
+  }
 `;
 
 const InfoCardTitle = styled.div`
@@ -192,39 +248,29 @@ const InfoCardDetail = styled.div`
   line-height: 22px;
 `;
 
-const InfoPanel = ({
-  title,
-  detail
-}: {
-  title: string;
-  detail: React.ReactNode;
-}) => {
-  return (
-    <Info>
-      <InfoBar />
-      <InfoTitle>{title}</InfoTitle>
-      <InfoDetail>{detail}</InfoDetail>
-    </Info>
-  );
-};
-
 const CelebrateDivider = styled.div`
   width: 700px;
   height: 8px;
   border-radius: 4px;
   margin: 75px auto 15px;
   background-image: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
+  @media (max-width: ${breakpoints.sm}) {
+    width: 300px;
+  }
 `;
 
 const Info = styled.div`
   margin: 60px 75px 0;
+  @media (max-width: ${breakpoints.md}) {
+    margin: 60px 10px 0;
+  }
 `;
 
 const InfoBar = styled.div`
   width: 250px;
   height: 8px;
   border-radius: 4px;
-  margin: 12px auto;
+  margin: 12px 0;
   background-image: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
   @media (min-width: ${breakpoints.md}) {
     margin: 12px 0;
@@ -239,6 +285,9 @@ const InfoTitle = styled.h1`
   text-transform: uppercase;
   letter-spacing: 0.07em;
   line-height: 38px;
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 32px;
+  }
 `;
 
 const InfoDetail = styled.div`
@@ -254,11 +303,8 @@ const DividerBar = styled.div`
   width: 250px;
   height: 8px;
   border-radius: 4px;
-  margin: 12px auto;
+  margin: 12px 0;
   background-image: linear-gradient(270deg, #2f4550 0%, #82b29a 100%);
-  @media (min-width: ${breakpoints.md}) {
-    margin: 12px 0;
-  }
 `;
 
 const Card = styled.div`
@@ -268,7 +314,12 @@ const Card = styled.div`
   border-radius: 8px;
   width: 1000px;
   margin: 55px auto 0;
-  padding: 50px 50px;
+  padding: 50px;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 30px;
+    width: 350px;
+  }
 `;
 
 const CardTitle = styled.h2`
@@ -288,6 +339,10 @@ const CardDetail = styled.div`
   color: ${colors.slate};
   letter-spacing: 0.01em;
   font-weight: 400;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 22px;
+  }
 `;
 
 const Button = styled(BSButton)`

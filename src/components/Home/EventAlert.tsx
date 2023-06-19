@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
 import { Button as BSButton, Col, Fade, Modal, Row } from 'react-bootstrap';
 import styled from 'styled-components';
-import { colors, fonts } from '../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../theme/styleVars';
 
 const BANNER_KEY = 'cag-hide-banner';
 const MODAL_KEY = 'cag-hide-modal';
@@ -72,14 +72,13 @@ const EventAlert = () => {
                 </span>{' '}
                 as we celebrate the upcoming release of our platform! We'll have
                 drinks, music and a silent auction - so come and enjoy a night
-                with us, and help support our efforts at making Chicago theatre
-                more diverse, equitable and inclusive.
+                with us.
               </ModalDetail>
-              <ModalDetail
+              {/* <ModalDetail
                 style={{ fontWeight: 900, color: colors.black, marginTop: 30 }}
               >
                 Special friends & family pricing available now!
-              </ModalDetail>
+              </ModalDetail> */}
               <div style={{ textAlign: 'center' }}>
                 <Button
                   href="/night-at-the-cag-baret#tickets"
@@ -112,6 +111,11 @@ const Banner = styled.div`
   margin-top: calc(3% + 60px);
   z-index: 99;
   position: sticky;
+
+  @media (max-width: ${breakpoints.lg}) {
+    font-size: 16px;
+    margin-top: calc(3% + 80px);
+  }
 `;
 
 const BannerLink = styled.a`
@@ -134,7 +138,7 @@ const Divider = styled.div`
   width: 250px;
   height: 8px;
   border-radius: 4px;
-  margin: 12px 0;
+  margin: 0 0 12px;
   background-image: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
 `;
 
@@ -159,7 +163,7 @@ const ModalDetail = styled.div`
 `;
 
 const Button = styled(BSButton)`
-  margin: 55px auto 0;
+  margin: 45px auto 0;
   border: none;
   border-radius: 43px;
   box-shadow: 0px 0px 8px 4px #0000000d;
