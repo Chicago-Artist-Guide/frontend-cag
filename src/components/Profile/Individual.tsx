@@ -477,14 +477,32 @@ const IndividualProfile: React.FC<{
         </Col>
         <Col lg={8}>
           <div>
-            <HeaderNamePronouns>
-              <h2>
-                {account.first_name} {account.last_name}
-              </h2>
-              <p>{profile?.pronouns || profile?.pronouns_other}</p>
-            </HeaderNamePronouns>
-            {profile?.profile_tagline && <h3>{profile?.profile_tagline}</h3>}
-            {profile?.bio && <p>{profile?.bio}</p>}
+            <a
+              href="#"
+              onClick={(e: React.MouseEvent<HTMLElement>) =>
+                onEditModeClick(e, 'headline')
+              }
+            >
+              Edit
+            </a>
+            {editMode['headline'] ? (
+              <>
+                <p>editing headline</p>
+              </>
+            ) : (
+              <>
+                <HeaderNamePronouns>
+                  <h2>
+                    {account.first_name} {account.last_name}
+                  </h2>
+                  <p>{profile?.pronouns || profile?.pronouns_other}</p>
+                </HeaderNamePronouns>
+                {profile?.profile_tagline && (
+                  <h3>{profile?.profile_tagline}</h3>
+                )}
+                {profile?.bio && <p>{profile?.bio}</p>}
+              </>
+            )}
           </div>
           <div>
             {profile?.completed_profile_2 && (
