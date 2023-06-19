@@ -47,7 +47,7 @@ const blobs = [
     blob: redBlob3,
     opacity: 1,
     transform: 'scale(.8)',
-    translate: '15rem, 250rem'
+    translate: '15rem, 220rem'
   }
 ];
 
@@ -112,7 +112,10 @@ const EventPage = () => {
             <InfoPanel
               title="Transportation Info"
               detail={
-                <a href="https://chicagochildrenstheatre.org/plan-your-visit/">
+                <a
+                  style={{ color: 'black' }}
+                  href="https://chicagochildrenstheatre.org/plan-your-visit/"
+                >
                   https://chicagochildrenstheatre.org/plan-your-visit/
                 </a>
               }
