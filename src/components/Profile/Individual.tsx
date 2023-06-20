@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useProfileContext } from '../../context/ProfileContext';
-import { Button, Checkbox } from '../../genericComponents';
+import { Button, Checkbox, InputField } from '../../genericComponents';
 import { fonts, colors } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
 import DetailSection from './shared/DetailSection';
@@ -20,6 +20,7 @@ import {
   genders,
   PastPerformances,
   ProfileAwards,
+  pronouns,
   UpcomingPerformances,
   IndividualWebsite
 } from '../SignUp/Individual/types';
@@ -160,13 +161,14 @@ const IndividualProfile: React.FC<{
 
   const onEditModeClick = (
     e: React.MouseEvent<HTMLElement>,
-    editModeSection: keyof EditModeSections
+    editModeSection: keyof EditModeSections,
+    editModeVal?: boolean
   ) => {
     e.preventDefault();
 
     setEditMode({
       ...editMode,
-      [editModeSection]: true
+      [editModeSection]: editModeVal ?? true
     });
   };
 
@@ -234,10 +236,14 @@ const IndividualProfile: React.FC<{
               <a
                 href="#"
                 onClick={(e: React.MouseEvent<HTMLElement>) =>
-                  onEditModeClick(e, 'personalDetails')
+                  onEditModeClick(
+                    e,
+                    'personalDetails',
+                    !editMode['personalDetails']
+                  )
                 }
               >
-                Edit
+                {editMode['personalDetails'] ? 'Cancel' : 'Edit'}
               </a>
             </DetailsColTitle>
             {editMode['personalDetails'] ? (
@@ -409,6 +415,12 @@ const IndividualProfile: React.FC<{
                     </Row>
                   </Container>
                 </Form.Group>
+                <Button
+                  onClick={() => null}
+                  text="Save"
+                  type="button"
+                  variant="primary"
+                />
               </>
             ) : (
               <>
@@ -480,14 +492,93 @@ const IndividualProfile: React.FC<{
             <a
               href="#"
               onClick={(e: React.MouseEvent<HTMLElement>) =>
-                onEditModeClick(e, 'headline')
+                onEditModeClick(e, 'headline', !editMode['headline'])
               }
             >
-              Edit
+              {editMode['headline'] ? 'Cancel' : 'Edit'}
             </a>
             {editMode['headline'] ? (
               <>
-                <p>editing headline</p>
+                <InputField
+                  label="First"
+                  name="basicsFirstName"
+                  onChange={() => null}
+                  required={true}
+                  requiredLabel="First name"
+                  value={account.first_name}
+                />
+                <InputField
+                  label="Last"
+                  name="basicsLastName"
+                  onChange={() => null}
+                  required={true}
+                  requiredLabel="Last name"
+                  value={account.last_name}
+                />
+                <Form.Group className="form-group">
+                  <Container>
+                    <Row>
+                      <PaddedCol lg="6">
+                        <CAGLabel>Pronouns</CAGLabel>
+                        <Form.Control
+                          aria-label="pronouns"
+                          as="select"
+                          defaultValue={profile?.pronouns}
+                          name="actorInfo1Pronouns"
+                          onChange={() => null}
+                        >
+                          <option value={undefined}>Choose...</option>
+                          {pronouns.map((noun) => (
+                            <option key={`option-value-${noun}`} value={noun}>
+                              {noun}
+                            </option>
+                          ))}
+                        </Form.Control>
+                      </PaddedCol>
+                      <PaddedCol lg="6">
+                        <CAGLabel>Other</CAGLabel>
+                        <Form.Control
+                          aria-label="pronouns"
+                          defaultValue={profile?.pronouns_other}
+                          disabled={false}
+                          name="actorInfo1PronounsOther"
+                          onChange={() => null}
+                        />
+                      </PaddedCol>
+                    </Row>
+                  </Container>
+                </Form.Group>
+                <CAGLabel>Profile Headline &amp; Personal Bio</CAGLabel>
+                <Container>
+                  <Row>
+                    <PaddedCol lg="10">
+                      <Form.Group className="form-group">
+                        <CAGFormControl
+                          aria-label="bio headline"
+                          defaultValue={profile?.profile_tagline}
+                          name="demographicsBioHeadline"
+                          onChange={() => null}
+                          placeholder="Profile Headline (ex: Actor, Musician, Dancer)"
+                        />
+                      </Form.Group>
+                      <Form.Group className="form-group">
+                        <Form.Control
+                          as="textarea"
+                          defaultValue={profile?.bio}
+                          name="demographicsBio"
+                          onChange={() => null}
+                          rows={5}
+                        />
+                      </Form.Group>
+                    </PaddedCol>
+                  </Row>
+                </Container>
+                <Button
+                  onClick={() => null}
+                  text="Save"
+                  type="button"
+                  variant="primary"
+                />
               </>
             ) : (
               <>
