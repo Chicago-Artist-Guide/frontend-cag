@@ -247,7 +247,7 @@ const IndividualProfile: React.FC<{
               </a>
             </DetailsColTitle>
             {editMode['personalDetails'] ? (
-              <>
+              <div>
                 <Form.Group className="form-group">
                   <CAGLabel>What age range do you play?</CAGLabel>
                   <p>Select up to 3 ranges</p>
@@ -421,7 +421,7 @@ const IndividualProfile: React.FC<{
                   type="button"
                   variant="primary"
                 />
-              </>
+              </div>
             ) : (
               <>
                 <p>
@@ -498,7 +498,8 @@ const IndividualProfile: React.FC<{
               {editMode['headline'] ? 'Cancel' : 'Edit'}
             </a>
             {editMode['headline'] ? (
-              <>
+              <div>
+                <CAGLabel>Edit Profile</CAGLabel>
                 <InputField
                   label="First"
                   name="basicsFirstName"
@@ -579,7 +580,7 @@ const IndividualProfile: React.FC<{
                   type="button"
                   variant="primary"
                 />
-              </>
+              </div>
             ) : (
               <>
                 <HeaderNamePronouns>
