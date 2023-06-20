@@ -38,7 +38,7 @@ const blobs = [
     blob: redBlob3,
     opacity: 1,
     transform: 'scale(.8)',
-    translate: '15rem, 220rem'
+    translate: '15rem, 200rem'
   }
 ];
 
@@ -171,13 +171,13 @@ const InfoPanel = ({
 };
 
 const IFrame = styled.iframe`
-  height: 1150px;
+  height: 750px;
   width: 700px;
   border: none;
   overflow: hidden;
   @media (max-width: ${breakpoints.md}) {
     width: auto;
-    height: 1450px;
+    height: 950px;
   }
 `;
 
