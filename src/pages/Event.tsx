@@ -57,7 +57,6 @@ const EventPage = () => {
                 <IFrame
                   allow="payment"
                   frameBorder="0"
-                  scrolling="no"
                   src="https://secure.lglforms.com/form_engine/s/Ggqb-vmkrb6sWyeyD-TL9Q"
                 >
                   <a href="https://secure.lglforms.com/form_engine/s/Ggqb-vmkrb6sWyeyD-TL9Q">
