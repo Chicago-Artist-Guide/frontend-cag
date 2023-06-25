@@ -10,11 +10,11 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useProfileContext } from '../../context/ProfileContext';
-import { Button, Checkbox, InputField } from '../../genericComponents';
-import { fonts, colors } from '../../theme/styleVars';
-import PageContainer from '../layout/PageContainer';
-import DetailSection from './shared/DetailSection';
+import { useProfileContext } from '../../../context/ProfileContext';
+import { Button, Checkbox, InputField } from '../../../genericComponents';
+import { fonts, colors } from '../../../theme/styleVars';
+import PageContainer from '../../layout/PageContainer';
+import DetailSection from '../shared/DetailSection';
 import {
   AgeRange,
   ageRanges,
@@ -26,115 +26,13 @@ import {
   UpcomingPerformances,
   IndividualWebsite,
   websiteTypeOptions
-} from '../SignUp/Individual/types';
+} from '../../SignUp/Individual/types';
 import type { EditModeSections } from './types';
-import {
-  RightCol,
-  ShowCard,
-  ShowImage,
-  ShowName,
-  ShowDescription,
-  ShowStatus as ShowDates
-} from './Company/Production/ActiveProduction';
-import { hasNonEmptyValues } from '../../utils/hasNonEmptyValues';
-import { PreviewCard } from './shared/styles';
-import Ribbon from '../../images/icons-profile/ribbon.svg';
-
-const IndividualUpcomingShow: React.FC<{
-  show: UpcomingPerformances;
-}> = ({ show }) => {
-  return (
-    <ShowCard>
-      <Row>
-        <Col lg={4}>
-          <ShowImage src={show?.imageUrl} fluid />
-        </Col>
-        <RightCol lg={8}>
-          <div className="d-flex flex-column" style={{ height: '100%' }}>
-            <div className="flex-grow-1">
-              <ShowName>{show?.title}</ShowName>
-              <ShowDescription>{show?.synopsis}</ShowDescription>
-              <ShowDescription>
-                <strong>Industry Code:</strong> {show?.industryCode}
-                <br />
-                <strong>Website:</strong>{' '}
-                <a href={show?.url} target="_blank">
-                  {show?.url}
-                </a>
-              </ShowDescription>
-            </div>
-          </div>
-        </RightCol>
-      </Row>
-    </ShowCard>
-  );
-};
-
-const IndividualCredits: React.FC<{
-  show: PastPerformances;
-}> = ({ show }) => {
-  return (
-    <ShowCard>
-      <Row>
-        <Col lg={6}>
-          <ShowName>{show?.title}</ShowName>
-          <ShowDates>
-            ({show?.startDate} - {show?.endDate})
-          </ShowDates>
-          <ShowDescription>
-            {show?.group}
-            <br />
-            {show?.location}
-          </ShowDescription>
-        </Col>
-        <Col lg={6}>
-          <ShowDescription>
-            <strong>Role:</strong> {show?.role}
-            <br />
-            <strong>Director:</strong> {show?.director}
-            <br />
-            <strong>Musical Director:</strong> {show?.musicalDirector}
-            <br />
-            <strong>Recognition:</strong> {show?.recognition}
-          </ShowDescription>
-        </Col>
-      </Row>
-      <Row>
-        <Col lg={8}>
-          <ShowDescription>
-            <a href={show?.url} target="_blank">
-              Visit Website &gt;
-            </a>
-          </ShowDescription>
-        </Col>
-      </Row>
-    </ShowCard>
-  );
-};
-
-const AwardCard: React.FC<{
-  award: ProfileAwards;
-}> = ({ award }) => {
-  return (
-    <AwardCardFlex>
-      <Row>
-        <Col lg={4}>
-          <AwardIconImage src={Ribbon} fluid />
-        </Col>
-        <Col lg={8}>
-          <AwardTitle>{award?.title}</AwardTitle>
-          <AwardP>{award?.year}</AwardP>
-          <AwardP>{award?.description}</AwardP>
-          <AwardP>
-            <a href={award?.url} target="_blank">
-              View Website
-            </a>
-          </AwardP>
-        </Col>
-      </Row>
-    </AwardCardFlex>
-  );
-};
+import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
+import AwardCard from './AwardCard';
+import IndividualUpcomingShow from './IndividualUpcomingShow';
+import IndividualCredits from './IndividualCredits';
+import { PreviewCard } from '../shared/styles';
 
 const IndividualProfile: React.FC<{
   previewMode?: boolean;
@@ -915,37 +813,6 @@ const ProfileFlex = styled.div`
   flex-wrap: wrap;
   gap: 12px;
   padding: 24px 0;
-`;
-
-const AwardCardFlex = styled.div`
-  flex: 1 1 50%;
-  background: ${colors.white};
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  border-radius: 8px;
-  padding: 25px 21px;
-`;
-
-const AwardIconImage = styled(Image)`
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  height: 100%;
-`;
-
-const AwardTitle = styled.h3`
-  font-family: ${fonts.mainFont};
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 24px;
-  letter-spacing: 0.5px;
-  margin-bottom: 2px;
-`;
-
-const AwardP = styled.p`
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 20px;
-  letter-spacing: 0.25px;
 `;
 
 const CAGLabel = styled(Form.Label)`
