@@ -1,4 +1,9 @@
-import { updateDoc } from 'firebase/firestore';
+import {
+  DocumentData,
+  DocumentSnapshot,
+  onSnapshot,
+  updateDoc
+} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
@@ -24,6 +29,10 @@ import {
   ProfileAwards,
   pronouns,
   UpcomingPerformances,
+  IndividualAccountInit,
+  IndividualProfileInit,
+  IndividualProfile as IndividualProfileT,
+  IndividualProfile2,
   IndividualWebsite,
   websiteTypeOptions
 } from '../../SignUp/Individual/types';
@@ -38,17 +47,15 @@ const IndividualProfile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
   const history = useHistory();
-  const {
-    account: { data: account },
-    profile: { data: profile }
-  } = useProfileContext();
+  const { account, profile, setAccountData, setProfileData } =
+    useProfileContext();
   const [showSignUp2Link, setShowUp2Link] = useState(false);
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,
     headline: false
   });
-  const [editProfile, setEditProfile] = useState(profile);
-  const [editAccount, setEditAccount] = useState(account);
+  const [editProfile, setEditProfile] = useState(profile?.data);
+  const [editAccount, setEditAccount] = useState(account?.data);
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -57,9 +64,51 @@ const IndividualProfile: React.FC<{
   };
 
   useEffect(() => {
-    setShowUp2Link(previewMode || !profile?.completed_profile_2);
-    setEditProfile(profile);
-  }, [profile]);
+    if (editMode.personalDetails || editMode.headline) {
+      return;
+    }
+
+    setShowUp2Link(previewMode || !profile?.data?.completed_profile_2);
+    setEditProfile(profile?.data);
+  }, [profile?.data, editMode]);
+
+  useEffect(() => {
+    if (profile.ref) {
+      const unsubscribeProfile = onSnapshot(
+        profile.ref,
+        (snapshot: DocumentSnapshot<DocumentData>) => {
+          const updatedProfileData = snapshot.data();
+          if (updatedProfileData) {
+            setProfileData(updatedProfileData);
+          } else {
+            console.log('Profile document does not exist');
+          }
+        }
+      );
+
+      // Clean up the subscription on unmount
+      return () => unsubscribeProfile();
+    }
+  }, [profile.ref, setProfileData]);
+
+  useEffect(() => {
+    if (account.ref) {
+      const unsubscribeAccount = onSnapshot(
+        account.ref,
+        (snapshot: DocumentSnapshot<DocumentData>) => {
+          const updatedAccountData = snapshot.data();
+          if (updatedAccountData) {
+            setAccountData(updatedAccountData);
+          } else {
+            console.log('Account document does not exist');
+          }
+        }
+      );
+
+      // Clean up the subscription on unmount
+      return () => unsubscribeAccount();
+    }
+  }, [account.ref, setAccountData]);
 
   const onEditModeClick = (
     e: React.MouseEvent<HTMLElement>,
@@ -75,17 +124,20 @@ const IndividualProfile: React.FC<{
   };
 
   const setProfileForm = (field: string, value: any) => {
-    setEditProfile({
-      ...editProfile,
-      [field]: value
-    });
+    setEditProfile(
+      (
+        prevState: IndividualProfileInit &
+          IndividualProfileT &
+          IndividualProfile2
+      ) => ({ ...prevState, [field]: value })
+    );
   };
 
-  const setAccountForm = (e: any, field: string, value: any) => {
-    setEditAccount({
-      ...editAccount,
+  const setAccountForm = (field: string, value: any) => {
+    setEditAccount((prevState: IndividualAccountInit) => ({
+      ...prevState,
       [field]: value
-    });
+    }));
   };
 
   const ageRangeChange = (checkValue: boolean, range: AgeRange) => {
@@ -148,10 +200,15 @@ const IndividualProfile: React.FC<{
     };
 
     try {
-      if (profile?.ref) {
+      if (profile.ref) {
         await updateDoc(profile.ref, { ...personalDetailsData });
+
+        setEditMode({
+          ...editMode,
+          personalDetails: false
+        });
       } else {
-        // no profileRef
+        // no profile.ref
         // look up?
       }
     } catch (err) {
@@ -175,11 +232,16 @@ const IndividualProfile: React.FC<{
     };
 
     try {
-      if (profile?.ref) {
+      if (account.ref && profile.ref) {
         await updateDoc(account.ref, { ...headlineAccountDetails });
         await updateDoc(profile.ref, { ...headlineProfileDetails });
+
+        setEditMode({
+          ...editMode,
+          headline: false
+        });
       } else {
-        // no profileRef
+        // no profile.ref
         // look up?
       }
     } catch (err) {
@@ -211,7 +273,7 @@ const IndividualProfile: React.FC<{
           </PreviewCard>
         </Row>
       )}
-      {profile?.completed_profile_2 && (
+      {profile?.data?.completed_profile_2 && (
         <Row>
           <PreviewCard>
             <h2>
@@ -237,7 +299,7 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          <ProfileImage src={profile?.profile_image_url} fluid />
+          <ProfileImage src={profile?.data?.profile_image_url} fluid />
           <DetailsCard>
             <DetailsColTitle>
               Personal Details
@@ -261,7 +323,7 @@ const IndividualProfile: React.FC<{
                   <p>Select up to 3 ranges</p>
                   {ageRanges.map((ageRange) => (
                     <Checkbox
-                      checked={profile?.age_ranges?.includes(ageRange)}
+                      checked={editProfile?.age_ranges?.includes(ageRange)}
                       fieldType="checkbox"
                       key={`age-range-chk-${ageRange}`}
                       label={ageRange}
@@ -280,7 +342,7 @@ const IndividualProfile: React.FC<{
                         <Form.Control
                           aria-label="height feet"
                           as="select"
-                          value={profile?.height_ft}
+                          value={editProfile?.height_ft}
                           name="actorInfo2HeightFt"
                           onChange={(e: any) =>
                             setProfileForm('height_ft', e.target.value)
@@ -298,7 +360,7 @@ const IndividualProfile: React.FC<{
                         <Form.Control
                           aria-label="height inches"
                           as="select"
-                          value={profile?.height_in}
+                          value={editProfile?.height_in}
                           name="actorInfo2HeightIn"
                           onChange={(e: any) =>
                             setProfileForm('height_in', e.target.value)
@@ -321,7 +383,7 @@ const IndividualProfile: React.FC<{
                     <Row>
                       <PaddedCol lg="12">
                         <Checkbox
-                          checked={profile?.height_no_answer}
+                          checked={editProfile?.height_no_answer}
                           fieldType="checkbox"
                           label="I do not wish to answer"
                           name="actorInfo2HeightNoAnswer"
@@ -346,7 +408,7 @@ const IndividualProfile: React.FC<{
                   </p>
                   <Form.Control
                     as="select"
-                    value={profile?.gender_identity}
+                    value={editProfile?.gender_identity}
                     name="actorInfo2Gender"
                     onChange={(e: any) =>
                       setProfileForm('gender_identity', e.target.value)
@@ -365,7 +427,7 @@ const IndividualProfile: React.FC<{
                   {ethnicityTypes.map((eth) => (
                     <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                       <Checkbox
-                        checked={profile?.ethnicities.includes(eth.name)}
+                        checked={editProfile?.ethnicities.includes(eth.name)}
                         fieldType="checkbox"
                         key={`first-level-chk-${eth.name}`}
                         label={eth.name}
@@ -378,7 +440,7 @@ const IndividualProfile: React.FC<{
                         <Checkbox style={{ paddingLeft: '1.25rem' }}>
                           {eth.values.map((ethV) => (
                             <Checkbox
-                              checked={profile?.ethnicities.includes(ethV)}
+                              checked={editProfile?.ethnicities.includes(ethV)}
                               fieldType="checkbox"
                               key={`${eth.name}-child-chk-${ethV}`}
                               label={ethV}
@@ -402,7 +464,7 @@ const IndividualProfile: React.FC<{
                           aria-label="union"
                           as="select"
                           name="demographicsUnionStatus"
-                          value={profile?.union_status}
+                          value={editProfile?.union_status}
                           onChange={(e: any) =>
                             setProfileForm('union_status', e.target.value)
                           }
@@ -416,7 +478,7 @@ const IndividualProfile: React.FC<{
                       <PaddedCol lg="5">
                         <CAGFormControl
                           aria-label="union"
-                          defaultValue={profile?.union_other}
+                          defaultValue={editProfile?.union_other}
                           disabled={false}
                           name="demographicsUnionStatusOther"
                           onChange={(e: any) =>
@@ -434,7 +496,7 @@ const IndividualProfile: React.FC<{
                         <Form.Group className="form-group">
                           <CAGFormControl
                             aria-label="agency"
-                            defaultValue={profile?.agency}
+                            defaultValue={editProfile?.agency}
                             name="demographicsAgency"
                             onChange={(e: any) =>
                               setProfileForm('agency', e.target.value)
@@ -452,37 +514,39 @@ const IndividualProfile: React.FC<{
                   <Container>
                     <Row>
                       <PaddedCol lg="10">
-                        {profile?.websites?.map((websiteRow: any, i: any) => (
-                          <div key={`website-row-${websiteRow.id}`}>
-                            <CAGFormControl
-                              aria-label="URL"
-                              as="input"
-                              name="websiteUrl"
-                              onChange={() => null}
-                              placeholder="URL"
-                              value={websiteRow.url}
-                            />
-                            <CAGFormControl
-                              aria-label="website type"
-                              as="select"
-                              defaultValue={websiteRow.websiteType}
-                              name="websiteType"
-                              onChange={() => null}
-                            >
-                              <option value={undefined}>Select Type</option>
-                              {websiteTypeOptions.map((wT) => (
-                                <option value={wT} key={wT}>
-                                  {wT}
-                                </option>
-                              ))}
-                            </CAGFormControl>
-                            {editProfile.websites.length > 1 && (
-                              <a href="#" onClick={() => null}>
-                                X
-                              </a>
-                            )}
-                          </div>
-                        ))}
+                        {editProfile?.websites?.map(
+                          (websiteRow: any, i: any) => (
+                            <div key={`website-row-${websiteRow.id}`}>
+                              <CAGFormControl
+                                aria-label="URL"
+                                as="input"
+                                name="websiteUrl"
+                                onChange={() => null}
+                                placeholder="URL"
+                                value={websiteRow.url}
+                              />
+                              <CAGFormControl
+                                aria-label="website type"
+                                as="select"
+                                defaultValue={websiteRow.websiteType}
+                                name="websiteType"
+                                onChange={() => null}
+                              >
+                                <option value={undefined}>Select Type</option>
+                                {websiteTypeOptions.map((wT) => (
+                                  <option value={wT} key={wT}>
+                                    {wT}
+                                  </option>
+                                ))}
+                              </CAGFormControl>
+                              {editProfile.websites.length > 1 && (
+                                <a href="#" onClick={() => null}>
+                                  X
+                                </a>
+                              )}
+                            </div>
+                          )
+                        )}
                         <div>
                           <a href="#" onClick={() => null}>
                             + Add Website
@@ -502,55 +566,61 @@ const IndividualProfile: React.FC<{
             ) : (
               <>
                 <p>
-                  {profile?.age_ranges?.length && (
+                  {profile?.data?.age_ranges?.length && (
                     <>
-                      Age Range: {profile?.age_ranges?.join(', ')}
+                      Age Range: {profile?.data?.age_ranges?.join(', ')}
                       <br />
                     </>
                   )}
-                  {(profile?.height_no_answer ||
-                    (profile?.height_ft && profile?.height_ft !== '')) && (
+                  {(profile?.data?.height_no_answer ||
+                    (profile?.data?.height_ft &&
+                      profile?.data?.height_ft !== '')) && (
                     <>
                       Height:{' '}
-                      {profile?.height_no_answer ? (
+                      {profile?.data?.height_no_answer ? (
                         'N/A'
                       ) : (
                         <>
-                          {profile?.height_ft}’-{profile?.height_in}”
+                          {profile?.data?.height_ft}’-{profile?.data?.height_in}
+                          ”
                         </>
                       )}
                       <br />
                     </>
                   )}
-                  {profile?.gender_identity &&
-                    profile?.gender_identity !== '' && (
+                  {profile?.data?.gender_identity &&
+                    profile?.data?.gender_identity !== '' && (
                       <>
-                        Gender Identity: {profile?.gender_identity}
+                        Gender Identity: {profile?.data?.gender_identity}
                         <br />
                       </>
                     )}
-                  {profile?.ethnicities.length && (
+                  {profile?.data?.ethnicities.length && (
                     <>
-                      Ethnicity: {profile?.ethnicities?.join(', ')}
+                      Ethnicity: {profile?.data?.ethnicities?.join(', ')}
                       <br />
                     </>
                   )}
-                  {((profile?.union_status && profile?.union_status !== '') ||
-                    (profile?.union_other && profile?.union_other !== '')) && (
+                  {((profile?.data?.union_status &&
+                    profile?.data?.union_status !== '') ||
+                    (profile?.data?.union_other &&
+                      profile?.data?.union_other !== '')) && (
                     <>
-                      Union: {profile?.union_status || profile?.union_other}
+                      Union:{' '}
+                      {profile?.data?.union_status ||
+                        profile?.data?.union_other}
                       <br />
                     </>
                   )}
-                  {profile?.agency && profile?.agency !== '' && (
-                    <>Agency: {profile?.agency}</>
+                  {profile?.data?.agency && profile?.data?.agency !== '' && (
+                    <>Agency: {profile?.data?.agency}</>
                   )}
                 </p>
-                {hasNonEmptyValues(profile?.websites) && (
+                {hasNonEmptyValues(profile?.data?.websites) && (
                   <p>
                     <strong>Websites:</strong>
                     <br />
-                    {profile?.websites.map((w: IndividualWebsite) => (
+                    {profile?.data?.websites.map((w: IndividualWebsite) => (
                       <React.Fragment key={`personal-website-${w.id}`}>
                         <a href={w.url} target="_blank">
                           Visit Website (<em>{w.websiteType}</em>)
@@ -580,18 +650,22 @@ const IndividualProfile: React.FC<{
                 <InputField
                   label="First"
                   name="basicsFirstName"
-                  onChange={() => null}
+                  onChange={(e: any) =>
+                    setAccountForm('first_name', e.target.value)
+                  }
                   required={true}
                   requiredLabel="First name"
-                  value={account.first_name}
+                  value={editAccount?.first_name}
                 />
                 <InputField
                   label="Last"
                   name="basicsLastName"
-                  onChange={() => null}
+                  onChange={(e: any) =>
+                    setAccountForm('last_name', e.target.value)
+                  }
                   required={true}
                   requiredLabel="Last name"
-                  value={account.last_name}
+                  value={editAccount?.last_name}
                 />
                 <Form.Group className="form-group">
                   <Container>
@@ -601,9 +675,11 @@ const IndividualProfile: React.FC<{
                         <Form.Control
                           aria-label="pronouns"
                           as="select"
-                          defaultValue={profile?.pronouns}
+                          defaultValue={editProfile?.pronouns}
                           name="actorInfo1Pronouns"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('pronouns', e.target.value)
+                          }
                         >
                           <option value={undefined}>Choose...</option>
                           {pronouns.map((noun) => (
@@ -617,10 +693,12 @@ const IndividualProfile: React.FC<{
                         <CAGLabel>Other</CAGLabel>
                         <Form.Control
                           aria-label="pronouns"
-                          defaultValue={profile?.pronouns_other}
+                          defaultValue={editProfile?.pronouns_other}
                           disabled={false}
                           name="actorInfo1PronounsOther"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('pronouns_other', e.target.value)
+                          }
                         />
                       </PaddedCol>
                     </Row>
@@ -633,18 +711,22 @@ const IndividualProfile: React.FC<{
                       <Form.Group className="form-group">
                         <CAGFormControl
                           aria-label="bio headline"
-                          defaultValue={profile?.profile_tagline}
+                          defaultValue={editProfile?.profile_tagline}
                           name="demographicsBioHeadline"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('profile_tagline', e.target.value)
+                          }
                           placeholder="Profile Headline (ex: Actor, Musician, Dancer)"
                         />
                       </Form.Group>
                       <Form.Group className="form-group">
                         <Form.Control
                           as="textarea"
-                          defaultValue={profile?.bio}
+                          defaultValue={editProfile?.bio}
                           name="demographicsBio"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('bio', e.target.value)
+                          }
                           rows={5}
                         />
                       </Form.Group>
@@ -662,34 +744,37 @@ const IndividualProfile: React.FC<{
               <>
                 <HeaderNamePronouns>
                   <h2>
-                    {account.first_name} {account.last_name}
+                    {account?.data.first_name} {account?.data.last_name}
                   </h2>
-                  <p>{profile?.pronouns || profile?.pronouns_other}</p>
+                  <p>
+                    {profile?.data?.pronouns || profile?.data?.pronouns_other}
+                  </p>
                 </HeaderNamePronouns>
-                {profile?.profile_tagline && (
-                  <h3>{profile?.profile_tagline}</h3>
+                {profile?.data?.profile_tagline && (
+                  <h3>{profile?.data?.profile_tagline}</h3>
                 )}
-                {profile?.bio && <p>{profile?.bio}</p>}
+                {profile?.data?.bio && <p>{profile?.data?.bio}</p>}
               </>
             )}
           </div>
           <div>
-            {profile?.completed_profile_2 && (
+            {profile?.data?.completed_profile_2 && (
               <DetailSection title="Training">
                 <p>
-                  <strong>{profile?.training_institution}</strong>
+                  <strong>{profile?.data?.training_institution}</strong>
                   <br />
-                  {profile?.training_city}, {profile?.training_state}
+                  {profile?.data?.training_city},{' '}
+                  {profile?.data?.training_state}
                   <br />
-                  <em>{profile?.training_degree}</em>
+                  <em>{profile?.data?.training_degree}</em>
                   <br />
-                  <span>{profile?.training_details}</span>
+                  <span>{profile?.data?.training_details}</span>
                 </p>
               </DetailSection>
             )}
-            {hasNonEmptyValues(profile?.upcoming_performances) && (
+            {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
               <DetailSection title="Upcoming Features">
-                {profile?.upcoming_performances.map(
+                {profile?.data?.upcoming_performances.map(
                   (perf: UpcomingPerformances) => (
                     <IndividualUpcomingShow
                       key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
@@ -699,22 +784,24 @@ const IndividualProfile: React.FC<{
                 )}
               </DetailSection>
             )}
-            {hasNonEmptyValues(profile?.past_performances) && (
+            {hasNonEmptyValues(profile?.data?.past_performances) && (
               <DetailSection title="Past Performances">
-                {profile?.past_performances.map((perf: PastPerformances) => (
-                  <IndividualCredits
-                    key={`credits-shows-${perf.id}`}
-                    show={perf}
-                  />
-                ))}
+                {profile?.data?.past_performances.map(
+                  (perf: PastPerformances) => (
+                    <IndividualCredits
+                      key={`credits-shows-${perf.id}`}
+                      show={perf}
+                    />
+                  )
+                )}
               </DetailSection>
             )}
-            {(profile?.additional_skills_checkboxes?.length ||
-              profile?.additional_skills_manual?.length) && (
+            {(profile?.data?.additional_skills_checkboxes?.length ||
+              profile?.data?.additional_skills_manual?.length) && (
               <DetailSection title="Special Skills">
                 <ProfileFlex>
-                  {profile?.additional_skills_checkboxes?.length &&
-                    profile?.additional_skills_checkboxes.map(
+                  {profile?.data?.additional_skills_checkboxes?.length &&
+                    profile?.data?.additional_skills_checkboxes.map(
                       (skill: string) => (
                         <Badge
                           pill
@@ -726,24 +813,26 @@ const IndividualProfile: React.FC<{
                         </Badge>
                       )
                     )}
-                  {profile?.additional_skills_manual?.length &&
-                    profile?.additional_skills_manual.map((skill: string) => (
-                      <Badge
-                        pill
-                        bg="secondary"
-                        key={`skills-manual-${skill}`}
-                        text="white"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
+                  {profile?.data?.additional_skills_manual?.length &&
+                    profile?.data?.additional_skills_manual.map(
+                      (skill: string) => (
+                        <Badge
+                          pill
+                          bg="secondary"
+                          key={`skills-manual-${skill}`}
+                          text="white"
+                        >
+                          {skill}
+                        </Badge>
+                      )
+                    )}
                 </ProfileFlex>
               </DetailSection>
             )}
-            {hasNonEmptyValues(profile?.awards) && (
+            {hasNonEmptyValues(profile?.data?.awards) && (
               <DetailSection title="Awards & Recognition">
                 <ProfileFlex>
-                  {profile?.awards.map((award: ProfileAwards) => (
+                  {profile?.data?.awards.map((award: ProfileAwards) => (
                     <AwardCard award={award} key={`award-${award?.title}`} />
                   ))}
                 </ProfileFlex>
