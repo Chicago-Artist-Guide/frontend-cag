@@ -1,3 +1,4 @@
+import { updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
@@ -15,6 +16,7 @@ import { fonts, colors } from '../../theme/styleVars';
 import PageContainer from '../layout/PageContainer';
 import DetailSection from './shared/DetailSection';
 import {
+  AgeRange,
   ageRanges,
   ethnicityTypes,
   genders,
@@ -22,7 +24,8 @@ import {
   ProfileAwards,
   pronouns,
   UpcomingPerformances,
-  IndividualWebsite
+  IndividualWebsite,
+  websiteTypeOptions
 } from '../SignUp/Individual/types';
 import type { EditModeSections } from './types';
 import {
@@ -147,6 +150,7 @@ const IndividualProfile: React.FC<{
     headline: false
   });
   const [editProfile, setEditProfile] = useState(profile);
+  const [editAccount, setEditAccount] = useState(account);
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -172,11 +176,117 @@ const IndividualProfile: React.FC<{
     });
   };
 
-  const setProfileForm = (e: any, field: string, value: any) => {
+  const setProfileForm = (field: string, value: any) => {
     setEditProfile({
       ...editProfile,
       [field]: value
     });
+  };
+
+  const setAccountForm = (e: any, field: string, value: any) => {
+    setEditAccount({
+      ...editAccount,
+      [field]: value
+    });
+  };
+
+  const ageRangeChange = (checkValue: boolean, range: AgeRange) => {
+    let newRanges = [...(editProfile?.age_ranges || [])];
+
+    if (checkValue) {
+      // check age range value
+      if (newRanges.indexOf(range) < 0) {
+        newRanges.push(range);
+      }
+    } else {
+      // uncheck age range value
+      newRanges = newRanges.filter((aR) => aR !== range);
+    }
+
+    setProfileForm('age_ranges', newRanges);
+  };
+
+  const ethnicityChange = (checkValue: any, type: string) => {
+    let newEthnicities = [...(editProfile?.ethnicities || [])];
+
+    if (checkValue) {
+      // check ethnicity type value
+      if (newEthnicities.indexOf(type) < 0) {
+        newEthnicities.push(type);
+      }
+    } else {
+      // uncheck age range value
+      newEthnicities = newEthnicities.filter((aR) => aR !== type);
+    }
+
+    setProfileForm('ethnicities', newEthnicities);
+  };
+
+  const updatePersonalDetails = async () => {
+    const {
+      age_ranges,
+      height_ft,
+      height_in,
+      height_no_answer,
+      gender_identity,
+      ethnicities,
+      union_status,
+      union_other,
+      agency,
+      websites
+    } = editProfile;
+
+    const personalDetailsData = {
+      age_ranges,
+      height_ft,
+      height_in,
+      height_no_answer,
+      gender_identity,
+      ethnicities,
+      union_status,
+      union_other,
+      agency,
+      websites
+    };
+
+    try {
+      if (profile?.ref) {
+        await updateDoc(profile.ref, { ...personalDetailsData });
+      } else {
+        // no profileRef
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
+
+  const updateHeadlineProfile = async () => {
+    const { first_name, last_name } = editAccount;
+    const { pronouns, pronouns_other, profile_tagline, bio } = editProfile;
+
+    const headlineAccountDetails = {
+      first_name,
+      last_name
+    };
+    const headlineProfileDetails = {
+      pronouns,
+      pronouns_other,
+      profile_tagline,
+      bio
+    };
+
+    try {
+      if (profile?.ref) {
+        await updateDoc(account.ref, { ...headlineAccountDetails });
+        await updateDoc(profile.ref, { ...headlineProfileDetails });
+      } else {
+        // no profileRef
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
   };
 
   return (
@@ -258,7 +368,9 @@ const IndividualProfile: React.FC<{
                       key={`age-range-chk-${ageRange}`}
                       label={ageRange}
                       name="actorInfo2AgeRanges"
-                      onChange={() => null}
+                      onChange={(e: any) =>
+                        ageRangeChange(e.currentTarget.checked, ageRange)
+                      }
                     />
                   ))}
                 </Form.Group>
@@ -272,7 +384,9 @@ const IndividualProfile: React.FC<{
                           as="select"
                           value={profile?.height_ft}
                           name="actorInfo2HeightFt"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('height_ft', e.target.value)
+                          }
                         >
                           <option value={undefined}>Feet</option>
                           {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
@@ -288,7 +402,9 @@ const IndividualProfile: React.FC<{
                           as="select"
                           value={profile?.height_in}
                           name="actorInfo2HeightIn"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('height_in', e.target.value)
+                          }
                         >
                           <option value={undefined}>Inches</option>
                           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
@@ -311,7 +427,12 @@ const IndividualProfile: React.FC<{
                           fieldType="checkbox"
                           label="I do not wish to answer"
                           name="actorInfo2HeightNoAnswer"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm(
+                              'height_no_answer',
+                              e.currentTarget.checked
+                            )
+                          }
                         />
                       </PaddedCol>
                     </Row>
@@ -329,7 +450,9 @@ const IndividualProfile: React.FC<{
                     as="select"
                     value={profile?.gender_identity}
                     name="actorInfo2Gender"
-                    onChange={() => null}
+                    onChange={(e: any) =>
+                      setProfileForm('gender_identity', e.target.value)
+                    }
                   >
                     <option value={undefined}>Select</option>
                     {genders.map((g) => (
@@ -349,7 +472,9 @@ const IndividualProfile: React.FC<{
                         key={`first-level-chk-${eth.name}`}
                         label={eth.name}
                         name="actorInfo1Ethnicities"
-                        onChange={() => null}
+                        onChange={(e: any) =>
+                          ethnicityChange(e.currentTarget.checked, eth.name)
+                        }
                       />
                       {eth.values.length > 0 && (
                         <Checkbox style={{ paddingLeft: '1.25rem' }}>
@@ -360,7 +485,9 @@ const IndividualProfile: React.FC<{
                               key={`${eth.name}-child-chk-${ethV}`}
                               label={ethV}
                               name="actorInfoEthnicities"
-                              onChange={() => null}
+                              onChange={(e: any) =>
+                                ethnicityChange(e.currentTarget.checked, ethV)
+                              }
                             />
                           ))}
                         </Checkbox>
@@ -378,7 +505,9 @@ const IndividualProfile: React.FC<{
                           as="select"
                           name="demographicsUnionStatus"
                           value={profile?.union_status}
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('union_status', e.target.value)
+                          }
                         >
                           <option value={undefined}>Select union status</option>
                           <option value="Union">Union</option>
@@ -392,7 +521,9 @@ const IndividualProfile: React.FC<{
                           defaultValue={profile?.union_other}
                           disabled={false}
                           name="demographicsUnionStatusOther"
-                          onChange={() => null}
+                          onChange={(e: any) =>
+                            setProfileForm('union_other', e.target.value)
+                          }
                           placeholder="Other"
                         />
                       </PaddedCol>
@@ -407,7 +538,9 @@ const IndividualProfile: React.FC<{
                             aria-label="agency"
                             defaultValue={profile?.agency}
                             name="demographicsAgency"
-                            onChange={() => null}
+                            onChange={(e: any) =>
+                              setProfileForm('agency', e.target.value)
+                            }
                             placeholder="Agency"
                           />
                         </Form.Group>
@@ -415,8 +548,54 @@ const IndividualProfile: React.FC<{
                     </Row>
                   </Container>
                 </Form.Group>
+                <hr />
+                <Form.Group>
+                  <CAGLabel>Website Links</CAGLabel>
+                  <Container>
+                    <Row>
+                      <PaddedCol lg="10">
+                        {profile?.websites?.map((websiteRow: any, i: any) => (
+                          <div key={`website-row-${websiteRow.id}`}>
+                            <CAGFormControl
+                              aria-label="URL"
+                              as="input"
+                              name="websiteUrl"
+                              onChange={() => null}
+                              placeholder="URL"
+                              value={websiteRow.url}
+                            />
+                            <CAGFormControl
+                              aria-label="website type"
+                              as="select"
+                              defaultValue={websiteRow.websiteType}
+                              name="websiteType"
+                              onChange={() => null}
+                            >
+                              <option value={undefined}>Select Type</option>
+                              {websiteTypeOptions.map((wT) => (
+                                <option value={wT} key={wT}>
+                                  {wT}
+                                </option>
+                              ))}
+                            </CAGFormControl>
+                            {editProfile.websites.length > 1 && (
+                              <a href="#" onClick={() => null}>
+                                X
+                              </a>
+                            )}
+                          </div>
+                        ))}
+                        <div>
+                          <a href="#" onClick={() => null}>
+                            + Add Website
+                          </a>
+                        </div>
+                      </PaddedCol>
+                    </Row>
+                  </Container>
+                </Form.Group>
                 <Button
-                  onClick={() => null}
+                  onClick={updatePersonalDetails}
                   text="Save"
                   type="button"
                   variant="primary"
@@ -575,7 +754,7 @@ const IndividualProfile: React.FC<{
                   </Row>
                 </Container>
                 <Button
-                  onClick={() => null}
+                  onClick={updateHeadlineProfile}
                   text="Save"
                   type="button"
                   variant="primary"
