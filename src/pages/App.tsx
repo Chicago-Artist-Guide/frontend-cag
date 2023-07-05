@@ -12,9 +12,9 @@ import {
 import { getStorage } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import {
-  BrowserRouter as Router,
   Redirect,
   Route,
+  BrowserRouter as Router,
   Switch
 } from 'react-router-dom';
 import Footer from '../components/layout/Footer';
@@ -29,17 +29,19 @@ import { Document, ProfileContext } from '../context/ProfileContext';
 import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
 import Donate from './Donate';
+import EventPage from './Event';
 import FAQ from './FAQ';
+import ForgotPassword from './ForgotPassword';
 import Home from './Home';
 import Login from './Login';
 import Logout from './Logout';
-import ForgotPassword from './ForgotPassword';
 import NotFound from './NotFound';
 import Profile from './Profile';
 import SignUp from './SignUp';
 import TheaterResources from './TheaterResources';
 import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
+import EventAlert from '../components/Home/EventAlert';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -52,38 +54,42 @@ const firebaseConfig = {
 };
 const lglApiKey = process.env.REACT_APP_LGL_API_KEY || '';
 
-const CAG = () => (
-  <Router>
-    <ScrollToTop />
-    <GlobalStyle />
-    <Header />
-    <Switch>
-      <Route
-        exact
-        path="/"
-        render={() => <Redirect to={{ pathname: '/home' }} />}
-      />
-      <Route component={Home} exact path="/home" />
-      <Route component={Donate} exact path="/donate" />
-      <Route component={FAQ} exact path="/faq" />
-      <Route component={TOS} exact path="/terms-of-service" />
-      <Route component={WhoWeAre} exact path="/about-us" />
-      <Route component={Login} exact path="/login" />
-      <Route component={Logout} exact path="/logout" />
-      <Route component={ForgotPassword} exact path="/forgot-password" />
-      <Route component={Profile} exact path="/profile" />
-      <Route component={SignUp} exact path="/sign-up" />
-      <Route component={SignUp2} exact path="/sign-up-2" />
-      <Route component={TheaterResources} exact path="/theater-resources" />
-      <Route
-        component={ManageProduction}
-        path="/production/:productionId/manage"
-      />
-      <Route component={NotFound} />
-    </Switch>
-    <Footer />
-  </Router>
-);
+const CAG = () => {
+  return (
+    <Router>
+      <ScrollToTop />
+      <GlobalStyle />
+      <Header />
+      <EventAlert />
+      <Switch>
+        <Route
+          exact
+          path="/"
+          render={() => <Redirect to={{ pathname: '/home' }} />}
+        />
+        <Route component={Home} exact path="/home" />
+        <Route component={Donate} exact path="/donate" />
+        <Route component={FAQ} exact path="/faq" />
+        <Route component={TOS} exact path="/terms-of-service" />
+        <Route component={WhoWeAre} exact path="/about-us" />
+        <Route component={Login} exact path="/login" />
+        <Route component={Logout} exact path="/logout" />
+        <Route component={ForgotPassword} exact path="/forgot-password" />
+        <Route component={Profile} exact path="/profile" />
+        <Route component={SignUp} exact path="/sign-up" />
+        <Route component={SignUp2} exact path="/sign-up-2" />
+        <Route component={TheaterResources} exact path="/theater-resources" />
+        <Route component={EventPage} exact path="/night-at-the-cag-baret" />
+        <Route
+          component={ManageProduction}
+          path="/production/:productionId/manage"
+        />
+        <Route component={NotFound} />
+      </Switch>
+      <Footer />
+    </Router>
+  );
+};
 
 const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);

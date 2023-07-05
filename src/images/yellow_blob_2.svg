@@ -1,1 +1,7 @@
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500"><defs><style>.cls-1{fill:#e9c166;}</style></defs><path id="Path_915" data-name="Path 915" class="cls-1" d="M175.71,96.46c64.55-53.3,232.74-4.72,232.74,64.4s-29.76,130.22-94.3,183.52-122,97.46-163.88,29.67S111.17,149.76,175.71,96.46Z"/></svg>
+<svg id="Layer_1" data-name="Layer 1"
+  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+  <defs>
+    <style>.cls-1{fill:#e9c166;}</style>
+  </defs>
+  <path id="Path_915" data-name="Path 915" class="cls-1" d="M175.71,96.46c64.55-53.3,232.74-4.72,232.74,64.4s-29.76,130.22-94.3,183.52-122,97.46-163.88,29.67S111.17,149.76,175.71,96.46Z"/>
+</svg>
