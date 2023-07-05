@@ -185,7 +185,7 @@ const ActorInfo1: React.FC<{
                       }
                     />
                     {eth.values.length > 0 && (
-                      <InnerEthnicities style={{ paddingLeft: '1.25rem' }}>
+                      <Checkbox style={{ paddingLeft: '1.25rem' }}>
                         {eth.values.map((ethV) => (
                           <Checkbox
                             checked={isEthnicityInEthnicities(ethV)}
@@ -198,7 +198,7 @@ const ActorInfo1: React.FC<{
                             }
                           />
                         ))}
-                      </InnerEthnicities>
+                      </Checkbox>
                     )}
                   </React.Fragment>
                 ))}
@@ -237,8 +237,6 @@ const PrivacyPar = styled.p`
   letter-spacing: 0;
   margin-top: 17px;
 `;
-
-const InnerEthnicities = styled(Checkbox)``;
 
 const PaddedCol = styled(Col)`
   padding-left: 0;
