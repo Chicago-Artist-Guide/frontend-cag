@@ -13,7 +13,11 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheckCircle,
+  faPenToSquare,
+  faXmark
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button, Checkbox, InputField } from '../../../genericComponents';
@@ -34,7 +38,8 @@ import {
   IndividualProfile as IndividualProfileT,
   IndividualProfile2,
   IndividualWebsite,
-  websiteTypeOptions
+  websiteTypeOptions,
+  WebsiteTypes
 } from '../../SignUp/Individual/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
@@ -56,6 +61,7 @@ const IndividualProfile: React.FC<{
   });
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
+  const [websiteId, setWebsiteId] = useState(1);
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -68,6 +74,7 @@ const IndividualProfile: React.FC<{
       return;
     }
 
+    setWebsiteId(profile?.data?.websites?.length || 1);
     setShowUp2Link(previewMode || !profile?.data?.completed_profile_2);
     setEditProfile(profile?.data);
   }, [profile?.data, editMode]);
@@ -170,6 +177,43 @@ const IndividualProfile: React.FC<{
     }
 
     setProfileForm('ethnicities', newEthnicities);
+  };
+
+  const onWebsiteInputChange = <T extends keyof IndividualWebsite>(
+    fieldValue: IndividualWebsite[T],
+    fieldName: T,
+    id: number
+  ) => {
+    const newWebsiteValues = [...(editProfile?.websites || [])];
+    const findIndex = newWebsiteValues.findIndex((web) => web.id === id);
+    newWebsiteValues[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('websites', newWebsiteValues);
+  };
+
+  const removeWebsiteInput = (e: any, id: any) => {
+    e.preventDefault();
+
+    const newWebsiteValues = [...(editProfile?.websites || [])];
+    const findIndex = newWebsiteValues.findIndex((web) => web.id === id);
+    newWebsiteValues.splice(findIndex, 1);
+
+    setProfileForm('websites', newWebsiteValues);
+  };
+
+  const addWebsiteInput = (e: any) => {
+    e.preventDefault();
+    const newWebsiteId = websiteId + 1;
+    const newWebsiteInputs = [...(editProfile?.websites || [])];
+
+    newWebsiteInputs.push({
+      id: newWebsiteId,
+      url: '',
+      websiteType: '' as WebsiteTypes
+    });
+
+    setWebsiteId(newWebsiteId);
+    setProfileForm('websites', newWebsiteInputs);
   };
 
   const updatePersonalDetails = async () => {
@@ -302,19 +346,23 @@ const IndividualProfile: React.FC<{
           <ProfileImage src={profile?.data?.profile_image_url} fluid />
           <DetailsCard>
             <DetailsColTitle>
-              Personal Details
-              <a
-                href="#"
-                onClick={(e: React.MouseEvent<HTMLElement>) =>
-                  onEditModeClick(
-                    e,
-                    'personalDetails',
-                    !editMode['personalDetails']
-                  )
-                }
-              >
-                {editMode['personalDetails'] ? 'Cancel' : 'Edit'}
-              </a>
+              <div>
+                Personal Details
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(
+                      e,
+                      'personalDetails',
+                      !editMode['personalDetails']
+                    )
+                  }
+                >
+                  <FontAwesomeIcon
+                    icon={editMode['personalDetails'] ? faXmark : faPenToSquare}
+                  />
+                </a>
+              </div>
             </DetailsColTitle>
             {editMode['personalDetails'] ? (
               <div>
@@ -521,7 +569,13 @@ const IndividualProfile: React.FC<{
                                 aria-label="URL"
                                 as="input"
                                 name="websiteUrl"
-                                onChange={() => null}
+                                onChange={(e: any) =>
+                                  onWebsiteInputChange(
+                                    e.target.value || '',
+                                    'url',
+                                    websiteRow.id
+                                  )
+                                }
                                 placeholder="URL"
                                 value={websiteRow.url}
                               />
@@ -530,7 +584,13 @@ const IndividualProfile: React.FC<{
                                 as="select"
                                 defaultValue={websiteRow.websiteType}
                                 name="websiteType"
-                                onChange={() => null}
+                                onChange={(e: any) =>
+                                  onWebsiteInputChange(
+                                    e.target.value || '',
+                                    'websiteType',
+                                    websiteRow.id
+                                  )
+                                }
                               >
                                 <option value={undefined}>Select Type</option>
                                 {websiteTypeOptions.map((wT) => (
@@ -540,7 +600,12 @@ const IndividualProfile: React.FC<{
                                 ))}
                               </CAGFormControl>
                               {editProfile.websites.length > 1 && (
-                                <a href="#" onClick={() => null}>
+                                <a
+                                  href="#"
+                                  onClick={(e: any) =>
+                                    removeWebsiteInput(e, websiteRow.id)
+                                  }
+                                >
                                   X
                                 </a>
                               )}
@@ -548,7 +613,7 @@ const IndividualProfile: React.FC<{
                           )
                         )}
                         <div>
-                          <a href="#" onClick={() => null}>
+                          <a href="#" onClick={addWebsiteInput}>
                             + Add Website
                           </a>
                         </div>
@@ -642,7 +707,9 @@ const IndividualProfile: React.FC<{
                 onEditModeClick(e, 'headline', !editMode['headline'])
               }
             >
-              {editMode['headline'] ? 'Cancel' : 'Edit'}
+              <FontAwesomeIcon
+                icon={editMode['headline'] ? faXmark : faPenToSquare}
+              />
             </a>
             {editMode['headline'] ? (
               <div>
@@ -874,6 +941,14 @@ const DetailsColTitle = styled.h2`
   font-weight: 500;
   font-size: 18px;
   line-height: 24px;
+
+  > div {
+    display: flex;
+
+    a {
+      margin-left: auto;
+    }
+  }
 
   &::after {
     content: '';
