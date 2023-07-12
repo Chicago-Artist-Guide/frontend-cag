@@ -826,7 +826,7 @@ const IndividualProfile: React.FC<{
             )}
           </div>
           <div>
-            {hasNonEmptyValues(profile?.data?.training_institutions) && (
+            {hasNonEmptyValues(profile?.data?.training_institutions) ? (
               <DetailSection title="Training">
                 {profile?.data?.training_institutions.map(
                   (training: TrainingInstitution) => (
@@ -842,6 +842,22 @@ const IndividualProfile: React.FC<{
                   )
                 )}
               </DetailSection>
+            ) : profile?.data?.training_institution &&
+              profile?.data?.training_institution !== '' ? (
+              <DetailSection title="Training">
+                {/* need to support the old single training value profiles - will only update once they edit */}
+                <p>
+                  <strong>{profile?.data.training_institution}</strong>
+                  <br />
+                  {profile?.data.training_city}, {profile?.data.training_state}
+                  <br />
+                  <em>{profile?.data.training_degree}</em>
+                  <br />
+                  <span>{profile?.data.training_details}</span>
+                </p>
+              </DetailSection>
+            ) : (
+              <></>
             )}
             {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
               <DetailSection title="Upcoming Features">
