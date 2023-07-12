@@ -15,12 +15,12 @@ const TOS = () => (
       information.
     </p>
     <p>
-      You agree that by clicking “Join Now”, “Join Chicago Artist Guide”, “Sign
-      Up” or similar, registering, accessing or using our services (described
+      You agree that by clicking "Join Now", "Join Chicago Artist Guide", "Sign
+      Up" or similar, registering, accessing or using our services (described
       below), you are agreeing to enter into a legally binding contract with
       Chicago Artist Guide (even if you are using our Services on behalf of a
-      company). If you do not agree to this contract (“Contract” or “User
-      Agreement”), do not click “Join Now” (or similar) and do not access or
+      company). If you do not agree to this contract ("Contract" or "User
+      Agreement"), do not click "Join Now" (or similar) and do not access or
       otherwise use any of our Services. If you wish to terminate this contract,
       at any time you can do so by closing your account and no longer accessing
       or using our Services.
@@ -30,15 +30,15 @@ const TOS = () => (
       This Contract applies to Chicagoartistguide.org, Chicago Artist
       Guide-branded apps, and other CAG-related sites, apps, communications and
       other services that state that they are offered under this Contract
-      (“Services”), including the offsite collection of data for those Services,
-      such as our ads and the “Apply with Chicago Artist Guide” and “Share with
-      CAG” plugins. Registered users of our Services are “Members” and
-      unregistered users are “Visitors”.
+      ("Services"), including the offsite collection of data for those Services,
+      such as our ads and the "Apply with Chicago Artist Guide" and "Share with
+      CAG" plugins. Registered users of our Services are "Members" and
+      unregistered users are "Visitors".
     </p>
     <BoldP>Chicago Artist Guide</BoldP>
     <p>
       You are entering into this Contract with Chicago Artist Guide (also
-      referred to as “we”, “us”, and “CAG”).
+      referred to as "we", "us", and "CAG").
     </p>
     <BoldP>This Contract applies to Members and Visitors.</BoldP>
     <p>
@@ -51,7 +51,7 @@ const TOS = () => (
     <p>
       When you register and join the CAG Services, you become a Member. If you
       have chosen not to register for our Services, you may access certain
-      features as a “Visitor.”
+      features as a "Visitor."
     </p>
     <TitleThree>1.3 Change</TitleThree>
     <BoldP>We may make changes to the Contract.</BoldP>
@@ -67,16 +67,14 @@ const TOS = () => (
     </p>
     <h3>2. Obligations</h3>
     <TitleThree>2.1 Service Eligibility</TitleThree>
+    <BoldP>Here are some promises that you make to us in this Contract:</BoldP>
     <BoldP>
-      Here are some promises that you make to us in this Contract:
-    </BoldP>
-    <BoldP>
-      You’re eligible to enter into this Contract and you are at least our
-      “Minimum Age.”
+      You're eligible to enter into this Contract and you are at least our
+      "Minimum Age."
     </BoldP>
     <p>The Services are not for use by anyone under the age of 18.</p>
     <p>
-      To use the Services, you agree that: (1) you must be the “Minimum Age”
+      To use the Services, you agree that: (1) you must be the "Minimum Age"
       (described below) or older; (2) you will only have one CAG account; and
       (3) you are not already restricted by CAG from using the Services.
       Creating an account with false information is a violation of our terms,
@@ -84,7 +82,7 @@ const TOS = () => (
       of 16.
     </p>
     <p>
-      “Minimum Age” means 18 years old. However, if law requires that you must
+      "Minimum Age" means 18 years old. However, if law requires that you must
       be older in order for CAG to lawfully provide the Services to you without
       parental consent (including using of your personal data) then the Minimum
       Age is such older age.
@@ -98,7 +96,7 @@ const TOS = () => (
     <p>
       Members are account holders. You agree to: (1) use a strong password and
       keep it confidential; (2) not transfer any part of your account (e.g.,
-      connections) and (3) follow the law and our list of Dos and Don’ts and
+      connections) and (3) follow the law and our list of Dos and Don'ts and
       Professional Community Policies. You are responsible for anything that
       happens through your account unless you close it or report misuse.
     </p>
@@ -112,7 +110,7 @@ const TOS = () => (
     </p>
     <TitleThree>2.3 Notices and Messages</TitleThree>
     <p>
-      You’re okay with us providing notices and messages to you through our
+      You're okay with us providing notices and messages to you through our
       websites, apps, and contact information. If your contact information is
       out of date, you may miss out on important notices.
     </p>
@@ -151,14 +149,14 @@ const TOS = () => (
     </p>
     <h3>3. Rights and Limits</h3>
     <TitleThree>
-      3.1 Your License to Chicago Artist Guide (aka “CAG”)
+      3.1 Your License to Chicago Artist Guide (aka "CAG")
     </TitleThree>
     <p>
       You own all of the content, feedback and personal information you provide
       to us, but you also grant us a non-exclusive license to it.
     </p>
     <p>
-      We’ll honor the choices you make about who gets to see your information
+      We'll honor the choices you make about who gets to see your information
       and content, including how it can be used for ads.
     </p>
     <p>
@@ -247,7 +245,7 @@ const TOS = () => (
     </p>
     <p>
       You agree to only provide content or information that does not violate the
-      law nor anyone’s rights (including intellectual property rights). You also
+      law nor anyone's rights (including intellectual property rights). You also
       agree that your profile information will be truthful. CAG may be required
       by law to remove certain information or content in certain countries.
     </p>
@@ -259,27 +257,27 @@ const TOS = () => (
       extent allowed under the law.
     </p>
     <p>
-      We don’t promise to store or keep showing any information and content that
-      you’ve posted. CAG is not a storage service. You agree that we have no
+      We don't promise to store or keep showing any information and content that
+      you've posted. CAG is not a storage service. You agree that we have no
       obligation to store, maintain or provide you a copy of any content or
       information that you or others provide, except to the extent required by
       applicable law and as noted in our Privacy Policy.
     </p>
     <TitleThree>3.3 Other Content, Sites and Apps</TitleThree>
     <p>
-      Your use of others’ content and information posted on our Services, is at
+      Your use of others' content and information posted on our Services, is at
       your own risk.
     </p>
     <p>
       Others may offer their own products and services through our Services, and
-      we aren’t responsible for those third-party activities.
+      we aren't responsible for those third-party activities.
     </p>
     <p>
       By using the Services, you may encounter content or information that might
       be inaccurate, incomplete, delayed, misleading, illegal, offensive or
       otherwise harmful. CAG generally does not review content provided by our
-      Members or others. You agree that we are not responsible for others’
-      (including other Members’) content or information. We cannot always
+      Members or others. You agree that we are not responsible for others'
+      (including other Members') content or information. We cannot always
       prevent this misuse of our Services, and you agree that we are not
       responsible for any such misuse. You also acknowledge the risk that you or
       your organization may be mistakenly associated with content about others
@@ -294,7 +292,7 @@ const TOS = () => (
       that CAG does not supervise, direct, control or monitor Members in the
       performance of these services and agree that (1) CAG is not responsible
       for the offering, performance or procurement of these services, (2) CAG
-      does not endorse any particular Member’s offered services, and (3) nothing
+      does not endorse any particular Member's offered services, and (3) nothing
       shall create an employment, agency, or joint venture relationship between
       CAG and any Member offering services. If you are a Member offering
       services, you represent and warrant that you have all the required
@@ -319,11 +317,11 @@ const TOS = () => (
       number of your connections and your ability to contact other Members. CAG
       reserves the right to restrict, suspend, or terminate your account if you
       breach this Contract or the law or are misusing the Services (e.g.,
-      violating any of the Dos and Don’ts or Professional Community Policies).
+      violating any of the Dos and Don'ts or Professional Community Policies).
     </p>
     <TitleThree>3.5 Intellectual Property Rights</TitleThree>
     <BoldP>
-      We’re providing you notice about our intellectual property rights.
+      We're providing you notice about our intellectual property rights.
     </BoldP>
     <p>
       CAG reserves all of its intellectual property rights in the Services.
@@ -342,7 +340,7 @@ const TOS = () => (
       CHICAGO ARTIST GUIDE AND ITS AFFILIATES MAKE NO REPRESENTATION OR WARRANTY
       ABOUT THE SERVICES, INCLUDING ANY REPRESENTATION THAT THE SERVICES WILL BE
       UNINTERRUPTED OR ERROR-FREE, AND PROVIDE THE SERVICES (INCLUDING CONTENT
-      AND INFORMATION) ON AN “AS IS” AND “AS AVAILABLE” BASIS. TO THE FULLEST
+      AND INFORMATION) ON AN "AS IS" AND "AS AVAILABLE" BASIS. TO THE FULLEST
       EXTENT PERMITTED UNDER APPLICABLE LAW, CHICAGO ARTIST GUIDE AND ITS
       AFFILIATES DISCLAIM ANY IMPLIED OR STATUTORY WARRANTY, INCLUDING ANY
       IMPLIED WARRANTY OF TITLE, ACCURACY OF DATA, NON-INFRINGEMENT,
@@ -369,7 +367,7 @@ const TOS = () => (
     <TitleThree>4.3 Basis of the Bargain; Exclusions</TitleThree>
     <p>
       The limitations of liability in this Section 4 are part of the basis of
-      the bargain between you and Chicago Artist Guide (or “CAG”) and shall
+      the bargain between you and Chicago Artist Guide (or "CAG") and shall
       apply to all claims of liability (e.g., warranty, tort, negligence,
       contract and law) even if CAG or its affiliates has been told of the
       possibility of any such damage, and even if these remedies fail their
@@ -398,7 +396,7 @@ const TOS = () => (
       <li>
         <BoldP>Our rights to use and disclose your feedback</BoldP>
         <p>
-          Members and/or Visitors’ rights to further re-share content and
+          Members and/or Visitors' rights to further re-share content and
           information you shared through the Services.
         </p>
       </li>
@@ -446,8 +444,8 @@ const TOS = () => (
     <h3>8. CAG "Dos and Don'ts"</h3>
     <TitleThree>8.1 Dos</TitleThree>
     <p>
-      Chicago Artist Guide is a community of professionals. This list of “Dos
-      and Don’ts” along with our Professional Community Policies limit what you
+      Chicago Artist Guide is a community of professionals. This list of "Dos
+      and Don'ts" along with our Professional Community Policies limit what you
       can and cannot do on our Services.
     </p>
     <p>You agree that you will:</p>
@@ -470,7 +468,7 @@ const TOS = () => (
         <li>
           Create a false identity on CAG, misrepresent your identity, create a
           Member profile for anyone other than yourself (a real person), or use
-          or attempt to use another’s account;
+          or attempt to use another's account;
         </li>
         <li>
           Develop, support or use software, devices, scripts, robots or any
@@ -505,7 +503,7 @@ const TOS = () => (
           without limitation, (i) copying or distributing our learning videos or
           other materials or (ii) copying or distributing our technology, unless
           it is released under open source licenses; (iii) using the name
-          “Chicago Artist Guide” or our logos in any business name, email, or
+          "Chicago Artist Guide" or our logos in any business name, email, or
           URL except as provided in the Brand Guidelines;
         </li>
         <li>
@@ -528,18 +526,18 @@ const TOS = () => (
         </li>
         <li>
           Deep-link to our Services for any purpose other than to promote your
-          profile or a Group on our Services, without CAG’s consent;
+          profile or a Group on our Services, without CAG's consent;
         </li>
         <li>
           Use bots or other automated methods to access the Services, add or
           download contacts, send or redirect messages;
         </li>
         <li>
-          Monitor the Services’ availability, performance or functionality for
+          Monitor the Services' availability, performance or functionality for
           any competitive purpose;
         </li>
         <li>
-          Engage in “framing,” “mirroring,” or otherwise simulating the
+          Engage in "framing," "mirroring," or otherwise simulating the
           appearance or function of the Services;
         </li>
         <li>
