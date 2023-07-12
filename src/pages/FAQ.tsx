@@ -50,7 +50,7 @@ const FAQ = () => {
           <u>Anti-Racism</u>
           <br />
         </>,
-        'Racism is inherent to every aspect of our lives; it is woven into the fabric of society and  encompasses more than racial prejudices. Racism involves social, institutional and systemic powers. While we cannot separate ourselves from White Supremacy we are committed to challenging the traditionally biased processes for hiring and promoting artists both on and off stage. Chicago Artist Guide is dedicated to doing our part in creating equitable anti-racist representation in all areas of the performing arts. We at Chicago Artist Guide must be actively anti-racist. We absolutely and unapologetically denounce our racist systems and its proponents without exception.',
+        'Racism is inherent to every aspect of our lives; it is woven into the fabric of society and encompasses more than racial prejudices. Racism involves social, institutional and systemic powers. While we cannot separate ourselves from White Supremacy we are committed to challenging the traditionally biased processes for hiring and promoting artists both on and off stage. Chicago Artist Guide is dedicated to doing our part in creating equitable anti-racist representation in all areas of the performing arts. We at Chicago Artist Guide must be actively anti-racist. We absolutely and unapologetically denounce our racist systems and its proponents without exception.',
         <>
           <br />
           <br />
@@ -59,7 +59,7 @@ const FAQ = () => {
           <u>Intersectionality</u>
           <br />
         </>,
-        'We stand for and protect the values of inclusion, participation, and compassion for everyone--regardless of race, class, religion, country of origin, immigration status, (dis)ability,  age, gender identity, or sexual orientation. ​(via ',
+        'We stand for and protect the values of inclusion, participation, and compassion for everyone--regardless of race, class, religion, country of origin, immigration status, (dis)ability,  age, gender identity, or sexual orientation. (via',
         <a href="https://theghostlightproject.com/" target="_blank">
           The Ghostlight Project
         </a>,
@@ -171,7 +171,7 @@ const FAQ = () => {
           <Tagline>Find out what we're all about</Tagline>
           <Section>
             <h2>About Chicago Artist Guide</h2>
-            {aboutQ.map(qa => (
+            {aboutQ.map((qa) => (
               <div className="" key={qa.id}>
                 <Question>{qa.question}</Question>
                 <p>{qa.answer}</p>
@@ -180,7 +180,7 @@ const FAQ = () => {
           </Section>
           <Section>
             <h2>Our Platform</h2>
-            {platformQ.map(qa => (
+            {platformQ.map((qa) => (
               <div className="" key={qa.id}>
                 <Question>{qa.question}</Question>
                 <p>{qa.answer}</p>
@@ -189,7 +189,7 @@ const FAQ = () => {
           </Section>
           <Section>
             <h2>Privacy</h2>
-            {privacyQ.map(qa => (
+            {privacyQ.map((qa) => (
               <div className="" key={qa.id}>
                 <Question>{qa.question}</Question>
                 <p>{qa.answer}</p>
@@ -198,7 +198,7 @@ const FAQ = () => {
           </Section>
           <Section>
             <h2>Identity</h2>
-            {identityQ.map(qa => (
+            {identityQ.map((qa) => (
               <div className="" key={qa.id}>
                 <Question>{qa.question}</Question>
                 <p>{qa.answer}</p>

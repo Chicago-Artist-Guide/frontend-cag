@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
 import { useHistory } from 'react-router-dom';
@@ -19,9 +19,16 @@ const SignUp2Footer: React.FC<{
   const showBackButton = currentStep !== 'training';
   const stepIndex = steps.findIndex((s: any) => s.id === (step as any).id);
 
+  useEffect(() => {
+    if (currentStep === 'awards') {
+      setNextBtnText('Go to Profile');
+    } else {
+      setNextBtnText('Continue');
+    }
+  }, [currentStep]);
+
   const nextButtonAction = async (currStep: string) => {
     if (currStep === 'awards') {
-      setNextBtnText('Go to Profile');
       await submitSignUp2Profile();
       history.push('/profile');
       goToTop();

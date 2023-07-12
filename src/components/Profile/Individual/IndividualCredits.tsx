@@ -28,7 +28,7 @@ const IndividualCredits: React.FC<{
         </Col>
         <Col lg={6}>
           <ShowDescription>
-            <strong>Role:</strong> {show?.role}
+            <strong>Role/Position:</strong> {show?.role}
             <br />
             <strong>Director:</strong> {show?.director}
             <br />

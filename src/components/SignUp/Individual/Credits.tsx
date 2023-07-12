@@ -113,7 +113,7 @@ const Credits: React.FC<{
                 onChange={(e: any) =>
                   onCreditFieldChange('role', e.target.value, credit.id)
                 }
-                placeholder="Role"
+                placeholder="Role/Position"
                 value={credit.role}
               />
               <InputField

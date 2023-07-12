@@ -26,11 +26,16 @@ const steps: Step[] = [
 // establish our form data structure
 // assign defaults
 const defaultData: IndividualProfile2Data = {
-  trainingInstitution: '',
-  trainingCity: '',
-  trainingState: '' as USStateSymbol,
-  trainingDegree: '',
-  trainingDetails: '',
+  trainingInstitutions: [
+    {
+      id: 1,
+      trainingInstitution: '',
+      trainingCity: '',
+      trainingState: '' as USStateSymbol,
+      trainingDegree: '',
+      trainingDetails: ''
+    }
+  ],
 
   pastPerformances: [
     {
@@ -69,11 +74,7 @@ const SignUp2 = () => {
   // submit full sign up flow 2 profile data
   const submitSignUp2Profile = async () => {
     const {
-      trainingInstitution,
-      trainingCity,
-      trainingState,
-      trainingDegree,
-      trainingDetails,
+      trainingInstitutions,
       pastPerformances, // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
       upcoming, // { id, title, synopsis, industryCode, url, imageUrl }
       additionalSkillsCheckboxes,
@@ -83,11 +84,7 @@ const SignUp2 = () => {
 
     const finalProfileData: IndividualProfile2 = {
       // training
-      training_institution: trainingInstitution,
-      training_city: trainingCity,
-      training_state: trainingState,
-      training_degree: trainingDegree,
-      training_details: trainingDetails,
+      training_institutions: trainingInstitutions,
 
       // past perf
       past_performances: pastPerformances,
