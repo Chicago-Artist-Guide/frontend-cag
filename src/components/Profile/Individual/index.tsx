@@ -39,7 +39,8 @@ import {
   IndividualProfile2,
   IndividualWebsite,
   websiteTypeOptions,
-  WebsiteTypes
+  WebsiteTypes,
+  TrainingInstitution
 } from '../../SignUp/Individual/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
@@ -825,18 +826,21 @@ const IndividualProfile: React.FC<{
             )}
           </div>
           <div>
-            {profile?.data?.completed_profile_2 && (
+            {hasNonEmptyValues(profile?.data?.training_institutions) && (
               <DetailSection title="Training">
-                <p>
-                  <strong>{profile?.data?.training_institution}</strong>
-                  <br />
-                  {profile?.data?.training_city},{' '}
-                  {profile?.data?.training_state}
-                  <br />
-                  <em>{profile?.data?.training_degree}</em>
-                  <br />
-                  <span>{profile?.data?.training_details}</span>
-                </p>
+                {profile?.data?.training_institutions.map(
+                  (training: TrainingInstitution) => (
+                    <p>
+                      <strong>{training.trainingInstitution}</strong>
+                      <br />
+                      {training.trainingCity}, {training.trainingState}
+                      <br />
+                      <em>{training.trainingDegree}</em>
+                      <br />
+                      <span>{training.trainingDetails}</span>
+                    </p>
+                  )
+                )}
               </DetailSection>
             )}
             {hasNonEmptyValues(profile?.data?.upcoming_performances) && (

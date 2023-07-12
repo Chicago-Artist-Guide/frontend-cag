@@ -225,12 +225,17 @@ export type ProfileAwards = {
   description: string;
 };
 
-export type IndividualProfile2Data = {
+export type TrainingInstitution = {
+  id: number;
   trainingInstitution: string;
   trainingCity: string;
   trainingState: USStateSymbol;
   trainingDegree: string;
   trainingDetails: string;
+};
+
+export type IndividualProfile2Data = {
+  trainingInstitutions: TrainingInstitution[];
   pastPerformances: PastPerformances[];
   upcoming: UpcomingPerformances[];
   additionalSkillsCheckboxes: SkillCheckbox[];
@@ -239,11 +244,7 @@ export type IndividualProfile2Data = {
 };
 
 export type IndividualProfile2 = {
-  training_institution: string;
-  training_city: string;
-  training_state: USStateSymbol;
-  training_degree: string;
-  training_details: string;
+  training_institutions: TrainingInstitution[];
   past_performances: PastPerformances[];
   upcoming_performances: UpcomingPerformances[];
   additional_skills_checkboxes: SkillCheckbox[];
