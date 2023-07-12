@@ -81,7 +81,7 @@ const ActorInfo2: React.FC<{
 
     if (checkValue) {
       // check age range value
-      if (newRanges.indexOf(range) < 0) {
+      if (newRanges.indexOf(range) < 0 && newRanges.length < 3) {
         newRanges.push(range);
       }
     } else {
