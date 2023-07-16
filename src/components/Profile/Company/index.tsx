@@ -55,7 +55,7 @@ const CompanyProfile: React.FC<{
       where('account_id', '==', uid)
     );
     const querySnapshot = await getDocs(q);
-    setProductions(querySnapshot.docs.map(doc => doc.data()) as Production[]);
+    setProductions(querySnapshot.docs.map((doc) => doc.data()) as Production[]);
   };
 
   const toggleEdit = async () => {
@@ -130,7 +130,7 @@ const CompanyProfile: React.FC<{
             <DetailAdd text="Add an award or recognition" />
           </DetailSection>
           <DetailSection title="Active Shows">
-            {productions?.map(show => (
+            {productions?.map((show) => (
               <ActiveProduction key={show.production_id} show={show} />
             ))}
             <DetailAdd
@@ -139,13 +139,9 @@ const CompanyProfile: React.FC<{
             />
           </DetailSection>
           <DetailSection title="Inactive Shows">
-            {productions?.map(show => (
+            {productions?.map((show) => (
               <InactiveProduction key={show.production_id} show={show} />
             ))}
-            <DetailAdd
-              text="Add a new show"
-              onClick={() => setEditing('add-production')}
-            />
           </DetailSection>
         </RightCol>
       </Row>
