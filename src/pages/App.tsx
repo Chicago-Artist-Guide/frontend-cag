@@ -60,7 +60,7 @@ const CAG = () => {
       <ScrollToTop />
       <GlobalStyle />
       <Header />
-      <EventAlert />
+      {/* <EventAlert /> */}
       <Switch>
         <Route
           exact
@@ -79,7 +79,7 @@ const CAG = () => {
         <Route component={SignUp} exact path="/sign-up" />
         <Route component={SignUp2} exact path="/sign-up-2" />
         <Route component={TheaterResources} exact path="/theater-resources" />
-        <Route component={EventPage} exact path="/night-at-the-cag-baret" />
+        {/* <Route component={EventPage} exact path="/night-at-the-cag-baret" /> */}
         <Route
           component={ManageProduction}
           path="/production/:productionId/manage"
