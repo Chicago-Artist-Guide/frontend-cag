@@ -134,7 +134,6 @@ const ActorInfo1: React.FC<{
                   Do you identify as part of the LGBTQIA+ community?{' '}
                   <PrivateLabel />
                 </CAGLabel>
-                <p>A = asexual, not ally</p>
                 <Checkbox
                   checked={actorInfo1LGBTQ === 'Yes'}
                   fieldType="radio"
