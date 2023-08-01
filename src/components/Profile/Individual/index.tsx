@@ -4,6 +4,7 @@ import {
   onSnapshot,
   updateDoc
 } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
@@ -15,10 +16,12 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   faCheckCircle,
+  faImage,
   faPenToSquare,
   faXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button, Checkbox, InputField } from '../../../genericComponents';
 import { fonts, colors } from '../../../theme/styleVars';
@@ -49,20 +52,44 @@ import IndividualUpcomingShow from './IndividualUpcomingShow';
 import IndividualCredits from './IndividualCredits';
 import { PreviewCard } from '../shared/styles';
 
+type PerformanceState = {
+  [key: number]: string | number | null | boolean;
+};
+
 const IndividualProfile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
   const history = useHistory();
+  const { firebaseStorage } = useFirebaseContext();
   const { account, profile, setAccountData, setProfileData } =
     useProfileContext();
   const [showSignUp2Link, setShowUp2Link] = useState(false);
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,
-    headline: false
+    headline: false,
+    training: false,
+    upcoming: false,
+    past: false,
+    skills: false,
+    awards: false
   });
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
+
+  // websites
   const [websiteId, setWebsiteId] = useState(1);
+
+  // upcoming
+  const [showId, setShowId] = useState(1);
+  const [file, setFile] = useState<any>({ 1: '' });
+  const [percent, setPercent] = useState<PerformanceState>({ 1: 0 });
+  const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
+    1: null
+  });
+  const [uploadInProgress, setUploadInProgress] = useState<PerformanceState>({
+    1: false
+  });
+
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -70,14 +97,46 @@ const IndividualProfile: React.FC<{
     setShowUp2Link(false);
   };
 
+  const updatePerformanceState = () => {
+    if (!profile?.data?.upcoming_performances) {
+      return;
+    }
+
+    let maxId = 1;
+    const uPFiles: any = {};
+    const uPPercents: PerformanceState = {};
+    const uPImgUrls: { [key: number]: string | null } = {};
+    const uPUploads: PerformanceState = {};
+
+    for (const performance of profile.data.upcoming_performances) {
+      const id = performance.id;
+
+      if (id > maxId) {
+        maxId = id;
+      }
+
+      uPFiles[id] = '';
+      uPPercents[id] = 0;
+      uPImgUrls[id] = performance.imageUrl || null;
+      uPUploads[id] = false;
+    }
+
+    setShowId(maxId);
+    setFile(uPFiles);
+    setPercent(uPPercents);
+    setImgUrl(uPImgUrls);
+    setUploadInProgress(uPUploads);
+  };
+
   useEffect(() => {
-    if (editMode.personalDetails || editMode.headline) {
+    if (editMode.personalDetails || editMode.headline || editMode.upcoming) {
       return;
     }
 
     setWebsiteId(profile?.data?.websites?.length || 1);
     setShowUp2Link(previewMode || !profile?.data?.completed_profile_2);
     setEditProfile(profile?.data);
+    updatePerformanceState();
   }, [profile?.data, editMode]);
 
   useEffect(() => {
@@ -293,6 +352,143 @@ const IndividualProfile: React.FC<{
       console.error('Error updating profile data:', err);
     }
   };
+
+  const onFileChange = (e: any, id: number) => {
+    const imgFile = e.target.files[0];
+
+    if (imgFile) {
+      const currFiles = { ...file };
+      setFile({ ...currFiles, [id]: imgFile });
+    }
+  };
+
+  const uploadFile = (id: number) => {
+    if (!file[id]) {
+      return;
+    }
+
+    // get file
+    const currFile = file[id];
+
+    // start upload
+    const currUploadProg = { ...uploadInProgress };
+    setUploadInProgress({ ...currUploadProg, [id]: true });
+
+    const storageRef = ref(
+      firebaseStorage,
+      `/files-${editProfile?.uid}/${editProfile?.account_id}-${currFile.name}`
+    );
+    const uploadTask = uploadBytesResumable(storageRef, currFile);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const currPercent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+
+        // update progress
+        const currProgress = { ...percent };
+        setPercent({ ...currProgress, [id]: currPercent });
+      },
+      (err) => {
+        console.log('Error uploading image', err);
+        setUploadInProgress({ ...currUploadProg, [id]: false });
+      },
+      () => {
+        setUploadInProgress({ ...currUploadProg, [id]: false });
+
+        // download url
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log('Uploaded image url:', url);
+          const currImgUrl = { ...imgUrl };
+          setImgUrl({ ...currImgUrl, [id]: url });
+        });
+      }
+    );
+  };
+
+  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
+    fieldValue: UpcomingPerformances[T],
+    fieldName: T,
+    id: any
+  ) => {
+    // indexing to assign each upcoming show value a number
+    const newUpcomingShowValues = [
+      ...(editProfile?.upcoming_performances || [])
+    ];
+    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
+    newUpcomingShowValues[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('upcoming_performances', newUpcomingShowValues);
+  };
+
+  const removeUpcomingInput = (e: any, id: any) => {
+    e.preventDefault();
+    const newUpcomingShowValues = [
+      ...(editProfile?.upcoming_performances || [])
+    ];
+    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
+    newUpcomingShowValues.splice(findIndex, 1);
+
+    setProfileForm('upcoming_performances', newUpcomingShowValues);
+
+    const newFile = { ...file };
+    const newPercent = { ...percent };
+    const newImgUrl = { ...imgUrl };
+    const newUploadInProgress = { ...uploadInProgress };
+
+    delete newFile[id];
+    delete (newPercent as any)[id];
+    delete newImgUrl[id];
+    delete (newUploadInProgress as any)[id];
+
+    setFile(newFile);
+    setPercent(newPercent);
+    setImgUrl(newImgUrl);
+    setUploadInProgress(newUploadInProgress);
+  };
+
+  const addUpcomingInput = (e: any) => {
+    e.preventDefault();
+    const newUpcomingShowValues = [
+      ...(editProfile?.upcoming_performances || [])
+    ];
+    const newShowId = showId + 1;
+
+    newUpcomingShowValues.push({
+      id: newShowId,
+      title: '',
+      synopsis: '',
+      industryCode: '',
+      url: '',
+      imageUrl: ''
+    });
+
+    setShowId(newShowId);
+    setProfileForm('upcoming_performances', newUpcomingShowValues);
+
+    const newFile = { ...file, [newShowId]: '' };
+    const newPercent = { ...percent, [newShowId]: 0 };
+    const newImgUrl = { ...imgUrl, [newShowId]: null };
+    const newUploadInProgress = { ...uploadInProgress, [newShowId]: false };
+
+    setFile(newFile);
+    setPercent(newPercent);
+    setImgUrl(newImgUrl);
+    setUploadInProgress(newUploadInProgress);
+  };
+
+  useEffect(() => {
+    editProfile?.upcoming_performances.forEach((upcomingShow: any) => {
+      const showId = upcomingShow.id;
+      const showImgUrl = imgUrl[showId] ?? false;
+
+      if (showImgUrl) {
+        onUpcomingInputChange(showImgUrl, 'imageUrl', showId);
+      }
+    });
+  }, [imgUrl]);
 
   return (
     <PageWrapper>
@@ -826,51 +1022,234 @@ const IndividualProfile: React.FC<{
             )}
           </div>
           <div>
-            {hasNonEmptyValues(profile?.data?.training_institutions) ? (
-              <DetailSection title="Training">
-                {profile?.data?.training_institutions.map(
-                  (training: TrainingInstitution) => (
-                    <p>
-                      <strong>{training.trainingInstitution}</strong>
-                      <br />
-                      {training.trainingCity}, {training.trainingState}
-                      <br />
-                      <em>{training.trainingDegree}</em>
-                      <br />
-                      <span>{training.trainingDetails}</span>
-                    </p>
-                  )
-                )}
-              </DetailSection>
-            ) : profile?.data?.training_institution &&
-              profile?.data?.training_institution !== '' ? (
-              <DetailSection title="Training">
-                {/* need to support the old single training value profiles - will only update once they edit */}
-                <p>
-                  <strong>{profile?.data.training_institution}</strong>
-                  <br />
-                  {profile?.data.training_city}, {profile?.data.training_state}
-                  <br />
-                  <em>{profile?.data.training_degree}</em>
-                  <br />
-                  <span>{profile?.data.training_details}</span>
-                </p>
-              </DetailSection>
-            ) : (
+            {editMode['training'] ? (
               <></>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.training_institutions) ? (
+                  <DetailSection title="Training">
+                    {profile?.data?.training_institutions.map(
+                      (training: TrainingInstitution) => (
+                        <p>
+                          <strong>{training.trainingInstitution}</strong>
+                          <br />
+                          {training.trainingCity}, {training.trainingState}
+                          <br />
+                          <em>{training.trainingDegree}</em>
+                          <br />
+                          <span>{training.trainingDetails}</span>
+                        </p>
+                      )
+                    )}
+                  </DetailSection>
+                ) : profile?.data?.training_institution &&
+                  profile?.data?.training_institution !== '' ? (
+                  <DetailSection title="Training">
+                    {/* need to support the old single training value profiles - will only update once they edit */}
+                    <p>
+                      <strong>{profile?.data.training_institution}</strong>
+                      <br />
+                      {profile?.data.training_city},{' '}
+                      {profile?.data.training_state}
+                      <br />
+                      <em>{profile?.data.training_degree}</em>
+                      <br />
+                      <span>{profile?.data.training_details}</span>
+                    </p>
+                  </DetailSection>
+                ) : (
+                  <></>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'training', !editMode['training'])
+                  }
+                >
+                  + Add Training
+                </a>
+              </>
             )}
-            {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
-              <DetailSection title="Upcoming Features">
-                {profile?.data?.upcoming_performances.map(
-                  (perf: UpcomingPerformances) => (
-                    <IndividualUpcomingShow
-                      key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
-                      show={perf}
-                    />
+            <hr />
+            {editMode['upcoming'] ? (
+              <Container>
+                {editProfile?.upcoming_performances?.map(
+                  (upcomingRow: any, i: any) => (
+                    <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
+                      <Col lg="4">
+                        <Form.Group className="form-group">
+                          <PhotoContainer
+                            style={{
+                              backgroundImage:
+                                imgUrl[upcomingRow.id] !== null
+                                  ? `url(${imgUrl[upcomingRow.id]})`
+                                  : undefined
+                            }}
+                          >
+                            {imgUrl[upcomingRow.id] === null && (
+                              <FontAwesomeIcon
+                                className="bod-icon"
+                                icon={faImage}
+                                size="lg"
+                              />
+                            )}
+                          </PhotoContainer>
+                          <Form.Group className="form-group">
+                            <Form.Label>File size limit: 5MB</Form.Label>
+                            <Form.Control
+                              accept="image/*"
+                              onChange={(e: any) =>
+                                onFileChange(e, upcomingRow.id)
+                              }
+                              style={{
+                                padding: 0,
+                                border: 'none'
+                              }}
+                              type="file"
+                            />
+                          </Form.Group>
+                          <div>
+                            <Button
+                              disabled={
+                                (uploadInProgress as any)[upcomingRow.id] ||
+                                file[upcomingRow.id] === ''
+                              }
+                              onClick={() => uploadFile(upcomingRow.id)}
+                              text="Upload File"
+                              type="button"
+                              variant="secondary"
+                            />
+                          </div>
+                          {(uploadInProgress as any)[upcomingRow.id] && (
+                            <p>
+                              Upload progress:{' '}
+                              {(percent as any)[upcomingRow.id]}%
+                            </p>
+                          )}
+                          {editProfile?.upcoming_performances?.length > 1 && (
+                            <DeleteLinkDiv>
+                              <a
+                                href="#"
+                                onClick={(e: any) =>
+                                  removeUpcomingInput(e, upcomingRow.id)
+                                }
+                              >
+                                X Delete Show
+                              </a>
+                            </DeleteLinkDiv>
+                          )}
+                        </Form.Group>
+                      </Col>
+                      <Col lg="8">
+                        <InputField
+                          label="Show Title"
+                          name="title"
+                          onChange={(e: any) =>
+                            onUpcomingInputChange(
+                              e.target.value || '',
+                              'title',
+                              upcomingRow.id
+                            )
+                          }
+                          value={upcomingRow.title}
+                        />
+                        <SynopsisTextarea controlId="show-synopsis">
+                          <Form.Control
+                            as="textarea"
+                            name="synopsis"
+                            onChange={(e: any) =>
+                              onUpcomingInputChange(
+                                e.target.value || '',
+                                'synopsis',
+                                upcomingRow.id
+                              )
+                            }
+                            placeholder="Show Synopsis"
+                            value={upcomingRow.synopsis}
+                          />
+                        </SynopsisTextarea>
+                        <InputField
+                          label="Industry Code"
+                          name="industryCode"
+                          onChange={(e: any) =>
+                            onUpcomingInputChange(
+                              e.target.value || '',
+                              'industryCode',
+                              upcomingRow.id
+                            )
+                          }
+                          value={upcomingRow.industryCode}
+                        />
+                        <WebsiteUrlField>
+                          <InputField
+                            label="Link to Website/Tickets"
+                            name="url"
+                            onChange={(e: any) =>
+                              onUpcomingInputChange(
+                                e.target.value || '',
+                                'url',
+                                upcomingRow.id
+                              )
+                            }
+                            placeholder="http://"
+                            value={upcomingRow.url}
+                          />
+                        </WebsiteUrlField>
+                      </Col>
+                    </PerfRow>
                   )
                 )}
-              </DetailSection>
+                <Row>
+                  <Col lg="12">
+                    <div>
+                      <a href="#" onClick={addUpcomingInput}>
+                        + Add Upcoming Show
+                      </a>
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <Button
+                      onClick={() => null}
+                      text="Save"
+                      type="button"
+                      variant="primary"
+                    />
+                    <Button
+                      onClick={() => null}
+                      text="Cancel"
+                      type="button"
+                      variant="secondary"
+                    />
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
+                  <DetailSection title="Upcoming Features">
+                    {profile?.data?.upcoming_performances.map(
+                      (perf: UpcomingPerformances) => (
+                        <IndividualUpcomingShow
+                          key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
+                          show={perf}
+                        />
+                      )
+                    )}
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'upcoming', !editMode['upcoming'])
+                  }
+                >
+                  + Add Upcoming Features
+                </a>
+              </>
             )}
+            <hr />
             {hasNonEmptyValues(profile?.data?.past_performances) && (
               <DetailSection title="Past Performances">
                 {profile?.data?.past_performances.map(
@@ -883,6 +1262,15 @@ const IndividualProfile: React.FC<{
                 )}
               </DetailSection>
             )}
+            <a
+              href="#"
+              onClick={(e: React.MouseEvent<HTMLElement>) =>
+                onEditModeClick(e, 'past', !editMode['past'])
+              }
+            >
+              + Add Past Performances
+            </a>
+            <hr />
             {(profile?.data?.additional_skills_checkboxes?.length ||
               profile?.data?.additional_skills_manual?.length) && (
               <DetailSection title="Special Skills">
@@ -916,6 +1304,15 @@ const IndividualProfile: React.FC<{
                 </ProfileFlex>
               </DetailSection>
             )}
+            <a
+              href="#"
+              onClick={(e: React.MouseEvent<HTMLElement>) =>
+                onEditModeClick(e, 'skills', !editMode['skills'])
+              }
+            >
+              + Add Skills
+            </a>
+            <hr />
             {hasNonEmptyValues(profile?.data?.awards) && (
               <DetailSection title="Awards & Recognition">
                 <ProfileFlex>
@@ -925,6 +1322,14 @@ const IndividualProfile: React.FC<{
                 </ProfileFlex>
               </DetailSection>
             )}
+            <a
+              href="#"
+              onClick={(e: React.MouseEvent<HTMLElement>) =>
+                onEditModeClick(e, 'awards', !editMode['awards'])
+              }
+            >
+              + Add Awards &amp; Recognition
+            </a>
           </div>
         </Col>
       </Row>
@@ -1017,6 +1422,46 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
+`;
+
+const PerfRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
+
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const PhotoContainer = styled.div`
+  align-items: center;
+  background: ${colors.lightGrey};
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: white;
+  display: flex;
+  font-size: 68px;
+  height: 300px;
+  justify-content: center;
+  width: 100%;
+`;
+
+const SynopsisTextarea = styled(Form.Group)`
+  margin-top: 12px;
+`;
+
+const WebsiteUrlField = styled.div`
+  margin-top: 12px;
+`;
+
+const DeleteLinkDiv = styled.div`
+  padding: 1em 0;
+
+  a,
+  a:hover {
+    color: ${colors.salmon};
+  }
 `;
 
 export default IndividualProfile;
