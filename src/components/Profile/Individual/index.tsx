@@ -25,8 +25,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button, Checkbox, InputField } from '../../../genericComponents';
-import { fonts, colors } from '../../../theme/styleVars';
+import { Tagline } from '../../layout/Titles';
 import PageContainer from '../../layout/PageContainer';
+import { fonts, colors } from '../../../theme/styleVars';
 import DetailSection from '../shared/DetailSection';
 import {
   AgeRange,
@@ -44,7 +45,9 @@ import {
   IndividualWebsite,
   websiteTypeOptions,
   WebsiteTypes,
-  TrainingInstitution
+  TrainingInstitution,
+  skillCheckboxes,
+  SkillCheckbox
 } from '../../SignUp/Individual/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
@@ -91,6 +94,13 @@ const IndividualProfile: React.FC<{
   const [uploadInProgress, setUploadInProgress] = useState<PerformanceState>({
     1: false
   });
+
+  // skills
+  const [input, setInput] = useState('');
+  const [skillTags, setTags] = useState([
+    ...(editProfile?.additional_skills_manual || [])
+  ] as string[]);
+  const [isKeyReleased, setIsKeyReleased] = useState(false);
 
   const PageWrapper = previewMode ? Container : PageContainer;
 
@@ -544,6 +554,75 @@ const IndividualProfile: React.FC<{
 
     setShowPastId(newShowId);
   };
+
+  const isAdditionalSkillsCheckboxes = (skillOption: SkillCheckbox) =>
+    editProfile?.additional_skills_checkboxes?.indexOf(skillOption) > -1;
+
+  const skillOptionChange = (checkValue: boolean, skill: SkillCheckbox) => {
+    let newSkills = [...(editProfile?.additional_skills_checkboxes || [])];
+
+    if (checkValue) {
+      // check value
+      if (newSkills.indexOf(skill) < 0) {
+        newSkills.push(skill);
+      }
+    } else {
+      // uncheck value
+      newSkills = newSkills.filter((sO) => sO !== skill);
+    }
+
+    setProfileForm('additional_skills_checkboxes', newSkills);
+  };
+
+  const addTag = () => {
+    const trimmedInput = input.trim();
+    if (trimmedInput.length && !skillTags.includes(trimmedInput)) {
+      setTags((prevState) => [...prevState, trimmedInput]);
+      setInput('');
+    }
+  };
+
+  const deleteTag = (index: any) => {
+    setTags((prevState) => prevState.filter((tag, i) => i !== index));
+  };
+
+  const onKeyDown = (e: any) => {
+    const { key } = e;
+    const trimmedInput = input.trim();
+
+    if (
+      (key === ',' || key === 'Enter') &&
+      trimmedInput.length &&
+      !skillTags.includes(trimmedInput)
+    ) {
+      e.preventDefault();
+      setTags((prevState) => [...prevState, trimmedInput]);
+      setInput('');
+    }
+
+    if (
+      key === 'Backspace' &&
+      !input.length &&
+      skillTags.length &&
+      isKeyReleased
+    ) {
+      e.preventDefault();
+      const tagsCopy = [...skillTags];
+      const poppedTag = tagsCopy.pop() ?? '';
+      setTags(tagsCopy);
+      setInput(poppedTag);
+    }
+    setIsKeyReleased(false);
+  };
+
+  const onKeyUp = () => {
+    setIsKeyReleased(true);
+  };
+
+  useEffect(() => {
+    const allSkills = [...skillTags];
+    setProfileForm('additional_skills_manual', allSkills);
+  }, [skillTags]);
 
   return (
     <PageWrapper>
@@ -1504,47 +1583,102 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
-            {(profile?.data?.additional_skills_checkboxes?.length ||
-              profile?.data?.additional_skills_manual?.length) && (
-              <DetailSection title="Special Skills">
-                <ProfileFlex>
-                  {profile?.data?.additional_skills_checkboxes?.length &&
-                    profile?.data?.additional_skills_checkboxes.map(
-                      (skill: string) => (
-                        <Badge
-                          pill
-                          bg="primary"
-                          key={`skills-primary-${skill}`}
-                          text="white"
-                        >
-                          {skill}
-                        </Badge>
-                      )
-                    )}
-                  {profile?.data?.additional_skills_manual?.length &&
-                    profile?.data?.additional_skills_manual.map(
-                      (skill: string) => (
-                        <Badge
-                          pill
-                          bg="secondary"
-                          key={`skills-manual-${skill}`}
-                          text="white"
-                        >
-                          {skill}
-                        </Badge>
-                      )
-                    )}
-                </ProfileFlex>
-              </DetailSection>
+            {editMode['skills'] ? (
+              <Container>
+                <Row>
+                  <Col>
+                    <CAGFormGroup>
+                      <BoldP>I am interested in roles that require:</BoldP>
+                      {skillCheckboxes.map((skill) => (
+                        <CAGCheckbox
+                          checked={isAdditionalSkillsCheckboxes(skill)}
+                          fieldType="checkbox"
+                          key={`skill-chk-${skill}`}
+                          label={skill}
+                          name="additionalSkillsCheckboxes"
+                          onChange={(e: any) =>
+                            skillOptionChange(e.currentTarget.checked, skill)
+                          }
+                        />
+                      ))}
+                    </CAGFormGroup>
+                    <CAGFormGroup>
+                      <BoldP>Additional Skills</BoldP>
+                      <CAGInput>
+                        <input
+                          name="additionalSkillsManual"
+                          onChange={(e: any) => {
+                            const { value } = e.target;
+                            setInput(value);
+                          }}
+                          onKeyDown={onKeyDown}
+                          onKeyUp={onKeyUp}
+                          placeholder="Type to add a skill..."
+                          value={input}
+                        />
+                        <button onClick={addTag}>+</button>
+                      </CAGInput>
+                      <CAGContainer>
+                        {skillTags.map((tag, index) => (
+                          <CAGTag key={`${tag}-${index}`}>
+                            <div className="tag">
+                              {tag}
+                              <button onClick={() => deleteTag(index)}>
+                                x
+                              </button>
+                            </div>
+                          </CAGTag>
+                        ))}
+                      </CAGContainer>
+                    </CAGFormGroup>
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {(profile?.data?.additional_skills_checkboxes?.length ||
+                  profile?.data?.additional_skills_manual?.length) && (
+                  <DetailSection title="Special Skills">
+                    <ProfileFlex>
+                      {profile?.data?.additional_skills_checkboxes?.length &&
+                        profile?.data?.additional_skills_checkboxes.map(
+                          (skill: string) => (
+                            <Badge
+                              pill
+                              bg="primary"
+                              key={`skills-primary-${skill}`}
+                              text="white"
+                            >
+                              {skill}
+                            </Badge>
+                          )
+                        )}
+                      {profile?.data?.additional_skills_manual?.length &&
+                        profile?.data?.additional_skills_manual.map(
+                          (skill: string) => (
+                            <Badge
+                              pill
+                              bg="secondary"
+                              key={`skills-manual-${skill}`}
+                              text="white"
+                            >
+                              {skill}
+                            </Badge>
+                          )
+                        )}
+                    </ProfileFlex>
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'skills', !editMode['skills'])
+                  }
+                >
+                  + Add Skills
+                </a>
+              </>
             )}
-            <a
-              href="#"
-              onClick={(e: React.MouseEvent<HTMLElement>) =>
-                onEditModeClick(e, 'skills', !editMode['skills'])
-              }
-            >
-              + Add Skills
-            </a>
             <hr />
             {hasNonEmptyValues(profile?.data?.awards) && (
               <DetailSection title="Awards & Recognition">
@@ -1715,6 +1849,83 @@ const DateRowTitle = styled.h5`
 const DateRow = styled.div`
   display: flex;
   gap: 1em;
+`;
+
+const CAGInput = styled.div`
+  position: relative;
+
+  input {
+    border: 1px solid ${colors.lightGrey};
+    border-radius: 7px;
+    font-family: ${fonts.mainFont};
+    padding: 10px;
+    padding-left: 10px;
+    width: 60%;
+  }
+
+  button {
+    position: absolute;
+    right: 40%;
+    top: -10px;
+    border: none;
+    background-color: unset;
+    font-size: 40px;
+    cursor: pointer;
+    color: ${colors.darkGreen};
+  }
+`;
+
+const CAGContainer = styled.div`
+  color: ${colors.gray};
+  display: flex;
+  max-width: 60%;
+  overflow: scroll;
+  padding-left: none;
+  width: 600%;
+`;
+
+const CAGTag = styled.div`
+  .tag {
+    align-items: center;
+    margin: 20px 0;
+    margin-right: 10px;
+    font-family: ${fonts.mainFont};
+    padding-left: 15px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border: 1.5px solid ${colors.darkGreen};
+    border-radius: 20px;
+    background-color: white;
+    white-space: nowrap;
+    color: ${colors.mainFont};
+  }
+
+  .tag button {
+    display: inline;
+    padding: 4px;
+    border: none;
+    background-color: unset;
+    cursor: pointer;
+    color: ${colors.lightGrey};
+  }
+`;
+
+const BoldP = styled.p`
+  font-weight: bold;
+  color: ${colors.secondaryFontColor};
+`;
+
+const CAGTagline = styled(Tagline)`
+  color: ${colors.italicColor};
+`;
+
+const CAGCheckbox = styled(Checkbox)`
+  color: ${colors.secondaryFontColor};
+`;
+
+const CAGFormGroup = styled(Form.Group)`
+  margin-bottom: 2em;
 `;
 
 export default IndividualProfile;
