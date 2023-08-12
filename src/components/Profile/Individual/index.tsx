@@ -12,6 +12,7 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import DatePicker from 'react-datepicker';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -79,8 +80,9 @@ const IndividualProfile: React.FC<{
   // websites
   const [websiteId, setWebsiteId] = useState(1);
 
-  // upcoming
+  // upcoming and past shows
   const [showId, setShowId] = useState(1);
+  const [showPastId, setShowPastId] = useState(1);
   const [file, setFile] = useState<any>({ 1: '' });
   const [percent, setPercent] = useState<PerformanceState>({ 1: 0 });
   const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
@@ -128,6 +130,15 @@ const IndividualProfile: React.FC<{
     setUploadInProgress(uPUploads);
   };
 
+  const updatePastPerformanceState = () => {
+    if (!profile?.data?.past_performances) {
+      return;
+    }
+
+    const maxId = profile.data.upcoming_performances.length || 1;
+    setShowPastId(maxId);
+  };
+
   useEffect(() => {
     if (editMode.personalDetails || editMode.headline || editMode.upcoming) {
       return;
@@ -137,6 +148,7 @@ const IndividualProfile: React.FC<{
     setShowUp2Link(previewMode || !profile?.data?.completed_profile_2);
     setEditProfile(profile?.data);
     updatePerformanceState();
+    updatePastPerformanceState();
   }, [profile?.data, editMode]);
 
   useEffect(() => {
@@ -489,6 +501,49 @@ const IndividualProfile: React.FC<{
       }
     });
   }, [imgUrl]);
+
+  const onCreditFieldChange = <T extends keyof PastPerformances>(
+    fieldName: T,
+    fieldValue: PastPerformances[T],
+    id: number
+  ) => {
+    const newCredits = [...(editProfile?.past_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('past_performances', newCredits);
+  };
+
+  const removeCreditBlock = (e: any, id: number) => {
+    e.preventDefault();
+    const newCredits = [...(editProfile?.past_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits.splice(findIndex, 1);
+
+    setProfileForm('past_performances', newCredits);
+  };
+
+  const addCreditBlock = () => {
+    const newShowId = showId + 1;
+
+    setProfileForm('past_performances', [
+      ...(editProfile?.past_performances || []),
+      {
+        id: newShowId,
+        title: '',
+        group: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        url: '',
+        role: '',
+        director: '',
+        musicalDirector: ''
+      }
+    ]);
+
+    setShowPastId(newShowId);
+  };
 
   return (
     <PageWrapper>
@@ -1203,7 +1258,7 @@ const IndividualProfile: React.FC<{
                   <Col lg="12">
                     <div>
                       <a href="#" onClick={addUpcomingInput}>
-                        + Add Upcoming Show
+                        + Add Upcoming Feature
                       </a>
                     </div>
                   </Col>
@@ -1217,7 +1272,9 @@ const IndividualProfile: React.FC<{
                       variant="primary"
                     />
                     <Button
-                      onClick={() => null}
+                      onClick={(e: React.MouseEvent<HTMLElement>) =>
+                        onEditModeClick(e, 'upcoming', !editMode['upcoming'])
+                      }
                       text="Cancel"
                       type="button"
                       variant="secondary"
@@ -1250,26 +1307,202 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
-            {hasNonEmptyValues(profile?.data?.past_performances) && (
-              <DetailSection title="Past Performances">
-                {profile?.data?.past_performances.map(
-                  (perf: PastPerformances) => (
-                    <IndividualCredits
-                      key={`credits-shows-${perf.id}`}
-                      show={perf}
-                    />
+            {editMode['past'] ? (
+              <Container>
+                {editProfile?.past_performances?.map(
+                  (credit: any, i: number) => (
+                    <PerfRow key={`credit-${credit.id}`}>
+                      <Col lg="4">
+                        <Form>
+                          <InputField
+                            name="title"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'title',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Show Title"
+                            value={credit.title}
+                          />
+                          <InputField
+                            name="group"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'location',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Theatre or Location"
+                            value={credit.location}
+                          />
+                          <InputField
+                            name="url"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'url',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Web Link"
+                            value={credit.url}
+                          />
+                          <InputField
+                            name="role"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'role',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Role/Position"
+                            value={credit.role}
+                          />
+                          <InputField
+                            name="director"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'director',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Director"
+                            value={credit.director}
+                          />
+                          <InputField
+                            name="musicalDirector"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'musicalDirector',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Musical Director"
+                            value={credit.musicalDirector}
+                          />
+                        </Form>
+                        {i ? (
+                          <DeleteRowLink
+                            href="#"
+                            onClick={(e: any) =>
+                              removeCreditBlock(e, credit.id)
+                            }
+                          >
+                            X Delete
+                          </DeleteRowLink>
+                        ) : null}
+                      </Col>
+                      <Col lg="4">
+                        <InputField
+                          name="group"
+                          onChange={(e: any) =>
+                            onCreditFieldChange(
+                              'group',
+                              e.target.value,
+                              credit.id
+                            )
+                          }
+                          placeholder="Theatre Group"
+                          value={credit.group}
+                        />
+                        <DateRowTitle>Running Dates</DateRowTitle>
+                        <DateRow>
+                          <DatePicker
+                            name="startDate"
+                            onChange={(date: any) => {
+                              const dateString = new Date(
+                                date
+                              ).toLocaleDateString();
+                              onCreditFieldChange(
+                                'startDate',
+                                dateString,
+                                credit.id
+                              );
+                            }}
+                            value={credit.startDate}
+                          />
+                          <h6>through</h6>
+                          <DatePicker
+                            name="endDate"
+                            onChange={(date: any) => {
+                              const dateString = new Date(
+                                date
+                              ).toLocaleDateString();
+                              onCreditFieldChange(
+                                'endDate',
+                                dateString,
+                                credit.id
+                              );
+                            }}
+                            value={credit.endDate}
+                          />
+                        </DateRow>
+                      </Col>
+                    </PerfRow>
                   )
                 )}
-              </DetailSection>
+                <Row>
+                  <Col lg="12">
+                    <a
+                      href="#"
+                      onClick={(e: any) => {
+                        e.preventDefault();
+                        addCreditBlock();
+                      }}
+                    >
+                      + Save and add another past performance
+                    </a>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <Button
+                      onClick={() => null}
+                      text="Save"
+                      type="button"
+                      variant="primary"
+                    />
+                    <Button
+                      onClick={(e: React.MouseEvent<HTMLElement>) =>
+                        onEditModeClick(e, 'past', !editMode['past'])
+                      }
+                      text="Cancel"
+                      type="button"
+                      variant="secondary"
+                    />
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.past_performances) && (
+                  <DetailSection title="Past Performances">
+                    {profile?.data?.past_performances.map(
+                      (perf: PastPerformances) => (
+                        <IndividualCredits
+                          key={`credits-shows-${perf.id}`}
+                          show={perf}
+                        />
+                      )
+                    )}
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'past', !editMode['past'])
+                  }
+                >
+                  + Add Past Performances
+                </a>
+              </>
             )}
-            <a
-              href="#"
-              onClick={(e: React.MouseEvent<HTMLElement>) =>
-                onEditModeClick(e, 'past', !editMode['past'])
-              }
-            >
-              + Add Past Performances
-            </a>
             <hr />
             {(profile?.data?.additional_skills_checkboxes?.length ||
               profile?.data?.additional_skills_manual?.length) && (
@@ -1462,6 +1695,26 @@ const DeleteLinkDiv = styled.div`
   a:hover {
     color: ${colors.salmon};
   }
+`;
+
+const DeleteRowLink = styled.a`
+  color: ${colors.salmon};
+  display: block;
+  margin-top: 1em;
+
+  &:hover {
+    color: ${colors.salmon};
+  }
+`;
+
+const DateRowTitle = styled.h5`
+  margin-top: 20px;
+  padding-bottom: 8px;
+`;
+
+const DateRow = styled.div`
+  display: flex;
+  gap: 1em;
 `;
 
 export default IndividualProfile;
