@@ -162,7 +162,7 @@ const Awards: React.FC<{
         <Col lg="10">
           <CAGButton>
             <a href="#" onClick={addAwardInput}>
-              + Add another recognition
+              + Add another award or recognition
             </a>
           </CAGButton>
         </Col>

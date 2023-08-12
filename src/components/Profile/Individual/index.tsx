@@ -102,6 +102,10 @@ const IndividualProfile: React.FC<{
   ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
+  // awards
+  const [awardId, setAwardId] = useState(1);
+  const [yearOptions, setYearOptions] = useState([] as number[]);
+
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -623,6 +627,55 @@ const IndividualProfile: React.FC<{
     const allSkills = [...skillTags];
     setProfileForm('additional_skills_manual', allSkills);
   }, [skillTags]);
+
+  useEffect(() => {
+    const newYears = [] as number[];
+
+    for (let i = 2023; i > 1949; i--) {
+      newYears.push(i);
+    }
+
+    setYearOptions(newYears);
+  }, []);
+
+  const onAwardInputChange = <T extends keyof ProfileAwards>(
+    fieldValue: ProfileAwards[T],
+    fieldName: T,
+    id: number
+  ) => {
+    const newAwardValues = [...(editProfile?.awards || [])] as ProfileAwards[];
+    const findIndex = newAwardValues.findIndex((award) => award.id === id);
+    newAwardValues[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('awards', newAwardValues);
+  };
+
+  const addAwardInput = (e: any) => {
+    e.preventDefault();
+    const newAwardId = awardId + 1;
+    const newAwardInputs = [...(editProfile?.awards || [])];
+
+    newAwardInputs.push({
+      id: newAwardId,
+      title: '',
+      year: '',
+      url: '',
+      description: ''
+    });
+
+    setAwardId(newAwardId);
+    setProfileForm('awards', newAwardInputs);
+  };
+
+  const removeAwardInput = (e: any, id: any) => {
+    e.preventDefault();
+
+    const newAwardValues = [...(editProfile?.awards || [])];
+    const findIndex = newAwardValues.findIndex((award) => award.id === id);
+    newAwardValues.splice(findIndex, 1);
+
+    setProfileForm('awards', newAwardValues);
+  };
 
   return (
     <PageWrapper>
@@ -1633,6 +1686,24 @@ const IndividualProfile: React.FC<{
                     </CAGFormGroup>
                   </Col>
                 </Row>
+                <Row>
+                  <Col lg="12">
+                    <Button
+                      onClick={() => null}
+                      text="Save"
+                      type="button"
+                      variant="primary"
+                    />
+                    <Button
+                      onClick={(e: React.MouseEvent<HTMLElement>) =>
+                        onEditModeClick(e, 'skills', !editMode['skills'])
+                      }
+                      text="Cancel"
+                      type="button"
+                      variant="secondary"
+                    />
+                  </Col>
+                </Row>
               </Container>
             ) : (
               <>
@@ -1680,23 +1751,140 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
-            {hasNonEmptyValues(profile?.data?.awards) && (
-              <DetailSection title="Awards & Recognition">
-                <ProfileFlex>
-                  {profile?.data?.awards.map((award: ProfileAwards) => (
-                    <AwardCard award={award} key={`award-${award?.title}`} />
-                  ))}
-                </ProfileFlex>
-              </DetailSection>
+            {editMode['awards'] ? (
+              <Container>
+                {editProfile?.awards?.map((awardRow: any, i: any) => (
+                  <AwardRow key={`award-row-${awardRow.id}`}>
+                    <Col lg="4">
+                      <CAGFormControl
+                        as="input"
+                        name="title"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'title',
+                            awardRow.id
+                          )
+                        }
+                        placeholder="Award or Recognition"
+                        value={awardRow.title}
+                      />
+                      <CAGFormControl
+                        as="select"
+                        name="year"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'year',
+                            awardRow.id
+                          )
+                        }
+                        value={awardRow.year}
+                      >
+                        <option disabled selected value="">
+                          Year Received
+                        </option>
+                        {yearOptions.map((year) => {
+                          return <option value={year}>{year}</option>;
+                        })}
+                      </CAGFormControl>
+                      <CAGFormControl
+                        as="input"
+                        name="url"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'url',
+                            awardRow.id
+                          )
+                        }
+                        placeholder="Web Link"
+                        value={awardRow.url}
+                      />
+                      {editProfile?.awards?.length > 1 && (
+                        <CAGButton>
+                          <a
+                            href="#"
+                            className="delete"
+                            onClick={(e: any) =>
+                              removeAwardInput(e, awardRow.id)
+                            }
+                          >
+                            X Delete Recognition
+                          </a>
+                        </CAGButton>
+                      )}
+                    </Col>
+                    <Col lg="6">
+                      <CAGFormControl
+                        as="textarea"
+                        name="description"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'description',
+                            awardRow.id
+                          )
+                        }
+                        placeholder="Description/Notes"
+                        rows={6}
+                        value={awardRow.description}
+                      />
+                    </Col>
+                  </AwardRow>
+                ))}
+                <Row>
+                  <Col lg="10">
+                    <CAGButton>
+                      <a href="#" onClick={addAwardInput}>
+                        + Add another award or recognition
+                      </a>
+                    </CAGButton>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <Button
+                      onClick={() => null}
+                      text="Save"
+                      type="button"
+                      variant="primary"
+                    />
+                    <Button
+                      onClick={(e: React.MouseEvent<HTMLElement>) =>
+                        onEditModeClick(e, 'awards', !editMode['awards'])
+                      }
+                      text="Cancel"
+                      type="button"
+                      variant="secondary"
+                    />
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.awards) && (
+                  <DetailSection title="Awards & Recognition">
+                    <ProfileFlex>
+                      {profile?.data?.awards.map((award: ProfileAwards) => (
+                        <AwardCard
+                          award={award}
+                          key={`award-${award?.title}`}
+                        />
+                      ))}
+                    </ProfileFlex>
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'awards', !editMode['awards'])
+                  }
+                >
+                  + Add Awards &amp; Recognition
+                </a>
+              </>
             )}
-            <a
-              href="#"
-              onClick={(e: React.MouseEvent<HTMLElement>) =>
-                onEditModeClick(e, 'awards', !editMode['awards'])
-              }
-            >
-              + Add Awards &amp; Recognition
-            </a>
           </div>
         </Col>
       </Row>
@@ -1926,6 +2114,26 @@ const CAGCheckbox = styled(Checkbox)`
 
 const CAGFormGroup = styled(Form.Group)`
   margin-bottom: 2em;
+`;
+
+const AwardRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
+
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const CAGButton = styled.div`
+  a {
+    display: block;
+    margin: 1em 0;
+
+    &.delete {
+      color: ${colors.salmon};
+    }
+  }
 `;
 
 export default IndividualProfile;
