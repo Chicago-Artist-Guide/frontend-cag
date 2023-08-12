@@ -113,7 +113,6 @@ const AdditionalSkills: React.FC<{
         <Col lg="12">
           <Title>ANY SPECIAL SKILLS?</Title>
           <CAGTagline>Tell us more about what you can do.</CAGTagline>
-          {/* checkbox default skills*/}
           <CAGFormGroup>
             <BoldP>I am interested in roles that require:</BoldP>
             {skillCheckboxes.map((skill) => (
@@ -129,7 +128,6 @@ const AdditionalSkills: React.FC<{
               />
             ))}
           </CAGFormGroup>
-          {/* manually entered skills */}
           <CAGFormGroup>
             <BoldP>Additional Skills</BoldP>
             <CAGInput>
@@ -144,7 +142,7 @@ const AdditionalSkills: React.FC<{
                 placeholder="Type to add a skill..."
                 value={input}
               />
-              <button onClick={() => addTag()}>+</button>
+              <button onClick={addTag}>+</button>
             </CAGInput>
             <CAGContainer>
               {skillTags.map((tag, index) => (

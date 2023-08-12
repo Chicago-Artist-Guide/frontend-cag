@@ -4,6 +4,7 @@ import {
   onSnapshot,
   updateDoc
 } from 'firebase/firestore';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
@@ -11,24 +12,24 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import DatePicker from 'react-datepicker';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   faCheckCircle,
+  faImage,
   faPenToSquare,
   faXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button, Checkbox, InputField } from '../../../genericComponents';
-import { fonts, colors } from '../../../theme/styleVars';
 import PageContainer from '../../layout/PageContainer';
+import { fonts, colors } from '../../../theme/styleVars';
 import DetailSection from '../shared/DetailSection';
 import {
   AgeRange,
-  ageRanges,
-  ethnicityTypes,
-  genders,
   PastPerformances,
   ProfileAwards,
   pronouns,
@@ -38,9 +39,10 @@ import {
   IndividualProfile as IndividualProfileT,
   IndividualProfile2,
   IndividualWebsite,
-  websiteTypeOptions,
   WebsiteTypes,
-  TrainingInstitution
+  TrainingInstitution,
+  skillCheckboxes,
+  SkillCheckbox
 } from '../../SignUp/Individual/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
@@ -48,21 +50,58 @@ import AwardCard from './AwardCard';
 import IndividualUpcomingShow from './IndividualUpcomingShow';
 import IndividualCredits from './IndividualCredits';
 import { PreviewCard } from '../shared/styles';
+import EditPersonalDetails from './EditPersonalDetails';
+
+type PerformanceState = {
+  [key: number]: string | number | null | boolean;
+};
 
 const IndividualProfile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
   const history = useHistory();
+  const { firebaseStorage } = useFirebaseContext();
   const { account, profile, setAccountData, setProfileData } =
     useProfileContext();
   const [showSignUp2Link, setShowUp2Link] = useState(false);
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,
-    headline: false
+    headline: false,
+    training: false,
+    upcoming: false,
+    past: false,
+    skills: false,
+    awards: false
   });
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
+
+  // websites
   const [websiteId, setWebsiteId] = useState(1);
+
+  // upcoming and past shows
+  const [showId, setShowId] = useState(1);
+  const [showPastId, setShowPastId] = useState(1);
+  const [file, setFile] = useState<any>({ 1: '' });
+  const [percent, setPercent] = useState<PerformanceState>({ 1: 0 });
+  const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
+    1: null
+  });
+  const [uploadInProgress, setUploadInProgress] = useState<PerformanceState>({
+    1: false
+  });
+
+  // skills
+  const [input, setInput] = useState('');
+  const [skillTags, setTags] = useState([
+    ...(editProfile?.additional_skills_manual || [])
+  ] as string[]);
+  const [isKeyReleased, setIsKeyReleased] = useState(false);
+
+  // awards
+  const [awardId, setAwardId] = useState(1);
+  const [yearOptions, setYearOptions] = useState([] as number[]);
+
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
@@ -70,14 +109,56 @@ const IndividualProfile: React.FC<{
     setShowUp2Link(false);
   };
 
+  const updatePerformanceState = () => {
+    if (!profile?.data?.upcoming_performances) {
+      return;
+    }
+
+    let maxId = 1;
+    const uPFiles: any = {};
+    const uPPercents: PerformanceState = {};
+    const uPImgUrls: { [key: number]: string | null } = {};
+    const uPUploads: PerformanceState = {};
+
+    for (const performance of profile.data.upcoming_performances) {
+      const id = performance.id;
+
+      if (id > maxId) {
+        maxId = id;
+      }
+
+      uPFiles[id] = '';
+      uPPercents[id] = 0;
+      uPImgUrls[id] = performance.imageUrl || null;
+      uPUploads[id] = false;
+    }
+
+    setShowId(maxId);
+    setFile(uPFiles);
+    setPercent(uPPercents);
+    setImgUrl(uPImgUrls);
+    setUploadInProgress(uPUploads);
+  };
+
+  const updatePastPerformanceState = () => {
+    if (!profile?.data?.past_performances) {
+      return;
+    }
+
+    const maxId = profile.data.upcoming_performances.length || 1;
+    setShowPastId(maxId);
+  };
+
   useEffect(() => {
-    if (editMode.personalDetails || editMode.headline) {
+    if (editMode.personalDetails || editMode.headline || editMode.upcoming) {
       return;
     }
 
     setWebsiteId(profile?.data?.websites?.length || 1);
     setShowUp2Link(previewMode || !profile?.data?.completed_profile_2);
     setEditProfile(profile?.data);
+    updatePerformanceState();
+    updatePastPerformanceState();
   }, [profile?.data, editMode]);
 
   useEffect(() => {
@@ -294,6 +375,356 @@ const IndividualProfile: React.FC<{
     }
   };
 
+  const updateMultiSection = async (
+    section: 'upcoming_performances' | 'past_performances' | 'awards',
+    editModeName: keyof EditModeSections
+  ) => {
+    const newData = editProfile[section];
+
+    if (!newData) {
+      return;
+    }
+
+    try {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { [section]: newData });
+
+        setEditMode({
+          ...editMode,
+          [editModeName]: false
+        });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
+
+  const updateSkills = async () => {
+    const { additional_skills_checkboxes, additional_skills_manual } =
+      editProfile;
+    const skillsProps = {
+      additional_skills_checkboxes,
+      additional_skills_manual
+    };
+
+    try {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { ...skillsProps });
+
+        setEditMode({
+          ...editMode,
+          skills: false
+        });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
+
+  const onFileChange = (e: any, id: number) => {
+    const imgFile = e.target.files[0];
+
+    if (imgFile) {
+      const currFiles = { ...file };
+      setFile({ ...currFiles, [id]: imgFile });
+    }
+  };
+
+  const uploadFile = (id: number) => {
+    if (!file[id]) {
+      return;
+    }
+
+    // get file
+    const currFile = file[id];
+
+    // start upload
+    const currUploadProg = { ...uploadInProgress };
+    setUploadInProgress({ ...currUploadProg, [id]: true });
+
+    const storageRef = ref(
+      firebaseStorage,
+      `/files-${editProfile?.uid}/${editProfile?.account_id}-${currFile.name}`
+    );
+    const uploadTask = uploadBytesResumable(storageRef, currFile);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const currPercent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+
+        // update progress
+        const currProgress = { ...percent };
+        setPercent({ ...currProgress, [id]: currPercent });
+      },
+      (err) => {
+        console.log('Error uploading image', err);
+        setUploadInProgress({ ...currUploadProg, [id]: false });
+      },
+      () => {
+        setUploadInProgress({ ...currUploadProg, [id]: false });
+
+        // download url
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log('Uploaded image url:', url);
+          const currImgUrl = { ...imgUrl };
+          setImgUrl({ ...currImgUrl, [id]: url });
+        });
+      }
+    );
+  };
+
+  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
+    fieldValue: UpcomingPerformances[T],
+    fieldName: T,
+    id: any
+  ) => {
+    // indexing to assign each upcoming show value a number
+    const newUpcomingShowValues = [
+      ...(editProfile?.upcoming_performances || [])
+    ];
+    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
+    newUpcomingShowValues[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('upcoming_performances', newUpcomingShowValues);
+  };
+
+  const removeUpcomingInput = (e: any, id: any) => {
+    e.preventDefault();
+    const newUpcomingShowValues = [
+      ...(editProfile?.upcoming_performances || [])
+    ];
+    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
+    newUpcomingShowValues.splice(findIndex, 1);
+
+    setProfileForm('upcoming_performances', newUpcomingShowValues);
+
+    const newFile = { ...file };
+    const newPercent = { ...percent };
+    const newImgUrl = { ...imgUrl };
+    const newUploadInProgress = { ...uploadInProgress };
+
+    delete newFile[id];
+    delete (newPercent as any)[id];
+    delete newImgUrl[id];
+    delete (newUploadInProgress as any)[id];
+
+    setFile(newFile);
+    setPercent(newPercent);
+    setImgUrl(newImgUrl);
+    setUploadInProgress(newUploadInProgress);
+  };
+
+  const addUpcomingInput = (e: any) => {
+    e.preventDefault();
+    const newUpcomingShowValues = [
+      ...(editProfile?.upcoming_performances || [])
+    ];
+    const newShowId = showId + 1;
+
+    newUpcomingShowValues.push({
+      id: newShowId,
+      title: '',
+      synopsis: '',
+      industryCode: '',
+      url: '',
+      imageUrl: ''
+    });
+
+    setShowId(newShowId);
+    setProfileForm('upcoming_performances', newUpcomingShowValues);
+
+    const newFile = { ...file, [newShowId]: '' };
+    const newPercent = { ...percent, [newShowId]: 0 };
+    const newImgUrl = { ...imgUrl, [newShowId]: null };
+    const newUploadInProgress = { ...uploadInProgress, [newShowId]: false };
+
+    setFile(newFile);
+    setPercent(newPercent);
+    setImgUrl(newImgUrl);
+    setUploadInProgress(newUploadInProgress);
+  };
+
+  useEffect(() => {
+    editProfile?.upcoming_performances.forEach((upcomingShow: any) => {
+      const showId = upcomingShow.id;
+      const showImgUrl = imgUrl[showId] ?? false;
+
+      if (showImgUrl) {
+        onUpcomingInputChange(showImgUrl, 'imageUrl', showId);
+      }
+    });
+  }, [imgUrl]);
+
+  const onCreditFieldChange = <T extends keyof PastPerformances>(
+    fieldName: T,
+    fieldValue: PastPerformances[T],
+    id: number
+  ) => {
+    const newCredits = [...(editProfile?.past_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('past_performances', newCredits);
+  };
+
+  const removeCreditBlock = (e: any, id: number) => {
+    e.preventDefault();
+    const newCredits = [...(editProfile?.past_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits.splice(findIndex, 1);
+
+    setProfileForm('past_performances', newCredits);
+  };
+
+  const addCreditBlock = () => {
+    const newShowId = showPastId + 1;
+
+    setProfileForm('past_performances', [
+      ...(editProfile?.past_performances || []),
+      {
+        id: newShowId,
+        title: '',
+        group: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        url: '',
+        role: '',
+        director: '',
+        musicalDirector: ''
+      }
+    ]);
+
+    setShowPastId(newShowId);
+  };
+
+  const isAdditionalSkillsCheckboxes = (skillOption: SkillCheckbox) =>
+    editProfile?.additional_skills_checkboxes?.indexOf(skillOption) > -1;
+
+  const skillOptionChange = (checkValue: boolean, skill: SkillCheckbox) => {
+    let newSkills = [...(editProfile?.additional_skills_checkboxes || [])];
+
+    if (checkValue) {
+      // check value
+      if (newSkills.indexOf(skill) < 0) {
+        newSkills.push(skill);
+      }
+    } else {
+      // uncheck value
+      newSkills = newSkills.filter((sO) => sO !== skill);
+    }
+
+    setProfileForm('additional_skills_checkboxes', newSkills);
+  };
+
+  const addTag = () => {
+    const trimmedInput = input.trim();
+    if (trimmedInput.length && !skillTags.includes(trimmedInput)) {
+      setTags((prevState) => [...prevState, trimmedInput]);
+      setInput('');
+    }
+  };
+
+  const deleteTag = (index: any) => {
+    setTags((prevState) => prevState.filter((tag, i) => i !== index));
+  };
+
+  const onKeyDown = (e: any) => {
+    const { key } = e;
+    const trimmedInput = input.trim();
+
+    if (
+      (key === ',' || key === 'Enter') &&
+      trimmedInput.length &&
+      !skillTags.includes(trimmedInput)
+    ) {
+      e.preventDefault();
+      setTags((prevState) => [...prevState, trimmedInput]);
+      setInput('');
+    }
+
+    if (
+      key === 'Backspace' &&
+      !input.length &&
+      skillTags.length &&
+      isKeyReleased
+    ) {
+      e.preventDefault();
+      const tagsCopy = [...skillTags];
+      const poppedTag = tagsCopy.pop() ?? '';
+      setTags(tagsCopy);
+      setInput(poppedTag);
+    }
+    setIsKeyReleased(false);
+  };
+
+  const onKeyUp = () => {
+    setIsKeyReleased(true);
+  };
+
+  useEffect(() => {
+    const allSkills = [...skillTags];
+    setProfileForm('additional_skills_manual', allSkills);
+  }, [skillTags]);
+
+  useEffect(() => {
+    const newYears = [] as number[];
+
+    for (let i = 2023; i > 1949; i--) {
+      newYears.push(i);
+    }
+
+    setYearOptions(newYears);
+  }, []);
+
+  const onAwardInputChange = <T extends keyof ProfileAwards>(
+    fieldValue: ProfileAwards[T],
+    fieldName: T,
+    id: number
+  ) => {
+    const newAwardValues = [...(editProfile?.awards || [])] as ProfileAwards[];
+    const findIndex = newAwardValues.findIndex((award) => award.id === id);
+    newAwardValues[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('awards', newAwardValues);
+  };
+
+  const addAwardInput = (e: any) => {
+    e.preventDefault();
+    const newAwardId = awardId + 1;
+    const newAwardInputs = [...(editProfile?.awards || [])];
+
+    newAwardInputs.push({
+      id: newAwardId,
+      title: '',
+      year: '',
+      url: '',
+      description: ''
+    });
+
+    setAwardId(newAwardId);
+    setProfileForm('awards', newAwardInputs);
+  };
+
+  const removeAwardInput = (e: any, id: any) => {
+    e.preventDefault();
+
+    const newAwardValues = [...(editProfile?.awards || [])];
+    const findIndex = newAwardValues.findIndex((award) => award.id === id);
+    newAwardValues.splice(findIndex, 1);
+
+    setProfileForm('awards', newAwardValues);
+  };
+
   return (
     <PageWrapper>
       {showSignUp2Link && (
@@ -366,269 +797,18 @@ const IndividualProfile: React.FC<{
               </div>
             </DetailsColTitle>
             {editMode['personalDetails'] ? (
-              <div>
-                <Form.Group className="form-group">
-                  <CAGLabel>What age range do you play?</CAGLabel>
-                  <p>Select up to 3 ranges</p>
-                  {ageRanges.map((ageRange) => (
-                    <Checkbox
-                      checked={editProfile?.age_ranges?.includes(ageRange)}
-                      fieldType="checkbox"
-                      key={`age-range-chk-${ageRange}`}
-                      label={ageRange}
-                      name="actorInfo2AgeRanges"
-                      onChange={(e: any) =>
-                        ageRangeChange(e.currentTarget.checked, ageRange)
-                      }
-                    />
-                  ))}
-                </Form.Group>
-                <Form.Group className="form-group">
-                  <CAGLabel>Height</CAGLabel>
-                  <Container>
-                    <Row>
-                      <PaddedCol lg="6">
-                        <Form.Control
-                          aria-label="height feet"
-                          as="select"
-                          value={editProfile?.height_ft}
-                          name="actorInfo2HeightFt"
-                          onChange={(e: any) =>
-                            setProfileForm('height_ft', e.target.value)
-                          }
-                        >
-                          <option value={undefined}>Feet</option>
-                          {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
-                            <option key={`ft-option-value-${ft}`} value={ft}>
-                              {ft} ft
-                            </option>
-                          ))}
-                        </Form.Control>
-                      </PaddedCol>
-                      <PaddedCol lg="6">
-                        <Form.Control
-                          aria-label="height inches"
-                          as="select"
-                          value={editProfile?.height_in}
-                          name="actorInfo2HeightIn"
-                          onChange={(e: any) =>
-                            setProfileForm('height_in', e.target.value)
-                          }
-                        >
-                          <option value={undefined}>Inches</option>
-                          {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
-                            (inches) => (
-                              <option
-                                key={`inch-option-value-${inches}`}
-                                value={inches}
-                              >
-                                {inches} in
-                              </option>
-                            )
-                          )}
-                        </Form.Control>
-                      </PaddedCol>
-                    </Row>
-                    <Row>
-                      <PaddedCol lg="12">
-                        <Checkbox
-                          checked={editProfile?.height_no_answer}
-                          fieldType="checkbox"
-                          label="I do not wish to answer"
-                          name="actorInfo2HeightNoAnswer"
-                          onChange={(e: any) =>
-                            setProfileForm(
-                              'height_no_answer',
-                              e.currentTarget.checked
-                            )
-                          }
-                        />
-                      </PaddedCol>
-                    </Row>
-                  </Container>
-                </Form.Group>
-                <Form.Group className="form-group">
-                  <CAGLabel>Gender Identity</CAGLabel>
-                  <p>
-                    First, choose your gender identity - additional options may
-                    be presented for casting purposes. If other, please select
-                    the option with which you most closely identify for casting
-                    purposes.
-                  </p>
-                  <Form.Control
-                    as="select"
-                    value={editProfile?.gender_identity}
-                    name="actorInfo2Gender"
-                    onChange={(e: any) =>
-                      setProfileForm('gender_identity', e.target.value)
-                    }
-                  >
-                    <option value={undefined}>Select</option>
-                    {genders.map((g) => (
-                      <option key={`gender-value-${g}`} value={g}>
-                        {g}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-                <Form.Group className="form-group">
-                  <CAGLabel>Ethnicity</CAGLabel>
-                  {ethnicityTypes.map((eth) => (
-                    <React.Fragment key={`parent-frag-chk-${eth.name}`}>
-                      <Checkbox
-                        checked={editProfile?.ethnicities.includes(eth.name)}
-                        fieldType="checkbox"
-                        key={`first-level-chk-${eth.name}`}
-                        label={eth.name}
-                        name="actorInfo1Ethnicities"
-                        onChange={(e: any) =>
-                          ethnicityChange(e.currentTarget.checked, eth.name)
-                        }
-                      />
-                      {eth.values.length > 0 && (
-                        <Checkbox style={{ paddingLeft: '1.25rem' }}>
-                          {eth.values.map((ethV) => (
-                            <Checkbox
-                              checked={editProfile?.ethnicities.includes(ethV)}
-                              fieldType="checkbox"
-                              key={`${eth.name}-child-chk-${ethV}`}
-                              label={ethV}
-                              name="actorInfoEthnicities"
-                              onChange={(e: any) =>
-                                ethnicityChange(e.currentTarget.checked, ethV)
-                              }
-                            />
-                          ))}
-                        </Checkbox>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </Form.Group>
-                <Form.Group>
-                  <CAGLabel>Union</CAGLabel>
-                  <Container>
-                    <Row>
-                      <PaddedCol lg="5">
-                        <CAGFormControl
-                          aria-label="union"
-                          as="select"
-                          name="demographicsUnionStatus"
-                          value={editProfile?.union_status}
-                          onChange={(e: any) =>
-                            setProfileForm('union_status', e.target.value)
-                          }
-                        >
-                          <option value={undefined}>Select union status</option>
-                          <option value="Union">Union</option>
-                          <option value="Non-Union">Non-Union</option>
-                          <option value="Other">Other</option>
-                        </CAGFormControl>
-                      </PaddedCol>
-                      <PaddedCol lg="5">
-                        <CAGFormControl
-                          aria-label="union"
-                          defaultValue={editProfile?.union_other}
-                          disabled={false}
-                          name="demographicsUnionStatusOther"
-                          onChange={(e: any) =>
-                            setProfileForm('union_other', e.target.value)
-                          }
-                          placeholder="Other"
-                        />
-                      </PaddedCol>
-                    </Row>
-                  </Container>
-                  <CAGLabel>Agency</CAGLabel>
-                  <Container>
-                    <Row>
-                      <PaddedCol lg="10">
-                        <Form.Group className="form-group">
-                          <CAGFormControl
-                            aria-label="agency"
-                            defaultValue={editProfile?.agency}
-                            name="demographicsAgency"
-                            onChange={(e: any) =>
-                              setProfileForm('agency', e.target.value)
-                            }
-                            placeholder="Agency"
-                          />
-                        </Form.Group>
-                      </PaddedCol>
-                    </Row>
-                  </Container>
-                </Form.Group>
-                <hr />
-                <Form.Group>
-                  <CAGLabel>Website Links</CAGLabel>
-                  <Container>
-                    <Row>
-                      <PaddedCol lg="10">
-                        {editProfile?.websites?.map(
-                          (websiteRow: any, i: any) => (
-                            <div key={`website-row-${websiteRow.id}`}>
-                              <CAGFormControl
-                                aria-label="URL"
-                                as="input"
-                                name="websiteUrl"
-                                onChange={(e: any) =>
-                                  onWebsiteInputChange(
-                                    e.target.value || '',
-                                    'url',
-                                    websiteRow.id
-                                  )
-                                }
-                                placeholder="URL"
-                                value={websiteRow.url}
-                              />
-                              <CAGFormControl
-                                aria-label="website type"
-                                as="select"
-                                defaultValue={websiteRow.websiteType}
-                                name="websiteType"
-                                onChange={(e: any) =>
-                                  onWebsiteInputChange(
-                                    e.target.value || '',
-                                    'websiteType',
-                                    websiteRow.id
-                                  )
-                                }
-                              >
-                                <option value={undefined}>Select Type</option>
-                                {websiteTypeOptions.map((wT) => (
-                                  <option value={wT} key={wT}>
-                                    {wT}
-                                  </option>
-                                ))}
-                              </CAGFormControl>
-                              {editProfile.websites.length > 1 && (
-                                <a
-                                  href="#"
-                                  onClick={(e: any) =>
-                                    removeWebsiteInput(e, websiteRow.id)
-                                  }
-                                >
-                                  X
-                                </a>
-                              )}
-                            </div>
-                          )
-                        )}
-                        <div>
-                          <a href="#" onClick={addWebsiteInput}>
-                            + Add Website
-                          </a>
-                        </div>
-                      </PaddedCol>
-                    </Row>
-                  </Container>
-                </Form.Group>
-                <Button
-                  onClick={updatePersonalDetails}
-                  text="Save"
-                  type="button"
-                  variant="primary"
-                />
-              </div>
+              <EditPersonalDetails
+                {...{
+                  ageRangeChange,
+                  editProfile,
+                  onWebsiteInputChange,
+                  removeWebsiteInput,
+                  addWebsiteInput,
+                  updatePersonalDetails,
+                  setProfileForm,
+                  ethnicityChange
+                }}
+              />
             ) : (
               <>
                 <p>
@@ -826,104 +1006,698 @@ const IndividualProfile: React.FC<{
             )}
           </div>
           <div>
-            {hasNonEmptyValues(profile?.data?.training_institutions) ? (
-              <DetailSection title="Training">
-                {profile?.data?.training_institutions.map(
-                  (training: TrainingInstitution) => (
-                    <p>
-                      <strong>{training.trainingInstitution}</strong>
-                      <br />
-                      {training.trainingCity}, {training.trainingState}
-                      <br />
-                      <em>{training.trainingDegree}</em>
-                      <br />
-                      <span>{training.trainingDetails}</span>
-                    </p>
-                  )
-                )}
-              </DetailSection>
-            ) : profile?.data?.training_institution &&
-              profile?.data?.training_institution !== '' ? (
-              <DetailSection title="Training">
-                {/* need to support the old single training value profiles - will only update once they edit */}
-                <p>
-                  <strong>{profile?.data.training_institution}</strong>
-                  <br />
-                  {profile?.data.training_city}, {profile?.data.training_state}
-                  <br />
-                  <em>{profile?.data.training_degree}</em>
-                  <br />
-                  <span>{profile?.data.training_details}</span>
-                </p>
-              </DetailSection>
+            {editMode['training'] ? (
+              <>
+                <p>Coming soon</p>
+              </>
             ) : (
-              <></>
-            )}
-            {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
-              <DetailSection title="Upcoming Features">
-                {profile?.data?.upcoming_performances.map(
-                  (perf: UpcomingPerformances) => (
-                    <IndividualUpcomingShow
-                      key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
-                      show={perf}
-                    />
-                  )
-                )}
-              </DetailSection>
-            )}
-            {hasNonEmptyValues(profile?.data?.past_performances) && (
-              <DetailSection title="Past Performances">
-                {profile?.data?.past_performances.map(
-                  (perf: PastPerformances) => (
-                    <IndividualCredits
-                      key={`credits-shows-${perf.id}`}
-                      show={perf}
-                    />
-                  )
-                )}
-              </DetailSection>
-            )}
-            {(profile?.data?.additional_skills_checkboxes?.length ||
-              profile?.data?.additional_skills_manual?.length) && (
-              <DetailSection title="Special Skills">
-                <ProfileFlex>
-                  {profile?.data?.additional_skills_checkboxes?.length &&
-                    profile?.data?.additional_skills_checkboxes.map(
-                      (skill: string) => (
-                        <Badge
-                          pill
-                          bg="primary"
-                          key={`skills-primary-${skill}`}
-                          text="white"
-                        >
-                          {skill}
-                        </Badge>
+              <>
+                {hasNonEmptyValues(profile?.data?.training_institutions) ? (
+                  <DetailSection title="Training">
+                    {profile?.data?.training_institutions.map(
+                      (training: TrainingInstitution) => (
+                        <p>
+                          <strong>{training.trainingInstitution}</strong>
+                          <br />
+                          {training.trainingCity}, {training.trainingState}
+                          <br />
+                          <em>{training.trainingDegree}</em>
+                          <br />
+                          <span>{training.trainingDetails}</span>
+                        </p>
                       )
                     )}
-                  {profile?.data?.additional_skills_manual?.length &&
-                    profile?.data?.additional_skills_manual.map(
-                      (skill: string) => (
-                        <Badge
-                          pill
-                          bg="secondary"
-                          key={`skills-manual-${skill}`}
-                          text="white"
-                        >
-                          {skill}
-                        </Badge>
+                  </DetailSection>
+                ) : profile?.data?.training_institution &&
+                  profile?.data?.training_institution !== '' ? (
+                  <DetailSection title="Training">
+                    {/* need to support the old single training value profiles - will only update once they edit */}
+                    <p>
+                      <strong>{profile?.data.training_institution}</strong>
+                      <br />
+                      {profile?.data.training_city},{' '}
+                      {profile?.data.training_state}
+                      <br />
+                      <em>{profile?.data.training_degree}</em>
+                      <br />
+                      <span>{profile?.data.training_details}</span>
+                    </p>
+                  </DetailSection>
+                ) : (
+                  <></>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'training', !editMode['training'])
+                  }
+                >
+                  + Add Training
+                </a>
+              </>
+            )}
+            <hr />
+            {editMode['upcoming'] ? (
+              <Container>
+                {editProfile?.upcoming_performances?.map(
+                  (upcomingRow: any, i: any) => (
+                    <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
+                      <Col lg="4">
+                        <Form.Group className="form-group">
+                          <PhotoContainer
+                            style={{
+                              backgroundImage:
+                                imgUrl[upcomingRow.id] !== null
+                                  ? `url(${imgUrl[upcomingRow.id]})`
+                                  : undefined
+                            }}
+                          >
+                            {imgUrl[upcomingRow.id] === null && (
+                              <FontAwesomeIcon
+                                className="bod-icon"
+                                icon={faImage}
+                                size="lg"
+                              />
+                            )}
+                          </PhotoContainer>
+                          <Form.Group className="form-group">
+                            <Form.Label>File size limit: 5MB</Form.Label>
+                            <Form.Control
+                              accept="image/*"
+                              onChange={(e: any) =>
+                                onFileChange(e, upcomingRow.id)
+                              }
+                              style={{
+                                padding: 0,
+                                border: 'none'
+                              }}
+                              type="file"
+                            />
+                          </Form.Group>
+                          <div>
+                            <Button
+                              disabled={
+                                (uploadInProgress as any)[upcomingRow.id] ||
+                                file[upcomingRow.id] === ''
+                              }
+                              onClick={() => uploadFile(upcomingRow.id)}
+                              text="Upload File"
+                              type="button"
+                              variant="secondary"
+                            />
+                          </div>
+                          {(uploadInProgress as any)[upcomingRow.id] && (
+                            <p>
+                              Upload progress:{' '}
+                              {(percent as any)[upcomingRow.id]}%
+                            </p>
+                          )}
+                          {editProfile?.upcoming_performances?.length > 1 && (
+                            <DeleteLinkDiv>
+                              <a
+                                href="#"
+                                onClick={(e: any) =>
+                                  removeUpcomingInput(e, upcomingRow.id)
+                                }
+                              >
+                                X Delete Show
+                              </a>
+                            </DeleteLinkDiv>
+                          )}
+                        </Form.Group>
+                      </Col>
+                      <Col lg="8">
+                        <InputField
+                          label="Show Title"
+                          name="title"
+                          onChange={(e: any) =>
+                            onUpcomingInputChange(
+                              e.target.value || '',
+                              'title',
+                              upcomingRow.id
+                            )
+                          }
+                          value={upcomingRow.title}
+                        />
+                        <SynopsisTextarea controlId="show-synopsis">
+                          <Form.Control
+                            as="textarea"
+                            name="synopsis"
+                            onChange={(e: any) =>
+                              onUpcomingInputChange(
+                                e.target.value || '',
+                                'synopsis',
+                                upcomingRow.id
+                              )
+                            }
+                            placeholder="Show Synopsis"
+                            value={upcomingRow.synopsis}
+                          />
+                        </SynopsisTextarea>
+                        <InputField
+                          label="Industry Code"
+                          name="industryCode"
+                          onChange={(e: any) =>
+                            onUpcomingInputChange(
+                              e.target.value || '',
+                              'industryCode',
+                              upcomingRow.id
+                            )
+                          }
+                          value={upcomingRow.industryCode}
+                        />
+                        <WebsiteUrlField>
+                          <InputField
+                            label="Link to Website/Tickets"
+                            name="url"
+                            onChange={(e: any) =>
+                              onUpcomingInputChange(
+                                e.target.value || '',
+                                'url',
+                                upcomingRow.id
+                              )
+                            }
+                            placeholder="http://"
+                            value={upcomingRow.url}
+                          />
+                        </WebsiteUrlField>
+                      </Col>
+                    </PerfRow>
+                  )
+                )}
+                <Row>
+                  <Col lg="12">
+                    <div>
+                      <a href="#" onClick={addUpcomingInput}>
+                        + Add Upcoming Feature
+                      </a>
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <ProfileFlex>
+                      <Button
+                        onClick={() =>
+                          updateMultiSection(
+                            'upcoming_performances',
+                            'upcoming'
+                          )
+                        }
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'upcoming', !editMode['upcoming'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
+                  <DetailSection title="Upcoming Features">
+                    {profile?.data?.upcoming_performances.map(
+                      (perf: UpcomingPerformances) => (
+                        <IndividualUpcomingShow
+                          key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
+                          show={perf}
+                        />
                       )
                     )}
-                </ProfileFlex>
-              </DetailSection>
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'upcoming', !editMode['upcoming'])
+                  }
+                >
+                  + Add Upcoming Features
+                </a>
+              </>
             )}
-            {hasNonEmptyValues(profile?.data?.awards) && (
-              <DetailSection title="Awards & Recognition">
-                <ProfileFlex>
-                  {profile?.data?.awards.map((award: ProfileAwards) => (
-                    <AwardCard award={award} key={`award-${award?.title}`} />
-                  ))}
-                </ProfileFlex>
-              </DetailSection>
+            <hr />
+            {editMode['past'] ? (
+              <Container>
+                {editProfile?.past_performances?.map(
+                  (credit: any, i: number) => (
+                    <PerfRow key={`credit-${credit.id}`}>
+                      <Col lg="4">
+                        <Form>
+                          <InputField
+                            name="title"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'title',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Show Title"
+                            value={credit.title}
+                          />
+                          <InputField
+                            name="group"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'location',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Theatre or Location"
+                            value={credit.location}
+                          />
+                          <InputField
+                            name="url"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'url',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Web Link"
+                            value={credit.url}
+                          />
+                          <InputField
+                            name="role"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'role',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Role/Position"
+                            value={credit.role}
+                          />
+                          <InputField
+                            name="director"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'director',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Director"
+                            value={credit.director}
+                          />
+                          <InputField
+                            name="musicalDirector"
+                            onChange={(e: any) =>
+                              onCreditFieldChange(
+                                'musicalDirector',
+                                e.target.value,
+                                credit.id
+                              )
+                            }
+                            placeholder="Musical Director"
+                            value={credit.musicalDirector}
+                          />
+                        </Form>
+                        {i ? (
+                          <DeleteRowLink
+                            href="#"
+                            onClick={(e: any) =>
+                              removeCreditBlock(e, credit.id)
+                            }
+                          >
+                            X Delete
+                          </DeleteRowLink>
+                        ) : null}
+                      </Col>
+                      <Col lg="4">
+                        <InputField
+                          name="group"
+                          onChange={(e: any) =>
+                            onCreditFieldChange(
+                              'group',
+                              e.target.value,
+                              credit.id
+                            )
+                          }
+                          placeholder="Theatre Group"
+                          value={credit.group}
+                        />
+                        <DateRowTitle>Running Dates</DateRowTitle>
+                        <DateRow>
+                          <DatePicker
+                            name="startDate"
+                            onChange={(date: any) => {
+                              const dateString = new Date(
+                                date
+                              ).toLocaleDateString();
+                              onCreditFieldChange(
+                                'startDate',
+                                dateString,
+                                credit.id
+                              );
+                            }}
+                            value={credit.startDate}
+                          />
+                          <h6>through</h6>
+                          <DatePicker
+                            name="endDate"
+                            onChange={(date: any) => {
+                              const dateString = new Date(
+                                date
+                              ).toLocaleDateString();
+                              onCreditFieldChange(
+                                'endDate',
+                                dateString,
+                                credit.id
+                              );
+                            }}
+                            value={credit.endDate}
+                          />
+                        </DateRow>
+                      </Col>
+                    </PerfRow>
+                  )
+                )}
+                <Row>
+                  <Col lg="12">
+                    <a
+                      href="#"
+                      onClick={(e: any) => {
+                        e.preventDefault();
+                        addCreditBlock();
+                      }}
+                    >
+                      + Save and add another past performance
+                    </a>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <ProfileFlex>
+                      <Button
+                        onClick={() =>
+                          updateMultiSection('past_performances', 'past')
+                        }
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'past', !editMode['past'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.past_performances) && (
+                  <DetailSection title="Past Performances">
+                    {profile?.data?.past_performances.map(
+                      (perf: PastPerformances) => (
+                        <IndividualCredits
+                          key={`credits-shows-${perf.id}`}
+                          show={perf}
+                        />
+                      )
+                    )}
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'past', !editMode['past'])
+                  }
+                >
+                  + Add Past Performances
+                </a>
+              </>
+            )}
+            <hr />
+            {editMode['skills'] ? (
+              <Container>
+                <Row>
+                  <Col>
+                    <CAGFormGroup>
+                      <BoldP>I am interested in roles that require:</BoldP>
+                      {skillCheckboxes.map((skill) => (
+                        <CAGCheckbox
+                          checked={isAdditionalSkillsCheckboxes(skill)}
+                          fieldType="checkbox"
+                          key={`skill-chk-${skill}`}
+                          label={skill}
+                          name="additionalSkillsCheckboxes"
+                          onChange={(e: any) =>
+                            skillOptionChange(e.currentTarget.checked, skill)
+                          }
+                        />
+                      ))}
+                    </CAGFormGroup>
+                    <CAGFormGroup>
+                      <BoldP>Additional Skills</BoldP>
+                      <CAGInput>
+                        <input
+                          name="additionalSkillsManual"
+                          onChange={(e: any) => {
+                            const { value } = e.target;
+                            setInput(value);
+                          }}
+                          onKeyDown={onKeyDown}
+                          onKeyUp={onKeyUp}
+                          placeholder="Type to add a skill..."
+                          value={input}
+                        />
+                        <button onClick={addTag}>+</button>
+                      </CAGInput>
+                      <CAGContainer>
+                        {skillTags.map((tag, index) => (
+                          <CAGTag key={`${tag}-${index}`}>
+                            <div className="tag">
+                              {tag}
+                              <button onClick={() => deleteTag(index)}>
+                                x
+                              </button>
+                            </div>
+                          </CAGTag>
+                        ))}
+                      </CAGContainer>
+                    </CAGFormGroup>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <ProfileFlex>
+                      <Button
+                        onClick={updateSkills}
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'skills', !editMode['skills'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {(profile?.data?.additional_skills_checkboxes?.length ||
+                  profile?.data?.additional_skills_manual?.length) && (
+                  <DetailSection title="Special Skills">
+                    <ProfileFlex>
+                      {profile?.data?.additional_skills_checkboxes?.length &&
+                        profile?.data?.additional_skills_checkboxes.map(
+                          (skill: string) => (
+                            <Badge
+                              pill
+                              bg="primary"
+                              key={`skills-primary-${skill}`}
+                              text="white"
+                            >
+                              {skill}
+                            </Badge>
+                          )
+                        )}
+                      {profile?.data?.additional_skills_manual?.length &&
+                        profile?.data?.additional_skills_manual.map(
+                          (skill: string) => (
+                            <Badge
+                              pill
+                              bg="secondary"
+                              key={`skills-manual-${skill}`}
+                              text="white"
+                            >
+                              {skill}
+                            </Badge>
+                          )
+                        )}
+                    </ProfileFlex>
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'skills', !editMode['skills'])
+                  }
+                >
+                  + Add Skills
+                </a>
+              </>
+            )}
+            <hr />
+            {editMode['awards'] ? (
+              <Container>
+                {editProfile?.awards?.map((awardRow: any, i: any) => (
+                  <AwardRow key={`award-row-${awardRow.id}`}>
+                    <Col lg="4">
+                      <CAGFormControl
+                        as="input"
+                        name="title"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'title',
+                            awardRow.id
+                          )
+                        }
+                        placeholder="Award or Recognition"
+                        value={awardRow.title}
+                      />
+                      <CAGFormControl
+                        as="select"
+                        name="year"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'year',
+                            awardRow.id
+                          )
+                        }
+                        value={awardRow.year}
+                      >
+                        <option disabled selected value="">
+                          Year Received
+                        </option>
+                        {yearOptions.map((year) => {
+                          return <option value={year}>{year}</option>;
+                        })}
+                      </CAGFormControl>
+                      <CAGFormControl
+                        as="input"
+                        name="url"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'url',
+                            awardRow.id
+                          )
+                        }
+                        placeholder="Web Link"
+                        value={awardRow.url}
+                      />
+                      {editProfile?.awards?.length > 1 && (
+                        <CAGButton>
+                          <a
+                            href="#"
+                            className="delete"
+                            onClick={(e: any) =>
+                              removeAwardInput(e, awardRow.id)
+                            }
+                          >
+                            X Delete Recognition
+                          </a>
+                        </CAGButton>
+                      )}
+                    </Col>
+                    <Col lg="6">
+                      <CAGFormControl
+                        as="textarea"
+                        name="description"
+                        onChange={(e: any) =>
+                          onAwardInputChange(
+                            e.target.value || '',
+                            'description',
+                            awardRow.id
+                          )
+                        }
+                        placeholder="Description/Notes"
+                        rows={6}
+                        value={awardRow.description}
+                      />
+                    </Col>
+                  </AwardRow>
+                ))}
+                <Row>
+                  <Col lg="10">
+                    <CAGButton>
+                      <a href="#" onClick={addAwardInput}>
+                        + Add another award or recognition
+                      </a>
+                    </CAGButton>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <ProfileFlex>
+                      <Button
+                        onClick={() => updateMultiSection('awards', 'awards')}
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'awards', !editMode['awards'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
+                  </Col>
+                </Row>
+              </Container>
+            ) : (
+              <>
+                {hasNonEmptyValues(profile?.data?.awards) && (
+                  <DetailSection title="Awards & Recognition">
+                    <ProfileFlex>
+                      {profile?.data?.awards.map((award: ProfileAwards) => (
+                        <AwardCard
+                          award={award}
+                          key={`award-${award?.title}`}
+                        />
+                      ))}
+                    </ProfileFlex>
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'awards', !editMode['awards'])
+                  }
+                >
+                  + Add Awards &amp; Recognition
+                </a>
+              </>
             )}
           </div>
         </Col>
@@ -1017,6 +1791,163 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
+`;
+
+const PerfRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
+
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const PhotoContainer = styled.div`
+  align-items: center;
+  background: ${colors.lightGrey};
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  color: white;
+  display: flex;
+  font-size: 68px;
+  height: 300px;
+  justify-content: center;
+  width: 100%;
+`;
+
+const SynopsisTextarea = styled(Form.Group)`
+  margin-top: 12px;
+`;
+
+const WebsiteUrlField = styled.div`
+  margin-top: 12px;
+`;
+
+const DeleteLinkDiv = styled.div`
+  padding: 1em 0;
+
+  a,
+  a:hover {
+    color: ${colors.salmon};
+  }
+`;
+
+const DeleteRowLink = styled.a`
+  color: ${colors.salmon};
+  display: block;
+  margin-top: 1em;
+
+  &:hover {
+    color: ${colors.salmon};
+  }
+`;
+
+const DateRowTitle = styled.h5`
+  margin-top: 20px;
+  padding-bottom: 8px;
+`;
+
+const DateRow = styled.div`
+  display: flex;
+  gap: 1em;
+`;
+
+const CAGInput = styled.div`
+  position: relative;
+
+  input {
+    border: 1px solid ${colors.lightGrey};
+    border-radius: 7px;
+    font-family: ${fonts.mainFont};
+    padding: 10px;
+    padding-left: 10px;
+    width: 60%;
+  }
+
+  button {
+    position: absolute;
+    right: 40%;
+    top: -10px;
+    border: none;
+    background-color: unset;
+    font-size: 40px;
+    cursor: pointer;
+    color: ${colors.darkGreen};
+  }
+`;
+
+const CAGContainer = styled.div`
+  color: ${colors.gray};
+  display: flex;
+  max-width: 60%;
+  overflow: scroll;
+  padding-left: none;
+  width: 600%;
+`;
+
+const CAGTag = styled.div`
+  .tag {
+    align-items: center;
+    margin: 20px 0;
+    margin-right: 10px;
+    font-family: ${fonts.mainFont};
+    padding-left: 15px;
+    padding-right: 10px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    border: 1.5px solid ${colors.darkGreen};
+    border-radius: 20px;
+    background-color: white;
+    white-space: nowrap;
+    color: ${colors.mainFont};
+  }
+
+  .tag button {
+    display: inline;
+    padding: 4px;
+    border: none;
+    background-color: unset;
+    cursor: pointer;
+    color: ${colors.lightGrey};
+  }
+`;
+
+const BoldP = styled.p`
+  font-weight: bold;
+  color: ${colors.secondaryFontColor};
+`;
+
+const CAGCheckbox = styled(Checkbox)`
+  color: ${colors.secondaryFontColor};
+`;
+
+const CAGFormGroup = styled(Form.Group)`
+  margin-bottom: 2em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;
+
+const AwardRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
+
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const CAGButton = styled.div`
+  a {
+    display: block;
+    margin: 1em 0;
+
+    &.delete {
+      color: ${colors.salmon};
+    }
+  }
 `;
 
 export default IndividualProfile;
