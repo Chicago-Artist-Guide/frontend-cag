@@ -25,7 +25,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { Button, Checkbox, InputField } from '../../../genericComponents';
-import { Tagline } from '../../layout/Titles';
 import PageContainer from '../../layout/PageContainer';
 import { fonts, colors } from '../../../theme/styleVars';
 import DetailSection from '../shared/DetailSection';
@@ -366,6 +365,58 @@ const IndividualProfile: React.FC<{
         setEditMode({
           ...editMode,
           headline: false
+        });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
+
+  const updateMultiSection = async (
+    section: 'upcoming_performances' | 'past_performances' | 'awards',
+    editModeName: keyof EditModeSections
+  ) => {
+    const newData = editProfile[section];
+
+    if (!newData) {
+      return;
+    }
+
+    try {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { [section]: newData });
+
+        setEditMode({
+          ...editMode,
+          [editModeName]: false
+        });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile data:', err);
+    }
+  };
+
+  const updateSkills = async () => {
+    const { additional_skills_checkboxes, additional_skills_manual } =
+      editProfile;
+    const skillsProps = {
+      additional_skills_checkboxes,
+      additional_skills_manual
+    };
+
+    try {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { ...skillsProps });
+
+        setEditMode({
+          ...editMode,
+          skills: false
         });
       } else {
         // no profile.ref
@@ -1147,7 +1198,12 @@ const IndividualProfile: React.FC<{
                   <Col lg="12">
                     <ProfileFlex>
                       <Button
-                        onClick={() => null}
+                        onClick={() =>
+                          updateMultiSection(
+                            'upcoming_performances',
+                            'upcoming'
+                          )
+                        }
                         text="Save"
                         type="button"
                         variant="primary"
@@ -1346,7 +1402,9 @@ const IndividualProfile: React.FC<{
                   <Col lg="12">
                     <ProfileFlex>
                       <Button
-                        onClick={() => null}
+                        onClick={() =>
+                          updateMultiSection('past_performances', 'past')
+                        }
                         text="Save"
                         type="button"
                         variant="primary"
@@ -1442,7 +1500,7 @@ const IndividualProfile: React.FC<{
                   <Col lg="12">
                     <ProfileFlex>
                       <Button
-                        onClick={() => null}
+                        onClick={updateSkills}
                         text="Save"
                         type="button"
                         variant="primary"
@@ -1600,7 +1658,7 @@ const IndividualProfile: React.FC<{
                   <Col lg="12">
                     <ProfileFlex>
                       <Button
-                        onClick={() => null}
+                        onClick={() => updateMultiSection('awards', 'awards')}
                         text="Save"
                         type="button"
                         variant="primary"
