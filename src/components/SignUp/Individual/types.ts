@@ -252,3 +252,5 @@ export type IndividualProfile2 = {
   awards: ProfileAwards[];
   completed_profile_2: boolean;
 };
+
+export type IndividualProfileDataFull = IndividualProfile & IndividualProfile2;
