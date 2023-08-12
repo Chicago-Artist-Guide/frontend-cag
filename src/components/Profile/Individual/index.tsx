@@ -538,7 +538,7 @@ const IndividualProfile: React.FC<{
   };
 
   const addCreditBlock = () => {
-    const newShowId = showId + 1;
+    const newShowId = showPastId + 1;
 
     setProfileForm('past_performances', [
       ...(editProfile?.past_performances || []),
