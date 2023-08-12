@@ -956,7 +956,9 @@ const IndividualProfile: React.FC<{
           </div>
           <div>
             {editMode['training'] ? (
-              <></>
+              <>
+                <p>Coming soon</p>
+              </>
             ) : (
               <>
                 {hasNonEmptyValues(profile?.data?.training_institutions) ? (
@@ -1143,20 +1145,22 @@ const IndividualProfile: React.FC<{
                 </Row>
                 <Row>
                   <Col lg="12">
-                    <Button
-                      onClick={() => null}
-                      text="Save"
-                      type="button"
-                      variant="primary"
-                    />
-                    <Button
-                      onClick={(e: React.MouseEvent<HTMLElement>) =>
-                        onEditModeClick(e, 'upcoming', !editMode['upcoming'])
-                      }
-                      text="Cancel"
-                      type="button"
-                      variant="secondary"
-                    />
+                    <ProfileFlex>
+                      <Button
+                        onClick={() => null}
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'upcoming', !editMode['upcoming'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
                   </Col>
                 </Row>
               </Container>
@@ -1340,20 +1344,22 @@ const IndividualProfile: React.FC<{
                 </Row>
                 <Row>
                   <Col lg="12">
-                    <Button
-                      onClick={() => null}
-                      text="Save"
-                      type="button"
-                      variant="primary"
-                    />
-                    <Button
-                      onClick={(e: React.MouseEvent<HTMLElement>) =>
-                        onEditModeClick(e, 'past', !editMode['past'])
-                      }
-                      text="Cancel"
-                      type="button"
-                      variant="secondary"
-                    />
+                    <ProfileFlex>
+                      <Button
+                        onClick={() => null}
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'past', !editMode['past'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
                   </Col>
                 </Row>
               </Container>
@@ -1434,20 +1440,22 @@ const IndividualProfile: React.FC<{
                 </Row>
                 <Row>
                   <Col lg="12">
-                    <Button
-                      onClick={() => null}
-                      text="Save"
-                      type="button"
-                      variant="primary"
-                    />
-                    <Button
-                      onClick={(e: React.MouseEvent<HTMLElement>) =>
-                        onEditModeClick(e, 'skills', !editMode['skills'])
-                      }
-                      text="Cancel"
-                      type="button"
-                      variant="secondary"
-                    />
+                    <ProfileFlex>
+                      <Button
+                        onClick={() => null}
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'skills', !editMode['skills'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
                   </Col>
                 </Row>
               </Container>
@@ -1590,20 +1598,22 @@ const IndividualProfile: React.FC<{
                 </Row>
                 <Row>
                   <Col lg="12">
-                    <Button
-                      onClick={() => null}
-                      text="Save"
-                      type="button"
-                      variant="primary"
-                    />
-                    <Button
-                      onClick={(e: React.MouseEvent<HTMLElement>) =>
-                        onEditModeClick(e, 'awards', !editMode['awards'])
-                      }
-                      text="Cancel"
-                      type="button"
-                      variant="secondary"
-                    />
+                    <ProfileFlex>
+                      <Button
+                        onClick={() => null}
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'awards', !editMode['awards'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
                   </Col>
                 </Row>
               </Container>
@@ -1856,6 +1866,10 @@ const CAGCheckbox = styled(Checkbox)`
 
 const CAGFormGroup = styled(Form.Group)`
   margin-bottom: 2em;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 `;
 
 const AwardRow = styled(Row)`
