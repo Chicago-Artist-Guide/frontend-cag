@@ -13,6 +13,7 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import DatePicker from 'react-datepicker';
+import ReactCrop, { Crop } from 'react-image-crop';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -51,6 +52,7 @@ import IndividualUpcomingShow from './IndividualUpcomingShow';
 import IndividualCredits from './IndividualCredits';
 import { PreviewCard } from '../shared/styles';
 import EditPersonalDetails from './EditPersonalDetails';
+import 'react-image-crop/dist/ReactCrop.css';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -75,6 +77,12 @@ const IndividualProfile: React.FC<{
   });
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
+
+  // pfp
+  const [crop, setCrop] = useState<Crop>();
+  const [upImg, setUpImg] = useState<any>();
+  const [imgRef, setImgRef] = useState<any>(null);
+  const [completedCrop, setCompletedCrop] = useState<any>(null);
 
   // websites
   const [websiteId, setWebsiteId] = useState(1);
@@ -107,6 +115,92 @@ const IndividualProfile: React.FC<{
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setShowUp2Link(false);
+  };
+
+  const onImageLoaded = (image: any) => {
+    setImgRef(image);
+  };
+
+  const onCropComplete = (crop: Crop) => {
+    setCompletedCrop(crop);
+  };
+
+  const onCropChange = (crop: Crop) => {
+    setCrop(crop);
+  };
+
+  const getCroppedImg = (image: any, crop: any, src: string): Promise<Blob> => {
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+    const ctx = canvas.getContext('2d');
+
+    ctx?.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+
+    // Determine image type based on the original image src
+    let imageType = 'image/jpeg'; // Default to jpeg
+    if (src.endsWith('.png')) {
+      imageType = 'image/png';
+    } else if (src.endsWith('.gif')) {
+      imageType = 'image/gif';
+    }
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Canvas is empty'));
+          return;
+        }
+        resolve(blob);
+      }, imageType);
+    });
+  };
+
+  const handleImageUpload = async () => {
+    if (completedCrop && imgRef) {
+      const croppedImageBlob = await getCroppedImg(
+        imgRef,
+        completedCrop,
+        profile?.data?.profile_image_url
+      );
+
+      const storageRef = ref(
+        firebaseStorage,
+        `/files-${editProfile?.uid}/${editProfile?.account_id}-${imgRef.name}`
+      );
+      const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Handle progress
+        },
+        (error) => {
+          console.error('Upload error:', error);
+        },
+        () => {
+          console.log('Uploaded successfully!');
+
+          // download url
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            console.log('Uploaded pfp image url:', url);
+            // setProfileForm profile_image_url
+          });
+        }
+      );
+    }
   };
 
   const updatePerformanceState = () => {
@@ -775,7 +869,16 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          <ReactCrop
+            // src={profile?.data?.profile_image_url || upImg}
+            // onImageLoaded={onImageLoaded}
+            aspect={1}
+            crop={crop}
+            onChange={onCropChange}
+            onComplete={onCropComplete}
+          >
+            <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          </ReactCrop>
           <DetailsCard>
             <DetailsColTitle>
               <div>
