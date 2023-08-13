@@ -13,6 +13,7 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import DatePicker from 'react-datepicker';
+import ReactCrop, { Crop } from 'react-image-crop';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -44,13 +45,16 @@ import {
   skillCheckboxes,
   SkillCheckbox
 } from '../../SignUp/Individual/types';
+import { USStateSymbol } from '../../SignUp/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import AwardCard from './AwardCard';
 import IndividualUpcomingShow from './IndividualUpcomingShow';
 import IndividualCredits from './IndividualCredits';
 import { PreviewCard } from '../shared/styles';
+import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
+import 'react-image-crop/dist/ReactCrop.css';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -76,8 +80,17 @@ const IndividualProfile: React.FC<{
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
 
+  // pfp
+  const [crop, setCrop] = useState<Crop>();
+  const [upImg, setUpImg] = useState<any>();
+  const [imgRef, setImgRef] = useState<any>(null);
+  const [completedCrop, setCompletedCrop] = useState<any>(null);
+
   // websites
   const [websiteId, setWebsiteId] = useState(1);
+
+  // training
+  const [trainingId, setTrainingId] = useState(1);
 
   // upcoming and past shows
   const [showId, setShowId] = useState(1);
@@ -107,6 +120,92 @@ const IndividualProfile: React.FC<{
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setShowUp2Link(false);
+  };
+
+  const onImageLoaded = (image: any) => {
+    setImgRef(image);
+  };
+
+  const onCropComplete = (crop: Crop) => {
+    setCompletedCrop(crop);
+  };
+
+  const onCropChange = (crop: Crop) => {
+    setCrop(crop);
+  };
+
+  const getCroppedImg = (image: any, crop: any, src: string): Promise<Blob> => {
+    const canvas = document.createElement('canvas');
+    const scaleX = image.naturalWidth / image.width;
+    const scaleY = image.naturalHeight / image.height;
+    canvas.width = crop.width;
+    canvas.height = crop.height;
+    const ctx = canvas.getContext('2d');
+
+    ctx?.drawImage(
+      image,
+      crop.x * scaleX,
+      crop.y * scaleY,
+      crop.width * scaleX,
+      crop.height * scaleY,
+      0,
+      0,
+      crop.width,
+      crop.height
+    );
+
+    // Determine image type based on the original image src
+    let imageType = 'image/jpeg'; // Default to jpeg
+    if (src.endsWith('.png')) {
+      imageType = 'image/png';
+    } else if (src.endsWith('.gif')) {
+      imageType = 'image/gif';
+    }
+
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          reject(new Error('Canvas is empty'));
+          return;
+        }
+        resolve(blob);
+      }, imageType);
+    });
+  };
+
+  const handleImageUpload = async () => {
+    if (completedCrop && imgRef) {
+      const croppedImageBlob = await getCroppedImg(
+        imgRef,
+        completedCrop,
+        profile?.data?.profile_image_url
+      );
+
+      const storageRef = ref(
+        firebaseStorage,
+        `/files-${editProfile?.uid}/${editProfile?.account_id}-${imgRef.name}`
+      );
+      const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
+
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Handle progress
+        },
+        (error) => {
+          console.error('Upload error:', error);
+        },
+        () => {
+          console.log('Uploaded successfully!');
+
+          // download url
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            console.log('Uploaded pfp image url:', url);
+            // setProfileForm profile_image_url
+          });
+        }
+      );
+    }
   };
 
   const updatePerformanceState = () => {
@@ -376,7 +475,11 @@ const IndividualProfile: React.FC<{
   };
 
   const updateMultiSection = async (
-    section: 'upcoming_performances' | 'past_performances' | 'awards',
+    section:
+      | 'training_institutions'
+      | 'upcoming_performances'
+      | 'past_performances'
+      | 'awards',
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
@@ -480,6 +583,45 @@ const IndividualProfile: React.FC<{
         });
       }
     );
+  };
+
+  const onTrainingFieldChange = <T extends keyof TrainingInstitution>(
+    fieldName: T,
+    fieldValue: TrainingInstitution[T],
+    id: number
+  ) => {
+    const newTrainings = [...(editProfile?.training_institutions || [])];
+    const findIndex = newTrainings.findIndex((training) => training.id === id);
+    newTrainings[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('training_institutions', newTrainings);
+  };
+
+  const removeTrainingBlock = (e: any, id: number) => {
+    e.preventDefault();
+    const newTrainings = [...(editProfile?.training_institutions || [])];
+    const findIndex = newTrainings.findIndex((training) => training.id === id);
+    newTrainings.splice(findIndex, 1);
+
+    setProfileForm('training_institutions', newTrainings);
+  };
+
+  const addTrainingBlock = () => {
+    const newTrainingId = trainingId + 1;
+
+    setProfileForm('training_institutions', [
+      ...(editProfile?.training_institutions || []),
+      {
+        id: newTrainingId,
+        trainingInstitution: '',
+        trainingCity: '',
+        trainingState: '' as USStateSymbol,
+        trainingDegree: '',
+        trainingDetails: ''
+      }
+    ]);
+
+    setTrainingId(newTrainingId);
   };
 
   const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
@@ -775,7 +917,16 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          <ReactCrop
+            // src={profile?.data?.profile_image_url || upImg}
+            // onImageLoaded={onImageLoaded}
+            aspect={1}
+            crop={crop}
+            onChange={onCropChange}
+            onComplete={onCropComplete}
+          >
+            <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          </ReactCrop>
           <DetailsCard>
             <DetailsColTitle>
               <div>
@@ -1005,11 +1156,220 @@ const IndividualProfile: React.FC<{
               </>
             )}
           </div>
+          <hr />
           <div>
             {editMode['training'] ? (
-              <>
-                <p>Coming soon</p>
-              </>
+              <Container>
+                {(hasNonEmptyValues(editProfile?.training_institutions)
+                  ? editProfile.training_institutions
+                  : profile?.data?.training_institution &&
+                    profile.data.training_institution !== ''
+                  ? [
+                      {
+                        trainingInstitution: profile.data.training_institution,
+                        trainingCity: profile.data.training_city,
+                        trainingState: profile.data.training_state,
+                        trainingDegree: profile.data.training_degree,
+                        trainingDetails: profile.data.training_details
+                      }
+                    ]
+                  : []
+                ).map((training: any, i: number) => (
+                  <TrainingRow key={`training-${training.id}`}>
+                    <Col lg="8">
+                      <Form>
+                        <InputField
+                          name="trainingInstitution"
+                          onChange={(e: any) =>
+                            onTrainingFieldChange(
+                              'trainingInstitution',
+                              e.target.value,
+                              training.id
+                            )
+                          }
+                          placeholder="Institution"
+                          value={training.trainingInstitution}
+                        />
+                        <Container>
+                          <Row>
+                            <PaddedCol lg="8">
+                              <InputField
+                                name="trainingCity"
+                                onChange={(e: any) =>
+                                  onTrainingFieldChange(
+                                    'trainingCity',
+                                    e.target.value,
+                                    training.id
+                                  )
+                                }
+                                placeholder="City"
+                                value={training.trainingCity}
+                              />
+                            </PaddedCol>
+                            <PaddedCol lg="4">
+                              <CAGFormSelect
+                                name="trainingState"
+                                onChange={(e: any) =>
+                                  onTrainingFieldChange(
+                                    'trainingState',
+                                    e.target.value,
+                                    training.id
+                                  )
+                                }
+                                value={training.trainingState || ''}
+                                style={{
+                                  height: 52,
+                                  marginTop: 'calc(25px + 0.5rem)',
+                                  border: `1px solid ${colors.lightGrey}`,
+                                  color: training.trainingState
+                                    ? colors.secondaryFontColor
+                                    : colors.lightGrey
+                                }}
+                              >
+                                <option value="">State</option>
+                                <option value="AL">Alabama</option>
+                                <option value="AK">Alaska</option>
+                                <option value="AZ">Arizona</option>
+                                <option value="AR">Arkansas</option>
+                                <option value="CA">California</option>
+                                <option value="CO">Colorado</option>
+                                <option value="CT">Connecticut</option>
+                                <option value="DE">Delaware</option>
+                                <option value="DC">District Of Columbia</option>
+                                <option value="FL">Florida</option>
+                                <option value="GA">Georgia</option>
+                                <option value="HI">Hawaii</option>
+                                <option value="ID">Idaho</option>
+                                <option value="IL">Illinois</option>
+                                <option value="IN">Indiana</option>
+                                <option value="IA">Iowa</option>
+                                <option value="KS">Kansas</option>
+                                <option value="KY">Kentucky</option>
+                                <option value="LA">Louisiana</option>
+                                <option value="ME">Maine</option>
+                                <option value="MD">Maryland</option>
+                                <option value="MA">Massachusetts</option>
+                                <option value="MI">Michigan</option>
+                                <option value="MN">Minnesota</option>
+                                <option value="MS">Mississippi</option>
+                                <option value="MO">Missouri</option>
+                                <option value="MT">Montana</option>
+                                <option value="NE">Nebraska</option>
+                                <option value="NV">Nevada</option>
+                                <option value="NH">New Hampshire</option>
+                                <option value="NJ">New Jersey</option>
+                                <option value="NM">New Mexico</option>
+                                <option value="NY">New York</option>
+                                <option value="NC">North Carolina</option>
+                                <option value="ND">North Dakota</option>
+                                <option value="OH">Ohio</option>
+                                <option value="OK">Oklahoma</option>
+                                <option value="OR">Oregon</option>
+                                <option value="PA">Pennsylvania</option>
+                                <option value="RI">Rhode Island</option>
+                                <option value="SC">South Carolina</option>
+                                <option value="SD">South Dakota</option>
+                                <option value="TN">Tennessee</option>
+                                <option value="TX">Texas</option>
+                                <option value="UT">Utah</option>
+                                <option value="VT">Vermont</option>
+                                <option value="VA">Virginia</option>
+                                <option value="WA">Washington</option>
+                                <option value="WV">West Virginia</option>
+                                <option value="WI">Wisconsin</option>
+                                <option value="WY">Wyoming</option>
+                              </CAGFormSelect>
+                            </PaddedCol>
+                          </Row>
+                        </Container>
+                        <InputField
+                          name="trainingDegree"
+                          onChange={(e: any) =>
+                            onTrainingFieldChange(
+                              'trainingDegree',
+                              e.target.value,
+                              training.id
+                            )
+                          }
+                          placeholder="Degree"
+                          value={training.trainingDegree}
+                        />
+                        <Container>
+                          <Row>
+                            <PaddedCol className="mt-4" lg="12">
+                              <SmallTitle>Notes/Details</SmallTitle>
+                              <Form.Group controlId="formControlTextarea1">
+                                <Form.Control
+                                  as="textarea"
+                                  name="trainingDetails"
+                                  onChange={(e: any) =>
+                                    onTrainingFieldChange(
+                                      'trainingDetails',
+                                      e.target.value,
+                                      training.id
+                                    )
+                                  }
+                                  placeholder="Provide any additional information here"
+                                  rows={6}
+                                  value={training.trainingDetails || ''}
+                                />
+                              </Form.Group>
+                            </PaddedCol>
+                          </Row>
+                        </Container>
+                        {i ? (
+                          <DeleteRowLink
+                            href="#"
+                            onClick={(e: any) =>
+                              removeTrainingBlock(e, training.id)
+                            }
+                          >
+                            X Delete
+                          </DeleteRowLink>
+                        ) : null}
+                      </Form>
+                    </Col>
+                  </TrainingRow>
+                ))}
+                <Row>
+                  <Col lg="10">
+                    <a
+                      href="#"
+                      onClick={(e: any) => {
+                        e.preventDefault();
+                        addTrainingBlock();
+                      }}
+                    >
+                      + Save and add another institution
+                    </a>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <ProfileFlex>
+                      <Button
+                        onClick={() =>
+                          updateMultiSection(
+                            'training_institutions',
+                            'training'
+                          )
+                        }
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'training', !editMode['training'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
+                  </Col>
+                </Row>
+              </Container>
             ) : (
               <>
                 {hasNonEmptyValues(profile?.data?.training_institutions) ? (
@@ -1791,6 +2151,22 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
+`;
+
+const TrainingRow = styled(Row)`
+  padding-top: 2em;
+  padding-bottom: 2em;
+
+  &:not(:first-child) {
+    border-top: 1px solid ${colors.lightGrey};
+  }
+`;
+
+const SmallTitle = styled.h3`
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 24px;
+  color: ${colors.dark};
 `;
 
 const PerfRow = styled(Row)`

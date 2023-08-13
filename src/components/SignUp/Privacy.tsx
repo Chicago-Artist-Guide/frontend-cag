@@ -6,7 +6,6 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import PrivateLabel from '../../genericComponents/PrivateLabel';
 import yellow_blob from '../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../theme/styleVars';
 import SignUpBody from './shared/Body';
@@ -15,7 +14,7 @@ import SignUpHeader from './shared/Header';
 const Privacy: React.FC<{
   setForm: SetForm;
   formData: any;
-}> = props => {
+}> = (props) => {
   const { formData } = props;
 
   return (
@@ -23,25 +22,32 @@ const Privacy: React.FC<{
       <Row>
         <SignUpHeader
           title="Let's talk privacy"
-          subtitle="Your privacy is our top concern. Always."
-          pre={`Hi, ${formData.basicsFirstName ||
-            formData.theatreName ||
-            'member'}!`}
+          subtitle="Privacy for all of our users is our top concern. Always."
+          pre={`Hi, ${
+            formData.basicsFirstName || formData.theatreName || 'member'
+          }!`}
         />
       </Row>
       <Row>
         <SignUpBody lg="8">
           <PrivacyPar>
-            We take privacy seriously (seriously). We will never share, sell, or
-            otherwise distribute your information to a third party. We also know
-            that some of the information we're asking for is personal, and for
-            some could be sensitive in nature. The reason we’re asking is to
-            create the most effective, inclusive, and equitable casting & hiring
-            platform possible. If you see <PrivateLabel /> next to a field,
-            that's because even though we're collecting the information to
-            inform our search algorithm, we won't display this information on
-            your profile, or to producers and casting directors. If you'd like
-            to learn more about the measures we take to secure your data,{' '}
+            We take privacy seriously (seriously). That means that we expect you
+            to never share, sell, or otherwise distribute any information on
+            this site to a third party. Doing so will be grounds for the
+            immediate removal of your organization's account.
+          </PrivacyPar>
+          <PrivacyPar>
+            Some of the information you'll see from individual users is
+            personal, and for some could be sensitive in nature. The reason we
+            allow access to this information is for the purpose of creating the
+            most effective, inclusive, and equitable casting &amp; hiring
+            platform possible. You are expected to use our platform for this
+            purpose in filling your positions.
+          </PrivacyPar>
+          <PrivacyPar>
+            While we may use aggregated data for reporting purposes, we will
+            never share your group's individual data. If you'd like to learn
+            more about the measures we take to secure user data,{' '}
             <Link to="/faq" target="_blank">
               click here
             </Link>
