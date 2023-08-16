@@ -34,7 +34,7 @@ const Donate = () => (
             </p>
             <iframe
               frameBorder="0"
-              height="650px"
+              height="950px"
               name="givebutter"
               scrolling="no"
               seamless
