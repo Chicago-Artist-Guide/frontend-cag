@@ -83,6 +83,7 @@ const CompanySignUp: React.FC<{
         theatre_name: formValues.theatreName,
         number_of_members: formValues.numberOfMembers,
         primary_contact: formValues.primaryContact,
+        primary_contact_email: formValues.emailAddress,
         location: formValues.location,
         description: formValues.description,
         profile_image_url: formValues.profilePhotoUrl,

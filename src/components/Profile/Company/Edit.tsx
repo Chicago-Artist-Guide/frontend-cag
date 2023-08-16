@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
 import { useProfileContext } from '../../../context/ProfileContext';
-import { Button } from '../../../genericComponents';
+import { Button, InputField } from '../../../genericComponents';
 import { neighborhoods } from '../../../utils/lookups';
 import PageContainer from '../../layout/PageContainer';
 import AdditionalPhoto from '../Form/AdditionalPhoto';
@@ -25,6 +25,7 @@ import {
   Title
 } from './ProfileStyles';
 import { Profile } from './types';
+import { ErrorMessage } from '../../../utils/validation';
 
 const CompanyProfileEdit: React.FC<{
   toggleEdit: () => void;
@@ -39,7 +40,7 @@ const CompanyProfileEdit: React.FC<{
   });
   const locations = [
     { name: 'Choose one...', value: 'choose' },
-    ...neighborhoods.map(neighborhood => ({
+    ...neighborhoods.map((neighborhood) => ({
       name: neighborhood,
       value: neighborhood
     }))
@@ -131,11 +132,17 @@ const CompanyProfileEdit: React.FC<{
                 </DetailsCardItem>
                 <DetailsCardItem>
                   Email Address:{' '}
-                  <Input
+                  <InputField
+                    first
+                    required
                     aria-label="primary_contact_email"
                     name="primary_contact_email"
                     onChange={setFormValues}
-                    defaultValue={formValues?.primary_contact_email}
+                    value={formValues?.primary_contact_email || ''}
+                    hasErrorCallback={() => null}
+                    requiredLabel="Email address"
+                    validationRegexMessage={ErrorMessage.EmailFormat}
+                    validationRegexName="emailAddress"
                   />
                 </DetailsCardItem>
               </div>
