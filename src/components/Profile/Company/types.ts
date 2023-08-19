@@ -54,6 +54,8 @@ export type Role = {
   role_id?: string;
   role_name?: string;
   description?: string;
+  role_rate?: number;
+  role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour';
   gender_identity?: string[];
   ethnicity?: string[];
   role_status?: RoleStatus;
