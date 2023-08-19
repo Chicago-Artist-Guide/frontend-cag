@@ -1,19 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { getOptions } from '../../../../../utils/helpers';
+import { productionStatuses } from '../../../../../utils/lookups';
 import { FormInput, FormRadio, FormTextArea } from '../../../Form/Inputs';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Production } from '../../types';
 import ProductionPhoto from '../ProductionPhoto';
 
 const types = ['Musical', 'Play', 'Other'];
-const statuses = ['Open Casting', 'Auditioning', 'Production'];
 const equity = ['Union', 'Non-Union'];
-
-function getOptions(options: string[]) {
-  return options.map(option => ({
-    name: option,
-    value: option
-  }));
-}
 
 const ManageProductionBasic: React.FC<{
   formValues: Production;
@@ -64,7 +58,7 @@ const ManageProductionBasic: React.FC<{
         <FormRadio
           name="status"
           label="Status"
-          options={getOptions(statuses)}
+          options={getOptions(productionStatuses)}
           checked={formValues.status}
           onChange={setFormValues}
         />

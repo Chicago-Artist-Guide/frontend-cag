@@ -13,7 +13,7 @@ const ManageProductionRoles: React.FC<{
   handleUpdate: (x: Production) => void;
 }> = ({ formValues, setFormValues, handleUpdate }) => {
   const [showModal, setShowModal] = useState(false);
-  const [roleType, setRoleType] = useState<StageRole>(StageRole.OnStage);
+  const [roleType, setRoleType] = useState<StageRole>('On-Stage');
   const [editRole, setEditRole] = useState<Role>();
   const currentRoles = formValues.roles || [];
 
@@ -52,21 +52,21 @@ const ManageProductionRoles: React.FC<{
 
   const onManageOnStageRole = (role: Role = {}) => {
     setEditRole(role);
-    setRoleType(StageRole.OnStage);
+    setRoleType('On-Stage');
     setShowModal(true);
   };
 
   const onManageOffStageRole = (role: Role = {}) => {
     setEditRole(role);
-    setRoleType(StageRole.OffStage);
+    setRoleType('Off-Stage');
     setShowModal(true);
   };
 
   const { onStageRoles, offStageRoles } = currentRoles.reduce(
     (acc, role) => {
-      if (role.type === StageRole.OnStage) {
+      if (role.type === 'On-Stage') {
         acc.onStageRoles.push(role);
-      } else if (role.type === StageRole.OffStage) {
+      } else if (role.type === 'Off-Stage') {
         acc.offStageRoles.push(role);
       }
       return acc;

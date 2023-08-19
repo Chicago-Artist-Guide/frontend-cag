@@ -87,7 +87,7 @@ const ManageProduction: React.FC<null> = () => {
             <div className="d-flex flex-row justify-content-between">
               <Title>Manage Production</Title>
               <Button
-                onClick={handleUpdateDocument}
+                onClick={handleSave}
                 text="Save Show"
                 icon={faFloppyDisk}
                 type="button"

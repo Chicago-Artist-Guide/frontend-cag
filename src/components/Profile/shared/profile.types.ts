@@ -1,28 +1,17 @@
-export enum StageRole {
-  'OnStage' = 'on-stage',
-  'OffStage' = 'off-stage'
-}
+export type StageRole = 'On-Stage' | 'Off-Stage';
 
-export enum ProductionEquity {
-  'Union' = 'Union',
-  'NonUnion' = 'Non-Union'
-}
+export type ProductionEquity = 'Union' | 'Non-Union';
 
-export enum ProductionType {
-  'Musical' = 'Musical',
-  'Play' = 'Play',
-  'Other' = 'Other'
-}
+export type ProductionType = 'Musical' | 'Play' | 'Other';
 
-export enum ProductionStatus {
-  'OpenCasting' = 'Open Casting',
-  'Auditioning' = 'Auditioning',
-  'Production' = 'Production'
-}
+export type ProductionStatus =
+  | 'Pre-Production'
+  | 'Casting'
+  | 'Casting Complete'
+  | 'Rehearsal'
+  | 'Now Playing'
+  | 'Complete';
 
-export enum RoleStatus {
-  'Open' = 'open',
-  'Closed' = 'closed'
-}
+export type RoleStatus = 'Open' | 'Closed';
 
 export type EnumType = { [s: string]: string };
