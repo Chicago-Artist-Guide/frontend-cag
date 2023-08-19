@@ -38,16 +38,24 @@ const ManageProductionRoles: React.FC<{
       nextRoles = [...currentRoles, role];
     }
 
+    onEditOrDelete(nextRoles);
+  };
+
+  const onDeleteRole = (role: Role) => {
+    const nextRoles = currentRoles.filter((r) => r.role_id !== role.role_id);
+    onEditOrDelete(nextRoles);
+  };
+
+  const onEditOrDelete = (roles: Role[]) => {
     setFormValues({
       target: {
         name: 'roles',
-        value: nextRoles
+        value: roles
       }
     });
-
     setEditRole(undefined);
     setShowModal(false);
-    handleUpdate({ ...formValues, roles: nextRoles });
+    handleUpdate({ ...formValues, roles: roles });
   };
 
   const onManageOnStageRole = (role: Role = {}) => {
@@ -80,6 +88,7 @@ const ManageProductionRoles: React.FC<{
         show={showModal}
         type={roleType}
         role={editRole}
+        onDelete={onDeleteRole}
         onSubmit={onSaveRole}
         onClose={() => setShowModal(false)}
       />

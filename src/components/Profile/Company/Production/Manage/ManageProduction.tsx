@@ -1,6 +1,6 @@
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import { deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import { Form, Tab, Tabs } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -18,6 +18,7 @@ import ManageProductionBasic from './ManageProductionBasic';
 import ManageProductionDates from './ManageProductionDates';
 import ManageProductionMatches from './ManageProductionMatches';
 import ManageProductionRoles from './ManageProductionRoles';
+import ConfirmDialog from '../../../../ConfirmDIalog';
 
 const ManageProduction: React.FC<null> = () => {
   const { productionId } = useParams();
@@ -26,6 +27,7 @@ const ManageProduction: React.FC<null> = () => {
   const {
     account: { data: accountData }
   } = useProfileContext();
+  const [showConfirm, setShowConfirm] = useState(false);
   const [formValues, setFormValues] = useForm<Production>({
     account_id: accountData?.account_id,
     production_id: '',
@@ -79,8 +81,25 @@ const ManageProduction: React.FC<null> = () => {
     history.push('/profile');
   };
 
+  const onDeleteConfirm = async () => {
+    const docRef = doc(db, 'productions', productionId);
+    await deleteDoc(docRef);
+    goToProfile();
+  };
+
+  const onDeleteCancel = () => {
+    setShowConfirm(false);
+  };
+
   return (
     <PageContainer>
+      <ConfirmDialog
+        title="Delete show"
+        content="Are you sure you wish to delete this production?"
+        onCancel={onDeleteCancel}
+        onConfirm={onDeleteConfirm}
+        show={showConfirm}
+      />
       <Form>
         <Row>
           <Col lg={12}>
@@ -146,13 +165,22 @@ const ManageProduction: React.FC<null> = () => {
                 type="button"
                 variant="danger"
               />
-              <Button
-                onClick={handleSave}
-                text="Save Show"
-                icon={faFloppyDisk}
-                type="button"
-                variant="primary"
-              />
+              <div className="d-flex flex-row">
+                <Button
+                  onClick={() => setShowConfirm(true)}
+                  text="Delete"
+                  type="button"
+                  variant="danger"
+                  className="mr-3"
+                />
+                <Button
+                  onClick={handleSave}
+                  text="Save Show"
+                  icon={faFloppyDisk}
+                  type="button"
+                  variant="primary"
+                />
+              </div>
             </div>
           </Col>
         </Row>

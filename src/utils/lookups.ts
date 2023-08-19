@@ -98,7 +98,7 @@ export const productionStatuses: ProductionStatus[] = [
 export const productionEquities: ProductionEquity[] = ['Union', 'Non-Union'];
 export const productionTypes: ProductionType[] = ['Musical', 'Play', 'Other'];
 export const stageRoles: StageRole[] = ['On-Stage', 'Off-Stage'];
-export const roleStatus: RoleStatus[] = ['Open', 'Closed'];
+export const roleStatuses: RoleStatus[] = ['Open', 'Closed'];
 
 export const ethnicities = [
   'Open to all ethnicities',
