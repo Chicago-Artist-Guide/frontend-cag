@@ -17,7 +17,7 @@ import {
   roleStatuses
 } from '../../../../../utils/lookups';
 import { getOptions } from '../../../../../utils/helpers';
-import ConfirmDialog from '../../../../ConfirmDIalog';
+import ConfirmDialog from '../../../../ConfirmDialog';
 
 const statuses = getOptions(roleStatuses);
 
