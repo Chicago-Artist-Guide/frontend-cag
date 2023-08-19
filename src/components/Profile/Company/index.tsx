@@ -42,7 +42,10 @@ const CompanyProfile: React.FC<{
     }
   } = useProfileContext();
   const [editing, setEditing] = useState<Edit>(null);
-  const [productions, setProductions] = useState<Production[]>([]);
+  const [productions, setProductions] = useState<{
+    active: Production[];
+    inactive: Production[];
+  }>();
   const profileData = profile?.data as Profile;
 
   useEffect(() => {
@@ -55,7 +58,20 @@ const CompanyProfile: React.FC<{
       where('account_id', '==', uid)
     );
     const querySnapshot = await getDocs(q);
-    setProductions(querySnapshot.docs.map((doc) => doc.data()) as Production[]);
+    const productions = (
+      querySnapshot.docs.map((doc) => doc.data()) as Production[]
+    ).reduce(
+      (acc, cur) => {
+        if (cur.status === 'Complete') {
+          acc.inactive.push(cur);
+        } else {
+          acc.active.push(cur);
+        }
+        return acc;
+      },
+      { active: [] as Production[], inactive: [] as Production[] }
+    );
+    setProductions(productions);
   };
 
   const toggleEdit = async () => {
@@ -130,7 +146,7 @@ const CompanyProfile: React.FC<{
             <DetailAdd text="Add an award or recognition" />
           </DetailSection>
           <DetailSection title="Active Shows">
-            {productions?.map((show) => (
+            {productions?.active?.map((show) => (
               <ActiveProduction key={show.production_id} show={show} />
             ))}
             <DetailAdd
@@ -138,11 +154,13 @@ const CompanyProfile: React.FC<{
               onClick={() => setEditing('add-production')}
             />
           </DetailSection>
-          <DetailSection title="Inactive Shows">
-            {productions?.map((show) => (
-              <InactiveProduction key={show.production_id} show={show} />
-            ))}
-          </DetailSection>
+          {!!productions?.inactive?.length && (
+            <DetailSection title="Inactive Shows">
+              {productions?.inactive?.map((show) => (
+                <InactiveProduction key={show.production_id} show={show} />
+              ))}
+            </DetailSection>
+          )}
         </RightCol>
       </Row>
     </PageContainer>

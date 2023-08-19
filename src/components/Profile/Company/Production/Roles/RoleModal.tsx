@@ -6,10 +6,11 @@ import { FormTarget } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, Checkbox, Dropdown } from '../../../../../genericComponents';
 import { colors, fonts } from '../../../../../theme/styleVars';
-import { FormInput, FormTextArea } from '../../../Form/Inputs';
-import { RoleStatus, StageRole } from '../../../shared/profile.types';
-import { Role, genders, ethnicities, ageRanges } from '../../types';
 import { CAGLabel } from '../../../../SignUp/SignUpStyles';
+import { FormInput, FormTextArea } from '../../../Form/Inputs';
+import { StageRole } from '../../../shared/profile.types';
+import { Role } from '../../types';
+import { ageRanges, ethnicities, genders } from '../../../../../utils/lookups';
 
 const statuses = ['Open', 'Closed'].map((status) => ({
   name: status,
@@ -32,7 +33,7 @@ const RoleModal: React.FC<{
     } else {
       setFormValues({
         type: type,
-        role_status: RoleStatus.Open
+        role_status: 'Open'
       });
     }
   }, []);
@@ -56,7 +57,7 @@ const RoleModal: React.FC<{
     setFormValues({});
   };
 
-  const title = type === StageRole.OnStage ? 'On-Stage Role' : 'Off-Stage Role';
+  const title = type === 'On-Stage' ? 'On-Stage Role' : 'Off-Stage Role';
   const isAgeRangeInAgeRanges = (ageRange: string) => {
     return formValues.age_range?.includes(ageRange);
   };

@@ -1,3 +1,4 @@
+import { uuidv4 } from '@firebase/util';
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
 import { doc, setDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
@@ -6,11 +7,16 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
-import { uuidv4 } from '@firebase/util';
 import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useProfileContext } from '../../../../context/ProfileContext';
 import { Button } from '../../../../genericComponents';
 import { colors, fonts } from '../../../../theme/styleVars';
+import { getOptions } from '../../../../utils/helpers';
+import {
+  productionEquities,
+  productionStatuses,
+  productionTypes
+} from '../../../../utils/lookups';
 import PageContainer from '../../../layout/PageContainer';
 import {
   FormDateRange,
@@ -21,12 +27,6 @@ import {
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
 import { Production } from '../types';
 import ProductionPhoto from './ProductionPhoto';
-import { getOptionsFromEnum } from '../../../../utils/helpers';
-import {
-  ProductionEquity,
-  ProductionStatus,
-  ProductionType
-} from '../../shared/profile.types';
 
 const CompanyAddShow: React.FC<{
   toggleEdit: () => void;
@@ -101,7 +101,7 @@ const CompanyAddShow: React.FC<{
             <FormRadio
               name="type"
               label="Type"
-              options={getOptionsFromEnum(ProductionType)}
+              options={getOptions(productionTypes)}
               checked={formValues.type}
               onChange={setFormValues}
             />
@@ -119,7 +119,7 @@ const CompanyAddShow: React.FC<{
             <FormRadio
               name="status"
               label="Status"
-              options={getOptionsFromEnum(ProductionStatus)}
+              options={getOptions(productionStatuses)}
               checked={formValues.status}
               onChange={setFormValues}
             />
@@ -148,7 +148,7 @@ const CompanyAddShow: React.FC<{
             <FormRadio
               name="equity"
               label="Equity"
-              options={getOptionsFromEnum(ProductionEquity)}
+              options={getOptions(productionEquities)}
               checked={formValues.equity}
               onChange={setFormValues}
             />
