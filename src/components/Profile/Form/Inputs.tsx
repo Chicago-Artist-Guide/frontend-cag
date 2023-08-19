@@ -155,6 +155,7 @@ const FormDatePicker: React.FC<{
 }> = ({ name, defaultValue, onChange }) => {
   const handleChange = (date: any) => {
     const dateString = new Date(date).toLocaleDateString();
+
     onChange({
       target: {
         name: name,
@@ -162,11 +163,13 @@ const FormDatePicker: React.FC<{
       }
     });
   };
+
   return (
     <DatePickerInput
       name={name}
       onChange={handleChange}
       value={defaultValue}
+      selected={defaultValue ? new Date(defaultValue) : undefined}
       placeholderText="mm/dd/yyyy"
     />
   );
