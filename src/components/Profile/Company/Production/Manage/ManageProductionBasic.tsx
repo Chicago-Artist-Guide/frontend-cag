@@ -36,7 +36,6 @@ const ManageProductionBasic: React.FC<{
           defaultValue={formValues?.production_name}
           style={{ marginTop: 0 }}
         />
-
         <FormRadio
           name="type"
           label="Type"
@@ -44,7 +43,6 @@ const ManageProductionBasic: React.FC<{
           checked={formValues.type}
           onChange={setFormValues}
         />
-
         {showOtherType && (
           <FormInput
             name="type_other"
@@ -54,7 +52,6 @@ const ManageProductionBasic: React.FC<{
             style={{ marginTop: 0 }}
           />
         )}
-
         <FormRadio
           name="status"
           label="Status"
@@ -62,28 +59,36 @@ const ManageProductionBasic: React.FC<{
           checked={formValues.status}
           onChange={setFormValues}
         />
-
         <FormTextArea
           name="description"
           label="Description"
           onChange={setFormValues}
           defaultValue={formValues?.description}
         />
-
         <FormInput
           name="director"
           label="Director"
           onChange={setFormValues}
           defaultValue={formValues?.director}
         />
-
         <FormInput
           name="musical_director"
           label="Musical Director"
           onChange={setFormValues}
           defaultValue={formValues?.musical_director}
         />
-
+        <FormInput
+          name="casting_director"
+          label="Casting Director"
+          onChange={setFormValues}
+          defaultValue={formValues?.casting_director}
+        />
+        <FormInput
+          name="casting_director_email"
+          label="Casting Director Email"
+          onChange={setFormValues}
+          defaultValue={formValues?.casting_director_email}
+        />
         <FormRadio
           name="equity"
           label="Equity"

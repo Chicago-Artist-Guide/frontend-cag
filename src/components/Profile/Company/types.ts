@@ -32,6 +32,8 @@ export type Production = {
   description?: string;
   director?: string;
   musical_director?: string;
+  casting_director?: string;
+  casting_director_email?: string;
   equity?: ProductionEquity;
   audition_start?: string;
   audition_end?: string;

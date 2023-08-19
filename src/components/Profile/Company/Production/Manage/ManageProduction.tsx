@@ -39,6 +39,8 @@ const ManageProduction: React.FC<null> = () => {
     description: '',
     director: '',
     musical_director: '',
+    casting_director: '',
+    casting_director_email: '',
     equity: undefined,
     writers: '',
     roles: []
