@@ -18,7 +18,7 @@ import ManageProductionBasic from './ManageProductionBasic';
 import ManageProductionDates from './ManageProductionDates';
 import ManageProductionMatches from './ManageProductionMatches';
 import ManageProductionRoles from './ManageProductionRoles';
-import ConfirmDialog from '../../../../ConfirmDialogTemp';
+import ConfirmDialog from '../../../../ConfirmDialog';
 
 const ManageProduction: React.FC<null> = () => {
   const { productionId } = useParams();
