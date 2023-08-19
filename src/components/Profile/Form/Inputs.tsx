@@ -41,7 +41,8 @@ export const FormInput: React.FC<{
   defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
   style?: CSSProperties;
-}> = ({ name, label, defaultValue, onChange, ...rest }) => {
+  type?: 'text' | 'number';
+}> = ({ name, label, defaultValue, onChange, type = 'text', ...rest }) => {
   return (
     <FormGroup controlId={name} {...rest}>
       <Label>{label}</Label>
@@ -50,6 +51,7 @@ export const FormInput: React.FC<{
         name={name}
         onChange={onChange}
         defaultValue={defaultValue}
+        type={type}
       />
     </FormGroup>
   );
@@ -75,7 +77,7 @@ export const FormSelect: React.FC<{
           color: defaultValue ? colors.secondaryFontColor : colors.lightGrey
         }}
       >
-        {options.map(option => (
+        {options.map((option) => (
           <option key={option.value}>{option.name}</option>
         ))}
       </Select>
@@ -103,7 +105,7 @@ export const FormRadio: React.FC<{
   return (
     <FormGroup controlId={name}>
       <Label>{label}</Label>
-      {options.map(option => (
+      {options.map((option) => (
         <Radio
           type="radio"
           onChange={handleChange}
@@ -214,7 +216,7 @@ export const TextArea = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
   border: 1px solid ${colors.lightGrey};
-  color: ${props =>
+  color: ${(props) =>
     props.defaultValue ? colors.secondaryFontColor : colors.lightGrey};
   fontweight: 400;
   maxwidth: 800px;

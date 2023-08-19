@@ -124,6 +124,38 @@ const RoleModal: React.FC<{
                   defaultValue={formValues?.description}
                   rows={6}
                 />
+                <Form.Group className="form-group">
+                  <CAGLabel>Role Rate</CAGLabel>
+                  <RoleRate>
+                    <FormInput
+                      name="rate_rate"
+                      label="Rate"
+                      onChange={setFormState}
+                      defaultValue={formValues?.role_rate}
+                      type="number"
+                    />
+                    <Dropdown
+                      name="rate_rate_unit"
+                      label="Unit"
+                      options={[
+                        {
+                          name: 'Total',
+                          value: 'Total'
+                        },
+                        {
+                          name: 'Per Week',
+                          value: 'Per Week'
+                        },
+                        {
+                          name: 'Per Hour',
+                          value: 'Per Hour'
+                        }
+                      ]}
+                      value={formValues?.role_rate_unit}
+                      onChange={setFormState}
+                    />
+                  </RoleRate>
+                </Form.Group>
                 <Form.Group className="form-group" style={{ marginTop: 20 }}>
                   <CAGLabel>Gender Identity</CAGLabel>
                   {genders.map((gender) => (
@@ -263,6 +295,12 @@ const Title = styled.h2`
   line-height: 16px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+`;
+
+const RoleRate = styled.div`
+  display: flex;
+  gap: 0.75em;
+  align-items: center;
 `;
 
 export default RoleModal;
