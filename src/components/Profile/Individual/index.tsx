@@ -13,7 +13,6 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import DatePicker from 'react-datepicker';
-import ReactCrop, { Crop } from 'react-image-crop';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
@@ -55,7 +54,6 @@ import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
-import 'react-image-crop/dist/ReactCrop.css';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -83,10 +81,6 @@ const IndividualProfile: React.FC<{
 
   // pfp
   const [pfpModalShow, setPfpModalShow] = useState<boolean>(false);
-  const [crop, setCrop] = useState<Crop>();
-  const [upImg, setUpImg] = useState<any>();
-  const [imgRef, setImgRef] = useState<any>(null);
-  const [completedCrop, setCompletedCrop] = useState<any>(null);
 
   // websites
   const [websiteId, setWebsiteId] = useState(1);
@@ -122,92 +116,6 @@ const IndividualProfile: React.FC<{
   const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
     setShowUp2Link(false);
-  };
-
-  const onImageLoaded = (image: any) => {
-    setImgRef(image);
-  };
-
-  const onCropComplete = (crop: Crop) => {
-    setCompletedCrop(crop);
-  };
-
-  const onCropChange = (crop: Crop) => {
-    setCrop(crop);
-  };
-
-  const getCroppedImg = (image: any, crop: any, src: string): Promise<Blob> => {
-    const canvas = document.createElement('canvas');
-    const scaleX = image.naturalWidth / image.width;
-    const scaleY = image.naturalHeight / image.height;
-    canvas.width = crop.width;
-    canvas.height = crop.height;
-    const ctx = canvas.getContext('2d');
-
-    ctx?.drawImage(
-      image,
-      crop.x * scaleX,
-      crop.y * scaleY,
-      crop.width * scaleX,
-      crop.height * scaleY,
-      0,
-      0,
-      crop.width,
-      crop.height
-    );
-
-    // Determine image type based on the original image src
-    let imageType = 'image/jpeg'; // Default to jpeg
-    if (src.endsWith('.png')) {
-      imageType = 'image/png';
-    } else if (src.endsWith('.gif')) {
-      imageType = 'image/gif';
-    }
-
-    return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (!blob) {
-          reject(new Error('Canvas is empty'));
-          return;
-        }
-        resolve(blob);
-      }, imageType);
-    });
-  };
-
-  const handleImageUpload = async () => {
-    if (completedCrop && imgRef) {
-      const croppedImageBlob = await getCroppedImg(
-        imgRef,
-        completedCrop,
-        profile?.data?.profile_image_url
-      );
-
-      const storageRef = ref(
-        firebaseStorage,
-        `/files-${editProfile?.uid}/${editProfile?.account_id}-${imgRef.name}`
-      );
-      const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          // Handle progress
-        },
-        (error) => {
-          console.error('Upload error:', error);
-        },
-        () => {
-          console.log('Uploaded successfully!');
-
-          // download url
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            console.log('Uploaded pfp image url:', url);
-            // setProfileForm profile_image_url
-          });
-        }
-      );
-    }
   };
 
   const updatePerformanceState = () => {
@@ -397,6 +305,26 @@ const IndividualProfile: React.FC<{
 
     setWebsiteId(newWebsiteId);
     setProfileForm('websites', newWebsiteInputs);
+  };
+
+  const updatePfpUrl = async () => {
+    const { profile_image_url } = editProfile;
+
+    try {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { profile_image_url });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    } catch (err) {
+      console.error('Error updating profile image', err);
+    }
+  };
+
+  const savePfpUrlModal = async (pfpImgUrl: string) => {
+    setProfileForm('profile_image_url', pfpImgUrl);
+    await updatePfpUrl();
   };
 
   const updatePersonalDetails = async () => {
@@ -924,15 +852,13 @@ const IndividualProfile: React.FC<{
             editProfile={editProfile}
             show={pfpModalShow}
             onHide={() => setPfpModalShow(false)}
-            onSave={(pfpImgUrl: string) =>
-              console.log('pfp image url:', pfpImgUrl)
-            }
+            onSave={(pfpImgUrl: string) => savePfpUrlModal(pfpImgUrl)}
           />
           <p>
             <a
               href="#"
               onClick={(e: React.MouseEvent<HTMLElement>) => {
-                e.preventDefault;
+                e.preventDefault();
                 setPfpModalShow(true);
               }}
             >

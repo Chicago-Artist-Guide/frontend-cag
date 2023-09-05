@@ -49,6 +49,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       // Convert crop to blob
       const imageEl =
         document.querySelector<HTMLImageElement>('.ReactCrop__image');
+
       if (imageEl && crop.width && crop.height) {
         const canvas = document.createElement('canvas');
         canvas.width = crop.width;
@@ -106,10 +107,15 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     }
   };
 
+  const saveImage = async (finalUrl: string) => {
+    await onSave(finalUrl);
+    onHide();
+  };
+
   return (
     <Modal show={show} onHide={onHide} backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>Change Profile Picture</Modal.Title>
+        <Modal.Title>Upload Picture</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {error && <Alert variant="danger">{error}</Alert>}
@@ -137,7 +143,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
         </Button>
         <Button
           variant="success"
-          onClick={() => onSave(imageUrl)}
+          onClick={() => saveImage(imageUrl)}
           disabled={!imageUrl}
         >
           Save
