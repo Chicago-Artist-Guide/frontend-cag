@@ -51,6 +51,7 @@ import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import AwardCard from './AwardCard';
 import IndividualUpcomingShow from './IndividualUpcomingShow';
 import IndividualCredits from './IndividualCredits';
+import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
@@ -81,6 +82,7 @@ const IndividualProfile: React.FC<{
   const [editAccount, setEditAccount] = useState(account?.data);
 
   // pfp
+  const [pfpModalShow, setPfpModalShow] = useState<boolean>(false);
   const [crop, setCrop] = useState<Crop>();
   const [upImg, setUpImg] = useState<any>();
   const [imgRef, setImgRef] = useState<any>(null);
@@ -917,16 +919,26 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          <ReactCrop
-            // src={profile?.data?.profile_image_url || upImg}
-            // onImageLoaded={onImageLoaded}
-            aspect={1}
-            crop={crop}
-            onChange={onCropChange}
-            onComplete={onCropComplete}
-          >
-            <ProfileImage src={profile?.data?.profile_image_url} fluid />
-          </ReactCrop>
+          <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          <ImageUploadModal
+            editProfile={editProfile}
+            show={pfpModalShow}
+            onHide={() => setPfpModalShow(false)}
+            onSave={(pfpImgUrl: string) =>
+              console.log('pfp image url:', pfpImgUrl)
+            }
+          />
+          <p>
+            <a
+              href="#"
+              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                e.preventDefault;
+                setPfpModalShow(true);
+              }}
+            >
+              Change Profile Picture
+            </a>
+          </p>
           <DetailsCard>
             <DetailsColTitle>
               <div>
