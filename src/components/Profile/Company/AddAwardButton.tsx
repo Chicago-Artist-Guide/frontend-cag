@@ -11,7 +11,7 @@ const AddAwardButton: React.FC<{
 }> = ({ onClick }) => {
   return (
     <Button
-      className="d-flex flex-column justify-content-center align-items-center ml-1"
+      className="d-flex flex-column justify-content-center align-items-center ml-1 mt-2"
       onClick={onClick}
     >
       <MainIcon src={Ribbon} />

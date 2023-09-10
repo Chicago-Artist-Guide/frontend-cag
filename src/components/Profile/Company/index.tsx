@@ -90,6 +90,8 @@ const CompanyProfile: React.FC<{
     }
   }
 
+  const awards = profileData?.awards || [];
+
   return (
     <PageContainer>
       <Row>
@@ -143,7 +145,31 @@ const CompanyProfile: React.FC<{
           {profileData?.description && <Bio>{profileData.description}</Bio>}
 
           <DetailSection title="Awards & Recognition">
-            <DetailAdd text="Add an award or recognition" />
+            {awards.map((award, index) => (
+              <div key={award.award_id}>
+                <AwardTitle>Award #{index + 1}</AwardTitle>
+                <div className="d-flex flex-column ml-4">
+                  <div className="row">
+                    <AwardLabel className="col-md-3">Award</AwardLabel>
+                    <div className="col">{award.award_name}</div>
+                  </div>
+                  <div className="row mt-2">
+                    <AwardLabel className="col-md-3">Awarded By: </AwardLabel>
+                    <div className="col">{award.awarded_by}</div>
+                  </div>
+                  <div className="row mt-2">
+                    <AwardLabel className="col-md-3">Year:</AwardLabel>
+                    <div className="col">{award.award_year}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
+            <div className="mt-3">
+              <DetailAdd
+                text="Add an award or recognition"
+                onClick={() => setEditing('profile')}
+              />
+            </div>
           </DetailSection>
           <DetailSection title="Active Shows">
             {productions?.active?.map((show) => (
@@ -166,6 +192,23 @@ const CompanyProfile: React.FC<{
     </PageContainer>
   );
 };
+
+const AwardTitle = styled.h3`
+  font-family: ${fonts.montserrat};
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: ${colors.mainFont};
+`;
+
+const AwardLabel = styled.span`
+  font-family: ${fonts.montserrat};
+  font-style: normal;
+  font-weight: 700;
+  font-size: 16px;
+`;
 
 const TheatreName = styled.h2`
   font-family: ${fonts.montserrat};

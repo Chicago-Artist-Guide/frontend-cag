@@ -1,4 +1,5 @@
 import { getDoc, updateDoc } from '@firebase/firestore';
+import { uuidv4 } from '@firebase/util';
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
 import React, { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
@@ -12,7 +13,6 @@ import PageContainer from '../../layout/PageContainer';
 import AdditionalPhoto from '../Form/AdditionalPhoto';
 import { FormInput, FormSelect, FormTextArea, Input } from '../Form/Inputs';
 import FormPhoto from '../Form/Photo';
-import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
 import AddAwardButton from './AddAwardButton';
 import {
@@ -24,8 +24,13 @@ import {
   RightCol,
   Title
 } from './ProfileStyles';
-import { Profile } from './types';
+import { Award, Profile } from './types';
 import { ErrorMessage } from '../../../utils/validation';
+import styled from 'styled-components';
+import { colors, fonts } from '../../../theme/styleVars';
+import DetailAdd from '../shared/DetailAdd';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const CompanyProfileEdit: React.FC<{
   toggleEdit: () => void;
@@ -36,6 +41,7 @@ const CompanyProfileEdit: React.FC<{
   } = useProfileContext();
   const [formValues, setFormValues] = useForm<Profile>({
     additional_photos: {},
+    awards: [],
     ...data
   });
   const locations = [
@@ -63,7 +69,8 @@ const CompanyProfileEdit: React.FC<{
     if (ref && JSON.stringify(data) !== JSON.stringify(formValues)) {
       const nextData = {
         ...data,
-        ...formValues
+        ...formValues,
+        awards: formValues.awards?.filter((award) => award.award_name) || []
       };
       await updateDoc(ref, nextData);
       const profileData = await getDoc(ref);
@@ -73,6 +80,38 @@ const CompanyProfileEdit: React.FC<{
   };
 
   const images = Array(6).fill(1);
+  const awards = formValues?.awards || [];
+
+  const handleAwardChange = (event: any, index: number, field: keyof Award) => {
+    const newAwards = [...awards];
+    newAwards[index][field] = event.target.value;
+    setFormValues({
+      target: {
+        name: 'awards',
+        value: newAwards
+      }
+    });
+  };
+
+  const removeAward = (index: number) => {
+    const newAwards = [...awards];
+    newAwards.splice(index, 1);
+    setFormValues({
+      target: {
+        name: 'awards',
+        value: newAwards
+      }
+    });
+  };
+
+  const addAward = () => {
+    setFormValues({
+      target: {
+        name: 'awards',
+        value: [...awards, { award_id: uuidv4(), award_name: '' }]
+      }
+    });
+  };
 
   return (
     <PageContainer>
@@ -173,13 +212,43 @@ const CompanyProfileEdit: React.FC<{
             />
 
             <DetailSection title="Awards & Recognition">
-              <AddAwardButton />
-            </DetailSection>
-            <DetailSection title="Active Shows">
-              <DetailAdd text="Add a new show" />
-            </DetailSection>
-            <DetailSection title="Inactive Shows">
-              <DetailAdd text="Add a new show" />
+              {awards.map((award, index) => (
+                <div key={index} className="mt-3">
+                  <div className="d-flex">
+                    <AwardTitle>Award #{index + 1}</AwardTitle>
+                    <CloseIcon
+                      icon={faClose}
+                      className="ml-auto"
+                      size="lg"
+                      onClick={() => removeAward(index)}
+                    />
+                  </div>
+                  <FormInput
+                    name={`awards.${index}.award_name`}
+                    label="Award Name"
+                    defaultValue={award.award_name}
+                    onChange={(e) => handleAwardChange(e, index, 'award_name')}
+                  />
+                  <FormInput
+                    name={`awards.${index}.award_year`}
+                    label="Award Year"
+                    defaultValue={award.award_year}
+                    onChange={(e) => handleAwardChange(e, index, 'award_year')}
+                  />
+                  <FormInput
+                    name={`awards.${index}.awarded_by`}
+                    label="Awarded By"
+                    defaultValue={award.awarded_by}
+                    onChange={(e) => handleAwardChange(e, index, 'awarded_by')}
+                  />
+                </div>
+              ))}
+              <div className="mt-4">
+                <DetailAdd
+                  text="Add an award or recognition"
+                  onClick={addAward}
+                />
+              </div>
             </DetailSection>
           </RightCol>
         </Row>
@@ -187,5 +256,23 @@ const CompanyProfileEdit: React.FC<{
     </PageContainer>
   );
 };
+
+const AwardTitle = styled.h2`
+  font-family: ${fonts.montserrat};
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: ${colors.mainFont};
+`;
+
+const CloseIcon = styled(FontAwesomeIcon)`
+  color: ${colors.black};
+  cursor: pointer;
+  &:hover {
+    color: ${colors.slate};
+  }
+`;
 
 export default CompanyProfileEdit;
