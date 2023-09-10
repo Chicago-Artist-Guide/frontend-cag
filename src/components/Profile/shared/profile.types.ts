@@ -15,3 +15,7 @@ export type ProductionStatus =
 export type RoleStatus = 'Open' | 'Closed';
 
 export type EnumType = { [s: string]: string };
+
+export type StringArrayKeyValues<T> = {
+  [K in keyof T]: T[K] extends string[] ? { key: K; value: T[K] } : never;
+}[keyof T];

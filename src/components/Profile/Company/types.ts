@@ -19,6 +19,14 @@ export type Profile = {
   theatre_name: string;
   uid: string;
   shows?: Production[];
+  awards?: Award[];
+};
+
+export type Award = {
+  award_id: string;
+  award_name: string;
+  award_year: string;
+  awarded_by: string;
 };
 
 export type Production = {

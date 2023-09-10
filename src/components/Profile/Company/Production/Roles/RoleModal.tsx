@@ -11,6 +11,7 @@ import { FormInput, FormTextArea } from '../../../Form/Inputs';
 import { StageRole } from '../../../shared/profile.types';
 import { Role } from '../../types';
 import {
+  additionalRequirements,
   ageRanges,
   ethnicities,
   genders,
@@ -62,17 +63,13 @@ const RoleModal: React.FC<{
     setFormValues({});
   };
 
-  const title = type === 'On-Stage' ? 'On-Stage Role' : 'Off-Stage Role';
-  const isAgeRangeInAgeRanges = (ageRange: string) => {
-    return formValues.age_range?.includes(ageRange);
-  };
+  const isOnStage = type === 'On-Stage';
+  const title = isOnStage ? 'On-Stage Role' : 'Off-Stage Role';
 
-  const isGenderInGenders = (gender: string) => {
-    return formValues.gender_identity?.includes(gender);
-  };
-
-  const isEthnicityInEthnicities = (ethnicity: string) => {
-    return formValues.ethnicity?.includes(ethnicity);
+  const isValueIncluded = (field: keyof Role, value: string) => {
+    const fieldValue = formValues[field] as string[];
+    if (!fieldValue) return false;
+    return fieldValue.includes(value);
   };
 
   const onDeleteConfirm = () => {
@@ -124,8 +121,8 @@ const RoleModal: React.FC<{
                   defaultValue={formValues?.description}
                   rows={6}
                 />
-                <Form.Group className="form-group">
-                  <CAGLabel>Role Rate</CAGLabel>
+                <Form.Group className="form-group" style={{ marginTop: 30 }}>
+                  <CAGLabel>Pay</CAGLabel>
                   <RoleRate>
                     <FormInput
                       name="rate_rate"
@@ -156,15 +153,15 @@ const RoleModal: React.FC<{
                     />
                   </RoleRate>
                 </Form.Group>
-                <Form.Group className="form-group" style={{ marginTop: 20 }}>
+                <Form.Group className="form-group" style={{ marginTop: 30 }}>
                   <CAGLabel>Gender Identity</CAGLabel>
                   {genders.map((gender) => (
                     <Checkbox
-                      checked={isGenderInGenders(gender)}
+                      checked={isValueIncluded('gender_identity', gender)}
                       fieldType="checkbox"
                       key={`gender_identity_${gender}`}
                       label={gender}
-                      name={`${gender}`}
+                      name={gender}
                       onChange={(e: any) => {
                         let genders = formValues.gender_identity || [];
                         const selected = e.target.name;
@@ -183,6 +180,42 @@ const RoleModal: React.FC<{
                     />
                   ))}
                 </Form.Group>
+
+                <Form.Group className="form-group" style={{ marginTop: 30 }}>
+                  <CAGLabel>Additional Requirements</CAGLabel>
+                  {additionalRequirements.map((requirement) => (
+                    <Checkbox
+                      checked={isValueIncluded(
+                        'additional_requirements',
+                        requirement
+                      )}
+                      fieldType="checkbox"
+                      key={`additional_requirements_${requirement}`}
+                      label={requirement}
+                      name={requirement}
+                      onChange={(e: any) => {
+                        let additionalRequirements =
+                          formValues.additional_requirements || [];
+                        const selected = e.target.name;
+                        if (
+                          additionalRequirements.includes(requirement) &&
+                          !e.target.checked
+                        ) {
+                          additionalRequirements =
+                            additionalRequirements?.filter(
+                              (range) => range !== requirement
+                            );
+                        } else if (e.target.checked) {
+                          additionalRequirements.push(selected);
+                        }
+                        setFormValues({
+                          ...formValues,
+                          additional_requirements: additionalRequirements
+                        });
+                      }}
+                    />
+                  ))}
+                </Form.Group>
               </Col>
               <Col lg={{ span: 4, offset: 1 }}>
                 <Dropdown
@@ -193,45 +226,47 @@ const RoleModal: React.FC<{
                   onChange={setFormState}
                   style={{ marginTop: 0 }}
                 />
-                <Form.Group className="form-group" style={{ marginTop: 20 }}>
-                  <CAGLabel>Age Range</CAGLabel>
-                  {ageRanges.map((ageRange) => (
-                    <Checkbox
-                      checked={isAgeRangeInAgeRanges(ageRange)}
-                      fieldType="checkbox"
-                      key={`age_range_${ageRange}`}
-                      label={ageRange}
-                      name={`${ageRange}`}
-                      onChange={(e: any) => {
-                        let ageRanges = formValues.age_range || [];
-                        const selectedRange = e.target.name;
-                        if (
-                          ageRanges?.includes(ageRange) &&
-                          !e.target.checked
-                        ) {
-                          ageRanges = ageRanges?.filter(
-                            (range) => range !== ageRange
-                          );
-                        } else if (e.target.checked) {
-                          ageRanges.push(selectedRange);
-                        }
-                        setFormValues({
-                          ...formValues,
-                          age_range: ageRanges
-                        });
-                      }}
-                    />
-                  ))}
-                </Form.Group>
+                {isOnStage && (
+                  <Form.Group className="form-group" style={{ marginTop: 20 }}>
+                    <CAGLabel>Age Range</CAGLabel>
+                    {ageRanges.map((ageRange) => (
+                      <Checkbox
+                        checked={isValueIncluded('age_range', ageRange)}
+                        fieldType="checkbox"
+                        key={`age_range_${ageRange}`}
+                        label={ageRange}
+                        name={ageRange}
+                        onChange={(e: any) => {
+                          let ageRanges = formValues.age_range || [];
+                          const selectedRange = e.target.name;
+                          if (
+                            ageRanges?.includes(ageRange) &&
+                            !e.target.checked
+                          ) {
+                            ageRanges = ageRanges?.filter(
+                              (range) => range !== ageRange
+                            );
+                          } else if (e.target.checked) {
+                            ageRanges.push(selectedRange);
+                          }
+                          setFormValues({
+                            ...formValues,
+                            age_range: ageRanges
+                          });
+                        }}
+                      />
+                    ))}
+                  </Form.Group>
+                )}
                 <Form.Group className="form-group" style={{ marginTop: 20 }}>
                   <CAGLabel>Ethnicity</CAGLabel>
                   {ethnicities.map((ethnicity) => (
                     <Checkbox
-                      checked={isEthnicityInEthnicities(ethnicity)}
+                      checked={isValueIncluded('ethnicity', ethnicity)}
                       fieldType="checkbox"
                       key={`age_range_${ethnicity}`}
                       label={ethnicity}
-                      name={`${ethnicity}`}
+                      name={ethnicity}
                       onChange={(e: any) => {
                         let ethnicities = formValues.ethnicity || [];
                         const selectedRange = e.target.name;
@@ -298,6 +333,7 @@ const Title = styled.h2`
 `;
 
 const RoleRate = styled.div`
+  margin-top: -30px;
   display: flex;
   gap: 0.75em;
   align-items: center;
