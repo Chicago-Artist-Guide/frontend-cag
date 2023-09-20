@@ -187,7 +187,7 @@ const IndividualProfile: React.FC<{
       // Clean up the subscription on unmount
       return () => unsubscribeProfile();
     }
-  }, [profile.ref, setProfileData]);
+  }, []); // removing profile.ref to save calls to firebase
 
   useEffect(() => {
     if (account.ref) {
@@ -206,7 +206,7 @@ const IndividualProfile: React.FC<{
       // Clean up the subscription on unmount
       return () => unsubscribeAccount();
     }
-  }, [account.ref, setAccountData]);
+  }, []); // removing account.ref to save calls to firebase
 
   const onEditModeClick = (
     e: React.MouseEvent<HTMLElement>,
