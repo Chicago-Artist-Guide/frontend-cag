@@ -18,10 +18,11 @@ const requiredFields = ['theatreName', 'emailAddress', 'password'];
 
 const CompanyBasics: React.FC<{
   stepId: string;
+  errors: { [key: string]: string };
   setForm: SetForm;
   formValues: CompanyData;
   setStepErrors: (step: string, hasErrors: boolean) => void;
-}> = ({ stepId, setForm, formValues, setStepErrors }) => {
+}> = ({ stepId, setForm, formValues, errors, setStepErrors }) => {
   const { theatreName, emailAddress, password } = formValues;
 
   useEffect(() => {
@@ -47,6 +48,7 @@ const CompanyBasics: React.FC<{
               placeholder="Theatre Name"
               hasErrorCallback={setStepErrors}
               name="theatreName"
+              error={errors.theatreName}
               onChange={setForm}
               requiredLabel="Theatre name"
               value={theatreName || ''}
@@ -57,6 +59,7 @@ const CompanyBasics: React.FC<{
               placeholder="Email Address"
               name="emailAddress"
               onChange={setForm}
+              error={errors.emailAddress}
               requiredLabel="Email address"
               validationRegexMessage={ErrorMessage.EmailFormat}
               validationRegexName="emailAddress"
@@ -69,6 +72,7 @@ const CompanyBasics: React.FC<{
               placeholder="Password"
               name="password"
               onChange={setForm}
+              error={errors.password}
               requiredLabel="Password"
               validationRegexMessage={ErrorMessage.PasswordsRules}
               validationRegexName="password"

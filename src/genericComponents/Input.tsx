@@ -53,6 +53,7 @@ type Props = {
   validationRegexName?: keyof typeof validationRegex;
   value?: string | number;
   first?: boolean;
+  error?: string | null;
 } & Omit<FormProps, 'onChange'>;
 
 const InputField = (props: Props) => {
@@ -71,6 +72,7 @@ const InputField = (props: Props) => {
     hasErrorCallback,
     helperText,
     value,
+    error,
     first = false,
     ...rest
   } = props;
@@ -135,7 +137,7 @@ const InputField = (props: Props) => {
       hasErrorsCall(numFuncErrors > 0);
     } else if (validationRegexName) {
       // 2. then care about regex
-      if (!validateRegex(validationRegexName, (value as string) as string)) {
+      if (!validateRegex(validationRegexName, value as string as string)) {
         setHasError(true);
         setErrorMessage(validationRegexMessage || ErrorMessage.Default);
         hasErrorsCall(true);
@@ -154,7 +156,13 @@ const InputField = (props: Props) => {
         resetErrorState();
       }
     }
-  }, [value]); // eslint-disable-line react-hooks/exhaustive-deps
+
+    if (error) {
+      setHasError(true);
+      setErrorMessage(error);
+      hasErrorsCall(true);
+    }
+  }, [value, error]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const marginTop = first ? '0' : '25px';
 

@@ -13,6 +13,7 @@ const SignUpFooter: React.FC<{
   setLandingStep: (x: number) => void;
   formStep: FormStep;
   steps: Step[];
+  setErrors: (step: string, hasErrors: boolean) => void;
   submitBasics: () => Promise<SubmitResponse>;
   completeSignUp: () => Promise<void>;
   stepErrors: { [key: string]: boolean };
@@ -23,21 +24,22 @@ const SignUpFooter: React.FC<{
   steps,
   submitBasics,
   stepErrors,
+  setErrors,
   completeSignUp
 }) => {
   const history = useHistory();
   const { next, previous } = navigation;
-  const stepIndex = steps.findIndex(step => step.id === formStep);
+  const stepIndex = steps.findIndex((step) => step.id === formStep);
   const nextText = formStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
   const onNextClick = async () => {
+    console.log('onNextClick', formStep);
     if (formStep === 'basics') {
       const submitted = await submitBasics();
       if (submitted.ok) {
         next();
-        return;
       }
-      previous?.();
+      return;
     }
 
     if (formStep === 'photo') {

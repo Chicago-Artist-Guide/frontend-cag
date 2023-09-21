@@ -37,25 +37,25 @@ const CompanyPhoto: React.FC<{
 
     const storageRef = ref(
       firebaseStorage,
-      `/files-${data.account_id}/${file.name}`
+      `/files-${data?.account_id}/${file.name}`
     );
     const uploadTask = uploadBytesResumable(storageRef, file);
 
     uploadTask.on(
       'state_changed',
-      snapshot => {
+      (snapshot) => {
         const percent = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
         setPercent(percent);
       },
-      err => {
+      (err) => {
         console.log('Error uploading image', err);
         setUploadInProgress(false);
       },
       () => {
         setUploadInProgress(false);
-        getDownloadURL(uploadTask.snapshot.ref).then(url => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           setImgUrl(url);
           const target = {
             name: 'profilePhotoUrl',

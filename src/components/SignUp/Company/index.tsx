@@ -25,6 +25,7 @@ const CompanySignUp: React.FC<{
   const { lglApiKey } = useMarketingContext();
   const [formValues, setFormValues] = useForm<CompanyData>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);
+  const [errors, setErrors] = useState({});
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
   const { step, navigation } = useStep({
@@ -34,14 +35,27 @@ const CompanySignUp: React.FC<{
   const stepId = (step as Step).id as FormStep;
 
   const handleSubmitBasics: () => Promise<SubmitResponse> = async () => {
+    let userResponse;
+
+    const { emailAddress, password, theatreName } = formValues;
+
     try {
-      const { emailAddress, password, theatreName } = formValues;
-      const response = await createUserWithEmailAndPassword(
+      setErrors({});
+      userResponse = await createUserWithEmailAndPassword(
         firebaseAuth,
         emailAddress,
         password
       );
-      const userId = response.user.uid;
+    } catch (err) {
+      setErrors((prev) => ({
+        ...prev,
+        emailAddress: 'Email is already in use'
+      }));
+      return { ok: false };
+    }
+
+    try {
+      const userId = userResponse.user.uid;
       const account = await addDoc(collection(firebaseFirestore, 'accounts'), {
         uid: userId,
         type: 'company',
@@ -70,11 +84,11 @@ const CompanySignUp: React.FC<{
 
       const nextSteps = steps.filter((s) => s.id !== 'basics');
       setSteps(nextSteps);
+      return { ok: true };
     } catch (e) {
       console.error('Error adding document:', e);
+      return { ok: false };
     }
-
-    return { ok: true };
   };
 
   const completeSignUp = async () => {
@@ -106,6 +120,7 @@ const CompanySignUp: React.FC<{
       stepId,
       navigation,
       formValues,
+      errors,
       setForm: setFormValues,
       setStepErrors: setStepErrorsCallback
     };
@@ -134,6 +149,7 @@ const CompanySignUp: React.FC<{
         formStep={stepId}
         stepErrors={stepErrors}
         steps={defaultSteps}
+        setErrors={setErrors}
         submitBasics={handleSubmitBasics}
         completeSignUp={completeSignUp}
       />

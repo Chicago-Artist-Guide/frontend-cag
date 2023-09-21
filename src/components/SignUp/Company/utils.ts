@@ -1,12 +1,12 @@
 import { Step } from 'react-hooks-helper';
 import { FormStep } from './types';
 
-export const formSteps: FormStep[] = ['basics', 'details', 'privacy', 'photo'];
+export const formSteps: FormStep[] = ['basics', 'privacy', 'details', 'photo'];
 
-export const defaultSteps: Step[] = formSteps.map(step => ({ id: step }));
+export const defaultSteps: Step[] = formSteps.map((step) => ({ id: step }));
 
 export const flattenSteps = (steps: Step[]) => {
-  return steps.map(step => step.id as FormStep) as FormStep[];
+  return steps.map((step) => step.id as FormStep) as FormStep[];
 };
 
 export const defaultErrorState = formSteps.reduce(
@@ -17,7 +17,7 @@ export const defaultErrorState = formSteps.reduce(
 };
 
 export const checkForErrors = <T>(requiredFields: string[], formValues: T) => {
-  return requiredFields.some(field => {
+  return requiredFields.some((field) => {
     return !formValues[field as keyof T] as boolean;
   });
 };
