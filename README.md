@@ -5,7 +5,7 @@ This is a React application using TypeScript, Bootstrap, and Styled-Components.
 
 ### Instructions
 
-Before you run this app, make sure you're using Node Version Manager (NVM) and are using at least Node v18.12.1 (`nvm install 18.12.1` and `nvm use 18.12.1`)
+Before you run this app, make sure you're using Node Version Manager (NVM) and are using at least Node v18.13.0 (`nvm install 18.13.0` and `nvm use 18.13.0`)
 
 **Running this app:**
 1. `npm install`
