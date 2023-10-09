@@ -202,16 +202,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Jordin Jewell',
-      role: 'Co-Marketing Manager',
-      pronouns: 'she/her',
-      affilitation: 'Founder, West Loop Soul',
-      image: JewellJordin,
-      linkedin: 'jordinjewell',
-      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That’s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She’s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she’s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
-    },
-    {
-      id: bioId(),
       name: 'Alexandria Alyse Moorman',
       role: 'Development Manager',
       pronouns: 'she/her',
@@ -233,7 +223,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Brianna Walton',
-      role: 'Co-Marketing Manager',
+      role: 'Marketing Manager',
       pronouns: 'she/her',
       affilitation: null,
       image: Walton,
@@ -274,7 +264,7 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Grace Desant',
+      name: 'Grace DeSant',
       role: 'Designer',
       pronouns: 'she/her',
       affiliation: null,
@@ -316,6 +306,16 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Jordin Jewell',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affilitation: 'Founder, West Loop Soul',
+      image: JewellJordin,
+      linkedin: 'jordinjewell',
+      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That’s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She’s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she’s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
+    },
+    {
+      id: bioId(),
       name: 'Carlene Liriano',
       role: 'Advisory Board Member',
       pronouns: 'she/her',
@@ -329,10 +329,21 @@ const bios = {
       name: 'Luciana Mendez Gonzalez',
       role: 'Advisory Board Member',
       pronouns: 'she/her',
-      affiliation: 'Software Engineer',
+      affiliation: 'Data Engineer',
       image: MendezGonzalez,
-      linkedin: 'lucianamendezg',
-      bio: 'is a software engineer and was the founding Technical Lead for Chicago Artist Guide. She graduated from DePaul University, cum laude, with a degree in mathematics and computer science, with concentrations in pure math, image processing and theory of computation. She works as an Appraiser On-Boarding Coordinator and has experience in image processing, cybersecurity, and web development. Her favorite musical is Hairspray.'
+      linkedin: 'lmg25',
+      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
+    },
+    {
+      id: bioId(),
+      name: 'Adebayo Onigbanjo',
+      role: 'Advisory Board Member',
+      pronouns: 'he/him',
+      affiliation:
+        'Director of Digital Strategy and Product Planning, Cummins Inc.',
+      image: Onigbanjo,
+      linkedin: 'aonigbanjo',
+      bio: 'helps to position businesses for what’s next and brings unique insights into the growing power of new markets on breakthrough innovation and business transformation. \n\nAdebayo is the principal Internet of Things platforms and applications for Wabtec – A GE Transportation company, where he sets both the technical and commercial strategies and processes to transform a century old industry as well as enabled a truly inter-modal solution by bringing Internet of Things, mobility and cloud solutions to customers. \nHe has a background in computer science and data communication systems with over 20 years working experience from Motorola, MTN, Zebra Technologies and GE. \n\nAdebayo holds executive advisor roles at both startups and global technology brands, he is a member of the Internet of Things advisory board to the city of Chicago, a mentor at M-Hub, co-founder of SpectaPLAY, a founding member of the Institute for African Future, and an advisor to several governments. Connect on LinkedIn and Twitter.'
     },
     {
       id: bioId(),
