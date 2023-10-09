@@ -135,7 +135,7 @@ const bios = {
       pronouns: 'he/him',
       affiliation: null,
       image: Ferro,
-      linkedin: null,
+      linkedin: 'vanferro',
       bio: 'is honored to be part of the Artists Board at Chicago Artist Guide. He is a professional stage and screen actor in Chicago, IL who is passionate with finding ways to help make Chicago theater more diverse, as well as to support new work in theater. Recent selected theater collaboration with Oil Lamp Theater, Sigman Brothers, Three Cat Productions, and Act Your Page. Van also won two BroadwayWorld Chicago Awards for performance in 2021. @therealvanferro'
     },
     {
@@ -145,7 +145,7 @@ const bios = {
       pronouns: 'he/him',
       affiliation: null,
       image: Silva,
-      linkedin: null,
+      linkedin: 'rj-silva-3080b178',
       bio: "is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ's Food Rocks."
     },
     {
@@ -163,7 +163,7 @@ const bios = {
       name: 'Celine Foster',
       role: 'Artist Board Member',
       pronouns: 'she/her',
-      affiliation: '',
+      affiliation: null,
       image: Foster,
       linkedin: 'celine-foster-b19414149',
       bio: 'is a recent graduate of Stanford University, where she received her Bachelors of Arts in Science, Technology, and Society with an emphasis in Media and Communication Studies. Celine hopes to continue her previous work in bolstering equity by supporting the growth of the Chicago Artist Guide.'
@@ -185,7 +185,7 @@ const bios = {
       pronouns: 'she/her',
       affiliation: null,
       image: Stiles,
-      linkedin: null,
+      linkedin: 'rachelannestiles',
       bio: "is a theatre professional and artist working in Milwaukee and Chicago with a specially in wigs and makeup. Her resume includes Lyric Opera of Chicago, Florentine Opera, Central City Opera, Broadway in Milwaukee, and The Milwaukee Rep, among others. A midwest girl at heart, her passion is helping people get a head's start in working in the arts, no matter their background. She created Stage Creatives Network to help theatre professionals find peace, prosperity and joy through the 4 pillars of a sustainable career: connection, financial literacy, work-life balance and self expression. If it's all about who you know, let's get to know each other!"
     }
   ],
