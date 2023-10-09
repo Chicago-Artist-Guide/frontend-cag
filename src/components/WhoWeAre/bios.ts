@@ -3,8 +3,10 @@ import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
 import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import White from '../../images/who-we-are/board/Board_White.png';
+import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
 import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
+import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 
 //Artist Auxiliary Board
 import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
@@ -53,6 +55,17 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Zeke Dolezalek',
+      role: 'Vice President',
+      pronouns: 'he/him',
+      affiliation:
+        'Human Resources & Recruitment Manager, Corner Table Restaurants',
+      image: Dolezalek,
+      linkedin: 'iamzeked',
+      bio: 'In the workplace or in the community, Zeke has a passion for creating spaces in which people can thrive. As a People & Culture professional, Zeke strives to unite people together by encouraging conversations and empowering others. Over the course of his time at What if Syndicate, Zeke has overseen a near 200% increase of staff, over 6 new property openings, labor laws and employee relations in over 5 markets, and growth and development planning for several leaders and operators within our brands.\n\nWith a BFA in Musical Theatre from the Chicago College of Performing Arts, Zeke has spent time actively involved in the Chicago theatre community both on and off-stage. As a professional photographer, Zeke specializes in headshots, events, and production photography/B-roll. @iAmZekeD'
+    },
+    {
+      id: bioId(),
       name: 'Tatum Lee',
       role: 'Secretary',
       pronouns: 'she/her',
@@ -74,14 +87,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Adebayo Onigbanjo',
-      role: 'Fundraising Chair',
-      pronouns: 'he/him',
-      affiliation:
-        'Director of Digital Strategy and Product Planning, Cummins Inc.',
-      image: Onigbanjo,
-      linkedin: 'aonigbanjo',
-      bio: 'helps to position businesses for what’s next and brings unique insights into the growing power of new markets on breakthrough innovation and business transformation. \n\nAdebayo is the principal Internet of Things platforms and applications for Wabtec – A GE Transportation company, where he sets both the technical and commercial strategies and processes to transform a century old industry as well as enabled a truly inter-modal solution by bringing Internet of Things, mobility and cloud solutions to customers. \nHe has a background in computer science and data communication systems with over 20 years working experience from Motorola, MTN, Zebra Technologies and GE. \n\nAdebayo holds executive advisor roles at both startups and global technology brands, he is a member of the Internet of Things advisory board to the city of Chicago, a mentor at M-Hub, co-founder of SpectaPLAY, a founding member of the Institute for African Future, and an advisor to several governments. Connect on LinkedIn and Twitter.'
+      name: 'Emily Adler',
+      role: 'Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Chef/Owner, The Buttery Babe',
+      image: Adler,
+      linkedin: 'emily-adler-8830659',
+      bio: 'is a Chicago-area chef and hospitality jill-of-all trades.  After years in high end, fast paced hotels and catering, Emily moved on to running a 15 room bed and breakfast with a 50 seat restaurant in upstate New York.  Upon her return to Chicago, Emily focused on raising the standard of dining in the elder care sector.  Five years of managing cheese shops and grocery stores rounds out her resume.  She now enjoys catering small dinners with curated beverage pairings, working in her organic vegetable garden and support various non-profit organizations.'
     },
     {
       id: bioId(),
@@ -96,17 +108,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Zeke Dolezalek',
-      role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation:
-        'Human Resources & Recruitment Manager, Corner Table Restaurants',
-      image: Dolezalek,
-      linkedin: 'iamzeked',
-      bio: 'In the workplace or in the community, Zeke has a passion for creating spaces in which people can thrive. As a People & Culture professional, Zeke strives to unite people together by encouraging conversations and empowering others. Over the course of his time at What if Syndicate, Zeke has overseen a near 200% increase of staff, over 6 new property openings, labor laws and employee relations in over 5 markets, and growth and development planning for several leaders and operators within our brands.\n\nWith a BFA in Musical Theatre from the Chicago College of Performing Arts, Zeke has spent time actively involved in the Chicago theatre community both on and off-stage. As a professional photographer, Zeke specializes in headshots, events, and production photography/B-roll. @iAmZekeD'
-    },
-    {
-      id: bioId(),
       name: 'Erin Mitchell',
       role: 'Board Member',
       pronouns: 'she/her',
@@ -114,6 +115,16 @@ const bios = {
       image: Mitchell,
       linkedin: 'erin-m-6749b28',
       bio: "holds a bachelor's degree in Computer Information Systems from DeVry University. She worked with the American Red Cross in the Information Technology (IT) department for twelve years. In her twelve years with the Red Cross, she has gained experience from helpdesk support to project coordination. Wearing many hats, she has acquired skills such as relationship management, documentation development, problem-solving, organization and planning, and operations management. The skills she acquired during her time at the Red Cross has equipped her to excel in any role and position she steps into. Recently acquiring her master's degree in Nonprofit Management from DePaul University, Erin started her second business, Erin Mitchell Consulting, where she consults small businesses and nonprofit organizations in various capacities. The arts is an area in the nonprofit world that Erin is excited to learn more about and see how she can effectively support artists in the Chicagoland area. She is a member of the Chicago Women in Philanthropy. She was inducted into the Pi Alpha Alpha of Global Honor Society for Public Affairs and Administration and received the Degree Chair Award from DePaul University."
+    },
+    {
+      id: bioId(),
+      name: 'Alicia Webb',
+      role: 'Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Principal, Bright Spot Public Relations',
+      image: Webb,
+      linkedin: 'alicia-webb-3536784',
+      bio: 'is an award-winning marketing and communications professional with experience in a wide variety of industries including politics, manufacturing, and pharmaceuticals. A former journalist, she loves telling stories about people doing extraordinary things. She began her career as a general assignment reporter with ABC News in Maryland. She previously worked as a personal shopper and event specialist with Macy’s. Alicia has also held roles in media relations, event planning and brand management with several organizations including BCBG Max Azria and Baxter Healthcare Corporation. She holds a B.A. in Journalism and Political Science from Indiana University. Alicia is also a certified life coach. She currently serves as a mentor for the Good Food Accelerator, where she helps entrepreneurs build and establish their businesses. Alicia loves news, sports, travel, politics, Chicago’s theatre and art scene and all things related to pop culture. She serves on the Board of Directors for the Chicago Chapter of the Indiana University Alumni Association. She is also a member of the Indiana University Media School Alumni Board. Most recently, Alicia was a board member for BoHo Theatre.'
     }
   ],
   artists: [
