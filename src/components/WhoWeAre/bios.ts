@@ -1,40 +1,39 @@
-// Board Images
-import Bradford from '../../images/who-we-are/board/Board_Bradford.jpg';
-import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
-import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
-import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
-import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
-import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
-import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
-import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
+// Board of Directors
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
-import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
-import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
-import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
-import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
-import Silva from '../../images/who-we-are/board/Board_Silva.png';
-import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
-import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
-import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
+import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
+import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import White from '../../images/who-we-are/board/Board_White.png';
+import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
+import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
 
-// Operations Images
-import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
-import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
+//Artist Auxiliary Board
+import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
+import Silva from '../../images/who-we-are/board/Board_Silva.png';
+import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
+import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
+import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
+import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
+
+// Business Operations
+import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
+import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
+import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Walz from '../../images/who-we-are/operations/Staff_Walz.png';
-import Zacks from '../../images/who-we-are/board/Board_Zacks.png';
 
-// Technical Images
+// Site Development
+import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
-import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
-import Nagra from '../../images/who-we-are/technical/Staff_Nagra.png';
-import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
 
-// Artists Images
-import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
+// Advisory Board
+import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
+import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
+import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
+import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
+import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
+import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
 
 const bioId = () => (<any>crypto).randomUUID();
@@ -97,16 +96,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Tommy J. Bradford',
-      role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation: 'Educator, Chicago Public Schools',
-      image: Bradford,
-      linkedin: 'tommy-bradford-b77475a',
-      bio: "is a saxophonist, Entrepreneur and Educator. He is a focused musician and artistic leader with a proven record for fostering deep emotional connections through exceptional musical performance and artistic and professional leadership. This fundamental idea is what keeps him constantly developing his philosophy, knowledge and abilities to connect people. Growing up in Chicago, he's had the privilege of hearing a variety of music and has absorbed a tremendous amount of Chicago's artistic culture. As a youth, Tommy began his musical path in elementary school playing throughout high school and later graduating from Columbia College in Chicago, 2003, with a B.A in Music Business. In 2013, he received an MEd from the University of Illinois at Chicago in Instructional Leadership and has several State of Illinois certifications in teaching Middle School, ELL & Music Education. A portion of his focus has been in developing and implementing both curriculum and artistic programming in the Chicago school systems, and creating artistic partnerships that provide creative learning environments and outlets using music and art from diverse cultural backgrounds. He is presently the Director of General Music for Barry Elementary and is a recent appointee of the Board of Directors for the Chicago Artists Guide."
-    },
-    {
-      id: bioId(),
       name: 'Zeke Dolezalek',
       role: 'Board Member',
       pronouns: 'he/him',
@@ -125,16 +114,6 @@ const bios = {
       image: Mitchell,
       linkedin: 'erin-m-6749b28',
       bio: "holds a bachelor's degree in Computer Information Systems from DeVry University. She worked with the American Red Cross in the Information Technology (IT) department for twelve years. In her twelve years with the Red Cross, she has gained experience from helpdesk support to project coordination. Wearing many hats, she has acquired skills such as relationship management, documentation development, problem-solving, organization and planning, and operations management. The skills she acquired during her time at the Red Cross has equipped her to excel in any role and position she steps into. Recently acquiring her master's degree in Nonprofit Management from DePaul University, Erin started her second business, Erin Mitchell Consulting, where she consults small businesses and nonprofit organizations in various capacities. The arts is an area in the nonprofit world that Erin is excited to learn more about and see how she can effectively support artists in the Chicagoland area. She is a member of the Chicago Women in Philanthropy. She was inducted into the Pi Alpha Alpha of Global Honor Society for Public Affairs and Administration and received the Degree Chair Award from DePaul University."
-    },
-    {
-      id: bioId(),
-      name: 'Steven Zacks',
-      role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation: 'Product Manager, Trajecktory',
-      image: Zacks,
-      linkedin: 'stevenzacks',
-      bio: 'is a Product Manager, building software for the mortgage industry. Now based in Chicago, he has a BA in Economics from Fordham University and a J.D. from Washington University in St. Louis. Prior to moving to Chicago two years ago, Steven was a producer in Los Angeles, focusing mostly on documentaries and virtual reality experiences. His life goal is to steal a cape from Andrew Lloyd Webber.'
     }
   ],
   artists: [
@@ -252,16 +231,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Steven Zacks',
-      role: 'Head of Platform',
-      pronouns: 'he/him',
-      affiliation: null,
-      image: Zacks,
-      linkedin: 'stevenzacks',
-      bio: 'is a Product Manager, building software for the mortgage industry. Now based in Chicago, he has a BA in Economics from Fordham University and a J.D. from Washington University in St. Louis. Prior to moving to Chicago two years ago, Steven was a producer in Los Angeles, focusing mostly on documentaries and virtual reality experiences. His life goal is to steal a cape from Andrew Lloyd Webber.'
-    },
-    {
-      id: bioId(),
       name: 'Missy Staros',
       role: 'Grant Writer',
       pronouns: 'she/her',
@@ -321,16 +290,6 @@ const bios = {
       image: Hoskins,
       linkedin: 'alanhoskins',
       bio: 'is a software engineer based out of Indianapolis. He has always had a passion for technology. With expertise in developing web applications, Alan is dedicated to finding effective solutions to unique challenges and contributing to the growth of his company.'
-    },
-    {
-      id: bioId(),
-      name: 'Gisselle Nagra',
-      role: 'Designer',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Nagra,
-      linkedin: 'gissellenagra',
-      bio: "received her BA in Psychology at the University of California, Berkeley. She approaches design with a focus on people, establishing empathy for those who create and use the product. Gisselle strives to take every opportunity to prioritize equity in her design process and continue to grow as a UX/UI Designer. She's excited to use her skills to create beautiful and meaningful work here at CAG. When she's not designing, Gisselle enjoys spending time with loved ones and immersing herself in new adventures!"
     }
   ],
   artistAdvisory: [
