@@ -1,40 +1,41 @@
-// Board Images
-import Bradford from '../../images/who-we-are/board/Board_Bradford.jpg';
-import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
-import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
-import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
-import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
-import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
-import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
-import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
+// Board of Directors
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
-import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
-import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
-import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
-import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
-import Silva from '../../images/who-we-are/board/Board_Silva.png';
-import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
-import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
-import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
+import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
+import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import White from '../../images/who-we-are/board/Board_White.png';
+import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
+import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
+import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
+import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 
-// Operations Images
-import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
-import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
+//Artist Auxiliary Board
+import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
+import Silva from '../../images/who-we-are/board/Board_Silva.png';
+import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
+import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
+import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
+import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
+
+// Business Operations
+import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
+import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
+import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Walz from '../../images/who-we-are/operations/Staff_Walz.png';
-import Zacks from '../../images/who-we-are/board/Board_Zacks.png';
 
-// Technical Images
+// Site Development
+import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
-import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
-import Nagra from '../../images/who-we-are/technical/Staff_Nagra.png';
-import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
 
-// Artists Images
-import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
+// Advisory Board
+import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
+import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
+import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
+import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
+import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
+import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
 
 const bioId = () => (<any>crypto).randomUUID();
@@ -51,6 +52,17 @@ const bios = {
       image: McCall,
       linkedin: 'joey-m-mccall-esq-303356143',
       bio: 'is the founding Principal and Managing Partner of McCall | Atten, International, PLLC. McCall | Atten, International provides legal representation in the following areas: Real Estate Transactional Services, Real Estate Litigation, Civil Litigation, Immigration, and Outside General Counsel Services for Small to Mid-Sized Businesses. With a strong foundation rooted in establishing quality long-lasting relationships, both business and personal, Mr. McCall identifies the most effective legal solutions to the individual legal needs his clients may encounter during their professional and personal lives. Mr. McCall continuously strives to resolve all conflicts for his clients in the most optimal and effective manner.'
+    },
+    {
+      id: bioId(),
+      name: 'Zeke Dolezalek',
+      role: 'Vice President',
+      pronouns: 'he/him',
+      affiliation:
+        'Human Resources & Recruitment Manager, Corner Table Restaurants',
+      image: Dolezalek,
+      linkedin: 'iamzeked',
+      bio: 'In the workplace or in the community, Zeke has a passion for creating spaces in which people can thrive. As a People & Culture professional, Zeke strives to unite people together by encouraging conversations and empowering others. Over the course of his time at What if Syndicate, Zeke has overseen a near 200% increase of staff, over 6 new property openings, labor laws and employee relations in over 5 markets, and growth and development planning for several leaders and operators within our brands.\n\nWith a BFA in Musical Theatre from the Chicago College of Performing Arts, Zeke has spent time actively involved in the Chicago theatre community both on and off-stage. As a professional photographer, Zeke specializes in headshots, events, and production photography/B-roll. @iAmZekeD'
     },
     {
       id: bioId(),
@@ -75,14 +87,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Adebayo Onigbanjo',
-      role: 'Fundraising Chair',
-      pronouns: 'he/him',
-      affiliation:
-        'Director of Digital Strategy and Product Planning, Cummins Inc.',
-      image: Onigbanjo,
-      linkedin: 'aonigbanjo',
-      bio: 'helps to position businesses for what’s next and brings unique insights into the growing power of new markets on breakthrough innovation and business transformation. \n\nAdebayo is the principal Internet of Things platforms and applications for Wabtec – A GE Transportation company, where he sets both the technical and commercial strategies and processes to transform a century old industry as well as enabled a truly inter-modal solution by bringing Internet of Things, mobility and cloud solutions to customers. \nHe has a background in computer science and data communication systems with over 20 years working experience from Motorola, MTN, Zebra Technologies and GE. \n\nAdebayo holds executive advisor roles at both startups and global technology brands, he is a member of the Internet of Things advisory board to the city of Chicago, a mentor at M-Hub, co-founder of SpectaPLAY, a founding member of the Institute for African Future, and an advisor to several governments. Connect on LinkedIn and Twitter.'
+      name: 'Emily Adler',
+      role: 'Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Chef/Owner, The Buttery Babe',
+      image: Adler,
+      linkedin: 'emily-adler-8830659',
+      bio: 'is a Chicago-area chef and hospitality jill-of-all trades.  After years in high end, fast paced hotels and catering, Emily moved on to running a 15 room bed and breakfast with a 50 seat restaurant in upstate New York.  Upon her return to Chicago, Emily focused on raising the standard of dining in the elder care sector.  Five years of managing cheese shops and grocery stores rounds out her resume.  She now enjoys catering small dinners with curated beverage pairings, working in her organic vegetable garden and support various non-profit organizations.'
     },
     {
       id: bioId(),
@@ -97,27 +108,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Tommy J. Bradford',
-      role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation: 'Educator, Chicago Public Schools',
-      image: Bradford,
-      linkedin: 'tommy-bradford-b77475a',
-      bio: "is a saxophonist, Entrepreneur and Educator. He is a focused musician and artistic leader with a proven record for fostering deep emotional connections through exceptional musical performance and artistic and professional leadership. This fundamental idea is what keeps him constantly developing his philosophy, knowledge and abilities to connect people. Growing up in Chicago, he's had the privilege of hearing a variety of music and has absorbed a tremendous amount of Chicago's artistic culture. As a youth, Tommy began his musical path in elementary school playing throughout high school and later graduating from Columbia College in Chicago, 2003, with a B.A in Music Business. In 2013, he received an MEd from the University of Illinois at Chicago in Instructional Leadership and has several State of Illinois certifications in teaching Middle School, ELL & Music Education. A portion of his focus has been in developing and implementing both curriculum and artistic programming in the Chicago school systems, and creating artistic partnerships that provide creative learning environments and outlets using music and art from diverse cultural backgrounds. He is presently the Director of General Music for Barry Elementary and is a recent appointee of the Board of Directors for the Chicago Artists Guide."
-    },
-    {
-      id: bioId(),
-      name: 'Zeke Dolezalek',
-      role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation:
-        'Human Resources & Recruitment Manager, Corner Table Restaurants',
-      image: Dolezalek,
-      linkedin: 'iamzeked',
-      bio: 'In the workplace or in the community, Zeke has a passion for creating spaces in which people can thrive. As a People & Culture professional, Zeke strives to unite people together by encouraging conversations and empowering others. Over the course of his time at What if Syndicate, Zeke has overseen a near 200% increase of staff, over 6 new property openings, labor laws and employee relations in over 5 markets, and growth and development planning for several leaders and operators within our brands.\n\nWith a BFA in Musical Theatre from the Chicago College of Performing Arts, Zeke has spent time actively involved in the Chicago theatre community both on and off-stage. As a professional photographer, Zeke specializes in headshots, events, and production photography/B-roll. @iAmZekeD'
-    },
-    {
-      id: bioId(),
       name: 'Erin Mitchell',
       role: 'Board Member',
       pronouns: 'she/her',
@@ -128,13 +118,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Steven Zacks',
+      name: 'Alicia Webb',
       role: 'Board Member',
-      pronouns: 'he/him',
-      affiliation: 'Product Manager, Trajecktory',
-      image: Zacks,
-      linkedin: 'stevenzacks',
-      bio: 'is a Product Manager, building software for the mortgage industry. Now based in Chicago, he has a BA in Economics from Fordham University and a J.D. from Washington University in St. Louis. Prior to moving to Chicago two years ago, Steven was a producer in Los Angeles, focusing mostly on documentaries and virtual reality experiences. His life goal is to steal a cape from Andrew Lloyd Webber.'
+      pronouns: 'she/her',
+      affiliation: 'Principal, Bright Spot Public Relations',
+      image: Webb,
+      linkedin: 'alicia-webb-3536784',
+      bio: 'is an award-winning marketing and communications professional with experience in a wide variety of industries including politics, manufacturing, and pharmaceuticals. A former journalist, she loves telling stories about people doing extraordinary things. She began her career as a general assignment reporter with ABC News in Maryland. She previously worked as a personal shopper and event specialist with Macy’s. Alicia has also held roles in media relations, event planning and brand management with several organizations including BCBG Max Azria and Baxter Healthcare Corporation. She holds a B.A. in Journalism and Political Science from Indiana University. Alicia is also a certified life coach. She currently serves as a mentor for the Good Food Accelerator, where she helps entrepreneurs build and establish their businesses. Alicia loves news, sports, travel, politics, Chicago’s theatre and art scene and all things related to pop culture. She serves on the Board of Directors for the Chicago Chapter of the Indiana University Alumni Association. She is also a member of the Indiana University Media School Alumni Board. Most recently, Alicia was a board member for BoHo Theatre.'
     }
   ],
   artists: [
@@ -145,7 +135,7 @@ const bios = {
       pronouns: 'he/him',
       affiliation: null,
       image: Ferro,
-      linkedin: null,
+      linkedin: 'vanferro',
       bio: 'is honored to be part of the Artists Board at Chicago Artist Guide. He is a professional stage and screen actor in Chicago, IL who is passionate with finding ways to help make Chicago theater more diverse, as well as to support new work in theater. Recent selected theater collaboration with Oil Lamp Theater, Sigman Brothers, Three Cat Productions, and Act Your Page. Van also won two BroadwayWorld Chicago Awards for performance in 2021. @therealvanferro'
     },
     {
@@ -155,7 +145,7 @@ const bios = {
       pronouns: 'he/him',
       affiliation: null,
       image: Silva,
-      linkedin: null,
+      linkedin: 'rj-silva-3080b178',
       bio: "is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ's Food Rocks."
     },
     {
@@ -173,7 +163,7 @@ const bios = {
       name: 'Celine Foster',
       role: 'Artist Board Member',
       pronouns: 'she/her',
-      affiliation: '',
+      affiliation: null,
       image: Foster,
       linkedin: 'celine-foster-b19414149',
       bio: 'is a recent graduate of Stanford University, where she received her Bachelors of Arts in Science, Technology, and Society with an emphasis in Media and Communication Studies. Celine hopes to continue her previous work in bolstering equity by supporting the growth of the Chicago Artist Guide.'
@@ -195,7 +185,7 @@ const bios = {
       pronouns: 'she/her',
       affiliation: null,
       image: Stiles,
-      linkedin: null,
+      linkedin: 'rachelannestiles',
       bio: "is a theatre professional and artist working in Milwaukee and Chicago with a specially in wigs and makeup. Her resume includes Lyric Opera of Chicago, Florentine Opera, Central City Opera, Broadway in Milwaukee, and The Milwaukee Rep, among others. A midwest girl at heart, her passion is helping people get a head's start in working in the arts, no matter their background. She created Stage Creatives Network to help theatre professionals find peace, prosperity and joy through the 4 pillars of a sustainable career: connection, financial literacy, work-life balance and self expression. If it's all about who you know, let's get to know each other!"
     }
   ],
@@ -209,16 +199,6 @@ const bios = {
       image: Schutz,
       linkedin: 'annaschutz',
       bio: "holds a BFA in Acting from the University of Illinois Urbana-Champaign and has worked in Chicago as a performer, playwright, and producer for over a decade. She co-founded the storefront theatre Brown Paper Box Co. and served as Managing Director during its 11 years of operation. Anna completed her Master of Nonprofit Management at DePaul University where her research was on Representation in Nonprofit Performing Arts Leadership. During that time she was the manager of DePaul’s Undergraduate Admission daily operations and guest experience where she had the privilege of leading a team of students, focusing on their professional development. ​She served twice as the TA for DePaul's Women in Chicago Theatre course exposing first year students to intersectional feminist theory through field trips to performances around the city. Previously, Anna facilitated technical and customer service training during her 6 years with Apple Inc. in its Chicago stores and around the world on its Global Retail Training team. She founded Chicago Artist Guide with the belief that technology can create access, and theatre can create change. Sunday in the Park with George will never not make her cry. More info at www.annaschutz.com."
-    },
-    {
-      id: bioId(),
-      name: 'Jordin Jewell',
-      role: 'Co-Marketing Manager',
-      pronouns: 'she/her',
-      affilitation: 'Founder, West Loop Soul',
-      image: JewellJordin,
-      linkedin: 'jordinjewell',
-      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That’s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She’s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she’s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
     },
     {
       id: bioId(),
@@ -243,22 +223,12 @@ const bios = {
     {
       id: bioId(),
       name: 'Brianna Walton',
-      role: 'Co-Marketing Manager',
+      role: 'Marketing Manager',
       pronouns: 'she/her',
       affilitation: null,
       image: Walton,
       linkedin: 'briannamwalton',
       bio: 'is a Digital Marketing enthusiast who enjoys creating written and visual content. She has always been an extremely passionate writer and a social justice advocate. Brianna was able to explore these interests during her studies at Agnes Scott College where she earned a Bachelor of Arts degree in International Relations and Business Management. Previously, she was active in student organizations including Her Campus (as a Content Creator and Campus Correspondent) and Mortar Board (as a Director of Communications). She was also a Marketing intern at CARE USA, which allowed her to gain experience in website content accessibility. She is motivated by the idea of helping other people have equitable access to opportunities and resources that will allow them to pursue their life goals. During her free time, Brianna enjoys listening to music of pretty much any genre, sketching, painting, and spending time outdoors. She is also an animal lover and enjoys spending time caring for her two pet turtles along with almost any other animals she happens to cross paths with.'
-    },
-    {
-      id: bioId(),
-      name: 'Steven Zacks',
-      role: 'Head of Platform',
-      pronouns: 'he/him',
-      affiliation: null,
-      image: Zacks,
-      linkedin: 'stevenzacks',
-      bio: 'is a Product Manager, building software for the mortgage industry. Now based in Chicago, he has a BA in Economics from Fordham University and a J.D. from Washington University in St. Louis. Prior to moving to Chicago two years ago, Steven was a producer in Los Angeles, focusing mostly on documentaries and virtual reality experiences. His life goal is to steal a cape from Andrew Lloyd Webber.'
     },
     {
       id: bioId(),
@@ -294,7 +264,7 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Grace Desant',
+      name: 'Grace DeSant',
       role: 'Designer',
       pronouns: 'she/her',
       affiliation: null,
@@ -321,16 +291,6 @@ const bios = {
       image: Hoskins,
       linkedin: 'alanhoskins',
       bio: 'is a software engineer based out of Indianapolis. He has always had a passion for technology. With expertise in developing web applications, Alan is dedicated to finding effective solutions to unique challenges and contributing to the growth of his company.'
-    },
-    {
-      id: bioId(),
-      name: 'Gisselle Nagra',
-      role: 'Designer',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Nagra,
-      linkedin: 'gissellenagra',
-      bio: "received her BA in Psychology at the University of California, Berkeley. She approaches design with a focus on people, establishing empathy for those who create and use the product. Gisselle strives to take every opportunity to prioritize equity in her design process and continue to grow as a UX/UI Designer. She's excited to use her skills to create beautiful and meaningful work here at CAG. When she's not designing, Gisselle enjoys spending time with loved ones and immersing herself in new adventures!"
     }
   ],
   artistAdvisory: [
@@ -343,6 +303,16 @@ const bios = {
       image: Gordon,
       linkedin: 'halliegordonl66',
       bio: 'is the former Artistic and Education Director for Steppenwolf for Young Adults; over her tenure at Steppenwolf Theatre Company, she created a nationally recognized theatre education program for high school students. Programs included the Young Adult Council, a group of high school students from all over the city coming together weekly to learn the inner-workings of how a professional arts organization operates. Council members annually attend over 30 plays throughout Chicago, participate in workshops with leading theater professionals, and curate teen nights at Steppenwolf Theatre. Gordon commissioned playwrights to provide contemporary work that teens could see themselves in, these professional productions served over 15,000 students annually. As a theatre artist Gordon has directed numerous productions for Steppenwolf for Young Adults and Steppenwolf Theatre Company. \n\nAs a director she has worked with Writers Theatre, Northlight, The New Victory Theatre in NYC, and Rivendell Theatre where she is a proud ensemble member. She is currently consulting theatres in Arts Education work and is leading an initiative that intersects the arts with climate justice and social justice with Rivendell Theatre. Hallie is the recipient of The Helen Coburn Meier & Tim Meier Achievement Award.'
+    },
+    {
+      id: bioId(),
+      name: 'Jordin Jewell',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affilitation: 'Founder, West Loop Soul',
+      image: JewellJordin,
+      linkedin: 'jordinjewell',
+      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That’s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She’s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she’s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
     },
     {
       id: bioId(),
@@ -359,10 +329,21 @@ const bios = {
       name: 'Luciana Mendez Gonzalez',
       role: 'Advisory Board Member',
       pronouns: 'she/her',
-      affiliation: 'Software Engineer',
+      affiliation: 'Data Engineer',
       image: MendezGonzalez,
-      linkedin: 'lucianamendezg',
-      bio: 'is a software engineer and was the founding Technical Lead for Chicago Artist Guide. She graduated from DePaul University, cum laude, with a degree in mathematics and computer science, with concentrations in pure math, image processing and theory of computation. She works as an Appraiser On-Boarding Coordinator and has experience in image processing, cybersecurity, and web development. Her favorite musical is Hairspray.'
+      linkedin: 'lmg25',
+      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
+    },
+    {
+      id: bioId(),
+      name: 'Adebayo Onigbanjo',
+      role: 'Advisory Board Member',
+      pronouns: 'he/him',
+      affiliation:
+        'Director of Digital Strategy and Product Planning, Cummins Inc.',
+      image: Onigbanjo,
+      linkedin: 'aonigbanjo',
+      bio: 'helps to position businesses for what’s next and brings unique insights into the growing power of new markets on breakthrough innovation and business transformation. \n\nAdebayo is the principal Internet of Things platforms and applications for Wabtec – A GE Transportation company, where he sets both the technical and commercial strategies and processes to transform a century old industry as well as enabled a truly inter-modal solution by bringing Internet of Things, mobility and cloud solutions to customers. \nHe has a background in computer science and data communication systems with over 20 years working experience from Motorola, MTN, Zebra Technologies and GE. \n\nAdebayo holds executive advisor roles at both startups and global technology brands, he is a member of the Internet of Things advisory board to the city of Chicago, a mentor at M-Hub, co-founder of SpectaPLAY, a founding member of the Institute for African Future, and an advisor to several governments. Connect on LinkedIn and Twitter.'
     },
     {
       id: bioId(),
