@@ -35,10 +35,7 @@ const CompanyBasics: React.FC<{
   return (
     <Container>
       <Row>
-        <SignUpHeader
-          title="LET'S GET STARTED"
-          subtitle="This is a subheader that may or may not be used on any given page"
-        />
+        <SignUpHeader title="LET'S GET STARTED" />
       </Row>
       <Row>
         <SignUpBody lg="4">

@@ -9,6 +9,7 @@ import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 import { CompanyData } from './types';
 import { checkForErrors } from './utils';
+import { ErrorMessage } from '../../../utils/validation';
 
 const requiredFields = ['numberOfMembers', 'primaryContact', 'description'];
 
@@ -20,7 +21,7 @@ const CompanyDetails: React.FC<{
 }> = ({ setForm, stepId, formValues, setStepErrors }) => {
   const locations = [
     { name: 'Choose one...', value: 'choose' },
-    ...neighborhoods.map(neighborhood => ({
+    ...neighborhoods.map((neighborhood) => ({
       name: neighborhood,
       value: neighborhood
     }))
@@ -36,10 +37,7 @@ const CompanyDetails: React.FC<{
   return (
     <Container>
       <Row>
-        <SignUpHeader
-          title="Let's get some details"
-          subtitle="This is a subheader that may or may not be used on any given page"
-        />
+        <SignUpHeader title="Let's get some details" />
       </Row>
       <Row>
         <SignUpBody lg="6">
@@ -62,6 +60,18 @@ const CompanyDetails: React.FC<{
             onChange={setForm}
             requiredLabel="primaryContact"
             value={formValues.primaryContact ?? ''}
+          />
+          <InputField
+            required
+            name="primaryContactEmail"
+            label="Primary Contact Email"
+            placeholder="Email Address"
+            hasErrorCallback={setStepErrors}
+            onChange={setForm}
+            requiredLabel="primaryContactEmail"
+            validationRegexMessage={ErrorMessage.EmailFormat}
+            validationRegexName="emailAddress"
+            value={formValues.primaryContactEmail ?? ''}
           />
           <Dropdown
             name="location"

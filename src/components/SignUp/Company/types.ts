@@ -5,6 +5,7 @@ export type CompanyData = {
   passwordConfirm: string;
   numberOfMembers: string;
   primaryContact: string;
+  primaryContactEmail: string;
   location: string;
   description: string;
   privacyAgreement: boolean;

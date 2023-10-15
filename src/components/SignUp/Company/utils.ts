@@ -29,6 +29,7 @@ export const defaultFormState = {
   passwordConfirm: '',
   numberOfMembers: '',
   primaryContact: '',
+  primaryContactEmail: '',
   location: '',
   description: '',
   privacyAgreement: false,
