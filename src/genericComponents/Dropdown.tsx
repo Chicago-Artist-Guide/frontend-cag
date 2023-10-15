@@ -48,7 +48,7 @@ const DropdownMenu = ({
         {options.map((option) => (
           <option
             key={option.value}
-            selected={option.value === value}
+            // selected={option.value === value}
             value={option.value}
           >
             {option.name}

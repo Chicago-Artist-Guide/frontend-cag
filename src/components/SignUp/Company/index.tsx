@@ -3,6 +3,7 @@ import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
+
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
@@ -16,6 +17,13 @@ import SignUpFooter from './SignUpFooter';
 import { CompanyData, FormStep, SubmitResponse } from './types';
 import { defaultErrorState, defaultFormState, defaultSteps } from './utils';
 
+const stepComponents = {
+  basics: CompanyBasics,
+  privacy: Privacy,
+  details: CompanyDetails,
+  photo: CompanyPhoto
+};
+
 const CompanySignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
@@ -26,19 +34,16 @@ const CompanySignUp: React.FC<{
   const [formValues, setFormValues] = useForm<CompanyData>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);
   const [errors, setErrors] = useState({});
-  const [steps, setSteps] = useState<Step[]>(defaultSteps);
 
   const { step, navigation } = useStep({
     initialStep: currentStep,
-    steps: steps
+    steps: defaultSteps
   });
   const stepId = (step as Step).id as FormStep;
 
   const handleSubmitBasics: () => Promise<SubmitResponse> = async () => {
-    let userResponse;
-
     const { emailAddress, password, theatreName } = formValues;
-
+    let userResponse;
     try {
       setErrors({});
       userResponse = await createUserWithEmailAndPassword(
@@ -82,8 +87,6 @@ const CompanySignUp: React.FC<{
         org_name: theatreName
       });
 
-      const nextSteps = steps.filter((s) => s.id !== 'basics');
-      setSteps(nextSteps);
       return { ok: true };
     } catch (e) {
       console.error('Error adding document:', e);
@@ -115,33 +118,23 @@ const CompanySignUp: React.FC<{
     }
   };
 
-  const stepFrame = () => {
-    const props = {
-      stepId,
-      navigation,
-      formValues,
-      errors,
-      setForm: setFormValues,
-      setStepErrors: setStepErrorsCallback
-    };
-    switch (stepId) {
-      case 'basics':
-        return <CompanyBasics {...props} />;
-      case 'privacy':
-        return <Privacy {...props} formData={formValues} />;
-      case 'details':
-        return <CompanyDetails {...props} />;
-      case 'photo':
-        return <CompanyPhoto {...props} />;
-      default:
-        return <>Something went wrong</>;
-    }
+  const props = {
+    stepId,
+    navigation,
+    formValues,
+    errors,
+    setForm: setFormValues,
+    setStepErrors: setStepErrorsCallback
   };
+
+  const StepComponent = stepComponents[stepId];
 
   return (
     <PageContainer>
       <Row>
-        <Col lg={12}>{stepFrame()}</Col>
+        <Col lg={12}>
+          <StepComponent {...props} formData={formValues} />
+        </Col>
       </Row>
       <SignUpFooter
         navigation={navigation}

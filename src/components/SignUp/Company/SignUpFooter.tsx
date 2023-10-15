@@ -33,7 +33,6 @@ const SignUpFooter: React.FC<{
   const nextText = formStep === 'privacy' ? 'Accept & Continue' : 'Continue';
 
   const onNextClick = async () => {
-    console.log('onNextClick', formStep);
     if (formStep === 'basics') {
       const submitted = await submitBasics();
       if (submitted.ok) {
@@ -64,6 +63,7 @@ const SignUpFooter: React.FC<{
     <PageFooterRow>
       <Col lg="4">
         <Button
+          disabled={formStep === 'privacy'}
           onClick={onPreviousClick}
           text="Back"
           type="button"

@@ -11,7 +11,7 @@ export type CompanyData = {
   profilePhotoUrl: string;
 };
 
-export type FormStep = 'basics' | 'details' | 'privacy' | 'photo';
+export type FormStep = 'basics' | 'privacy' | 'details' | 'photo';
 
 export type SubmitResponse = {
   ok: boolean;
