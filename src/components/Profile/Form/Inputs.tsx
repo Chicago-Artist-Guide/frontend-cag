@@ -7,10 +7,18 @@ import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-interface SelectValue {
+export interface SelectValue {
   name: string;
   value: string;
 }
+
+export type OptGroupSelectValue = {
+  [key: string]: {
+    category: string;
+    name: string;
+    options: SelectValue[];
+  };
+};
 
 export const FormTextArea: React.FC<{
   name: string;
@@ -62,8 +70,16 @@ export const FormSelect: React.FC<{
   label: string;
   defaultValue: string | number | readonly string[] | undefined;
   onChange: SetForm;
-  options: SelectValue[];
-}> = ({ name, label, defaultValue, onChange, options }) => {
+  options: SelectValue[] | OptGroupSelectValue;
+  hasOptGroups?: boolean;
+}> = ({
+  name,
+  label,
+  defaultValue,
+  onChange,
+  options,
+  hasOptGroups = false
+}) => {
   return (
     <FormGroup controlId={name}>
       <Label>{label}</Label>
@@ -77,9 +93,26 @@ export const FormSelect: React.FC<{
           color: defaultValue ? colors.secondaryFontColor : colors.lightGrey
         }}
       >
-        {options.map((option) => (
-          <option key={option.value}>{option.name}</option>
-        ))}
+        {hasOptGroups ? (
+          <>
+            {!Array.isArray(options) &&
+              Object.keys(options).map((cat) => (
+                <optgroup label={options[cat].name} key={options[cat].category}>
+                  {Array.isArray(options[cat].options) &&
+                    options[cat].options.map((option) => (
+                      <option key={option.value}>{option.name}</option>
+                    ))}
+                </optgroup>
+              ))}
+          </>
+        ) : (
+          <>
+            {Array.isArray(options) &&
+              options.map((option) => (
+                <option key={option.value}>{option.name}</option>
+              ))}
+          </>
+        )}
       </Select>
     </FormGroup>
   );

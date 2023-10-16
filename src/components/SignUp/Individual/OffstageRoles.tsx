@@ -10,8 +10,16 @@ import { SetForm } from 'react-hooks-helper';
 import { Tagline, Title } from '../../layout/Titles';
 import GenericAccordion from '../../../genericComponents/GenericAccordion';
 import Checkbox from '../../../genericComponents/Checkbox';
-import yellow_blob_1 from '../../../images/yellow_blob_1.svg';
+import { offstageRolesOptions } from '../../Profile/shared/offstageRolesOptions';
+import type {
+  OffStageRoleCategory,
+  OffStageRoleSection,
+  OffStageRoleByCategory,
+  TransformedOffStageRoleSection,
+  TransformedOffStageRoleByCategory
+} from '../../Profile/shared/profile.types';
 import type { IndividualData } from './types';
+import yellow_blob_1 from '../../../images/yellow_blob_1.svg';
 
 const OffstageRoles: React.FC<{
   setForm: SetForm;
@@ -28,154 +36,53 @@ const OffstageRoles: React.FC<{
     offstageRolesHairMakeupCostumes
   } = formData;
 
-  const offstageRolesObj = {
-    general: {
-      sectionStateValue: offstageRolesGeneral,
-      sectionStateName: 'offstageRolesGeneral',
-      textHeader: 'General',
-      checkboxes: [
-        {
-          label: 'Directing',
-          value: 'Directing'
-        },
-        {
-          label: 'Violence / Fight Design',
-          value: 'Violence / Fight Design'
-        },
-        {
-          label: 'Intimacy Design',
-          value: 'Intimacy Design'
-        },
-        {
-          label: 'Choreography',
-          value: 'Choreography'
-        },
-        {
-          label: 'Casting',
-          value: 'Casting'
-        },
-        {
-          label: 'Dramaturgy',
-          value: 'Dramaturgy'
-        },
-        {
-          label: 'Dialect Coaching',
-          value: 'Dialect Coaching'
-        },
-        {
-          label: 'Musical Directing',
-          value: 'Musical Directing'
-        }
-      ]
-    },
-    production: {
-      sectionStateValue: offstageRolesProduction,
-      sectionStateName: 'offstageRolesProduction',
-      textHeader: 'Production',
-      checkboxes: [
-        {
-          label: 'Stage Management',
-          value: 'Stage Management'
-        },
-        {
-          label: 'Production Management',
-          value: 'Production Management'
-        },
-        {
-          label: 'Board Op',
-          value: 'Board Op'
-        },
-        {
-          label: 'Run Crew',
-          value: 'Run Crew'
-        }
-      ]
-    },
-    scenicAndProperties: {
-      sectionStateValue: offstageRolesScenicAndProperties,
-      sectionStateName: 'offstageRolesScenicAndProperties',
-      textHeader: 'Scenic & Properties',
-      checkboxes: [
-        {
-          label: 'Set Design',
-          value: 'Set Design'
-        },
-        {
-          label: 'Technical Direction',
-          value: 'Technical Direction'
-        },
-        {
-          label: 'Properties Designer',
-          value: 'Properties Designer'
-        },
-        {
-          label: 'Scenic Carpentry',
-          value: 'Scenic Carpentry'
-        },
-        {
-          label: 'Charge Artist',
-          value: 'Charge Artist'
-        }
-      ]
-    },
-    lighting: {
-      sectionStateValue: offstageRolesLighting,
-      sectionStateName: 'offstageRolesLighting',
-      textHeader: 'Lighting',
-      checkboxes: [
-        {
-          label: 'Lighting Design',
-          value: 'Lighting Design'
-        },
-        {
-          label: 'Projection Design',
-          value: 'Projection Design'
-        },
-        {
-          label: 'Special Effect Design',
-          value: 'Special Effect Design'
-        },
-        {
-          label: 'Master Electrician',
-          value: 'Master Electrician'
-        }
-      ]
-    },
-    sound: {
-      sectionStateValue: offstageRolesSound,
-      sectionStateName: 'offstageRolesSound',
-      textHeader: 'Sound',
-      checkboxes: [
-        {
-          label: 'Sound Design',
-          value: 'Sound Design'
-        },
-        {
-          label: 'Sound Mixer / Engineer',
-          value: 'Sound Mixer / Engineer'
-        }
-      ]
-    },
-    hairMakeupCostumes: {
-      sectionStateValue: offstageRolesHairMakeupCostumes,
-      sectionStateName: 'offstageRolesHairMakeupCostumes',
-      textHeader: 'Hair, Makeup, Costumes',
-      checkboxes: [
-        {
-          label: 'Costume Design',
-          value: 'Costume Design'
-        },
-        {
-          label: 'Hair & Wig Design',
-          value: 'Hair & Wig Design'
-        },
-        {
-          label: 'Make-up Design',
-          value: 'Make-up Design'
-        }
-      ]
-    }
+  const sectionStateValueOptions = {
+    offstageRolesGeneral,
+    offstageRolesProduction,
+    offstageRolesScenicAndProperties,
+    offstageRolesLighting,
+    offstageRolesSound,
+    offstageRolesHairMakeupCostumes
   };
+
+  const categoryToSectionStateValueKey: {
+    [key in OffStageRoleCategory]: keyof typeof sectionStateValueOptions;
+  } = {
+    general: 'offstageRolesGeneral',
+    production: 'offstageRolesProduction',
+    scenicAndProperties: 'offstageRolesScenicAndProperties',
+    lighting: 'offstageRolesLighting',
+    sound: 'offstageRolesSound',
+    hairMakeupCostumes: 'offstageRolesHairMakeupCostumes'
+  };
+
+  const transformOffStageRoleSection = (
+    category: OffStageRoleCategory,
+    section: OffStageRoleSection
+  ): TransformedOffStageRoleSection => {
+    return {
+      sectionStateName: section.category,
+      textHeader: section.name,
+      checkboxes: section.options,
+      sectionStateValue:
+        sectionStateValueOptions[categoryToSectionStateValueKey[category]]
+    };
+  };
+
+  const transformOffStageRolesOptions = (
+    options: OffStageRoleByCategory
+  ): TransformedOffStageRoleByCategory => {
+    const transformed: TransformedOffStageRoleByCategory =
+      {} as TransformedOffStageRoleByCategory;
+
+    for (const key of Object.keys(options) as OffStageRoleCategory[]) {
+      transformed[key] = transformOffStageRoleSection(key, options[key]);
+    }
+
+    return transformed;
+  };
+
+  const offstageRolesObj = transformOffStageRolesOptions(offstageRolesOptions);
 
   const isRoleInRolesSection = (section: string[], role: string) =>
     section.indexOf(role) > -1;

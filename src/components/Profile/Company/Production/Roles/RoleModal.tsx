@@ -7,8 +7,14 @@ import styled from 'styled-components';
 import { Button, Checkbox, Dropdown } from '../../../../../genericComponents';
 import { colors, fonts } from '../../../../../theme/styleVars';
 import { CAGLabel } from '../../../../SignUp/SignUpStyles';
-import { FormInput, FormTextArea } from '../../../Form/Inputs';
-import { StageRole } from '../../../shared/profile.types';
+import {
+  FormInput,
+  FormSelect,
+  FormTextArea,
+  OptGroupSelectValue
+} from '../../../Form/Inputs';
+import { OffStageRoleCategory, StageRole } from '../../../shared/profile.types';
+import { offstageRolesOptions } from '../../../shared/offstageRolesOptions';
 import { Role } from '../../types';
 import {
   additionalRequirements,
@@ -79,6 +85,23 @@ const RoleModal: React.FC<{
   const onDeleteCancel = () => {
     setShowConfirm(false);
   };
+
+  const transformedOffstageRoleOptions: OptGroupSelectValue = Object.keys(
+    offstageRolesOptions
+  ).reduce((acc, cat) => {
+    acc[cat] = {
+      category: offstageRolesOptions[cat as OffStageRoleCategory].category,
+      name: offstageRolesOptions[cat as OffStageRoleCategory].name,
+      options: offstageRolesOptions[cat as OffStageRoleCategory].options.map(
+        (opt) => ({
+          name: opt.label,
+          value: opt.value
+        })
+      )
+    };
+
+    return acc;
+  }, {} as OptGroupSelectValue);
 
   return (
     <>
@@ -180,7 +203,6 @@ const RoleModal: React.FC<{
                     />
                   ))}
                 </Form.Group>
-
                 <Form.Group className="form-group" style={{ marginTop: 30 }}>
                   <CAGLabel>Additional Requirements</CAGLabel>
                   {additionalRequirements.map((requirement) => (
@@ -226,7 +248,7 @@ const RoleModal: React.FC<{
                   onChange={setFormState}
                   style={{ marginTop: 0 }}
                 />
-                {isOnStage && (
+                {isOnStage ? (
                   <Form.Group className="form-group" style={{ marginTop: 20 }}>
                     <CAGLabel>Age Range</CAGLabel>
                     {ageRanges.map((ageRange) => (
@@ -257,6 +279,15 @@ const RoleModal: React.FC<{
                       />
                     ))}
                   </Form.Group>
+                ) : (
+                  <FormSelect
+                    name="offstage_role"
+                    label="Off-Stage Role"
+                    defaultValue={formValues?.offstage_role}
+                    onChange={setFormState}
+                    hasOptGroups={true}
+                    options={transformedOffstageRoleOptions}
+                  />
                 )}
                 <Form.Group className="form-group" style={{ marginTop: 20 }}>
                   <CAGLabel>Ethnicity</CAGLabel>
