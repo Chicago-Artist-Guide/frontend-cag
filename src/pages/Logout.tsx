@@ -1,5 +1,5 @@
 import { signOut } from 'firebase/auth';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -10,12 +10,9 @@ import { useProfileContext } from '../context/ProfileContext';
 
 const Logout = () => {
   const { firebaseAuth } = useFirebaseContext();
-  const {
-    setAccountRef,
-    setAccountData,
-    setProfileRef,
-    setProfileData
-  } = useProfileContext();
+  const { setAccountRef, setAccountData, setProfileRef, setProfileData } =
+    useProfileContext();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     signOut(firebaseAuth)
@@ -25,9 +22,10 @@ const Logout = () => {
         setProfileRef(null);
         setProfileData(null);
       })
-      .catch(err => {
+      .catch((err) => {
         console.log('Sign out error', err);
-      });
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   return (
@@ -35,7 +33,7 @@ const Logout = () => {
       <Row>
         <Col lg="8">
           <Title>Logging out...</Title>
-          <Redirect to="/login" />
+          {!loading && <Redirect to="/login" />}
         </Col>
       </Row>
     </PageContainer>

@@ -61,6 +61,7 @@ export type Role = {
   type?: StageRole;
   role_id?: string;
   role_name?: string;
+  offstage_role?: string;
   description?: string;
   role_rate?: number;
   role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour';
