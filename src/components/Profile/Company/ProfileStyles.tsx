@@ -24,7 +24,7 @@ export const Title = styled.h1`
 
 export const DetailsColTitle = styled.h2`
   font-family: ${fonts.montserrat};
-  font-weight: 500;
+  font-weight: bold;
   font-size: 18px;
   line-height: 24px;
 

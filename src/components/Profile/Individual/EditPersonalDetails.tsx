@@ -44,7 +44,7 @@ const EditPersonalDetails = ({
   return (
     <div>
       <Form.Group className="form-group">
-        <CAGLabel>What age range do you play?</CAGLabel>
+        <CAGLabel>Which age ranges do you play?</CAGLabel>
         <p>Select up to 3 ranges</p>
         {ageRanges.map((ageRange) => (
           <Checkbox
