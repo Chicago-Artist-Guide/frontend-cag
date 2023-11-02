@@ -250,7 +250,7 @@ const RoleModal: React.FC<{
                 />
                 {isOnStage ? (
                   <Form.Group className="form-group" style={{ marginTop: 20 }}>
-                    <CAGLabel>Age Range</CAGLabel>
+                    <CAGLabel>Character Age Range</CAGLabel>
                     {ageRanges.map((ageRange) => (
                       <Checkbox
                         checked={isValueIncluded('age_range', ageRange)}

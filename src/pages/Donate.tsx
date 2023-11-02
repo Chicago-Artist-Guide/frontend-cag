@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
-import Row from 'react-bootstrap/Row';
+import Image from 'react-bootstrap/Image';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title, TitleThree } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';
@@ -8,6 +9,8 @@ import yellowBlob1 from '../images/yellow_blob_1.svg';
 import homeDance from '../images/home_dance.svg';
 import styled from 'styled-components';
 import { breakpoints } from '../theme/styleVars';
+import SponsorDonutLogo from '../images/sponsors/donut.png';
+import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
 
 const Donate = () => {
   return (
@@ -79,6 +82,24 @@ const Donate = () => {
           </p>
         </Col>
       </Row>
+      <Row>
+        <Col lg="12">
+          <hr />
+          <TitleThree>Thank You to Our Generous Supporters</TitleThree>
+          <Row>
+            <SponsorCol lg="3">
+              <a href="https://www.donut.com/" target="_blank">
+                <Image src={SponsorDonutLogo} fluid />
+              </a>
+            </SponsorCol>
+            <SponsorCol lg="3">
+              <a href="https://cliff-chicago.org/foundation/" target="_blank">
+                <Image src={SponsorCliffLogo} fluid />
+              </a>
+            </SponsorCol>
+          </Row>
+        </Col>
+      </Row>
     </PageContainer>
   );
 };
@@ -88,6 +109,16 @@ const IFrame = styled.iframe`
 
   @media screen and (max-width: ${breakpoints.sm}) {
     height: 1360px;
+  }
+`;
+
+const SponsorCol = styled(Col)`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  a {
+    display: block;
   }
 `;
 
