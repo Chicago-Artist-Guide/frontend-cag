@@ -272,7 +272,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Luciana Mendez Gonzalez',
-      role: 'Advisory Board Member',
+      role: 'Engineer',
       pronouns: 'she/her',
       affiliation: 'Data Engineer',
       image: MendezGonzalez,
