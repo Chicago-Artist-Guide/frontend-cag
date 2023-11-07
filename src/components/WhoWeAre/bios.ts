@@ -12,7 +12,6 @@ import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
 import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
-import Foster from '../../images/who-we-are/board/Board_Foster.jpg';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
 
@@ -21,19 +20,17 @@ import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
-import Walz from '../../images/who-we-are/operations/Staff_Walz.png';
 
 // Site Development
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
+import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 
 // Advisory Board
-import Gordon from '../../images/who-we-are/board/Board_Gordon.jpg';
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
 import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
-import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
@@ -160,22 +157,12 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Celine Foster',
-      role: 'Artist Board Member',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Foster,
-      linkedin: 'celine-foster-b19414149',
-      bio: 'is a recent graduate of Stanford University, where she received her Bachelors of Arts in Science, Technology, and Society with an emphasis in Media and Communication Studies. Celine hopes to continue her previous work in bolstering equity by supporting the growth of the Chicago Artist Guide.'
-    },
-    {
-      id: bioId(),
       name: 'Alexandria Alyse Moorman',
       role: 'Artist Board Member',
       pronouns: 'she/her',
       affiliation: null,
       image: Moorman,
-      linkedin: null,
+      linkedin: 'alexandria-moorman-309a5b170',
       bio: 'holds a BFA in Acting from Emerson College and is a proud recipient of the Isabel Sanford Award. While working in partnership with Cacique Youth Learning Center in the South End of Boston she helped lead and coordinate a classroom of Pre-K students through artistic workshops culminating in producing presentations of their original work. \n\nAlexandria’s credits as a performer/writer/poet/ improviser have been in collaboration with and on the stages of The MCA, iO (Diversity Scholar recipient), The Haitian American Museum, The Second City, The Den Theater, Brown Paper Box Co., Stage 773, The Annoyance, MPAACT Theater, Rough House Theater Co. among others. She is an ensemble member of The Not That Late Show, a monthly late night style talk show. She can also be heard as a recurring guest on the podcast Lifetime Uncorked, which was featured in O Magazine last year. \n\nFilm credits include How to Re-caulk Your Tub (Elevated FF - Audience Award Winner, Calgary Underground FF - Best Int. Short Winner), Mid 30’s Martyr (Austin Revolution FF - Best Actress Short Winner, Cindependent FF, San Angelo Revolution FF - Best Actress nom.), Ponytail (Shortcut 100 Int. FF - Winner: Audience Choice, Best Chicago Made, Female Filmmaker). When not dreaming of winning the lottery, she enjoys watching Bravo TV for all that nonsense, flexing her mixology skills, traveling and eating well with her partner John.'
     },
     {
@@ -203,11 +190,11 @@ const bios = {
     {
       id: bioId(),
       name: 'Alexandria Alyse Moorman',
-      role: 'Development Manager',
+      role: 'Development Director',
       pronouns: 'she/her',
       affiliation: null,
       image: Moorman,
-      linkedin: null,
+      linkedin: 'alexandria-moorman-309a5b170',
       bio: 'holds a BFA in Acting from Emerson College and is a proud recipient of the Isabel Sanford Award. While working in partnership with Cacique Youth Learning Center in the South End of Boston she helped lead and coordinate a classroom of Pre-K students through artistic workshops culminating in producing presentations of their original work. \n\nAlexandria’s credits as a performer/writer/poet/ improviser have been in collaboration with and on the stages of The MCA, iO (Diversity Scholar recipient), The Haitian American Museum, The Second City, The Den Theater, Brown Paper Box Co., Stage 773, The Annoyance, MPAACT Theater, Rough House Theater Co. among others. She is an ensemble member of The Not That Late Show, a monthly late night style talk show. She can also be heard as a recurring guest on the podcast Lifetime Uncorked, which was featured in O Magazine last year. \n\nFilm credits include How to Re-caulk Your Tub (Elevated FF - Audience Award Winner, Calgary Underground FF - Best Int. Short Winner), Mid 30’s Martyr (Austin Revolution FF - Best Actress Short Winner, Cindependent FF, San Angelo Revolution FF - Best Actress nom.), Ponytail (Shortcut 100 Int. FF - Winner: Audience Choice, Best Chicago Made, Female Filmmaker). When not dreaming of winning the lottery, she enjoys watching Bravo TV for all that nonsense, flexing her mixology skills, traveling and eating well with her partner John.'
     },
     {
@@ -223,7 +210,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Brianna Walton',
-      role: 'Marketing Manager',
+      role: 'Marketing Director',
       pronouns: 'she/her',
       affilitation: null,
       image: Walton,
@@ -239,16 +226,6 @@ const bios = {
       image: Brown,
       linkedin: 'missy-brown-a956a832',
       bio: "has been in leadership with Trader Joe's for the last 28 years. With strong business acumen and a caring, inclusive, and community-minded approach, she has been regarded as a top leader and mentor in the company. She has a BA in Sociology, MA in Educational Leadership, and certification in Grant Writing. She began her grant writing journey to help the community on a different level and is optimistic for the future. Her varied interests include attending the theatre and live music, hiking, reading WWII fiction and mysteries of all kinds, yoga, cooking for friends, wine tasting, watching Top Chef, and photographing a sunset."
-    },
-    {
-      id: bioId(),
-      name: 'Jacob Walz',
-      role: 'Grants and Development Specialist',
-      pronouns: 'he/him',
-      affilitation: null,
-      image: Walz,
-      linkedin: 'jacob-walz-81ba27163',
-      bio: 'is a nonprofit professional from Massachusetts who has been working for nonprofits since he was 19 years old. After earning his BA from Assumption University, where he worked for four different Nonprofits, he earned the Crown and Shield award for Outstanding Community Service. Jacob is well-versed in Grant Writing, Donor Relations, Communications, and Volunteer Recruitment and is dedicated to making Arts and Music more accessible. For fun, Jacob enjoys choral singing, basketball, stand-up comedy, and gardening.'
     }
   ],
   technical: [
@@ -291,19 +268,19 @@ const bios = {
       image: Hoskins,
       linkedin: 'alanhoskins',
       bio: 'is a software engineer based out of Indianapolis. He has always had a passion for technology. With expertise in developing web applications, Alan is dedicated to finding effective solutions to unique challenges and contributing to the growth of his company.'
+    },
+    {
+      id: bioId(),
+      name: 'Luciana Mendez Gonzalez',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Data Engineer',
+      image: MendezGonzalez,
+      linkedin: 'lmg25',
+      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
     }
   ],
   artistAdvisory: [
-    {
-      id: bioId(),
-      name: 'Hallie Gordon',
-      role: 'Advisory Board Member',
-      pronouns: 'she/her',
-      affiliation: 'Senior Associate Artistic Director, Olney Theatre Center',
-      image: Gordon,
-      linkedin: 'halliegordonl66',
-      bio: 'is the former Artistic and Education Director for Steppenwolf for Young Adults; over her tenure at Steppenwolf Theatre Company, she created a nationally recognized theatre education program for high school students. Programs included the Young Adult Council, a group of high school students from all over the city coming together weekly to learn the inner-workings of how a professional arts organization operates. Council members annually attend over 30 plays throughout Chicago, participate in workshops with leading theater professionals, and curate teen nights at Steppenwolf Theatre. Gordon commissioned playwrights to provide contemporary work that teens could see themselves in, these professional productions served over 15,000 students annually. As a theatre artist Gordon has directed numerous productions for Steppenwolf for Young Adults and Steppenwolf Theatre Company. \n\nAs a director she has worked with Writers Theatre, Northlight, The New Victory Theatre in NYC, and Rivendell Theatre where she is a proud ensemble member. She is currently consulting theatres in Arts Education work and is leading an initiative that intersects the arts with climate justice and social justice with Rivendell Theatre. Hallie is the recipient of The Helen Coburn Meier & Tim Meier Achievement Award.'
-    },
     {
       id: bioId(),
       name: 'Jordin Jewell',
@@ -323,16 +300,6 @@ const bios = {
       image: Liriano,
       linkedin: 'carlene-liriano-99390429',
       bio: 'is a Product Manager based out of Chicago currently working in consulting and specializing in the incubation of new asset ideas and taking them from concept to market. Carlene has a degree in Computer Science and Economics from Columbia University and an MBA from Yale. She has spent the majority of her career working in technology and brings several years of experience productizing strategic visions, managing application design and development, and driving the end-to-end product lifecycle. \n\nWhen she’s not “product managing”, you can find Carlene browsing the stacks at Open Books (yay used bookstores!) or trying to leash-train her cat, Pepper.'
-    },
-    {
-      id: bioId(),
-      name: 'Luciana Mendez Gonzalez',
-      role: 'Advisory Board Member',
-      pronouns: 'she/her',
-      affiliation: 'Data Engineer',
-      image: MendezGonzalez,
-      linkedin: 'lmg25',
-      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
     },
     {
       id: bioId(),
