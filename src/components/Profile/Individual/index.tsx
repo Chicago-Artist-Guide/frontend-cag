@@ -901,7 +901,7 @@ const IndividualProfile: React.FC<{
             ) : (
               <>
                 <p>
-                  {profile?.data?.age_ranges?.length && (
+                  {profile?.data?.age_ranges?.length > 0 && (
                     <>
                       Character Age Ranges:{' '}
                       {profile?.data?.age_ranges?.join(', ')}
@@ -931,7 +931,7 @@ const IndividualProfile: React.FC<{
                         <br />
                       </>
                     )}
-                  {profile?.data?.ethnicities.length && (
+                  {profile?.data?.ethnicities.length > 0 && (
                     <>
                       Ethnicity: {profile?.data?.ethnicities?.join(', ')}
                       <br />
