@@ -1818,11 +1818,12 @@ const IndividualProfile: React.FC<{
               </Container>
             ) : (
               <>
-                {(profile?.data?.additional_skills_checkboxes?.length ||
-                  profile?.data?.additional_skills_manual?.length) && (
+                {(profile?.data?.additional_skills_checkboxes?.length > 0 ||
+                  profile?.data?.additional_skills_manual?.length > 0) && (
                   <DetailSection title="Special Skills">
                     <ProfileFlex>
-                      {profile?.data?.additional_skills_checkboxes?.length &&
+                      {profile?.data?.additional_skills_checkboxes?.length >
+                        0 &&
                         profile?.data?.additional_skills_checkboxes.map(
                           (skill: string) => (
                             <Badge
@@ -1835,7 +1836,7 @@ const IndividualProfile: React.FC<{
                             </Badge>
                           )
                         )}
-                      {profile?.data?.additional_skills_manual?.length &&
+                      {profile?.data?.additional_skills_manual?.length > 0 &&
                         profile?.data?.additional_skills_manual.map(
                           (skill: string) => (
                             <Badge
