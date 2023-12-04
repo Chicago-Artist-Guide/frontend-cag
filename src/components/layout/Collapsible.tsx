@@ -6,21 +6,21 @@ import { media } from 'styled-bootstrap-grid';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { colors } from '../../theme/styleVars';
-import bios from './bios';
-import Team from './Team';
 
-const Department = () => {
-  const sectionTitles = {
-    board: 'BOARD OF DIRECTORS',
-    artists: 'ARTIST AUXILIARY BOARD',
-    operations: 'BUSINESS OPERATIONS',
-    technical: 'SITE DEVELOPMENT',
-    artistAdvisory: 'ADVISORY BOARD'
-  };
+interface Props {
+  sectionTitles: any;
+  subSections: any;
+  subContainer: any;
+}
 
-  const sections = Object.keys(bios).map(s => ({
+const Collapsible: React.FC<Props> = ({
+  sectionTitles,
+  subSections,
+  subContainer
+}) => {
+  const sections = Object.keys(subSections).map((s) => ({
     title: (sectionTitles as any)[s],
-    bios: (bios as any)[s]
+    subSections: (subSections as any)[s]
   }));
 
   const breakpointColumnsObj = {
@@ -61,9 +61,7 @@ const Department = () => {
                 className="my-masonry-grid"
                 columnClassName="my-masonry-grid_column"
               >
-                {sect.bios.map((who: any) => (
-                  <Team {...who} key={who.name} />
-                ))}
+                {sect.subSections.map((sub: any) => subContainer(sub))}
               </Masonry>
             </Accordion.Body>
           </Accordion.Item>
@@ -126,4 +124,4 @@ const HrLine = styled.hr`
   width: 100%;
 `;
 
-export default Department;
+export default Collapsible;
