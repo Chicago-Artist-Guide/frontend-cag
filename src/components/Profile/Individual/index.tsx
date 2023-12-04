@@ -901,7 +901,7 @@ const IndividualProfile: React.FC<{
             ) : (
               <>
                 <p>
-                  {profile?.data?.age_ranges?.length && (
+                  {profile?.data?.age_ranges?.length > 0 && (
                     <>
                       Character Age Ranges:{' '}
                       {profile?.data?.age_ranges?.join(', ')}
@@ -931,7 +931,7 @@ const IndividualProfile: React.FC<{
                         <br />
                       </>
                     )}
-                  {profile?.data?.ethnicities.length && (
+                  {profile?.data?.ethnicities.length > 0 && (
                     <>
                       Ethnicity: {profile?.data?.ethnicities?.join(', ')}
                       <br />
@@ -1818,11 +1818,12 @@ const IndividualProfile: React.FC<{
               </Container>
             ) : (
               <>
-                {(profile?.data?.additional_skills_checkboxes?.length ||
-                  profile?.data?.additional_skills_manual?.length) && (
+                {(profile?.data?.additional_skills_checkboxes?.length > 0 ||
+                  profile?.data?.additional_skills_manual?.length > 0) && (
                   <DetailSection title="Special Skills">
                     <ProfileFlex>
-                      {profile?.data?.additional_skills_checkboxes?.length &&
+                      {profile?.data?.additional_skills_checkboxes?.length >
+                        0 &&
                         profile?.data?.additional_skills_checkboxes.map(
                           (skill: string) => (
                             <Badge
@@ -1835,7 +1836,7 @@ const IndividualProfile: React.FC<{
                             </Badge>
                           )
                         )}
-                      {profile?.data?.additional_skills_manual?.length &&
+                      {profile?.data?.additional_skills_manual?.length > 0 &&
                         profile?.data?.additional_skills_manual.map(
                           (skill: string) => (
                             <Badge
