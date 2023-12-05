@@ -30,6 +30,7 @@ const FAQ = () => {
             sectionTitles={sectionTitles}
             subSections={aboutQ}
             subContainer={QandA}
+            grid={false}
           />
         </Col>
         <Col lg={4}>

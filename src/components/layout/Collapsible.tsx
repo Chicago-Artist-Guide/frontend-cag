@@ -11,12 +11,14 @@ interface Props {
   sectionTitles: any;
   subSections: any;
   subContainer: any;
+  grid: boolean;
 }
 
 const Collapsible: React.FC<Props> = ({
   sectionTitles,
   subSections,
-  subContainer
+  subContainer,
+  grid
 }) => {
   const sections = Object.keys(subSections).map((s) => ({
     title: (sectionTitles as any)[s],
@@ -56,13 +58,17 @@ const Collapsible: React.FC<Props> = ({
               </h2>
             </Accordion.Button>
             <Accordion.Body>
-              <Masonry
-                breakpointCols={breakpointColumnsObj}
-                className="my-masonry-grid"
-                columnClassName="my-masonry-grid_column"
-              >
-                {sect.subSections.map((sub: any) => subContainer(sub))}
-              </Masonry>
+              {grid ? (
+                <Masonry
+                  breakpointCols={breakpointColumnsObj}
+                  className="my-masonry-grid"
+                  columnClassName="my-masonry-grid_column"
+                >
+                  {sect.subSections.map((sub: any) => subContainer(sub))}
+                </Masonry>
+              ) : (
+                <>{sect.subSections.map((sub: any) => subContainer(sub))}</>
+              )}
             </Accordion.Body>
           </Accordion.Item>
           <HrLine />

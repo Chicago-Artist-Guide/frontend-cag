@@ -43,6 +43,7 @@ const WhoWeAre = () => {
               sectionTitles={sectionTitles}
               subSections={bios}
               subContainer={Team}
+              grid={true}
             />
           </Stack>
         </Col>
