@@ -9,6 +9,7 @@ import streamingDance from '../images/streaming_dance.svg';
 import Collapsible from '../components/layout/Collapsible';
 import { aboutQ } from '../components/FAQ/questions';
 import QandA from '../components/FAQ/QandA';
+import styled from 'styled-components';
 
 const FAQ = () => {
   const sectionTitles = {
@@ -32,11 +33,19 @@ const FAQ = () => {
           />
         </Col>
         <Col lg={4}>
-          <SVGLayer blob={blueBlob} dancer={streamingDance} />
+          <HiddenIfMobile>
+            <SVGLayer blob={blueBlob} dancer={streamingDance} />
+          </HiddenIfMobile>
         </Col>
       </Row>
     </PageContainer>
   );
 };
+
+const HiddenIfMobile = styled.div`
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
 
 export default FAQ;
