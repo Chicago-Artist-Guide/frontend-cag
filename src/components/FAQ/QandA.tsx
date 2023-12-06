@@ -16,7 +16,8 @@ const QandA = (props: any) => {
 };
 
 const Section = styled.div`
-  margin-top: 4rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
 `;
 
 const Question = styled.div`

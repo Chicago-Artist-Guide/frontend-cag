@@ -29,7 +29,7 @@ export const aboutQ = {
       question: 'How can I support CAG?',
       answer: [
         'You can ',
-        <a href="https://www.chicagoartistguide.org/donate">donate!</a>,
+        <a href="https://www.chicagoartistguide.org/donate">donate! </a>,
         'We are able to keep our platform free due to generous donations from people like you and every dollar helps to keep our site running. Chicago Artist Guide NFP is a 501(c)(3) and donations are tax deductible to the fullest extent of the law.'
       ]
     },
