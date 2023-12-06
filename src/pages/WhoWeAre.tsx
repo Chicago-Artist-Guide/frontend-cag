@@ -5,9 +5,19 @@ import Col from 'react-bootstrap/Col';
 import Stack from 'react-bootstrap/Stack';
 import styled from 'styled-components';
 import PageContainer from '../components/layout/PageContainer';
-import Departments from '../components/WhoWeAre/Departments';
+import Collapsible from '../components/layout/Collapsible';
+import bios from '../components/WhoWeAre/bios';
+import Team from '../components/WhoWeAre/Team';
 
 const WhoWeAre = () => {
+  const sectionTitles = {
+    board: 'BOARD OF DIRECTORS',
+    artists: 'ARTIST AUXILIARY BOARD',
+    operations: 'BUSINESS OPERATIONS',
+    technical: 'SITE DEVELOPMENT',
+    artistAdvisory: 'ADVISORY BOARD'
+  };
+
   return (
     <PageContainer>
       <Row>
@@ -29,8 +39,13 @@ const WhoWeAre = () => {
               </p>
             </AboutSection>
             <MeetOurTeamTitle>Meet Our Team</MeetOurTeamTitle>
+            <Collapsible
+              sectionTitles={sectionTitles}
+              subSections={bios}
+              subContainer={Team}
+              grid={true}
+            />
           </Stack>
-          <Departments />
         </Col>
       </Row>
     </PageContainer>
