@@ -2,13 +2,11 @@
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
 import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
-import White from '../../images/who-we-are/board/Board_White.png';
 import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
-import Mitchell from '../../images/who-we-are/board/Board_Mitchell.jpg';
 import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 
-//Artist Auxiliary Board
+// Artist Auxiliary Board
 import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
 import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
@@ -20,6 +18,7 @@ import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
+import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
 
 // Site Development
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
@@ -27,11 +26,10 @@ import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
+import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
 
 // Advisory Board
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
-import Liriano from '../../images/who-we-are/technical/Staff_Liriano.jpg';
-import Onigbanjo from '../../images/who-we-are/board/Board_Onigbanjo.jpg';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
 
@@ -73,19 +71,8 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Alexis White',
-      role: 'Treasurer',
-      pronouns: 'she/her',
-      affiliation:
-        'Deputy Budget Director, Office of Budget and Management, City of Chicago',
-      image: White,
-      linkedin: 'alexismwhite82',
-      bio: "serves as Deputy Budget Director for the City of Chicago Office of Budget and Management. She has years of successful experience in fiscal management, project management, and people operations. Alexis graduated from the University of Illinois at Urbana-Champaign with a B.Sc. in Marketing from Southern Illinois University Edwardsville and a Master's in Business Administration. Alexis has served in a budgeting capacity at both the State of Illinois- Office of Management and Budget and the City of Chicago- Office of the City Clerk. She is a Board Member for Southern Illinois University Alumni Board-Chicago Chapter. She is also an active member of Alpha Kappa Alpha Sorority, Incorporated and serves in the capacity of Small Group Leader and alumni of Bonfire Women- Women Leadership Development Program. She was a Mentor Coach for the America Needs You program which focuses on First-Generation College students. Alexis is also a co-founder of Build Up Bold, a professional development collective and a former Board Member for Women in Public Finance-Chicago Chapter. Alexis has also volunteered with the Greater Chicago Food Depository and Lakeview Pantry."
-    },
-    {
-      id: bioId(),
       name: 'Emily Adler',
-      role: 'Board Member',
+      role: 'Treasurer',
       pronouns: 'she/her',
       affiliation: 'Chef/Owner, The Buttery Babe',
       image: Adler,
@@ -105,18 +92,8 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Erin Mitchell',
-      role: 'Board Member',
-      pronouns: 'she/her',
-      affiliation: 'Business Consultant, Erin Mitchell Consulting',
-      image: Mitchell,
-      linkedin: 'erin-m-6749b28',
-      bio: "holds a bachelor's degree in Computer Information Systems from DeVry University. She worked with the American Red Cross in the Information Technology (IT) department for twelve years. In her twelve years with the Red Cross, she has gained experience from helpdesk support to project coordination. Wearing many hats, she has acquired skills such as relationship management, documentation development, problem-solving, organization and planning, and operations management. The skills she acquired during her time at the Red Cross has equipped her to excel in any role and position she steps into. Recently acquiring her master's degree in Nonprofit Management from DePaul University, Erin started her second business, Erin Mitchell Consulting, where she consults small businesses and nonprofit organizations in various capacities. The arts is an area in the nonprofit world that Erin is excited to learn more about and see how she can effectively support artists in the Chicagoland area. She is a member of the Chicago Women in Philanthropy. She was inducted into the Pi Alpha Alpha of Global Honor Society for Public Affairs and Administration and received the Degree Chair Award from DePaul University."
-    },
-    {
-      id: bioId(),
       name: 'Alicia Webb',
-      role: 'Board Member',
+      role: 'Board Governance Co-Chair',
       pronouns: 'she/her',
       affiliation: 'Principal, Bright Spot Public Relations',
       image: Webb,
@@ -154,16 +131,6 @@ const bios = {
       image: Lewis,
       linkedin: null,
       bio: 'is a Chicago Actor and Dad originally from Connecticut. Excited to be apart of the Artist Board, his previous Chicago Theatre Credits: The Secret Council (First Folio Theatre), The Last Pair of Earlies (Raven Theatre), Short Changed (Factory Theatre), YPF at Pegasus (Pegasus Theatre), Titus Andronicus (Haven Theatre), Grace, Or the art of climbing (Brown Paper Box co). His TV credits include: 2 Broke Girls, True Blood and Real Husbands of Hollywood. James also attended The Theatre School at DePaul University for undergrad. James also is a writer and multi-instrumentalist but his greatest job is being a dad to the two greatest kids in the world, Amari and Naomi.'
-    },
-    {
-      id: bioId(),
-      name: 'Alexandria Alyse Moorman',
-      role: 'Artist Board Member',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Moorman,
-      linkedin: 'alexandria-moorman-309a5b170',
-      bio: 'holds a BFA in Acting from Emerson College and is a proud recipient of the Isabel Sanford Award. While working in partnership with Cacique Youth Learning Center in the South End of Boston she helped lead and coordinate a classroom of Pre-K students through artistic workshops culminating in producing presentations of their original work. \n\nAlexandria’s credits as a performer/writer/poet/ improviser have been in collaboration with and on the stages of The MCA, iO (Diversity Scholar recipient), The Haitian American Museum, The Second City, The Den Theater, Brown Paper Box Co., Stage 773, The Annoyance, MPAACT Theater, Rough House Theater Co. among others. She is an ensemble member of The Not That Late Show, a monthly late night style talk show. She can also be heard as a recurring guest on the podcast Lifetime Uncorked, which was featured in O Magazine last year. \n\nFilm credits include How to Re-caulk Your Tub (Elevated FF - Audience Award Winner, Calgary Underground FF - Best Int. Short Winner), Mid 30’s Martyr (Austin Revolution FF - Best Actress Short Winner, Cindependent FF, San Angelo Revolution FF - Best Actress nom.), Ponytail (Shortcut 100 Int. FF - Winner: Audience Choice, Best Chicago Made, Female Filmmaker). When not dreaming of winning the lottery, she enjoys watching Bravo TV for all that nonsense, flexing her mixology skills, traveling and eating well with her partner John.'
     },
     {
       id: bioId(),
@@ -210,12 +177,22 @@ const bios = {
     {
       id: bioId(),
       name: 'Brianna Walton',
-      role: 'Marketing Director',
+      role: 'Marketing Manager',
       pronouns: 'she/her',
       affilitation: null,
       image: Walton,
       linkedin: 'briannamwalton',
       bio: 'is a Digital Marketing enthusiast who enjoys creating written and visual content. She has always been an extremely passionate writer and a social justice advocate. Brianna was able to explore these interests during her studies at Agnes Scott College where she earned a Bachelor of Arts degree in International Relations and Business Management. Previously, she was active in student organizations including Her Campus (as a Content Creator and Campus Correspondent) and Mortar Board (as a Director of Communications). She was also a Marketing intern at CARE USA, which allowed her to gain experience in website content accessibility. She is motivated by the idea of helping other people have equitable access to opportunities and resources that will allow them to pursue their life goals. During her free time, Brianna enjoys listening to music of pretty much any genre, sketching, painting, and spending time outdoors. She is also an animal lover and enjoys spending time caring for her two pet turtles along with almost any other animals she happens to cross paths with.'
+    },
+    {
+      id: bioId(),
+      name: 'Tumpale Mwakasisi',
+      role: 'Social Media Associate',
+      pronouns: 'she/her',
+      affilitation: null,
+      image: Mwakasisi,
+      linkedin: 'tumpalemwakasisi',
+      bio: "is Chicago-based content creator who showcases the city's diverse food and culture through her videos and reviews at @malortandmoet. She creates engaging videos and reviews for various online platforms, sharing her insights and recommendations with her audience and beyond. Previously, Tumpale worked in tech program management for companies like Webflow and LinkedIn. She also has digital marketing experience from her previous roles at Bottle & Bottega and Northwestern. Tumpale is passionate about supporting local businesses and communities, and she is excited to join Chicago Artist Guide. She hopes to contribute to the organization's mission and vision with her skills and experience. When she is not creating content, Tumpale likes to watch Youtube and movies, play video games, listen to music, and watch TV."
     },
     {
       id: bioId(),
@@ -231,10 +208,21 @@ const bios = {
   technical: [
     {
       id: bioId(),
+      name: 'Jeannine Fischer',
+      role: 'Head of Product',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Fischer,
+      linkedin: 'jeanninefischer',
+      bio: "is an innovative product leader with experience in launching and scaling products at high-growth marketplace startups. Recognized on Product50 for her impact at Avail Car Sharing, Jeannine brings rich experience from diverse roles in Product, Finance, and Marketing at Allstate's startups and core businesses. Fueled by deep user empathy and a passion for people, she extends her impact beyond product management. As an inclusion advocate, Jeannine served as the President of the Young Professionals organization at Allstate, driving resources for underserved communities and influencing inclusive benefits decisions for 40K+ employees. Beyond tech, she's a music aficionado and outdoor enthusiast. When not building products, you'll find her catching the latest concert or exploring mountains through rock climbing or skiing."
+    },
+    {
+      id: bioId(),
       name: 'Alex Jewell',
       role: 'Engineering Lead',
       pronouns: 'he/him',
-      affiliation: 'VP, Director of Software Engineering @ Truist Foundry',
+      affiliation:
+        'Senior Engineering Manager @ Institutional Cash Distributors (ICD)',
       image: JewellAlex,
       linkedin: 'alexjewellcom',
       bio: 'is a socially-driven software engineering leader in banking innovation, focusing on innovation and web3 for consumer banking. Blockchain and decentralization consultant and activist. Artisan foodporn director and social media marketing expert at @bestfoodalex. Leftist ghostwriter for political organizations, global economic forums, and watchdog groups dealing with the Fourth Industrial Revolution, futurism, and decentralization.'
@@ -242,7 +230,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Grace DeSant',
-      role: 'Designer',
+      role: 'UX Designer',
       pronouns: 'she/her',
       affiliation: null,
       image: DeSant,
@@ -252,7 +240,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Nicole Hernandez',
-      role: 'Designer',
+      role: 'UX Designer',
       pronouns: 'she/her',
       affiliation: null,
       image: Hernandez,
@@ -290,27 +278,6 @@ const bios = {
       image: JewellJordin,
       linkedin: 'jordinjewell',
       bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That’s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She’s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she’s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
-    },
-    {
-      id: bioId(),
-      name: 'Carlene Liriano',
-      role: 'Advisory Board Member',
-      pronouns: 'she/her',
-      affiliation: 'Senior Product Manager, Angi',
-      image: Liriano,
-      linkedin: 'carlene-liriano-99390429',
-      bio: 'is a Product Manager based out of Chicago currently working in consulting and specializing in the incubation of new asset ideas and taking them from concept to market. Carlene has a degree in Computer Science and Economics from Columbia University and an MBA from Yale. She has spent the majority of her career working in technology and brings several years of experience productizing strategic visions, managing application design and development, and driving the end-to-end product lifecycle. \n\nWhen she’s not “product managing”, you can find Carlene browsing the stacks at Open Books (yay used bookstores!) or trying to leash-train her cat, Pepper.'
-    },
-    {
-      id: bioId(),
-      name: 'Adebayo Onigbanjo',
-      role: 'Advisory Board Member',
-      pronouns: 'he/him',
-      affiliation:
-        'Director of Digital Strategy and Product Planning, Cummins Inc.',
-      image: Onigbanjo,
-      linkedin: 'aonigbanjo',
-      bio: 'helps to position businesses for what’s next and brings unique insights into the growing power of new markets on breakthrough innovation and business transformation. \n\nAdebayo is the principal Internet of Things platforms and applications for Wabtec – A GE Transportation company, where he sets both the technical and commercial strategies and processes to transform a century old industry as well as enabled a truly inter-modal solution by bringing Internet of Things, mobility and cloud solutions to customers. \nHe has a background in computer science and data communication systems with over 20 years working experience from Motorola, MTN, Zebra Technologies and GE. \n\nAdebayo holds executive advisor roles at both startups and global technology brands, he is a member of the Internet of Things advisory board to the city of Chicago, a mentor at M-Hub, co-founder of SpectaPLAY, a founding member of the Institute for African Future, and an advisor to several governments. Connect on LinkedIn and Twitter.'
     },
     {
       id: bioId(),
