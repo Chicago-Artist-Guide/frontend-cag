@@ -52,15 +52,19 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
       if (imageEl && crop.width && crop.height) {
         const canvas = document.createElement('canvas');
+        const targetX = (imageEl.width * pixelCrop.x) / 100;
+        const targetY = (imageEl.height * pixelCrop.y) / 100;
+        const targetWidth = (imageEl.width * pixelCrop.width) / 100;
+        const targetHeight = (imageEl.height * pixelCrop.height) / 100;
         canvas.width = crop.width;
         canvas.height = crop.height;
         const ctx = canvas.getContext('2d');
         ctx?.drawImage(
           imageEl,
-          pixelCrop.x,
-          pixelCrop.y,
-          pixelCrop.width,
-          pixelCrop.height,
+          targetX,
+          targetY,
+          targetWidth,
+          targetHeight,
           0,
           0,
           crop.width,
