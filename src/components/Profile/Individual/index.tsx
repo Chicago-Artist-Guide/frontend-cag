@@ -313,6 +313,7 @@ const IndividualProfile: React.FC<{
     try {
       if (profile.ref) {
         await updateDoc(profile.ref, { profile_image_url });
+        console.log('save');
       } else {
         // no profile.ref
         // look up?
