@@ -93,7 +93,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Alicia Webb',
-      role: 'Board Governance Co-Chair',
+      role: 'Board Development Co-Chair',
       pronouns: 'she/her',
       affiliation: 'Principal, Bright Spot Public Relations',
       image: Webb,
