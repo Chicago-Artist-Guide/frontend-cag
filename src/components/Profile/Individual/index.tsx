@@ -626,7 +626,7 @@ const IndividualProfile: React.FC<{
   };
 
   useEffect(() => {
-    editProfile?.upcoming_performances.forEach((upcomingShow: any) => {
+    editProfile?.upcoming_performances?.forEach((upcomingShow: any) => {
       const showId = upcomingShow.id;
       const showImgUrl = imgUrl[showId] ?? false;
 
