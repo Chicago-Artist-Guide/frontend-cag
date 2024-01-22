@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Image from 'react-bootstrap/Image';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -43,12 +43,12 @@ const Donate = () => {
                 allow="payment"
                 frameBorder="0"
                 scrolling="no"
-                title="Donate to Chicago Artist Guide online"
+                title="Donate to Chicago Artist Guide online. Donation form powered by Zeffy."
                 style={{ width: '100%', border: 'none' }}
-                src="https://secure.lglforms.com/form_engine/s/wIPQhEmPD0vhxafb-oKAQQ"
+                src="https://www.zeffy.com/en-US/donation-form/bf4f5b40-de6b-44d1-9276-ef91daa82842"
               >
-                <a href="https://secure.lglforms.com/form_engine/s/wIPQhEmPD0vhxafb-oKAQQ">
-                  Fill out my LGL Form!
+                <a href="https://www.zeffy.com/en-US/donation-form/bf4f5b40-de6b-44d1-9276-ef91daa82842">
+                  Click here to donate to CAG on Zeffy!
                 </a>
               </IFrame>
             </Col>
@@ -105,10 +105,10 @@ const Donate = () => {
 };
 
 const IFrame = styled.iframe`
-  height: 1200px;
+  height: 1620px;
 
   @media screen and (max-width: ${breakpoints.sm}) {
-    height: 1360px;
+    height: 1740px;
   }
 `;
 
