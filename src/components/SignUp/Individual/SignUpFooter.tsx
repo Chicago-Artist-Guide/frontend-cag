@@ -69,7 +69,7 @@ const SignUpFooter: React.FC<{
       const submitted = await submitBasics();
       const prev = previous ? previous : () => null;
 
-      return submitted.ok ? next() : prev();
+      return submitted.ok && next();
     }
 
     if (currStep === 'demographics') {
