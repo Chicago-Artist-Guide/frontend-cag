@@ -307,13 +307,10 @@ const IndividualProfile: React.FC<{
     setProfileForm('websites', newWebsiteInputs);
   };
 
-  const updatePfpUrl = async () => {
-    const { profile_image_url } = editProfile;
-
+  const savePfpUrlModal = async (pfpImgUrl: string) => {
     try {
       if (profile.ref) {
-        await updateDoc(profile.ref, { profile_image_url });
-        console.log('save');
+        await updateDoc(profile.ref, { ['profile_image_url']: pfpImgUrl });
       } else {
         // no profile.ref
         // look up?
@@ -321,11 +318,6 @@ const IndividualProfile: React.FC<{
     } catch (err) {
       console.error('Error updating profile image', err);
     }
-  };
-
-  const savePfpUrlModal = async (pfpImgUrl: string) => {
-    setProfileForm('profile_image_url', pfpImgUrl);
-    await updatePfpUrl();
   };
 
   const updatePersonalDetails = async () => {
