@@ -163,6 +163,8 @@ export const aboutQ = {
         <a href="https://www.chicagoartistguide.org/terms-of-service">
           Terms of Service
         </a>,
+        ' and ',
+        <a href="/privacy-policy">Privacy Policy</a>,
         ' for more details.'
       ]
     },

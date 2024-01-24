@@ -9,7 +9,7 @@ import { useProfileContext } from '../../../context/ProfileContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
-import Privacy from '../Privacy';
+import CompanyPrivacy from './Privacy';
 import CompanyBasics from './Basics';
 import CompanyDetails from './Details';
 import CompanyPhoto from './Photo';
@@ -19,7 +19,7 @@ import { defaultErrorState, defaultFormState, defaultSteps } from './utils';
 
 const stepComponents = {
   basics: CompanyBasics,
-  privacy: Privacy,
+  privacy: CompanyPrivacy,
   details: CompanyDetails,
   photo: CompanyPhoto
 };

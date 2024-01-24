@@ -6,12 +6,12 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import yellow_blob from '../../images/yellow_blob_2.svg';
-import { colors, fonts } from '../../theme/styleVars';
-import SignUpBody from './shared/Body';
-import SignUpHeader from './shared/Header';
+import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { colors, fonts } from '../../../theme/styleVars';
+import SignUpBody from '../shared/Body';
+import SignUpHeader from '../shared/Header';
 
-const Privacy: React.FC<{
+const CompanyPrivacy: React.FC<{
   setForm: SetForm;
   formData: any;
 }> = (props) => {
@@ -30,36 +30,40 @@ const Privacy: React.FC<{
       </Row>
       <Row>
         <SignUpBody lg="8">
-          <PrivacyPar>
+          <Paragraph>
             We take privacy seriously (seriously). That means that we expect you
             to never share, sell, or otherwise distribute any information on
             this site to a third party. Doing so will be grounds for the
             immediate removal of your organization's account.
-          </PrivacyPar>
-          <PrivacyPar>
-            Some of the information you'll see from individual users is
+          </Paragraph>
+          <Paragraph>
+            Some of the information you’ll see from individual users is
             personal, and for some could be sensitive in nature. The reason we
             allow access to this information is for the purpose of creating the
-            most effective, inclusive, and equitable casting &amp; hiring
-            platform possible. You are expected to use our platform for this
-            purpose in filling your positions.
-          </PrivacyPar>
-          <PrivacyPar>
+            most effective, inclusive, and equitable casting & hiring platform
+            possible. You are expected to use our platform for this purpose in
+            filling your positions.
+          </Paragraph>
+          <Paragraph>
             While we may use aggregated data for reporting purposes, we will
-            never share your group's individual data. If you'd like to learn
+            never share your group’s individual data. If you'd like to learn
             more about the measures we take to secure user data,{' '}
-            <Link to="/faq" target="_blank">
+            <Link to="/privacy-policy" target="_blank">
               click here
             </Link>
             .
-          </PrivacyPar>
-          <TermsPrivacyLink to="/terms-of-service" target="_blank">
-            View our full terms and privacy policy
-          </TermsPrivacyLink>
-          <PrivacyPar>
-            Tap the green "Accept &amp; Continue" button to agree with our terms
-            and privacy policy.
-          </PrivacyPar>
+          </Paragraph>
+          <Paragraph>
+            Tap the green "Accept & Continue" button to agree with our{' '}
+            <Link to="/terms-of-service" target="_blank">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link to="/privacy-policy" target="_blank">
+              Privacy Policy
+            </Link>
+            .
+          </Paragraph>
         </SignUpBody>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
@@ -75,19 +79,11 @@ const ImageCol = styled(Col)`
   max-width: 100%;
 `;
 
-const PrivacyPar = styled.p`
+const Paragraph = styled.p`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
-  letter-spacing: 0px;
+  letter-spacing: 1px;
 `;
 
-const TermsPrivacyLink = styled(Link)`
-  color: ${colors.veryDarkGrayBlue};
-  font-family: ${fonts.lora};
-  font-size: 14px;
-  margin-bottom: 18px;
-  margin-top: 26px;
-`;
-
-export default Privacy;
+export default CompanyPrivacy;

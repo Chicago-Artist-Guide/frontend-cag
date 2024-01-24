@@ -9,7 +9,7 @@ import { useMarketingContext } from '../../../context/MarketingContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
-import Privacy from '../Privacy';
+import Privacy from './Privacy';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
 import ActorInfo1 from './ActorInfo1';
 import ActorInfo2 from './ActorInfo2';

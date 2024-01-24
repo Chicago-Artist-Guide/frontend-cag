@@ -107,6 +107,11 @@ const Footer = () => (
                 TERMS OF SERVICE
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link as={Link} to="/privacy-policy">
+                PRIVACY POLICY
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
         </EdgeCols>
       </Row>
@@ -122,7 +127,7 @@ const FooterNavbar = styled(Navbar)`
     background-size: 150% auto;
     min-height: 200px;
     padding-top: 50px;
-    
+
     .navbar-nav.icon-list {
       flex: 1;
       flex-direction: row;
