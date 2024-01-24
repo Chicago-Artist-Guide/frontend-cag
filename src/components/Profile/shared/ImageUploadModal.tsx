@@ -135,6 +135,8 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
             crop={crop}
             onChange={(newCrop: Crop) => setCrop(newCrop)}
             onComplete={onCropComplete}
+            circularCrop={true}
+            aspect={1 / 1}
           >
             <img className="ReactCrop__image" src={src} />
           </ReactCrop>
