@@ -1,39 +1,24 @@
 import React, { useState, useCallback } from 'react';
 import { Modal, Button, Alert } from 'react-bootstrap';
 import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { useFirebaseContext } from '../../../context/FirebaseContext';
+import { useFirebaseContext } from '../../context/FirebaseContext';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-import ImageUpload from '../../shared/ImageUpload';
-import styled from 'styled-components';
+import { Container } from 'styled-bootstrap-grid';
 
-interface ImageUploadModalProps {
-  show: boolean;
-  onHide: () => void;
-  onSave: (imageUrl: string) => void;
-  editProfile: any;
-}
-
-const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
-  show,
-  onHide,
-  onSave,
-  editProfile
-}) => {
-  const { firebaseStorage } = useFirebaseContext();
-  const [src, setSrc] = useState(null as string | null);
+const ImageUpload = () => {
   const [fileName, setFileName] = useState('');
+  const [fileType, setFileType] = useState('image/jpeg');
+  const [src, setSrc] = useState(null as string | null);
+  const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
+  const { firebaseStorage } = useFirebaseContext();
   const [crop, setCrop] = useState<Crop>({
     width: 50,
     height: 50,
     x: 0,
     y: 0,
-    unit: '%'
+    unit: 'px'
   });
-  const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
-  const [error, setError] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
-  const [fileType, setFileType] = useState('image/jpeg');
 
   const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -51,7 +36,6 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       // Convert crop to blob
       const imageEl =
         document.querySelector<HTMLImageElement>('.ReactCrop__image');
-
       if (imageEl && crop.width && crop.height) {
         const canvas = document.createElement('canvas');
         const scaleX = imageEl.naturalWidth / imageEl.width;
@@ -84,12 +68,10 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   );
 
   const uploadImage = async () => {
-    if (croppedImageBlob && editProfile) {
+    if (croppedImageBlob) {
       const imgRef = ref(
         firebaseStorage,
-        `/files-${editProfile?.uid}/${
-          editProfile?.account_id
-        }-${Date.now()}-${fileName}`
+        `/files-${'123'}/${'123'}}-${Date.now()}-${fileName}`
       );
       const uploadTask = uploadBytesResumable(imgRef, croppedImageBlob);
 
@@ -100,7 +82,6 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
         },
         (error) => {
           console.error('Upload error:', error);
-          setError('Error uploading image: ' + error.message);
         },
         () => {
           console.log('Uploaded successfully!');
@@ -108,27 +89,37 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
           // download url
           getDownloadURL(uploadTask.snapshot.ref).then((url) => {
             console.log('Uploaded pfp image url:', url);
-            setImageUrl(url);
           });
         }
       );
     }
   };
 
-  const saveImage = async (finalUrl: string) => {
-    await onSave(finalUrl);
-    onHide();
-  };
-
   return (
-    <Modal show={show} onHide={onHide} backdrop="static">
-      <Modal.Header closeButton>
-        <Modal.Title>Profile Picture</Modal.Title>
-      </Modal.Header>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <ImageUpload />
-    </Modal>
+    <Container>
+      <input
+        type="file"
+        accept="image/jpeg, image/png, image/gif"
+        onChange={onSelectFile}
+      />
+      {src && (
+        <ReactCrop
+          crop={crop}
+          onChange={(newCrop: Crop) => setCrop(newCrop)}
+          onComplete={onCropComplete}
+          circularCrop={true}
+          aspect={1 / 1}
+        >
+          <img className="ReactCrop__image" src={src} />
+        </ReactCrop>
+      )}
+      {src && (
+        <Button variant="success" onClick={uploadImage}>
+          Save Photo
+        </Button>
+      )}
+    </Container>
   );
 };
 
-export default ImageUploadModal;
+export default ImageUpload;
