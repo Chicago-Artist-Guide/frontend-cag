@@ -311,6 +311,7 @@ const IndividualProfile: React.FC<{
     try {
       if (profile.ref) {
         await updateDoc(profile.ref, { ['profile_image_url']: pfpImgUrl });
+        setPfpModalShow(false);
       } else {
         // no profile.ref
         // look up?
