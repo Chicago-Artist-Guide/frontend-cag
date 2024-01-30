@@ -1,12 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import { Modal, Button, Alert } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Container } from 'styled-bootstrap-grid';
 
-const ImageUpload = () => {
+interface ImageUploadModalProps {
+  onSave: (imageUrl: string) => void;
+}
+
+const ImageUpload: React.FC<ImageUploadModalProps> = ({ onSave }) => {
   const [fileName, setFileName] = useState('');
   const [fileType, setFileType] = useState('image/jpeg');
   const [src, setSrc] = useState(null as string | null);
@@ -89,6 +93,7 @@ const ImageUpload = () => {
           // download url
           getDownloadURL(uploadTask.snapshot.ref).then((url) => {
             console.log('Uploaded pfp image url:', url);
+            onSave(url);
           });
         }
       );
