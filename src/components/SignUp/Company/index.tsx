@@ -54,7 +54,8 @@ const CompanySignUp: React.FC<{
     } catch (err) {
       setErrors((prev) => ({
         ...prev,
-        emailAddress: 'Email is already in use'
+        emailAddress:
+          'Email address already in use, please ensure you are using your theatre’s email address not your personal'
       }));
       return { ok: false };
     }
