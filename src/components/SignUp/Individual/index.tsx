@@ -44,8 +44,8 @@ const defaultSteps: Step[] = [
   { id: 'role' },
   { id: 'basics' },
   { id: 'privacy' },
-  { id: 'actorInfo' },
   { id: 'offstageRoles' },
+  { id: 'actorInfo' },
   { id: 'profilePhoto' }
 ];
 
@@ -138,7 +138,7 @@ const IndividualSignUp: React.FC<{
       case 'off-stage':
         // if we can't find the step we need here, we need to re-add it
         if (indexForOffstageRoles === -1 && indexForActorInfo > -1) {
-          newSteps.splice(indexForActorInfo + 1, 0, {
+          newSteps.splice(indexForActorInfo, 0, {
             id: 'offstageRoles'
           });
         }
@@ -410,13 +410,13 @@ const IndividualSignUp: React.FC<{
       case 'privacy':
         returnStep = <Privacy {...props} />;
         break;
+      case 'offstageRoles':
+        returnStep = <OffstageRoles {...props} />;
+        break;
       case 'actorInfo':
         returnStep = (
           <ActorInfo {...props} hasErrorCallback={setStepErrorsCallback} />
         );
-        break;
-      case 'offstageRoles':
-        returnStep = <OffstageRoles {...props} />;
         break;
       case 'profilePhoto':
         returnStep = <ProfilePhoto {...props} />;

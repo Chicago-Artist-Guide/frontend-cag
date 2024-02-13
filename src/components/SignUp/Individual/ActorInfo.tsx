@@ -29,6 +29,7 @@ const ActorInfo: React.FC<{
 }> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
   const {
+    stageRole,
     demographicsUnionStatus,
     actorInfo2AgeRanges,
     actorInfo1Ethnicities,
@@ -38,13 +39,19 @@ const ActorInfo: React.FC<{
     actorInfo1LGBTQ
   } = formData;
 
-  const requiredFields = [
-    'demographicsUnionStatus',
-    'actorInfo2AgeRanges',
-    'actorInfo1Ethnicities',
-    'actorInfo2Gender',
-    'actorInfo1LGBTQ'
-  ];
+  const optLabel = '(Optional)';
+  const isOffStage = stageRole === 'off-stage';
+  const requiredFields = ['demographicsUnionStatus'];
+
+  // most fields are optional for off-stage
+  if (!isOffStage) {
+    requiredFields.push(
+      'actorInfo2AgeRanges',
+      'actorInfo1Ethnicities',
+      'actorInfo2Gender',
+      'actorInfo1LGBTQ'
+    );
+  }
 
   const createDefaultFormErrorsData = () => {
     const formErrorsObj: { [key: string]: boolean } = {};
@@ -189,26 +196,28 @@ const ActorInfo: React.FC<{
                   value="No"
                 />
               </Form.Group>
+              {!isOffStage && (
+                <Form.Group className="form-group">
+                  <CAGLabel>
+                    Which age ranges do you play? <PrivateLabel />
+                  </CAGLabel>
+                  <p>Select up to 3 ranges</p>
+                  {ageRanges.map((ageRange) => (
+                    <Checkbox
+                      checked={isAgeRangeInAgeRanges(ageRange)}
+                      fieldType="checkbox"
+                      key={`age-range-chk-${ageRange}`}
+                      label={ageRange}
+                      name="actorInfo2AgeRanges"
+                      onChange={(e: any) =>
+                        ageRangeChange(e.currentTarget.checked, ageRange)
+                      }
+                    />
+                  ))}
+                </Form.Group>
+              )}
               <Form.Group className="form-group">
-                <CAGLabel>
-                  Which age ranges do you play? <PrivateLabel />
-                </CAGLabel>
-                <p>Select up to 3 ranges</p>
-                {ageRanges.map((ageRange) => (
-                  <Checkbox
-                    checked={isAgeRangeInAgeRanges(ageRange)}
-                    fieldType="checkbox"
-                    key={`age-range-chk-${ageRange}`}
-                    label={ageRange}
-                    name="actorInfo2AgeRanges"
-                    onChange={(e: any) =>
-                      ageRangeChange(e.currentTarget.checked, ageRange)
-                    }
-                  />
-                ))}
-              </Form.Group>
-              <Form.Group className="form-group">
-                <CAGLabel>Ethnicity:</CAGLabel>
+                <CAGLabel>Ethnicity {isOffStage && optLabel}</CAGLabel>
                 {ethnicityTypes.map((eth) => (
                   <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                     <Checkbox
@@ -242,14 +251,16 @@ const ActorInfo: React.FC<{
               </Form.Group>
               <Form.Group className="form-group">
                 <CAGLabel>
-                  Gender Identity <PrivateLabel />
+                  Gender Identity {isOffStage && optLabel} <PrivateLabel />
                 </CAGLabel>
-                <p>
-                  First, choose your gender identity - additional options may be
-                  presented for casting purposes. If other, please select the
-                  option with which you most closely identify for casting
-                  purposes.
-                </p>
+                {!isOffStage && (
+                  <p>
+                    First, choose your gender identity - additional options may
+                    be presented for casting purposes. If other, please select
+                    the option with which you most closely identify for casting
+                    purposes.
+                  </p>
+                )}
                 <Form.Control
                   as="select"
                   defaultValue=""
@@ -267,7 +278,8 @@ const ActorInfo: React.FC<{
             </Col>
           </Row>
           {actorInfo2Gender !== ('' as Gender) &&
-            !actorInfo2Gender.includes('Cis') && (
+            !actorInfo2Gender.includes('Cis') &&
+            !isOffStage && (
               <Row>
                 <Col lg="6">
                   <Form.Group className="form-group">
@@ -320,6 +332,7 @@ const ActorInfo: React.FC<{
               <Form.Group className="form-group">
                 <CAGLabel>
                   Do you identify as part of the LGBTQIA+ community?{' '}
+                  {isOffStage && optLabel}
                   <PrivateLabel />
                 </CAGLabel>
                 <Checkbox
