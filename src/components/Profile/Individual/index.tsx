@@ -62,11 +62,9 @@ type PerformanceState = {
 const IndividualProfile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
-  const history = useHistory();
   const { firebaseStorage } = useFirebaseContext();
   const { account, profile, setAccountData, setProfileData } =
     useProfileContext();
-  const [showSignUp2Link, setShowUp2Link] = useState(false);
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,
     headline: false,
@@ -112,11 +110,6 @@ const IndividualProfile: React.FC<{
   const [yearOptions, setYearOptions] = useState([] as number[]);
 
   const PageWrapper = previewMode ? Container : PageContainer;
-
-  const hideShowUpLink = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault();
-    setShowUp2Link(false);
-  };
 
   const updatePerformanceState = () => {
     if (!profile?.data?.upcoming_performances) {
@@ -164,7 +157,6 @@ const IndividualProfile: React.FC<{
     }
 
     setWebsiteId(profile?.data?.websites?.length || 1);
-    setShowUp2Link(previewMode || !profile?.data?.completed_profile_2);
     setEditProfile(profile?.data);
     updatePerformanceState();
     updatePastPerformanceState();
@@ -799,29 +791,7 @@ const IndividualProfile: React.FC<{
 
   return (
     <PageWrapper>
-      {showSignUp2Link && (
-        <Row>
-          <PreviewCard>
-            <h2>Your Profile is looking great!</h2>
-            <p>
-              We can walk you through the remaining steps or you can take it
-              from here
-            </p>
-            <div>
-              <Button
-                onClick={() => history.push('/sign-up-2')}
-                text="Keep Going"
-                type="button"
-                variant="secondary"
-              />
-              <a href="#" onClick={hideShowUpLink}>
-                remind me later
-              </a>
-            </div>
-          </PreviewCard>
-        </Row>
-      )}
-      {profile?.data?.completed_profile_2 && (
+      {profile?.data?.completed_profile && (
         <Row>
           <PreviewCard>
             <h2>

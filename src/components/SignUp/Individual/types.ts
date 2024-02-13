@@ -188,7 +188,8 @@ export type IndividualProfile = {
   headline: string;
   bio: string;
   profile_tagline: string;
-  completed_profile_1: boolean;
+  completed_profile: boolean;
+  completed_profile_1: boolean; // old
 };
 
 export const skillCheckboxes = ['Dancing', 'Singing'] as const;
