@@ -3,11 +3,11 @@ import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
+import { useHistory } from 'react-router-dom';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
-import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
 import Privacy from './Privacy';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
@@ -46,8 +46,7 @@ const defaultSteps: Step[] = [
   { id: 'privacy' },
   { id: 'actorInfo' },
   { id: 'offstageRoles' },
-  { id: 'profilePhoto' },
-  { id: 'profilePreview' }
+  { id: 'profilePhoto' }
 ];
 
 // flatten our step id's into a single array
@@ -93,6 +92,7 @@ const IndividualSignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
+  const history = useHistory();
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useProfileContext();
   const { lglApiKey } = useMarketingContext();
@@ -358,7 +358,10 @@ const IndividualSignUp: React.FC<{
       // profile tagline
       profile_tagline: profileTagline,
 
-      // completed profile
+      // completed profile (new)
+      completed_profile: true,
+
+      // completed_profile (old)
       completed_profile_1: true
     };
 
@@ -418,9 +421,6 @@ const IndividualSignUp: React.FC<{
       case 'profilePhoto':
         returnStep = <ProfilePhoto {...props} />;
         break;
-      case 'profilePreview':
-        returnStep = <Profile previewMode={true} />;
-        break;
       default:
         returnStep = <></>;
         break;
@@ -429,26 +429,24 @@ const IndividualSignUp: React.FC<{
     return returnStep;
   };
 
-  // if no Landing type is selected or it's profile preview, don't show navigation yet
-  const showSignUpFooter = stepId !== 'profilePreview';
+  const goToProfile = () => history.push('/profile');
 
   return (
     <PageContainer>
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
       </Row>
-      {showSignUpFooter && (
-        <SignUpFooter
-          landingStep={index}
-          navigation={navigation}
-          setLandingStep={setCurrentStep}
-          submitSignUpProfile={submitSignUpProfile}
-          currentStep={stepId}
-          stepErrors={stepErrors}
-          steps={steps}
-          submitBasics={submitBasics}
-        />
-      )}
+      <SignUpFooter
+        landingStep={index}
+        navigation={navigation}
+        setLandingStep={setCurrentStep}
+        submitSignUpProfile={submitSignUpProfile}
+        currentStep={stepId}
+        stepErrors={stepErrors}
+        steps={steps}
+        submitBasics={submitBasics}
+        goToProfile={goToProfile}
+      />
     </PageContainer>
   );
 };

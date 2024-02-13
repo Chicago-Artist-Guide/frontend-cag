@@ -22,6 +22,7 @@ const SignUpFooter: React.FC<{
   submitBasics: () => Promise<SubmitBasicsResp>;
   submitSignUpProfile: () => Promise<void>;
   stepErrors: { [key: string]: boolean };
+  goToProfile: () => void;
 }> = ({
   landingStep,
   navigation,
@@ -30,7 +31,8 @@ const SignUpFooter: React.FC<{
   steps,
   submitBasics,
   submitSignUpProfile,
-  stepErrors
+  stepErrors,
+  goToProfile
 }) => {
   /*
     SPECIAL CASES:
@@ -53,8 +55,19 @@ const SignUpFooter: React.FC<{
   const { next, previous } = navigation;
   const navigationNext = landingStep === 2 || currentStep !== 'privacy';
   const stepIndex = steps.findIndex((step) => step.id === currentStep);
-  const continueText =
-    currentStep === 'privacy' ? 'Accept & Continue' : 'Continue';
+  const lastStep = steps[steps.length - 1];
+  let continueText = 'Continue';
+
+  switch (currentStep) {
+    case 'privacy':
+      continueText = 'Accept & Continue';
+      break;
+    case lastStep.id:
+      continueText = 'Finish';
+      break;
+    default:
+      continueText = 'Continue';
+  }
 
   const prevButtonAction = (landingStep: number) => {
     goToTop();
@@ -72,9 +85,10 @@ const SignUpFooter: React.FC<{
       return submitted.ok && next();
     }
 
-    if (currStep === 'profilePhoto') {
+    // on the last step, submit data and go to profile
+    if (currStep === lastStep.id) {
       await submitSignUpProfile();
-      return next();
+      return goToProfile();
     }
 
     if (navNext) {
@@ -110,15 +124,13 @@ const SignUpFooter: React.FC<{
         </Pagination>
       </Col>
       <ButtonCol lg="4">
-        {currentStep !== ('awards' as any) && (
-          <Button
-            disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
-            onClick={() => nextButtonAction(navigationNext, currentStep)}
-            text={continueText}
-            type="button"
-            variant="primary"
-          />
-        )}
+        <Button
+          disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
+          onClick={() => nextButtonAction(navigationNext, currentStep)}
+          text={continueText}
+          type="button"
+          variant="primary"
+        />
       </ButtonCol>
     </PageFooterRow>
   );
