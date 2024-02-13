@@ -13,7 +13,6 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import DatePicker from 'react-datepicker';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import {
   faCheckCircle,
@@ -880,7 +879,7 @@ const IndividualProfile: React.FC<{
                   )}
                   {(profile?.data?.height_no_answer ||
                     (profile?.data?.height_ft &&
-                      profile?.data?.height_ft !== '')) && (
+                      profile?.data?.height_ft !== '0')) && (
                     <>
                       Height:{' '}
                       {profile?.data?.height_no_answer ? (

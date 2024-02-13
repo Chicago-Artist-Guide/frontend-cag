@@ -63,7 +63,7 @@ const defaultData: IndividualData = {
   actorInfo2GenderTransition: '',
   actorInfo2HeightFt: 0,
   actorInfo2HeightIn: 0,
-  actorInfo2HeightNoAnswer: false,
+  actorInfo2HeightNoAnswer: true,
   basics18Plus: false,
   basicsEmailAddress: '',
   basicsFirstName: '',
