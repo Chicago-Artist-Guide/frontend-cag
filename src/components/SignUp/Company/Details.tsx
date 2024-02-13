@@ -1,17 +1,34 @@
 import React, { useEffect } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
-import { Dropdown } from '../../../genericComponents';
-import InputField from '../../../genericComponents/Input';
+import { Dropdown, InputField } from '../../../genericComponents';
 import TextArea from '../../../genericComponents/TextArea';
 import { neighborhoods } from '../../../utils/lookups';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 import { CompanyData } from './types';
 import { checkForErrors } from './utils';
-import { ErrorMessage } from '../../../utils/validation';
+import { FormRadio } from '../../Profile/Form/Inputs';
+import { getOptions } from '../../../utils/helpers';
 
-const requiredFields = ['numberOfMembers', 'primaryContact', 'description'];
+const numOfMemberRanges = [
+  { name: 'Choose one...', value: 'choose' },
+  ...['less than 5', '5-14', '15-30', '30+'].map((val) => ({
+    name: val,
+    value: val
+  }))
+];
+const equity = ['Equity', 'Non-Equity'];
+
+const requiredFields = ['numberOfMembers', 'equity'];
+
+const locations = [
+  { name: 'Choose one...', value: 'choose' },
+  ...neighborhoods.map((neighborhood) => ({
+    name: neighborhood,
+    value: neighborhood
+  }))
+];
 
 const CompanyDetails: React.FC<{
   stepId: string;
@@ -19,14 +36,6 @@ const CompanyDetails: React.FC<{
   formValues: CompanyData;
   setStepErrors: (step: string, hasErrors: boolean) => void;
 }> = ({ setForm, stepId, formValues, setStepErrors }) => {
-  const locations = [
-    { name: 'Choose one...', value: 'choose' },
-    ...neighborhoods.map((neighborhood) => ({
-      name: neighborhood,
-      value: neighborhood
-    }))
-  ];
-
   useEffect(() => {
     if (requiredFields.length > 0) {
       const hasErrors = checkForErrors(requiredFields, formValues);
@@ -41,17 +50,14 @@ const CompanyDetails: React.FC<{
       </Row>
       <Row>
         <SignUpBody lg="6">
-          <InputField
-            required
+          <Dropdown
             name="numberOfMembers"
             label="Number of Members"
-            placeholder="Enter approx. number"
-            hasErrorCallback={setStepErrors}
+            options={numOfMemberRanges}
+            value={formValues.numberOfMembers}
             onChange={setForm}
-            requiredLabel="numberOfMembers"
-            value={formValues.numberOfMembers ?? ''}
           />
-          <InputField
+          {/* <InputField
             required
             name="primaryContact"
             label="Primary Contact"
@@ -72,7 +78,7 @@ const CompanyDetails: React.FC<{
             validationRegexMessage={ErrorMessage.EmailFormat}
             validationRegexName="emailAddress"
             value={formValues.primaryContactEmail ?? ''}
-          />
+          /> */}
           <Dropdown
             name="location"
             label="Location (neighborhood)"
@@ -80,7 +86,23 @@ const CompanyDetails: React.FC<{
             value={formValues.location}
             onChange={setForm}
           />
-          <TextArea
+          <InputField
+            name="website"
+            label="Link to website"
+            placeholder="Website URL"
+            hasErrorCallback={setStepErrors}
+            onChange={setForm}
+            requiredLabel="website"
+            value={formValues.website ?? ''}
+          />
+          <FormRadio
+            name="equity"
+            label="Equity"
+            options={getOptions(equity)}
+            checked={formValues.equity}
+            onChange={setForm}
+          />
+          {/* <TextArea
             required
             name="description"
             label="Theatre Group Description"
@@ -89,7 +111,7 @@ const CompanyDetails: React.FC<{
             onChange={setForm}
             requiredLabel="description"
             value={formValues.description ?? ''}
-          />
+          /> */}
         </SignUpBody>
       </Row>
     </Container>
