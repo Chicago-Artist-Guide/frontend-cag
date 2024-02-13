@@ -13,7 +13,6 @@ import Privacy from './Privacy';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
 import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
-import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import ProfilePhoto from './ProfilePhoto';
 import IndividualRole from './Role';

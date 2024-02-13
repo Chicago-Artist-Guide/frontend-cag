@@ -79,6 +79,8 @@ const IndividualProfile: React.FC<{
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
 
+  console.log(profile.data);
+
   // pfp
   const [pfpModalShow, setPfpModalShow] = useState<boolean>(false);
 

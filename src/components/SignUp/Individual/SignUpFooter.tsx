@@ -72,7 +72,7 @@ const SignUpFooter: React.FC<{
       return submitted.ok && next();
     }
 
-    if (currStep === 'demographics') {
+    if (currStep === 'profilePhoto') {
       await submitSignUpProfile();
       return next();
     }
