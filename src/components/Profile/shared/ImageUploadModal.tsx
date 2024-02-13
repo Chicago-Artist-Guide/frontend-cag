@@ -2,28 +2,32 @@ import React, { useState } from 'react';
 import { Modal, Alert } from 'react-bootstrap';
 import 'react-image-crop/dist/ReactCrop.css';
 import ImageUpload from '../../shared/ImageUpload';
+import Button from '../../../genericComponents/Button';
 
 interface ImageUploadModalProps {
   show: boolean;
   onHide: () => void;
   onSave: (imageUrl: string) => void;
   editProfile: any;
+  currentImgUrl: string;
 }
 
 const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   show,
   onHide,
-  onSave
+  onSave,
+  currentImgUrl
 }) => {
   const [error, setError] = useState('');
 
   return (
     <Modal show={show} onHide={onHide} backdrop="static">
-      <Modal.Header closeButton>
+      <Modal.Header>
         <Modal.Title>Profile Picture</Modal.Title>
       </Modal.Header>
       {error && <Alert variant="danger">{error}</Alert>}
-      <ImageUpload onSave={onSave} />
+      <ImageUpload onSave={onSave} currentImgUrl={currentImgUrl} />
+      <Button onClick={onHide} text="Cancel" type="danger" variant="danger" />
     </Modal>
   );
 };

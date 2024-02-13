@@ -1,21 +1,36 @@
-import React, { useState, useCallback } from 'react';
-import { Button } from 'react-bootstrap';
-import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { useFirebaseContext } from '../../context/FirebaseContext';
-import ReactCrop, { Crop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import React, { useState, useCallback, useRef } from 'react';
 import { Container } from 'styled-bootstrap-grid';
+import Row from 'react-bootstrap/Row';
+import { Col } from 'react-bootstrap';
+import { colors } from '../../theme/styleVars';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import styled from 'styled-components';
+import { useFirebaseContext } from '../../context/FirebaseContext';
+import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { useProfileContext } from '../../context/ProfileContext';
+import Button from '../../genericComponents/Button';
+import ReactCrop, { Crop } from 'react-image-crop';
 
 interface ImageUploadModalProps {
   onSave: (imageUrl: string) => void;
+  currentImgUrl: string;
 }
 
-const ImageUpload: React.FC<ImageUploadModalProps> = ({ onSave }) => {
-  const [fileName, setFileName] = useState('');
-  const [fileType, setFileType] = useState('image/jpeg');
-  const [src, setSrc] = useState(null as string | null);
+const ImageUpload: React.FC<ImageUploadModalProps> = ({
+  onSave,
+  currentImgUrl
+}) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [uploadInProgress, setUploadInProgress] = useState(false);
   const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
   const { firebaseStorage } = useFirebaseContext();
+  const [percent, setPercent] = useState(0);
+  const [imgUrl, setImgUrl] = useState<string | null>(currentImgUrl);
+  const [src, setSrc] = useState(null as string | null);
+  const {
+    profile: { data }
+  } = useProfileContext();
   const [crop, setCrop] = useState<Crop>({
     width: 50,
     height: 50,
@@ -24,20 +39,56 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({ onSave }) => {
     unit: 'px'
   });
 
-  const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const reader = new FileReader();
       const file = e.target.files[0];
-      setFileType(file.type);
-      setFileName(file.name);
+      setFile(file);
       reader.addEventListener('load', () => setSrc(reader.result as string));
       reader.readAsDataURL(file);
     }
   };
 
+  const uploadFile = () => {
+    if (!croppedImageBlob) {
+      return;
+    }
+
+    setUploadInProgress(true);
+    const storageRef = ref(
+      firebaseStorage,
+      `/files-${data.uid}/${data.account_id}-${file?.name}`
+    );
+    const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const currentPercent = Math.round(
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        );
+        // update progress
+        setPercent(currentPercent);
+      },
+      (err) => {
+        console.log('Error uploading image', err);
+        setUploadInProgress(false);
+      },
+      () => {
+        setUploadInProgress(false);
+
+        // download url
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+          console.log('Uploaded image url:', url);
+          onSave(url);
+        });
+      }
+    );
+  };
+
   const onCropComplete = useCallback(
     (crop, pixelCrop) => {
-      // Convert crop to blob
       const imageEl =
         document.querySelector<HTMLImageElement>('.ReactCrop__image');
       if (imageEl && crop.width && crop.height) {
@@ -62,69 +113,88 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({ onSave }) => {
           crop.width,
           crop.height
         );
-
         canvas.toBlob((blob) => {
           setCroppedImageBlob(blob);
-        }, fileType);
+        }, file?.type);
       }
     },
-    [fileType]
+    [file?.type]
   );
-
-  const uploadImage = async () => {
-    if (croppedImageBlob) {
-      const imgRef = ref(
-        firebaseStorage,
-        `/files-${'123'}/${'123'}}-${Date.now()}-${fileName}`
-      );
-      const uploadTask = uploadBytesResumable(imgRef, croppedImageBlob);
-
-      uploadTask.on(
-        'state_changed',
-        (snapshot) => {
-          // Handle progress
-        },
-        (error) => {
-          console.error('Upload error:', error);
-        },
-        () => {
-          console.log('Uploaded successfully!');
-
-          // download url
-          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-            console.log('Uploaded pfp image url:', url);
-            onSave(url);
-          });
-        }
-      );
-    }
-  };
 
   return (
     <Container>
-      <input
-        type="file"
-        accept="image/jpeg, image/png, image/gif"
-        onChange={onSelectFile}
-      />
-      {src && (
+      {src ? (
         <ReactCrop
           crop={crop}
           onChange={(newCrop: Crop) => setCrop(newCrop)}
           onComplete={onCropComplete}
-          circularCrop={true}
-          aspect={1 / 1}
+          aspect={1}
         >
           <img className="ReactCrop__image" src={src} />
         </ReactCrop>
+      ) : (
+        <PhotoContainer
+          style={{
+            backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
+          }}
+        >
+          {imgUrl === null ||
+            (imgUrl === undefined && (
+              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
+            ))}
+        </PhotoContainer>
       )}
-      {src && (
-        <Button variant="success" onClick={uploadImage}>
-          Save Photo
-        </Button>
-      )}
+      <StyledRow>
+        <Col>
+          <>
+            <Button
+              onClick={() => fileInputRef?.current?.click()}
+              text="Choose File"
+              type="button"
+              variant="secondary"
+            />
+            <input
+              onChange={onFileChange}
+              multiple={false}
+              ref={fileInputRef}
+              type="file"
+              hidden
+            />
+            <p>File size limit: 5MB</p>
+          </>
+        </Col>
+        <Col>
+          {file && (
+            <>
+              <Button
+                onClick={uploadFile}
+                text="Upload File"
+                type="button"
+                variant="secondary"
+              />
+              <p>{file.name}</p>
+            </>
+          )}
+        </Col>
+      </StyledRow>
     </Container>
   );
 };
+
+const PhotoContainer = styled.div`
+  background: ${colors.lightGrey};
+  color: white;
+  display: flex;
+  font-size: 68px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 350px;
+  width: 100%;
+`;
+
+const StyledRow = styled(Row)`
+  margin-top: 20px;
+  justify-content: center;
+`;
 
 export default ImageUpload;

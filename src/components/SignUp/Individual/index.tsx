@@ -18,6 +18,7 @@ import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import ProfilePhoto from './ProfilePhoto';
 import IndividualRole from './Role';
+import ImageUpload from '../../shared/ImageUpload';
 import type {
   Gender,
   IndividualAccountInit,

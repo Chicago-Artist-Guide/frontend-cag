@@ -847,6 +847,7 @@ const IndividualProfile: React.FC<{
             show={pfpModalShow}
             onHide={() => setPfpModalShow(false)}
             onSave={(pfpImgUrl: string) => savePfpUrlModal(pfpImgUrl)}
+            currentImgUrl={profile?.data?.profile_image_url}
           />
           <p>
             <a
@@ -2014,7 +2015,6 @@ const ProfileImage = styled(Image)`
   background: ${colors.lightGrey};
   minheight: 250px;
   width: 100%;
-  border-radius: 50%;
 `;
 
 const DetailsCard = styled.div`
