@@ -24,10 +24,10 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     <Modal show={show} onHide={onHide} backdrop="static">
       <Modal.Header>
         <Modal.Title>Profile Picture</Modal.Title>
+        <Button onClick={onHide} text="Cancel" type="danger" variant="danger" />
       </Modal.Header>
       {error && <Alert variant="danger">{error}</Alert>}
       <ImageUpload onSave={onSave} currentImgUrl={currentImgUrl} />
-      <Button onClick={onHide} text="Cancel" type="danger" variant="danger" />
     </Modal>
   );
 };
