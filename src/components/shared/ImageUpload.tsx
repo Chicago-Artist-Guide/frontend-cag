@@ -123,27 +123,6 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
 
   return (
     <Container>
-      {src ? (
-        <ReactCrop
-          crop={crop}
-          onChange={(newCrop: Crop) => setCrop(newCrop)}
-          onComplete={onCropComplete}
-          aspect={1}
-        >
-          <img className="ReactCrop__image" src={src} />
-        </ReactCrop>
-      ) : (
-        <PhotoContainer
-          style={{
-            backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
-          }}
-        >
-          {imgUrl === null ||
-            (imgUrl === undefined && (
-              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
-            ))}
-        </PhotoContainer>
-      )}
       <StyledRow>
         <Col>
           <>
@@ -160,7 +139,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
               type="file"
               hidden
             />
-            <p>File size limit: 5MB</p>
+            <ButtonLabel>File size limit: 5MB</ButtonLabel>
           </>
         </Col>
         <Col>
@@ -172,11 +151,34 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
                 type="button"
                 variant="secondary"
               />
-              <p>{file.name}</p>
+              <ButtonLabel>{file.name}</ButtonLabel>
             </>
           )}
         </Col>
       </StyledRow>
+      {src ? (
+        <CropContainer>
+          <ReactCrop
+            crop={crop}
+            onChange={(newCrop: Crop) => setCrop(newCrop)}
+            onComplete={onCropComplete}
+            aspect={1}
+          >
+            <img className="ReactCrop__image" src={src} />
+          </ReactCrop>
+        </CropContainer>
+      ) : (
+        <PhotoContainer
+          style={{
+            backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
+          }}
+        >
+          {imgUrl === null ||
+            (imgUrl === undefined && (
+              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
+            ))}
+        </PhotoContainer>
+      )}
     </Container>
   );
 };
@@ -184,17 +186,27 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
 const PhotoContainer = styled.div`
   background: ${colors.lightGrey};
   color: white;
-  display: flex;
   font-size: 68px;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 350px;
+  height: 100%;
   width: 100%;
+  margin-bottom: 20px;
+  text-align: center;
+`;
+
+const CropContainer = styled.div`
+  margin-bottom: 20px;
+  text-align: center;
 `;
 
 const StyledRow = styled(Row)`
   margin-top: 20px;
-  justify-content: center;
+  margin-bottom: 25px;
+`;
+
+const ButtonLabel = styled.p`
+  padding-top: 10px;
 `;
 
 export default ImageUpload;
