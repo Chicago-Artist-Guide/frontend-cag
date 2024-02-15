@@ -2,9 +2,7 @@ import React, { useState, useCallback, useRef } from 'react';
 import { Container } from 'styled-bootstrap-grid';
 import Row from 'react-bootstrap/Row';
 import { Col } from 'react-bootstrap';
-import { colors } from '../../theme/styleVars';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import { colors, breakpoints } from '../../theme/styleVars';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
@@ -41,6 +39,8 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
   });
 
   const imageId = uuidv4();
+  const placeholderUrl =
+    'https://firebasestorage.googleapis.com/v0/b/chicago-artist-guide-dev.appspot.com/o/5a35def2-4f2e-42ac-b619-c6bfa2a5bd11-1234.png?alt=media&token=45772221-1f35-40be-b134-e60f84494b5f';
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -119,11 +119,57 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
     [file?.type]
   );
 
-  const ChooseFileUploadButtons = () => {
+  const MobileButtons = () => {
     return (
-      <StyledRow>
+      <MobileButtonHide>
+        <StyledRow>
+          <Col>
+            <>
+              <Button
+                disabled={uploadInProgress}
+                onClick={() => fileInputRef?.current?.click()}
+                text="Choose File"
+                type="button"
+                variant="secondary"
+              />
+              <input
+                onChange={onFileChange}
+                multiple={false}
+                ref={fileInputRef}
+                type="file"
+                hidden
+              />
+              <ButtonLabel>File size limit: 5MB</ButtonLabel>
+            </>
+          </Col>
+          <Col>
+            {file && (
+              <>
+                <Button
+                  disabled={uploadInProgress}
+                  onClick={uploadFile}
+                  text="Upload File"
+                  type="button"
+                  variant="secondary"
+                />
+                {uploadInProgress ? (
+                  <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
+                ) : (
+                  <ButtonLabel>{file.name}</ButtonLabel>
+                )}
+              </>
+            )}
+          </Col>
+        </StyledRow>
+      </MobileButtonHide>
+    );
+  };
+
+  const DesktopButtons = () => {
+    return (
+      <DesktopButtonHide>
         <Col>
-          <>
+          <StyledMargin>
             <Button
               disabled={uploadInProgress}
               onClick={() => fileInputRef?.current?.click()}
@@ -139,9 +185,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
               hidden
             />
             <ButtonLabel>File size limit: 5MB</ButtonLabel>
-          </>
-        </Col>
-        <Col>
+          </StyledMargin>
           {file && (
             <>
               <Button
@@ -159,42 +203,35 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
             </>
           )}
         </Col>
-      </StyledRow>
+      </DesktopButtonHide>
     );
   };
 
   return (
     <Container>
-      <ChooseFileUploadButtons />
-      {src ? (
-        <CropContainer>
-          <ReactCrop
-            crop={crop}
-            onChange={(newCrop: Crop) => setCrop(newCrop)}
-            onComplete={onCropComplete}
-            aspect={1}
-          >
-            <img className="ReactCrop__image" src={src} />
-          </ReactCrop>
-        </CropContainer>
-      ) : (
-        <PhotoContainer
-          style={{
-            backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
-          }}
-        >
-          {imgUrl === null ||
-            (imgUrl === undefined && (
-              <PlaceholderImage>
-                <FontAwesomeIcon
-                  className="bod-icon"
-                  icon={faCamera}
-                  size="lg"
-                />
-              </PlaceholderImage>
-            ))}
-        </PhotoContainer>
-      )}
+      <MobileButtons />
+      <Row>
+        {src ? (
+          <CropContainer>
+            <ReactCrop
+              crop={crop}
+              onChange={(newCrop: Crop) => setCrop(newCrop)}
+              onComplete={onCropComplete}
+              aspect={1}
+            >
+              <img className="ReactCrop__image" src={src} />
+            </ReactCrop>
+          </CropContainer>
+        ) : (
+          <PhotoContainer
+            style={{
+              backgroundImage:
+                imgUrl !== null ? `url(${imgUrl})` : `url(${placeholderUrl})`
+            }}
+          ></PhotoContainer>
+        )}
+        <DesktopButtons />
+      </Row>
     </Container>
   );
 };
@@ -209,11 +246,15 @@ const PhotoContainer = styled.div`
   width: 100%;
   margin-bottom: 20px;
   text-align: center;
+  display: flex;
+  justify-content: center;
 `;
 
 const CropContainer = styled.div`
   margin-bottom: 20px;
   text-align: center;
+  justify-content: center;
+  align-items: center;
 `;
 
 const StyledRow = styled(Row)`
@@ -225,19 +266,21 @@ const ButtonLabel = styled.p`
   padding-top: 10px;
 `;
 
-const PlaceholderImage = styled.div`
-  background: ${colors.lightGrey};
-  color: white;
-  display: flex;
-  font-size: 68px;
-  height: 300px;
-  width: 100%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  border-radius: 8px;
+const StyledMargin = styled.div`
+  margin-bottom: 100px;
+`;
+
+const MobileButtonHide = styled.div`
+  @media (min-width: ${breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const DesktopButtonHide = styled.div`
+  @media (max-width: ${breakpoints.md}) {
+    display: none;
+  }
+  margin-left: 50px;
 `;
 
 export default ImageUpload;
