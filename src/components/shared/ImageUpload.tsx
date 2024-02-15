@@ -68,7 +68,6 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
         const currentPercent = Math.round(
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100
         );
-        // update progress
         setPercent(currentPercent);
       },
       (err) => {
@@ -76,8 +75,6 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
         setUploadInProgress(false);
       },
       () => {
-        setUploadInProgress(false);
-
         // download url
         getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           console.log('Uploaded image url:', url);
@@ -127,6 +124,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
         <Col>
           <>
             <Button
+              disabled={uploadInProgress}
               onClick={() => fileInputRef?.current?.click()}
               text="Choose File"
               type="button"
@@ -146,12 +144,17 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
           {file && (
             <>
               <Button
+                disabled={uploadInProgress}
                 onClick={uploadFile}
                 text="Upload File"
                 type="button"
                 variant="secondary"
               />
-              <ButtonLabel>{file.name}</ButtonLabel>
+              {uploadInProgress ? (
+                <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
+              ) : (
+                <ButtonLabel>{file.name}</ButtonLabel>
+              )}
             </>
           )}
         </Col>
