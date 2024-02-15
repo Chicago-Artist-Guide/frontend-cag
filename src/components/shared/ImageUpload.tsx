@@ -57,10 +57,8 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
     }
 
     setUploadInProgress(true);
-    const storageRef = ref(
-      firebaseStorage,
-      `/files-${data.uid}/${data.account_id}-${file?.name}`
-    );
+
+    const storageRef = ref(firebaseStorage, `/files-testestest-${file?.name}`);
     const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
     uploadTask.on(
       'state_changed',
@@ -118,8 +116,8 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
     [file?.type]
   );
 
-  return (
-    <Container>
+  const ChooseFileUploadButtons = () => {
+    return (
       <StyledRow>
         <Col>
           <>
@@ -159,6 +157,12 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
           )}
         </Col>
       </StyledRow>
+    );
+  };
+
+  return (
+    <Container>
+      <ChooseFileUploadButtons />
       {src ? (
         <CropContainer>
           <ReactCrop
@@ -178,7 +182,13 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
         >
           {imgUrl === null ||
             (imgUrl === undefined && (
-              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
+              <PlaceholderImage>
+                <FontAwesomeIcon
+                  className="bod-icon"
+                  icon={faCamera}
+                  size="lg"
+                />
+              </PlaceholderImage>
             ))}
         </PhotoContainer>
       )}
@@ -192,7 +202,7 @@ const PhotoContainer = styled.div`
   font-size: 68px;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 100%;
+  height: 250px;
   width: 100%;
   margin-bottom: 20px;
   text-align: center;
@@ -210,6 +220,21 @@ const StyledRow = styled(Row)`
 
 const ButtonLabel = styled.p`
   padding-top: 10px;
+`;
+
+const PlaceholderImage = styled.div`
+  background: ${colors.lightGrey};
+  color: white;
+  display: flex;
+  font-size: 68px;
+  height: 300px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px 4px ${colors.black05a};
+  border-radius: 8px;
 `;
 
 export default ImageUpload;
