@@ -53,11 +53,11 @@ const CompanyBasics: React.FC<{
             <InputField
               required
               hasErrorCallback={setStepErrors}
-              placeholder="Email Address"
+              placeholder="Theatre Email Address"
               name="emailAddress"
               onChange={setForm}
               error={errors.emailAddress}
-              requiredLabel="Email address"
+              requiredLabel="Theatre Email Address"
               validationRegexMessage={ErrorMessage.EmailFormat}
               validationRegexName="emailAddress"
               value={emailAddress || ''}

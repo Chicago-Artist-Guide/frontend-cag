@@ -39,6 +39,7 @@ const CardHeader = styled(Card.Header)`
   display: flex;
   justify-content: space-between;
   background-color: white;
+  align-items: center;
 `;
 
 export default GenericAccordion;

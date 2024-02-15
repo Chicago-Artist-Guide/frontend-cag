@@ -1,7 +1,7 @@
 import { Step } from 'react-hooks-helper';
 import { FormStep } from './types';
 
-export const formSteps: FormStep[] = ['basics', 'privacy', 'details', 'photo'];
+export const formSteps: FormStep[] = ['basics', 'privacy', 'details'];
 
 export const defaultSteps: Step[] = formSteps.map((step) => ({ id: step }));
 
@@ -32,6 +32,8 @@ export const defaultFormState = {
   primaryContactEmail: '',
   location: '',
   description: '',
+  equity: '',
+  website: '',
   privacyAgreement: false,
   profilePhotoUrl: ''
 };

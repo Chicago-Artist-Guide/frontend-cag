@@ -41,7 +41,7 @@ const SignUpFooter: React.FC<{
       return;
     }
 
-    if (formStep === 'photo') {
+    if (formStep === 'details') {
       await completeSignUp();
       history.push('/profile');
       return;

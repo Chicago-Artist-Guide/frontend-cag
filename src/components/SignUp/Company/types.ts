@@ -8,11 +8,13 @@ export type CompanyData = {
   primaryContactEmail: string;
   location: string;
   description: string;
+  website: string;
+  equity: string;
   privacyAgreement: boolean;
   profilePhotoUrl: string;
 };
 
-export type FormStep = 'basics' | 'privacy' | 'details' | 'photo';
+export type FormStep = 'basics' | 'privacy' | 'details';
 
 export type SubmitResponse = {
   ok: boolean;

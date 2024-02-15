@@ -5,23 +5,21 @@ import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 
 import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
+import { useProfileContext } from '../../../context/ProfileContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
-import Privacy from '../Privacy';
 import CompanyBasics from './Basics';
 import CompanyDetails from './Details';
-import CompanyPhoto from './Photo';
+import CompanyPrivacy from './Privacy';
 import SignUpFooter from './SignUpFooter';
 import { CompanyData, FormStep, SubmitResponse } from './types';
 import { defaultErrorState, defaultFormState, defaultSteps } from './utils';
 
 const stepComponents = {
   basics: CompanyBasics,
-  privacy: Privacy,
-  details: CompanyDetails,
-  photo: CompanyPhoto
+  privacy: CompanyPrivacy,
+  details: CompanyDetails
 };
 
 const CompanySignUp: React.FC<{
@@ -54,7 +52,8 @@ const CompanySignUp: React.FC<{
     } catch (err) {
       setErrors((prev) => ({
         ...prev,
-        emailAddress: 'Email is already in use'
+        emailAddress:
+          'Email address already in use, please ensure you are using your theatre’s email address not your personal'
       }));
       return { ok: false };
     }

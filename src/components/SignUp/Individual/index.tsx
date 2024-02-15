@@ -3,18 +3,16 @@ import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
+import { useHistory } from 'react-router-dom';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useProfileContext } from '../../../context/ProfileContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
-import Profile from '../../../pages/Profile';
 import PageContainer from '../../layout/PageContainer';
-import Privacy from '../Privacy';
+import Privacy from './Privacy';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
-import ActorInfo1 from './ActorInfo1';
-import ActorInfo2 from './ActorInfo2';
+import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
-import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import { Tagline, Title } from '../../layout/Titles';
 import IndividualRole from './Role';
@@ -47,12 +45,9 @@ const defaultSteps: Step[] = [
   { id: 'role' },
   { id: 'basics' },
   { id: 'privacy' },
-  { id: 'actorInfo1' },
-  { id: 'actorInfo2' },
   { id: 'offstageRoles' },
-  { id: 'profilePhoto' },
-  { id: 'demographics' },
-  { id: 'profilePreview' }
+  { id: 'actorInfo' },
+  { id: 'profilePhoto' }
 ];
 
 // flatten our step id's into a single array
@@ -69,7 +64,7 @@ const defaultData: IndividualData = {
   actorInfo2GenderTransition: '',
   actorInfo2HeightFt: 0,
   actorInfo2HeightIn: 0,
-  actorInfo2HeightNoAnswer: false,
+  actorInfo2HeightNoAnswer: true,
   basics18Plus: false,
   basicsEmailAddress: '',
   basicsFirstName: '',
@@ -98,6 +93,7 @@ const IndividualSignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
+  const history = useHistory();
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useProfileContext();
   const { lglApiKey } = useMarketingContext();
@@ -127,12 +123,7 @@ const IndividualSignUp: React.FC<{
     const indexForOffstageRoles = newSteps.findIndex(
       (nS) => nS.id === 'offstageRoles'
     );
-    const indexForActorInfo1 = newSteps.findIndex(
-      (nS) => nS.id === 'actorInfo1'
-    );
-    const indexForActorInfo2 = newSteps.findIndex(
-      (nS) => nS.id === 'actorInfo2'
-    );
+    const indexForActorInfo = newSteps.findIndex((nS) => nS.id === 'actorInfo');
 
     // Rules for conditional steps:
     // a. If the user selects "on-stage" then they see actor info 2 but not offstage roles
@@ -144,23 +135,11 @@ const IndividualSignUp: React.FC<{
         if (indexForOffstageRoles > -1) {
           newSteps.splice(indexForOffstageRoles, 1);
         }
-
-        // if we can't find the step we need here, we need to re-add it
-        if (indexForActorInfo2 === -1 && indexForActorInfo1 > -1) {
-          newSteps.splice(indexForActorInfo1 + 1, 0, {
-            id: 'actorInfo2'
-          });
-        }
         break;
       case 'off-stage':
-        // if we can't find the index for the step to remove, the user probably just went back
-        if (indexForActorInfo2 > -1) {
-          newSteps.splice(indexForActorInfo2, 1);
-        }
-
         // if we can't find the step we need here, we need to re-add it
-        if (indexForOffstageRoles === -1 && indexForActorInfo1 > -1) {
-          newSteps.splice(indexForActorInfo1 + 1, 0, {
+        if (indexForOffstageRoles === -1 && indexForActorInfo > -1) {
+          newSteps.splice(indexForActorInfo, 0, {
             id: 'offstageRoles'
           });
         }
@@ -388,7 +367,10 @@ const IndividualSignUp: React.FC<{
       // profile tagline
       profile_tagline: profileTagline,
 
-      // completed profile
+      // completed profile (new)
+      completed_profile: true,
+
+      // completed_profile (old)
       completed_profile_1: true
     };
 
@@ -437,18 +419,13 @@ const IndividualSignUp: React.FC<{
       case 'privacy':
         returnStep = <Privacy {...props} />;
         break;
-      case 'actorInfo1':
-        returnStep = (
-          <ActorInfo1 {...props} hasErrorCallback={setStepErrorsCallback} />
-        );
-        break;
-      case 'actorInfo2':
-        returnStep = (
-          <ActorInfo2 {...props} hasErrorCallback={setStepErrorsCallback} />
-        );
-        break;
       case 'offstageRoles':
         returnStep = <OffstageRoles {...props} />;
+        break;
+      case 'actorInfo':
+        returnStep = (
+          <ActorInfo {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
         break;
       case 'profilePhoto':
         returnStep = (
@@ -464,12 +441,6 @@ const IndividualSignUp: React.FC<{
           </>
         );
         break;
-      case 'demographics':
-        returnStep = <Demographics {...props} />;
-        break;
-      case 'profilePreview':
-        returnStep = <Profile previewMode={true} />;
-        break;
       default:
         returnStep = <></>;
         break;
@@ -478,26 +449,24 @@ const IndividualSignUp: React.FC<{
     return returnStep;
   };
 
-  // if no Landing type is selected or it's profile preview, don't show navigation yet
-  const showSignUpFooter = stepId !== 'profilePreview';
+  const goToProfile = () => history.push('/profile');
 
   return (
     <PageContainer>
       <Row>
         <Col lg={12}>{stepFrame()}</Col>
       </Row>
-      {showSignUpFooter && (
-        <SignUpFooter
-          landingStep={index}
-          navigation={navigation}
-          setLandingStep={setCurrentStep}
-          submitSignUpProfile={submitSignUpProfile}
-          currentStep={stepId}
-          stepErrors={stepErrors}
-          steps={steps}
-          submitBasics={submitBasics}
-        />
-      )}
+      <SignUpFooter
+        landingStep={index}
+        navigation={navigation}
+        setLandingStep={setCurrentStep}
+        submitSignUpProfile={submitSignUpProfile}
+        currentStep={stepId}
+        stepErrors={stepErrors}
+        steps={steps}
+        submitBasics={submitBasics}
+        goToProfile={goToProfile}
+      />
     </PageContainer>
   );
 };

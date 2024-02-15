@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import CompanyProfile from '../components/Profile/Company';
 import IndividualProfile from '../components/Profile/Individual';
@@ -17,6 +17,7 @@ const Profile: React.FC<{
     profile: { ref: profileRef },
     setProfileData
   } = useProfileContext();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
@@ -38,7 +39,12 @@ const Profile: React.FC<{
 
     setProfileData(profileData.data());
     setAccountData(accountData.data());
+    setLoading(false);
   };
+
+  if (loading) {
+    return <div>Loading</div>;
+  }
 
   if (account?.type === 'company') {
     return <CompanyProfile previewMode={previewMode} />;
@@ -48,7 +54,7 @@ const Profile: React.FC<{
     return <IndividualProfile previewMode={previewMode} />;
   }
 
-  return <div>Loading</div>;
+  return <div>No Profile</div>;
 };
 
 export default Profile;

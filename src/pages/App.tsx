@@ -29,19 +29,18 @@ import { Document, ProfileContext } from '../context/ProfileContext';
 import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
 import Donate from './Donate';
-import EventPage from './Event';
 import FAQ from './FAQ';
 import ForgotPassword from './ForgotPassword';
 import Home from './Home';
 import Login from './Login';
 import Logout from './Logout';
 import NotFound from './NotFound';
+import PrivacyPolicy from './PrivacyPolicy';
 import Profile from './Profile';
 import SignUp from './SignUp';
 import TheaterResources from './TheaterResources';
 import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
-import EventAlert from '../components/Home/EventAlert';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -71,6 +70,7 @@ const CAG = () => {
         <Route component={Donate} exact path="/donate" />
         <Route component={FAQ} exact path="/faq" />
         <Route component={TOS} exact path="/terms-of-service" />
+        <Route component={PrivacyPolicy} exact path="/privacy-policy" />
         <Route component={WhoWeAre} exact path="/about-us" />
         <Route component={Login} exact path="/login" />
         <Route component={Logout} exact path="/logout" />
