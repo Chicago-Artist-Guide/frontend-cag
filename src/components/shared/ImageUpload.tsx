@@ -11,6 +11,7 @@ import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { useProfileContext } from '../../context/ProfileContext';
 import Button from '../../genericComponents/Button';
 import ReactCrop, { Crop } from 'react-image-crop';
+import { v4 as uuidv4 } from 'uuid';
 
 interface ImageUploadModalProps {
   onSave: (imageUrl: string) => void;
@@ -39,6 +40,8 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
     unit: 'px'
   });
 
+  const imageId = uuidv4();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,7 +61,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
 
     setUploadInProgress(true);
 
-    const storageRef = ref(firebaseStorage, `/files-testestest-${file?.name}`);
+    const storageRef = ref(firebaseStorage, `/${imageId}-${file?.name}`);
     const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
     uploadTask.on(
       'state_changed',
@@ -202,7 +205,7 @@ const PhotoContainer = styled.div`
   font-size: 68px;
   background-repeat: no-repeat;
   background-size: cover;
-  height: 250px;
+  height: 100%;
   width: 100%;
   margin-bottom: 20px;
   text-align: center;
