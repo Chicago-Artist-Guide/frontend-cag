@@ -54,6 +54,7 @@ import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -841,7 +842,13 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          {profile?.data?.profile_image_url ? (
+            <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          ) : (
+            <PlaceholderImage>
+              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
+            </PlaceholderImage>
+          )}
           <ImageUploadModal
             editProfile={editProfile}
             show={pfpModalShow}
@@ -2015,6 +2022,21 @@ const ProfileImage = styled(Image)`
   background: ${colors.lightGrey};
   minheight: 250px;
   width: 100%;
+`;
+
+const PlaceholderImage = styled.div`
+  background: ${colors.lightGrey};
+  color: white;
+  display: flex;
+  font-size: 68px;
+  height: 300px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px 4px ${colors.black05a};
+  border-radius: 8px;
 `;
 
 const DetailsCard = styled.div`
