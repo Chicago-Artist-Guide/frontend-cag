@@ -29,6 +29,7 @@
     "firebase": "^9.6.11",
     "history": "^4.10.1",
     "http-proxy-middleware": "^0.19.1",
+    "multiselect-react-dropdown": "^2.0.25",
     "query-string": "^8.1.0",
     "react": "^16.13.1",
     "react-bootstrap": "^2.5.0",
