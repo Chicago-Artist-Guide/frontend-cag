@@ -5,6 +5,7 @@ import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
 import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
+import Laws from '../../images/who-we-are/board/Board_Laws.jpg';
 
 // Artist Auxiliary Board
 import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
@@ -12,6 +13,7 @@ import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
+import Goins from '../../images/who-we-are/board/Board_Goins.jpeg';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
@@ -19,6 +21,7 @@ import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
+import Wills from '../../images/who-we-are/operations/Staff_Wills.jpeg';
 
 // Site Development
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
@@ -27,6 +30,7 @@ import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
+import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
 
 // Advisory Board
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
@@ -99,6 +103,16 @@ const bios = {
       image: Webb,
       linkedin: 'alicia-webb-3536784',
       bio: 'is an award-winning marketing and communications professional with experience in a wide variety of industries including politics, manufacturing, and pharmaceuticals. A former journalist, she loves telling stories about people doing extraordinary things. She began her career as a general assignment reporter with ABC News in Maryland. She previously worked as a personal shopper and event specialist with Macy’s. Alicia has also held roles in media relations, event planning and brand management with several organizations including BCBG Max Azria and Baxter Healthcare Corporation. She holds a B.A. in Journalism and Political Science from Indiana University. Alicia is also a certified life coach. She currently serves as a mentor for the Good Food Accelerator, where she helps entrepreneurs build and establish their businesses. Alicia loves news, sports, travel, politics, Chicago’s theatre and art scene and all things related to pop culture. She serves on the Board of Directors for the Chicago Chapter of the Indiana University Alumni Association. She is also a member of the Indiana University Media School Alumni Board. Most recently, Alicia was a board member for BoHo Theatre.'
+    },
+    {
+      id: bioId(),
+      name: 'Lisa Laws',
+      role: 'Board Member',
+      pronouns: 'she/her',
+      affiliation: 'Chief Operating Officer, 1871',
+      image: Laws,
+      linkedin: 'lisalaws',
+      bio: "is a visionary leader committed to fostering growth and opportunity within the arts community. Born and raised in Hyde Park, Chicago, Lisa has deep roots in the city and a strong connection to its vibrant cultural landscape. With over 15 years of executive experience, Lisa serves as the Chief Operating Officer of 1871, a prominent non-profit tech hub in Chicago.\n\nBeyond her professional endeavors, Lisa is deeply passionate about supporting artists and cultural initiatives. Her commitment to social value is evident in her pivotal roles at Mayor Rahm Emanuel's Office and the Department of Cultural Affairs and Special Events (DCASE). In these positions, she led daily operations, coordinated significant events, and managed comprehensive infrastructure projects, demonstrating resilience and strategic insight in addressing the diverse needs of Chicago's vibrant arts community.\n\nLisa's academic achievements include an MBA from Northwestern's Kellogg School of Management, a Graduate Certificate in Infrastructure Engineering and Management from the Illinois Institute of Technology, and dual degrees from Tulane and Xavier University of Louisiana. Recognized for her contributions to STEM education, innovation, and diversity, Lisa is dedicated to advancing opportunities for artists and cultural organizations.\n\nAs a member of the Board of Directors for the Chicago Artist Guide, Lisa is poised to make a lasting impact, leveraging her expertise to support and elevate the vibrant arts community in Chicago and beyond. Lisa's passion for music and performance is evident in her involvement in the Kenwood Academy Concert Choir and the Chicago Children's Choir, now Uniting Voices Chicago, where she had the opportunity to tour extensively across the US and the globe."
     }
   ],
   artists: [
@@ -124,8 +138,18 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Jorie Goins',
+      role: 'Secretary',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Goins,
+      linkedin: 'joriejgoins',
+      bio: "is a dancer based out of Chicago, Ill. Jorie earned a bachelor's degree in journalism with a minor in dance from Northwestern University in 2016. While at Northwestern, Jorie was a member of Tonik Tap, Northwestern's premiere tap dance company where she choreographed five original pieces. Jorie has danced with Noumenon Dance Ensemble, Praize Productions' Rize Pro-Elite company, and as a guest performer with Chicago Tap Theatre. She has performed works choreographed by Brenda Bufalino, Rich Ashworth, Mark Yonally, Nicole Clarke Springer and April Torneby."
+    },
+    {
+      id: bioId(),
       name: 'James Lewis',
-      role: 'Treasurer',
+      role: 'Artist Board Member',
       pronouns: 'he/him',
       affiliation: null,
       image: Lewis,
@@ -196,6 +220,16 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Abby Wills',
+      role: 'Administrative Associate',
+      pronouns: 'she/her',
+      affilitation: null,
+      image: Wills,
+      linkedin: 'abbydwills',
+      bio: "is Chicago-based content creator who showcases the city's diverse food and culture through her videos and reviews at @malortandmoet. She creates engaging videos and reviews for various online platforms, sharing her insights and recommendations with her audience and beyond. Previously, Tumpale worked in tech program management for companies like Webflow and LinkedIn. She also has digital marketing experience from her previous roles at Bottle & Bottega and Northwestern. Tumpale is passionate about supporting local businesses and communities, and she is excited to join Chicago Artist Guide. She hopes to contribute to the organization's mission and vision with her skills and experience. When she is not creating content, Tumpale likes to watch Youtube and movies, play video games, listen to music, and watch TV."
+    },
+    {
+      id: bioId(),
       name: 'Missy Staros',
       role: 'Grant Writer',
       pronouns: 'she/her',
@@ -215,6 +249,16 @@ const bios = {
       image: Fischer,
       linkedin: 'jeanninefischer',
       bio: "is an innovative product leader with experience in launching and scaling products at high-growth marketplace startups. Recognized on Product50 for her impact at Avail Car Sharing, Jeannine brings rich experience from diverse roles in Product, Finance, and Marketing at Allstate's startups and core businesses. Fueled by deep user empathy and a passion for people, she extends her impact beyond product management. As an inclusion advocate, Jeannine served as the President of the Young Professionals organization at Allstate, driving resources for underserved communities and influencing inclusive benefits decisions for 40K+ employees. Beyond tech, she's a music aficionado and outdoor enthusiast. When not building products, you'll find her catching the latest concert or exploring mountains through rock climbing or skiing."
+    },
+    {
+      id: bioId(),
+      name: 'Dana Rose',
+      role: 'Product Manager',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Rose,
+      linkedin: 'dana-r-4b0633199',
+      bio: 'is interested in the intersection of business and technology and passionate about transforming ideas into valuable user focused products. She is honored to be involved with Chicago Artist Guide and contribute to its mission.'
     },
     {
       id: bioId(),
