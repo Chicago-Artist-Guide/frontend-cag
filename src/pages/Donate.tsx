@@ -11,6 +11,7 @@ import styled from 'styled-components';
 import { breakpoints } from '../theme/styleVars';
 import SponsorDonutLogo from '../images/sponsors/donut.png';
 import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
+import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
 
 const Donate = () => {
   return (
@@ -95,6 +96,11 @@ const Donate = () => {
             <SponsorCol lg="3">
               <a href="https://cliff-chicago.org/foundation/" target="_blank">
                 <Image src={SponsorCliffLogo} fluid />
+              </a>
+            </SponsorCol>
+            <SponsorCol lg="3">
+              <a href="https://callforculture.com/" target="_blank">
+                <Image src={SponsorCallForCulture} fluid />
               </a>
             </SponsorCol>
           </Row>
