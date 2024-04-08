@@ -13,7 +13,7 @@ import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
-import Goins from '../../images/who-we-are/board/Board_Goins.jpeg';
+import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
@@ -21,7 +21,8 @@ import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
-import Wills from '../../images/who-we-are/operations/Staff_Wills.jpeg';
+import Wills from '../../images/who-we-are/operations/Staff_Wills.jpg';
+import Adamy from '../../images/who-we-are/operations/Staff_Adamy.jpg';
 
 // Site Development
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
@@ -207,6 +208,16 @@ const bios = {
       image: Walton,
       linkedin: 'briannamwalton',
       bio: 'is a Digital Marketing enthusiast who enjoys creating written and visual content. She has always been an extremely passionate writer and a social justice advocate. Brianna was able to explore these interests during her studies at Agnes Scott College where she earned a Bachelor of Arts degree in International Relations and Business Management. Previously, she was active in student organizations including Her Campus (as a Content Creator and Campus Correspondent) and Mortar Board (as a Director of Communications). She was also a Marketing intern at CARE USA, which allowed her to gain experience in website content accessibility. She is motivated by the idea of helping other people have equitable access to opportunities and resources that will allow them to pursue their life goals. During her free time, Brianna enjoys listening to music of pretty much any genre, sketching, painting, and spending time outdoors. She is also an animal lover and enjoys spending time caring for her two pet turtles along with almost any other animals she happens to cross paths with.'
+    },
+    {
+      id: bioId(),
+      name: 'Hannah Adamy',
+      role: 'Development Associate',
+      pronouns: 'she/her',
+      affilitation: null,
+      image: Adamy,
+      linkedin: 'hpadamy',
+      bio: 'holds a BA in Music from the College of New Jersey and a MA in Performance Studies from Texas A&M. She currently works as a coordinator at the University of California, Davis and is pursuing a career in fundraising and development. She has worked as a consultant with the Girls Rock Camp Alliance (GRCA) and the Library of Musiclandria. She is also an award-winning writer, and her work has been published in Studies in Musical Theatre and Public: A Journal of Imagining America.'
     },
     {
       id: bioId(),
