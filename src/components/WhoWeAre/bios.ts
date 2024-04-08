@@ -13,7 +13,7 @@ import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
-import Goins from '../../images/who-we-are/board/Board_Goins.jpeg';
+import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
@@ -21,7 +21,7 @@ import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
-import Wills from '../../images/who-we-are/operations/Staff_Wills.jpeg';
+import Wills from '../../images/who-we-are/operations/Staff_Wills.jpg';
 import Adamy from '../../images/who-we-are/operations/Staff_Adamy.jpg';
 
 // Site Development
