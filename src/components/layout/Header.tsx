@@ -31,6 +31,13 @@ const Header = () => {
           <Nav.Link as={Link} to="/about-us">
             ABOUT US
           </Nav.Link>
+          <a
+            className="nav-link"
+            href="https://www.zeffy.com/en-US/ticketing/a28a0969-38b1-4a43-b7d3-2fed7b6364f8"
+            target="_blank"
+          >
+            HEADSHOT EVENT
+          </a>
           <Nav.Link as={Link} to="/donate">
             DONATE
           </Nav.Link>

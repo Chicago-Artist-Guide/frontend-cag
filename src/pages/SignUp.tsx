@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import queryString from 'query-string';
 import styled from 'styled-components';
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
