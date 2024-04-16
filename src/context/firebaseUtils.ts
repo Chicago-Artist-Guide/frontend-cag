@@ -7,28 +7,40 @@ import {
   QueryDocumentSnapshot
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
+import { MatchingFilters } from '../components/Matches/types';
 
 export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
-  filters = {}
+  filters: MatchingFilters
 ): Promise<IndividualProfileDataFullInit[]> {
-  const matchesRef = collection(firebaseStore, 'profiles');
+  const { type: accountType, ...profileFilters } = filters;
+  const accountsRef = collection(firebaseStore, 'accounts');
+  const accountsQuery = query(accountsRef, where('type', '==', accountType));
+  const accountsSnapshot = await getDocs(accountsQuery);
 
-  let q = query(matchesRef);
+  // collect all individual uuids
+  const uuids = accountsSnapshot.docs.map((doc) => doc.id);
+
+  // get matching profiles
+  const profilesRef = collection(firebaseStore, 'profiles');
+  let profileQuery = query(profilesRef, where('uuid', 'in', uuids));
 
   for (const [field, value] of Object.entries(filters)) {
     if (value !== undefined) {
       // Check if the value is an array for filters like ethnicity and age range
       if (Array.isArray(value) && value.length > 0) {
-        q = query(q, where(field, 'array-contains-any', value));
+        profileQuery = query(
+          profileQuery,
+          where(field, 'array-contains-any', value)
+        );
       } else {
         // simple value check for everything else
-        q = query(q, where(field, '==', value));
+        profileQuery = query(profileQuery, where(field, '==', value));
       }
     }
   }
 
-  const snapshot = await getDocs(q);
+  const snapshot = await getDocs(profileQuery);
   const matches = snapshot.docs.map((doc: QueryDocumentSnapshot) => ({
     id: doc.id,
     ...(doc.data() as IndividualProfileDataFullInit)
