@@ -30,17 +30,18 @@ import '../styles/App.scss';
 import GlobalStyle from '../theme/globalStyles';
 import Donate from './Donate';
 import FAQ from './FAQ';
-import ForgotPassword from './ForgotPassword';
 import Home from './Home';
-import Login from './Login';
-import Logout from './Logout';
 import NotFound from './NotFound';
 import PrivacyPolicy from './PrivacyPolicy';
-import Profile from './Profile';
-import SignUp from './SignUp';
 import TheaterResources from './TheaterResources';
 import TOS from './TOS';
 import WhoWeAre from './WhoWeAre';
+import Login from './Login';
+import Logout from './Logout';
+import ForgotPassword from './ForgotPassword';
+import SignUp from './SignUp';
+import Profile from './Profile';
+import Matches from './Matches';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -80,6 +81,7 @@ const CAG = () => {
         <Route component={SignUp2} exact path="/sign-up-2" />
         <Route component={TheaterResources} exact path="/theater-resources" />
         {/* <Route component={EventPage} exact path="/night-at-the-cag-baret" /> */}
+        <Route component={Matches} exact path="/profile/search" />
         <Route
           component={ManageProduction}
           path="/production/:productionId/manage"

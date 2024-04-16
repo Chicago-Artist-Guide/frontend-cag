@@ -10,16 +10,29 @@ import { fetchTalentWithFilters } from './firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 
-const MatchContext = createContext({});
-
-export function useMatches() {
-  return useContext(MatchContext);
+// TODO: broaden "matches" typing to support profiles OR roles
+interface MatchContextValue {
+  matches: IndividualProfileDataFullInit[];
+  loading: boolean;
+  filters: MatchingFilters;
+  updateFilters: (newFilters: MatchingFilters) => void;
 }
 
 type MatchProviderProps = {
   firestore: Firestore;
   children: ReactNode;
 };
+
+const defaultContextValue: MatchContextValue = {
+  matches: [],
+  loading: true,
+  filters: { type: 'individual' }, // Default filters setup
+  updateFilters: () => null
+};
+
+const MatchContext = createContext<MatchContextValue>(defaultContextValue);
+
+export const useMatches = (): MatchContextValue => useContext(MatchContext);
 
 export const MatchProvider: React.FC<MatchProviderProps> = ({
   firestore,
@@ -34,6 +47,8 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
   useEffect(() => {
     setLoading(true);
+
+    // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
     fetchTalentWithFilters(firestore, filters).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
@@ -44,9 +59,10 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
   };
 
-  const value = {
+  const value: MatchContextValue = {
     matches,
     loading,
+    filters,
     updateFilters
   };
 

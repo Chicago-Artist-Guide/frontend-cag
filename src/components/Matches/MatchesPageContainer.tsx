@@ -1,17 +1,21 @@
 import React from 'react';
+import Container from 'react-bootstrap/Container';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import { MatchesFilterBar } from './MatchesFilterBar';
+import { MatchesList } from './MatchesList';
 
-type MatchesPageContainerType = {
-  matchingType: 'company' | 'individual';
-};
-
-export const MatchesPageContainer: React.FC<MatchesPageContainerType> = ({
-  matchingType
-}) => {
+export const MatchesPageContainer = () => {
   return (
-    <div>
-      <h1>Matches</h1>
-      <div>MatchesFilterBar</div>
-      <div>MatchesList</div>
-    </div>
+    <Container>
+      <Row>
+        <Col lg={4}>
+          <MatchesFilterBar />
+        </Col>
+        <Col lg={8}>
+          <MatchesList />
+        </Col>
+      </Row>
+    </Container>
   );
 };

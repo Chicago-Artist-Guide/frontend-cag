@@ -9,6 +9,8 @@ import {
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 
+// TODO: add version for roles called fetchRolesWithFilters()
+
 export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
   filters: MatchingFilters
@@ -25,7 +27,7 @@ export async function fetchTalentWithFilters(
   const profilesRef = collection(firebaseStore, 'profiles');
   let profileQuery = query(profilesRef, where('uuid', 'in', uuids));
 
-  for (const [field, value] of Object.entries(filters)) {
+  for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       // Check if the value is an array for filters like ethnicity and age range
       if (Array.isArray(value) && value.length > 0) {
