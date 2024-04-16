@@ -15,6 +15,7 @@ import {
   ButtonCol,
   PageFooterRow
 } from '../components/SignUp/SignUpFooterStyles';
+import { AccountTypeOptions } from '../components/SignUp/types';
 import Button from '../genericComponents/Button';
 import { breakpoints } from '../theme/styleVars';
 import { PreviewCard } from '../components/Profile/shared/styles';
@@ -24,9 +25,9 @@ const SignUp: React.FC = () => {
   const { flag } = queryString.parse(location.search);
   const { currentUser } = useAuthValue();
   const [currentStep, setCurrentStep] = useState(-1);
-  const [accountType, setAccountType] = useState<
-    'individual' | 'company' | null
-  >(null);
+  const [accountType, setAccountType] = useState<AccountTypeOptions | null>(
+    null
+  );
 
   useEffect(() => {
     if (currentUser && currentStep === -1) {
@@ -100,6 +101,7 @@ const SignUp: React.FC = () => {
   return <div>Something went wrong.</div>;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MobileWarning = styled(PreviewCard as any)`
   display: block;
 

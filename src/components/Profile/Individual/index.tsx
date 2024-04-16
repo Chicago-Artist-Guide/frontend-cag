@@ -34,9 +34,7 @@ import {
   pronouns,
   UpcomingPerformances,
   IndividualAccountInit,
-  IndividualProfileInit,
-  IndividualProfile as IndividualProfileT,
-  IndividualProfile2,
+  IndividualProfileDataFullInit,
   IndividualWebsite,
   WebsiteTypes,
   TrainingInstitution,
@@ -213,13 +211,10 @@ const IndividualProfile: React.FC<{
   };
 
   const setProfileForm = (field: string, value: any) => {
-    setEditProfile(
-      (
-        prevState: IndividualProfileInit &
-          IndividualProfileT &
-          IndividualProfile2
-      ) => ({ ...prevState, [field]: value })
-    );
+    setEditProfile((prevState: IndividualProfileDataFullInit) => ({
+      ...prevState,
+      [field]: value
+    }));
   };
 
   const setAccountForm = (field: string, value: any) => {
