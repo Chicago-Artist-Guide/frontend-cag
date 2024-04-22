@@ -6,7 +6,7 @@ import React, {
   useState,
   ReactNode
 } from 'react';
-import { fetchTalentWithFilters } from './firebaseUtils';
+import { fetchTalentWithFilters } from '../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 
