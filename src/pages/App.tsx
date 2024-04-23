@@ -42,6 +42,7 @@ import ForgotPassword from './ForgotPassword';
 import SignUp from './SignUp';
 import Profile from './Profile';
 import Matches from './Matches';
+import Messages from './Messages';
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -73,15 +74,16 @@ const CAG = () => {
         <Route component={TOS} exact path="/terms-of-service" />
         <Route component={PrivacyPolicy} exact path="/privacy-policy" />
         <Route component={WhoWeAre} exact path="/about-us" />
+        <Route component={TheaterResources} exact path="/theater-resources" />
+        {/* <Route component={EventPage} exact path="/night-at-the-cag-baret" /> */}
         <Route component={Login} exact path="/login" />
         <Route component={Logout} exact path="/logout" />
         <Route component={ForgotPassword} exact path="/forgot-password" />
-        <Route component={Profile} exact path="/profile" />
         <Route component={SignUp} exact path="/sign-up" />
         <Route component={SignUp2} exact path="/sign-up-2" />
-        <Route component={TheaterResources} exact path="/theater-resources" />
-        {/* <Route component={EventPage} exact path="/night-at-the-cag-baret" /> */}
+        <Route component={Profile} exact path="/profile" />
         <Route component={Matches} exact path="/profile/search" />
+        <Route component={Messages} exact path="/profile/messages" />
         <Route
           component={ManageProduction}
           path="/production/:productionId/manage"
