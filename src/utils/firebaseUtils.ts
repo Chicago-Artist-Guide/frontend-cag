@@ -4,10 +4,12 @@ import {
   query,
   where,
   getDocs,
-  QueryDocumentSnapshot
+  QueryDocumentSnapshot,
+  orderBy
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
+import { MessageFilters, MessageType } from '../components/Messages/types';
 
 // TODO: add version for roles called fetchRolesWithFilters()
 
@@ -50,3 +52,55 @@ export async function fetchTalentWithFilters(
 
   return matches;
 }
+
+export const fetchMessagesByAccountAndRole = async (
+  firebaseStore: Firestore,
+  filters: MessageFilters
+) => {
+  const messagesCollection = collection(firebaseStore, 'messages');
+  let q;
+
+  if (filters.roleId && filters.accountId) {
+    q = query(
+      messagesCollection,
+      where('role_id', '==', filters.roleId),
+      where('from_id', '==', filters.accountId),
+      orderBy('timestamp', 'desc')
+    );
+  } else if (filters.accountId) {
+    q = query(
+      messagesCollection,
+      where('from_id', '==', filters.accountId),
+      orderBy('timestamp', 'desc')
+    );
+  } else {
+    throw new Error('Invalid filter combination');
+  }
+
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as MessageType)
+  );
+};
+
+export const fetchSingleThread = async (
+  firebaseStore: Firestore,
+  roleId: string,
+  fromId: string,
+  toId: string
+) => {
+  const messagesCollection = collection(firebaseStore, 'messages');
+  const q = query(
+    messagesCollection,
+    where('role_id', '==', roleId),
+    where('from_id', '==', fromId),
+    where('to_id', '==', toId),
+    orderBy('timestamp', 'desc')
+  );
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as MessageType)
+  );
+};
