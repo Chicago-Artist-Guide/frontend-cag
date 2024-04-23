@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
-import { MessageFilters } from '../components/Messages/types';
+import { MessageFilters, MessageType } from '../components/Messages/types';
 
 // TODO: add version for roles called fetchRolesWithFilters()
 
@@ -79,7 +79,9 @@ export const fetchMessagesByAccountAndRole = async (
 
   const querySnapshot = await getDocs(q);
 
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as MessageType)
+  );
 };
 
 export const fetchSingleThread = async (
@@ -98,5 +100,7 @@ export const fetchSingleThread = async (
   );
   const querySnapshot = await getDocs(q);
 
-  return querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  return querySnapshot.docs.map(
+    (doc) => ({ id: doc.id, ...doc.data() } as MessageType)
+  );
 };
