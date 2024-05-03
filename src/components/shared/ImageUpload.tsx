@@ -255,6 +255,7 @@ const CropContainer = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
+  width: 100%;
 `;
 
 const StyledRow = styled(Row)`
@@ -271,16 +272,16 @@ const StyledMargin = styled.div`
 `;
 
 const MobileButtonHide = styled.div`
-  @media (min-width: ${breakpoints.md}) {
+  @media (max-width: ${breakpoints.sm}) {
     display: none;
   }
+  padding-left: 10px;
 `;
 
 const DesktopButtonHide = styled.div`
-  @media (max-width: ${breakpoints.md}) {
+  @media (min-width: ${breakpoints.md}) {
     display: none;
   }
-  margin-left: 50px;
 `;
 
 export default ImageUpload;
