@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
+import { Multiselect } from 'multiselect-react-dropdown';
 import { Title } from '../../layout/Titles';
 import Checkbox from '../../../genericComponents/Checkbox';
 import PrivateLabel from '../../../genericComponents/PrivateLabel';
@@ -14,7 +15,7 @@ import yellow_blob from '../../../images/yellow_blob_2.svg';
 import {
   ageRanges,
   AgeRange,
-  ethnicityTypes,
+  flattenedEthnicityTypes,
   IndividualData,
   genders,
   genderRoles,
@@ -38,6 +39,8 @@ const ActorInfo: React.FC<{
     actorInfo2GenderTransition,
     actorInfo1LGBTQ
   } = formData;
+
+  console.log('actorInfo1Ethnicities', actorInfo1Ethnicities);
 
   const optLabel = '(Optional)';
   const isOffStage = stageRole === 'off-stage';
@@ -94,28 +97,28 @@ const ActorInfo: React.FC<{
     actorInfo1LGBTQ
   ]);
 
-  const isAgeRangeInAgeRanges = (ageRange: AgeRange) =>
-    actorInfo2AgeRanges.indexOf(ageRange) > -1;
-
   const isGenderRoleInGenderRoles = (genderRole: GenderRole) =>
     actorInfo2GenderRoles.indexOf(genderRole) > -1;
 
-  const ageRangeChange = (checkValue: boolean, range: AgeRange) => {
-    let newRanges = [...actorInfo2AgeRanges];
-
-    if (checkValue) {
-      // check age range value
-      if (newRanges.indexOf(range) < 0 && newRanges.length < 3) {
-        newRanges.push(range);
-      }
-    } else {
-      // uncheck age range value
-      newRanges = newRanges.filter((aR) => aR !== range);
-    }
-
+  const onRangeChangeMulti = (
+    selectedList: AgeRange[],
+    _selectedItem: AgeRange
+  ) => {
     const target = {
       name: 'actorInfo2AgeRanges',
-      value: newRanges
+      value: selectedList.length ? selectedList : []
+    };
+
+    setForm({ target });
+  };
+
+  const onEthnicityChangeMulti = (
+    selectedList: AgeRange[],
+    _selectedItem: AgeRange
+  ) => {
+    const target = {
+      name: 'actorInfo1Ethnicities',
+      value: selectedList.length ? selectedList : []
     };
 
     setForm({ target });
@@ -137,31 +140,6 @@ const ActorInfo: React.FC<{
     const target = {
       name: 'actorInfo2GenderRoles',
       value: newRoles
-    };
-
-    setForm({ target });
-  };
-
-  // updating ethnicity fields
-  const isEthnicityInEthnicities = (ethnicityType: string) =>
-    actorInfo1Ethnicities.indexOf(ethnicityType) > -1;
-
-  const ethnicityChange = (checkValue: any, type: string) => {
-    let newEthnicities = [...actorInfo1Ethnicities];
-
-    if (checkValue) {
-      // check ethnicity type value
-      if (newEthnicities.indexOf(type) < 0) {
-        newEthnicities.push(type);
-      }
-    } else {
-      // uncheck age range value
-      newEthnicities = newEthnicities.filter((aR) => aR !== type);
-    }
-
-    const target = {
-      name: 'actorInfo1Ethnicities',
-      value: newEthnicities
     };
 
     setForm({ target });
@@ -202,52 +180,28 @@ const ActorInfo: React.FC<{
                     Which age ranges do you play? <PrivateLabel />
                   </CAGLabel>
                   <p>Select up to 3 ranges</p>
-                  {ageRanges.map((ageRange) => (
-                    <Checkbox
-                      checked={isAgeRangeInAgeRanges(ageRange)}
-                      fieldType="checkbox"
-                      key={`age-range-chk-${ageRange}`}
-                      label={ageRange}
-                      name="actorInfo2AgeRanges"
-                      onChange={(e: any) =>
-                        ageRangeChange(e.currentTarget.checked, ageRange)
-                      }
-                    />
-                  ))}
+                  <Multiselect
+                    options={ageRanges}
+                    showCheckbox={true}
+                    isObject={false}
+                    selectedValues={actorInfo2AgeRanges}
+                    onSelect={onRangeChangeMulti}
+                    onRemove={onRangeChangeMulti}
+                    placeholder="Select Age Ranges"
+                  />
                 </Form.Group>
               )}
               <Form.Group className="form-group">
                 <CAGLabel>Ethnicity {isOffStage && optLabel}</CAGLabel>
-                {ethnicityTypes.map((eth) => (
-                  <React.Fragment key={`parent-frag-chk-${eth.name}`}>
-                    <Checkbox
-                      checked={isEthnicityInEthnicities(eth.name)}
-                      fieldType="checkbox"
-                      key={`first-level-chk-${eth.name}`}
-                      label={eth.name}
-                      name="actorInfo1Ethnicities"
-                      onChange={(e: any) =>
-                        ethnicityChange(e.currentTarget.checked, eth.name)
-                      }
-                    />
-                    {eth.values.length > 0 && (
-                      <Checkbox style={{ paddingLeft: '1.25rem' }}>
-                        {eth.values.map((ethV) => (
-                          <Checkbox
-                            checked={isEthnicityInEthnicities(ethV)}
-                            fieldType="checkbox"
-                            key={`${eth.name}-child-chk-${ethV}`}
-                            label={ethV}
-                            name="actorInfoEthnicities"
-                            onChange={(e: any) =>
-                              ethnicityChange(e.currentTarget.checked, ethV)
-                            }
-                          />
-                        ))}
-                      </Checkbox>
-                    )}
-                  </React.Fragment>
-                ))}
+                <Multiselect
+                  options={flattenedEthnicityTypes}
+                  isObject={false}
+                  showCheckbox={true}
+                  selectedValues={actorInfo1Ethnicities}
+                  placeholder="Select Ethnicities"
+                  onSelect={onEthnicityChangeMulti}
+                  onRemove={onEthnicityChangeMulti}
+                />
               </Form.Group>
               <Form.Group className="form-group">
                 <CAGLabel>
