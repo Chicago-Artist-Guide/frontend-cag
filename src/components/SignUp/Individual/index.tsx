@@ -437,6 +437,7 @@ const IndividualSignUp: React.FC<{
             <ImageUpload
               onSave={(pfpImgUrl: string) => setProfilePicture(pfpImgUrl)}
               currentImgUrl=""
+              modal={false}
             />
           </>
         );

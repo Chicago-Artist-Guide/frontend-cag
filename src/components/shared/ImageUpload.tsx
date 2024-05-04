@@ -14,11 +14,13 @@ import { v4 as uuidv4 } from 'uuid';
 interface ImageUploadModalProps {
   onSave: (imageUrl: string) => void;
   currentImgUrl: string;
+  modal: boolean;
 }
 
 const ImageUpload: React.FC<ImageUploadModalProps> = ({
   onSave,
-  currentImgUrl
+  currentImgUrl,
+  modal
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState(false);
@@ -121,55 +123,9 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
 
   const MobileButtons = () => {
     return (
-      <MobileButtonHide>
-        <StyledRow>
-          <Col>
-            <>
-              <Button
-                disabled={uploadInProgress}
-                onClick={() => fileInputRef?.current?.click()}
-                text="Choose File"
-                type="button"
-                variant="secondary"
-              />
-              <input
-                onChange={onFileChange}
-                multiple={false}
-                ref={fileInputRef}
-                type="file"
-                hidden
-              />
-              <ButtonLabel>File size limit: 5MB</ButtonLabel>
-            </>
-          </Col>
-          <Col>
-            {file && (
-              <>
-                <Button
-                  disabled={uploadInProgress}
-                  onClick={uploadFile}
-                  text="Upload File"
-                  type="button"
-                  variant="secondary"
-                />
-                {uploadInProgress ? (
-                  <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
-                ) : (
-                  <ButtonLabel>{file.name}</ButtonLabel>
-                )}
-              </>
-            )}
-          </Col>
-        </StyledRow>
-      </MobileButtonHide>
-    );
-  };
-
-  const DesktopButtons = () => {
-    return (
-      <DesktopButtonHide>
+      <StyledRow>
         <Col>
-          <StyledMargin>
+          <>
             <Button
               disabled={uploadInProgress}
               onClick={() => fileInputRef?.current?.click()}
@@ -185,7 +141,9 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
               hidden
             />
             <ButtonLabel>File size limit: 5MB</ButtonLabel>
-          </StyledMargin>
+          </>
+        </Col>
+        <Col>
           {file && (
             <>
               <Button
@@ -203,13 +161,53 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
             </>
           )}
         </Col>
-      </DesktopButtonHide>
+      </StyledRow>
+    );
+  };
+
+  const DesktopButtons = () => {
+    return (
+      <Col>
+        <StyledMargin>
+          <Button
+            disabled={uploadInProgress}
+            onClick={() => fileInputRef?.current?.click()}
+            text="Choose File"
+            type="button"
+            variant="secondary"
+          />
+          <input
+            onChange={onFileChange}
+            multiple={false}
+            ref={fileInputRef}
+            type="file"
+            hidden
+          />
+          <ButtonLabel>File size limit: 5MB</ButtonLabel>
+        </StyledMargin>
+        {file && (
+          <>
+            <Button
+              disabled={uploadInProgress}
+              onClick={uploadFile}
+              text="Upload File"
+              type="button"
+              variant="secondary"
+            />
+            {uploadInProgress ? (
+              <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
+            ) : (
+              <ButtonLabel>{file.name}</ButtonLabel>
+            )}
+          </>
+        )}
+      </Col>
     );
   };
 
   return (
     <Container>
-      <MobileButtons />
+      {modal && <MobileButtons />}
       <Row>
         {src ? (
           <CropContainer>
@@ -230,7 +228,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
             }}
           ></PhotoContainer>
         )}
-        <DesktopButtons />
+        {!modal && <DesktopButtons />}
       </Row>
     </Container>
   );
@@ -255,7 +253,6 @@ const CropContainer = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
-  width: 100%;
 `;
 
 const StyledRow = styled(Row)`
@@ -269,19 +266,6 @@ const ButtonLabel = styled.p`
 
 const StyledMargin = styled.div`
   margin-bottom: 100px;
-`;
-
-const MobileButtonHide = styled.div`
-  @media (max-width: ${breakpoints.sm}) {
-    display: none;
-  }
-  padding-left: 10px;
-`;
-
-const DesktopButtonHide = styled.div`
-  @media (min-width: ${breakpoints.md}) {
-    display: none;
-  }
 `;
 
 export default ImageUpload;

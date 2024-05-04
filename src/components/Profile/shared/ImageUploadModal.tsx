@@ -27,7 +27,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
         <Button onClick={onHide} text="Cancel" type="danger" variant="danger" />
       </Modal.Header>
       {error && <Alert variant="danger">{error}</Alert>}
-      <ImageUpload onSave={onSave} currentImgUrl={currentImgUrl} />
+      <ImageUpload onSave={onSave} currentImgUrl={currentImgUrl} modal={true} />
     </Modal>
   );
 };
