@@ -44,7 +44,7 @@ import {
 import { USStateSymbol } from '../../SignUp/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
-import AwardCard from './AwardCard';
+import Awards from './ProfileSections/Awards';
 import IndividualUpcomingShow from './IndividualUpcomingShow';
 import IndividualCredits from './IndividualCredits';
 import ImageUploadModal from '../shared/ImageUploadModal';
@@ -732,7 +732,7 @@ const IndividualProfile: React.FC<{
   useEffect(() => {
     const newYears = [] as number[];
 
-    for (let i = 2023; i > 1949; i--) {
+    for (let i = 2024; i > 1949; i--) {
       newYears.push(i);
     }
 
@@ -1829,11 +1829,13 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
+
+            {/* AWARD SECTION */}
             {editMode['awards'] ? (
               <Container>
                 {editProfile?.awards?.map((awardRow: any, i: any) => (
                   <AwardRow key={`award-row-${awardRow.id}`}>
-                    <Col lg="4">
+                    <Col>
                       <CAGFormControl
                         as="input"
                         name="title"
@@ -1866,19 +1868,6 @@ const IndividualProfile: React.FC<{
                           return <option value={year}>{year}</option>;
                         })}
                       </CAGFormControl>
-                      <CAGFormControl
-                        as="input"
-                        name="url"
-                        onChange={(e: any) =>
-                          onAwardInputChange(
-                            e.target.value || '',
-                            'url',
-                            awardRow.id
-                          )
-                        }
-                        placeholder="Web Link"
-                        value={awardRow.url}
-                      />
                       {editProfile?.awards?.length > 1 && (
                         <CAGButton>
                           <a
@@ -1892,22 +1881,6 @@ const IndividualProfile: React.FC<{
                           </a>
                         </CAGButton>
                       )}
-                    </Col>
-                    <Col lg="6">
-                      <CAGFormControl
-                        as="textarea"
-                        name="description"
-                        onChange={(e: any) =>
-                          onAwardInputChange(
-                            e.target.value || '',
-                            'description',
-                            awardRow.id
-                          )
-                        }
-                        placeholder="Description/Notes"
-                        rows={6}
-                        value={awardRow.description}
-                      />
                     </Col>
                   </AwardRow>
                 ))}
@@ -1945,14 +1918,10 @@ const IndividualProfile: React.FC<{
               <>
                 {hasNonEmptyValues(profile?.data?.awards) && (
                   <DetailSection title="Awards & Recognition">
-                    <ProfileFlex>
-                      {profile?.data?.awards.map((award: ProfileAwards) => (
-                        <AwardCard
-                          award={award}
-                          key={`award-${award?.title}`}
-                        />
-                      ))}
-                    </ProfileFlex>
+                    <Awards
+                      awards={profile?.data?.awards}
+                      editMode={editMode.awards}
+                    />
                   </DetailSection>
                 )}
                 <a
