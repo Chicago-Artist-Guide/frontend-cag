@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { format } from 'date-fns';
+import { AccountTypeOptions } from '../components/SignUp/types';
 import { IndividualRoles } from '../components/SignUp/Individual/types';
 
 export type SubmitLGLConstituentParams = {
@@ -7,7 +8,7 @@ export type SubmitLGLConstituentParams = {
   first_name: string;
   last_name: string;
   email_address: string;
-  account_type: 'individual' | 'company';
+  account_type: AccountTypeOptions;
   stage_role?: IndividualRoles;
   org_name?: string;
 };
@@ -22,7 +23,7 @@ export type LGLEmailAddress = {
 export type LGLCustomAttrs = {
   id: number;
   key: 'account_type' | 'stage_role';
-  value: 'individual' | 'company' | IndividualRoles;
+  value: AccountTypeOptions | IndividualRoles;
 };
 
 export type LGLGroup = {
@@ -104,6 +105,8 @@ export const submitLGLConstituent = async ({
 
   if (groupItems.length) {
     const findKey = account_type === 'company' ? 'producing_company' : 'artist';
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const constituentGroup = groupItems.find((i: any) => i.key === findKey);
 
     if (constituentGroup) {

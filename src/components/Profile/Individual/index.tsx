@@ -34,9 +34,7 @@ import {
   pronouns,
   UpcomingPerformances,
   IndividualAccountInit,
-  IndividualProfileInit,
-  IndividualProfile as IndividualProfileT,
-  IndividualProfile2,
+  IndividualProfileDataFullInit,
   IndividualWebsite,
   WebsiteTypes,
   TrainingInstitution,
@@ -53,6 +51,7 @@ import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -213,13 +212,10 @@ const IndividualProfile: React.FC<{
   };
 
   const setProfileForm = (field: string, value: any) => {
-    setEditProfile(
-      (
-        prevState: IndividualProfileInit &
-          IndividualProfileT &
-          IndividualProfile2
-      ) => ({ ...prevState, [field]: value })
-    );
+    setEditProfile((prevState: IndividualProfileDataFullInit) => ({
+      ...prevState,
+      [field]: value
+    }));
   };
 
   const setAccountForm = (field: string, value: any) => {
@@ -298,12 +294,11 @@ const IndividualProfile: React.FC<{
     setProfileForm('websites', newWebsiteInputs);
   };
 
-  const updatePfpUrl = async () => {
-    const { profile_image_url } = editProfile;
-
+  const savePfpUrlModal = async (pfpImgUrl: string) => {
     try {
       if (profile.ref) {
-        await updateDoc(profile.ref, { profile_image_url });
+        await updateDoc(profile.ref, { ['profile_image_url']: pfpImgUrl });
+        setPfpModalShow(false);
       } else {
         // no profile.ref
         // look up?
@@ -311,11 +306,6 @@ const IndividualProfile: React.FC<{
     } catch (err) {
       console.error('Error updating profile image', err);
     }
-  };
-
-  const savePfpUrlModal = async (pfpImgUrl: string) => {
-    setProfileForm('profile_image_url', pfpImgUrl);
-    await updatePfpUrl();
   };
 
   const updatePersonalDetails = async () => {
@@ -816,12 +806,19 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          {profile?.data?.profile_image_url ? (
+            <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          ) : (
+            <PlaceholderImage>
+              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
+            </PlaceholderImage>
+          )}
           <ImageUploadModal
             editProfile={editProfile}
             show={pfpModalShow}
             onHide={() => setPfpModalShow(false)}
             onSave={(pfpImgUrl: string) => savePfpUrlModal(pfpImgUrl)}
+            currentImgUrl={profile?.data?.profile_image_url}
           />
           <p>
             <a
@@ -1989,6 +1986,21 @@ const ProfileImage = styled(Image)`
   background: ${colors.lightGrey};
   minheight: 250px;
   width: 100%;
+`;
+
+const PlaceholderImage = styled.div`
+  background: ${colors.lightGrey};
+  color: white;
+  display: flex;
+  font-size: 68px;
+  height: 300px;
+  width: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px 4px ${colors.black05a};
+  border-radius: 8px;
 `;
 
 const DetailsCard = styled.div`

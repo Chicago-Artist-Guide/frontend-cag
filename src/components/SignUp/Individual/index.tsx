@@ -14,8 +14,9 @@ import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
 import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
 import OffstageRoles from './OffstageRoles';
-import ProfilePhoto from './ProfilePhoto';
+import { Tagline, Title } from '../../layout/Titles';
 import IndividualRole from './Role';
+import ImageUpload from '../../shared/ImageUpload';
 import type {
   Gender,
   IndividualAccountInit,
@@ -161,6 +162,14 @@ const IndividualSignUp: React.FC<{
     const target = {
       name: 'privacyAgreement',
       value: true
+    };
+    setForm({ target });
+  };
+
+  const setProfilePicture = (url: string) => {
+    const target = {
+      name: 'profilePhotoUrl',
+      value: url
     };
     setForm({ target });
   };
@@ -419,7 +428,19 @@ const IndividualSignUp: React.FC<{
         );
         break;
       case 'profilePhoto':
-        returnStep = <ProfilePhoto {...props} />;
+        returnStep = (
+          <>
+            <Title>LET'S PUT A FACE TO THE NAME</Title>
+            <Tagline>
+              We just need one for now, but you can add more later.
+            </Tagline>
+            <ImageUpload
+              onSave={(pfpImgUrl: string) => setProfilePicture(pfpImgUrl)}
+              currentImgUrl=""
+              modal={false}
+            />
+          </>
+        );
         break;
       default:
         returnStep = <></>;

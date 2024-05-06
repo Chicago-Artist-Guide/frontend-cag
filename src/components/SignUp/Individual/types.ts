@@ -255,3 +255,5 @@ export type IndividualProfile2 = {
 };
 
 export type IndividualProfileDataFull = IndividualProfile & IndividualProfile2;
+export type IndividualProfileDataFullInit = IndividualProfileInit &
+  IndividualProfileDataFull;
