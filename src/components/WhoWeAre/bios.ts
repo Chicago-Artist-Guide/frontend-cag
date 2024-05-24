@@ -14,6 +14,7 @@ import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
 import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
+import Kauffman from '../../images/who-we-are/board/Board_Kauffman.jpg';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
@@ -23,6 +24,9 @@ import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
 import Wills from '../../images/who-we-are/operations/Staff_Wills.jpg';
 import Adamy from '../../images/who-we-are/operations/Staff_Adamy.jpg';
+import Newsome from '../../images/who-we-are/operations/Staff_Newsome.jpg';
+import Hinton from '../../images/who-we-are/operations/Staff_Hinton.png';
+import Walker from '../../images/who-we-are/operations/Staff_Walker.jpg';
 
 // Site Development
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
@@ -149,6 +153,16 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Madison Kauffman',
+      role: 'Artist Board Member',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Kauffman,
+      linkedin: 'madisonkauffman13',
+      bio: 'Madison is over the moon to be working with Chicago Artist Guide. She is a professional actress for both the stage and screen- working here in Chicago as well as regionally. Credits include: Chicago Shakespeare Theater, Lyric Opera of Chicago, Paramount Theatre, Broadway in Chicago, Theo Ubique, Kokandy Productions, Drury Lane Oakbrook, NYMF, & Casa Manana. When not performing, she loves to create and find art in everything she does. Madison also works as a freelance social media content creator and on her downtime, loves playing the accordion or baking. She holds a BFA in Musical Theater and Digital Media Marketing from Millikin University and is proudly represented by Gray Talent Group.'
+    },
+    {
+      id: bioId(),
       name: 'James Lewis',
       role: 'Artist Board Member',
       pronouns: 'he/him',
@@ -191,6 +205,16 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Sara Newsome',
+      role: 'Development Manager',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Newsome,
+      linkedin: 'saranewsome',
+      bio: 'graduated with a BA in Japanese Studies from Gettysburg College and an MA and PhD in East Asian Studies from Washington University in St. Louis and UC Irvine respectively. Her focus during her studies was on the intersection of theater, religion and activism in Japan. Currently, Sara hopes to use her skills and experiences in grant writing, management and development to make a positive impact on the world around her.'
+    },
+    {
+      id: bioId(),
       name: 'Yazmin Torres',
       role: 'Business Manager',
       pronouns: 'she/her',
@@ -221,6 +245,16 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Supreme Hinton',
+      role: 'Development Associate',
+      pronouns: 'he/him',
+      affiliation: null,
+      image: Hinton,
+      linkedin: 'supremeh',
+      bio: 'is a new media artist and community manager based in Chicago, NYC, and San Francisco with over 8 years of experience in arts administration, community organization, and technological consulting. During his stay at The University of Chicago, Supreme founded Diversity in Business and Blockchain Chi to host accessible hackathons and programs for artists and pre-professionals in the Chicagoland area. During the pandemic, Supreme worked for Currents.fm, providing a digital venue space and tipping pipelines for over 5,000 artists across 150 countries. Ever since, his dedication towards bringing communities together has been constant.'
+    },
+    {
+      id: bioId(),
       name: 'Tumpale Mwakasisi',
       role: 'Social Media Associate',
       pronouns: 'she/her',
@@ -228,6 +262,16 @@ const bios = {
       image: Mwakasisi,
       linkedin: 'tumpalemwakasisi',
       bio: "is Chicago-based content creator who showcases the city's diverse food and culture through her videos and reviews at @malortandmoet. She creates engaging videos and reviews for various online platforms, sharing her insights and recommendations with her audience and beyond. Previously, Tumpale worked in tech program management for companies like Webflow and LinkedIn. She also has digital marketing experience from her previous roles at Bottle & Bottega and Northwestern. Tumpale is passionate about supporting local businesses and communities, and she is excited to join Chicago Artist Guide. She hopes to contribute to the organization's mission and vision with her skills and experience. When she is not creating content, Tumpale likes to watch Youtube and movies, play video games, listen to music, and watch TV."
+    },
+    {
+      id: bioId(),
+      name: 'Ella Walker',
+      role: 'Public Relations Associate',
+      pronouns: 'she/her',
+      affilitation: null,
+      image: Walker,
+      linkedin: 'ella-walker10',
+      bio: "is a director, choreographer, teaching artist, and marketing professional. With a passion for making theatre and arts spaces more equitable and inclusive, Ella is grateful to be part of Chicago Artist Guide. She holds a B.A. in Theatre Performance from Carthage College and is currently earning her M.S. in Leadership for Creative Enterprises from Northwestern University. When she's not directing, studying, or writing a press release, Ella loves to read, be in nature, and travel! "
     },
     {
       id: bioId(),
