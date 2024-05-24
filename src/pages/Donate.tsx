@@ -42,10 +42,8 @@ const Donate = () => {
               <IFrame
                 allowTransparency
                 allow="payment"
-                frameBorder="0"
-                scrolling="no"
                 title="Donate to Chicago Artist Guide online. Donation form powered by Zeffy."
-                style={{ width: '100%', border: 'none' }}
+                style={{ width: '100%', border: 'none', height: '1960px' }}
                 src="https://www.zeffy.com/en-US/donation-form/bf4f5b40-de6b-44d1-9276-ef91daa82842"
               >
                 <a href="https://www.zeffy.com/en-US/donation-form/bf4f5b40-de6b-44d1-9276-ef91daa82842">
@@ -53,7 +51,8 @@ const Donate = () => {
                 </a>
               </IFrame>
             </Col>
-            <Col lg="4">
+            <Col lg="12">
+              <br />
               <p>
                 <strong>2. OR by mail:</strong>
               </p>
