@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useFirebaseContext } from '../context/FirebaseContext';
@@ -9,9 +10,10 @@ import { MatchesPageContainer } from '../components/Matches/MatchesPageContainer
 
 const Matches = () => {
   const { firebaseFirestore } = useFirebaseContext();
+  const { productionId } = useParams();
 
   return (
-    <MatchProvider firestore={firebaseFirestore}>
+    <MatchProvider productionId={productionId} firestore={firebaseFirestore}>
       <PageContainer>
         <Row>
           <Col lg={12}>

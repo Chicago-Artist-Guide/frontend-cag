@@ -5,20 +5,41 @@ import {
   where,
   getDocs,
   QueryDocumentSnapshot,
-  orderBy
+  orderBy,
+  doc,
+  getDoc
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 import { MessageFilters, MessageType } from '../components/Messages/types';
+import { Production } from '../components/Profile/Company/types';
+import { IndividualAccountInit } from '../components/SignUp/Individual/types';
+
+export const getProduction = async (
+  firebaseStore: Firestore,
+  productionId: string
+) => {
+  const docRef = doc(firebaseStore, 'productions', productionId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as Production;
+    return data;
+  } else {
+    return false;
+  }
+};
 
 // TODO: add version for roles called fetchRolesWithFilters()
-
 export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
   filters: MatchingFilters
 ): Promise<IndividualProfileDataFullInit[]> {
   const { type: accountType, ...profileFilters } = filters;
-  const accountsRef = collection(firebaseStore, 'accounts');
+
+  // This is inefficient to do, and Firebase limits IN queries to 10
+  // We should get the same effect with profile filters
+  /* const accountsRef = collection(firebaseStore, 'accounts');
   const accountsQuery = query(accountsRef, where('type', '==', accountType));
   const accountsSnapshot = await getDocs(accountsQuery);
 
@@ -27,7 +48,11 @@ export async function fetchTalentWithFilters(
 
   // get matching profiles
   const profilesRef = collection(firebaseStore, 'profiles');
-  let profileQuery = query(profilesRef, where('uuid', 'in', uuids));
+  let profileQuery = query(profilesRef, where('uuid', 'in', uuids));*/
+
+  // get matching profiles
+  const profilesRef = collection(firebaseStore, 'profiles');
+  let profileQuery = query(profilesRef);
 
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
@@ -52,6 +77,24 @@ export async function fetchTalentWithFilters(
 
   return matches;
 }
+
+export const getMatchName = async (
+  firebaseStore: Firestore,
+  account_id: string
+) => {
+  const docRef = doc(firebaseStore, 'accounts', account_id);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as IndividualAccountInit;
+    const { first_name, last_name } = data;
+    return first_name && last_name
+      ? `${data.first_name} ${data.last_name}`
+      : `User ${account_id}`;
+  } else {
+    return '';
+  }
+};
 
 export const fetchMessagesByAccountAndRole = async (
   firebaseStore: Firestore,

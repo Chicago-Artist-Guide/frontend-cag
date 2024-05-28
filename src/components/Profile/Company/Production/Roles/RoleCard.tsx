@@ -32,7 +32,12 @@ const RoleCard: React.FC<{
                 variant="primary"
                 icon={faEdit}
               />
-              <RoleButton text="View Matches" type="button" variant="primary" />
+              <RoleButton
+                onClick={onViewMatches}
+                text="View Matches"
+                type="button"
+                variant="primary"
+              />
             </div>
           </div>
         </RightCol>
