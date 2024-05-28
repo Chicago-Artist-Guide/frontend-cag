@@ -53,6 +53,7 @@ const ManageProduction: React.FC<null> = () => {
   const getProduction = async () => {
     const docRef = doc(db, 'productions', productionId);
     const docSnap = await getDoc(docRef);
+
     if (docSnap.exists()) {
       const data = docSnap.data() as Production;
       Object.entries(data).map(([key, value]) =>

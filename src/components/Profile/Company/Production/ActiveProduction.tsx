@@ -8,8 +8,13 @@ import { Production } from '../types';
 
 const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
   const history = useHistory();
+
   const manageProduction = () => {
     history.push(`production/${show.production_id}/manage`);
+  };
+
+  const viewMatches = () => {
+    history.push(`/profile/search/talent/${show.production_id}`);
   };
 
   return (
@@ -36,7 +41,7 @@ const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
                 variant="primary"
               />
               <ShowButton
-                onClick={() => alert('this will view matches')}
+                onClick={viewMatches}
                 text="View Matches"
                 type="button"
                 variant="primary"
