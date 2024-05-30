@@ -60,6 +60,11 @@ export async function fetchTalentWithFilters(
       if (Array.isArray(value) && value.length > 0) {
         profileQuery = query(
           profileQuery,
+          // TODO: Firebase only supports ONE 'array-contains-any' per query
+          // We have to refactor this to either:
+          //  1. Only use 1 array query and then do the rest of the filtering client-side
+          //  2. Do multiple queries, 1 per array filter, then merge them
+          // One consideration is how this could impact pagination
           where(field, 'array-contains-any', value)
         );
       } else {

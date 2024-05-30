@@ -10,6 +10,16 @@ import { getProduction, fetchTalentWithFilters } from '../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 import { Production, Role } from '../components/Profile/Company/types';
+import {
+  IndividualRoles,
+  Gender,
+  AgeRange
+} from '../components/SignUp/Individual/types';
+import {
+  findCategoryByValue,
+  OffstageCategoryKey,
+  findOffstageCategoryDataProp
+} from '../components/Profile/shared/offstageRolesOptions';
 
 // TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {
@@ -57,6 +67,57 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
   const [roles, setRoles] = useState<Role[]>([]);
   const [currentRoleId, setCurrentRoleId] = useState<string>();
 
+  const updateFiltersFromRole = (findRole: Role) => {
+    const newFilters: MatchingFilters = { ...filters };
+
+    // stage role type
+    if (findRole.type) {
+      newFilters['stage_role'] = [
+        findRole.type.toLocaleLowerCase() as IndividualRoles,
+        'both-stage'
+      ];
+    }
+
+    // for offstage roles
+    if (findRole.offstage_role) {
+      const findOffCat = findCategoryByValue(
+        findRole.offstage_role
+      ) as OffstageCategoryKey;
+
+      if (findOffCat) {
+        const findOffCatDataProp = findOffstageCategoryDataProp[findOffCat];
+
+        if (!findOffCatDataProp) {
+          return;
+        }
+
+        newFilters[findOffCatDataProp] = [findRole.offstage_role];
+      }
+    }
+
+    if (findRole.gender_identity) {
+      newFilters['gender_identity'] = findRole.gender_identity as Gender[];
+    }
+
+    if (findRole.ethnicity) {
+      const ethnicityCatchAll = 'Open to all ethnicities';
+      newFilters['ethnicities'] = findRole.ethnicity.filter(
+        (f) => f !== ethnicityCatchAll
+      );
+    }
+
+    if (findRole.age_range) {
+      const ageCatchAll = 'Open to all ages';
+      newFilters['age_ranges'] = findRole.age_range.filter(
+        (a) => a !== ageCatchAll
+      ) as AgeRange[];
+    }
+
+    // do not set new filters for now until we solve the multiple 'array-contains-any' problem
+    // setFilters(newFilters);
+    return newFilters;
+  };
+
   // get production and roles
   useEffect(() => {
     getProduction(firestore, productionId).then((p) => {
@@ -73,11 +134,27 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     });
   }, [productionId]);
 
+  // set filters based on role
+  useEffect(() => {
+    if (!currentRoleId || !roles.length) {
+      return;
+    }
+
+    const findRole = roles.find((r) => r.role_id === currentRoleId);
+
+    if (!findRole) {
+      return;
+    }
+
+    updateFiltersFromRole(findRole);
+  }, [currentRoleId]);
+
   // get matches
   useEffect(() => {
     setLoading(true);
 
     // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
+    console.log(filters);
     fetchTalentWithFilters(firestore, filters).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);

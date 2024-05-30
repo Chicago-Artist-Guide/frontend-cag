@@ -1,16 +1,21 @@
 import {
   IndividualAccountInit,
-  IndividualProfileDataFullInit
+  IndividualProfileDataFullInit,
+  IndividualRoles,
+  Gender
 } from '../SignUp/Individual/types';
 
 // add more filter options to this as we work on the filter bar functionality
-export type MatchingFilters = Pick<IndividualAccountInit, 'type'> &
-  Partial<
+// we split out some as arrays because single values in the profile
+// need to have multiple options for search
+export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
+  stage_role?: IndividualRoles[];
+  gender_identity?: Gender[];
+} & Partial<
     Pick<
       IndividualProfileDataFullInit,
       | 'ethnicities'
       | 'age_ranges'
-      | 'gender_identity'
       | 'gender_roles'
       | 'gender_transition'
       | 'lgbtqia'
@@ -18,5 +23,11 @@ export type MatchingFilters = Pick<IndividualAccountInit, 'type'> &
       | 'additional_skills_manual'
       | 'union_status'
       | 'union_other'
+      | 'offstage_roles_general'
+      | 'offstage_roles_production'
+      | 'offstage_roles_scenic_and_properties'
+      | 'offstage_roles_lighting'
+      | 'offstage_roles_sound'
+      | 'offstage_roles_hair_makeup_costumes'
     >
   >;
