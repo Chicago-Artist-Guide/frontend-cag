@@ -154,7 +154,6 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     setLoading(true);
 
     // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
-    console.log(filters);
     fetchTalentWithFilters(firestore, filters).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
