@@ -37,35 +37,40 @@ export async function fetchTalentWithFilters(
   filters: MatchingFilters
 ): Promise<IndividualProfileDataFullInit[]> {
   const { type: accountType, ...profileFilters } = filters;
-
-  const profilesRef = collection(firebaseStore, 'profiles');
   const profileQueries: any[] = [];
+  const profilesRef = collection(firebaseStore, 'profiles');
+  let singleProfileQuery = query(profilesRef);
 
   console.log('filters', filters);
 
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       // Check if the value is an array for filters like ethnicity and age range
-      if (Array.isArray(value) && value.length > 0) {
-        const profileQuery = query(
-          profilesRef,
-          where(field, 'array-contains-any', value)
-        );
-        profileQueries.push(profileQuery);
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          const profileQuery = query(
+            profilesRef,
+            where(field, 'array-contains-any', value)
+          );
+
+          profileQueries.push(profileQuery);
+        }
       } else {
-        const profileQuery = query(profilesRef, where(field, '==', value));
-        profileQueries.push(profileQuery);
+        singleProfileQuery = query(
+          singleProfileQuery,
+          where(field, '==', value)
+        );
       }
     }
   }
 
-  console.log('profileQueries', profileQueries);
-
-  const snapshotPromises = profileQueries.map((profileQuery) =>
+  const allProfileQueries = [singleProfileQuery, ...profileQueries];
+  const snapshotPromises = allProfileQueries.map((profileQuery) =>
     getDocs(profileQuery)
   );
   const snapshots = await Promise.all(snapshotPromises);
 
+  console.log('allProfileQueries', allProfileQueries);
   console.log('snapshots', snapshots);
 
   const matches: IndividualProfileDataFullInit[] = [];
