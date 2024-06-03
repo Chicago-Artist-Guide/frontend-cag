@@ -52,6 +52,7 @@ import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import Training from './ProfileSections/Training';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -396,6 +397,7 @@ const IndividualProfile: React.FC<{
     const newData = editProfile[section];
 
     if (!newData) {
+      console.log('This is your error');
       return;
     }
 
@@ -531,7 +533,6 @@ const IndividualProfile: React.FC<{
         trainingDetails: ''
       }
     ]);
-
     setTrainingId(newTrainingId);
   };
 
@@ -1063,6 +1064,7 @@ const IndividualProfile: React.FC<{
           </div>
           <hr />
           <div>
+            {/* TRAINING SECTION */}
             {editMode['training'] ? (
               <Container>
                 {(hasNonEmptyValues(editProfile?.training_institutions)
@@ -1078,7 +1080,7 @@ const IndividualProfile: React.FC<{
                         trainingDetails: profile.data.training_details
                       }
                     ]
-                  : []
+                  : [{}]
                 ).map((training: any, i: number) => (
                   <TrainingRow key={`training-${training.id}`}>
                     <Col lg="8">
@@ -1099,91 +1101,17 @@ const IndividualProfile: React.FC<{
                           <Row>
                             <PaddedCol lg="8">
                               <InputField
-                                name="trainingCity"
+                                name="trainingYear"
                                 onChange={(e: any) =>
                                   onTrainingFieldChange(
-                                    'trainingCity',
+                                    'trainingYear',
                                     e.target.value,
                                     training.id
                                   )
                                 }
-                                placeholder="City"
-                                value={training.trainingCity}
+                                placeholder="Year"
+                                value={training.trainingYear}
                               />
-                            </PaddedCol>
-                            <PaddedCol lg="4">
-                              <CAGFormSelect
-                                name="trainingState"
-                                onChange={(e: any) =>
-                                  onTrainingFieldChange(
-                                    'trainingState',
-                                    e.target.value,
-                                    training.id
-                                  )
-                                }
-                                value={training.trainingState || ''}
-                                style={{
-                                  height: 52,
-                                  marginTop: 'calc(25px + 0.5rem)',
-                                  border: `1px solid ${colors.lightGrey}`,
-                                  color: training.trainingState
-                                    ? colors.secondaryFontColor
-                                    : colors.lightGrey
-                                }}
-                              >
-                                <option value="">State</option>
-                                <option value="AL">Alabama</option>
-                                <option value="AK">Alaska</option>
-                                <option value="AZ">Arizona</option>
-                                <option value="AR">Arkansas</option>
-                                <option value="CA">California</option>
-                                <option value="CO">Colorado</option>
-                                <option value="CT">Connecticut</option>
-                                <option value="DE">Delaware</option>
-                                <option value="DC">District Of Columbia</option>
-                                <option value="FL">Florida</option>
-                                <option value="GA">Georgia</option>
-                                <option value="HI">Hawaii</option>
-                                <option value="ID">Idaho</option>
-                                <option value="IL">Illinois</option>
-                                <option value="IN">Indiana</option>
-                                <option value="IA">Iowa</option>
-                                <option value="KS">Kansas</option>
-                                <option value="KY">Kentucky</option>
-                                <option value="LA">Louisiana</option>
-                                <option value="ME">Maine</option>
-                                <option value="MD">Maryland</option>
-                                <option value="MA">Massachusetts</option>
-                                <option value="MI">Michigan</option>
-                                <option value="MN">Minnesota</option>
-                                <option value="MS">Mississippi</option>
-                                <option value="MO">Missouri</option>
-                                <option value="MT">Montana</option>
-                                <option value="NE">Nebraska</option>
-                                <option value="NV">Nevada</option>
-                                <option value="NH">New Hampshire</option>
-                                <option value="NJ">New Jersey</option>
-                                <option value="NM">New Mexico</option>
-                                <option value="NY">New York</option>
-                                <option value="NC">North Carolina</option>
-                                <option value="ND">North Dakota</option>
-                                <option value="OH">Ohio</option>
-                                <option value="OK">Oklahoma</option>
-                                <option value="OR">Oregon</option>
-                                <option value="PA">Pennsylvania</option>
-                                <option value="RI">Rhode Island</option>
-                                <option value="SC">South Carolina</option>
-                                <option value="SD">South Dakota</option>
-                                <option value="TN">Tennessee</option>
-                                <option value="TX">Texas</option>
-                                <option value="UT">Utah</option>
-                                <option value="VT">Vermont</option>
-                                <option value="VA">Virginia</option>
-                                <option value="WA">Washington</option>
-                                <option value="WV">West Virginia</option>
-                                <option value="WI">Wisconsin</option>
-                                <option value="WY">Wyoming</option>
-                              </CAGFormSelect>
                             </PaddedCol>
                           </Row>
                         </Container>
@@ -1199,30 +1127,7 @@ const IndividualProfile: React.FC<{
                           placeholder="Degree"
                           value={training.trainingDegree}
                         />
-                        <Container>
-                          <Row>
-                            <PaddedCol className="mt-4" lg="12">
-                              <SmallTitle>Notes/Details</SmallTitle>
-                              <Form.Group controlId="formControlTextarea1">
-                                <Form.Control
-                                  as="textarea"
-                                  name="trainingDetails"
-                                  onChange={(e: any) =>
-                                    onTrainingFieldChange(
-                                      'trainingDetails',
-                                      e.target.value,
-                                      training.id
-                                    )
-                                  }
-                                  placeholder="Provide any additional information here"
-                                  rows={6}
-                                  value={training.trainingDetails || ''}
-                                />
-                              </Form.Group>
-                            </PaddedCol>
-                          </Row>
-                        </Container>
-                        {i ? (
+                        {i + 1 ? (
                           <DeleteRowLink
                             href="#"
                             onClick={(e: any) =>
@@ -1277,39 +1182,15 @@ const IndividualProfile: React.FC<{
               </Container>
             ) : (
               <>
-                {hasNonEmptyValues(profile?.data?.training_institutions) ? (
+                {hasNonEmptyValues(profile?.data?.training_institutions) && (
                   <DetailSection title="Training">
-                    {profile?.data?.training_institutions.map(
-                      (training: TrainingInstitution) => (
-                        <p>
-                          <strong>{training.trainingInstitution}</strong>
-                          <br />
-                          {training.trainingCity}, {training.trainingState}
-                          <br />
-                          <em>{training.trainingDegree}</em>
-                          <br />
-                          <span>{training.trainingDetails}</span>
-                        </p>
-                      )
-                    )}
+                    <Training
+                      training_institutions={
+                        profile?.data?.training_institutions
+                      }
+                      editMode={editProfile?.['training_institutions']}
+                    />
                   </DetailSection>
-                ) : profile?.data?.training_institution &&
-                  profile?.data?.training_institution !== '' ? (
-                  <DetailSection title="Training">
-                    {/* need to support the old single training value profiles - will only update once they edit */}
-                    <p>
-                      <strong>{profile?.data.training_institution}</strong>
-                      <br />
-                      {profile?.data.training_city},{' '}
-                      {profile?.data.training_state}
-                      <br />
-                      <em>{profile?.data.training_degree}</em>
-                      <br />
-                      <span>{profile?.data.training_details}</span>
-                    </p>
-                  </DetailSection>
-                ) : (
-                  <></>
                 )}
                 <a
                   href="#"

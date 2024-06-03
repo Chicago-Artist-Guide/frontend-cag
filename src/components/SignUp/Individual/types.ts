@@ -233,6 +233,7 @@ export type TrainingInstitution = {
   trainingState: USStateSymbol;
   trainingDegree: string;
   trainingDetails: string;
+  trainingYear: string;
 };
 
 export type IndividualProfile2Data = {
