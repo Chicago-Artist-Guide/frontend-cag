@@ -6,9 +6,10 @@ import React, {
   useState,
   ReactNode
 } from 'react';
-import { fetchTalentWithFilters } from '../utils/firebaseUtils';
+import { getProduction, fetchTalentWithFilters } from '../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
+import { Production, Role } from '../components/Profile/Company/types';
 
 // TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {
@@ -16,10 +17,17 @@ interface MatchContextValue {
   loading: boolean;
   filters: MatchingFilters;
   updateFilters: (newFilters: MatchingFilters) => void;
+  production?: Production;
+  setProduction?: (production: Production) => void;
+  roles?: Role[];
+  setRoles?: (roles: Role[]) => void;
+  currentRoleId?: string;
+  setCurrentRoleId?: (roleId: string) => void;
 }
 
 type MatchProviderProps = {
   firestore: Firestore;
+  productionId: string;
   children: ReactNode;
 };
 
@@ -36,6 +44,7 @@ export const useMatches = (): MatchContextValue => useContext(MatchContext);
 
 export const MatchProvider: React.FC<MatchProviderProps> = ({
   firestore,
+  productionId,
   children
 }) => {
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
@@ -44,7 +53,27 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     // the only required filter we need to start is account type
     type: 'individual'
   });
+  const [production, setProduction] = useState<Production>();
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [currentRoleId, setCurrentRoleId] = useState<string>();
 
+  // get production and roles
+  useEffect(() => {
+    getProduction(firestore, productionId).then((p) => {
+      if (!p) {
+        return;
+      }
+
+      setProduction(p);
+
+      if (p.roles) {
+        setRoles(p.roles);
+        setCurrentRoleId(p.roles[0].role_id);
+      }
+    });
+  }, [productionId]);
+
+  // get matches
   useEffect(() => {
     setLoading(true);
 
@@ -63,7 +92,13 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     matches,
     loading,
     filters,
-    updateFilters
+    updateFilters,
+    production,
+    setProduction,
+    roles,
+    setRoles,
+    currentRoleId,
+    setCurrentRoleId
   };
 
   return (

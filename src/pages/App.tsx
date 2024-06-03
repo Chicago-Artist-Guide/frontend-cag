@@ -82,11 +82,15 @@ const CAG = () => {
         <Route component={SignUp} exact path="/sign-up" />
         <Route component={SignUp2} exact path="/sign-up-2" />
         <Route component={Profile} exact path="/profile" />
-        <Route component={Matches} exact path="/profile/search" />
         <Route component={Messages} exact path="/profile/messages" />
         <Route
           component={ManageProduction}
           path="/production/:productionId/manage"
+        />
+        <Route component={Matches} exact path="/profile/search/roles" />
+        <Route
+          component={Matches}
+          path="/profile/search/talent/:productionId"
         />
         <Route component={NotFound} />
       </Switch>

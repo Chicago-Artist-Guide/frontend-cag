@@ -1,5 +1,6 @@
 import { uuidv4 } from '@firebase/util';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { SetForm } from 'react-hooks-helper';
 import { StageRole } from '../../../shared/profile.types';
 import { Production, Role } from '../../types';
@@ -12,6 +13,7 @@ const ManageProductionRoles: React.FC<{
   setFormValues: SetForm;
   handleUpdate: (x: Production) => void;
 }> = ({ formValues, setFormValues, handleUpdate }) => {
+  const history = useHistory();
   const [showModal, setShowModal] = useState(false);
   const [roleType, setRoleType] = useState<StageRole>('On-Stage');
   const [editRole, setEditRole] = useState<Role>();
@@ -82,6 +84,10 @@ const ManageProductionRoles: React.FC<{
     { onStageRoles: [] as Role[], offStageRoles: [] as Role[] }
   );
 
+  const onViewMatches = () => {
+    history.push(`/profile/search/talent/${formValues.production_id}`);
+  };
+
   return (
     <>
       <RoleModal
@@ -99,7 +105,7 @@ const ManageProductionRoles: React.FC<{
               key={role.role_id}
               role={role}
               onEdit={() => onManageOnStageRole(role)}
-              onViewMatches={() => alert('matches')}
+              onViewMatches={onViewMatches}
             />
           ))}
         </RoleSection>
@@ -110,7 +116,7 @@ const ManageProductionRoles: React.FC<{
                 key={role.role_id}
                 role={role}
                 onEdit={() => onManageOffStageRole(role)}
-                onViewMatches={() => alert('matches')}
+                onViewMatches={onViewMatches}
               />
             ))}
           </RoleSection>
