@@ -7,7 +7,8 @@ import {
   QueryDocumentSnapshot,
   orderBy,
   doc,
-  getDoc
+  getDoc,
+  DocumentData
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
@@ -37,48 +38,48 @@ export async function fetchTalentWithFilters(
 ): Promise<IndividualProfileDataFullInit[]> {
   const { type: accountType, ...profileFilters } = filters;
 
-  // This is inefficient to do, and Firebase limits IN queries to 10
-  // We should get the same effect with profile filters
-  /* const accountsRef = collection(firebaseStore, 'accounts');
-  const accountsQuery = query(accountsRef, where('type', '==', accountType));
-  const accountsSnapshot = await getDocs(accountsQuery);
-
-  // collect all individual uuids
-  const uuids = accountsSnapshot.docs.map((doc) => doc.id);
-
-  // get matching profiles
   const profilesRef = collection(firebaseStore, 'profiles');
-  let profileQuery = query(profilesRef, where('uuid', 'in', uuids));*/
+  const profileQueries: any[] = [];
 
-  // get matching profiles
-  const profilesRef = collection(firebaseStore, 'profiles');
-  let profileQuery = query(profilesRef);
+  console.log('filters', filters);
 
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       // Check if the value is an array for filters like ethnicity and age range
       if (Array.isArray(value) && value.length > 0) {
-        profileQuery = query(
-          profileQuery,
-          // TODO: Firebase only supports ONE 'array-contains-any' per query
-          // We have to refactor this to either:
-          //  1. Only use 1 array query and then do the rest of the filtering client-side
-          //  2. Do multiple queries, 1 per array filter, then merge them
-          // One consideration is how this could impact pagination
+        const profileQuery = query(
+          profilesRef,
           where(field, 'array-contains-any', value)
         );
+        profileQueries.push(profileQuery);
       } else {
-        // simple value check for everything else
-        profileQuery = query(profileQuery, where(field, '==', value));
+        const profileQuery = query(profilesRef, where(field, '==', value));
+        profileQueries.push(profileQuery);
       }
     }
   }
 
-  const snapshot = await getDocs(profileQuery);
-  const matches = snapshot.docs.map((doc: QueryDocumentSnapshot) => ({
-    id: doc.id,
-    ...(doc.data() as IndividualProfileDataFullInit)
-  }));
+  console.log('profileQueries', profileQueries);
+
+  const snapshotPromises = profileQueries.map((profileQuery) =>
+    getDocs(profileQuery)
+  );
+  const snapshots = await Promise.all(snapshotPromises);
+
+  console.log('snapshots', snapshots);
+
+  const matches: IndividualProfileDataFullInit[] = [];
+
+  for (const snapshot of snapshots) {
+    const profiles = snapshot.docs.map((doc: QueryDocumentSnapshot<any>) => ({
+      id: doc.id,
+      ...(doc.data() as IndividualProfileDataFullInit)
+    }));
+
+    matches.push(...profiles);
+  }
+
+  console.log('matches', matches);
 
   return matches;
 }

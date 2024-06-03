@@ -114,7 +114,7 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     }
 
     // do not set new filters for now until we solve the multiple 'array-contains-any' problem
-    // setFilters(newFilters);
+    setFilters(newFilters);
     return newFilters;
   };
 

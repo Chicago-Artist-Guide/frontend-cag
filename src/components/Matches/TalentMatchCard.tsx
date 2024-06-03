@@ -25,7 +25,6 @@ export const TalentMatchCard = ({
           {profile.additional_skills_checkboxes?.join(', ')}{' '}
           {profile.additional_skills_manual?.join(', ')}
         </strong>
-        Other
       </p>
     </div>
   );
