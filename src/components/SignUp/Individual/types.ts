@@ -207,6 +207,7 @@ export type PastPerformances = {
   director: string;
   musicalDirector: string;
   recognition: string;
+  year: string;
 };
 
 export type UpcomingPerformances = {
@@ -216,6 +217,8 @@ export type UpcomingPerformances = {
   industryCode: string;
   url: string;
   imageUrl: string;
+  year: string;
+  role: string;
 };
 
 export type ProfileAwards = {

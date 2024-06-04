@@ -52,6 +52,7 @@ import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import Features from './ProfileSections/Features';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -1322,6 +1323,8 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
+            {/* UPCOMING FEATURES */}
+
             {editMode['upcoming'] ? (
               <Container>
                 {editProfile?.upcoming_performances?.map(
@@ -1345,38 +1348,26 @@ const IndividualProfile: React.FC<{
                               />
                             )}
                           </PhotoContainer>
-                          <Form.Group className="form-group">
-                            <Form.Label>File size limit: 5MB</Form.Label>
-                            <Form.Control
-                              accept="image/*"
-                              onChange={(e: any) =>
-                                onFileChange(e, upcomingRow.id)
-                              }
-                              style={{
-                                padding: 0,
-                                border: 'none'
+                          <ImageUploadModal
+                            editProfile={editProfile}
+                            show={pfpModalShow}
+                            onHide={() => setPfpModalShow(false)}
+                            onSave={(pfpImgUrl: string) =>
+                              savePfpUrlModal(pfpImgUrl)
+                            }
+                            currentImgUrl={imgUrl[upcomingRow.id] || ''}
+                          />
+                          <p>
+                            <a
+                              href="#"
+                              onClick={(e: React.MouseEvent<HTMLElement>) => {
+                                e.preventDefault();
+                                setPfpModalShow(true);
                               }}
-                              type="file"
-                            />
-                          </Form.Group>
-                          <div>
-                            <Button
-                              disabled={
-                                (uploadInProgress as any)[upcomingRow.id] ||
-                                file[upcomingRow.id] === ''
-                              }
-                              onClick={() => uploadFile(upcomingRow.id)}
-                              text="Upload File"
-                              type="button"
-                              variant="secondary"
-                            />
-                          </div>
-                          {(uploadInProgress as any)[upcomingRow.id] && (
-                            <p>
-                              Upload progress:{' '}
-                              {(percent as any)[upcomingRow.id]}%
-                            </p>
-                          )}
+                            >
+                              Add or Change Picture
+                            </a>
+                          </p>
                           {editProfile?.upcoming_performances?.length > 1 && (
                             <DeleteLinkDiv>
                               <a
@@ -1404,48 +1395,30 @@ const IndividualProfile: React.FC<{
                           }
                           value={upcomingRow.title}
                         />
-                        <SynopsisTextarea controlId="show-synopsis">
-                          <Form.Control
-                            as="textarea"
-                            name="synopsis"
-                            onChange={(e: any) =>
-                              onUpcomingInputChange(
-                                e.target.value || '',
-                                'synopsis',
-                                upcomingRow.id
-                              )
-                            }
-                            placeholder="Show Synopsis"
-                            value={upcomingRow.synopsis}
-                          />
-                        </SynopsisTextarea>
                         <InputField
-                          label="Industry Code"
-                          name="industryCode"
+                          label="Year"
+                          name="Year"
                           onChange={(e: any) =>
                             onUpcomingInputChange(
                               e.target.value || '',
-                              'industryCode',
+                              'year',
                               upcomingRow.id
                             )
                           }
-                          value={upcomingRow.industryCode}
+                          value={upcomingRow.year}
                         />
-                        <WebsiteUrlField>
-                          <InputField
-                            label="Link to Website/Tickets"
-                            name="url"
-                            onChange={(e: any) =>
-                              onUpcomingInputChange(
-                                e.target.value || '',
-                                'url',
-                                upcomingRow.id
-                              )
-                            }
-                            placeholder="http://"
-                            value={upcomingRow.url}
-                          />
-                        </WebsiteUrlField>
+                        <InputField
+                          label="Role"
+                          name="Role"
+                          onChange={(e: any) =>
+                            onUpcomingInputChange(
+                              e.target.value || '',
+                              'role',
+                              upcomingRow.id
+                            )
+                          }
+                          value={upcomingRow.role}
+                        />
                       </Col>
                     </PerfRow>
                   )
@@ -1489,14 +1462,10 @@ const IndividualProfile: React.FC<{
               <>
                 {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
                   <DetailSection title="Upcoming Features">
-                    {profile?.data?.upcoming_performances.map(
-                      (perf: UpcomingPerformances) => (
-                        <IndividualUpcomingShow
-                          key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
-                          show={perf}
-                        />
-                      )
-                    )}
+                    <Features
+                      features={profile.data.upcoming_performances}
+                      emptyPlaceholder=""
+                    />
                   </DetailSection>
                 )}
                 <a

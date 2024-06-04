@@ -49,12 +49,22 @@ const defaultData: IndividualProfile2Data = {
       role: '',
       director: '',
       musicalDirector: '',
-      recognition: ''
+      recognition: '',
+      year: ''
     }
   ], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
   upcoming: [
-    { id: 1, title: '', synopsis: '', industryCode: '', url: '', imageUrl: '' }
+    {
+      id: 1,
+      title: '',
+      synopsis: '',
+      industryCode: '',
+      url: '',
+      imageUrl: '',
+      year: '',
+      role: ''
+    }
   ], // { id, title, synopsis, industryCode, url, imageUrl }
 
   additionalSkillsCheckboxes: [],

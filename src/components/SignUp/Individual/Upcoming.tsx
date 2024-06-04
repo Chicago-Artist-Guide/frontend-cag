@@ -145,7 +145,9 @@ const Upcoming: React.FC<{
       synopsis: '',
       industryCode: '',
       url: '',
-      imageUrl: ''
+      imageUrl: '',
+      year: '',
+      role: ''
     });
 
     const target = {
