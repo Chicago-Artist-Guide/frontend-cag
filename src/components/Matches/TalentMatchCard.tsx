@@ -20,12 +20,13 @@ export const TalentMatchCard = ({
         <br />
         Gender <strong>{profile.gender_identity || 'N/A'}</strong>
         <br />
+        Role Type: <strong>{profile.stage_role}</strong>
+        <br />
         Special Skills{' '}
         <strong>
           {profile.additional_skills_checkboxes?.join(', ')}{' '}
           {profile.additional_skills_manual?.join(', ')}
         </strong>
-        Other
       </p>
     </div>
   );
