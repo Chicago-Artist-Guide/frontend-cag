@@ -20,6 +20,7 @@ import {
   OffstageCategoryKey,
   findOffstageCategoryDataProp
 } from '../components/Profile/shared/offstageRolesOptions';
+import { set } from 'js-cookie';
 
 // TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {
@@ -59,6 +60,9 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 }) => {
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
+    'loading'
+  );
   const [filters, setFilters] = useState<MatchingFilters>({
     // the only required filter we need to start is account type
     type: 'individual'
@@ -113,13 +117,14 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
       ) as AgeRange[];
     }
 
-    // do not set new filters for now until we solve the multiple 'array-contains-any' problem
     setFilters(newFilters);
     return newFilters;
   };
 
   // get production and roles
   useEffect(() => {
+    setLoading(true);
+
     getProduction(firestore, productionId).then((p) => {
       if (!p) {
         return;
@@ -143,14 +148,20 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     const findRole = roles.find((r) => r.role_id === currentRoleId);
 
     if (!findRole) {
+      setFoundRole('not-found');
       return;
     }
 
+    setFoundRole('found');
     updateFiltersFromRole(findRole);
   }, [currentRoleId]);
 
   // get matches
   useEffect(() => {
+    if (foundRole === 'loading') {
+      return;
+    }
+
     setLoading(true);
 
     // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead

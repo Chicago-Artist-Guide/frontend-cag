@@ -8,10 +8,14 @@ import {
   orderBy,
   doc,
   getDoc,
-  DocumentData
+  Query,
+  QuerySnapshot
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
-import { MatchingFilters } from '../components/Matches/types';
+import {
+  FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
+  MatchingFilters
+} from '../components/Matches/types';
 import { MessageFilters, MessageType } from '../components/Messages/types';
 import { Production } from '../components/Profile/Company/types';
 import { IndividualAccountInit } from '../components/SignUp/Individual/types';
@@ -37,25 +41,35 @@ export async function fetchTalentWithFilters(
   filters: MatchingFilters
 ): Promise<IndividualProfileDataFullInit[]> {
   const { type: accountType, ...profileFilters } = filters;
-  const profileQueries: any[] = [];
   const profilesRef = collection(firebaseStore, 'profiles');
+  const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
 
   console.log('filters', filters);
+  console.log('profileFilters', profileFilters);
 
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
-      // Check if the value is an array for filters like ethnicity and age range
       if (Array.isArray(value)) {
         if (value.length > 0) {
-          const profileQuery = query(
-            profilesRef,
-            where(field, 'array-contains-any', value)
-          );
+          console.log('array field', field, 'value', value);
+          let profileQuery: Query;
 
-          profileQueries.push(profileQuery);
+          // if the comparison is array to single value
+          if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
+            profileQuery = query(profilesRef, where(field, 'in', value));
+          } else {
+            // we know the comparison is array to array
+            profileQuery = query(
+              profilesRef,
+              where(field, 'array-contains-any', value)
+            );
+          }
+
+          snapshotPromises.push(getDocs(profileQuery));
         }
       } else {
+        console.log('non array field', field, 'value', value);
         singleProfileQuery = query(
           singleProfileQuery,
           where(field, '==', value)
@@ -64,27 +78,50 @@ export async function fetchTalentWithFilters(
     }
   }
 
-  const allProfileQueries = [singleProfileQuery, ...profileQueries];
-  const snapshotPromises = allProfileQueries.map((profileQuery) =>
-    getDocs(profileQuery)
-  );
+  snapshotPromises.unshift(getDocs(singleProfileQuery));
+
   const snapshots = await Promise.all(snapshotPromises);
 
-  console.log('allProfileQueries', allProfileQueries);
-  console.log('snapshots', snapshots);
-
+  const matchesSet: Set<string> = new Set(
+    snapshots[0].docs.map((doc: QueryDocumentSnapshot<any>) => doc.id)
+  );
   const matches: IndividualProfileDataFullInit[] = [];
 
-  for (const snapshot of snapshots) {
-    const profiles = snapshot.docs.map((doc: QueryDocumentSnapshot<any>) => ({
-      id: doc.id,
-      ...(doc.data() as IndividualProfileDataFullInit)
-    }));
+  console.log('snaps', snapshots, 'matches set', matchesSet);
 
-    matches.push(...profiles);
+  // This is the complicated part: we have to find the intersection
+  // Because we did multuple queries and only want profiles that match ALL of the filters
+  for (let i = 0; i < snapshots.length; i++) {
+    const currentSet = new Set(
+      snapshots[i].docs.map((doc: QueryDocumentSnapshot<any>) => doc.id)
+    );
+
+    console.log('currentSet', i, currentSet);
+    console.log('matchesSet now', matchesSet);
+
+    for (const id of matchesSet) {
+      if (!currentSet.has(id)) {
+        matchesSet.delete(id);
+      }
+    }
   }
 
-  console.log('matches', matches);
+  console.log('matches set after intersection', matchesSet);
+
+  // finally, collect remaining matches
+  for (const id of matchesSet) {
+    const docRef = doc(profilesRef, id);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      matches.push({
+        // id: docSnap.id, TODO: add id to type for what is returned
+        ...(docSnap.data() as IndividualProfileDataFullInit)
+      });
+    }
+  }
+
+  console.log('final matches', matches);
 
   return matches;
 }
