@@ -6,7 +6,6 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
-import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
@@ -52,6 +51,8 @@ import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import SpecialSkills from './ProfileSections/SpecialSkills';
+import OffStageSkills from './ProfileSections/OffStageSkills';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -1787,35 +1788,10 @@ const IndividualProfile: React.FC<{
                 {(profile?.data?.additional_skills_checkboxes?.length > 0 ||
                   profile?.data?.additional_skills_manual?.length > 0) && (
                   <DetailSection title="Special Skills">
-                    <ProfileFlex>
-                      {profile?.data?.additional_skills_checkboxes?.length >
-                        0 &&
-                        profile?.data?.additional_skills_checkboxes.map(
-                          (skill: string) => (
-                            <Badge
-                              pill
-                              bg="primary"
-                              key={`skills-primary-${skill}`}
-                              text="white"
-                            >
-                              {skill}
-                            </Badge>
-                          )
-                        )}
-                      {profile?.data?.additional_skills_manual?.length > 0 &&
-                        profile?.data?.additional_skills_manual.map(
-                          (skill: string) => (
-                            <Badge
-                              pill
-                              bg="secondary"
-                              key={`skills-manual-${skill}`}
-                              text="white"
-                            >
-                              {skill}
-                            </Badge>
-                          )
-                        )}
-                    </ProfileFlex>
+                    <SpecialSkills
+                      checkboxes={profile?.data?.additional_skills_checkboxes}
+                      manual={profile?.data?.additional_skills_manual}
+                    />
                   </DetailSection>
                 )}
                 <a
@@ -1829,7 +1805,29 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
-
+            <DetailSection title="Off Stage Skills">
+              <OffStageSkills
+                offstage_roles_general={
+                  profile?.data?.additional_skills_checkboxes
+                }
+                offstage_roles_production={
+                  profile?.data?.additional_skills_checkboxes
+                }
+                offstage_roles_scenic_and_properties={
+                  profile?.data?.additional_skills_checkboxes
+                }
+                offstage_roles_lighting={
+                  profile?.data?.additional_skills_checkboxes
+                }
+                offstage_roles_sound={
+                  profile?.data?.additional_skills_checkboxes
+                }
+                offstage_roles_hair_makeup_costumes={
+                  profile?.data?.additional_skills_checkboxes
+                }
+              />
+            </DetailSection>
+            <hr />
             {/* AWARD SECTION */}
             {editMode['awards'] ? (
               <Container>
