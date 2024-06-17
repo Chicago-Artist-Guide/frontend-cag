@@ -9,7 +9,7 @@ type ProfileAndName = IndividualProfileDataFullInit & { fullName: string };
 
 export const TalentMatchList = () => {
   const { firebaseFirestore } = useFirebaseContext();
-  const { matches } = useMatches();
+  const { loading, matches } = useMatches();
   const [profiles, setProfiles] = useState<ProfileAndName[]>([]);
 
   useEffect(() => {
@@ -29,6 +29,7 @@ export const TalentMatchList = () => {
 
   return (
     <div>
+      {loading && <p>Loading...</p>}
       {profiles.map((profile) => (
         <TalentMatchCard
           key={`${profile.uid}-TalentMatchCard`}
