@@ -1659,14 +1659,10 @@ const IndividualProfile: React.FC<{
               <>
                 {hasNonEmptyValues(profile?.data?.past_performances) && (
                   <DetailSection title="Past Performances">
-                    {profile?.data?.past_performances.map(
-                      (perf: PastPerformances) => (
-                        <IndividualCredits
-                          key={`credits-shows-${perf.id}`}
-                          show={perf}
-                        />
-                      )
-                    )}
+                    <Features
+                      features={profile.data.past_performances}
+                      emptyPlaceholder=""
+                    />
                   </DetailSection>
                 )}
                 <a

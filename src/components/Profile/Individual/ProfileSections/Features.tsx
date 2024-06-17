@@ -10,88 +10,55 @@ const Features: React.FC<{
   features: any;
   emptyPlaceholder: string;
 }> = ({ features }) => {
-  console.log(features);
+  const director = ' Cody Maverick';
+  const musicalDirector = 'Jeff Bridges';
+  const group = 'The Company';
   return (
     <Container>
-      <Row>
-        {features.map((feature: any) => (
-          <Col xs={12} md={6} lg={4}>
-            <Row>
-              <Col xs={6}>
-                {feature.imageUrl !== undefined ? (
-                  <ImageDisplay src={feature.imageUrl} />
-                ) : (
-                  <PlaceholderImage>
-                    <FontAwesomeIcon
-                      className="bod-icon"
-                      icon={faCamera}
-                      size="lg"
-                    />
-                  </PlaceholderImage>
-                )}
-              </Col>
-              <Col xs={6}>
-                <FeatureInformation>
-                  <FeatureTitle>{feature.title}</FeatureTitle>
-                  <FeatureSubtitle>{feature.year}</FeatureSubtitle>
-                  <FeatureSubtitle>{feature.role}</FeatureSubtitle>
-                </FeatureInformation>
-              </Col>
-            </Row>
-          </Col>
-        ))}
-      </Row>
+      {features.map((feature: any) => (
+        <div>
+          <FeatureTitle>
+            <Bold>
+              {feature.title} <Group> - {group}</Group>
+            </Bold>
+            <Bold>{feature.year}</Bold>
+          </FeatureTitle>
+          <FeatureInformation>
+            <Role>{feature.role}</Role>
+            <p>Director: {director}</p>
+            <p>Musical Director: {musicalDirector}</p>
+          </FeatureInformation>
+          <hr />
+        </div>
+      ))}
     </Container>
   );
 };
 
-const FeatureSubtitle = styled.p`
-  font-size: 12px;
-`;
-
-const FeatureTitle = styled.h6`
+const FeatureTitle = styled.div`
+  display: flex;
+  justify-content: space-between;
   font-weight: bold;
-  font-size: 14px;
+  margin-top: 25px;
 `;
 
 const FeatureInformation = styled.div`
-  align-items: center;
-  justify-content: center;
-  height: 100%;
+  padding: 0px 25px 0px;
+  line-height: 1.5;
 `;
 
-const ImageDisplay = styled.img`
-  height: 150px;
-  width: 100px;
-  float: left;
-  background: ${colors.lightGrey};
-  font-size: 68px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  align-items: center;
-  justify-content: center;
-  border-radius: 8px;
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  margin-right: 10px;
-  margin-bottom: 30px;
+const Bold = styled.p`
+  font-weight: bolder;
+  font-size: 20px;
+`;
+const Group = styled.span`
+  font-style: italic;
+  font-weight: normal;
+  font-size: 18px;
 `;
 
-const PlaceholderImage = styled.div`
-  height: 150px;
-  width: 100px;
-  background: ${colors.lightGrey};
-  color: white;
-  font-size: 32px;
-  background-repeat: no-repeat;
-  background-size: cover;
-  border-radius: 8px;
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  margin-right: 10px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  margin-bottom: 30px;
+const Role = styled.p`
+  font-weight: 600;
 `;
 
 export default Features;
