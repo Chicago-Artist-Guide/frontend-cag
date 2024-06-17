@@ -63,7 +63,9 @@ const defaultData: IndividualProfile2Data = {
       url: '',
       imageUrl: '',
       year: '',
-      role: ''
+      role: '',
+      director: '',
+      musicalDirector: ''
     }
   ], // { id, title, synopsis, industryCode, url, imageUrl }
 

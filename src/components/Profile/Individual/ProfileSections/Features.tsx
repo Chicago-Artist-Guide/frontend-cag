@@ -10,23 +10,22 @@ const Features: React.FC<{
   features: any;
   emptyPlaceholder: string;
 }> = ({ features }) => {
-  const director = ' Cody Maverick';
-  const musicalDirector = 'Jeff Bridges';
-  const group = 'The Company';
   return (
     <Container>
       {features.map((feature: any) => (
         <div>
           <FeatureTitle>
             <Bold>
-              {feature.title} <Group> - {group}</Group>
+              {feature.title} <Group> - {feature.group}</Group>
             </Bold>
             <Bold>{feature.year}</Bold>
           </FeatureTitle>
           <FeatureInformation>
             <Role>{feature.role}</Role>
-            <p>Director: {director}</p>
-            <p>Musical Director: {musicalDirector}</p>
+            {feature.director && <p>Director: {feature.director}</p>}
+            {feature.musicalDirector && (
+              <p>Musical Director: {feature.musicalDirector}</p>
+            )}
           </FeatureInformation>
           <hr />
         </div>

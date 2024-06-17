@@ -219,6 +219,8 @@ export type UpcomingPerformances = {
   imageUrl: string;
   year: string;
   role: string;
+  director: string;
+  musicalDirector: string;
 };
 
 export type ProfileAwards = {

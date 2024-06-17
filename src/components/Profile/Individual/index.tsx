@@ -53,6 +53,7 @@ import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import Features from './ProfileSections/Features';
+import FeaturesEdit from './ProfileSections/Edits/FeaturesEdit';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -536,21 +537,6 @@ const IndividualProfile: React.FC<{
     setTrainingId(newTrainingId);
   };
 
-  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
-    fieldValue: UpcomingPerformances[T],
-    fieldName: T,
-    id: any
-  ) => {
-    // indexing to assign each upcoming show value a number
-    const newUpcomingShowValues = [
-      ...(editProfile?.upcoming_performances || [])
-    ];
-    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
-    newUpcomingShowValues[findIndex][fieldName] = fieldValue;
-
-    setProfileForm('upcoming_performances', newUpcomingShowValues);
-  };
-
   const removeUpcomingInput = (e: any, id: any) => {
     e.preventDefault();
     const newUpcomingShowValues = [
@@ -607,17 +593,6 @@ const IndividualProfile: React.FC<{
     setUploadInProgress(newUploadInProgress);
   };
 
-  useEffect(() => {
-    editProfile?.upcoming_performances?.forEach((upcomingShow: any) => {
-      const showId = upcomingShow.id;
-      const showImgUrl = imgUrl[showId] ?? false;
-
-      if (showImgUrl) {
-        onUpcomingInputChange(showImgUrl, 'imageUrl', showId);
-      }
-    });
-  }, [imgUrl]);
-
   const onCreditFieldChange = <T extends keyof PastPerformances>(
     fieldName: T,
     fieldValue: PastPerformances[T],
@@ -628,6 +603,18 @@ const IndividualProfile: React.FC<{
     newCredits[findIndex][fieldName] = fieldValue;
 
     setProfileForm('past_performances', newCredits);
+  };
+
+  const onUpcomingInputChange = <T extends keyof PastPerformances>(
+    fieldName: T,
+    fieldValue: PastPerformances[T],
+    id: number
+  ) => {
+    const newCredits = [...(editProfile?.upcoming_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('upcoming_performances', newCredits);
   };
 
   const removeCreditBlock = (e: any, id: number) => {
@@ -1327,102 +1314,12 @@ const IndividualProfile: React.FC<{
 
             {editMode['upcoming'] ? (
               <Container>
-                {editProfile?.upcoming_performances?.map(
-                  (upcomingRow: any, i: any) => (
-                    <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
-                      <Col lg="4">
-                        <Form.Group className="form-group">
-                          <PhotoContainer
-                            style={{
-                              backgroundImage:
-                                imgUrl[upcomingRow.id] !== null
-                                  ? `url(${imgUrl[upcomingRow.id]})`
-                                  : undefined
-                            }}
-                          >
-                            {imgUrl[upcomingRow.id] === null && (
-                              <FontAwesomeIcon
-                                className="bod-icon"
-                                icon={faImage}
-                                size="lg"
-                              />
-                            )}
-                          </PhotoContainer>
-                          <ImageUploadModal
-                            editProfile={editProfile}
-                            show={pfpModalShow}
-                            onHide={() => setPfpModalShow(false)}
-                            onSave={(pfpImgUrl: string) =>
-                              savePfpUrlModal(pfpImgUrl)
-                            }
-                            currentImgUrl={imgUrl[upcomingRow.id] || ''}
-                          />
-                          <p>
-                            <a
-                              href="#"
-                              onClick={(e: React.MouseEvent<HTMLElement>) => {
-                                e.preventDefault();
-                                setPfpModalShow(true);
-                              }}
-                            >
-                              Add or Change Picture
-                            </a>
-                          </p>
-                          {editProfile?.upcoming_performances?.length > 1 && (
-                            <DeleteLinkDiv>
-                              <a
-                                href="#"
-                                onClick={(e: any) =>
-                                  removeUpcomingInput(e, upcomingRow.id)
-                                }
-                              >
-                                X Delete Show
-                              </a>
-                            </DeleteLinkDiv>
-                          )}
-                        </Form.Group>
-                      </Col>
-                      <Col lg="8">
-                        <InputField
-                          label="Show Title"
-                          name="title"
-                          onChange={(e: any) =>
-                            onUpcomingInputChange(
-                              e.target.value || '',
-                              'title',
-                              upcomingRow.id
-                            )
-                          }
-                          value={upcomingRow.title}
-                        />
-                        <InputField
-                          label="Year"
-                          name="Year"
-                          onChange={(e: any) =>
-                            onUpcomingInputChange(
-                              e.target.value || '',
-                              'year',
-                              upcomingRow.id
-                            )
-                          }
-                          value={upcomingRow.year}
-                        />
-                        <InputField
-                          label="Role"
-                          name="Role"
-                          onChange={(e: any) =>
-                            onUpcomingInputChange(
-                              e.target.value || '',
-                              'role',
-                              upcomingRow.id
-                            )
-                          }
-                          value={upcomingRow.role}
-                        />
-                      </Col>
-                    </PerfRow>
-                  )
-                )}
+                <FeaturesEdit
+                  features={editProfile?.upcoming_performances}
+                  emptyPlaceholder={''}
+                  onCreditFieldChange={onUpcomingInputChange}
+                  removeCreditBlock={removeUpcomingInput}
+                />
                 <Row>
                   <Col lg="12">
                     <div>
@@ -1481,144 +1378,12 @@ const IndividualProfile: React.FC<{
             <hr />
             {editMode['past'] ? (
               <Container>
-                {editProfile?.past_performances?.map(
-                  (credit: any, i: number) => (
-                    <PerfRow key={`credit-${credit.id}`}>
-                      <Col lg="4">
-                        <Form>
-                          <InputField
-                            name="title"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'title',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Show Title"
-                            value={credit.title}
-                          />
-                          <InputField
-                            name="group"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'location',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Theatre or Location"
-                            value={credit.location}
-                          />
-                          <InputField
-                            name="url"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'url',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Web Link"
-                            value={credit.url}
-                          />
-                          <InputField
-                            name="role"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'role',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Role/Position"
-                            value={credit.role}
-                          />
-                          <InputField
-                            name="director"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'director',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Director"
-                            value={credit.director}
-                          />
-                          <InputField
-                            name="musicalDirector"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'musicalDirector',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Musical Director"
-                            value={credit.musicalDirector}
-                          />
-                        </Form>
-                        {i ? (
-                          <DeleteRowLink
-                            href="#"
-                            onClick={(e: any) =>
-                              removeCreditBlock(e, credit.id)
-                            }
-                          >
-                            X Delete
-                          </DeleteRowLink>
-                        ) : null}
-                      </Col>
-                      <Col lg="4">
-                        <InputField
-                          name="group"
-                          onChange={(e: any) =>
-                            onCreditFieldChange(
-                              'group',
-                              e.target.value,
-                              credit.id
-                            )
-                          }
-                          placeholder="Theatre Group"
-                          value={credit.group}
-                        />
-                        <DateRowTitle>Running Dates</DateRowTitle>
-                        <DateRow>
-                          <DatePicker
-                            name="startDate"
-                            onChange={(date: any) => {
-                              const dateString = new Date(
-                                date
-                              ).toLocaleDateString();
-                              onCreditFieldChange(
-                                'startDate',
-                                dateString,
-                                credit.id
-                              );
-                            }}
-                            value={credit.startDate}
-                          />
-                          <h6>through</h6>
-                          <DatePicker
-                            name="endDate"
-                            onChange={(date: any) => {
-                              const dateString = new Date(
-                                date
-                              ).toLocaleDateString();
-                              onCreditFieldChange(
-                                'endDate',
-                                dateString,
-                                credit.id
-                              );
-                            }}
-                            value={credit.endDate}
-                          />
-                        </DateRow>
-                      </Col>
-                    </PerfRow>
-                  )
-                )}
+                <FeaturesEdit
+                  features={editProfile?.past_performances}
+                  emptyPlaceholder={''}
+                  onCreditFieldChange={onCreditFieldChange}
+                  removeCreditBlock={removeCreditBlock}
+                />
                 <Row>
                   <Col lg="12">
                     <a

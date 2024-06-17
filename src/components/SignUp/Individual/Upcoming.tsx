@@ -147,7 +147,9 @@ const Upcoming: React.FC<{
       url: '',
       imageUrl: '',
       year: '',
-      role: ''
+      role: '',
+      director: '',
+      musicalDirector: ''
     });
 
     const target = {
