@@ -35,7 +35,7 @@ const Header = () => {
             DONATE
           </Nav.Link>
           <Nav.Link href="https://www.zeffy.com/ticketing/f021b4c4-c62b-4fbf-b975-689121ed5b71">
-            CAG-BERET
+            CAG-BARET
           </Nav.Link>
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">
