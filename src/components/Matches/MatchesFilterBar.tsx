@@ -4,7 +4,7 @@ import Dropdown from '../../genericComponents/Dropdown';
 import { Role } from '../../components/Profile/Company/types';
 
 export const MatchesFilterBar = () => {
-  const { currentRoleId, filters, roles } = useMatches();
+  const { currentRoleId, filters, roles, setCurrentRoleId } = useMatches();
   const [currentRole, setCurrentRole] = useState<Role>();
 
   useEffect(() => {
@@ -31,7 +31,9 @@ export const MatchesFilterBar = () => {
               label="Select Role"
               options={roleOptions}
               value={currentRoleId}
-              onChange={() => null}
+              onChange={(e) =>
+                setCurrentRoleId && setCurrentRoleId(e.target.value)
+              }
             />
           )}
           {currentRole && (
