@@ -10,6 +10,7 @@ export const TalentMatchCard = ({
   profile,
   fullName
 }: TalentMatchCardProps) => {
+  console.log(profile);
   return (
     <div>
       <h3>{fullName}</h3>

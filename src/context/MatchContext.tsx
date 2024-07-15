@@ -20,7 +20,6 @@ import {
   OffstageCategoryKey,
   findOffstageCategoryDataProp
 } from '../components/Profile/shared/offstageRolesOptions';
-import { set } from 'js-cookie';
 
 // TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {

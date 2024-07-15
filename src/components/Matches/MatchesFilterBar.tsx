@@ -2,9 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useMatches } from '../../context/MatchContext';
 import Dropdown from '../../genericComponents/Dropdown';
 import { Role } from '../../components/Profile/Company/types';
+import { MatchingFilters } from '../../components/Matches/types';
 
 export const MatchesFilterBar = () => {
-  const { currentRoleId, filters, roles, setCurrentRoleId } = useMatches();
+  const { currentRoleId, filters, updateFilters, roles, setCurrentRoleId } =
+    useMatches();
   const [currentRole, setCurrentRole] = useState<Role>();
 
   useEffect(() => {
@@ -19,6 +21,26 @@ export const MatchesFilterBar = () => {
     name: r.role_name || '',
     value: r.role_id || ''
   }));
+
+  const unionStatusOptions = [
+    {
+      name: 'All Options',
+      value: ''
+    },
+    {
+      name: 'Yes',
+      value: 'Yes'
+    },
+    {
+      name: 'No',
+      value: 'No'
+    }
+  ];
+
+  const updateUnionStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const unionStatusValue = e.target.value === '' ? undefined : e.target.value;
+    updateFilters({ union_status: unionStatusValue } as MatchingFilters);
+  };
 
   return (
     <div>
@@ -50,6 +72,17 @@ export const MatchesFilterBar = () => {
               <strong>{currentRole.additional_requirements?.join(', ')}</strong>
             </>
           )}
+          <hr />
+          Union Status
+          <Dropdown
+            name="unionStatus"
+            label="Select Role"
+            options={unionStatusOptions}
+            value={''}
+            onChange={updateUnionStatus}
+          />
+          <br />
+          Special Skills
         </>
       )}
     </div>
