@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useMatches } from '../../context/MatchContext';
 import Dropdown from '../../genericComponents/Dropdown';
 import { Role } from '../../components/Profile/Company/types';
+import { skillCheckboxes } from '../../components/SignUp/Individual/types';
 import { MatchingFilters } from '../../components/Matches/types';
 
 export const MatchesFilterBar = () => {
@@ -42,6 +43,24 @@ export const MatchesFilterBar = () => {
     updateFilters({ union_status: unionStatusValue } as MatchingFilters);
   };
 
+  const skillOptions = [
+    {
+      name: 'All Skills',
+      value: ''
+    },
+    ...skillCheckboxes.map((s) => ({
+      name: s,
+      value: s
+    }))
+  ];
+
+  const updateSkills = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const skillValue = e.target.value === '' ? undefined : e.target.value;
+    updateFilters({
+      additional_skills_checkboxes: [skillValue]
+    } as MatchingFilters);
+  };
+
   return (
     <div>
       <h2>Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}</h2>
@@ -73,16 +92,20 @@ export const MatchesFilterBar = () => {
             </>
           )}
           <hr />
-          Union Status
           <Dropdown
             name="unionStatus"
-            label="Select Role"
+            label="Union Status"
             options={unionStatusOptions}
             value={''}
             onChange={updateUnionStatus}
           />
-          <br />
-          Special Skills
+          <Dropdown
+            name="skills"
+            label="Special Skills"
+            options={skillOptions}
+            value={''}
+            onChange={updateSkills}
+          />
         </>
       )}
     </div>
