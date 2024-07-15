@@ -90,7 +90,7 @@ const CAG = () => {
         <Route component={Matches} exact path="/profile/search/roles" />
         <Route
           component={Matches}
-          path="/profile/search/talent/:productionId"
+          path="/profile/search/talent/:productionId/:roleId?"
         />
         <Route component={NotFound} />
       </Switch>

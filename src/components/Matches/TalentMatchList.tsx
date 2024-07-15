@@ -29,14 +29,19 @@ export const TalentMatchList = () => {
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
-      {profiles.map((profile) => (
-        <TalentMatchCard
-          key={`${profile.uid}-TalentMatchCard`}
-          fullName={profile.fullName}
-          profile={profile}
-        />
-      ))}
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          {profiles.map((profile) => (
+            <TalentMatchCard
+              key={`${profile.uid}-TalentMatchCard`}
+              fullName={profile.fullName}
+              profile={profile}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 };

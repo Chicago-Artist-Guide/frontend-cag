@@ -45,14 +45,10 @@ export async function fetchTalentWithFilters(
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
 
-  console.log('filters', filters);
-  console.log('profileFilters', profileFilters);
-
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       if (Array.isArray(value)) {
         if (value.length > 0) {
-          console.log('array field', field, 'value', value);
           let profileQuery: Query;
 
           // if the comparison is array to single value
@@ -69,7 +65,6 @@ export async function fetchTalentWithFilters(
           snapshotPromises.push(getDocs(profileQuery));
         }
       } else {
-        console.log('non array field', field, 'value', value);
         singleProfileQuery = query(
           singleProfileQuery,
           where(field, '==', value)
@@ -87,8 +82,6 @@ export async function fetchTalentWithFilters(
   );
   const matches: IndividualProfileDataFullInit[] = [];
 
-  console.log('snaps', snapshots, 'matches set', matchesSet);
-
   // This is the complicated part: we have to find the intersection
   // Because we did multuple queries and only want profiles that match ALL of the filters
   for (let i = 0; i < snapshots.length; i++) {
@@ -96,17 +89,12 @@ export async function fetchTalentWithFilters(
       snapshots[i].docs.map((doc: QueryDocumentSnapshot<any>) => doc.id)
     );
 
-    console.log('currentSet', i, currentSet);
-    console.log('matchesSet now', matchesSet);
-
     for (const id of matchesSet) {
       if (!currentSet.has(id)) {
         matchesSet.delete(id);
       }
     }
   }
-
-  console.log('matches set after intersection', matchesSet);
 
   // finally, collect remaining matches
   for (const id of matchesSet) {
@@ -120,8 +108,6 @@ export async function fetchTalentWithFilters(
       });
     }
   }
-
-  console.log('final matches', matches);
 
   return matches;
 }
