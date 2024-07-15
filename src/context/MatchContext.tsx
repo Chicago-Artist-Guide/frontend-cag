@@ -6,6 +6,7 @@ import React, {
   useState,
   ReactNode
 } from 'react';
+import { useHistory } from 'react-router-dom';
 import { getProduction, fetchTalentWithFilters } from '../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
@@ -38,6 +39,7 @@ interface MatchContextValue {
 type MatchProviderProps = {
   firestore: Firestore;
   productionId: string;
+  roleIdParam?: string;
   children: ReactNode;
 };
 
@@ -55,8 +57,10 @@ export const useMatches = (): MatchContextValue => useContext(MatchContext);
 export const MatchProvider: React.FC<MatchProviderProps> = ({
   firestore,
   productionId,
+  roleIdParam,
   children
 }) => {
+  const history = useHistory();
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
   const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
@@ -133,10 +137,10 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
       if (p.roles) {
         setRoles(p.roles);
-        setCurrentRoleId(p.roles[0].role_id);
+        setCurrentRoleId(roleIdParam ?? p.roles[0].role_id);
       }
     });
-  }, [productionId]);
+  }, [productionId, roleIdParam]);
 
   // set filters based on role
   useEffect(() => {
@@ -153,6 +157,7 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
     setFoundRole('found');
     updateFiltersFromRole(findRole);
+    history.push(`/profile/search/talent/${productionId}/${currentRoleId}`);
   }, [currentRoleId]);
 
   // get matches

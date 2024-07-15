@@ -38,11 +38,6 @@ export const MatchesFilterBar = () => {
     }
   ];
 
-  const updateUnionStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const unionStatusValue = e.target.value === '' ? undefined : e.target.value;
-    updateFilters({ union_status: unionStatusValue } as MatchingFilters);
-  };
-
   const skillOptions = [
     {
       name: 'All Skills',
@@ -53,6 +48,11 @@ export const MatchesFilterBar = () => {
       value: s
     }))
   ];
+
+  const updateUnionStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const unionStatusValue = e.target.value === '' ? undefined : e.target.value;
+    updateFilters({ union_status: unionStatusValue } as MatchingFilters);
+  };
 
   const updateSkills = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skillValue = e.target.value === '' ? undefined : e.target.value;
