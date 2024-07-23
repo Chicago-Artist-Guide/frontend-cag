@@ -1,15 +1,35 @@
 import React from 'react';
+import { useFirebaseContext } from '../../context/FirebaseContext';
+import { createTheaterTalentMatch } from '../../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 
 type TalentMatchCardProps = {
   profile: IndividualProfileDataFullInit;
   fullName: string;
+  productionId: string;
+  roleId: string;
 };
 
 export const TalentMatchCard = ({
   profile,
-  fullName
+  fullName,
+  productionId,
+  roleId
 }: TalentMatchCardProps) => {
+  const { firebaseFirestore } = useFirebaseContext();
+
+  const createMatch = async (status: boolean) => {
+    const talentAccountId = profile.account_id;
+
+    await createTheaterTalentMatch(
+      firebaseFirestore,
+      productionId,
+      roleId,
+      talentAccountId,
+      status
+    );
+  };
+
   return (
     <div>
       <h3>{fullName}</h3>
@@ -28,6 +48,26 @@ export const TalentMatchCard = ({
           {profile.additional_skills_manual?.join(', ')}
         </strong>
       </p>
+      <div>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            createMatch(true);
+          }}
+        >
+          Approve
+        </a>
+        <a
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            createMatch(false);
+          }}
+        >
+          Decline
+        </a>
+      </div>
     </div>
   );
 };
