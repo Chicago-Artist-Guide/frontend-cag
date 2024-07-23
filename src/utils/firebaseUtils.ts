@@ -8,6 +8,7 @@ import {
   orderBy,
   doc,
   getDoc,
+  addDoc,
   Query,
   QuerySnapshot
 } from 'firebase/firestore';
@@ -114,9 +115,9 @@ export async function fetchTalentWithFilters(
 
 export const getMatchName = async (
   firebaseStore: Firestore,
-  account_id: string
+  accountId: string
 ) => {
-  const docRef = doc(firebaseStore, 'accounts', account_id);
+  const docRef = doc(firebaseStore, 'accounts', accountId);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
@@ -124,10 +125,34 @@ export const getMatchName = async (
     const { first_name, last_name } = data;
     return first_name && last_name
       ? `${data.first_name} ${data.last_name}`
-      : `User ${account_id}`;
+      : `User ${accountId}`;
   } else {
     return '';
   }
+};
+
+export const createTheaterTalentMatch = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  talentAccountId: string,
+  status: boolean
+) => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+
+  if (!productionRef || !talentAccountRef) {
+    throw new Error('Invalid production or talent account');
+  }
+
+  const data = {
+    production_id: productionRef,
+    role_id: roleId,
+    status: status,
+    talent_account_id: talentAccountRef
+  };
+
+  return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
 };
 
 export const fetchMessagesByAccountAndRole = async (

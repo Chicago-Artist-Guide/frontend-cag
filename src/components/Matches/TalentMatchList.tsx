@@ -9,9 +9,10 @@ type ProfileAndName = IndividualProfileDataFullInit & { fullName: string };
 
 export const TalentMatchList = () => {
   const { firebaseFirestore } = useFirebaseContext();
-  const { loading, matches } = useMatches();
+  const { loading, matches, production, currentRoleId } = useMatches();
   const [profiles, setProfiles] = useState<ProfileAndName[]>([]);
 
+  // TODO: check if an existing match status exists in theater_talent_matches
   useEffect(() => {
     const fetchFullNames = async () => {
       const profilesWithNames = await Promise.all(
@@ -38,6 +39,8 @@ export const TalentMatchList = () => {
               key={`${profile.uid}-TalentMatchCard`}
               fullName={profile.fullName}
               profile={profile}
+              productionId={production?.production_id || ''}
+              roleId={currentRoleId || ''}
             />
           ))}
         </>
