@@ -57,7 +57,7 @@ export const MatchesFilterBar = () => {
   const updateSkills = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const skillValue = e.target.value === '' ? undefined : e.target.value;
     updateFilters({
-      additional_skills_checkboxes: [skillValue]
+      additional_skills_checkboxes: skillValue ? [skillValue] : undefined
     } as MatchingFilters);
   };
 
