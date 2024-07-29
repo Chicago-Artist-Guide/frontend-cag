@@ -162,14 +162,19 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
   // get matches
   useEffect(() => {
-    if (foundRole === 'loading') {
+    if (foundRole === 'loading' || !production || !currentRoleId) {
       return;
     }
 
     setLoading(true);
 
     // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
-    fetchTalentWithFilters(firestore, filters).then((filteredMatches) => {
+    fetchTalentWithFilters(
+      firestore,
+      filters,
+      production.production_id,
+      currentRoleId
+    ).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
     });

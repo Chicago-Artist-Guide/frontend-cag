@@ -18,6 +18,7 @@ export const FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING = [
 export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
   stage_role?: IndividualRoles[];
   gender_identity?: Gender[];
+  matchStatus?: boolean | null;
 } & Partial<
     Pick<
       IndividualProfileDataFullInit,

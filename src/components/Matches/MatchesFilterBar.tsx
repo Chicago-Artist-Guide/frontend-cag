@@ -76,6 +76,16 @@ export const MatchesFilterBar = () => {
     } as MatchingFilters);
   };
 
+  const updateMatchStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const matchStatusValue =
+      e.target.value === ''
+        ? undefined
+        : e.target.value === 'true'
+        ? true
+        : false;
+    updateFilters({ matchStatus: matchStatusValue } as MatchingFilters);
+  };
+
   return (
     <div>
       <h2>Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}</h2>
@@ -126,7 +136,7 @@ export const MatchesFilterBar = () => {
             label="Match Status"
             options={existingMatchOptions}
             value={''}
-            onChange={() => null}
+            onChange={updateMatchStatus}
           />
         </>
       )}
