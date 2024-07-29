@@ -158,8 +158,8 @@ const IndividualProfile: React.FC<{
 
     setWebsiteId(profile?.data?.websites?.length || 1);
     setEditProfile(profile?.data);
-    updatePerformanceState();
-    updatePastPerformanceState();
+    //updatePerformanceState();
+    //updatePastPerformanceState();
   }, [profile?.data, editMode]);
 
   useEffect(() => {
@@ -1067,16 +1067,37 @@ const IndividualProfile: React.FC<{
           <div>
             {/* TRAINING SECTION */}
             {editMode['training'] ? (
-              <div></div>
+              <TrainingEdit
+                trainingId={profile?.data?.id}
+                training_institutions={profile?.data?.training_institutions}
+                trainingInstitution={profile?.data?.trainingInstitution}
+                trainingDegree={profile?.data?.trainingDegree}
+                trainingYear={profile?.data?.trainingYear}
+                onTrainingFieldChange={onTrainingFieldChange}
+              />
             ) : (
-              <DetailSection title="Training">
-                <Training
-                  training_institutions={profile?.data?.training_institutions}
-                  trainingInstitution={profile?.data?.trainingInstitution}
-                  trainingDegree={profile?.data?.trainingDegree}
-                  trainingYear={profile?.data?.trainingYear}
-                />
-              </DetailSection>
+              <>
+                <DetailSection title="Training">
+                  <Training
+                    training_institutions={profile?.data?.training_institutions}
+                    trainingInstitution={profile?.data?.trainingInstitution}
+                    trainingDegree={profile?.data?.trainingDegree}
+                    trainingYear={profile?.data?.trainingYear}
+                  />
+                </DetailSection>
+                <Col lg="12">
+                  <div>
+                    <a
+                      href="#"
+                      onClick={(e: React.MouseEvent<HTMLElement>) =>
+                        onEditModeClick(e, 'training', !editMode['training'])
+                      }
+                    >
+                      + Add Training
+                    </a>
+                  </div>
+                </Col>
+              </>
             )}
             <hr />
             {editMode['upcoming'] ? (

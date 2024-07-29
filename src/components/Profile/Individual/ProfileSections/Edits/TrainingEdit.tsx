@@ -3,28 +3,65 @@ import styled from 'styled-components';
 import { colors } from '../../../../../theme/styleVars';
 import { Container } from 'styled-bootstrap-grid';
 import Row from 'react-bootstrap/Row';
+import { hasNonEmptyValues } from '../../../../../utils/hasNonEmptyValues';
+import Form from 'react-bootstrap/Form';
+import { InputField } from '../../../../../genericComponents';
 
 const TrainingEdit: React.FC<{
   training_institutions: any;
   trainingInstitution: string;
   trainingDegree: string;
   trainingYear: string;
+  onTrainingFieldChange: any;
+  trainingId: any;
 }> = ({
   training_institutions,
   trainingInstitution,
   trainingDegree,
-  trainingYear
+  trainingYear,
+  onTrainingFieldChange,
+  trainingId
 }) => {
-  let trainings = training_institutions;
-  const singleTraining = {
-    trainingInstitution: trainingInstitution,
-    trainingDegree: trainingDegree,
-    trainingYear: trainingYear
-  };
+  let trainings = [];
+  let singleTraining = null;
   if (trainingInstitution) {
-    trainings = training_institutions.concat(singleTraining);
+    singleTraining = {
+      trainingInstitution: trainingInstitution,
+      trainingDegree: trainingDegree,
+      trainingYear: trainingYear
+    };
+    trainings.push(singleTraining);
   }
-  return <div>Hello</div>;
+  if (hasNonEmptyValues(training_institutions)) {
+    trainings = trainings.concat(training_institutions);
+  }
+
+  return (
+    <div>
+      {hasNonEmptyValues(trainings) ? (
+        trainings.map((training) => (
+          <TrainingRow>
+            <Form>
+              <InputField
+                name="trainingInstitution"
+                onChange={(e: any) =>
+                  onTrainingFieldChange(
+                    'trainingInstitution',
+                    e.target.value,
+                    training.id
+                  )
+                }
+                placeholder="Institution"
+                value={training.trainingInstitution}
+              />
+            </Form>
+          </TrainingRow>
+        ))
+      ) : (
+        <Container>Hello</Container>
+      )}
+    </div>
+  );
 };
 
 const TrainingRow = styled(Row)`

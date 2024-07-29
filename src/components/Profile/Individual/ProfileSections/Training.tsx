@@ -28,7 +28,7 @@ const Training: React.FC<{
   if (hasNonEmptyValues(training_institutions)) {
     trainings = trainings.concat(training_institutions);
   }
-  console.log(trainings);
+
   return (
     <>
       {hasNonEmptyValues(trainings) && (
