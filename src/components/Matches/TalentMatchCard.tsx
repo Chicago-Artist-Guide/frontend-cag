@@ -8,13 +8,15 @@ type TalentMatchCardProps = {
   fullName: string;
   productionId: string;
   roleId: string;
+  matchStatus: boolean | null;
 };
 
 export const TalentMatchCard = ({
   profile,
   fullName,
   productionId,
-  roleId
+  roleId,
+  matchStatus
 }: TalentMatchCardProps) => {
   const { firebaseFirestore } = useFirebaseContext();
 
@@ -49,24 +51,32 @@ export const TalentMatchCard = ({
         </strong>
       </p>
       <div>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            createMatch(true);
-          }}
-        >
-          Approve
-        </a>
-        <a
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            createMatch(false);
-          }}
-        >
-          Decline
-        </a>
+        {matchStatus !== true ? (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              createMatch(true);
+            }}
+          >
+            Approve
+          </a>
+        ) : (
+          <p>Approved</p>
+        )}
+        {matchStatus !== false ? (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              createMatch(false);
+            }}
+          >
+            Decline
+          </a>
+        ) : (
+          <p>Declined</p>
+        )}
       </div>
     </div>
   );

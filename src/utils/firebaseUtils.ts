@@ -131,6 +131,35 @@ export const getMatchName = async (
   }
 };
 
+export const getTheaterTalentMatch = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  talentAccountId: string
+) => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+
+  if (!productionRef || !talentAccountRef) {
+    throw new Error('Invalid production or talent account');
+  }
+
+  const matchesQuery = query(
+    collection(firebaseStore, 'theater_talent_matches'),
+    where('production_id', '==', productionRef),
+    where('role_id', '==', roleId),
+    where('talent_account_id', '==', talentAccountRef)
+  );
+
+  const querySnapshot = await getDocs(matchesQuery);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data();
+  } else {
+    return false;
+  }
+};
+
 export const createTheaterTalentMatch = async (
   firebaseStore: Firestore,
   productionId: string,
@@ -143,6 +172,17 @@ export const createTheaterTalentMatch = async (
 
   if (!productionRef || !talentAccountRef) {
     throw new Error('Invalid production or talent account');
+  }
+
+  const theaterTalentMatchAlreadyExists = await getTheaterTalentMatch(
+    firebaseStore,
+    productionId,
+    roleId,
+    talentAccountId
+  );
+
+  if (theaterTalentMatchAlreadyExists) {
+    throw new Error('Match already exists');
   }
 
   const data = {

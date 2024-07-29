@@ -49,6 +49,21 @@ export const MatchesFilterBar = () => {
     }))
   ];
 
+  const existingMatchOptions = [
+    {
+      name: 'All Matches',
+      value: ''
+    },
+    {
+      name: 'Approved',
+      value: 'true'
+    },
+    {
+      name: 'Declined',
+      value: 'false'
+    }
+  ];
+
   const updateUnionStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const unionStatusValue = e.target.value === '' ? undefined : e.target.value;
     updateFilters({ union_status: unionStatusValue } as MatchingFilters);
@@ -105,6 +120,13 @@ export const MatchesFilterBar = () => {
             options={skillOptions}
             value={''}
             onChange={updateSkills}
+          />
+          <Dropdown
+            name="existingMatches"
+            label="Match Status"
+            options={existingMatchOptions}
+            value={''}
+            onChange={() => null}
           />
         </>
       )}
