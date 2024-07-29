@@ -36,12 +36,96 @@ export const getProduction = async (
   }
 };
 
+export const getMatchName = async (
+  firebaseStore: Firestore,
+  accountId: string
+) => {
+  const docRef = doc(firebaseStore, 'accounts', accountId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as IndividualAccountInit;
+    const { first_name, last_name } = data;
+    return first_name && last_name
+      ? `${data.first_name} ${data.last_name}`
+      : `User ${accountId}`;
+  } else {
+    return '';
+  }
+};
+
+export const getTheaterTalentMatch = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  talentAccountId: string
+) => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+
+  if (!productionRef || !talentAccountRef) {
+    throw new Error('Invalid production or talent account');
+  }
+
+  const matchesQuery = query(
+    collection(firebaseStore, 'theater_talent_matches'),
+    where('production_id', '==', productionRef),
+    where('role_id', '==', roleId),
+    where('talent_account_id', '==', talentAccountRef)
+  );
+
+  const querySnapshot = await getDocs(matchesQuery);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data();
+  }
+
+  return false;
+};
+
+export const createTheaterTalentMatch = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  talentAccountId: string,
+  status: boolean
+) => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+
+  if (!productionRef || !talentAccountRef) {
+    throw new Error('Invalid production or talent account');
+  }
+
+  const theaterTalentMatchAlreadyExists = await getTheaterTalentMatch(
+    firebaseStore,
+    productionId,
+    roleId,
+    talentAccountId
+  );
+
+  if (theaterTalentMatchAlreadyExists) {
+    throw new Error('Match already exists');
+  }
+
+  const data = {
+    production_id: productionRef,
+    role_id: roleId,
+    status: status,
+    talent_account_id: talentAccountRef
+  };
+
+  return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
+};
+
 // TODO: add version for roles called fetchRolesWithFilters()
 export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
-  filters: MatchingFilters
+  filters: MatchingFilters,
+  productionId: string,
+  roleId: string
 ): Promise<IndividualProfileDataFullInit[]> {
-  const { type: accountType, ...profileFilters } = filters;
+  const { type: accountType, matchStatus, ...profileFilters } = filters;
   const profilesRef = collection(firebaseStore, 'profiles');
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
@@ -102,58 +186,30 @@ export async function fetchTalentWithFilters(
     const docRef = doc(profilesRef, id);
     const docSnap = await getDoc(docRef);
 
+    // filter if we need to care about an existing match status
     if (docSnap.exists()) {
-      matches.push({
-        // id: docSnap.id, TODO: add id to type for what is returned
-        ...(docSnap.data() as IndividualProfileDataFullInit)
-      });
+      const profileData = docSnap.data() as IndividualProfileDataFullInit;
+
+      if (matchStatus !== null && matchStatus !== undefined) {
+        const findMatch = await getTheaterTalentMatch(
+          firebaseStore,
+          productionId,
+          roleId,
+          profileData.account_id
+        );
+        const foundMatchStatus = findMatch ? findMatch.status : null;
+
+        if (foundMatchStatus === matchStatus) {
+          matches.push({ ...profileData });
+        }
+      } else {
+        matches.push({ ...profileData });
+      }
     }
   }
 
   return matches;
 }
-
-export const getMatchName = async (
-  firebaseStore: Firestore,
-  accountId: string
-) => {
-  const docRef = doc(firebaseStore, 'accounts', accountId);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const data = docSnap.data() as IndividualAccountInit;
-    const { first_name, last_name } = data;
-    return first_name && last_name
-      ? `${data.first_name} ${data.last_name}`
-      : `User ${accountId}`;
-  } else {
-    return '';
-  }
-};
-
-export const createTheaterTalentMatch = async (
-  firebaseStore: Firestore,
-  productionId: string,
-  roleId: string,
-  talentAccountId: string,
-  status: boolean
-) => {
-  const productionRef = doc(firebaseStore, 'productions', productionId);
-  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
-
-  if (!productionRef || !talentAccountRef) {
-    throw new Error('Invalid production or talent account');
-  }
-
-  const data = {
-    production_id: productionRef,
-    role_id: roleId,
-    status: status,
-    talent_account_id: talentAccountRef
-  };
-
-  return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
-};
 
 export const fetchMessagesByAccountAndRole = async (
   firebaseStore: Firestore,
