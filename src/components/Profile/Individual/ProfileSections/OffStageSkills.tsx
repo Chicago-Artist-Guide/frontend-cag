@@ -2,14 +2,15 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors } from '../../../../theme/styleVars';
 import { Container } from 'styled-bootstrap-grid';
+import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
 const OffStageSkills: React.FC<{
-  offstage_roles_general: string[];
-  offstage_roles_production: string[];
-  offstage_roles_scenic_and_properties: string[];
-  offstage_roles_lighting: string[];
-  offstage_roles_sound: string[];
-  offstage_roles_hair_makeup_costumes: string[];
+  offstage_roles_general?: Array<string>;
+  offstage_roles_production?: Array<string>;
+  offstage_roles_scenic_and_properties?: Array<string>;
+  offstage_roles_lighting?: Array<string>;
+  offstage_roles_sound?: Array<string>;
+  offstage_roles_hair_makeup_costumes?: Array<string>;
 }> = ({
   offstage_roles_general,
   offstage_roles_production,
@@ -18,51 +19,83 @@ const OffStageSkills: React.FC<{
   offstage_roles_sound,
   offstage_roles_hair_makeup_costumes
 }) => {
-  const sections = [
-    {
-      id: 1,
-      roles: offstage_roles_general,
-      title: 'General'
-    },
-    {
-      id: 2,
-      roles: offstage_roles_production,
-      title: 'Production'
-    },
-    {
-      id: 3,
-      roles: offstage_roles_scenic_and_properties,
-      title: 'Scenic'
-    },
-    {
-      id: 4,
-      roles: offstage_roles_lighting,
-      title: 'Lighting'
-    },
-    {
-      id: 5,
-      roles: offstage_roles_sound,
-      title: 'Sound'
-    },
-    {
-      id: 6,
-      roles: offstage_roles_hair_makeup_costumes,
-      title: 'Hair and Makeup'
-    }
-  ];
-
   return (
     <Container>
-      {sections.map((section) => (
-        <div>
-          <Bold>{section.title}</Bold>
-          <ul>
-            {section.roles.map((skill) => (
-              <li>{skill}</li>
+      {hasNonEmptyValues(
+        offstage_roles_general?.map((role) => ({ value: role })) || []
+      ) && (
+        <>
+          <Bold>General</Bold>
+          <Flex>
+            {offstage_roles_general?.map((skill: string) => (
+              <SkillBadge>{skill}</SkillBadge>
             ))}
-          </ul>
-        </div>
-      ))}
+          </Flex>
+        </>
+      )}
+      {hasNonEmptyValues(
+        offstage_roles_production?.map((role) => ({ value: role })) || []
+      ) && (
+        <>
+          <Bold>Production</Bold>
+          <Flex>
+            {offstage_roles_production?.map((skill: string) => (
+              <SkillBadge>{skill}</SkillBadge>
+            ))}
+          </Flex>
+        </>
+      )}
+      {hasNonEmptyValues(
+        offstage_roles_scenic_and_properties?.map((role) => ({
+          value: role
+        })) || []
+      ) && (
+        <>
+          <Bold>Scenic</Bold>
+          <Flex>
+            {offstage_roles_scenic_and_properties?.map((skill: string) => (
+              <SkillBadge>{skill}</SkillBadge>
+            ))}
+          </Flex>
+        </>
+      )}
+      {hasNonEmptyValues(
+        offstage_roles_lighting?.map((role) => ({ value: role })) || []
+      ) && (
+        <>
+          <Bold>Lighting</Bold>
+          <Flex>
+            {offstage_roles_lighting?.map((skill: string) => (
+              <SkillBadge>{skill}</SkillBadge>
+            ))}
+          </Flex>
+        </>
+      )}
+      {hasNonEmptyValues(
+        offstage_roles_sound?.map((role) => ({ value: role })) || []
+      ) && (
+        <>
+          <Bold>Sound</Bold>
+          <Flex>
+            {offstage_roles_sound?.map((skill: string) => (
+              <SkillBadge>{skill}</SkillBadge>
+            ))}
+          </Flex>
+        </>
+      )}
+      {hasNonEmptyValues(
+        offstage_roles_hair_makeup_costumes?.map((role) => ({ value: role })) ||
+          []
+      ) && (
+        <>
+          <Bold>Hair, Makeup and Costumes</Bold>
+          <Flex>
+            {offstage_roles_hair_makeup_costumes?.map((skill: string) => (
+              <SkillBadge>{skill}</SkillBadge>
+            ))}
+          </Flex>
+        </>
+      )}
     </Container>
   );
 };
@@ -71,6 +104,20 @@ const Bold = styled.p`
   font-weight: 500;
   font-size: 20px;
   margin-top: 25px;
+`;
+
+const SkillBadge = styled.div`
+  color: ${colors.white};
+  background-color: ${colors.darkGreen};
+  padding: 5px 15px 5px;
+  text-align: center;
+  border-radius: 20px;
+  margin-right: 10px;
+  margin-left: 10px;
+`;
+
+const Flex = styled.div`
+  display: flex;
 `;
 
 export default OffStageSkills;
