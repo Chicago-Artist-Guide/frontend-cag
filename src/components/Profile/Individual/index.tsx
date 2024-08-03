@@ -53,6 +53,7 @@ import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import SpecialSkills from './ProfileSections/SpecialSkills';
 import OffStageSkills from './ProfileSections/OffStageSkills';
+import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -158,8 +159,8 @@ const IndividualProfile: React.FC<{
 
     setWebsiteId(profile?.data?.websites?.length || 1);
     setEditProfile(profile?.data);
-    //updatePerformanceState();
-    //updatePastPerformanceState();
+    updatePerformanceState();
+    updatePastPerformanceState();
   }, [profile?.data, editMode]);
 
   useEffect(() => {
@@ -441,6 +442,23 @@ const IndividualProfile: React.FC<{
     } catch (err) {
       console.error('Error updating profile data:', err);
     }
+  };
+
+  const submitOffStageSkills = async (selectedRoles: any) => {
+    Object.entries(selectedRoles).forEach(async ([key, value]) => {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { [key]: value } as {
+          [key: string]: string;
+        });
+        setEditMode({
+          ...editMode,
+          offstage_roles: false
+        });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    });
   };
 
   const onFileChange = (e: any, id: number) => {
@@ -885,8 +903,8 @@ const IndividualProfile: React.FC<{
                         'N/A'
                       ) : (
                         <>
-                          {profile?.data?.height_ft}’-{profile?.data?.height_in}
-                          ”
+                          {profile?.data?.height_ft}'-{profile?.data?.height_in}
+                          "
                         </>
                       )}
                       <br />
@@ -1806,44 +1824,71 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
-            <DetailSection title="Off Stage Skills">
-              {editMode['offstage_roles'] ? (
-                <Container>Hello</Container>
-              ) : (
-                <>
-                  <OffStageSkills
-                    offstage_roles_general={
-                      profile?.data?.offstage_roles_general
-                    }
-                    offstage_roles_production={
-                      profile?.data?.offstage_roles_production
-                    }
-                    offstage_roles_scenic_and_properties={
-                      profile?.data?.offstage_roles_scenic_and_properties
-                    }
-                    offstage_roles_lighting={
-                      profile?.data?.offstage_roles_lightning
-                    }
-                    offstage_roles_sound={profile?.data?.offstage_roles_sound}
-                    offstage_roles_hair_makeup_costumes={
-                      profile?.data?.offstage_roles_hair_makeup_costumes
-                    }
-                  />
-                  <a
-                    href="#"
-                    onClick={(e: React.MouseEvent<HTMLElement>) =>
-                      onEditModeClick(
-                        e,
-                        'offstage_roles',
-                        !editMode['offstage_roles']
-                      )
-                    }
-                  >
-                    + Add Off-Stage Skills
-                  </a>
-                </>
-              )}
-            </DetailSection>
+            {editMode['offstage_roles'] ? (
+              <>
+                <OffStageSkillsEdit
+                  offstage_roles_general={profile?.data?.offstage_roles_general}
+                  offstage_roles_production={
+                    profile?.data?.offstage_roles_production
+                  }
+                  offstage_roles_scenic_and_properties={
+                    profile?.data?.offstage_roles_scenic_and_properties
+                  }
+                  offstage_roles_lighting={
+                    profile?.data?.offstage_roles_lightning
+                  }
+                  offstage_roles_sound={profile?.data?.offstage_roles_sound}
+                  offstage_roles_hair_makeup_costumes={
+                    profile?.data?.offstage_roles_hair_makeup_costumes
+                  }
+                  submitOffStageSkills={submitOffStageSkills}
+                />
+              </>
+            ) : (
+              <>
+                {(profile?.data?.offstage_roles_general?.length > 0 ||
+                  profile?.data?.offstage_roles_production?.length > 0 ||
+                  profile?.data?.offstage_roles_scenic_and_properties?.length >
+                    0 ||
+                  profile?.data?.offstage_roles_lightning?.length > 0 ||
+                  profile?.data?.offstage_roles_sound?.length > 0 ||
+                  profile?.data?.offstage_roles_hair_makeup_costumes?.length >
+                    0) && (
+                  <DetailSection title="Off Stage Roles">
+                    <OffStageSkills
+                      offstage_roles_general={
+                        profile?.data?.offstage_roles_general
+                      }
+                      offstage_roles_production={
+                        profile?.data?.offstage_roles_production
+                      }
+                      offstage_roles_scenic_and_properties={
+                        profile?.data?.offstage_roles_scenic_and_properties
+                      }
+                      offstage_roles_lighting={
+                        profile?.data?.offstage_roles_lightning
+                      }
+                      offstage_roles_sound={profile?.data?.offstage_roles_sound}
+                      offstage_roles_hair_makeup_costumes={
+                        profile?.data?.offstage_roles_hair_makeup_costumes
+                      }
+                    />
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(
+                      e,
+                      'offstage_roles',
+                      !editMode['offstage_roles']
+                    )
+                  }
+                >
+                  + Add Off Stage Roles
+                </a>
+              </>
+            )}
             <hr />
             {/* AWARD SECTION */}
             {editMode['awards'] ? (

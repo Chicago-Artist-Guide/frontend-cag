@@ -118,6 +118,7 @@ const SkillBadge = styled.div`
 
 const Flex = styled.div`
   display: flex;
+  margin: 20px 0px 20px;
 `;
 
 export default OffStageSkills;
