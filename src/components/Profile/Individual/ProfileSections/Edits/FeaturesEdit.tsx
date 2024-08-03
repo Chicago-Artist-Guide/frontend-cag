@@ -97,14 +97,14 @@ const FeaturesEdit: React.FC<{
               value={credit.musicalDirector}
             />
           </Form>
-          {i ? (
+          {features.length > 1 && (
             <DeleteRowLink
               href="#"
               onClick={(e: any) => removeCreditBlock(e, credit.id)}
             >
               X Delete
             </DeleteRowLink>
-          ) : null}
+          )}
           <hr />
         </>
       ))}
