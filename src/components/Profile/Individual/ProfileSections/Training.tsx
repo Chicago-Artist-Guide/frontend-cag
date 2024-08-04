@@ -6,35 +6,13 @@ import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
 const Training: React.FC<{
   training_institutions: any;
-  trainingInstitution: string;
-  trainingDegree: string;
-  trainingYear: string;
-}> = ({
-  training_institutions,
-  trainingInstitution,
-  trainingDegree,
-  trainingYear
-}) => {
-  let trainings = [];
-  let singleTraining = null;
-  if (trainingInstitution) {
-    singleTraining = {
-      trainingInstitution: trainingInstitution,
-      trainingDegree: trainingDegree,
-      trainingYear: trainingYear
-    };
-    trainings.push(singleTraining);
-  }
-  if (hasNonEmptyValues(training_institutions)) {
-    trainings = trainings.concat(training_institutions);
-  }
-
+}> = ({ training_institutions }) => {
   return (
     <>
-      {hasNonEmptyValues(trainings) && (
+      {hasNonEmptyValues(training_institutions) && (
         <Container>
-          {trainings.map((training: any) => (
-            <div>
+          {training_institutions.map((training: any) => (
+            <div key={training.id}>
               <DegreeInformation>
                 <Bold>{training.trainingInstitution}</Bold>
                 <Bold>{training.trainingYear}</Bold>

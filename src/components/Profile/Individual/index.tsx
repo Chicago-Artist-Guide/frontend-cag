@@ -1068,23 +1068,21 @@ const IndividualProfile: React.FC<{
             {/* TRAINING SECTION */}
             {editMode['training'] ? (
               <TrainingEdit
-                trainingId={profile?.data?.id}
                 training_institutions={profile?.data?.training_institutions}
-                trainingInstitution={profile?.data?.trainingInstitution}
-                trainingDegree={profile?.data?.trainingDegree}
-                trainingYear={profile?.data?.trainingYear}
                 onTrainingFieldChange={onTrainingFieldChange}
+                removeTrainingBlock={removeTrainingBlock}
               />
             ) : (
               <>
-                <DetailSection title="Training">
-                  <Training
-                    training_institutions={profile?.data?.training_institutions}
-                    trainingInstitution={profile?.data?.trainingInstitution}
-                    trainingDegree={profile?.data?.trainingDegree}
-                    trainingYear={profile?.data?.trainingYear}
-                  />
-                </DetailSection>
+                {hasNonEmptyValues(profile?.data?.training_institutions) && (
+                  <DetailSection title="Training">
+                    <Training
+                      training_institutions={
+                        profile?.data?.training_institutions
+                      }
+                    />
+                  </DetailSection>
+                )}
                 <Col lg="12">
                   <div>
                     <a
