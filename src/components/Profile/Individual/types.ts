@@ -6,4 +6,5 @@ export type EditModeSections = {
   past: boolean;
   skills: boolean;
   awards: boolean;
+  offstage_roles: boolean;
 };

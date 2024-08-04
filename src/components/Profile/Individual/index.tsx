@@ -6,7 +6,6 @@ import {
 } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
-import Badge from 'react-bootstrap/Badge';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
@@ -52,6 +51,9 @@ import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import SpecialSkills from './ProfileSections/SpecialSkills';
+import OffStageSkills from './ProfileSections/OffStageSkills';
+import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -70,7 +72,8 @@ const IndividualProfile: React.FC<{
     upcoming: false,
     past: false,
     skills: false,
-    awards: false
+    awards: false,
+    offstage_roles: false
   });
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
@@ -439,6 +442,23 @@ const IndividualProfile: React.FC<{
     } catch (err) {
       console.error('Error updating profile data:', err);
     }
+  };
+
+  const submitOffStageSkills = async (selectedRoles: any) => {
+    Object.entries(selectedRoles).forEach(async ([key, value]) => {
+      if (profile.ref) {
+        await updateDoc(profile.ref, { [key]: value } as {
+          [key: string]: string;
+        });
+        setEditMode({
+          ...editMode,
+          offstage_roles: false
+        });
+      } else {
+        // no profile.ref
+        // look up?
+      }
+    });
   };
 
   const onFileChange = (e: any, id: number) => {
@@ -883,8 +903,8 @@ const IndividualProfile: React.FC<{
                         'N/A'
                       ) : (
                         <>
-                          {profile?.data?.height_ft}’-{profile?.data?.height_in}
-                          ”
+                          {profile?.data?.height_ft}'-{profile?.data?.height_in}
+                          "
                         </>
                       )}
                       <br />
@@ -1787,35 +1807,10 @@ const IndividualProfile: React.FC<{
                 {(profile?.data?.additional_skills_checkboxes?.length > 0 ||
                   profile?.data?.additional_skills_manual?.length > 0) && (
                   <DetailSection title="Special Skills">
-                    <ProfileFlex>
-                      {profile?.data?.additional_skills_checkboxes?.length >
-                        0 &&
-                        profile?.data?.additional_skills_checkboxes.map(
-                          (skill: string) => (
-                            <Badge
-                              pill
-                              bg="primary"
-                              key={`skills-primary-${skill}`}
-                              text="white"
-                            >
-                              {skill}
-                            </Badge>
-                          )
-                        )}
-                      {profile?.data?.additional_skills_manual?.length > 0 &&
-                        profile?.data?.additional_skills_manual.map(
-                          (skill: string) => (
-                            <Badge
-                              pill
-                              bg="secondary"
-                              key={`skills-manual-${skill}`}
-                              text="white"
-                            >
-                              {skill}
-                            </Badge>
-                          )
-                        )}
-                    </ProfileFlex>
+                    <SpecialSkills
+                      checkboxes={profile?.data?.additional_skills_checkboxes}
+                      manual={profile?.data?.additional_skills_manual}
+                    />
                   </DetailSection>
                 )}
                 <a
@@ -1829,7 +1824,72 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
-
+            {editMode['offstage_roles'] ? (
+              <>
+                <OffStageSkillsEdit
+                  offstage_roles_general={profile?.data?.offstage_roles_general}
+                  offstage_roles_production={
+                    profile?.data?.offstage_roles_production
+                  }
+                  offstage_roles_scenic_and_properties={
+                    profile?.data?.offstage_roles_scenic_and_properties
+                  }
+                  offstage_roles_lighting={
+                    profile?.data?.offstage_roles_lightning
+                  }
+                  offstage_roles_sound={profile?.data?.offstage_roles_sound}
+                  offstage_roles_hair_makeup_costumes={
+                    profile?.data?.offstage_roles_hair_makeup_costumes
+                  }
+                  submitOffStageSkills={submitOffStageSkills}
+                />
+              </>
+            ) : (
+              <>
+                {(profile?.data?.offstage_roles_general?.length > 0 ||
+                  profile?.data?.offstage_roles_production?.length > 0 ||
+                  profile?.data?.offstage_roles_scenic_and_properties?.length >
+                    0 ||
+                  profile?.data?.offstage_roles_lightning?.length > 0 ||
+                  profile?.data?.offstage_roles_sound?.length > 0 ||
+                  profile?.data?.offstage_roles_hair_makeup_costumes?.length >
+                    0) && (
+                  <DetailSection title="Off Stage Roles">
+                    <OffStageSkills
+                      offstage_roles_general={
+                        profile?.data?.offstage_roles_general
+                      }
+                      offstage_roles_production={
+                        profile?.data?.offstage_roles_production
+                      }
+                      offstage_roles_scenic_and_properties={
+                        profile?.data?.offstage_roles_scenic_and_properties
+                      }
+                      offstage_roles_lighting={
+                        profile?.data?.offstage_roles_lightning
+                      }
+                      offstage_roles_sound={profile?.data?.offstage_roles_sound}
+                      offstage_roles_hair_makeup_costumes={
+                        profile?.data?.offstage_roles_hair_makeup_costumes
+                      }
+                    />
+                  </DetailSection>
+                )}
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(
+                      e,
+                      'offstage_roles',
+                      !editMode['offstage_roles']
+                    )
+                  }
+                >
+                  + Add Off Stage Roles
+                </a>
+              </>
+            )}
+            <hr />
             {/* AWARD SECTION */}
             {editMode['awards'] ? (
               <Container>
