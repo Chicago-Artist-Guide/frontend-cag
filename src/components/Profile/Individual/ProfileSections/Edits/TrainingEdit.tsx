@@ -4,7 +4,6 @@ import { colors } from '../../../../../theme/styleVars';
 import { Container } from 'styled-bootstrap-grid';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { hasNonEmptyValues } from '../../../../../utils/hasNonEmptyValues';
 import Form from 'react-bootstrap/Form';
 import { InputField } from '../../../../../genericComponents';
 
@@ -17,9 +16,10 @@ const TrainingEdit: React.FC<{
   onTrainingFieldChange,
   removeTrainingBlock
 }) => {
+  console.log(training_institutions);
   return (
     <Container>
-      {hasNonEmptyValues(training_institutions) ? (
+      {training_institutions &&
         training_institutions.map((training: any, index: number) => (
           <TrainingRow key={`training-${training.id}`}>
             <Col lg="8">
@@ -60,49 +60,24 @@ const TrainingEdit: React.FC<{
                   placeholder="Degree"
                   value={training.trainingDegree}
                 />
-                {index + 1 ? (
+                {training_institutions.length > 1 && (
                   <DeleteRowLink
                     href="#"
                     onClick={(e: any) => removeTrainingBlock(e, training.id)}
                   >
                     X Delete
                   </DeleteRowLink>
-                ) : null}
+                )}
               </Form>
             </Col>
           </TrainingRow>
-        ))
-      ) : (
+        ))}
+      {!training_institutions && (
         <Container>
           <Form>
-            <InputField
-              name="trainingInstitution"
-              onChange={(e: any) =>
-                onTrainingFieldChange(
-                  'trainingInstitution',
-                  e.target.value,
-                  null
-                )
-              }
-              placeholder="Institution"
-              value=""
-            />
-            <InputField
-              name="trainingYear"
-              onChange={(e: any) =>
-                onTrainingFieldChange('trainingYear', e.target.value, null)
-              }
-              placeholder="Year"
-              value=""
-            />
-            <InputField
-              name="trainingDegree"
-              onChange={(e: any) =>
-                onTrainingFieldChange('trainingDegree', e.target.value, null)
-              }
-              placeholder="Degree"
-              value=""
-            />
+            <InputField name="trainingInstitution" placeholder="Institution" />
+            <InputField name="trainingYear" placeholder="Year" />
+            <InputField name="trainingDegree" placeholder="Degree" />
           </Form>
         </Container>
       )}

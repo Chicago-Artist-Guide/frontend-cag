@@ -103,6 +103,9 @@ const IndividualProfile: React.FC<{
   const [skillTags, setTags] = useState([
     ...(editProfile?.additional_skills_manual || [])
   ] as string[]);
+  const [trainings, setTrainings] = useState([
+    ...(editProfile?.training_institutions || [])
+  ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
   // awards
@@ -396,7 +399,6 @@ const IndividualProfile: React.FC<{
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
-
     if (!newData) {
       console.log('This is your error');
       return;
@@ -507,8 +509,15 @@ const IndividualProfile: React.FC<{
     const newTrainings = [...(editProfile?.training_institutions || [])];
     const findIndex = newTrainings.findIndex((training) => training.id === id);
     newTrainings[findIndex][fieldName] = fieldValue;
-
     setProfileForm('training_institutions', newTrainings);
+    setEditProfile((prev: any) => ({
+      ...prev,
+      training_institutions: newTrainings
+    }));
+    setProfileData((prev: any) => ({
+      ...prev,
+      training_institutions: newTrainings
+    }));
   };
 
   const removeTrainingBlock = (e: any, id: number) => {
@@ -518,23 +527,40 @@ const IndividualProfile: React.FC<{
     newTrainings.splice(findIndex, 1);
 
     setProfileForm('training_institutions', newTrainings);
+    setEditProfile((prev: any) => ({
+      ...prev,
+      training_institutions: newTrainings
+    }));
+    setProfileData((prev: any) => ({
+      ...prev,
+      training_institutions: newTrainings
+    }));
   };
 
-  const addTrainingBlock = () => {
+  const addTrainingBlock = (e: any) => {
+    e.preventDefault();
+    const newTrainings = editProfile?.training_institutions
+      ? [...editProfile.training_institutions]
+      : [];
     const newTrainingId = trainingId + 1;
 
-    setProfileForm('training_institutions', [
-      ...(editProfile?.training_institutions || []),
-      {
-        id: newTrainingId,
-        trainingInstitution: '',
-        trainingCity: '',
-        trainingState: '' as USStateSymbol,
-        trainingDegree: '',
-        trainingDetails: ''
-      }
-    ]);
+    newTrainings.push({
+      id: newTrainingId,
+      trainingYear: '',
+      trainingInstitution: '',
+      trainingDegree: ''
+    });
+
     setTrainingId(newTrainingId);
+    setProfileForm('training_institutions', newTrainings);
+    setEditProfile((prev: any) => ({
+      ...prev,
+      training_institutions: newTrainings
+    }));
+    setProfileData((prev: any) => ({
+      ...prev,
+      training_institutions: newTrainings
+    }));
   };
 
   const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
@@ -732,6 +758,11 @@ const IndividualProfile: React.FC<{
   }, [skillTags]);
 
   useEffect(() => {
+    const allTrainings = [...trainings];
+    setProfileForm('training_institutions', allTrainings);
+  }, [trainings]);
+
+  useEffect(() => {
     const newYears = [] as number[];
 
     for (let i = 2024; i > 1949; i--) {
@@ -885,8 +916,8 @@ const IndividualProfile: React.FC<{
                         'N/A'
                       ) : (
                         <>
-                          {profile?.data?.height_ft}’-{profile?.data?.height_in}
-                          ”
+                          {profile?.data?.height_ft}'-{profile?.data?.height_in}
+                          "
                         </>
                       )}
                       <br />
@@ -1067,11 +1098,47 @@ const IndividualProfile: React.FC<{
           <div>
             {/* TRAINING SECTION */}
             {editMode['training'] ? (
-              <TrainingEdit
-                training_institutions={profile?.data?.training_institutions}
-                onTrainingFieldChange={onTrainingFieldChange}
-                removeTrainingBlock={removeTrainingBlock}
-              />
+              <Container>
+                <TrainingEdit
+                  training_institutions={editProfile?.training_institutions}
+                  onTrainingFieldChange={onTrainingFieldChange}
+                  removeTrainingBlock={removeTrainingBlock}
+                />
+                <Row>
+                  <Col lg="12">
+                    <div>
+                      <a href="#" onClick={addTrainingBlock}>
+                        + Add Another Training
+                      </a>
+                    </div>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="12">
+                    <ProfileFlex>
+                      <Button
+                        onClick={() =>
+                          updateMultiSection(
+                            'training_institutions',
+                            'training'
+                          )
+                        }
+                        text="Save"
+                        type="button"
+                        variant="primary"
+                      />
+                      <Button
+                        onClick={(e: React.MouseEvent<HTMLElement>) =>
+                          onEditModeClick(e, 'training', !editMode['training'])
+                        }
+                        text="Cancel"
+                        type="button"
+                        variant="secondary"
+                      />
+                    </ProfileFlex>
+                  </Col>
+                </Row>
+              </Container>
             ) : (
               <>
                 {hasNonEmptyValues(profile?.data?.training_institutions) && (
@@ -1083,18 +1150,14 @@ const IndividualProfile: React.FC<{
                     />
                   </DetailSection>
                 )}
-                <Col lg="12">
-                  <div>
-                    <a
-                      href="#"
-                      onClick={(e: React.MouseEvent<HTMLElement>) =>
-                        onEditModeClick(e, 'training', !editMode['training'])
-                      }
-                    >
-                      + Add Training
-                    </a>
-                  </div>
-                </Col>
+                <a
+                  href="#"
+                  onClick={(e: React.MouseEvent<HTMLElement>) =>
+                    onEditModeClick(e, 'training', !editMode['training'])
+                  }
+                >
+                  + Add Training
+                </a>
               </>
             )}
             <hr />
