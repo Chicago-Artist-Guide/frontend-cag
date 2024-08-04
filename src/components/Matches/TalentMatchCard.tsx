@@ -1,15 +1,37 @@
 import React from 'react';
+import { useFirebaseContext } from '../../context/FirebaseContext';
+import { createTheaterTalentMatch } from '../../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 
 type TalentMatchCardProps = {
   profile: IndividualProfileDataFullInit;
   fullName: string;
+  productionId: string;
+  roleId: string;
+  matchStatus: boolean | null;
 };
 
 export const TalentMatchCard = ({
   profile,
-  fullName
+  fullName,
+  productionId,
+  roleId,
+  matchStatus
 }: TalentMatchCardProps) => {
+  const { firebaseFirestore } = useFirebaseContext();
+
+  const createMatch = async (status: boolean) => {
+    const talentAccountId = profile.account_id;
+
+    await createTheaterTalentMatch(
+      firebaseFirestore,
+      productionId,
+      roleId,
+      talentAccountId,
+      status
+    );
+  };
+
   return (
     <div>
       <h3>{fullName}</h3>
@@ -28,6 +50,34 @@ export const TalentMatchCard = ({
           {profile.additional_skills_manual?.join(', ')}
         </strong>
       </p>
+      <div>
+        {matchStatus !== true ? (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              createMatch(true);
+            }}
+          >
+            Approve
+          </a>
+        ) : (
+          <p>Approved</p>
+        )}
+        {matchStatus !== false ? (
+          <a
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              createMatch(false);
+            }}
+          >
+            Decline
+          </a>
+        ) : (
+          <p>Declined</p>
+        )}
+      </div>
     </div>
   );
 };

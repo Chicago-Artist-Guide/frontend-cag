@@ -6,6 +6,7 @@ import React, {
   useState,
   ReactNode
 } from 'react';
+import { useHistory } from 'react-router-dom';
 import { getProduction, fetchTalentWithFilters } from '../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
@@ -20,7 +21,6 @@ import {
   OffstageCategoryKey,
   findOffstageCategoryDataProp
 } from '../components/Profile/shared/offstageRolesOptions';
-import { set } from 'js-cookie';
 
 // TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {
@@ -39,6 +39,7 @@ interface MatchContextValue {
 type MatchProviderProps = {
   firestore: Firestore;
   productionId: string;
+  roleIdParam?: string;
   children: ReactNode;
 };
 
@@ -56,8 +57,10 @@ export const useMatches = (): MatchContextValue => useContext(MatchContext);
 export const MatchProvider: React.FC<MatchProviderProps> = ({
   firestore,
   productionId,
+  roleIdParam,
   children
 }) => {
+  const history = useHistory();
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
   const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
@@ -134,10 +137,10 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
       if (p.roles) {
         setRoles(p.roles);
-        setCurrentRoleId(p.roles[0].role_id);
+        setCurrentRoleId(roleIdParam ?? p.roles[0].role_id);
       }
     });
-  }, [productionId]);
+  }, [productionId, roleIdParam]);
 
   // set filters based on role
   useEffect(() => {
@@ -154,18 +157,24 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
     setFoundRole('found');
     updateFiltersFromRole(findRole);
+    history.push(`/profile/search/talent/${productionId}/${currentRoleId}`);
   }, [currentRoleId]);
 
   // get matches
   useEffect(() => {
-    if (foundRole === 'loading') {
+    if (foundRole === 'loading' || !production || !currentRoleId) {
       return;
     }
 
     setLoading(true);
 
     // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
-    fetchTalentWithFilters(firestore, filters).then((filteredMatches) => {
+    fetchTalentWithFilters(
+      firestore,
+      filters,
+      production.production_id,
+      currentRoleId
+    ).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
     });
