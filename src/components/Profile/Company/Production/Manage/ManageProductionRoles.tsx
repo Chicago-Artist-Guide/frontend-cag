@@ -1,5 +1,5 @@
 import { uuidv4 } from '@firebase/util';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { SetForm } from 'react-hooks-helper';
 import { StageRole } from '../../../shared/profile.types';
@@ -84,8 +84,10 @@ const ManageProductionRoles: React.FC<{
     { onStageRoles: [] as Role[], offStageRoles: [] as Role[] }
   );
 
-  const onViewMatches = () => {
-    history.push(`/profile/search/talent/${formValues.production_id}`);
+  const onViewMatches = (roleId: string) => {
+    history.push(
+      `/profile/search/talent/${formValues.production_id}/${roleId}`
+    );
   };
 
   return (
@@ -105,7 +107,7 @@ const ManageProductionRoles: React.FC<{
               key={role.role_id}
               role={role}
               onEdit={() => onManageOnStageRole(role)}
-              onViewMatches={onViewMatches}
+              onViewMatches={() => role.role_id && onViewMatches(role.role_id)}
             />
           ))}
         </RoleSection>
@@ -116,7 +118,9 @@ const ManageProductionRoles: React.FC<{
                 key={role.role_id}
                 role={role}
                 onEdit={() => onManageOffStageRole(role)}
-                onViewMatches={onViewMatches}
+                onViewMatches={() =>
+                  role.role_id && onViewMatches(role.role_id)
+                }
               />
             ))}
           </RoleSection>
