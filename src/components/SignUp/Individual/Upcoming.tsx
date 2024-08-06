@@ -142,11 +142,8 @@ const Upcoming: React.FC<{
     newUpcomingShowValues.push({
       id: newShowId,
       title: '',
-      synopsis: '',
-      industryCode: '',
-      url: '',
-      imageUrl: '',
       year: '',
+      group: '',
       role: '',
       director: '',
       musicalDirector: ''
@@ -171,17 +168,6 @@ const Upcoming: React.FC<{
     setUploadInProgress(newUploadInProgress);
   };
 
-  useEffect(() => {
-    upcoming.forEach((upcomingShow: any) => {
-      const showId = upcomingShow.id;
-      const showImgUrl = imgUrl[showId] ?? false;
-
-      if (showImgUrl) {
-        onUpcomingInputChange(showImgUrl, 'imageUrl', showId);
-      }
-    });
-  }, [imgUrl]);
-
   const numUpcomingShows = upcoming.length;
 
   return (
@@ -196,49 +182,6 @@ const Upcoming: React.FC<{
         <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
           <Col lg="4">
             <Form.Group className="form-group">
-              <PhotoContainer
-                style={{
-                  backgroundImage:
-                    imgUrl[upcomingRow.id] !== null
-                      ? `url(${imgUrl[upcomingRow.id]})`
-                      : undefined
-                }}
-              >
-                {imgUrl[upcomingRow.id] === null && (
-                  <FontAwesomeIcon
-                    className="bod-icon"
-                    icon={faImage}
-                    size="lg"
-                  />
-                )}
-              </PhotoContainer>
-              <Form.Group className="form-group">
-                <Form.Label>File size limit: 5MB</Form.Label>
-                <Form.Control
-                  accept="image/*"
-                  onChange={(e: any) => onFileChange(e, upcomingRow.id)}
-                  style={{
-                    padding: 0,
-                    border: 'none'
-                  }}
-                  type="file"
-                />
-              </Form.Group>
-              <div>
-                <Button
-                  disabled={
-                    (uploadInProgress as any)[upcomingRow.id] ||
-                    file[upcomingRow.id] === ''
-                  }
-                  onClick={() => uploadFile(upcomingRow.id)}
-                  text="Upload File"
-                  type="button"
-                  variant="secondary"
-                />
-              </div>
-              {(uploadInProgress as any)[upcomingRow.id] && (
-                <p>Upload progress: {(percent as any)[upcomingRow.id]}%</p>
-              )}
               <DeleteLinkDiv>
                 {numUpcomingShows > 1 && (
                   <a
@@ -264,48 +207,6 @@ const Upcoming: React.FC<{
               }
               value={upcomingRow.title}
             />
-            <SynopsisTextarea controlId="show-synopsis">
-              <Form.Control
-                as="textarea"
-                name="synopsis"
-                onChange={(e: any) =>
-                  onUpcomingInputChange(
-                    e.target.value || '',
-                    'synopsis',
-                    upcomingRow.id
-                  )
-                }
-                placeholder="Show Synopsis"
-                value={upcomingRow.synopsis}
-              />
-            </SynopsisTextarea>
-            <InputField
-              label="Industry Code"
-              name="industryCode"
-              onChange={(e: any) =>
-                onUpcomingInputChange(
-                  e.target.value || '',
-                  'industryCode',
-                  upcomingRow.id
-                )
-              }
-              value={upcomingRow.industryCode}
-            />
-            <WebsiteUrlField>
-              <InputField
-                label="Link to Website/Tickets"
-                name="url"
-                onChange={(e: any) =>
-                  onUpcomingInputChange(
-                    e.target.value || '',
-                    'url',
-                    upcomingRow.id
-                  )
-                }
-                placeholder="http://"
-                value={upcomingRow.url}
-              />
-            </WebsiteUrlField>
           </Col>
         </PerfRow>
       ))}

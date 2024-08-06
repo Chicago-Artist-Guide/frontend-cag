@@ -45,8 +45,6 @@ import { USStateSymbol } from '../../SignUp/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import Awards from './ProfileSections/Awards';
-import IndividualUpcomingShow from './IndividualUpcomingShow';
-import IndividualCredits from './IndividualCredits';
 import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
@@ -87,8 +85,9 @@ const IndividualProfile: React.FC<{
   const [trainingId, setTrainingId] = useState(1);
 
   // upcoming and past shows
-  const [showId, setShowId] = useState(1);
   const [showPastId, setShowPastId] = useState(1);
+  const [upcomingId, setShowUpcomingId] = useState(1);
+
   const [file, setFile] = useState<any>({ 1: '' });
   const [percent, setPercent] = useState<PerformanceState>({ 1: 0 });
   const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
@@ -117,29 +116,14 @@ const IndividualProfile: React.FC<{
     }
 
     let maxId = 1;
-    const uPFiles: any = {};
-    const uPPercents: PerformanceState = {};
-    const uPImgUrls: { [key: number]: string | null } = {};
-    const uPUploads: PerformanceState = {};
 
     for (const performance of profile.data.upcoming_performances) {
       const id = performance.id;
-
       if (id > maxId) {
         maxId = id;
       }
-
-      uPFiles[id] = '';
-      uPPercents[id] = 0;
-      uPImgUrls[id] = performance.imageUrl || null;
-      uPUploads[id] = false;
     }
-
-    setShowId(maxId);
-    setFile(uPFiles);
-    setPercent(uPPercents);
-    setImgUrl(uPImgUrls);
-    setUploadInProgress(uPUploads);
+    setShowUpcomingId(maxId);
   };
 
   const updatePastPerformanceState = () => {
@@ -396,11 +380,9 @@ const IndividualProfile: React.FC<{
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
-
     if (!newData) {
       return;
     }
-
     try {
       if (profile.ref) {
         await updateDoc(profile.ref, { [section]: newData });
@@ -539,58 +521,33 @@ const IndividualProfile: React.FC<{
 
   const removeUpcomingInput = (e: any, id: any) => {
     e.preventDefault();
-    const newUpcomingShowValues = [
-      ...(editProfile?.upcoming_performances || [])
-    ];
-    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
-    newUpcomingShowValues.splice(findIndex, 1);
+    const newCredits = [...(editProfile?.upcoming_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits.splice(findIndex, 1);
 
-    setProfileForm('upcoming_performances', newUpcomingShowValues);
-
-    const newFile = { ...file };
-    const newPercent = { ...percent };
-    const newImgUrl = { ...imgUrl };
-    const newUploadInProgress = { ...uploadInProgress };
-
-    delete newFile[id];
-    delete (newPercent as any)[id];
-    delete newImgUrl[id];
-    delete (newUploadInProgress as any)[id];
-
-    setFile(newFile);
-    setPercent(newPercent);
-    setImgUrl(newImgUrl);
-    setUploadInProgress(newUploadInProgress);
+    setProfileForm('upcoming_performances', newCredits);
   };
 
-  const addUpcomingInput = (e: any) => {
-    e.preventDefault();
-    const newUpcomingShowValues = [
-      ...(editProfile?.upcoming_performances || [])
-    ];
-    const newShowId = showId + 1;
+  const addUpcomingInput = () => {
+    const newShowId = upcomingId + 1;
 
-    newUpcomingShowValues.push({
-      id: newShowId,
-      title: '',
-      synopsis: '',
-      industryCode: '',
-      url: '',
-      imageUrl: ''
-    });
+    setProfileForm('upcoming_performances', [
+      ...(editProfile?.past_performances || []),
+      {
+        id: newShowId,
+        title: '',
+        group: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        url: '',
+        role: '',
+        director: '',
+        musicalDirector: ''
+      }
+    ]);
 
-    setShowId(newShowId);
-    setProfileForm('upcoming_performances', newUpcomingShowValues);
-
-    const newFile = { ...file, [newShowId]: '' };
-    const newPercent = { ...percent, [newShowId]: 0 };
-    const newImgUrl = { ...imgUrl, [newShowId]: null };
-    const newUploadInProgress = { ...uploadInProgress, [newShowId]: false };
-
-    setFile(newFile);
-    setPercent(newPercent);
-    setImgUrl(newImgUrl);
-    setUploadInProgress(newUploadInProgress);
+    setShowUpcomingId(newShowId);
   };
 
   const onCreditFieldChange = <T extends keyof PastPerformances>(
@@ -605,9 +562,9 @@ const IndividualProfile: React.FC<{
     setProfileForm('past_performances', newCredits);
   };
 
-  const onUpcomingInputChange = <T extends keyof PastPerformances>(
+  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
     fieldName: T,
-    fieldValue: PastPerformances[T],
+    fieldValue: UpcomingPerformances[T],
     id: number
   ) => {
     const newCredits = [...(editProfile?.upcoming_performances || [])];

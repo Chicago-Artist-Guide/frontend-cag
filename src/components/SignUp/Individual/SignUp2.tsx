@@ -41,16 +41,11 @@ const defaultData: IndividualProfile2Data = {
     {
       id: 1,
       title: '',
+      year: '',
       group: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      url: '',
       role: '',
       director: '',
-      musicalDirector: '',
-      recognition: '',
-      year: ''
+      musicalDirector: ''
     }
   ], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
@@ -58,11 +53,8 @@ const defaultData: IndividualProfile2Data = {
     {
       id: 1,
       title: '',
-      synopsis: '',
-      industryCode: '',
-      url: '',
-      imageUrl: '',
       year: '',
+      group: '',
       role: '',
       director: '',
       musicalDirector: ''

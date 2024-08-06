@@ -10,18 +10,13 @@ import { PastPerformances } from '../../../../SignUp/Individual/types';
 
 type CreditFieldChangeFunction = <
   T extends
-    | 'title'
     | 'id'
-    | 'role'
-    | 'group'
-    | 'url'
+    | 'title'
     | 'year'
+    | 'group'
+    | 'role'
     | 'director'
     | 'musicalDirector'
-    | 'location'
-    | 'startDate'
-    | 'endDate'
-    | 'recognition'
 >(
   fieldName: T,
   fieldValue: PastPerformances[T],
