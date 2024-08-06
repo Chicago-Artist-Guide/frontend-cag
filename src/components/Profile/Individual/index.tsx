@@ -388,7 +388,7 @@ const IndividualProfile: React.FC<{
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
-    console.log(section);
+
     if (!newData) {
       console.log('This is your error');
       return;
