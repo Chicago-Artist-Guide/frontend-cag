@@ -226,10 +226,8 @@ export type ProfileAwards = {
 export type TrainingInstitution = {
   id: number;
   trainingInstitution: string;
-  trainingCity: string;
-  trainingState: USStateSymbol;
   trainingDegree: string;
-  trainingDetails: string;
+  trainingYear: string;
 };
 
 export type IndividualProfile2Data = {

@@ -4,18 +4,15 @@ import {
   onSnapshot,
   updateDoc
 } from 'firebase/firestore';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
-import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 import {
   faCheckCircle,
-  faImage,
   faPenToSquare,
   faXmark
 } from '@fortawesome/free-solid-svg-icons';
@@ -40,13 +37,11 @@ import {
   skillCheckboxes,
   SkillCheckbox
 } from '../../SignUp/Individual/types';
-import { USStateSymbol } from '../../SignUp/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import Awards from './ProfileSections/Awards';
 import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
-import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import Features from './ProfileSections/Features';
@@ -54,9 +49,8 @@ import FeaturesEdit from './ProfileSections/Edits/FeaturesEdit';
 import SpecialSkills from './ProfileSections/SpecialSkills';
 import OffStageSkills from './ProfileSections/OffStageSkills';
 import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
-import SpecialSkills from './ProfileSections/SpecialSkills';
-import OffStageSkills from './ProfileSections/OffStageSkills';
-import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
+import Training from './ProfileSections/Training';
+import TrainingEdit from './ProfileSections/Edits/TrainingEdit';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
@@ -94,19 +88,13 @@ const IndividualProfile: React.FC<{
   const [showPastId, setShowPastId] = useState(1);
   const [upcomingId, setShowUpcomingId] = useState(1);
 
-  const [file, setFile] = useState<any>({ 1: '' });
-  const [percent, setPercent] = useState<PerformanceState>({ 1: 0 });
-  const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
-    1: null
-  });
-  const [uploadInProgress, setUploadInProgress] = useState<PerformanceState>({
-    1: false
-  });
-
   // skills
   const [input, setInput] = useState('');
   const [skillTags, setTags] = useState([
     ...(editProfile?.additional_skills_manual || [])
+  ] as string[]);
+  const [trainings, setTrainings] = useState([
+    ...(editProfile?.training_institutions || [])
   ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
@@ -141,6 +129,19 @@ const IndividualProfile: React.FC<{
     setShowPastId(maxId);
   };
 
+  const updateTrainingState = () => {
+    if (!profile?.data?.training_institutions) {
+      setEditProfile((prevState: any) => ({
+        ...prevState,
+        training_institutions: []
+      }));
+      return;
+    }
+
+    const maxId = profile.data.training_institutions.length || 1;
+    setTrainingId(maxId);
+  };
+
   useEffect(() => {
     if (editMode.personalDetails || editMode.headline || editMode.upcoming) {
       return;
@@ -150,6 +151,7 @@ const IndividualProfile: React.FC<{
     setEditProfile(profile?.data);
     updatePerformanceState();
     updatePastPerformanceState();
+    updateTrainingState();
   }, [profile?.data, editMode]);
 
   useEffect(() => {
@@ -386,7 +388,9 @@ const IndividualProfile: React.FC<{
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
+
     if (!newData) {
+      console.log('This is your error');
       return;
     }
     try {
@@ -448,61 +452,6 @@ const IndividualProfile: React.FC<{
     });
   };
 
-  const onFileChange = (e: any, id: number) => {
-    const imgFile = e.target.files[0];
-
-    if (imgFile) {
-      const currFiles = { ...file };
-      setFile({ ...currFiles, [id]: imgFile });
-    }
-  };
-
-  const uploadFile = (id: number) => {
-    if (!file[id]) {
-      return;
-    }
-
-    // get file
-    const currFile = file[id];
-
-    // start upload
-    const currUploadProg = { ...uploadInProgress };
-    setUploadInProgress({ ...currUploadProg, [id]: true });
-
-    const storageRef = ref(
-      firebaseStorage,
-      `/files-${editProfile?.uid}/${editProfile?.account_id}-${currFile.name}`
-    );
-    const uploadTask = uploadBytesResumable(storageRef, currFile);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const currPercent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-
-        // update progress
-        const currProgress = { ...percent };
-        setPercent({ ...currProgress, [id]: currPercent });
-      },
-      (err) => {
-        console.log('Error uploading image', err);
-        setUploadInProgress({ ...currUploadProg, [id]: false });
-      },
-      () => {
-        setUploadInProgress({ ...currUploadProg, [id]: false });
-
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log('Uploaded image url:', url);
-          const currImgUrl = { ...imgUrl };
-          setImgUrl({ ...currImgUrl, [id]: url });
-        });
-      }
-    );
-  };
-
   const onTrainingFieldChange = <T extends keyof TrainingInstitution>(
     fieldName: T,
     fieldValue: TrainingInstitution[T],
@@ -510,9 +459,10 @@ const IndividualProfile: React.FC<{
   ) => {
     const newTrainings = [...(editProfile?.training_institutions || [])];
     const findIndex = newTrainings.findIndex((training) => training.id === id);
-    newTrainings[findIndex][fieldName] = fieldValue;
 
+    newTrainings[findIndex][fieldName] = fieldValue;
     setProfileForm('training_institutions', newTrainings);
+    console.log(editProfile);
   };
 
   const removeTrainingBlock = (e: any, id: number) => {
@@ -531,14 +481,11 @@ const IndividualProfile: React.FC<{
       ...(editProfile?.training_institutions || []),
       {
         id: newTrainingId,
+        trainingYear: '',
         trainingInstitution: '',
-        trainingCity: '',
-        trainingState: '' as USStateSymbol,
-        trainingDegree: '',
-        trainingDetails: ''
+        trainingDegree: ''
       }
     ]);
-
     setTrainingId(newTrainingId);
   };
 
@@ -696,6 +643,11 @@ const IndividualProfile: React.FC<{
     const allSkills = [...skillTags];
     setProfileForm('additional_skills_manual', allSkills);
   }, [skillTags]);
+
+  useEffect(() => {
+    const allTrainings = [...trainings];
+    setProfileForm('training_institutions', allTrainings);
+  }, [trainings]);
 
   useEffect(() => {
     const newYears = [] as number[];
@@ -865,7 +817,7 @@ const IndividualProfile: React.FC<{
                         <br />
                       </>
                     )}
-                  {profile?.data?.ethnicities.length > 0 && (
+                  {profile?.data?.ethnicities?.length > 0 && (
                     <>
                       Ethnicity: {profile?.data?.ethnicities?.join(', ')}
                       <br />
@@ -1031,190 +983,21 @@ const IndividualProfile: React.FC<{
           </div>
           <hr />
           <div>
+            {/* TRAINING SECTION */}
             {editMode['training'] ? (
               <Container>
-                {(hasNonEmptyValues(editProfile?.training_institutions)
-                  ? editProfile.training_institutions
-                  : profile?.data?.training_institution &&
-                    profile.data.training_institution !== ''
-                  ? [
-                      {
-                        trainingInstitution: profile.data.training_institution,
-                        trainingCity: profile.data.training_city,
-                        trainingState: profile.data.training_state,
-                        trainingDegree: profile.data.training_degree,
-                        trainingDetails: profile.data.training_details
-                      }
-                    ]
-                  : []
-                ).map((training: any, i: number) => (
-                  <TrainingRow key={`training-${training.id}`}>
-                    <Col lg="8">
-                      <Form>
-                        <InputField
-                          name="trainingInstitution"
-                          onChange={(e: any) =>
-                            onTrainingFieldChange(
-                              'trainingInstitution',
-                              e.target.value,
-                              training.id
-                            )
-                          }
-                          placeholder="Institution"
-                          value={training.trainingInstitution}
-                        />
-                        <Container>
-                          <Row>
-                            <PaddedCol lg="8">
-                              <InputField
-                                name="trainingCity"
-                                onChange={(e: any) =>
-                                  onTrainingFieldChange(
-                                    'trainingCity',
-                                    e.target.value,
-                                    training.id
-                                  )
-                                }
-                                placeholder="City"
-                                value={training.trainingCity}
-                              />
-                            </PaddedCol>
-                            <PaddedCol lg="4">
-                              <CAGFormSelect
-                                name="trainingState"
-                                onChange={(e: any) =>
-                                  onTrainingFieldChange(
-                                    'trainingState',
-                                    e.target.value,
-                                    training.id
-                                  )
-                                }
-                                value={training.trainingState || ''}
-                                style={{
-                                  height: 52,
-                                  marginTop: 'calc(25px + 0.5rem)',
-                                  border: `1px solid ${colors.lightGrey}`,
-                                  color: training.trainingState
-                                    ? colors.secondaryFontColor
-                                    : colors.lightGrey
-                                }}
-                              >
-                                <option value="">State</option>
-                                <option value="AL">Alabama</option>
-                                <option value="AK">Alaska</option>
-                                <option value="AZ">Arizona</option>
-                                <option value="AR">Arkansas</option>
-                                <option value="CA">California</option>
-                                <option value="CO">Colorado</option>
-                                <option value="CT">Connecticut</option>
-                                <option value="DE">Delaware</option>
-                                <option value="DC">District Of Columbia</option>
-                                <option value="FL">Florida</option>
-                                <option value="GA">Georgia</option>
-                                <option value="HI">Hawaii</option>
-                                <option value="ID">Idaho</option>
-                                <option value="IL">Illinois</option>
-                                <option value="IN">Indiana</option>
-                                <option value="IA">Iowa</option>
-                                <option value="KS">Kansas</option>
-                                <option value="KY">Kentucky</option>
-                                <option value="LA">Louisiana</option>
-                                <option value="ME">Maine</option>
-                                <option value="MD">Maryland</option>
-                                <option value="MA">Massachusetts</option>
-                                <option value="MI">Michigan</option>
-                                <option value="MN">Minnesota</option>
-                                <option value="MS">Mississippi</option>
-                                <option value="MO">Missouri</option>
-                                <option value="MT">Montana</option>
-                                <option value="NE">Nebraska</option>
-                                <option value="NV">Nevada</option>
-                                <option value="NH">New Hampshire</option>
-                                <option value="NJ">New Jersey</option>
-                                <option value="NM">New Mexico</option>
-                                <option value="NY">New York</option>
-                                <option value="NC">North Carolina</option>
-                                <option value="ND">North Dakota</option>
-                                <option value="OH">Ohio</option>
-                                <option value="OK">Oklahoma</option>
-                                <option value="OR">Oregon</option>
-                                <option value="PA">Pennsylvania</option>
-                                <option value="RI">Rhode Island</option>
-                                <option value="SC">South Carolina</option>
-                                <option value="SD">South Dakota</option>
-                                <option value="TN">Tennessee</option>
-                                <option value="TX">Texas</option>
-                                <option value="UT">Utah</option>
-                                <option value="VT">Vermont</option>
-                                <option value="VA">Virginia</option>
-                                <option value="WA">Washington</option>
-                                <option value="WV">West Virginia</option>
-                                <option value="WI">Wisconsin</option>
-                                <option value="WY">Wyoming</option>
-                              </CAGFormSelect>
-                            </PaddedCol>
-                          </Row>
-                        </Container>
-                        <InputField
-                          name="trainingDegree"
-                          onChange={(e: any) =>
-                            onTrainingFieldChange(
-                              'trainingDegree',
-                              e.target.value,
-                              training.id
-                            )
-                          }
-                          placeholder="Degree"
-                          value={training.trainingDegree}
-                        />
-                        <Container>
-                          <Row>
-                            <PaddedCol className="mt-4" lg="12">
-                              <SmallTitle>Notes/Details</SmallTitle>
-                              <Form.Group controlId="formControlTextarea1">
-                                <Form.Control
-                                  as="textarea"
-                                  name="trainingDetails"
-                                  onChange={(e: any) =>
-                                    onTrainingFieldChange(
-                                      'trainingDetails',
-                                      e.target.value,
-                                      training.id
-                                    )
-                                  }
-                                  placeholder="Provide any additional information here"
-                                  rows={6}
-                                  value={training.trainingDetails || ''}
-                                />
-                              </Form.Group>
-                            </PaddedCol>
-                          </Row>
-                        </Container>
-                        {i ? (
-                          <DeleteRowLink
-                            href="#"
-                            onClick={(e: any) =>
-                              removeTrainingBlock(e, training.id)
-                            }
-                          >
-                            X Delete
-                          </DeleteRowLink>
-                        ) : null}
-                      </Form>
-                    </Col>
-                  </TrainingRow>
-                ))}
+                <TrainingEdit
+                  training_institutions={editProfile?.training_institutions}
+                  onTrainingFieldChange={onTrainingFieldChange}
+                  removeTrainingBlock={removeTrainingBlock}
+                />
                 <Row>
-                  <Col lg="10">
-                    <a
-                      href="#"
-                      onClick={(e: any) => {
-                        e.preventDefault();
-                        addTrainingBlock();
-                      }}
-                    >
-                      + Save and add another institution
-                    </a>
+                  <Col lg="12">
+                    <div>
+                      <a href="#" onClick={addTrainingBlock}>
+                        + Add Another Training
+                      </a>
+                    </div>
                   </Col>
                 </Row>
                 <Row>
@@ -1245,39 +1028,14 @@ const IndividualProfile: React.FC<{
               </Container>
             ) : (
               <>
-                {hasNonEmptyValues(profile?.data?.training_institutions) ? (
+                {hasNonEmptyValues(profile?.data?.training_institutions) && (
                   <DetailSection title="Training">
-                    {profile?.data?.training_institutions.map(
-                      (training: TrainingInstitution) => (
-                        <p>
-                          <strong>{training.trainingInstitution}</strong>
-                          <br />
-                          {training.trainingCity}, {training.trainingState}
-                          <br />
-                          <em>{training.trainingDegree}</em>
-                          <br />
-                          <span>{training.trainingDetails}</span>
-                        </p>
-                      )
-                    )}
+                    <Training
+                      training_institutions={
+                        profile?.data?.training_institutions
+                      }
+                    />
                   </DetailSection>
-                ) : profile?.data?.training_institution &&
-                  profile?.data?.training_institution !== '' ? (
-                  <DetailSection title="Training">
-                    {/* need to support the old single training value profiles - will only update once they edit */}
-                    <p>
-                      <strong>{profile?.data.training_institution}</strong>
-                      <br />
-                      {profile?.data.training_city},{' '}
-                      {profile?.data.training_state}
-                      <br />
-                      <em>{profile?.data.training_degree}</em>
-                      <br />
-                      <span>{profile?.data.training_details}</span>
-                    </p>
-                  </DetailSection>
-                ) : (
-                  <></>
                 )}
                 <a
                   href="#"

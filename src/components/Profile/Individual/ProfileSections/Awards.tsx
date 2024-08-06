@@ -49,6 +49,7 @@ const AwardContainer = styled.div`
   display: flex;
   justify-content: space-between;
   font-weight: bold;
+  margin: 6px;
 `;
 
 const Bold = styled.p`

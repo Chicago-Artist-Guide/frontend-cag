@@ -30,10 +30,8 @@ const defaultData: IndividualProfile2Data = {
     {
       id: 1,
       trainingInstitution: '',
-      trainingCity: '',
-      trainingState: '' as USStateSymbol,
       trainingDegree: '',
-      trainingDetails: ''
+      trainingYear: ''
     }
   ],
 
