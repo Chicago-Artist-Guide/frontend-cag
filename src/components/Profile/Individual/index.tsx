@@ -44,13 +44,16 @@ import { USStateSymbol } from '../../SignUp/types';
 import type { EditModeSections } from './types';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import Awards from './ProfileSections/Awards';
-import IndividualUpcomingShow from './IndividualUpcomingShow';
-import IndividualCredits from './IndividualCredits';
 import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import { CAGFormSelect } from '../../SignUp/SignUpStyles';
 import EditPersonalDetails from './EditPersonalDetails';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import Features from './ProfileSections/Features';
+import FeaturesEdit from './ProfileSections/Edits/FeaturesEdit';
+import SpecialSkills from './ProfileSections/SpecialSkills';
+import OffStageSkills from './ProfileSections/OffStageSkills';
+import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
 import SpecialSkills from './ProfileSections/SpecialSkills';
 import OffStageSkills from './ProfileSections/OffStageSkills';
 import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
@@ -88,8 +91,9 @@ const IndividualProfile: React.FC<{
   const [trainingId, setTrainingId] = useState(1);
 
   // upcoming and past shows
-  const [showId, setShowId] = useState(1);
   const [showPastId, setShowPastId] = useState(1);
+  const [upcomingId, setShowUpcomingId] = useState(1);
+
   const [file, setFile] = useState<any>({ 1: '' });
   const [percent, setPercent] = useState<PerformanceState>({ 1: 0 });
   const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
@@ -118,29 +122,14 @@ const IndividualProfile: React.FC<{
     }
 
     let maxId = 1;
-    const uPFiles: any = {};
-    const uPPercents: PerformanceState = {};
-    const uPImgUrls: { [key: number]: string | null } = {};
-    const uPUploads: PerformanceState = {};
 
     for (const performance of profile.data.upcoming_performances) {
       const id = performance.id;
-
       if (id > maxId) {
         maxId = id;
       }
-
-      uPFiles[id] = '';
-      uPPercents[id] = 0;
-      uPImgUrls[id] = performance.imageUrl || null;
-      uPUploads[id] = false;
     }
-
-    setShowId(maxId);
-    setFile(uPFiles);
-    setPercent(uPPercents);
-    setImgUrl(uPImgUrls);
-    setUploadInProgress(uPUploads);
+    setShowUpcomingId(maxId);
   };
 
   const updatePastPerformanceState = () => {
@@ -397,11 +386,9 @@ const IndividualProfile: React.FC<{
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
-
     if (!newData) {
       return;
     }
-
     try {
       if (profile.ref) {
         await updateDoc(profile.ref, { [section]: newData });
@@ -555,87 +542,36 @@ const IndividualProfile: React.FC<{
     setTrainingId(newTrainingId);
   };
 
-  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
-    fieldValue: UpcomingPerformances[T],
-    fieldName: T,
-    id: any
-  ) => {
-    // indexing to assign each upcoming show value a number
-    const newUpcomingShowValues = [
-      ...(editProfile?.upcoming_performances || [])
-    ];
-    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
-    newUpcomingShowValues[findIndex][fieldName] = fieldValue;
-
-    setProfileForm('upcoming_performances', newUpcomingShowValues);
-  };
-
   const removeUpcomingInput = (e: any, id: any) => {
     e.preventDefault();
-    const newUpcomingShowValues = [
-      ...(editProfile?.upcoming_performances || [])
-    ];
-    const findIndex = newUpcomingShowValues.findIndex((show) => show.id === id);
-    newUpcomingShowValues.splice(findIndex, 1);
+    const newCredits = [...(editProfile?.upcoming_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits.splice(findIndex, 1);
 
-    setProfileForm('upcoming_performances', newUpcomingShowValues);
-
-    const newFile = { ...file };
-    const newPercent = { ...percent };
-    const newImgUrl = { ...imgUrl };
-    const newUploadInProgress = { ...uploadInProgress };
-
-    delete newFile[id];
-    delete (newPercent as any)[id];
-    delete newImgUrl[id];
-    delete (newUploadInProgress as any)[id];
-
-    setFile(newFile);
-    setPercent(newPercent);
-    setImgUrl(newImgUrl);
-    setUploadInProgress(newUploadInProgress);
+    setProfileForm('upcoming_performances', newCredits);
   };
 
-  const addUpcomingInput = (e: any) => {
-    e.preventDefault();
-    const newUpcomingShowValues = [
-      ...(editProfile?.upcoming_performances || [])
-    ];
-    const newShowId = showId + 1;
+  const addUpcomingInput = () => {
+    const newShowId = upcomingId + 1;
 
-    newUpcomingShowValues.push({
-      id: newShowId,
-      title: '',
-      synopsis: '',
-      industryCode: '',
-      url: '',
-      imageUrl: ''
-    });
-
-    setShowId(newShowId);
-    setProfileForm('upcoming_performances', newUpcomingShowValues);
-
-    const newFile = { ...file, [newShowId]: '' };
-    const newPercent = { ...percent, [newShowId]: 0 };
-    const newImgUrl = { ...imgUrl, [newShowId]: null };
-    const newUploadInProgress = { ...uploadInProgress, [newShowId]: false };
-
-    setFile(newFile);
-    setPercent(newPercent);
-    setImgUrl(newImgUrl);
-    setUploadInProgress(newUploadInProgress);
-  };
-
-  useEffect(() => {
-    editProfile?.upcoming_performances?.forEach((upcomingShow: any) => {
-      const showId = upcomingShow.id;
-      const showImgUrl = imgUrl[showId] ?? false;
-
-      if (showImgUrl) {
-        onUpcomingInputChange(showImgUrl, 'imageUrl', showId);
+    setProfileForm('upcoming_performances', [
+      ...(editProfile?.past_performances || []),
+      {
+        id: newShowId,
+        title: '',
+        group: '',
+        location: '',
+        startDate: '',
+        endDate: '',
+        url: '',
+        role: '',
+        director: '',
+        musicalDirector: ''
       }
-    });
-  }, [imgUrl]);
+    ]);
+
+    setShowUpcomingId(newShowId);
+  };
 
   const onCreditFieldChange = <T extends keyof PastPerformances>(
     fieldName: T,
@@ -647,6 +583,18 @@ const IndividualProfile: React.FC<{
     newCredits[findIndex][fieldName] = fieldValue;
 
     setProfileForm('past_performances', newCredits);
+  };
+
+  const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
+    fieldName: T,
+    fieldValue: UpcomingPerformances[T],
+    id: number
+  ) => {
+    const newCredits = [...(editProfile?.upcoming_performances || [])];
+    const findIndex = newCredits.findIndex((show) => show.id === id);
+    newCredits[findIndex][fieldName] = fieldValue;
+
+    setProfileForm('upcoming_performances', newCredits);
   };
 
   const removeCreditBlock = (e: any, id: number) => {
@@ -1342,134 +1290,16 @@ const IndividualProfile: React.FC<{
               </>
             )}
             <hr />
+            {/* UPCOMING FEATURES */}
+
             {editMode['upcoming'] ? (
               <Container>
-                {editProfile?.upcoming_performances?.map(
-                  (upcomingRow: any, i: any) => (
-                    <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
-                      <Col lg="4">
-                        <Form.Group className="form-group">
-                          <PhotoContainer
-                            style={{
-                              backgroundImage:
-                                imgUrl[upcomingRow.id] !== null
-                                  ? `url(${imgUrl[upcomingRow.id]})`
-                                  : undefined
-                            }}
-                          >
-                            {imgUrl[upcomingRow.id] === null && (
-                              <FontAwesomeIcon
-                                className="bod-icon"
-                                icon={faImage}
-                                size="lg"
-                              />
-                            )}
-                          </PhotoContainer>
-                          <Form.Group className="form-group">
-                            <Form.Label>File size limit: 5MB</Form.Label>
-                            <Form.Control
-                              accept="image/*"
-                              onChange={(e: any) =>
-                                onFileChange(e, upcomingRow.id)
-                              }
-                              style={{
-                                padding: 0,
-                                border: 'none'
-                              }}
-                              type="file"
-                            />
-                          </Form.Group>
-                          <div>
-                            <Button
-                              disabled={
-                                (uploadInProgress as any)[upcomingRow.id] ||
-                                file[upcomingRow.id] === ''
-                              }
-                              onClick={() => uploadFile(upcomingRow.id)}
-                              text="Upload File"
-                              type="button"
-                              variant="secondary"
-                            />
-                          </div>
-                          {(uploadInProgress as any)[upcomingRow.id] && (
-                            <p>
-                              Upload progress:{' '}
-                              {(percent as any)[upcomingRow.id]}%
-                            </p>
-                          )}
-                          {editProfile?.upcoming_performances?.length > 1 && (
-                            <DeleteLinkDiv>
-                              <a
-                                href="#"
-                                onClick={(e: any) =>
-                                  removeUpcomingInput(e, upcomingRow.id)
-                                }
-                              >
-                                X Delete Show
-                              </a>
-                            </DeleteLinkDiv>
-                          )}
-                        </Form.Group>
-                      </Col>
-                      <Col lg="8">
-                        <InputField
-                          label="Show Title"
-                          name="title"
-                          onChange={(e: any) =>
-                            onUpcomingInputChange(
-                              e.target.value || '',
-                              'title',
-                              upcomingRow.id
-                            )
-                          }
-                          value={upcomingRow.title}
-                        />
-                        <SynopsisTextarea controlId="show-synopsis">
-                          <Form.Control
-                            as="textarea"
-                            name="synopsis"
-                            onChange={(e: any) =>
-                              onUpcomingInputChange(
-                                e.target.value || '',
-                                'synopsis',
-                                upcomingRow.id
-                              )
-                            }
-                            placeholder="Show Synopsis"
-                            value={upcomingRow.synopsis}
-                          />
-                        </SynopsisTextarea>
-                        <InputField
-                          label="Industry Code"
-                          name="industryCode"
-                          onChange={(e: any) =>
-                            onUpcomingInputChange(
-                              e.target.value || '',
-                              'industryCode',
-                              upcomingRow.id
-                            )
-                          }
-                          value={upcomingRow.industryCode}
-                        />
-                        <WebsiteUrlField>
-                          <InputField
-                            label="Link to Website/Tickets"
-                            name="url"
-                            onChange={(e: any) =>
-                              onUpcomingInputChange(
-                                e.target.value || '',
-                                'url',
-                                upcomingRow.id
-                              )
-                            }
-                            placeholder="http://"
-                            value={upcomingRow.url}
-                          />
-                        </WebsiteUrlField>
-                      </Col>
-                    </PerfRow>
-                  )
-                )}
+                <FeaturesEdit
+                  features={editProfile?.upcoming_performances}
+                  emptyPlaceholder={''}
+                  onCreditFieldChange={onUpcomingInputChange}
+                  removeCreditBlock={removeUpcomingInput}
+                />
                 <Row>
                   <Col lg="12">
                     <div>
@@ -1509,14 +1339,10 @@ const IndividualProfile: React.FC<{
               <>
                 {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
                   <DetailSection title="Upcoming Features">
-                    {profile?.data?.upcoming_performances.map(
-                      (perf: UpcomingPerformances) => (
-                        <IndividualUpcomingShow
-                          key={`upcoming-shows-${perf.id}-${perf.industryCode}`}
-                          show={perf}
-                        />
-                      )
-                    )}
+                    <Features
+                      features={profile.data.upcoming_performances}
+                      emptyPlaceholder=""
+                    />
                   </DetailSection>
                 )}
                 <a
@@ -1532,144 +1358,12 @@ const IndividualProfile: React.FC<{
             <hr />
             {editMode['past'] ? (
               <Container>
-                {editProfile?.past_performances?.map(
-                  (credit: any, i: number) => (
-                    <PerfRow key={`credit-${credit.id}`}>
-                      <Col lg="4">
-                        <Form>
-                          <InputField
-                            name="title"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'title',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Show Title"
-                            value={credit.title}
-                          />
-                          <InputField
-                            name="group"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'location',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Theatre or Location"
-                            value={credit.location}
-                          />
-                          <InputField
-                            name="url"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'url',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Web Link"
-                            value={credit.url}
-                          />
-                          <InputField
-                            name="role"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'role',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Role/Position"
-                            value={credit.role}
-                          />
-                          <InputField
-                            name="director"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'director',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Director"
-                            value={credit.director}
-                          />
-                          <InputField
-                            name="musicalDirector"
-                            onChange={(e: any) =>
-                              onCreditFieldChange(
-                                'musicalDirector',
-                                e.target.value,
-                                credit.id
-                              )
-                            }
-                            placeholder="Musical Director"
-                            value={credit.musicalDirector}
-                          />
-                        </Form>
-                        {i ? (
-                          <DeleteRowLink
-                            href="#"
-                            onClick={(e: any) =>
-                              removeCreditBlock(e, credit.id)
-                            }
-                          >
-                            X Delete
-                          </DeleteRowLink>
-                        ) : null}
-                      </Col>
-                      <Col lg="4">
-                        <InputField
-                          name="group"
-                          onChange={(e: any) =>
-                            onCreditFieldChange(
-                              'group',
-                              e.target.value,
-                              credit.id
-                            )
-                          }
-                          placeholder="Theatre Group"
-                          value={credit.group}
-                        />
-                        <DateRowTitle>Running Dates</DateRowTitle>
-                        <DateRow>
-                          <DatePicker
-                            name="startDate"
-                            onChange={(date: any) => {
-                              const dateString = new Date(
-                                date
-                              ).toLocaleDateString();
-                              onCreditFieldChange(
-                                'startDate',
-                                dateString,
-                                credit.id
-                              );
-                            }}
-                            value={credit.startDate}
-                          />
-                          <h6>through</h6>
-                          <DatePicker
-                            name="endDate"
-                            onChange={(date: any) => {
-                              const dateString = new Date(
-                                date
-                              ).toLocaleDateString();
-                              onCreditFieldChange(
-                                'endDate',
-                                dateString,
-                                credit.id
-                              );
-                            }}
-                            value={credit.endDate}
-                          />
-                        </DateRow>
-                      </Col>
-                    </PerfRow>
-                  )
-                )}
+                <FeaturesEdit
+                  features={editProfile?.past_performances}
+                  emptyPlaceholder={''}
+                  onCreditFieldChange={onCreditFieldChange}
+                  removeCreditBlock={removeCreditBlock}
+                />
                 <Row>
                   <Col lg="12">
                     <a
@@ -1710,14 +1404,10 @@ const IndividualProfile: React.FC<{
               <>
                 {hasNonEmptyValues(profile?.data?.past_performances) && (
                   <DetailSection title="Past Performances">
-                    {profile?.data?.past_performances.map(
-                      (perf: PastPerformances) => (
-                        <IndividualCredits
-                          key={`credits-shows-${perf.id}`}
-                          show={perf}
-                        />
-                      )
-                    )}
+                    <Features
+                      features={profile.data.past_performances}
+                      emptyPlaceholder=""
+                    />
                   </DetailSection>
                 )}
                 <a
