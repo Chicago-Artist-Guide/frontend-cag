@@ -58,11 +58,8 @@ const Credits: React.FC<{
       {
         id: newShowId,
         title: '',
+        year: '',
         group: '',
-        location: '',
-        startDate: '',
-        endDate: '',
-        url: '',
         role: '',
         director: '',
         musicalDirector: ''
@@ -91,22 +88,6 @@ const Credits: React.FC<{
                 }
                 placeholder="Show Title"
                 value={credit.title}
-              />
-              <InputField
-                name="group"
-                onChange={(e: any) =>
-                  onCreditFieldChange('location', e.target.value, credit.id)
-                }
-                placeholder="Theatre or Location"
-                value={credit.location}
-              />
-              <InputField
-                name="url"
-                onChange={(e: any) =>
-                  onCreditFieldChange('url', e.target.value, credit.id)
-                }
-                placeholder="Web Link"
-                value={credit.url}
               />
               <InputField
                 name="role"
@@ -155,26 +136,6 @@ const Credits: React.FC<{
               placeholder="Theatre Group"
               value={credit.group}
             />
-            <DateRowTitle>Running Dates</DateRowTitle>
-            <DateRow>
-              <DatePicker
-                name="startDate"
-                onChange={(date: any) => {
-                  const dateString = new Date(date).toLocaleDateString();
-                  onCreditFieldChange('startDate', dateString, credit.id);
-                }}
-                value={credit.startDate}
-              />
-              <h6>through</h6>
-              <DatePicker
-                name="endDate"
-                onChange={(date: any) => {
-                  const dateString = new Date(date).toLocaleDateString();
-                  onCreditFieldChange('endDate', dateString, credit.id);
-                }}
-                value={credit.endDate}
-              />
-            </DateRow>
           </Col>
         </PerfRow>
       ))}

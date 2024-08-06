@@ -14,6 +14,7 @@ import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
 import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
+import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.jpg';
 import Kauffman from '../../images/who-we-are/board/Board_Kauffman.jpg';
 
 // Business Operations
@@ -36,6 +37,7 @@ import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
 import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
+import Nagra from '../../images/who-we-are/technical/Staff_Nagra.jpg';
 
 // Advisory Board
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
@@ -180,6 +182,16 @@ const bios = {
       image: Stiles,
       linkedin: 'rachelannestiles',
       bio: "is a theatre professional and artist working in Milwaukee and Chicago with a specially in wigs and makeup. Her resume includes Lyric Opera of Chicago, Florentine Opera, Central City Opera, Broadway in Milwaukee, and The Milwaukee Rep, among others. A midwest girl at heart, her passion is helping people get a head's start in working in the arts, no matter their background. She created Stage Creatives Network to help theatre professionals find peace, prosperity and joy through the 4 pillars of a sustainable career: connection, financial literacy, work-life balance and self expression. If it's all about who you know, let's get to know each other!"
+    },
+    {
+      id: bioId(),
+      name: 'Camille Cadenhead',
+      role: 'Artist Board Member',
+      pronouns: 'they/she',
+      affiliation: null,
+      image: Cadenhead,
+      linkedin: 'camille-cadenhead-9708b0174',
+      bio: 'is an actor and writer of Chicago, having worked with numerous theater companies including 16th Street Theater, Red Tape Theater, Prologue Theater, Eta Theater, MPAACT Theater, and many others. They have also co-written sketch shows performed at The Second City Training Center with sketch group, The Family Robot. Camille’s training in theater and performance includes The Second City Conservatory, iO, and most recently The Black Box Academy. Their BA is in Theater from Columbia College.'
     }
   ],
   operations: [
@@ -345,6 +357,16 @@ const bios = {
       image: Hernandez,
       linkedin: 'nicolehernandez-design',
       bio: 'has an academic background in Child and Adolescent Development. After teaching at an elementary school for 8 years, she decided to pursue a different career path. She discovered UX/UI design and got her training through General Assembly User Experience Design Immersive course. When she’s not ‘designing’ you can find Nicole hanging out with her dog, Boo, working out, or trying the newest local restaurants.'
+    },
+    {
+      id: bioId(),
+      name: 'Gisselle Nagra',
+      role: 'UX Designer',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Nagra,
+      linkedin: 'gissellenagra',
+      bio: 'is a passionate UX researcher with a design background, dedicated to understanding and empathizing with users to bridge the gap between them and products. She earned her degree in psychology from UC Berkeley and a certificate in Design Innovation, applying these skills throughout her UX career. With prior experience in healthcare, she brings a diverse perspective to her work. Outside the office, she enjoys traveling and cherishing moments with her loyal sidekick, Zoey, her dog.'
     },
     {
       id: bioId(),

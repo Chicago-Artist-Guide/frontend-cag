@@ -198,24 +198,21 @@ export type SkillCheckbox = (typeof skillCheckboxes)[number];
 export type PastPerformances = {
   id: number;
   title: string;
+  year: string;
   group: string;
-  location: string;
-  startDate: string;
-  endDate: string;
-  url: string;
   role: string;
   director: string;
   musicalDirector: string;
-  recognition: string;
 };
 
 export type UpcomingPerformances = {
   id: number;
   title: string;
-  synopsis: string;
-  industryCode: string;
-  url: string;
-  imageUrl: string;
+  year: string;
+  group: string;
+  role: string;
+  director: string;
+  musicalDirector: string;
 };
 
 export type ProfileAwards = {
@@ -229,10 +226,7 @@ export type ProfileAwards = {
 export type TrainingInstitution = {
   id: number;
   trainingInstitution: string;
-  trainingCity: string;
-  trainingState: USStateSymbol;
   trainingDegree: string;
-  trainingDetails: string;
   trainingYear: string;
 };
 

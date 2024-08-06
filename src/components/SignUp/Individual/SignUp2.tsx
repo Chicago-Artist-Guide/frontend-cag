@@ -30,10 +30,7 @@ const defaultData: IndividualProfile2Data = {
     {
       id: 1,
       trainingInstitution: '',
-      trainingCity: '',
-      trainingState: '' as USStateSymbol,
       trainingDegree: '',
-      trainingDetails: '',
       trainingYear: ''
     }
   ],
@@ -42,20 +39,24 @@ const defaultData: IndividualProfile2Data = {
     {
       id: 1,
       title: '',
+      year: '',
       group: '',
-      location: '',
-      startDate: '',
-      endDate: '',
-      url: '',
       role: '',
       director: '',
-      musicalDirector: '',
-      recognition: ''
+      musicalDirector: ''
     }
   ], // { title, group, location, startDate, endDate, url, role, director, musicalDirector, recognition }
 
   upcoming: [
-    { id: 1, title: '', synopsis: '', industryCode: '', url: '', imageUrl: '' }
+    {
+      id: 1,
+      title: '',
+      year: '',
+      group: '',
+      role: '',
+      director: '',
+      musicalDirector: ''
+    }
   ], // { id, title, synopsis, industryCode, url, imageUrl }
 
   additionalSkillsCheckboxes: [],
