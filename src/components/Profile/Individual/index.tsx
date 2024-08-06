@@ -54,6 +54,9 @@ import FeaturesEdit from './ProfileSections/Edits/FeaturesEdit';
 import SpecialSkills from './ProfileSections/SpecialSkills';
 import OffStageSkills from './ProfileSections/OffStageSkills';
 import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
+import SpecialSkills from './ProfileSections/SpecialSkills';
+import OffStageSkills from './ProfileSections/OffStageSkills';
+import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
 
 type PerformanceState = {
   [key: number]: string | number | null | boolean;
