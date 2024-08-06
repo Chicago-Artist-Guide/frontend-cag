@@ -10,10 +10,14 @@ import { MatchesPageContainer } from '../components/Matches/MatchesPageContainer
 
 const Matches = () => {
   const { firebaseFirestore } = useFirebaseContext();
-  const { productionId } = useParams();
+  const { productionId, roleId } = useParams();
 
   return (
-    <MatchProvider productionId={productionId} firestore={firebaseFirestore}>
+    <MatchProvider
+      productionId={productionId}
+      roleIdParam={roleId}
+      firestore={firebaseFirestore}
+    >
       <PageContainer>
         <Row>
           <Col lg={12}>

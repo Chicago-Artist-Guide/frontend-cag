@@ -7,10 +7,16 @@ import {
   QueryDocumentSnapshot,
   orderBy,
   doc,
-  getDoc
+  getDoc,
+  addDoc,
+  Query,
+  QuerySnapshot
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
-import { MatchingFilters } from '../components/Matches/types';
+import {
+  FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
+  MatchingFilters
+} from '../components/Matches/types';
 import { MessageFilters, MessageType } from '../components/Messages/types';
 import { Production } from '../components/Profile/Company/types';
 import { IndividualAccountInit } from '../components/SignUp/Individual/types';
@@ -30,59 +36,11 @@ export const getProduction = async (
   }
 };
 
-// TODO: add version for roles called fetchRolesWithFilters()
-export async function fetchTalentWithFilters(
-  firebaseStore: Firestore,
-  filters: MatchingFilters
-): Promise<IndividualProfileDataFullInit[]> {
-  const { type: accountType, ...profileFilters } = filters;
-
-  // This is inefficient to do, and Firebase limits IN queries to 10
-  // We should get the same effect with profile filters
-  /* const accountsRef = collection(firebaseStore, 'accounts');
-  const accountsQuery = query(accountsRef, where('type', '==', accountType));
-  const accountsSnapshot = await getDocs(accountsQuery);
-
-  // collect all individual uuids
-  const uuids = accountsSnapshot.docs.map((doc) => doc.id);
-
-  // get matching profiles
-  const profilesRef = collection(firebaseStore, 'profiles');
-  let profileQuery = query(profilesRef, where('uuid', 'in', uuids));*/
-
-  // get matching profiles
-  const profilesRef = collection(firebaseStore, 'profiles');
-  let profileQuery = query(profilesRef);
-
-  for (const [field, value] of Object.entries(profileFilters)) {
-    if (value !== undefined) {
-      // Check if the value is an array for filters like ethnicity and age range
-      if (Array.isArray(value) && value.length > 0) {
-        profileQuery = query(
-          profileQuery,
-          where(field, 'array-contains-any', value)
-        );
-      } else {
-        // simple value check for everything else
-        profileQuery = query(profileQuery, where(field, '==', value));
-      }
-    }
-  }
-
-  const snapshot = await getDocs(profileQuery);
-  const matches = snapshot.docs.map((doc: QueryDocumentSnapshot) => ({
-    id: doc.id,
-    ...(doc.data() as IndividualProfileDataFullInit)
-  }));
-
-  return matches;
-}
-
 export const getMatchName = async (
   firebaseStore: Firestore,
-  account_id: string
+  accountId: string
 ) => {
-  const docRef = doc(firebaseStore, 'accounts', account_id);
+  const docRef = doc(firebaseStore, 'accounts', accountId);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
@@ -90,11 +48,168 @@ export const getMatchName = async (
     const { first_name, last_name } = data;
     return first_name && last_name
       ? `${data.first_name} ${data.last_name}`
-      : `User ${account_id}`;
+      : `User ${accountId}`;
   } else {
     return '';
   }
 };
+
+export const getTheaterTalentMatch = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  talentAccountId: string
+) => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+
+  if (!productionRef || !talentAccountRef) {
+    throw new Error('Invalid production or talent account');
+  }
+
+  const matchesQuery = query(
+    collection(firebaseStore, 'theater_talent_matches'),
+    where('production_id', '==', productionRef),
+    where('role_id', '==', roleId),
+    where('talent_account_id', '==', talentAccountRef)
+  );
+
+  const querySnapshot = await getDocs(matchesQuery);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.docs[0].data();
+  }
+
+  return false;
+};
+
+export const createTheaterTalentMatch = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  talentAccountId: string,
+  status: boolean
+) => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+
+  if (!productionRef || !talentAccountRef) {
+    throw new Error('Invalid production or talent account');
+  }
+
+  const theaterTalentMatchAlreadyExists = await getTheaterTalentMatch(
+    firebaseStore,
+    productionId,
+    roleId,
+    talentAccountId
+  );
+
+  if (theaterTalentMatchAlreadyExists) {
+    throw new Error('Match already exists');
+  }
+
+  const data = {
+    production_id: productionRef,
+    role_id: roleId,
+    status: status,
+    talent_account_id: talentAccountRef
+  };
+
+  return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
+};
+
+// TODO: add version for roles called fetchRolesWithFilters()
+export async function fetchTalentWithFilters(
+  firebaseStore: Firestore,
+  filters: MatchingFilters,
+  productionId: string,
+  roleId: string
+): Promise<IndividualProfileDataFullInit[]> {
+  const { type: accountType, matchStatus, ...profileFilters } = filters;
+  const profilesRef = collection(firebaseStore, 'profiles');
+  const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
+  let singleProfileQuery = query(profilesRef);
+
+  for (const [field, value] of Object.entries(profileFilters)) {
+    if (value !== undefined) {
+      if (Array.isArray(value)) {
+        if (value.length > 0) {
+          let profileQuery: Query;
+
+          // if the comparison is array to single value
+          if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
+            profileQuery = query(profilesRef, where(field, 'in', value));
+          } else {
+            // we know the comparison is array to array
+            profileQuery = query(
+              profilesRef,
+              where(field, 'array-contains-any', value)
+            );
+          }
+
+          snapshotPromises.push(getDocs(profileQuery));
+        }
+      } else {
+        singleProfileQuery = query(
+          singleProfileQuery,
+          where(field, '==', value)
+        );
+      }
+    }
+  }
+
+  snapshotPromises.unshift(getDocs(singleProfileQuery));
+
+  const snapshots = await Promise.all(snapshotPromises);
+
+  const matchesSet: Set<string> = new Set(
+    snapshots[0].docs.map((doc: QueryDocumentSnapshot<any>) => doc.id)
+  );
+  const matches: IndividualProfileDataFullInit[] = [];
+
+  // This is the complicated part: we have to find the intersection
+  // Because we did multuple queries and only want profiles that match ALL of the filters
+  for (let i = 0; i < snapshots.length; i++) {
+    const currentSet = new Set(
+      snapshots[i].docs.map((doc: QueryDocumentSnapshot<any>) => doc.id)
+    );
+
+    for (const id of matchesSet) {
+      if (!currentSet.has(id)) {
+        matchesSet.delete(id);
+      }
+    }
+  }
+
+  // finally, collect remaining matches
+  for (const id of matchesSet) {
+    const docRef = doc(profilesRef, id);
+    const docSnap = await getDoc(docRef);
+
+    // filter if we need to care about an existing match status
+    if (docSnap.exists()) {
+      const profileData = docSnap.data() as IndividualProfileDataFullInit;
+
+      if (matchStatus !== null && matchStatus !== undefined) {
+        const findMatch = await getTheaterTalentMatch(
+          firebaseStore,
+          productionId,
+          roleId,
+          profileData.account_id
+        );
+        const foundMatchStatus = findMatch ? findMatch.status : null;
+
+        if (foundMatchStatus === matchStatus) {
+          matches.push({ ...profileData });
+        }
+      } else {
+        matches.push({ ...profileData });
+      }
+    }
+  }
+
+  return matches;
+}
 
 export const fetchMessagesByAccountAndRole = async (
   firebaseStore: Firestore,

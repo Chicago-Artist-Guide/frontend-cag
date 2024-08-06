@@ -6,10 +6,21 @@ import React, {
   useState,
   ReactNode
 } from 'react';
+import { useHistory } from 'react-router-dom';
 import { getProduction, fetchTalentWithFilters } from '../utils/firebaseUtils';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 import { Production, Role } from '../components/Profile/Company/types';
+import {
+  IndividualRoles,
+  Gender,
+  AgeRange
+} from '../components/SignUp/Individual/types';
+import {
+  findCategoryByValue,
+  OffstageCategoryKey,
+  findOffstageCategoryDataProp
+} from '../components/Profile/shared/offstageRolesOptions';
 
 // TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {
@@ -28,6 +39,7 @@ interface MatchContextValue {
 type MatchProviderProps = {
   firestore: Firestore;
   productionId: string;
+  roleIdParam?: string;
   children: ReactNode;
 };
 
@@ -45,10 +57,15 @@ export const useMatches = (): MatchContextValue => useContext(MatchContext);
 export const MatchProvider: React.FC<MatchProviderProps> = ({
   firestore,
   productionId,
+  roleIdParam,
   children
 }) => {
+  const history = useHistory();
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
+    'loading'
+  );
   const [filters, setFilters] = useState<MatchingFilters>({
     // the only required filter we need to start is account type
     type: 'individual'
@@ -57,8 +74,60 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
   const [roles, setRoles] = useState<Role[]>([]);
   const [currentRoleId, setCurrentRoleId] = useState<string>();
 
+  const updateFiltersFromRole = (findRole: Role) => {
+    const newFilters: MatchingFilters = { ...filters };
+
+    // stage role type
+    if (findRole.type) {
+      newFilters['stage_role'] = [
+        findRole.type.toLocaleLowerCase() as IndividualRoles,
+        'both-stage'
+      ];
+    }
+
+    // for offstage roles
+    if (findRole.offstage_role) {
+      const findOffCat = findCategoryByValue(
+        findRole.offstage_role
+      ) as OffstageCategoryKey;
+
+      if (findOffCat) {
+        const findOffCatDataProp = findOffstageCategoryDataProp[findOffCat];
+
+        if (!findOffCatDataProp) {
+          return;
+        }
+
+        newFilters[findOffCatDataProp] = [findRole.offstage_role];
+      }
+    }
+
+    if (findRole.gender_identity) {
+      newFilters['gender_identity'] = findRole.gender_identity as Gender[];
+    }
+
+    if (findRole.ethnicity) {
+      const ethnicityCatchAll = 'Open to all ethnicities';
+      newFilters['ethnicities'] = findRole.ethnicity.filter(
+        (f) => f !== ethnicityCatchAll
+      );
+    }
+
+    if (findRole.age_range) {
+      const ageCatchAll = 'Open to all ages';
+      newFilters['age_ranges'] = findRole.age_range.filter(
+        (a) => a !== ageCatchAll
+      ) as AgeRange[];
+    }
+
+    setFilters(newFilters);
+    return newFilters;
+  };
+
   // get production and roles
   useEffect(() => {
+    setLoading(true);
+
     getProduction(firestore, productionId).then((p) => {
       if (!p) {
         return;
@@ -68,17 +137,44 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
       if (p.roles) {
         setRoles(p.roles);
-        setCurrentRoleId(p.roles[0].role_id);
+        setCurrentRoleId(roleIdParam ?? p.roles[0].role_id);
       }
     });
-  }, [productionId]);
+  }, [productionId, roleIdParam]);
+
+  // set filters based on role
+  useEffect(() => {
+    if (!currentRoleId || !roles.length) {
+      return;
+    }
+
+    const findRole = roles.find((r) => r.role_id === currentRoleId);
+
+    if (!findRole) {
+      setFoundRole('not-found');
+      return;
+    }
+
+    setFoundRole('found');
+    updateFiltersFromRole(findRole);
+    history.push(`/profile/search/talent/${productionId}/${currentRoleId}`);
+  }, [currentRoleId]);
 
   // get matches
   useEffect(() => {
+    if (foundRole === 'loading' || !production || !currentRoleId) {
+      return;
+    }
+
     setLoading(true);
 
     // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
-    fetchTalentWithFilters(firestore, filters).then((filteredMatches) => {
+    fetchTalentWithFilters(
+      firestore,
+      filters,
+      production.production_id,
+      currentRoleId
+    ).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
     });

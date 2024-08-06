@@ -1,4 +1,4 @@
-import { OffStageRoleByCategory } from './profile.types';
+import { OffStageRoleCategory, OffStageRoleByCategory } from './profile.types';
 
 export const offstageRolesOptions: OffStageRoleByCategory = {
   general: {
@@ -141,4 +141,30 @@ export const offstageRolesOptions: OffStageRoleByCategory = {
       }
     ]
   }
+};
+
+export const findOffstageCategoryDataProp = {
+  offstageRolesGeneral: 'offstage_roles_general',
+  offstageRolesProduction: 'offstage_roles_production',
+  offstageRolesScenicAndProperties: 'offstage_roles_scenic_and_properties',
+  offstageRolesLighting: 'offstage_roles_lighting',
+  offstageRolesSound: 'offstage_roles_sound',
+  offstageRolesHairMakeupCostumes: 'offstage_roles_hair_makeup_costumes'
+} as const;
+
+export type OffstageCategoryKey = keyof typeof findOffstageCategoryDataProp;
+
+export const findCategoryByValue = (value: string): string | undefined => {
+  for (const categoryKey in offstageRolesOptions) {
+    const category = offstageRolesOptions[categoryKey as OffStageRoleCategory];
+    const foundOption = category.options.find(
+      (option) => option.value === value
+    );
+
+    if (foundOption) {
+      return category.category;
+    }
+  }
+
+  return undefined;
 };
