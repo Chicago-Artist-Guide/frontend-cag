@@ -62,7 +62,7 @@ const CompanyProfile: React.FC<{
       querySnapshot.docs.map((doc) => doc.data()) as Production[]
     ).reduce(
       (acc, cur) => {
-        if (cur.status === 'Complete') {
+        if (cur.status === 'Show Complete') {
           acc.inactive.push(cur);
         } else {
           acc.active.push(cur);
