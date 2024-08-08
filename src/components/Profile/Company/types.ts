@@ -70,4 +70,5 @@ export type Role = {
   role_status?: RoleStatus;
   age_range?: string[];
   additional_requirements?: string[];
+  union?: string;
 };
