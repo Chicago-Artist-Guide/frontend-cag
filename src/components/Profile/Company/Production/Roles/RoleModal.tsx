@@ -138,7 +138,7 @@ const RoleModal: React.FC<{
               <Col lg={7}>
                 {!isOnStage ? (
                   <FormSelect
-                    name="offstage_role"
+                    name="role_name"
                     label="Position"
                     defaultValue={formValues?.offstage_role}
                     onChange={setFormState}
