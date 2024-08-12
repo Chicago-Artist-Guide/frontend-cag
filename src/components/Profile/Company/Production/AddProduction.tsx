@@ -27,7 +27,7 @@ import {
 } from '../../Form/Inputs';
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
 import { Production } from '../types';
-import ProductionPhoto from './ProductionPhoto';
+import ImageUpload from '../../../shared/ImageUpload';
 
 const CompanyAddShow: React.FC<{
   toggleEdit: () => void;
@@ -60,6 +60,14 @@ const CompanyAddShow: React.FC<{
     setShowOtherType(formValues.type === 'Other');
   }, [formValues.type]);
 
+  const setProfilePicture = (url: string) => {
+    const target = {
+      name: 'production_image_url',
+      value: url
+    };
+    setFormValues({ target });
+  };
+
   const handleSubmit = async () => {
     const productionId = uuidv4();
     await setDoc(doc(db, 'productions', productionId), {
@@ -88,10 +96,13 @@ const CompanyAddShow: React.FC<{
         </Row>
         <Row>
           <LeftCol lg={4}>
-            <ProductionPhoto
-              src={formValues?.production_image_url}
-              name="production_image_url"
-              onChange={setFormValues}
+            <ImageUpload
+              type="Poster"
+              onSave={(production_image_url: string) =>
+                setProfilePicture(production_image_url)
+              }
+              currentImgUrl={formValues?.production_image_url}
+              modal={false}
             />
           </LeftCol>
           <RightCol lg={{ span: 7, offset: 1 }}>
@@ -100,7 +111,7 @@ const CompanyAddShow: React.FC<{
               label="Production Name"
               onChange={setFormValues}
               defaultValue={formValues?.production_name}
-              style={{ marginTop: 20 }}
+              style={{ marginBottom: 20 }}
             />
             <FormInput
               name="writers"

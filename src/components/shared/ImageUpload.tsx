@@ -11,30 +11,34 @@ import Button from '../../genericComponents/Button';
 import ReactCrop, { Crop } from 'react-image-crop';
 import { v4 as uuidv4 } from 'uuid';
 
+type ImageUploadType = 'User' | 'Poster';
+
 interface ImageUploadModalProps {
   onSave: (imageUrl: string) => void;
-  currentImgUrl: string;
+  currentImgUrl: string | undefined;
   modal: boolean;
+  type: ImageUploadType;
 }
 
 const ImageUpload: React.FC<ImageUploadModalProps> = ({
   onSave,
   currentImgUrl,
-  modal
+  modal,
+  type
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
   const { firebaseStorage } = useFirebaseContext();
   const [percent, setPercent] = useState(0);
-  const [imgUrl, setImgUrl] = useState<string | null>(currentImgUrl);
+  const [imgUrl, setImgUrl] = useState<string | undefined>(currentImgUrl || '');
   const [src, setSrc] = useState(null as string | null);
   const {
     profile: { data }
   } = useProfileContext();
   const [crop, setCrop] = useState<Crop>({
+    height: type === 'User' ? 50 : 50 / (2 / 3),
     width: 50,
-    height: 50,
     x: 0,
     y: 0,
     unit: 'px'
@@ -215,7 +219,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
               crop={crop}
               onChange={(newCrop: Crop) => setCrop(newCrop)}
               onComplete={onCropComplete}
-              aspect={1}
+              aspect={type === 'User' ? 1 : 2 / 3}
             >
               <img className="ReactCrop__image" src={src} />
             </ReactCrop>
