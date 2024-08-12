@@ -127,6 +127,7 @@ const IndividualProfile: React.FC<{
     }
 
     const maxId = profile.data.past_performances.length || 1;
+        
     setShowPastId(maxId);
   };
 
