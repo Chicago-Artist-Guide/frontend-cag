@@ -7,7 +7,8 @@ import React, {
   ReactNode
 } from 'react';
 import { useHistory } from 'react-router-dom';
-import { getProduction, fetchTalentWithFilters } from '../utils/firebaseUtils';
+import { fetchTalentWithFilters } from '../components/Matches/api';
+import { getProduction } from '../components/Profile/Company/api';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 import { Production, Role } from '../components/Profile/Company/types';

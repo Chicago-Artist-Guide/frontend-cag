@@ -3,7 +3,7 @@ import { Firestore } from 'firebase/firestore';
 import {
   fetchMessagesByAccountAndRole,
   fetchSingleThread
-} from '../utils/firebaseUtils';
+} from '../components/Matches/api';
 import { MessageType, MessageThread } from '../components/Messages/types';
 
 interface MessageContextType {
