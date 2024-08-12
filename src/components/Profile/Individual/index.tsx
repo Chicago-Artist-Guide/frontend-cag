@@ -114,7 +114,7 @@ const IndividualProfile: React.FC<{
     }
 
     const maxId = profile.data.upcoming_performances.length || 1;
-    setTrainingId(maxId);
+    setShowUpcomingId(maxId);
   };
 
   const updatePastPerformanceState = () => {
@@ -127,7 +127,7 @@ const IndividualProfile: React.FC<{
     }
 
     const maxId = profile.data.past_performances.length || 1;
-    setTrainingId(maxId);
+    setShowPastId(maxId);
   };
 
   const updateTrainingState = () => {
