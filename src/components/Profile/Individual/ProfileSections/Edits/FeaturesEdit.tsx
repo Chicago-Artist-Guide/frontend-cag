@@ -1,39 +1,18 @@
 import React from 'react';
-import Image from 'react-bootstrap';
+
 import styled from 'styled-components';
 import { colors } from '../../../../../theme/styleVars';
-import { Col, Row, Container, Form } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCamera } from '@fortawesome/free-solid-svg-icons';
+import { Container, Form } from 'react-bootstrap';
 import { InputField } from '../../../../../genericComponents';
 import { PastPerformances } from '../../../../SignUp/Individual/types';
-
-type CreditFieldChangeFunction = <
-  T extends
-    | 'id'
-    | 'title'
-    | 'year'
-    | 'group'
-    | 'role'
-    | 'director'
-    | 'musicalDirector'
->(
-  fieldName: T,
-  fieldValue: PastPerformances[T],
-  id: number
-) => void;
 
 const FeaturesEdit: React.FC<{
   features: any;
   emptyPlaceholder: string;
-  onCreditFieldChange: CreditFieldChangeFunction;
+  onCreditFieldChange: any;
   removeCreditBlock: (e: any, i: number) => void;
-}> = ({
-  features,
-  emptyPlaceholder,
-  onCreditFieldChange,
-  removeCreditBlock
-}) => {
+}> = ({ features, onCreditFieldChange, removeCreditBlock }) => {
+
   return (
     <Container>
       {features.map((credit: any, i: number) => (
