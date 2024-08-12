@@ -55,6 +55,7 @@ export type Production = {
   open_and_close_end?: string;
   writers?: string;
   roles?: Role[];
+  location: string;
 };
 
 export type Role = {
