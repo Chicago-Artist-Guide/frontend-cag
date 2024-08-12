@@ -4,13 +4,7 @@ export type ProductionEquity = 'Union' | 'Non-Union';
 
 export type ProductionType = 'Musical' | 'Play' | 'Other';
 
-export type ProductionStatus =
-  | 'Pre-Production'
-  | 'Casting'
-  | 'Casting Complete'
-  | 'Rehearsal'
-  | 'Now Playing'
-  | 'Complete';
+export type ProductionStatus = 'Hiring' | 'In Production' | 'Show Complete';
 
 export type RoleStatus = 'Open' | 'Closed';
 

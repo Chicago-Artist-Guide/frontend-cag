@@ -435,6 +435,7 @@ const IndividualSignUp: React.FC<{
               We just need one for now, but you can add more later.
             </Tagline>
             <ImageUpload
+              type="User"
               onSave={(pfpImgUrl: string) => setProfilePicture(pfpImgUrl)}
               currentImgUrl=""
               modal={false}

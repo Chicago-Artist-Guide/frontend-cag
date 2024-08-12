@@ -125,7 +125,15 @@ const IndividualProfile: React.FC<{
       return;
     }
 
-    const maxId = profile.data.upcoming_performances.length || 1;
+    let maxId = 1;
+
+    for (const performance of profile.data.past_performances) {
+      const id = performance.id;
+      if (id > maxId) {
+        maxId = id;
+      }
+    }
+
     setShowPastId(maxId);
   };
 
@@ -502,7 +510,8 @@ const IndividualProfile: React.FC<{
     const newShowId = upcomingId + 1;
 
     setProfileForm('upcoming_performances', [
-      ...(editProfile?.past_performances || []),
+      ...(editProfile?.upcoming_performances || []),
+
       {
         id: newShowId,
         title: '',
@@ -739,6 +748,7 @@ const IndividualProfile: React.FC<{
             onHide={() => setPfpModalShow(false)}
             onSave={(pfpImgUrl: string) => savePfpUrlModal(pfpImgUrl)}
             currentImgUrl={profile?.data?.profile_image_url}
+            type="User"
           />
           <p>
             <a
