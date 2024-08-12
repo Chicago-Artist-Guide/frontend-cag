@@ -21,11 +21,8 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
   return (
     <div>
       {threads.map((thread, i) => (
-        <div
-          key={`${thread.role_id}-i`}
-          onClick={() => onThreadSelect(thread.role_id)}
-        >
-          <h4>Role: {thread.role_id}</h4>
+        <div key={`${thread.id}-i`} onClick={() => onThreadSelect(thread.id)}>
+          <h4>Role: {thread.id}</h4>
           {thread.messages.slice(0, 1).map((message: MessageType) => (
             <div key={message.id}>
               <p>{message.message}</p> {/* TODO: design as a message preview */}

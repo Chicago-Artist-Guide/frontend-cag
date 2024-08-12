@@ -1,72 +1,118 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Firestore } from 'firebase/firestore';
 import {
-  fetchMessagesByAccountAndRole,
-  fetchSingleThread
-} from '../components/Matches/api';
-import { MessageType, MessageThread } from '../components/Messages/types';
+  Firestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  getDoc
+} from 'firebase/firestore';
+import { useProfileContext } from './ProfileContext';
+import { MessageThread } from '../components/Messages/types';
 
 interface MessageContextType {
   threads: MessageThread[];
-  loadThreads: (accountId: string, roleId?: string) => void;
+  loadThreads: (accountId: string) => void;
   currentThread: MessageThread | null;
-  loadThread: (roleId: string, fromId: string, toId: string) => void;
+  loadThread: (threadId: string) => void;
+  updateThreadStatus: (threadId: string, status: string) => void;
+  updateMessageStatus: (
+    threadId: string,
+    messageId: string,
+    status: string
+  ) => void;
 }
 
 const MessageContext = createContext<MessageContextType>({
   threads: [],
   loadThreads: () => null,
   currentThread: null,
-  loadThread: () => null
+  loadThread: () => null,
+  updateThreadStatus: () => null,
+  updateMessageStatus: () => null
 });
+
 export const useMessages = () => useContext(MessageContext);
-
-const groupMessagesByRoleId = (messages: MessageType[]): MessageThread[] => {
-  const threadsMap = new Map<string, MessageType[]>();
-
-  messages.forEach((message) => {
-    const existingMessages = threadsMap.get(message.role_id) || [];
-    existingMessages.push(message);
-    threadsMap.set(message.role_id, existingMessages);
-  });
-
-  return Array.from(threadsMap, ([role_id, messages]) => ({
-    role_id,
-    messages
-  }));
-};
 
 export const MessageProvider: React.FC<{
   children: React.ReactNode;
   firestore: Firestore;
 }> = ({ children, firestore }) => {
+  const { account } = useProfileContext();
   const [threads, setThreads] = useState<MessageThread[]>([]);
   const [currentThread, setCurrentThread] = useState<MessageThread | null>(
     null
   );
 
-  const loadThreads = async (accountId: string, roleId?: string) => {
-    const fetchedMessages = await fetchMessagesByAccountAndRole(firestore, {
-      accountId,
-      roleId
-    });
-    const groupedThreads = groupMessagesByRoleId(fetchedMessages);
-    setThreads(groupedThreads);
+  const loadThreads = async (accountId: string) => {
+    const threadsCollection = collection(firestore, 'threads');
+    const threadsSnapshot = await getDocs(threadsCollection);
+
+    if (!threadsSnapshot.empty) {
+      const threadsData = threadsSnapshot.docs.map(
+        (doc) => doc.data() as MessageThread
+      );
+      setThreads(
+        threadsData.filter(
+          (thread) =>
+            thread.talent_account_id === accountId ||
+            thread.theater_account_id === accountId
+        )
+      );
+    }
   };
 
-  const loadThread = async (roleId: string, fromId: string, toId: string) => {
-    const fetchedThreadMessages = await fetchSingleThread(
-      firestore,
-      roleId,
-      fromId,
-      toId
-    );
-    setCurrentThread({ role_id: roleId, messages: fetchedThreadMessages });
+  const loadThread = async (threadId: string) => {
+    const threadDoc = doc(firestore, 'threads', threadId);
+    const threadSnapshot = await getDoc(threadDoc);
+
+    if (threadSnapshot.exists()) {
+      const threadData = threadSnapshot.data() as MessageThread;
+      setCurrentThread(threadData);
+    }
+  };
+
+  const updateThreadStatus = async (threadId: string, status: string) => {
+    const accountId = account?.data?.id;
+    const threadDoc = doc(firestore, 'threads', threadId);
+
+    await updateDoc(threadDoc, { status });
+
+    // Refresh threads
+    accountId && loadThreads(accountId);
+  };
+
+  const updateMessageStatus = async (
+    threadId: string,
+    messageId: string,
+    status: string
+  ) => {
+    const threadDoc = doc(firestore, 'threads', threadId);
+    const threadSnapshot = await getDoc(threadDoc);
+
+    if (threadSnapshot.exists()) {
+      const threadData = threadSnapshot.data() as MessageThread;
+      const updatedMessages = threadData.messages.map((message) =>
+        message.id === messageId ? { ...message, status } : message
+      );
+
+      await updateDoc(threadDoc, { messages: updatedMessages });
+
+      // Refresh current thread
+      loadThread(threadId);
+    }
   };
 
   return (
     <MessageContext.Provider
-      value={{ threads, loadThreads, currentThread, loadThread }}
+      value={{
+        threads,
+        loadThreads,
+        currentThread,
+        loadThread,
+        updateThreadStatus,
+        updateMessageStatus
+      }}
     >
       {children}
     </MessageContext.Provider>
