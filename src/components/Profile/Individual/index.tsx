@@ -106,35 +106,28 @@ const IndividualProfile: React.FC<{
 
   const updatePerformanceState = () => {
     if (!profile?.data?.upcoming_performances) {
+      setEditProfile((prevState: any) => ({
+        ...prevState,
+        upcoming_performances: []
+      }));
       return;
     }
 
-    let maxId = 1;
-
-    for (const performance of profile.data.upcoming_performances) {
-      const id = performance.id;
-      if (id > maxId) {
-        maxId = id;
-      }
-    }
-    setShowUpcomingId(maxId);
+    const maxId = profile.data.upcoming_performances.length || 1;
+    setTrainingId(maxId);
   };
 
   const updatePastPerformanceState = () => {
     if (!profile?.data?.past_performances) {
+      setEditProfile((prevState: any) => ({
+        ...prevState,
+        past_performances: []
+      }));
       return;
     }
 
-    let maxId = 1;
-
-    for (const performance of profile.data.past_performances) {
-      const id = performance.id;
-      if (id > maxId) {
-        maxId = id;
-      }
-    }
-
-    setShowPastId(maxId);
+    const maxId = profile.data.past_performances.length || 1;
+    setTrainingId(maxId);
   };
 
   const updateTrainingState = () => {
