@@ -13,20 +13,21 @@ import { Button } from '../../../../genericComponents';
 import { colors, fonts } from '../../../../theme/styleVars';
 import { getOptions } from '../../../../utils/helpers';
 import {
+  neighborhoods,
   productionEquities,
-  productionStatuses,
-  productionTypes
+  productionStatuses
 } from '../../../../utils/lookups';
 import PageContainer from '../../../layout/PageContainer';
 import {
   FormDateRange,
   FormInput,
   FormRadio,
-  FormTextArea
+  FormTextArea,
+  FormSelect
 } from '../../Form/Inputs';
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
 import { Production } from '../types';
-import ProductionPhoto from './ProductionPhoto';
+import ImageUpload from '../../../shared/ImageUpload';
 
 const CompanyAddShow: React.FC<{
   toggleEdit: () => void;
@@ -49,13 +50,23 @@ const CompanyAddShow: React.FC<{
     casting_director: '',
     casting_director_email: '',
     equity: undefined,
-    roles: []
+    roles: [],
+    writers: '',
+    location: ''
   });
   const [showOtherType, setShowOtherType] = useState(false);
 
   useEffect(() => {
     setShowOtherType(formValues.type === 'Other');
   }, [formValues.type]);
+
+  const setProfilePicture = (url: string) => {
+    const target = {
+      name: 'production_image_url',
+      value: url
+    };
+    setFormValues({ target });
+  };
 
   const handleSubmit = async () => {
     const productionId = uuidv4();
@@ -85,10 +96,13 @@ const CompanyAddShow: React.FC<{
         </Row>
         <Row>
           <LeftCol lg={4}>
-            <ProductionPhoto
-              src={formValues?.production_image_url}
-              name="production_image_url"
-              onChange={setFormValues}
+            <ImageUpload
+              type="Poster"
+              onSave={(production_image_url: string) =>
+                setProfilePicture(production_image_url)
+              }
+              currentImgUrl={formValues?.production_image_url}
+              modal={false}
             />
           </LeftCol>
           <RightCol lg={{ span: 7, offset: 1 }}>
@@ -97,24 +111,22 @@ const CompanyAddShow: React.FC<{
               label="Production Name"
               onChange={setFormValues}
               defaultValue={formValues?.production_name}
+              style={{ marginBottom: 20 }}
+            />
+            <FormInput
+              name="writers"
+              label="Written By"
+              onChange={setFormValues}
+              defaultValue={formValues?.writers}
               style={{ marginTop: 0 }}
             />
-            <FormRadio
-              name="type"
-              label="Type"
-              options={getOptions(productionTypes)}
-              checked={formValues.type}
+            <FormDateRange
+              name="open_and_close"
+              label="Open & Close"
               onChange={setFormValues}
+              startValue={formValues?.open_and_close_start}
+              endValue={formValues?.open_and_close_end}
             />
-            {showOtherType && (
-              <FormInput
-                name="type_other"
-                label=""
-                onChange={setFormValues}
-                defaultValue={formValues?.type_other}
-                style={{ marginTop: 0 }}
-              />
-            )}
             <FormRadio
               name="status"
               label="Status"
@@ -134,24 +146,6 @@ const CompanyAddShow: React.FC<{
               onChange={setFormValues}
               defaultValue={formValues?.director}
             />
-            <FormInput
-              name="musical_director"
-              label="Musical Director"
-              onChange={setFormValues}
-              defaultValue={formValues?.musical_director}
-            />
-            <FormInput
-              name="casting_director"
-              label="Casting Director"
-              onChange={setFormValues}
-              defaultValue={formValues?.casting_director}
-            />
-            <FormInput
-              name="casting_director_email"
-              label="Casting Director Email"
-              onChange={setFormValues}
-              defaultValue={formValues?.casting_director_email}
-            />
             <FormRadio
               name="equity"
               label="Equity"
@@ -159,41 +153,18 @@ const CompanyAddShow: React.FC<{
               checked={formValues.equity}
               onChange={setFormValues}
             />
-            <Section>Important Dates</Section>
-            <FormDateRange
-              name="audition"
-              label="Auditions"
+            <FormSelect
+              name="location"
+              label="Location"
+              defaultValue="The Loop"
+              options={getOptions(neighborhoods)}
               onChange={setFormValues}
-              startValue={formValues?.audition_start}
-              endValue={formValues?.audition_end}
             />
-            <FormDateRange
-              name="callback"
-              label="Callbacks"
+            <FormInput
+              name="musical_director"
+              label="Musical Director"
               onChange={setFormValues}
-              startValue={formValues?.callback_start}
-              endValue={formValues?.callback_end}
-            />
-            <FormDateRange
-              name="rehearsal"
-              label="Rehearsals"
-              onChange={setFormValues}
-              startValue={formValues?.rehearsal_start}
-              endValue={formValues?.rehearsal_end}
-            />
-            <FormDateRange
-              name="tech_week"
-              label="Tech Week"
-              onChange={setFormValues}
-              startValue={formValues?.tech_week_start}
-              endValue={formValues?.tech_week_end}
-            />
-            <FormDateRange
-              name="open_and_close"
-              label="Open & Close"
-              onChange={setFormValues}
-              startValue={formValues?.open_and_close_start}
-              endValue={formValues?.open_and_close_end}
+              defaultValue={formValues?.musical_director}
             />
           </RightCol>
         </Row>

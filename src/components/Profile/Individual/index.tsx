@@ -511,6 +511,7 @@ const IndividualProfile: React.FC<{
 
     setProfileForm('upcoming_performances', [
       ...(editProfile?.upcoming_performances || []),
+
       {
         id: newShowId,
         title: '',
@@ -747,6 +748,7 @@ const IndividualProfile: React.FC<{
             onHide={() => setPfpModalShow(false)}
             onSave={(pfpImgUrl: string) => savePfpUrlModal(pfpImgUrl)}
             currentImgUrl={profile?.data?.profile_image_url}
+            type="User"
           />
           <p>
             <a

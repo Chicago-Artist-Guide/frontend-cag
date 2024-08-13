@@ -21,12 +21,14 @@ import {
   ageRanges,
   ethnicities,
   genders,
-  roleStatuses
+  roleStatuses,
+  productionEquities
 } from '../../../../../utils/lookups';
 import { getOptions } from '../../../../../utils/helpers';
 import ConfirmDialog from '../../../../ConfirmDialog';
 
 const statuses = getOptions(roleStatuses);
+const equities = getOptions(productionEquities);
 
 const RoleModal: React.FC<{
   show: boolean;
@@ -46,9 +48,13 @@ const RoleModal: React.FC<{
     } else {
       setFormValues({
         type: type,
-        role_status: 'Open'
+        role_status: 'Open',
+        gender_identity: ['Open to all genders'],
+        age_range: ['Open to all ages'],
+        ethnicity: ['Open to all ethnicities']
       });
     }
+    console.log(formValues);
   }, []);
 
   const setFormState = (
@@ -130,19 +136,32 @@ const RoleModal: React.FC<{
             </Row>
             <Row className="mt-5">
               <Col lg={7}>
-                <FormInput
-                  name="role_name"
-                  label="Role Name"
-                  onChange={setFormState}
-                  defaultValue={formValues?.role_name}
-                  style={{ marginTop: 0 }}
-                />
+                {!isOnStage ? (
+                  <FormSelect
+                    name="role_name"
+                    label="Position"
+                    defaultValue={formValues?.offstage_role}
+                    onChange={setFormState}
+                    hasOptGroups={true}
+                    options={transformedOffstageRoleOptions}
+                  />
+                ) : (
+                  <FormInput
+                    name="role_name"
+                    label="Role Name"
+                    onChange={setFormState}
+                    defaultValue={formValues?.role_name}
+                    style={{ marginTop: 0 }}
+                  />
+                )}
                 <FormTextArea
                   name="description"
-                  label="Bio/Description"
+                  label={
+                    isOnStage ? 'Character Description' : 'Role Description'
+                  }
                   onChange={setFormState}
                   defaultValue={formValues?.description}
-                  rows={6}
+                  rows={4}
                 />
                 <Form.Group className="form-group" style={{ marginTop: 30 }}>
                   <CAGLabel>Pay</CAGLabel>
@@ -176,70 +195,6 @@ const RoleModal: React.FC<{
                     />
                   </RoleRate>
                 </Form.Group>
-                <Form.Group className="form-group" style={{ marginTop: 30 }}>
-                  <CAGLabel>Gender Identity</CAGLabel>
-                  {genders.map((gender) => (
-                    <Checkbox
-                      checked={isValueIncluded('gender_identity', gender)}
-                      fieldType="checkbox"
-                      key={`gender_identity_${gender}`}
-                      label={gender}
-                      name={gender}
-                      onChange={(e: any) => {
-                        let genders = formValues.gender_identity || [];
-                        const selected = e.target.name;
-                        if (genders?.includes(gender) && !e.target.checked) {
-                          genders = genders?.filter(
-                            (range) => range !== gender
-                          );
-                        } else if (e.target.checked) {
-                          genders.push(selected);
-                        }
-                        setFormValues({
-                          ...formValues,
-                          gender_identity: genders
-                        });
-                      }}
-                    />
-                  ))}
-                </Form.Group>
-                <Form.Group className="form-group" style={{ marginTop: 30 }}>
-                  <CAGLabel>Additional Requirements</CAGLabel>
-                  {additionalRequirements.map((requirement) => (
-                    <Checkbox
-                      checked={isValueIncluded(
-                        'additional_requirements',
-                        requirement
-                      )}
-                      fieldType="checkbox"
-                      key={`additional_requirements_${requirement}`}
-                      label={requirement}
-                      name={requirement}
-                      onChange={(e: any) => {
-                        let additionalRequirements =
-                          formValues.additional_requirements || [];
-                        const selected = e.target.name;
-                        if (
-                          additionalRequirements.includes(requirement) &&
-                          !e.target.checked
-                        ) {
-                          additionalRequirements =
-                            additionalRequirements?.filter(
-                              (range) => range !== requirement
-                            );
-                        } else if (e.target.checked) {
-                          additionalRequirements.push(selected);
-                        }
-                        setFormValues({
-                          ...formValues,
-                          additional_requirements: additionalRequirements
-                        });
-                      }}
-                    />
-                  ))}
-                </Form.Group>
-              </Col>
-              <Col lg={{ span: 4, offset: 1 }}>
                 <Dropdown
                   name="role_status"
                   label="Role Status"
@@ -248,77 +203,156 @@ const RoleModal: React.FC<{
                   onChange={setFormState}
                   style={{ marginTop: 0 }}
                 />
-                {isOnStage ? (
-                  <Form.Group className="form-group" style={{ marginTop: 20 }}>
-                    <CAGLabel>Character Age Range</CAGLabel>
-                    {ageRanges.map((ageRange) => (
-                      <Checkbox
-                        checked={isValueIncluded('age_range', ageRange)}
-                        fieldType="checkbox"
-                        key={`age_range_${ageRange}`}
-                        label={ageRange}
-                        name={ageRange}
-                        onChange={(e: any) => {
-                          let ageRanges = formValues.age_range || [];
-                          const selectedRange = e.target.name;
-                          if (
-                            ageRanges?.includes(ageRange) &&
-                            !e.target.checked
-                          ) {
-                            ageRanges = ageRanges?.filter(
-                              (range) => range !== ageRange
-                            );
-                          } else if (e.target.checked) {
-                            ageRanges.push(selectedRange);
-                          }
-                          setFormValues({
-                            ...formValues,
-                            age_range: ageRanges
-                          });
-                        }}
-                      />
-                    ))}
-                  </Form.Group>
-                ) : (
-                  <FormSelect
-                    name="offstage_role"
-                    label="Off-Stage Role"
-                    defaultValue={formValues?.offstage_role}
+                {!isOnStage ? (
+                  <Dropdown
+                    name="union"
+                    label="Union"
+                    options={equities}
+                    value={formValues.union}
                     onChange={setFormState}
-                    hasOptGroups={true}
-                    options={transformedOffstageRoleOptions}
+                    style={{ marginTop: 20 }}
                   />
+                ) : (
+                  <>
+                    <Form.Group
+                      className="form-group"
+                      style={{ marginTop: 30 }}
+                    >
+                      <CAGLabel>Additional Requirements</CAGLabel>
+                      {additionalRequirements.map((requirement) => (
+                        <Checkbox
+                          checked={isValueIncluded(
+                            'additional_requirements',
+                            requirement
+                          )}
+                          fieldType="checkbox"
+                          key={`additional_requirements_${requirement}`}
+                          label={requirement}
+                          name={requirement}
+                          onChange={(e: any) => {
+                            let additionalRequirements =
+                              formValues.additional_requirements || [];
+                            const selected = e.target.name;
+                            if (
+                              additionalRequirements.includes(requirement) &&
+                              !e.target.checked
+                            ) {
+                              additionalRequirements =
+                                additionalRequirements?.filter(
+                                  (range) => range !== requirement
+                                );
+                            } else if (e.target.checked) {
+                              additionalRequirements.push(selected);
+                            }
+                            setFormValues({
+                              ...formValues,
+                              additional_requirements: additionalRequirements
+                            });
+                          }}
+                        />
+                      ))}
+                    </Form.Group>
+                    <Form.Group
+                      className="form-group"
+                      style={{ marginTop: 30 }}
+                    >
+                      <CAGLabel>Gender Identity</CAGLabel>
+                      {genders.map((gender) => (
+                        <Checkbox
+                          checked={isValueIncluded('gender_identity', gender)}
+                          fieldType="checkbox"
+                          key={`gender_identity_${gender}`}
+                          label={gender}
+                          name={gender}
+                          onChange={(e: any) => {
+                            let genders = formValues.gender_identity || [];
+                            const selected = e.target.name;
+                            if (
+                              genders?.includes(gender) &&
+                              !e.target.checked
+                            ) {
+                              genders = genders?.filter(
+                                (range) => range !== gender
+                              );
+                            } else if (e.target.checked) {
+                              genders.push(selected);
+                            }
+                            setFormValues({
+                              ...formValues,
+                              gender_identity: genders
+                            });
+                          }}
+                        />
+                      ))}
+                    </Form.Group>
+                    <Form.Group
+                      className="form-group"
+                      style={{ marginTop: 20 }}
+                    >
+                      <CAGLabel>Character Age Range</CAGLabel>
+                      {ageRanges.map((ageRange) => (
+                        <Checkbox
+                          checked={isValueIncluded('age_range', ageRange)}
+                          fieldType="checkbox"
+                          key={`age_range_${ageRange}`}
+                          label={ageRange}
+                          name={ageRange}
+                          onChange={(e: any) => {
+                            let ageRanges = formValues.age_range || [];
+                            const selectedRange = e.target.name;
+                            if (
+                              ageRanges?.includes(ageRange) &&
+                              !e.target.checked
+                            ) {
+                              ageRanges = ageRanges?.filter(
+                                (range) => range !== ageRange
+                              );
+                            } else if (e.target.checked) {
+                              ageRanges.push(selectedRange);
+                            }
+                            setFormValues({
+                              ...formValues,
+                              age_range: ageRanges
+                            });
+                          }}
+                        />
+                      ))}
+                    </Form.Group>
+                    <Form.Group
+                      className="form-group"
+                      style={{ marginTop: 20 }}
+                    >
+                      <CAGLabel>Ethnicity</CAGLabel>
+                      {ethnicities.map((ethnicity) => (
+                        <Checkbox
+                          checked={isValueIncluded('ethnicity', ethnicity)}
+                          fieldType="checkbox"
+                          key={`age_range_${ethnicity}`}
+                          label={ethnicity}
+                          name={ethnicity}
+                          onChange={(e: any) => {
+                            let ethnicities = formValues.ethnicity || [];
+                            const selectedRange = e.target.name;
+                            if (
+                              ethnicities?.includes(ethnicity) &&
+                              !e.target.checked
+                            ) {
+                              ethnicities = ethnicities?.filter(
+                                (range) => range !== ethnicity
+                              );
+                            } else if (e.target.checked) {
+                              ethnicities.push(selectedRange);
+                            }
+                            setFormValues({
+                              ...formValues,
+                              ethnicity: ethnicities
+                            });
+                          }}
+                        />
+                      ))}
+                    </Form.Group>
+                  </>
                 )}
-                <Form.Group className="form-group" style={{ marginTop: 20 }}>
-                  <CAGLabel>Ethnicity</CAGLabel>
-                  {ethnicities.map((ethnicity) => (
-                    <Checkbox
-                      checked={isValueIncluded('ethnicity', ethnicity)}
-                      fieldType="checkbox"
-                      key={`age_range_${ethnicity}`}
-                      label={ethnicity}
-                      name={ethnicity}
-                      onChange={(e: any) => {
-                        let ethnicities = formValues.ethnicity || [];
-                        const selectedRange = e.target.name;
-                        if (
-                          ethnicities?.includes(ethnicity) &&
-                          !e.target.checked
-                        ) {
-                          ethnicities = ethnicities?.filter(
-                            (range) => range !== ethnicity
-                          );
-                        } else if (e.target.checked) {
-                          ethnicities.push(selectedRange);
-                        }
-                        setFormValues({
-                          ...formValues,
-                          ethnicity: ethnicities
-                        });
-                      }}
-                    />
-                  ))}
-                </Form.Group>
               </Col>
             </Row>
             <div className="d-flex flex-row flex-row-reverse mt-3">

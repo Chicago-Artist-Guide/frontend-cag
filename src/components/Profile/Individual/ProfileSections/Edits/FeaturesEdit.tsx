@@ -1,4 +1,5 @@
 import React from 'react';
+
 import styled from 'styled-components';
 import { colors } from '../../../../../theme/styleVars';
 import { Container, Form } from 'react-bootstrap';
@@ -11,6 +12,7 @@ const FeaturesEdit: React.FC<{
   onCreditFieldChange: any;
   removeCreditBlock: (e: any, i: number) => void;
 }> = ({ features, onCreditFieldChange, removeCreditBlock }) => {
+
   return (
     <Container>
       {features.map((credit: any, i: number) => (

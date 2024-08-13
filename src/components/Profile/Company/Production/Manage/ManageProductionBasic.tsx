@@ -5,6 +5,7 @@ import { FormInput, FormRadio, FormTextArea } from '../../../Form/Inputs';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Production } from '../../types';
 import ProductionPhoto from '../ProductionPhoto';
+import ImageUpload from '../../../../shared/ImageUpload';
 
 const types = ['Musical', 'Play', 'Other'];
 const equity = ['Union', 'Non-Union'];
@@ -19,13 +20,24 @@ const ManageProductionBasic: React.FC<{
     setShowOtherType(formValues.type === 'Other');
   }, [formValues.type]);
 
+  const setProfilePicture = (url: string) => {
+    const target = {
+      name: 'production_image_url',
+      value: url
+    };
+    setFormValues({ target });
+  };
+
   return (
     <>
       <LeftCol lg={4}>
-        <ProductionPhoto
-          src={formValues?.production_image_url}
-          name="production_image_url"
-          onChange={setFormValues}
+        <ImageUpload
+          onSave={(production_image_url: string) =>
+            setProfilePicture(production_image_url)
+          }
+          currentImgUrl={formValues?.production_image_url}
+          modal={false}
+          type={'Poster'}
         />
       </LeftCol>
       <RightCol lg={{ span: 7, offset: 1 }}>

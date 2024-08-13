@@ -88,12 +88,9 @@ export const neighborhoods = [
 ];
 
 export const productionStatuses: ProductionStatus[] = [
-  'Pre-Production',
-  'Casting',
-  'Casting Complete',
-  'Rehearsal',
-  'Now Playing',
-  'Complete'
+  'Hiring',
+  'In Production',
+  'Show Complete'
 ];
 export const productionEquities: ProductionEquity[] = ['Union', 'Non-Union'];
 export const productionTypes: ProductionType[] = ['Musical', 'Play', 'Other'];
