@@ -5,6 +5,7 @@ import PageContainer from '../components/layout/PageContainer';
 import { MessageProvider } from '../context/MessageContext';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { Title } from '../components/layout/Titles';
+import MessagesContainer from '../components/Messages/MessagesContainer';
 
 const Messages = () => {
   const { firebaseFirestore } = useFirebaseContext();
@@ -15,6 +16,7 @@ const Messages = () => {
         <Row>
           <Col lg={12}>
             <Title>Messages</Title>
+            <MessagesContainer />
           </Col>
         </Row>
       </PageContainer>
