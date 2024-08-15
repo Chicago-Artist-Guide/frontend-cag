@@ -7,7 +7,15 @@ import path from 'path';
 export default defineConfig({
   // depending on your application, base can also be "/"
   base: '',
-  plugins: [react(), viteTsconfigPaths(), svgr()],
+  plugins: [
+    react(),
+    viteTsconfigPaths(),
+    svgr({
+      svgrOptions: {
+        icon: true
+      }
+    })
+  ],
   define: {
     'process.env': {},
     // Add empty default values for your env vars

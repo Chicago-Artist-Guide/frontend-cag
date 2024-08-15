@@ -1,14 +1,12 @@
-import React, { FunctionComponent, SVGProps } from 'react';
+import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuthValue } from '../../context/AuthContext';
 import { useProfileContext } from '../../context/ProfileContext';
-import Logo from '../../images/cagLogo1.svg?react';
+import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
-
-const TypedCagLogo: FunctionComponent<SVGProps<SVGSVGElement>> = Logo;
 
 const Header = () => {
   const { currentUser } = useAuthValue();
@@ -19,7 +17,8 @@ const Header = () => {
   return (
     <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">
       <Navbar.Brand href="/">
-        <TypedCagLogo height="60px" width="70px" />
+        <img src={Logo} alt="CAG Logo" height="60" width="70" />
+        {/* <TypedCagLogo height="60px" width="70px" /> */}
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
