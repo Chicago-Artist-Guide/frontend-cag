@@ -8,7 +8,6 @@ export const MatchesList = () => {
 
   return (
     <div>
-      <h2>{filters.type === 'individual' ? 'Talent' : 'Role'} Results</h2>
       {filters.type === 'individual' ? (
         <TalentMatchList />
       ) : (

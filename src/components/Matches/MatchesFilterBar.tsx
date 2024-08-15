@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useMatches } from '../../context/MatchContext';
-import Dropdown from '../../genericComponents/Dropdown';
+import { MatchingFilters } from '../../components/Matches/types';
 import { Role } from '../../components/Profile/Company/types';
 import { skillCheckboxes } from '../../components/SignUp/Individual/types';
-import { MatchingFilters } from '../../components/Matches/types';
+import { useMatches } from '../../context/MatchContext';
+import Dropdown from '../../genericComponents/Dropdown';
 
 export const MatchesFilterBar = () => {
   const { currentRoleId, filters, updateFilters, roles, setCurrentRoleId } =
@@ -87,14 +87,16 @@ export const MatchesFilterBar = () => {
   };
 
   return (
-    <div>
-      <h2>Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}</h2>
+    <div className="bg-white p-4 max-w-md">
+      <h2 className="font-open-sans font-bold text-2xl tracking-[0.5px]">
+        Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}
+      </h2>
       {roles?.length && (
         <>
           {roleOptions?.length && (
             <Dropdown
               name="roleId"
-              label="Select Role"
+              label="Role Name"
               options={roleOptions}
               value={currentRoleId}
               onChange={(e) =>
@@ -102,21 +104,46 @@ export const MatchesFilterBar = () => {
               }
             />
           )}
+
           {currentRole && (
-            <>
-              Role Status <strong>{currentRole.role_status}</strong>
-              <br />
-              Ethnicity <strong>{currentRole.ethnicity?.join(', ')}</strong>
-              <br />
-              Age Range <strong>{currentRole.age_range?.join('; ')}</strong>
-              <br />
-              Gender <strong>{currentRole.gender_identity?.join(', ')}</strong>
-              <br />
-              LGBTQ+{' '}
-              <strong>{currentRole.additional_requirements?.join(', ')}</strong>
-            </>
+            <div className="grid grid-cols-3 gap-3 pt-3 font-normal text-md tracking-[0.5px] font-open-sans text-dark">
+              Role Status
+              <span className="font-bold col-span-2">
+                {currentRole.role_status}
+              </span>
+              {currentRole.ethnicity && (
+                <>
+                  Ethnicity
+                  <span className="font-bold col-span-2">
+                    {currentRole.ethnicity?.join(', ')}
+                  </span>
+                </>
+              )}
+              {currentRole.age_range && (
+                <>
+                  Age Range
+                  <span className="font-bold col-span-2">
+                    {currentRole.age_range?.join('; ')}
+                  </span>
+                </>
+              )}
+              {currentRole.age_range && (
+                <>
+                  Gender
+                  <span className="font-bold col-span-2">
+                    {currentRole.gender_identity?.join(', ')}
+                  </span>
+                </>
+              )}
+              <span className="col-span-3">LGBTQ+</span>
+              {currentRole.additional_requirements && (
+                <span className="font-bold col-span-3">
+                  {currentRole.additional_requirements?.join(', ')}
+                </span>
+              )}
+            </div>
           )}
-          <hr />
+
           <Dropdown
             name="unionStatus"
             label="Union Status"
