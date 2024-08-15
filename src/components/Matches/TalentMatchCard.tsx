@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { createTheaterTalentMatch } from '../../utils/firebaseUtils';
+import { createTheaterTalentMatch } from './api';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 
 type TalentMatchCardProps = {
@@ -9,6 +9,7 @@ type TalentMatchCardProps = {
   productionId: string;
   roleId: string;
   matchStatus: boolean | null;
+  fetchFullNames: () => void;
 };
 
 export const TalentMatchCard = ({
@@ -16,7 +17,8 @@ export const TalentMatchCard = ({
   fullName,
   productionId,
   roleId,
-  matchStatus
+  matchStatus,
+  fetchFullNames
 }: TalentMatchCardProps) => {
   const { firebaseFirestore } = useFirebaseContext();
 
@@ -30,6 +32,9 @@ export const TalentMatchCard = ({
       talentAccountId,
       status
     );
+
+    // refetch match statuses
+    await fetchFullNames();
   };
 
   return (

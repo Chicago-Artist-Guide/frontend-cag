@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useMatches } from '../../context/MatchContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { getMatchName, getTheaterTalentMatch } from '../../utils/firebaseUtils';
+import { getNameForAccount } from '../../components/Profile/shared/api';
+import { getTheaterTalentMatch } from './api';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { TalentMatchCard } from './TalentMatchCard';
 
@@ -17,26 +18,29 @@ export const TalentMatchList = () => {
   const [cardsLoading, setCardsLoading] = useState(true);
 
   // TODO: check if an existing match status exists in theater_talent_matches
+  const fetchFullNames = async () => {
+    const profilesWithNames = await Promise.all(
+      matches.map(async (m) => {
+        const fullName = await getNameForAccount(
+          firebaseFirestore,
+          m.account_id
+        );
+        const findMatch = await getTheaterTalentMatch(
+          firebaseFirestore,
+          production?.production_id || '',
+          currentRoleId || '',
+          m.account_id
+        );
+        const matchStatus = findMatch ? findMatch.status : null;
+        return { ...m, fullName, matchStatus };
+      })
+    );
+
+    setProfiles(profilesWithNames);
+    setCardsLoading(false);
+  };
+
   useEffect(() => {
-    const fetchFullNames = async () => {
-      const profilesWithNames = await Promise.all(
-        matches.map(async (m) => {
-          const fullName = await getMatchName(firebaseFirestore, m.account_id);
-          const findMatch = await getTheaterTalentMatch(
-            firebaseFirestore,
-            production?.production_id || '',
-            currentRoleId || '',
-            m.account_id
-          );
-          const matchStatus = findMatch ? findMatch.status : null;
-          return { ...m, fullName, matchStatus };
-        })
-      );
-
-      setProfiles(profilesWithNames);
-      setCardsLoading(false);
-    };
-
     fetchFullNames();
   }, [firebaseFirestore, matches]);
 
@@ -61,6 +65,7 @@ export const TalentMatchList = () => {
                     profile={restProfile}
                     productionId={production?.production_id || ''}
                     roleId={currentRoleId || ''}
+                    fetchFullNames={fetchFullNames}
                   />
                 );
               })}

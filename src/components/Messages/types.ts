@@ -14,7 +14,20 @@ export interface MessageType {
   status: string;
 }
 
+export interface LastMessage {
+  content: string;
+  message_id: string;
+  timestamp: Date;
+}
+
 export interface MessageThread {
-  role_id: string;
+  id: string;
+  created_at: Date;
+  last_message: LastMessage;
+  talent_account_id: string;
+  talent_status: string;
+  theater_account_id: string;
+  theater_status: string;
+  updated_at: Date;
   messages: MessageType[];
 }

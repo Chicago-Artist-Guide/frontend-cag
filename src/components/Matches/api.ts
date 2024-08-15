@@ -5,54 +5,17 @@ import {
   where,
   getDocs,
   QueryDocumentSnapshot,
-  orderBy,
   doc,
   getDoc,
   addDoc,
   Query,
   QuerySnapshot
 } from 'firebase/firestore';
-import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
+import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
   MatchingFilters
-} from '../components/Matches/types';
-import { MessageFilters, MessageType } from '../components/Messages/types';
-import { Production } from '../components/Profile/Company/types';
-import { IndividualAccountInit } from '../components/SignUp/Individual/types';
-
-export const getProduction = async (
-  firebaseStore: Firestore,
-  productionId: string
-) => {
-  const docRef = doc(firebaseStore, 'productions', productionId);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const data = docSnap.data() as Production;
-    return data;
-  } else {
-    return false;
-  }
-};
-
-export const getMatchName = async (
-  firebaseStore: Firestore,
-  accountId: string
-) => {
-  const docRef = doc(firebaseStore, 'accounts', accountId);
-  const docSnap = await getDoc(docRef);
-
-  if (docSnap.exists()) {
-    const data = docSnap.data() as IndividualAccountInit;
-    const { first_name, last_name } = data;
-    return first_name && last_name
-      ? `${data.first_name} ${data.last_name}`
-      : `User ${accountId}`;
-  } else {
-    return '';
-  }
-};
+} from './types';
 
 export const getTheaterTalentMatch = async (
   firebaseStore: Firestore,
@@ -210,55 +173,3 @@ export async function fetchTalentWithFilters(
 
   return matches;
 }
-
-export const fetchMessagesByAccountAndRole = async (
-  firebaseStore: Firestore,
-  filters: MessageFilters
-) => {
-  const messagesCollection = collection(firebaseStore, 'messages');
-  let q;
-
-  if (filters.roleId && filters.accountId) {
-    q = query(
-      messagesCollection,
-      where('role_id', '==', filters.roleId),
-      where('from_id', '==', filters.accountId),
-      orderBy('timestamp', 'desc')
-    );
-  } else if (filters.accountId) {
-    q = query(
-      messagesCollection,
-      where('from_id', '==', filters.accountId),
-      orderBy('timestamp', 'desc')
-    );
-  } else {
-    throw new Error('Invalid filter combination');
-  }
-
-  const querySnapshot = await getDocs(q);
-
-  return querySnapshot.docs.map(
-    (doc) => ({ id: doc.id, ...doc.data() } as MessageType)
-  );
-};
-
-export const fetchSingleThread = async (
-  firebaseStore: Firestore,
-  roleId: string,
-  fromId: string,
-  toId: string
-) => {
-  const messagesCollection = collection(firebaseStore, 'messages');
-  const q = query(
-    messagesCollection,
-    where('role_id', '==', roleId),
-    where('from_id', '==', fromId),
-    where('to_id', '==', toId),
-    orderBy('timestamp', 'desc')
-  );
-  const querySnapshot = await getDocs(q);
-
-  return querySnapshot.docs.map(
-    (doc) => ({ id: doc.id, ...doc.data() } as MessageType)
-  );
-};
