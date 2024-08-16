@@ -1,21 +1,19 @@
 import React from 'react';
 import Container from 'react-bootstrap/Container';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
 import { MatchesFilterBar } from './MatchesFilterBar';
 import { MatchesList } from './MatchesList';
 
 export const MatchesPageContainer = () => {
   return (
     <Container>
-      <Row>
-        <Col lg={4}>
+      <div className="flex gap-12 -mx-[15px] pt-3">
+        <div className="flex-none">
           <MatchesFilterBar />
-        </Col>
-        <Col lg={8}>
+        </div>
+        <div className="flex-1">
           <MatchesList />
-        </Col>
-      </Row>
+        </div>
+      </div>
     </Container>
   );
 };

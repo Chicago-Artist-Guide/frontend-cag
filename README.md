@@ -15,23 +15,23 @@ Before you run this app, make sure you're using Node Version Manager (NVM) and a
 **Environment Variables:**
 
 ```
-REACT_APP_FIREBASE_API_KEY
-REACT_APP_FIREBASE_PROJECT_ID
-REACT_APP_FIREBASE_SENDER_ID
-REACT_APP_FIREBASE_APP_ID
-REACT_APP_FIREBASE_MID
-REACT_APP_LGL_API_KEY
+VITE_APP_FIREBASE_API_KEY
+VITE_APP_FIREBASE_PROJECT_ID
+VITE_APP_FIREBASE_SENDER_ID
+VITE_APP_FIREBASE_APP_ID
+VITE_APP_FIREBASE_MID
+VITE_APP_LGL_API_KEY
 ```
 
 ### Pull Requests (PRs)
 
-We have standard guidelines for contributing code to the project. 
+We have standard guidelines for contributing code to the project.
 
 1. Fork the repo to your own GitHub. You should now have a repo in your account called `<your-username>/frontend-cag`.
 2. Clone that repo locally to your machine: `git clone git@github.com:<your-username>/frontend-cag.git` and then `cd frontend-cag`
 3. Add the org's repo as `upstream`: `git remote add upstream git@github.com:Chicago-Artist-Guide/frontend-cag.git`
 4. Create a branch off of `master` named after your JIRA ticket. For example, let's say you have JIRA ticket #125, you'd do: `git pull upstream master` on master, and then `git checkout -b dev125`
-5. Contribute changes as commits to your local branch `dev125`. For new files, `git add .`, and then to add commit messages: `git commit -am "<your commit message here>"`. Your commit messages don't matter too much here because we're going to Squash and Merge later, anyway. 
+5. Contribute changes as commits to your local branch `dev125`. For new files, `git add .`, and then to add commit messages: `git commit -am "<your commit message here>"`. Your commit messages don't matter too much here because we're going to Squash and Merge later, anyway.
 6. When you're ready to PR your changes, push: `git push origin dev125`
 6. Go to the Chicago-Artist-Guide/frontend-cag repo in GitHub and a message should pop up recognizing your new branch. Click on `Compare & Pull Request`
 7. Pull Requests must have:
@@ -49,4 +49,3 @@ PR tips:
 5. Please remind tech leads and team members in Slack if you need reviews and haven't received any
 
 **Warning:** commits to master trigger a push and build on production in AWS. Do not merge if you have any concerns about the branch breaking something. In some cases, we may work off of specific feature branches as an extra layer of protection, so please pay attention in those situations to use the feature branches instead of master.
-
