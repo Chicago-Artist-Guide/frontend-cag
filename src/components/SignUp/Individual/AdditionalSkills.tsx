@@ -181,7 +181,7 @@ const CAGInput = styled.div`
     background-color: unset;
     font-size: 40px;
     cursor: pointer;
-    color: ${colors.darkGreen};
+    color: ${colors.mint};
   }
 `;
 
@@ -204,7 +204,7 @@ const CAGTag = styled.div`
     padding-right: 10px;
     padding-top: 0px;
     padding-bottom: 0px;
-    border: 1.5px solid ${colors.darkGreen};
+    border: 1.5px solid ${colors.mint};
     border-radius: 20px;
     background-color: white;
     white-space: nowrap;

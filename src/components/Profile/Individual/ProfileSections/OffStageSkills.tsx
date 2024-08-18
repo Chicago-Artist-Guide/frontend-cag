@@ -108,7 +108,7 @@ const Bold = styled.p`
 
 const SkillBadge = styled.div`
   color: ${colors.white};
-  background-color: ${colors.darkGreen};
+  background-color: ${colors.mint};
   padding: 5px 15px 5px;
   text-align: center;
   border-radius: 20px;

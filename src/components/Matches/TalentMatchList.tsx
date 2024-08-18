@@ -1,15 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { useMatches } from '../../context/MatchContext';
-import { useFirebaseContext } from '../../context/FirebaseContext';
 import { getNameForAccount } from '../../components/Profile/shared/api';
+import { useFirebaseContext } from '../../context/FirebaseContext';
+import { useMatches } from '../../context/MatchContext';
 import { getTheaterTalentMatch } from './api';
-import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
-import { TalentMatchCard } from './TalentMatchCard';
-
-type ProfileAndName = IndividualProfileDataFullInit & {
-  fullName: string;
-  matchStatus: boolean | null;
-};
+import { ProfileAndName, TalentMatchCard } from './TalentMatchCard';
 
 export const TalentMatchList = () => {
   const { firebaseFirestore } = useFirebaseContext();
@@ -31,8 +25,11 @@ export const TalentMatchList = () => {
           currentRoleId || '',
           m.account_id
         );
-        const matchStatus = findMatch ? findMatch.status : null;
-        return { ...m, fullName, matchStatus };
+        return {
+          ...m,
+          fullName,
+          matchStatus: findMatch ? findMatch.status : null
+        };
       })
     );
 
@@ -44,35 +41,20 @@ export const TalentMatchList = () => {
     fetchFullNames();
   }, [firebaseFirestore, matches]);
 
-  return (
-    <div>
-      {loading || cardsLoading ? (
-        <p>Loading...</p>
-      ) : (
-        <>
-          {!profiles.length ? (
-            <p>No matches found</p>
-          ) : (
-            <>
-              {profiles.map((profile: ProfileAndName) => {
-                const { fullName, matchStatus, ...restProfile } = profile;
+  if (loading || cardsLoading) return <p>Loading...</p>;
+  if (!profiles.length) return <p>No matches found</p>;
 
-                return (
-                  <TalentMatchCard
-                    key={`${profile.uid}-TalentMatchCard`}
-                    fullName={fullName}
-                    matchStatus={matchStatus}
-                    profile={restProfile}
-                    productionId={production?.production_id || ''}
-                    roleId={currentRoleId || ''}
-                    fetchFullNames={fetchFullNames}
-                  />
-                );
-              })}
-            </>
-          )}
-        </>
-      )}
+  return (
+    <div className="flex flex-col gap-6">
+      {profiles.map((profile) => (
+        <TalentMatchCard
+          key={`${profile.uid}-TalentMatchCard`}
+          profile={profile}
+          productionId={production?.production_id || ''}
+          roleId={currentRoleId || ''}
+          fetchFullNames={fetchFullNames}
+        />
+      ))}
     </div>
   );
 };

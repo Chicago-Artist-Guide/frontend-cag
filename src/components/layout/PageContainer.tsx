@@ -1,14 +1,13 @@
+import clsx from 'clsx';
 import React from 'react';
-import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
 
 const PageContainer: React.FC<{ className?: string }> = ({
   children,
   className
-}) => <StyledContainer className={className}>{children}</StyledContainer>;
-
-const StyledContainer = styled(Container)`
-  margin-top: calc(3% + 130px);
-`;
+}) => (
+  <div className={clsx('container mx-auto mt-32 px-4 py-8', className)}>
+    {children}
+  </div>
+);
 
 export default PageContainer;

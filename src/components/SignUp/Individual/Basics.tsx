@@ -219,7 +219,7 @@ const LoginLink = styled.p`
   margin-top: 40px;
 
   a {
-    color: ${colors.orange};
+    color: ${colors.salmon};
   }
 `;
 

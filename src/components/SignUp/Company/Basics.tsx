@@ -97,7 +97,7 @@ const LoginLink = styled.p`
   margin-left: 4px;
   font-family: ${fonts.lora};
   a {
-    color: ${colors.orange};
+    color: ${colors.salmon};
   }
 `;
 

@@ -121,7 +121,7 @@ const LoginLink = styled.p`
   margin-bottom: -40px;
 
   a {
-    color: ${colors.orange};
+    color: ${colors.salmon};
   }
 `;
 

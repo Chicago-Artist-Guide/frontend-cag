@@ -100,7 +100,7 @@ const AccordionSection = styled.div`
   }
 
   .section-text:hover {
-    color: ${colors.darkGreen};
+    color: ${colors.mint};
   }
 
   button: focus {
@@ -125,7 +125,7 @@ const AccordionSection = styled.div`
 
 const HrLine = styled.hr`
   border-width: 2px;
-  border-color: ${colors.orange};
+  border-color: ${colors.salmon};
   padding: 0;
   width: 100%;
 `;

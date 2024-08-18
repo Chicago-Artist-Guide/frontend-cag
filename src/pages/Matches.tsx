@@ -1,12 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { MatchProvider } from '../context/MatchContext';
-import PageContainer from '../components/layout/PageContainer';
 import { Title } from '../components/layout/Titles';
 import { MatchesPageContainer } from '../components/Matches/MatchesPageContainer';
+import { PageContainer } from '../components/layout';
 
 const Matches = () => {
   const { firebaseFirestore } = useFirebaseContext();
@@ -19,12 +17,12 @@ const Matches = () => {
       firestore={firebaseFirestore}
     >
       <PageContainer>
-        <Row>
-          <Col lg={12}>
+        <div className="-mx-4 flex flex-wrap">
+          <div className="w-full px-4">
             <Title>Matches</Title>
             <MatchesPageContainer />
-          </Col>
-        </Row>
+          </div>
+        </div>
       </PageContainer>
     </MatchProvider>
   );

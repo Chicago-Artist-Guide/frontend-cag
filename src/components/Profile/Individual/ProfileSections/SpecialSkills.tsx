@@ -21,7 +21,7 @@ const SpecialSkills: React.FC<{
 
 const SkillBadge = styled.div`
   color: ${colors.white};
-  background-color: ${colors.orange};
+  background-color: ${colors.salmon};
   padding: 5px 15px 5px;
   text-align: center;
   border-radius: 20px;

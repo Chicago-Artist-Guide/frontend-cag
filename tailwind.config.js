@@ -26,21 +26,18 @@ export default {
         butter: '#E9C268',
         cornflower: '#4C7180',
         dark: '#3B4448',
-        darkGreen: '#82B29A',
         darkGrey: '#2F4550',
         darkGreyBlue: '#355669',
         darkPrimary: '#425B4E',
         gray: '#4d5055',
         grayishBlue: '#8A8A8A',
-        grayishLightGreen: '#b8d8c7',
         italicColor: '#537C8C',
         lighterGrey: '#C4C4C4',
         lightestGrey: '#EFEFEF',
         lightGrey: '#D1D1D1',
-        lightPink: '#f7beb2',
+        blush: '#F7BeB2',
         mainFont: '#0C2028',
-        mint: '#3EB489',
-        orange: '#E17B60',
+        mint: '#82B29A',
         paginationGray: '#D4D6DF',
         peach: '#F5AF19',
         primary: '#82B29A',
@@ -51,7 +48,8 @@ export default {
         veryDarkGrayBlue: '#4D5055',
         white: '#ffffff',
         white80a: 'rgba(255, 255, 255, 0.8)',
-        yellow: '#EFC93D'
+        yellow: '#EFC93D',
+        yoda: '#B8D8C7'
       }
     }
   },

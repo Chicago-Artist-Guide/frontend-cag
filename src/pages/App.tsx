@@ -61,7 +61,6 @@ const CAG = () => {
       <ScrollToTop />
       <GlobalStyle />
       <Header />
-      {/* <EventAlert /> */}
       <Switch>
         <Route
           exact
@@ -75,7 +74,6 @@ const CAG = () => {
         <Route component={PrivacyPolicy} exact path="/privacy-policy" />
         <Route component={WhoWeAre} exact path="/about-us" />
         <Route component={TheaterResources} exact path="/theater-resources" />
-        {/* <Route component={EventPage} exact path="/night-at-the-cag-baret" /> */}
         <Route component={Login} exact path="/login" />
         <Route component={Logout} exact path="/logout" />
         <Route component={ForgotPassword} exact path="/forgot-password" />

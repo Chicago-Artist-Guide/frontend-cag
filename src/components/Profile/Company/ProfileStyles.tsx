@@ -36,7 +36,7 @@ export const DetailsColTitle = styled.h2`
     background: linear-gradient(
       90deg,
       ${colors.yellow} 0%,
-      ${colors.darkGreen} 100%
+      ${colors.mint} 100%
     );
     border-radius: 4px;
   }

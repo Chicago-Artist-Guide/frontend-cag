@@ -5,7 +5,7 @@ export const PreviewCard = styled.div`
   height: auto;
   display: block;
   padding: 26px 12% 26px 32px;
-  background: ${colors.lightPink};
+  background: ${colors.blush};
   border-radius: 8px;
   margin-bottom: 45px;
 

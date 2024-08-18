@@ -19,7 +19,7 @@ const CAGLabel = styled(Badge)`
   font-weight: lighter;
   padding: 8px 10px;
   text-transform: uppercase;
-  background-color: ${colors.grayishLightGreen};
+  background-color: ${colors.yoda};
 `;
 
 export default PrivateLabel;
