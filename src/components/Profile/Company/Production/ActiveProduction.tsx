@@ -8,13 +8,17 @@ import { Production } from '../types';
 
 const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
   const navigate = useNavigate();
+  const roles = show?.roles ?? [];
+  const hasRoles = roles?.length > 0;
 
   const manageProduction = () => {
     navigate(`/production/${show.production_id}/manage`);
   };
 
   const viewMatches = () => {
-    navigate(`/profile/search/talent/${show.production_id}`);
+    navigate(
+      `/profile/search/talent/${show.production_id}/${roles[0].role_id}`
+    );
   };
 
   return (
@@ -41,6 +45,7 @@ const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
                 variant="primary"
               />
               <ShowButton
+                disabled={!hasRoles}
                 onClick={viewMatches}
                 text="View Matches"
                 type="button"
