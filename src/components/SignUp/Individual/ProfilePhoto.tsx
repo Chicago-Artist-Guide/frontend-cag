@@ -1,20 +1,20 @@
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
-import { SetForm } from 'react-hooks-helper';
 import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useEffect, useState } from 'react';
+import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
+import Form from 'react-bootstrap/Form';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
+import { SetForm } from 'react-hooks-helper';
+import styled from 'styled-components';
+import Button from '../../../components/shared/Button';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
-import Button from '../../../genericComponents/Button';
-import { Tagline, Title } from '../../layout/Titles';
-import { colors } from '../../../theme/styleVars';
+import { useUserContext } from '../../../context/UserContext';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { colors } from '../../../theme/styleVars';
+import { Tagline, Title } from '../../layout/Titles';
 import type { IndividualData } from './types';
 
 const ProfilePhoto: React.FC<{
@@ -25,7 +25,7 @@ const ProfilePhoto: React.FC<{
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
-  } = useProfileContext();
+  } = useUserContext();
   const [file, setFile] = useState<File | null>(null);
   const [percent, setPercent] = useState(0);
   const [imgUrl, setImgUrl] = useState<string | null>(null);

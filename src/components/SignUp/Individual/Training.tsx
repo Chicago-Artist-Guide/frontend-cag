@@ -5,10 +5,9 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
-import { Tagline, Title } from '../../layout/Titles';
-import InputField from '../../../genericComponents/Input';
+import InputField from '../../../components/shared/Input';
 import { colors } from '../../../theme/styleVars';
-import { CAGFormSelect } from '../SignUpStyles';
+import { Tagline, Title } from '../../layout/Titles';
 import type { USStateSymbol } from '../types';
 import type { IndividualProfile2Data, TrainingInstitution } from './types';
 
@@ -140,17 +139,6 @@ const TrainingRow = styled(Row)`
   &:not(:first-child) {
     border-top: 1px solid ${colors.lightGrey};
   }
-`;
-
-const PaddedCol = styled(Col)`
-  padding-left: 0;
-`;
-
-const SmallTitle = styled.h3`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-  color: ${colors.dark};
 `;
 
 const DeleteRowLink = styled.a`

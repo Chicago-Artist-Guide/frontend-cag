@@ -1,15 +1,15 @@
 import clsx from 'clsx';
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Container, Image } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Group from '../../images/icons-signup/group.svg';
 import Individual from '../../images/icons-signup/individual.svg';
 import { colors, fonts } from '../../theme/styleVars';
 import { Tagline, Title } from '../layout';
-import { CardHeading, StyledCard, CardText } from './SignUpStyles';
+import { CardHeading, CardText, StyledCard } from './SignUpStyles';
 import type { AccountTypeOptions } from './types';
 
 type Card = {

@@ -2,7 +2,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import styled from 'styled-components';
-import { fonts, colors } from '../../../../../theme/styleVars';
+import { colors, fonts } from '../../../../../theme/styleVars';
 
 const RoleSection: React.FC<{
   title: string;

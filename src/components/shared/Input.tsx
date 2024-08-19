@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { FormProps } from 'react-bootstrap';
 import {
+  ErrorMessage,
+  requiredFieldMessage,
+  validateRegex,
+  validationRegex
+} from '../../utils/validation';
+import {
   CAGError,
   CAGFormControl,
   CAGFormGroup,
   CAGHelperText,
   CAGLabel
-} from '../components/SignUp/SignUpStyles';
-import {
-  ErrorMessage,
-  requiredFieldMessage,
-  validateRegex,
-  validationRegex
-} from '../utils/validation';
+} from '../SignUp/SignUpStyles';
 
 /*
 

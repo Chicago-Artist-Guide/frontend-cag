@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import InputField from '../../../genericComponents/Input';
+import InputField from '../../../components/shared/Input';
 import { colors, fonts } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
 import SignUpBody from '../shared/Body';

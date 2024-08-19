@@ -6,7 +6,7 @@ import React, {
   useState,
   ReactNode
 } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { fetchTalentWithFilters } from '../components/Matches/api';
 import { getProduction } from '../components/Profile/Company/api';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
@@ -61,7 +61,7 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
   roleIdParam,
   children
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
   const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
@@ -158,7 +158,7 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
     setFoundRole('found');
     updateFiltersFromRole(findRole);
-    history.push(`/profile/search/talent/${productionId}/${currentRoleId}`);
+    navigate(`/profile/search/talent/${productionId}/${currentRoleId}`);
   }, [currentRoleId]);
 
   // get matches

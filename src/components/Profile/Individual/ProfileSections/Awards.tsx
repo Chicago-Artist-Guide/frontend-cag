@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { colors } from '../../../../theme/styleVars';
-import { Container } from 'styled-bootstrap-grid';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import React from 'react';
+import { Container } from 'styled-bootstrap-grid';
+import styled from 'styled-components';
 
 const Awards: React.FC<{
   awards: any;

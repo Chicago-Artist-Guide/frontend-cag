@@ -1,10 +1,9 @@
 import React from 'react';
-import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Nav from 'react-bootstrap/Nav';
+import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
-import { breakpoints, colors } from '../theme/styleVars';
+import styled from 'styled-components';
 import EmailList from '../components/Home/EmailList';
 import {
   BlobBox,
@@ -15,6 +14,7 @@ import {
   Title
 } from '../components/layout';
 import { greenBlob, redBlob, yellowBlob1, yellowBlob2 } from '../images';
+import { breakpoints, colors } from '../theme/styleVars';
 
 const Home = () => {
   const blobs = [

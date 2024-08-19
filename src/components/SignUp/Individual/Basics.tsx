@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import { Form } from 'react-bootstrap';
 import Alert from 'react-bootstrap/Alert';
+import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import { Form } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
-import { SubmitBasicsResp } from './SignUpFooter';
-import { Title } from '../../layout/Titles';
-import InputField from '../../../genericComponents/Input';
-import Checkbox from '../../../genericComponents/Checkbox';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import Checkbox from '../../../components/shared/Checkbox';
+import InputField from '../../../components/shared/Input';
+import Red_Blob from '../../../images/red_blob.svg';
 import { colors } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
+import { Title } from '../../layout/Titles';
+import { SubmitBasicsResp } from './SignUpFooter';
 import type { IndividualData } from './types';
-import Red_Blob from '../../../images/red_blob.svg';
 
 const IndividualBasics: React.FC<{
   setForm: SetForm;

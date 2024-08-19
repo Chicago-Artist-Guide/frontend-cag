@@ -1,28 +1,28 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import CompanyProfile from '../components/Profile/Company';
 import IndividualProfile from '../components/Profile/Individual';
-import { useProfileContext } from '../context/ProfileContext';
+import { useUserContext } from '../context/UserContext';
 
 const Profile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const auth = getAuth();
   const {
     account: { ref: accountRef, data: account },
     setAccountData,
     profile: { ref: profileRef },
     setProfileData
-  } = useProfileContext();
+  } = useUserContext();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        history.push('/login');
+        navigate('/login');
       }
     });
 

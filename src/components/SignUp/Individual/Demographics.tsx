@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import styled from 'styled-components';
-import Image from 'react-bootstrap/Image';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
-import { Title } from '../../layout/Titles';
-import { Tagline, TitleThree } from '../../layout/Titles';
+import styled from 'styled-components';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../../theme/styleVars';
+import { Tagline, Title, TitleThree } from '../../layout/Titles';
 import {
-  websiteTypeOptions,
   IndividualData,
   IndividualWebsite,
+  websiteTypeOptions,
   WebsiteTypes
 } from './types';
 
@@ -142,7 +141,7 @@ const Demographics: React.FC<{
               <Container>
                 <Row>
                   <PaddedCol lg="10">
-                    {demographicsWebsites?.map((websiteRow: any, i: any) => (
+                    {demographicsWebsites?.map((websiteRow: any) => (
                       <WebsiteRow key={`website-row-${websiteRow.id}`}>
                         <CAGFormControl
                           aria-label="URL"

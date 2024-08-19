@@ -1,4 +1,4 @@
-import type { AccountTypeOptions, USStateSymbol } from '../types';
+import type { AccountTypeOptions } from '../types';
 
 export type IndividualRoles = 'on-stage' | 'off-stage' | 'both-stage';
 

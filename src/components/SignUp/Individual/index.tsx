@@ -3,26 +3,26 @@ import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
+import { useUserContext } from '../../../context/UserContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
-import Privacy from './Privacy';
-import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
+import { Tagline, Title } from '../../layout/Titles';
+import ImageUpload from '../../shared/ImageUpload';
 import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
 import OffstageRoles from './OffstageRoles';
-import { Tagline, Title } from '../../layout/Titles';
+import Privacy from './Privacy';
 import IndividualRole from './Role';
-import ImageUpload from '../../shared/ImageUpload';
+import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
 import type {
   Gender,
   IndividualAccountInit,
-  IndividualProfileInit,
   IndividualData,
   IndividualProfile,
+  IndividualProfileInit,
   IndividualRoles,
   Pronouns,
   WebsiteTypes
@@ -93,9 +93,9 @@ const IndividualSignUp: React.FC<{
   currentStep: number;
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { profile, setAccountRef, setProfileRef } = useProfileContext();
+  const { profile, setAccountRef, setProfileRef } = useUserContext();
   const { lglApiKey } = useMarketingContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
@@ -451,7 +451,7 @@ const IndividualSignUp: React.FC<{
     return returnStep;
   };
 
-  const goToProfile = () => history.push('/profile');
+  const goToProfile = () => navigate('/profile');
 
   return (
     <PageContainer>

@@ -7,7 +7,7 @@ import {
   updateDoc,
   getDoc
 } from 'firebase/firestore';
-import { useProfileContext } from './ProfileContext';
+import { useUserContext } from './UserContext';
 import { MessageThread } from '../components/Messages/types';
 
 interface MessageContextType {
@@ -38,7 +38,7 @@ export const MessageProvider: React.FC<{
   children: React.ReactNode;
   firestore: Firestore;
 }> = ({ children, firestore }) => {
-  const { account } = useProfileContext();
+  const { account } = useUserContext();
   const [threads, setThreads] = useState<MessageThread[]>([]);
   const [currentThread, setCurrentThread] = useState<MessageThread | null>(
     null

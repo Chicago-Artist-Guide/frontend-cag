@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { colors } from '../../../../theme/styleVars';
+import React from 'react';
 import { Container } from 'styled-bootstrap-grid';
+import styled from 'styled-components';
 import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
 const Training: React.FC<{

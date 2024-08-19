@@ -1,25 +1,25 @@
 import React from 'react';
-import styled from 'styled-components';
 import Accordion from 'react-bootstrap/Accordion';
-import { fonts } from '../../../theme/styleVars';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
 import Container from 'react-bootstrap/Container';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
+import styled from 'styled-components';
+import Checkbox from '../../../components/shared/Checkbox';
+import GenericAccordion from '../../../components/shared/GenericAccordion';
+import yellow_blob_1 from '../../../images/yellow_blob_1.svg';
+import { fonts } from '../../../theme/styleVars';
 import { Tagline, Title } from '../../layout/Titles';
-import GenericAccordion from '../../../genericComponents/GenericAccordion';
-import Checkbox from '../../../genericComponents/Checkbox';
 import { offstageRolesOptions } from '../../Profile/shared/offstageRolesOptions';
 import type {
+  OffStageRoleByCategory,
   OffStageRoleCategory,
   OffStageRoleSection,
-  OffStageRoleByCategory,
-  TransformedOffStageRoleSection,
-  TransformedOffStageRoleByCategory
+  TransformedOffStageRoleByCategory,
+  TransformedOffStageRoleSection
 } from '../../Profile/shared/profile.types';
 import type { IndividualData } from './types';
-import yellow_blob_1 from '../../../images/yellow_blob_1.svg';
 
 const OffstageRoles: React.FC<{
   setForm: SetForm;

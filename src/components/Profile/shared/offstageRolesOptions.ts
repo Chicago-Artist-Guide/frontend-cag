@@ -1,4 +1,4 @@
-import { OffStageRoleCategory, OffStageRoleByCategory } from './profile.types';
+import { OffStageRoleByCategory, OffStageRoleCategory } from './profile.types';
 
 export const offstageRolesOptions: OffStageRoleByCategory = {
   general: {

@@ -1,20 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Form, FormProps } from 'react-bootstrap';
-import styled from 'styled-components';
+import React from 'react';
+import { FormProps } from 'react-bootstrap';
+import { colors } from '../../theme/styleVars';
+import { ErrorMessage, validationRegex } from '../../utils/validation';
 import {
   CAGError,
   CAGFormControl,
-  CAGHelperText,
   CAGFormGroup,
+  CAGHelperText,
   CAGLabel
-} from '../components/SignUp/SignUpStyles';
-import { colors, fonts } from '../theme/styleVars';
-import {
-  ErrorMessage,
-  requiredFieldMessage,
-  validateRegex,
-  validationRegex
-} from '../utils/validation';
+} from '../SignUp/SignUpStyles';
 
 /*
 
@@ -57,22 +51,7 @@ type Props = {
 } & Omit<FormProps, 'onChange'>;
 
 const TextArea = (props: Props) => {
-  const {
-    fieldType,
-    label,
-    name = '',
-    onChange,
-    placeholder,
-    required = false,
-    requiredLabel = '',
-    validationRegexName,
-    validationRegexMessage = '',
-    validationFuncs,
-    validationFuncMessages = [],
-    hasErrorCallback,
-    helperText,
-    value
-  } = props;
+  const { label, name = '', onChange, placeholder, helperText, value } = props;
   const hasError = false;
   const errorMessage = '';
 

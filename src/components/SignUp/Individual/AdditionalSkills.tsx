@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
-import Checkbox from '../../../genericComponents/Checkbox';
-import { Tagline, Title } from '../../layout/Titles';
+import styled from 'styled-components';
+import Checkbox from '../../../components/shared/Checkbox';
 import { colors, fonts } from '../../../theme/styleVars';
+import { Tagline, Title } from '../../layout/Titles';
 import {
-  skillCheckboxes,
   IndividualProfile2Data,
-  SkillCheckbox
+  SkillCheckbox,
+  skillCheckboxes
 } from './types';
 
 const AdditionalSkills: React.FC<{

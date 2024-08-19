@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { Container } from 'styled-bootstrap-grid';
-import { hasNonEmptyValues } from '../../../../../utils/hasNonEmptyValues';
+import styled from 'styled-components';
+import { Button, Checkbox } from '../../../../../components/shared';
 import { offstageRolesOptions } from '../../../shared/offstageRolesOptions';
-import { Checkbox, Button } from '../../../../../genericComponents';
 
 interface SelectedRolesType {
   offstage_roles_general: string[];

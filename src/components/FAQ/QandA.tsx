@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import { colors } from '../../theme/styleVars';
 
 const QandA = (props: any) => {
-  const { id, question, answer } = props;
-
   return (
     <div className="" key={props.id}>
       <Section>

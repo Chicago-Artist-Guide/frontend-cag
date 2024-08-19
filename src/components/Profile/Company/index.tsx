@@ -1,17 +1,21 @@
 import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
-import { useProfileContext } from '../../../context/ProfileContext';
-import { Button } from '../../../genericComponents';
+import { Button } from '../../../components/shared';
+import { useFirebaseContext } from '../../../context/FirebaseContext';
+import { useUserContext } from '../../../context/UserContext';
 import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import PageContainer from '../../layout/PageContainer';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
-import AddProduction from './Production/AddProduction';
 import CompanyProfileEdit from './Edit';
+import ActiveProduction from './Production/ActiveProduction';
+import AddProduction from './Production/AddProduction';
+import InactiveProduction from './Production/InactiveProduction';
 import {
   AdditionalPhotos,
   DetailsCard,
@@ -22,10 +26,6 @@ import {
   Title
 } from './ProfileStyles';
 import { Production, Profile } from './types';
-import ActiveProduction from './Production/ActiveProduction';
-import InactiveProduction from './Production/InactiveProduction';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { useFirebaseContext } from '../../../context/FirebaseContext';
 
 type Edit = 'profile' | 'add-production' | null;
 
@@ -40,7 +40,7 @@ const CompanyProfile: React.FC<{
     account: {
       data: { uid }
     }
-  } = useProfileContext();
+  } = useUserContext();
   const [editing, setEditing] = useState<Edit>(null);
   const [productions, setProductions] = useState<{
     active: Production[];
@@ -96,7 +96,7 @@ const CompanyProfile: React.FC<{
     <PageContainer>
       <Row>
         <Col lg={12}>
-          <div className="d-flex flex-row justify-content-between">
+          <div className="d-flex justify-content-between flex-row">
             <Title>YOUR PROFILE</Title>
             <Button
               onClick={() => setEditing('profile')}
@@ -112,7 +112,7 @@ const CompanyProfile: React.FC<{
         <LeftCol lg={4}>
           <ProfileImage src={profileData?.profile_image_url} fluid />
           {profileData?.additional_photos && (
-            <AdditionalPhotos className="d-flex flex-wrap justify-content-between">
+            <AdditionalPhotos className="d-flex justify-content-between flex-wrap">
               {images.map((_, index) => (
                 <AdditionalImage
                   key={index}

@@ -1,7 +1,7 @@
 import { uuidv4 } from '@firebase/util';
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { SetForm } from 'react-hooks-helper';
+import { useNavigate } from 'react-router-dom';
 import { StageRole } from '../../../shared/profile.types';
 import { Production, Role } from '../../types';
 import RoleCard from '../Roles/RoleCard';
@@ -13,7 +13,7 @@ const ManageProductionRoles: React.FC<{
   setFormValues: SetForm;
   handleUpdate: (x: Production) => void;
 }> = ({ formValues, setFormValues, handleUpdate }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [roleType, setRoleType] = useState<StageRole>('On-Stage');
   const [editRole, setEditRole] = useState<Role>();
@@ -85,9 +85,7 @@ const ManageProductionRoles: React.FC<{
   );
 
   const onViewMatches = (roleId: string) => {
-    history.push(
-      `/profile/search/talent/${formValues.production_id}/${roleId}`
-    );
+    navigate(`/profile/search/talent/${formValues.production_id}/${roleId}`);
   };
 
   return (

@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import Image from 'react-bootstrap/Image';
 import styled from 'styled-components';
-import { colors, fonts } from '../../../theme/styleVars';
 import Ribbon from '../../../images/icons-profile/ribbon.svg';
+import { colors, fonts } from '../../../theme/styleVars';
 
 const AddAwardButton: React.FC<{
   onClick?: () => void;

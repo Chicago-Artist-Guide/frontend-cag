@@ -6,7 +6,7 @@ import { Step, useForm, useStep } from 'react-hooks-helper';
 
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
-import { useProfileContext } from '../../../context/ProfileContext';
+import { useUserContext } from '../../../context/UserContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
 import CompanyBasics from './Basics';
@@ -27,7 +27,7 @@ const CompanySignUp: React.FC<{
   setCurrentStep: (x: number) => void;
 }> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { profile, setAccountRef, setProfileRef } = useProfileContext();
+  const { profile, setAccountRef, setProfileRef } = useUserContext();
   const { lglApiKey } = useMarketingContext();
   const [formValues, setFormValues] = useForm<CompanyData>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);

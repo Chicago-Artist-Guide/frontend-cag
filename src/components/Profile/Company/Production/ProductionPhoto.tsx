@@ -2,12 +2,12 @@ import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import React, { useEffect, useRef, useState } from 'react';
-import { Form, Row } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
+import Button from '../../../../components/shared/Button';
 import { useFirebaseContext } from '../../../../context/FirebaseContext';
-import { useProfileContext } from '../../../../context/ProfileContext';
-import Button from '../../../../genericComponents/Button';
+import { useUserContext } from '../../../../context/UserContext';
 import { colors, fonts } from '../../../../theme/styleVars';
 
 const ProductionPhoto: React.FC<{
@@ -18,7 +18,7 @@ const ProductionPhoto: React.FC<{
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
-  } = useProfileContext();
+  } = useUserContext();
   const [imgUrl, setImgUrl] = useState<string | null>(src || null);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
@@ -45,7 +45,7 @@ const ProductionPhoto: React.FC<{
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.then(() => {
-        getDownloadURL(uploadTask.snapshot.ref).then(url => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           setImgUrl(url);
           onChange({
             target: {

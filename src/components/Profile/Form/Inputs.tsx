@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
 import { SetForm } from 'react-hooks-helper';
 import styled, { CSSProperties } from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
-import DatePicker from 'react-datepicker';
 
 import 'react-datepicker/dist/react-datepicker.css';
 

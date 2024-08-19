@@ -1,6 +1,6 @@
-import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import styled from 'styled-components';
 import { colors, fonts } from '../../theme/styleVars';
 
 export const PageFooterRow = styled(Row)`
@@ -41,7 +41,7 @@ export const Pagination = styled.ul`
     }
 
     &:after {
-      content: "";
+      content: '';
       width: 28px;
       height: 1px;
       background-color: ${colors.italicColor};

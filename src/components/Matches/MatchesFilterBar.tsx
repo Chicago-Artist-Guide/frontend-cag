@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { MatchingFilters } from '../../components/Matches/types';
 import { Role } from '../../components/Profile/Company/types';
+import Dropdown from '../../components/shared/Dropdown';
 import { skillCheckboxes } from '../../components/SignUp/Individual/types';
 import { useMatches } from '../../context/MatchContext';
-import Dropdown from '../../genericComponents/Dropdown';
 
 export const MatchesFilterBar = () => {
   const { currentRoleId, filters, updateFilters, roles, setCurrentRoleId } =
@@ -81,14 +81,14 @@ export const MatchesFilterBar = () => {
       e.target.value === ''
         ? undefined
         : e.target.value === 'true'
-        ? true
-        : false;
+          ? true
+          : false;
     updateFilters({ matchStatus: matchStatusValue } as MatchingFilters);
   };
 
   return (
-    <div className="bg-white p-4 max-w-md">
-      <h2 className="font-open-sans font-bold text-2xl tracking-[0.5px]">
+    <div className="max-w-md bg-white p-4">
+      <h2 className="font-open-sans text-2xl font-bold tracking-[0.5px]">
         Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}
       </h2>
       {roles?.length && (
@@ -106,15 +106,15 @@ export const MatchesFilterBar = () => {
           )}
 
           {currentRole && (
-            <div className="grid grid-cols-3 gap-3 pt-3 font-normal text-md tracking-[0.5px] font-open-sans text-dark">
+            <div className="text-md grid grid-cols-3 gap-3 pt-3 font-open-sans font-normal tracking-[0.5px] text-dark">
               Role Status
-              <span className="font-bold col-span-2">
+              <span className="col-span-2 font-bold">
                 {currentRole.role_status}
               </span>
               {currentRole.ethnicity && (
                 <>
                   Ethnicity
-                  <span className="font-bold col-span-2">
+                  <span className="col-span-2 font-bold">
                     {currentRole.ethnicity?.join(', ')}
                   </span>
                 </>
@@ -122,7 +122,7 @@ export const MatchesFilterBar = () => {
               {currentRole.age_range && (
                 <>
                   Age Range
-                  <span className="font-bold col-span-2">
+                  <span className="col-span-2 font-bold">
                     {currentRole.age_range?.join('; ')}
                   </span>
                 </>
@@ -130,14 +130,14 @@ export const MatchesFilterBar = () => {
               {currentRole.age_range && (
                 <>
                   Gender
-                  <span className="font-bold col-span-2">
+                  <span className="col-span-2 font-bold">
                     {currentRole.gender_identity?.join(', ')}
                   </span>
                 </>
               )}
               <span className="col-span-3">LGBTQ+</span>
               {currentRole.additional_requirements && (
-                <span className="font-bold col-span-3">
+                <span className="col-span-3 font-bold">
                   {currentRole.additional_requirements?.join(', ')}
                 </span>
               )}

@@ -4,24 +4,24 @@ import Alert from 'react-bootstrap/Alert';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PageContainer, Title } from '../components/layout';
-import { useAuthValue } from '../context/AuthContext';
+import Button from '../components/shared/Button';
 import { useFirebaseContext } from '../context/FirebaseContext';
-import Button from '../genericComponents/Button';
+import { useUserContext } from '../context/UserContext';
 import Red_Blob from '../images/red_blob.svg';
 
 const Login = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { firebaseAuth } = useFirebaseContext();
-  const { currentUser } = useAuthValue();
+  const { currentUser } = useUserContext();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     if (currentUser) {
-      history.push('/profile');
+      navigate('/profile');
     }
   }, [currentUser]);
 
@@ -42,11 +42,11 @@ const Login = () => {
     }
 
     await signInWithEmailAndPassword(firebaseAuth, email, password)
-      .then(userCredential => {
+      .then((userCredential) => {
         setLoginError(null);
         console.log(userCredential.user);
       })
-      .catch(err => {
+      .catch((err) => {
         setLoginError('Incorrect email address or password! Please try again.');
         console.log('Error logging in:', err);
       });

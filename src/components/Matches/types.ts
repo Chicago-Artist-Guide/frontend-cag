@@ -1,8 +1,8 @@
 import {
+  Gender,
   IndividualAccountInit,
   IndividualProfileDataFullInit,
-  IndividualRoles,
-  Gender
+  IndividualRoles
 } from '../SignUp/Individual/types';
 
 // These are for situations where the filter value is an array

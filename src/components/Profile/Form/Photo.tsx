@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
+import { useUserContext } from '../../../context/UserContext';
 import { breakpoints, colors } from '../../../theme/styleVars';
 import { Profile } from '../Company/types';
 
@@ -17,7 +17,7 @@ const FormPhoto: React.FC<{
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
-  }: { profile: { data: Profile } } = useProfileContext();
+  }: { profile: { data: Profile } } = useUserContext();
   const [imgUrl, setImgUrl] = useState<string | undefined>(src);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
@@ -38,7 +38,7 @@ const FormPhoto: React.FC<{
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.then(() => {
-        getDownloadURL(uploadTask.snapshot.ref).then(url => {
+        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
           setImgUrl(url);
           onChange({
             target: {

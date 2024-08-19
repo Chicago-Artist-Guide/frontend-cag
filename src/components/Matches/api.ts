@@ -1,15 +1,15 @@
 import {
-  Firestore,
-  collection,
-  query,
-  where,
-  getDocs,
-  QueryDocumentSnapshot,
-  doc,
-  getDoc,
   addDoc,
+  collection,
+  doc,
+  Firestore,
+  getDoc,
+  getDocs,
+  query,
   Query,
-  QuerySnapshot
+  QueryDocumentSnapshot,
+  QuerySnapshot,
+  where
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import {
@@ -88,7 +88,7 @@ export async function fetchTalentWithFilters(
   productionId: string,
   roleId: string
 ): Promise<IndividualProfileDataFullInit[]> {
-  const { type: accountType, matchStatus, ...profileFilters } = filters;
+  const { matchStatus, ...profileFilters } = filters;
   const profilesRef = collection(firebaseStore, 'profiles');
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);

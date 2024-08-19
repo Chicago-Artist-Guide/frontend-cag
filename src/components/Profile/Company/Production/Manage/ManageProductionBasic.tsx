@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { getOptions } from '../../../../../utils/helpers';
 import { productionStatuses } from '../../../../../utils/lookups';
+import ImageUpload from '../../../../shared/ImageUpload';
 import { FormInput, FormRadio, FormTextArea } from '../../../Form/Inputs';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Production } from '../../types';
-import ProductionPhoto from '../ProductionPhoto';
-import ImageUpload from '../../../../shared/ImageUpload';
 
 const types = ['Musical', 'Play', 'Other'];
 const equity = ['Union', 'Non-Union'];

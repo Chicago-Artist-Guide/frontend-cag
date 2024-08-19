@@ -1,15 +1,14 @@
-import React, { useState, useCallback, useRef } from 'react';
-import { Container } from 'styled-bootstrap-grid';
-import Row from 'react-bootstrap/Row';
+import { uuidv4 } from '@firebase/util';
+import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
+import React, { useCallback, useRef, useState } from 'react';
 import { Col } from 'react-bootstrap';
-import { colors, breakpoints } from '../../theme/styleVars';
+import Row from 'react-bootstrap/Row';
+import ReactCrop, { Crop } from 'react-image-crop';
+import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { useProfileContext } from '../../context/ProfileContext';
-import Button from '../../genericComponents/Button';
-import ReactCrop, { Crop } from 'react-image-crop';
-import { v4 as uuidv4 } from 'uuid';
+import Button from './Button';
+import { colors } from '../../theme/styleVars';
 
 type ImageUploadType = 'User' | 'Poster';
 
@@ -22,7 +21,7 @@ interface ImageUploadModalProps {
 
 const ImageUpload: React.FC<ImageUploadModalProps> = ({
   onSave,
-  currentImgUrl,
+  currentImgUrl: imgUrl = '',
   modal,
   type
 }) => {
@@ -31,11 +30,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
   const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
   const { firebaseStorage } = useFirebaseContext();
   const [percent, setPercent] = useState(0);
-  const [imgUrl, setImgUrl] = useState<string | undefined>(currentImgUrl || '');
   const [src, setSrc] = useState(null as string | null);
-  const {
-    profile: { data }
-  } = useProfileContext();
   const [crop, setCrop] = useState<Crop>({
     height: type === 'User' ? 50 : 50 / (2 / 3),
     width: 50,

@@ -5,9 +5,9 @@ import React, { useRef, useState } from 'react';
 import { Col, Container, Form, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
+import Button from '../../../components/shared/Button';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
-import Button from '../../../genericComponents/Button';
+import { useUserContext } from '../../../context/UserContext';
 import { colors, fonts } from '../../../theme/styleVars';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
@@ -21,7 +21,7 @@ const CompanyPhoto: React.FC<{
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
-  } = useProfileContext();
+  } = useUserContext();
   const [file, setFile] = useState<File | null>(null);
   const [percent, setPercent] = useState(0);
   const [imgUrl, setImgUrl] = useState<string | null>(null);

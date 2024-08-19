@@ -1,10 +1,10 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import { useFirebaseContext } from '../context/FirebaseContext';
-import { MatchProvider } from '../context/MatchContext';
+import { PageContainer } from '../components/layout';
 import { Title } from '../components/layout/Titles';
 import { MatchesPageContainer } from '../components/Matches/MatchesPageContainer';
-import { PageContainer } from '../components/layout';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import { MatchProvider } from '../context/MatchContext';
 
 const Matches = () => {
   const { firebaseFirestore } = useFirebaseContext();
@@ -12,8 +12,8 @@ const Matches = () => {
 
   return (
     <MatchProvider
-      productionId={productionId}
-      roleIdParam={roleId}
+      productionId={productionId ?? ''}
+      roleIdParam={roleId ?? ''}
       firestore={firebaseFirestore}
     >
       <PageContainer>

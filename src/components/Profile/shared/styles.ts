@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { fonts, colors } from '../../../theme/styleVars';
+import { colors, fonts } from '../../../theme/styleVars';
 
 export const PreviewCard = styled.div`
   height: auto;

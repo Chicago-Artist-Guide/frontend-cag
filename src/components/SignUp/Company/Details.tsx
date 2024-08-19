@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import { SetForm } from 'react-hooks-helper';
-import { Dropdown, InputField } from '../../../genericComponents';
-import TextArea from '../../../genericComponents/TextArea';
+import { Dropdown, InputField } from '../../../components/shared';
+import { getOptions } from '../../../utils/helpers';
 import { neighborhoods } from '../../../utils/lookups';
+import { FormRadio } from '../../Profile/Form/Inputs';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 import { CompanyData } from './types';
 import { checkForErrors } from './utils';
-import { FormRadio } from '../../Profile/Form/Inputs';
-import { getOptions } from '../../../utils/helpers';
 
 const numOfMemberRanges = [
   { name: 'Choose one...', value: 'choose' },

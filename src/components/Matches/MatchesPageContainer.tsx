@@ -1,8 +1,8 @@
 import React from 'react';
+import { useMatches } from '../../context/MatchContext';
+import { CompanyMatchList } from './CompanyMatchList';
 import { MatchesFilterBar } from './MatchesFilterBar';
 import { TalentMatchList } from './TalentMatchList';
-import { CompanyMatchList } from './CompanyMatchList';
-import { useMatches } from '../../context/MatchContext';
 
 export const MatchesPageContainer = () => {
   const { filters } = useMatches();

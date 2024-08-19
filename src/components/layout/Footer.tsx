@@ -1,26 +1,25 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
-import { media } from 'styled-bootstrap-grid';
-import Container from 'react-bootstrap/Container';
-import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
-import Image from 'react-bootstrap/Image';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Image from 'react-bootstrap/Image';
+import Nav from 'react-bootstrap/Nav';
+import Navbar from 'react-bootstrap/Navbar';
+import Row from 'react-bootstrap/Row';
+import { Link } from 'react-router-dom';
+import { media } from 'styled-bootstrap-grid';
+import styled from 'styled-components';
 import FooterBg from '../../images/footer-background.png';
-import LogoSrc from '../../images/logoPlain.svg';
-import Facebook from '../../images/icons-footer/social_facebook.png';
-import Linkedin from '../../images/icons-footer/social_linkedin.png';
 import Envelope from '../../images/icons-footer/email.png';
+import Facebook from '../../images/icons-footer/social_facebook.png';
 import Insta from '../../images/icons-footer/social_instagram.png';
-import Twitter from '../../images/icons-footer/social_twitter.png';
+import Linkedin from '../../images/icons-footer/social_linkedin.png';
 import Medium from '../../images/icons-footer/social_medium.png';
+import Twitter from '../../images/icons-footer/social_twitter.png';
+import LogoSrc from '../../images/logoPlain.svg';
 
 const Footer = () => (
-  <FooterNavbar className="container justify-content-center nav" expand="sm">
-    <FooterContainer>
-      <Row>
+  <FooterNavbar className="justify-content-center nav container" expand="sm">
+    <div className="container mt-12">
+      <Row className="flex flex-1 justify-center">
         <EdgeCols
           md={{ order: 1, span: 3 }}
           sm={{ order: 1, span: 4 }}
@@ -52,7 +51,7 @@ const Footer = () => (
           <div className="d-sm-none d-none d-md-block">
             <FooterCAGLogo alt="Chicago Artist Guide" src={LogoSrc} />
           </div>
-          <Nav className="m-auto icon-list" fill>
+          <Nav className="icon-list m-auto" fill>
             <Nav.Item>
               <Nav.Link href="http://www.facebook.com/chiartistguide">
                 <FooterLogo src={Facebook} />
@@ -115,7 +114,7 @@ const Footer = () => (
           </Nav>
         </EdgeCols>
       </Row>
-    </FooterContainer>
+    </div>
   </FooterNavbar>
 );
 
@@ -135,14 +134,6 @@ const FooterNavbar = styled(Navbar)`
       width: 75%;
     }
   `}
-`;
-
-const FooterContainer = styled(Container)`
-  margin-top: 50px;
-  .row {
-    flex: 1;
-    justify-content: center;
-  }
 `;
 
 const MidCol = styled(Col)`

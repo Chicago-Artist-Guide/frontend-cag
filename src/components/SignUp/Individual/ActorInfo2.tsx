@@ -1,23 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import Image from 'react-bootstrap/Image';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Image from 'react-bootstrap/Image';
+import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
+import styled from 'styled-components';
+import { Checkbox, PrivateLabel } from '../../../components/shared';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
-import { Checkbox, PrivateLabel } from '../../../genericComponents';
 import { colors, fonts } from '../../../theme/styleVars';
 import { Title } from '../../layout';
 import {
-  ageRanges,
-  genders,
-  genderRoles,
   AgeRange,
-  IndividualData,
+  ageRanges,
   Gender,
-  GenderRole
+  GenderRole,
+  genderRoles,
+  genders,
+  IndividualData
 } from './types';
 
 const ActorInfo2: React.FC<{

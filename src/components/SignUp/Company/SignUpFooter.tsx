@@ -1,8 +1,8 @@
 import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
-import { useHistory } from 'react-router-dom';
-import Button from '../../../genericComponents/Button';
+import { useNavigate } from 'react-router-dom';
+import Button from '../../../components/shared/Button';
 import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
 import { FormStep, SubmitResponse } from './types';
 
@@ -24,10 +24,9 @@ const SignUpFooter: React.FC<{
   steps,
   submitBasics,
   stepErrors,
-  setErrors,
   completeSignUp
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { next, previous } = navigation;
   const stepIndex = steps.findIndex((step) => step.id === formStep);
   const nextText = formStep === 'privacy' ? 'Accept & Continue' : 'Continue';
@@ -43,7 +42,7 @@ const SignUpFooter: React.FC<{
 
     if (formStep === 'details') {
       await completeSignUp();
-      history.push('/profile');
+      navigate('/profile');
       return;
     }
     next();

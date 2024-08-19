@@ -1,14 +1,14 @@
 import React from 'react';
+import Button from 'react-bootstrap/Button';
+import Nav from 'react-bootstrap/Nav';
+import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
-import Nav from 'react-bootstrap/Nav';
-import Button from 'react-bootstrap/Button';
-import { BlobBox } from '../layout';
+import { Checkbox, DividerBar, InputField } from '../../components/shared';
 import { redBlob, yellowBlob1 } from '../../images';
 import { emailWhiteIcon } from '../../images/icons-home';
 import { colors } from '../../theme/styleVars';
-import { Checkbox, DividerBar, InputField } from '../../genericComponents';
+import { BlobBox } from '../layout';
 
 const InTouch = () => {
   const blobs = [
@@ -85,7 +85,7 @@ const InTouchRow = styled(Row)`
   height: 960px;
   padding: 35px 0;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas: "wordBox cardBox";
+  grid-template-areas: 'wordBox cardBox';
 
   div:nth-child(2),
   div:nth-child(3) {
@@ -105,7 +105,7 @@ const WordBox = styled.div`
 const CheckBoxes = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas: "Iam emails";
+  grid-template-areas: 'Iam emails';
   margin-top: 30px;
 
   div:nth-child(1) {

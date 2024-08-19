@@ -1,7 +1,7 @@
 import React from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
-import Button from '../../../genericComponents/Button';
+import Button from '../../../components/shared/Button';
 import { goToTop } from '../../../utils/goToTop';
 import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
 
@@ -80,8 +80,6 @@ const SignUpFooter: React.FC<{
 
     if (currStep === 'basics') {
       const submitted = await submitBasics();
-      const prev = previous ? previous : () => null;
-
       return submitted.ok && next();
     }
 

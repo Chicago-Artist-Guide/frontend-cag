@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { format } from 'date-fns';
-import { AccountTypeOptions } from '../components/SignUp/types';
 import { IndividualRoles } from '../components/SignUp/Individual/types';
+import { AccountTypeOptions } from '../components/SignUp/types';
 
 export type SubmitLGLConstituentParams = {
   api_key: string;

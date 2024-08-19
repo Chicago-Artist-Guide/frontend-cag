@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import styled from 'styled-components';
-import { colors } from '../../../../../theme/styleVars';
-import { Container } from 'styled-bootstrap-grid';
-import Row from 'react-bootstrap/Row';
+import React from 'react';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
-import { InputField } from '../../../../../genericComponents';
+import Row from 'react-bootstrap/Row';
+import { Container } from 'styled-bootstrap-grid';
+import styled from 'styled-components';
+import { InputField } from '../../../../../components/shared';
+import { colors } from '../../../../../theme/styleVars';
 
 const TrainingEdit: React.FC<{
   training_institutions: any;
@@ -19,7 +19,7 @@ const TrainingEdit: React.FC<{
   console.log(training_institutions);
   return (
     <Container>
-      {training_institutions.map((training: any, index: number) => (
+      {training_institutions.map((training: any) => (
         <TrainingRow key={`training-${training.id}`}>
           <Col lg="8">
             <Form>

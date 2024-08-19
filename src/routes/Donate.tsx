@@ -1,17 +1,17 @@
 import React from 'react';
-import Image from 'react-bootstrap/Image';
 import Col from 'react-bootstrap/Col';
+import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
+import styled from 'styled-components';
 import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title, TitleThree } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';
-import yellowBlob1 from '../images/yellow_blob_1.svg';
 import homeDance from '../images/home_dance.svg';
-import styled from 'styled-components';
-import { breakpoints } from '../theme/styleVars';
-import SponsorDonutLogo from '../images/sponsors/donut.png';
-import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
 import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
+import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
+import SponsorDonutLogo from '../images/sponsors/donut.png';
+import yellowBlob1 from '../images/yellow_blob_1.svg';
+import { breakpoints } from '../theme/styleVars';
 
 const Donate = () => {
   return (

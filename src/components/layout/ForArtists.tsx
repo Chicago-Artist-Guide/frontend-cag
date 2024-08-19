@@ -1,9 +1,9 @@
 import React from 'react';
+import Nav from 'react-bootstrap/Nav';
+import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
-import Nav from 'react-bootstrap/Nav';
-import { BlobBox, CardBox } from '../layout';
+import { DividerBar } from '../../components/shared';
 import { redBlob, yellowBlob1 } from '../../images';
 import {
   makeProfile,
@@ -12,7 +12,7 @@ import {
   submitToJobs
 } from '../../images/icons-home';
 import { breakpoints, colors } from '../../theme/styleVars';
-import { DividerBar } from '../../genericComponents';
+import { BlobBox, CardBox } from '../layout';
 
 const ForArtists = () => {
   const blobs = [

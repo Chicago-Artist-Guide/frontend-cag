@@ -1,17 +1,17 @@
 import { signOut } from 'firebase/auth';
 import React, { useEffect, useState } from 'react';
-import { Redirect } from 'react-router-dom';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useFirebaseContext } from '../context/FirebaseContext';
+import Row from 'react-bootstrap/Row';
+import { Navigate } from 'react-router-dom';
 import PageContainer from '../components/layout/PageContainer';
 import { Title } from '../components/layout/Titles';
-import { useProfileContext } from '../context/ProfileContext';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import { useUserContext } from '../context/UserContext';
 
 const Logout = () => {
   const { firebaseAuth } = useFirebaseContext();
   const { setAccountRef, setAccountData, setProfileRef, setProfileData } =
-    useProfileContext();
+    useUserContext();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const Logout = () => {
       <Row>
         <Col lg="8">
           <Title>Logging out...</Title>
-          {!loading && <Redirect to="/login" />}
+          {!loading && <Navigate to="/login" replace />}
         </Col>
       </Row>
     </PageContainer>

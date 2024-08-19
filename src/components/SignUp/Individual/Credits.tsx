@@ -1,16 +1,15 @@
 import React, { useState } from 'react';
-import DatePicker from 'react-datepicker';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
+import 'react-datepicker/dist/react-datepicker.css';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
-import { Tagline, Title } from '../../layout/Titles';
-import InputField from '../../../genericComponents/Input';
+import InputField from '../../../components/shared/Input';
 import { colors } from '../../../theme/styleVars';
+import { Tagline, Title } from '../../layout/Titles';
 import type { IndividualProfile2Data, PastPerformances } from './types';
-import 'react-datepicker/dist/react-datepicker.css';
 
 const Credits: React.FC<{
   setForm: SetForm;
@@ -178,16 +177,6 @@ const DeleteRowLink = styled.a`
   &:hover {
     color: ${colors.salmon};
   }
-`;
-
-const DateRowTitle = styled.h5`
-  margin-top: 20px;
-  padding-bottom: 8px;
-`;
-
-const DateRow = styled.div`
-  display: flex;
-  gap: 1em;
 `;
 
 export default Credits;

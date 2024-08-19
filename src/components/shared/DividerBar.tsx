@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { breakpoints } from '../theme/styleVars';
+import { breakpoints } from '../../theme/styleVars';
 
 const DividerBar = styled.div`
   width: 105px;

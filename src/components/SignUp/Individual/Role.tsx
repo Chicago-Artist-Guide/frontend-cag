@@ -15,7 +15,7 @@ import {
   SelectDirections,
   StyledCard
 } from '../SignUpStyles';
-import type { IndividualRoles, IndividualData } from './types';
+import type { IndividualData, IndividualRoles } from './types';
 
 interface Card {
   icon: string;

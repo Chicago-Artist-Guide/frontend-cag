@@ -4,23 +4,23 @@ import Alert from 'react-bootstrap/Alert';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PageContainer, Title } from '../components/layout';
-import { useAuthValue } from '../context/AuthContext';
-import Button from '../genericComponents/Button';
+import Button from '../components/shared/Button';
+import { useUserContext } from '../context/UserContext';
 import Red_Blob from '../images/red_blob.svg';
 
 const ForgotPassword = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const auth = getAuth();
-  const { currentUser } = useAuthValue();
+  const { currentUser } = useUserContext();
   const [email, setEmail] = useState('');
   const [resetError, setResetError] = useState<string | null>(null);
   const [resetSent, setResetSent] = useState<boolean>(false);
 
   useEffect(() => {
     if (currentUser) {
-      history.push('/profile');
+      navigate('/profile');
     }
   }, [currentUser]);
 
@@ -40,7 +40,7 @@ const ForgotPassword = () => {
         setResetError(null);
         setResetSent(true);
       })
-      .catch(err => {
+      .catch((err) => {
         setResetError('Error sending reset email.');
         console.log('Error logging in:', err);
       });

@@ -1,7 +1,7 @@
 import React from 'react';
+import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { colors } from '../../../../theme/styleVars';
-import { Container } from 'styled-bootstrap-grid';
 
 const SpecialSkills: React.FC<{
   checkboxes: string[];
@@ -31,11 +31,6 @@ const SkillBadge = styled.div`
 const Flex = styled.div`
   display: flex;
   margin: 20px 0px 20px;
-`;
-
-const Bold = styled.p`
-  font-weight: bolder;
-  font-size: 20px;
 `;
 
 export default SpecialSkills;

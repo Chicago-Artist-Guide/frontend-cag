@@ -1,14 +1,13 @@
 import React from 'react';
-import { BlobBox, PageContainer, Tagline, Title } from '../components/layout';
+import { Button as BSButton, Image } from 'react-bootstrap';
 import Col from 'react-bootstrap/esm/Col';
 import Row from 'react-bootstrap/esm/Row';
-import { Image } from 'react-bootstrap';
 import styled from 'styled-components';
-import { Button as BSButton } from 'react-bootstrap';
+import { BlobBox, PageContainer, Tagline, Title } from '../components/layout';
 
+import { redBlob2, redBlob3, yellowBlob1, yellowBlob3 } from '../images';
 import CagBaret from '../images/events/cag-baret.png';
 import Group from '../images/icons-signup/group.svg';
-import { redBlob2, redBlob3, yellowBlob1, yellowBlob3 } from '../images';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 
 const blobs = [

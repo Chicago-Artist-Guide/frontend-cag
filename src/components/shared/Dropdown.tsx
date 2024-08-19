@@ -1,10 +1,6 @@
 import React from 'react';
-import {
-  CAGFormGroup,
-  CAGFormSelect,
-  CAGLabel
-} from '../components/SignUp/SignUpStyles';
-import { colors } from '../theme/styleVars';
+import { colors } from '../../theme/styleVars';
+import { CAGFormGroup, CAGFormSelect, CAGLabel } from '../SignUp/SignUpStyles';
 
 interface Props {
   name?: string;

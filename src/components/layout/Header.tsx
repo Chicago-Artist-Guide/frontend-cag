@@ -3,19 +3,18 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { useAuthValue } from '../../context/AuthContext';
-import { useProfileContext } from '../../context/ProfileContext';
+import { useUserContext } from '../../context/UserContext';
 import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
 
 const Header = () => {
-  const { currentUser } = useAuthValue();
+  const { currentUser } = useUserContext();
   const {
     profile: { ref: profileRef }
-  } = useProfileContext();
+  } = useUserContext();
 
   return (
-    <WhiteBackNav className="container nav white-back" expand="lg" sticky="top">
+    <WhiteBackNav className="nav white-back container" expand="lg" sticky="top">
       <Navbar.Brand href="/">
         <img src={Logo} alt="CAG Logo" height="60" width="70" />
         {/* <TypedCagLogo height="60px" width="70px" /> */}

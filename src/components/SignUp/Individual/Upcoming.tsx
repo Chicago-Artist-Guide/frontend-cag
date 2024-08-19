@@ -1,17 +1,11 @@
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import React, { useEffect, useState } from 'react';
-import { faImage } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import styled from 'styled-components';
-import Container from 'react-bootstrap/Container';
+import React, { useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
 import { SetForm } from 'react-hooks-helper';
-import { Tagline, Title } from '../../layout/Titles';
-import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
-import Button from '../../../genericComponents/Button';
-import InputField from '../../../genericComponents/Input';
+import styled from 'styled-components';
+import InputField from '../../../components/shared/Input';
 import { colors } from '../../../theme/styleVars';
+import { Tagline, Title } from '../../layout/Titles';
 import type { IndividualProfile2Data, UpcomingPerformances } from './types';
 
 const Upcoming: React.FC<{
@@ -21,72 +15,12 @@ const Upcoming: React.FC<{
   const { setForm, formData } = props;
   const { upcoming } = formData;
   const [showId, setShowId] = useState(1);
-  const { firebaseStorage } = useFirebaseContext();
-  const {
-    profile: { data }
-  } = useProfileContext();
   const [file, setFile] = useState<any>({ 1: '' });
   const [percent, setPercent] = useState({ 1: 0 });
   const [imgUrl, setImgUrl] = useState<{ [key: number]: string | null }>({
     1: null
   });
   const [uploadInProgress, setUploadInProgress] = useState({ 1: false });
-
-  const onFileChange = (e: any, id: number) => {
-    const imgFile = e.target.files[0];
-
-    if (imgFile) {
-      const currFiles = { ...file };
-      setFile({ ...currFiles, [id]: imgFile });
-    }
-  };
-
-  const uploadFile = (id: number) => {
-    if (!file[id]) {
-      return;
-    }
-
-    // get file
-    const currFile = file[id];
-
-    // start upload
-    const currUploadProg = { ...uploadInProgress };
-    setUploadInProgress({ ...currUploadProg, [id]: true });
-
-    const storageRef = ref(
-      firebaseStorage,
-      `/files-${data.uid}/${data.account_id}-${currFile.name}`
-    );
-    const uploadTask = uploadBytesResumable(storageRef, currFile);
-
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const currPercent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-
-        // update progress
-        const currProgress = { ...percent };
-        setPercent({ ...currProgress, [id]: currPercent });
-      },
-      (err) => {
-        console.log('Error uploading image', err);
-        setUploadInProgress({ ...currUploadProg, [id]: false });
-      },
-      () => {
-        setUploadInProgress({ ...currUploadProg, [id]: false });
-
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log('Uploaded image url:', url);
-          const currImgUrl = { ...imgUrl };
-          setImgUrl({ ...currImgUrl, [id]: url });
-        });
-      }
-    );
-  };
-
   const onUpcomingInputChange = <T extends keyof UpcomingPerformances>(
     fieldValue: UpcomingPerformances[T],
     fieldName: T,
@@ -178,7 +112,7 @@ const Upcoming: React.FC<{
           <Tagline>Promote your next performance!</Tagline>
         </Col>
       </Row>
-      {upcoming.map((upcomingRow: any, i: any) => (
+      {upcoming.map((upcomingRow: any) => (
         <PerfRow key={`upcoming-show-row-${upcomingRow.id}`}>
           <Col lg="4">
             <Form.Group className="form-group">
@@ -230,28 +164,6 @@ const PerfRow = styled(Row)`
   &:not(:first-child) {
     border-top: 1px solid ${colors.lightGrey};
   }
-`;
-
-const PhotoContainer = styled.div`
-  align-items: center;
-  background: ${colors.lightGrey};
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: white;
-  display: flex;
-  font-size: 68px;
-  height: 300px;
-  justify-content: center;
-  width: 100%;
-`;
-
-const SynopsisTextarea = styled(Form.Group)`
-  margin-top: 12px;
-`;
-
-const WebsiteUrlField = styled.div`
-  margin-top: 12px;
 `;
 
 const DeleteLinkDiv = styled.div`

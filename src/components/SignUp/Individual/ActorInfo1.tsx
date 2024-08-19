@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import styled from 'styled-components';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
-import { Title } from '../../layout/Titles';
-import Checkbox from '../../../genericComponents/Checkbox';
-import PrivateLabel from '../../../genericComponents/PrivateLabel';
-import { colors, fonts } from '../../../theme/styleVars';
+import { Link } from 'react-router-dom';
+import styled from 'styled-components';
+import Checkbox from '../../../components/shared/Checkbox';
+import PrivateLabel from '../../../components/shared/PrivateLabel';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
-import { ethnicityTypes, pronouns, IndividualData } from './types';
+import { colors, fonts } from '../../../theme/styleVars';
+import { Title } from '../../layout/Titles';
+import { ethnicityTypes, IndividualData, pronouns } from './types';
 
 const ActorInfo1: React.FC<{
   setForm: SetForm;

@@ -2,7 +2,7 @@ import { faEdit } from '@fortawesome/free-regular-svg-icons';
 import React from 'react';
 import { Row } from 'react-bootstrap';
 import styled from 'styled-components';
-import { Button } from '../../../../../genericComponents';
+import { Button } from '../../../../../components/shared';
 import { colors, fonts } from '../../../../../theme/styleVars';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Role } from '../../types';
@@ -22,7 +22,7 @@ const RoleCard: React.FC<{
         <RightCol>
           <div className="d-flex flex-column flex-row-reverse">
             <div
-              className="d-flex flex-row flex-shrink-1 mt-1"
+              className="d-flex flex-shrink-1 mt-1 flex-row"
               style={{ gap: '1em' }}
             >
               <RoleButton

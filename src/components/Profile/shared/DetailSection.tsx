@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { fonts, colors } from '../../../theme/styleVars';
+import { colors, fonts } from '../../../theme/styleVars';
 
 const DetailSection: React.FC<{ title: string; children: React.ReactNode }> = ({
   title,

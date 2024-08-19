@@ -1,11 +1,11 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 import Stack from 'react-bootstrap/Stack';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import PageContainer from '../components/layout/PageContainer';
 import Collapsible from '../components/layout/Collapsible';
+import PageContainer from '../components/layout/PageContainer';
 import bios from '../components/WhoWeAre/bios';
 import Team from '../components/WhoWeAre/Team';
 

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Col, Image, Row } from 'react-bootstrap';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { Button } from '../../../../genericComponents';
+import { Button } from '../../../../components/shared';
 import { colors, fonts } from '../../../../theme/styleVars';
 import { Production } from '../types';
 
 const InactiveShow: React.FC<{ show: Production }> = ({ show }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const manageProduction = () => {
-    history.push(`production/${show.production_id}/manage`);
+    navigate(`/production/${show.production_id}/manage`);
   };
   return (
     <ShowCard>
@@ -24,7 +24,7 @@ const InactiveShow: React.FC<{ show: Production }> = ({ show }) => {
               <ShowStatus>{show?.status}</ShowStatus>
             </div>
             <div
-              className="d-flex flex-row flex-shrink-1"
+              className="d-flex flex-shrink-1 flex-row"
               style={{ gap: '1em' }}
             >
               <ShowButton

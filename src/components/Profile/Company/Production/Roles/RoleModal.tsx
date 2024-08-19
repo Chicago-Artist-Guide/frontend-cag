@@ -4,8 +4,18 @@ import React, { useEffect, useState } from 'react';
 import { Col, Form, Modal, Row } from 'react-bootstrap';
 import { FormTarget } from 'react-hooks-helper';
 import styled from 'styled-components';
-import { Button, Checkbox, Dropdown } from '../../../../../genericComponents';
+import { Button, Checkbox, Dropdown } from '../../../../../components/shared';
 import { colors, fonts } from '../../../../../theme/styleVars';
+import { getOptions } from '../../../../../utils/helpers';
+import {
+  additionalRequirements,
+  ageRanges,
+  ethnicities,
+  genders,
+  productionEquities,
+  roleStatuses
+} from '../../../../../utils/lookups';
+import ConfirmDialog from '../../../../ConfirmDialog';
 import { CAGLabel } from '../../../../SignUp/SignUpStyles';
 import {
   FormInput,
@@ -13,19 +23,9 @@ import {
   FormTextArea,
   OptGroupSelectValue
 } from '../../../Form/Inputs';
-import { OffStageRoleCategory, StageRole } from '../../../shared/profile.types';
 import { offstageRolesOptions } from '../../../shared/offstageRolesOptions';
+import { OffStageRoleCategory, StageRole } from '../../../shared/profile.types';
 import { Role } from '../../types';
-import {
-  additionalRequirements,
-  ageRanges,
-  ethnicities,
-  genders,
-  roleStatuses,
-  productionEquities
-} from '../../../../../utils/lookups';
-import { getOptions } from '../../../../../utils/helpers';
-import ConfirmDialog from '../../../../ConfirmDialog';
 
 const statuses = getOptions(roleStatuses);
 const equities = getOptions(productionEquities);
@@ -125,7 +125,7 @@ const RoleModal: React.FC<{
               <Col>
                 <Title>{title}</Title>
               </Col>
-              <div className="d-flex flex-row flex-shrink-1 flex-row-reverse">
+              <div className="d-flex flex-shrink-1 flex-row flex-row-reverse">
                 <CloseButton
                   className="d-flex align-items-center"
                   onClick={onClose}
@@ -355,7 +355,7 @@ const RoleModal: React.FC<{
                 )}
               </Col>
             </Row>
-            <div className="d-flex flex-row flex-row-reverse mt-3">
+            <div className="d-flex mt-3 flex-row flex-row-reverse">
               <Button
                 onClick={() => onSave(formValues)}
                 text="Save + Close"

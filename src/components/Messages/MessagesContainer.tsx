@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import MessageThreadsActionBar from './MessageThreadsActionBar';
-import MessageThreads from './MessageThreads';
 import { MessageThread } from './MessageThread';
+import MessageThreads from './MessageThreads';
+import MessageThreadsActionBar from './MessageThreadsActionBar';
 import { MessagesPagination } from './MessagesPagination';
 
 const MessagesContainer: React.FC = () => {

@@ -1,4 +1,11 @@
 import {
+  faCamera,
+  faCheckCircle,
+  faPenToSquare,
+  faXmark
+} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
   DocumentData,
   DocumentSnapshot,
   onSnapshot,
@@ -11,57 +18,43 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
-import {
-  faCheckCircle,
-  faPenToSquare,
-  faXmark
-} from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useFirebaseContext } from '../../../context/FirebaseContext';
-import { useProfileContext } from '../../../context/ProfileContext';
-import { Button, Checkbox, InputField } from '../../../genericComponents';
+import { Button, Checkbox, InputField } from '../../../components/shared';
+import { useUserContext } from '../../../context/UserContext';
+import { colors, fonts } from '../../../theme/styleVars';
+import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import PageContainer from '../../layout/PageContainer';
-import { fonts, colors } from '../../../theme/styleVars';
-import DetailSection from '../shared/DetailSection';
 import {
   AgeRange,
-  PastPerformances,
-  ProfileAwards,
-  pronouns,
-  UpcomingPerformances,
   IndividualAccountInit,
   IndividualProfileDataFullInit,
   IndividualWebsite,
-  WebsiteTypes,
-  TrainingInstitution,
+  PastPerformances,
+  ProfileAwards,
+  pronouns,
+  SkillCheckbox,
   skillCheckboxes,
-  SkillCheckbox
+  TrainingInstitution,
+  UpcomingPerformances,
+  WebsiteTypes
 } from '../../SignUp/Individual/types';
-import type { EditModeSections } from './types';
-import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
-import Awards from './ProfileSections/Awards';
+import DetailSection from '../shared/DetailSection';
 import ImageUploadModal from '../shared/ImageUploadModal';
 import { PreviewCard } from '../shared/styles';
 import EditPersonalDetails from './EditPersonalDetails';
-import { faCamera } from '@fortawesome/free-solid-svg-icons';
-import Features from './ProfileSections/Features';
+import Awards from './ProfileSections/Awards';
 import FeaturesEdit from './ProfileSections/Edits/FeaturesEdit';
-import SpecialSkills from './ProfileSections/SpecialSkills';
-import OffStageSkills from './ProfileSections/OffStageSkills';
 import OffStageSkillsEdit from './ProfileSections/Edits/OffStageSkillsEdit';
-import Training from './ProfileSections/Training';
 import TrainingEdit from './ProfileSections/Edits/TrainingEdit';
-
-type PerformanceState = {
-  [key: number]: string | number | null | boolean;
-};
+import Features from './ProfileSections/Features';
+import OffStageSkills from './ProfileSections/OffStageSkills';
+import SpecialSkills from './ProfileSections/SpecialSkills';
+import Training from './ProfileSections/Training';
+import type { EditModeSections } from './types';
 
 const IndividualProfile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
-  const { firebaseStorage } = useFirebaseContext();
-  const { account, profile, setAccountData, setProfileData } =
-    useProfileContext();
+  const { account, profile, setAccountData, setProfileData } = useUserContext();
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,
     headline: false,
@@ -93,7 +86,7 @@ const IndividualProfile: React.FC<{
   const [skillTags, setTags] = useState([
     ...(editProfile?.additional_skills_manual || [])
   ] as string[]);
-  const [trainings, setTrainings] = useState([
+  const [trainings] = useState([
     ...(editProfile?.training_institutions || [])
   ] as string[]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
@@ -1351,7 +1344,7 @@ const IndividualProfile: React.FC<{
             {/* AWARD SECTION */}
             {editMode['awards'] ? (
               <Container>
-                {editProfile?.awards?.map((awardRow: any, i: any) => (
+                {editProfile?.awards?.map((awardRow: any) => (
                   <AwardRow key={`award-row-${awardRow.id}`}>
                     <Col>
                       <CAGFormControl
@@ -1559,82 +1552,6 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
-`;
-
-const TrainingRow = styled(Row)`
-  padding-top: 2em;
-  padding-bottom: 2em;
-
-  &:not(:first-child) {
-    border-top: 1px solid ${colors.lightGrey};
-  }
-`;
-
-const SmallTitle = styled.h3`
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 24px;
-  color: ${colors.dark};
-`;
-
-const PerfRow = styled(Row)`
-  padding-top: 2em;
-  padding-bottom: 2em;
-
-  &:not(:first-child) {
-    border-top: 1px solid ${colors.lightGrey};
-  }
-`;
-
-const PhotoContainer = styled.div`
-  align-items: center;
-  background: ${colors.lightGrey};
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  color: white;
-  display: flex;
-  font-size: 68px;
-  height: 300px;
-  justify-content: center;
-  width: 100%;
-`;
-
-const SynopsisTextarea = styled(Form.Group)`
-  margin-top: 12px;
-`;
-
-const WebsiteUrlField = styled.div`
-  margin-top: 12px;
-`;
-
-const DeleteLinkDiv = styled.div`
-  padding: 1em 0;
-
-  a,
-  a:hover {
-    color: ${colors.salmon};
-  }
-`;
-
-const DeleteRowLink = styled.a`
-  color: ${colors.salmon};
-  display: block;
-  margin-top: 1em;
-
-  &:hover {
-    color: ${colors.salmon};
-  }
-`;
-
-const DateRowTitle = styled.h5`
-  margin-top: 20px;
-  padding-bottom: 8px;
-`;
-
-const DateRow = styled.div`
-  display: flex;
-  gap: 1em;
 `;
 
 const CAGInput = styled.div`

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
-import { colors, fonts } from '../../../theme/styleVars';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
+import { colors, fonts } from '../../../theme/styleVars';
 import { Tagline, Title } from '../../layout/Titles';
 import type { IndividualProfile2Data, ProfileAwards } from './types';
 
@@ -92,7 +92,7 @@ const Awards: React.FC<{
           <Tagline>Don't be shy, brag about it.</Tagline>
         </Col>
       </Row>
-      {awards.map((awardRow: any, i: any) => (
+      {awards.map((awardRow: any) => (
         <AwardRow key={`award-row-${awardRow.id}`}>
           <Col lg="4">
             <CAGFormControl

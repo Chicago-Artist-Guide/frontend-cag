@@ -1,48 +1,48 @@
 // Board of Directors
-import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
-import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
-import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
+import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
-import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 import Laws from '../../images/who-we-are/board/Board_Laws.jpg';
+import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
+import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
+import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 
 // Artist Auxiliary Board
-import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
-import Silva from '../../images/who-we-are/board/Board_Silva.png';
-import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
-import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
-import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
-import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
 import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.jpg';
+import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
+import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
 import Kauffman from '../../images/who-we-are/board/Board_Kauffman.jpg';
+import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
+import Silva from '../../images/who-we-are/board/Board_Silva.png';
+import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
+import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
-import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
-import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
-import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
-import Wills from '../../images/who-we-are/operations/Staff_Wills.jpg';
 import Adamy from '../../images/who-we-are/operations/Staff_Adamy.jpg';
-import Newsome from '../../images/who-we-are/operations/Staff_Newsome.jpg';
+import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
 import Hinton from '../../images/who-we-are/operations/Staff_Hinton.png';
+import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
+import Newsome from '../../images/who-we-are/operations/Staff_Newsome.jpg';
 import Walker from '../../images/who-we-are/operations/Staff_Walker.jpg';
+import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
+import Wills from '../../images/who-we-are/operations/Staff_Wills.jpg';
 
 // Site Development
-import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
+import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
+import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
-import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
-import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
-import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
+import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import Nagra from '../../images/who-we-are/technical/Staff_Nagra.jpg';
+import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
 
 // Advisory Board
-import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
-import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
+import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
+import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
 
 const bioId = () => (<any>crypto).randomUUID();
 

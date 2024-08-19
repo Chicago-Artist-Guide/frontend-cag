@@ -1,10 +1,6 @@
 import React from 'react';
-import Image from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import styled from 'styled-components';
-import { colors } from '../../../../theme/styleVars';
-import { Col, Row, Container } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCamera } from '@fortawesome/free-solid-svg-icons';
 
 const Features: React.FC<{
   features: any;

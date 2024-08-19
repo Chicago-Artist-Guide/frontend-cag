@@ -2,10 +2,10 @@ import React from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import PageContainer from '../components/layout/PageContainer';
-import { MessageProvider } from '../context/MessageContext';
-import { useFirebaseContext } from '../context/FirebaseContext';
 import { Title } from '../components/layout/Titles';
 import MessagesContainer from '../components/Messages/MessagesContainer';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import { MessageProvider } from '../context/MessageContext';
 
 const Messages = () => {
   const { firebaseFirestore } = useFirebaseContext();

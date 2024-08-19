@@ -5,28 +5,28 @@ import { Form, Tab, Tabs } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
-import { useFirebaseContext } from '../../../../../context/FirebaseContext';
-import { useProfileContext } from '../../../../../context/ProfileContext';
-import { Button } from '../../../../../genericComponents';
-import { colors, fonts } from '../../../../../theme/styleVars';
-import PageContainer from '../../../../layout/PageContainer';
-import { Title } from '../../ProfileStyles';
-import { Production } from '../../types';
-import ManageProductionBasic from './ManageProductionBasic';
-import ManageProductionDates from './ManageProductionDates';
-import ManageProductionMatches from './ManageProductionMatches';
-import ManageProductionRoles from './ManageProductionRoles';
-import ConfirmDialog from '../../../../ConfirmDialog';
+import ConfirmDialog from '../components/ConfirmDialog';
+import PageContainer from '../components/layout/PageContainer';
+import ManageProductionBasic from '../components/Profile/Company/Production/Manage/ManageProductionBasic';
+import ManageProductionDates from '../components/Profile/Company/Production/Manage/ManageProductionDates';
+import ManageProductionMatches from '../components/Profile/Company/Production/Manage/ManageProductionMatches';
+import ManageProductionRoles from '../components/Profile/Company/Production/Manage/ManageProductionRoles';
+import { Title } from '../components/Profile/Company/ProfileStyles';
+import { Production } from '../components/Profile/Company/types';
+import { Button } from '../components/shared';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import { useUserContext } from '../context/UserContext';
+import { colors, fonts } from '../theme/styleVars';
 
-const ManageProduction: React.FC<null> = () => {
-  const { productionId } = useParams();
-  const history = useHistory();
+const ManageProduction = () => {
+  const { productionId = '' } = useParams<{ productionId: string }>();
+  const navigate = useNavigate();
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     account: { data: accountData }
-  } = useProfileContext();
+  } = useUserContext();
   const [showConfirm, setShowConfirm] = useState(false);
   const [formValues, setFormValues] = useForm<Production>({
     account_id: accountData?.account_id,
@@ -48,6 +48,12 @@ const ManageProduction: React.FC<null> = () => {
   });
 
   useEffect(() => {
+    if (!productionId) {
+      console.log('No production ID provided');
+      goToProfile();
+      return;
+    }
+
     getProduction();
   }, [productionId]);
 
@@ -82,7 +88,7 @@ const ManageProduction: React.FC<null> = () => {
   };
 
   const goToProfile = () => {
-    history.push('/profile');
+    navigate('/profile');
   };
 
   const onDeleteConfirm = async () => {
@@ -107,7 +113,7 @@ const ManageProduction: React.FC<null> = () => {
       <Form>
         <Row>
           <Col lg={12}>
-            <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex justify-content-between flex-row">
               <Title>Manage Production</Title>
               <Button
                 onClick={handleSave}
@@ -133,7 +139,7 @@ const ManageProduction: React.FC<null> = () => {
               />
             </TabRow>
           </Tab>
-          <Tab eventKey="dates" title="Important Dates">
+          <Tab eventKey="dates" title="important Dates">
             <TabRow>
               <ManageProductionDates
                 formValues={formValues}
@@ -162,7 +168,7 @@ const ManageProduction: React.FC<null> = () => {
 
         <Row>
           <Col lg={12} style={{ marginTop: 20 }}>
-            <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex justify-content-between flex-row">
               <Button
                 onClick={goToProfile}
                 text="Cancel"

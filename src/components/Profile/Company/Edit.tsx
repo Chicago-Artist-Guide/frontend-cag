@@ -1,20 +1,25 @@
 import { getDoc, updateDoc } from '@firebase/firestore';
 import { uuidv4 } from '@firebase/util';
 import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
+import { faClose } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect } from 'react';
 import { Form } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
-import { useProfileContext } from '../../../context/ProfileContext';
-import { Button, InputField } from '../../../genericComponents';
+import styled from 'styled-components';
+import { Button, InputField } from '../../../components/shared';
+import { useUserContext } from '../../../context/UserContext';
+import { colors, fonts } from '../../../theme/styleVars';
 import { neighborhoods } from '../../../utils/lookups';
+import { ErrorMessage } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
 import AdditionalPhoto from '../Form/AdditionalPhoto';
 import { FormInput, FormSelect, FormTextArea, Input } from '../Form/Inputs';
 import FormPhoto from '../Form/Photo';
+import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
-import AddAwardButton from './AddAwardButton';
 import {
   AdditionalPhotos,
   DetailsCard,
@@ -25,12 +30,6 @@ import {
   Title
 } from './ProfileStyles';
 import { Award, Profile } from './types';
-import { ErrorMessage } from '../../../utils/validation';
-import styled from 'styled-components';
-import { colors, fonts } from '../../../theme/styleVars';
-import DetailAdd from '../shared/DetailAdd';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const CompanyProfileEdit: React.FC<{
   toggleEdit: () => void;
@@ -38,7 +37,7 @@ const CompanyProfileEdit: React.FC<{
   const {
     profile: { ref, data },
     setProfileData
-  } = useProfileContext();
+  } = useUserContext();
   const [formValues, setFormValues] = useForm<Profile>({
     additional_photos: {},
     awards: [],
@@ -118,7 +117,7 @@ const CompanyProfileEdit: React.FC<{
       <Form>
         <Row>
           <Col lg={12}>
-            <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex justify-content-between flex-row">
               <Title>Edit your profile</Title>
               <Button
                 onClick={handleSubmit}
@@ -137,7 +136,7 @@ const CompanyProfileEdit: React.FC<{
               name="profile_image_url"
               onChange={setFormValues}
             />
-            <AdditionalPhotos className="d-flex flex-wrap justify-content-between">
+            <AdditionalPhotos className="d-flex justify-content-between flex-wrap">
               {images.map((_, index) => (
                 <AdditionalPhoto
                   key={index}

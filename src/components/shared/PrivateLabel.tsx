@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from 'react-bootstrap';
 import styled from 'styled-components';
-import { colors, fonts } from '../theme/styleVars';
+import { colors, fonts } from '../../theme/styleVars';
 
 const PrivateLabel = () => {
   return (

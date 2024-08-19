@@ -6,11 +6,9 @@ import { Form } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useForm } from 'react-hooks-helper';
-import styled from 'styled-components';
+import { Button } from '../../../../components/shared';
 import { useFirebaseContext } from '../../../../context/FirebaseContext';
-import { useProfileContext } from '../../../../context/ProfileContext';
-import { Button } from '../../../../genericComponents';
-import { colors, fonts } from '../../../../theme/styleVars';
+import { useUserContext } from '../../../../context/UserContext';
 import { getOptions } from '../../../../utils/helpers';
 import {
   neighborhoods,
@@ -18,16 +16,16 @@ import {
   productionStatuses
 } from '../../../../utils/lookups';
 import PageContainer from '../../../layout/PageContainer';
+import ImageUpload from '../../../shared/ImageUpload';
 import {
   FormDateRange,
   FormInput,
   FormRadio,
-  FormTextArea,
-  FormSelect
+  FormSelect,
+  FormTextArea
 } from '../../Form/Inputs';
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
 import { Production } from '../types';
-import ImageUpload from '../../../shared/ImageUpload';
 
 const CompanyAddShow: React.FC<{
   toggleEdit: () => void;
@@ -35,7 +33,7 @@ const CompanyAddShow: React.FC<{
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     account: { data: accountData }
-  } = useProfileContext();
+  } = useUserContext();
   const [formValues, setFormValues] = useForm<Production>({
     account_id: accountData?.uid,
     production_id: '',
@@ -54,7 +52,7 @@ const CompanyAddShow: React.FC<{
     writers: '',
     location: ''
   });
-  const [showOtherType, setShowOtherType] = useState(false);
+  const [_showOtherType, setShowOtherType] = useState(false);
 
   useEffect(() => {
     setShowOtherType(formValues.type === 'Other');
@@ -82,7 +80,7 @@ const CompanyAddShow: React.FC<{
       <Form>
         <Row>
           <Col lg={12}>
-            <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex justify-content-between flex-row">
               <Title>Add a new show</Title>
               <Button
                 onClick={handleSubmit}
@@ -170,7 +168,7 @@ const CompanyAddShow: React.FC<{
         </Row>
         <Row>
           <Col lg={12} style={{ marginTop: 20 }}>
-            <div className="d-flex flex-row justify-content-between">
+            <div className="d-flex justify-content-between flex-row">
               <Button
                 onClick={toggleEdit}
                 text="Cancel"
@@ -191,16 +189,5 @@ const CompanyAddShow: React.FC<{
     </PageContainer>
   );
 };
-
-const Section = styled.h2`
-  font-family: ${fonts.montserrat};
-  font-style: normal;
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 24px;
-  letter-spacing: 0.07em;
-  color: ${colors.mainFont};
-  margin-top: 17px;
-`;
 
 export default CompanyAddShow;

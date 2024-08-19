@@ -1,18 +1,21 @@
 import { updateDoc } from 'firebase/firestore';
 import React from 'react';
-import { Step, useForm, useStep } from 'react-hooks-helper';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import { useProfileContext } from '../../../context/ProfileContext';
-import PageContainer from '../../layout/PageContainer';
-import SignUp2Footer from './SignUp2Footer';
-import Training from './Training';
-import Credits from './Credits';
-import Upcoming from './Upcoming';
-import AdditionalSkills from './AdditionalSkills';
-import Awards from './Awards';
-import type { USStateSymbol } from '../types';
-import type { IndividualProfile2Data, IndividualProfile2 } from './types';
+import Row from 'react-bootstrap/Row';
+import { Step, useForm, useStep } from 'react-hooks-helper';
+
+import { PageContainer } from '../components/layout';
+import AdditionalSkills from '../components/SignUp/Individual/AdditionalSkills';
+import Awards from '../components/SignUp/Individual/Awards';
+import Credits from '../components/SignUp/Individual/Credits';
+import SignUp2Footer from '../components/SignUp/Individual/SignUp2Footer';
+import Training from '../components/SignUp/Individual/Training';
+import type {
+  IndividualProfile2,
+  IndividualProfile2Data
+} from '../components/SignUp/Individual/types';
+import Upcoming from '../components/SignUp/Individual/Upcoming';
+import { useUserContext } from '../context/UserContext';
 
 // Establish our steps
 const steps: Step[] = [
@@ -66,11 +69,11 @@ const defaultData: IndividualProfile2Data = {
 };
 
 const SignUp2 = () => {
-  const { profile } = useProfileContext();
+  const { profile } = useUserContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
 
   // defaults for our steps
-  const { step, index, navigation } = useStep({ steps: steps });
+  const { step, navigation } = useStep({ steps: steps });
   const stepId = (step as Step).id;
 
   // submit full sign up flow 2 profile data

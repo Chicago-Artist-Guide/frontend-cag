@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
-import { useHistory } from 'react-router-dom';
-import Button from '../../../genericComponents/Button';
+import { useNavigate } from 'react-router-dom';
+import Button from '../../../components/shared/Button';
 import { goToTop } from '../../../utils/goToTop';
-import { PageFooterRow, ButtonCol, Pagination } from '../SignUpFooterStyles';
+import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
 
 const SignUp2Footer: React.FC<{
   navigation: NavigationProps;
@@ -13,7 +13,7 @@ const SignUp2Footer: React.FC<{
   currentStep: string;
   submitSignUp2Profile: () => Promise<void>;
 }> = ({ navigation, step, steps, currentStep, submitSignUp2Profile }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { next, previous } = navigation;
   const [nextBtnText, setNextBtnText] = useState<string>('Continue');
   const showBackButton = currentStep !== 'training';
@@ -30,7 +30,7 @@ const SignUp2Footer: React.FC<{
   const nextButtonAction = async (currStep: string) => {
     if (currStep === 'awards') {
       await submitSignUp2Profile();
-      history.push('/profile');
+      navigate('/profile');
       goToTop();
       return;
     }

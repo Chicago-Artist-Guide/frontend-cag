@@ -1,9 +1,9 @@
+import clsx from 'clsx';
 import React from 'react';
+import Swal from 'sweetalert2';
+import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { createTheaterTalentMatch } from './api';
-import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
-import clsx from 'clsx';
-import Swal from 'sweetalert2';
 
 type TalentMatchCardProps = {
   profile: ProfileAndName;
@@ -57,7 +57,7 @@ export const TalentMatchCard = ({
   };
 
   const { fullName, matchStatus } = profile;
-  const isRejected = matchStatus === false;
+  const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
   return (
@@ -141,12 +141,12 @@ export const TalentMatchCard = ({
         </button>
         <button
           onClick={() => createMatch(false)}
-          disabled={isRejected}
+          disabled={isDeclined}
           className={clsx(
             'flex h-full flex-col items-center justify-center bg-blush/50 px-4 py-2 text-salmon',
             {
-              'cursor-not-allowed opacity-50': isRejected,
-              'hover:bg-salmon/50 hover:text-white': !isRejected
+              'cursor-not-allowed opacity-50': isDeclined,
+              'hover:bg-salmon/50 hover:text-white': !isDeclined
             }
           )}
         >
@@ -163,7 +163,7 @@ export const TalentMatchCard = ({
             />
           </svg>
           <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
-            Reject
+            Decline
           </span>
         </button>
       </div>

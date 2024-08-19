@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Modal, Alert } from 'react-bootstrap';
+import { Alert, Modal } from 'react-bootstrap';
 import 'react-image-crop/dist/ReactCrop.css';
+import Button from '../../../components/shared/Button';
 import ImageUpload from '../../shared/ImageUpload';
-import Button from '../../../genericComponents/Button';
 
 type ImageUploadType = 'User' | 'Poster';
 
@@ -22,7 +22,7 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   currentImgUrl,
   type
 }) => {
-  const [error, setError] = useState('');
+  const [error] = useState('');
 
   return (
     <Modal show={show} onHide={onHide} backdrop="static">

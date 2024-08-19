@@ -1,7 +1,7 @@
 import React from 'react';
-import styled from 'styled-components';
-import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import styled from 'styled-components';
 import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';

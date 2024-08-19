@@ -1,10 +1,10 @@
+import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import Accordion from 'react-bootstrap/Accordion';
 import Masonry from 'react-masonry-css';
-import styled from 'styled-components';
 import { media } from 'styled-bootstrap-grid';
-import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import styled from 'styled-components';
 import { colors } from '../../theme/styleVars';
 
 interface Props {

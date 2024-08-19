@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Button } from 'react-bootstrap';
+import { Button, Modal } from 'react-bootstrap';
 import styled from 'styled-components';
 import { fonts } from '../theme/styleVars';
 

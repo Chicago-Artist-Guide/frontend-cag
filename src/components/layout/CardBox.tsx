@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import Card from '../../genericComponents/Card';
+import Card from '../../components/shared/Card';
 import { breakpoints } from '../../theme/styleVars';
 
 const CardBox = (props: any) => {

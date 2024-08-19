@@ -1,10 +1,9 @@
 import React from 'react';
 
-import styled from 'styled-components';
-import { colors } from '../../../../../theme/styleVars';
 import { Container, Form } from 'react-bootstrap';
-import { InputField } from '../../../../../genericComponents';
-import { PastPerformances } from '../../../../SignUp/Individual/types';
+import styled from 'styled-components';
+import { InputField } from '../../../../../components/shared';
+import { colors } from '../../../../../theme/styleVars';
 
 const FeaturesEdit: React.FC<{
   features: any;
@@ -12,10 +11,9 @@ const FeaturesEdit: React.FC<{
   onCreditFieldChange: any;
   removeCreditBlock: (e: any, i: number) => void;
 }> = ({ features, onCreditFieldChange, removeCreditBlock }) => {
-
   return (
     <Container>
-      {features.map((credit: any, i: number) => (
+      {features.map((credit: any) => (
         <>
           <Form>
             <InputField

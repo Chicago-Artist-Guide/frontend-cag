@@ -1,13 +1,14 @@
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import { useHistory } from 'react-router-dom';
-import queryString from 'query-string';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useAuthValue } from '../context/AuthContext';
 import PageContainer from '../components/layout/PageContainer';
+import { PreviewCard } from '../components/Profile/shared/styles';
+import Button from '../components/shared/Button';
 import AccountType from '../components/SignUp/AccountType';
 import CompanySignUp from '../components/SignUp/Company';
 import IndividualSignUp from '../components/SignUp/Individual';
@@ -16,14 +17,13 @@ import {
   PageFooterRow
 } from '../components/SignUp/SignUpFooterStyles';
 import { AccountTypeOptions } from '../components/SignUp/types';
-import Button from '../genericComponents/Button';
+import { useUserContext } from '../context/UserContext';
 import { breakpoints } from '../theme/styleVars';
-import { PreviewCard } from '../components/Profile/shared/styles';
 
 const SignUp: React.FC = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { flag } = queryString.parse(location.search);
-  const { currentUser } = useAuthValue();
+  const { currentUser } = useUserContext();
   const [currentStep, setCurrentStep] = useState(-1);
   const [accountType, setAccountType] = useState<AccountTypeOptions | null>(
     null
@@ -31,7 +31,7 @@ const SignUp: React.FC = () => {
 
   useEffect(() => {
     if (currentUser && currentStep === -1) {
-      history.push('/profile');
+      navigate('/profile');
     }
   }, [currentUser]);
 

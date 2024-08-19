@@ -4,17 +4,17 @@ import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
-import { Button, Checkbox, InputField } from '../../../genericComponents';
+import { Button, Checkbox } from '../../../components/shared';
+import { colors, fonts } from '../../../theme/styleVars';
 import {
   AgeRange,
   ageRanges,
   ethnicityTypes,
+  genders,
   IndividualProfileDataFull,
   IndividualWebsite,
-  genders,
   websiteTypeOptions
 } from '../../SignUp/Individual/types';
-import { fonts, colors } from '../../../theme/styleVars';
 
 interface EditPersonalDetailsProps<T extends keyof IndividualWebsite> {
   ageRangeChange: (checkValue: boolean, range: AgeRange) => void;
@@ -230,7 +230,7 @@ const EditPersonalDetails = ({
         <Container>
           <Row>
             <PaddedCol lg="10">
-              {editProfile?.websites?.map((websiteRow: any, i: any) => (
+              {editProfile?.websites?.map((websiteRow: any) => (
                 <div key={`website-row-${websiteRow.id}`}>
                   <CAGFormControl
                     aria-label="URL"

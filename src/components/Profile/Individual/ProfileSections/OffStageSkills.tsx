@@ -1,7 +1,7 @@
 import React from 'react';
+import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { colors } from '../../../../theme/styleVars';
-import { Container } from 'styled-bootstrap-grid';
 import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
 const OffStageSkills: React.FC<{
