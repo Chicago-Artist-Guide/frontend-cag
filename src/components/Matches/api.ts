@@ -88,12 +88,12 @@ export async function fetchTalentWithFilters(
   productionId: string,
   roleId: string
 ): Promise<IndividualProfileDataFullInit[]> {
+  // NOTE: do not remove "accountType" from the destructuring below
+  // it's necessary that it's removed for filters to work
   const { type: accountType, matchStatus, ...profileFilters } = filters;
   const profilesRef = collection(firebaseStore, 'profiles');
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
-
-  console.log('filters', filters);
 
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
@@ -132,8 +132,6 @@ export async function fetchTalentWithFilters(
   );
   const matches: IndividualProfileDataFullInit[] = [];
 
-  console.log('snaps and matches set', snapshots, matchesSet);
-
   // This is the complicated part: we have to find the intersection
   // Because we did multuple queries and only want profiles that match ALL of the filters
   for (let i = 0; i < snapshots.length; i++) {
@@ -142,10 +140,8 @@ export async function fetchTalentWithFilters(
     );
 
     for (const id of matchesSet) {
-      console.log('in for loop', id);
       if (!currentSet.has(id)) {
         matchesSet.delete(id);
-        console.log('deleted id', id);
       }
     }
   }
@@ -176,8 +172,6 @@ export async function fetchTalentWithFilters(
       }
     }
   }
-
-  console.log(matches);
 
   return matches;
 }
