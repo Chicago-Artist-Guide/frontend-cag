@@ -1,3 +1,5 @@
+import { DocumentReference, DocumentData } from 'firebase/firestore';
+
 export interface MessageFilters {
   accountId?: string; // company or talent account id
   roleId?: string;
@@ -5,10 +7,9 @@ export interface MessageFilters {
 
 export interface MessageType {
   id: string;
-  from_id: string;
-  to_id: string;
-  role_id: string;
-  message: string;
+  sender_id: DocumentReference<DocumentData> | string;
+  recipient_id: DocumentReference<DocumentData> | string;
+  content: string;
   action?: string;
   timestamp: Date;
   status: string;
@@ -24,10 +25,9 @@ export interface MessageThreadType {
   id: string;
   created_at: Date;
   last_message: LastMessage;
-  talent_account_id: string;
+  talent_account_id: DocumentReference<DocumentData> | string;
   talent_status: string;
-  theater_account_id: string;
+  theater_account_id: DocumentReference<DocumentData> | string;
   theater_status: string;
   updated_at: Date;
-  messages: MessageType[];
 }

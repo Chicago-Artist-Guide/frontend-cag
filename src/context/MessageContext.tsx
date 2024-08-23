@@ -5,10 +5,13 @@ import {
   getDocs,
   doc,
   updateDoc,
-  getDoc
+  getDoc,
+  where,
+  query,
+  or
 } from 'firebase/firestore';
 import { useUserContext } from './UserContext';
-import { MessageThreadType } from '../components/Messages/types';
+import { MessageThreadType, MessageType } from '../components/Messages/types';
 
 interface MessageContextType {
   threads: MessageThreadType[];
@@ -16,11 +19,8 @@ interface MessageContextType {
   currentThread: MessageThreadType | null;
   loadThread: (threadId: string) => void;
   updateThreadStatus: (threadId: string, status: string) => void;
-  updateMessageStatus: (
-    threadId: string,
-    messageId: string,
-    status: string
-  ) => void;
+  loadThreadMessages: (sender_id: string, recipient_id: string) => void;
+  currentThreadMessages: MessageType[];
 }
 
 const MessageContext = createContext<MessageContextType>({
@@ -29,7 +29,8 @@ const MessageContext = createContext<MessageContextType>({
   currentThread: null,
   loadThread: () => null,
   updateThreadStatus: () => null,
-  updateMessageStatus: () => null
+  loadThreadMessages: () => null,
+  currentThreadMessages: []
 });
 
 export const useMessages = () => useContext(MessageContext);
@@ -44,25 +45,26 @@ export const MessageProvider: React.FC<{
   const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
     null
   );
+  const [currentThreadMessages, setCurrentThreadMessages] = useState<
+    MessageType[]
+  >([]);
 
   const loadThreads = async (accountId: string) => {
-    const threadsCollection = collection(firestore, 'threads');
-    const threadsSnapshot = await getDocs(threadsCollection);
+    const threadsRef = collection(firestore, 'threads');
+    const currAccountRef = doc(firestore, 'accounts', accountId);
+    const threadQuery = query(
+      threadsRef,
+      or(
+        where('theater_account_id', '==', currAccountRef),
+        where('talent_account_id', '==', currAccountRef)
+      )
+    );
+    const threadSnapshot = await getDocs(threadQuery);
+    const userThreads = threadSnapshot.docs.map(
+      (doc) => ({ id: doc.id, ...doc.data() }) as MessageThreadType
+    );
 
-    if (!threadsSnapshot.empty) {
-      const threadsData = threadsSnapshot.docs.map(
-        (doc) => doc.data() as MessageThreadType
-      );
-      const userThreads = threadsData.filter(
-        (thread) =>
-          thread.talent_account_id === accountId ||
-          thread.theater_account_id === accountId
-      );
-
-      console.log(userThreads);
-
-      setThreads(userThreads);
-    }
+    setThreads(userThreads);
   };
 
   const loadThread = async (threadId: string) => {
@@ -75,6 +77,33 @@ export const MessageProvider: React.FC<{
     }
   };
 
+  const loadThreadMessages = async (
+    sender_id: string,
+    recipient_id: string
+  ) => {
+    const messagesRef = collection(firestore, 'messages');
+    const senderRef = doc(firestore, 'accounts', sender_id);
+    const recipientRef = doc(firestore, 'accounts', recipient_id);
+
+    try {
+      const messagesQuery = query(
+        messagesRef,
+        or(
+          where('sender_id', 'in', [senderRef, recipientRef]),
+          where('recipient_id', 'in', [senderRef, recipientRef])
+        )
+      );
+      const messagesSnapshot = await getDocs(messagesQuery);
+      const messagesDocs = messagesSnapshot.docs.map(
+        (doc) => ({ id: doc.id, ...doc.data() }) as MessageType
+      );
+
+      setCurrentThreadMessages(messagesDocs);
+    } catch (error) {
+      console.error('Could not fetch messages for thread', error);
+    }
+  };
+
   const updateThreadStatus = async (threadId: string, status: string) => {
     const accountId = account?.data?.uid;
     const threadDoc = doc(firestore, 'threads', threadId);
@@ -83,27 +112,6 @@ export const MessageProvider: React.FC<{
 
     // Refresh threads
     accountId && loadThreads(accountId);
-  };
-
-  const updateMessageStatus = async (
-    threadId: string,
-    messageId: string,
-    status: string
-  ) => {
-    const threadDoc = doc(firestore, 'threads', threadId);
-    const threadSnapshot = await getDoc(threadDoc);
-
-    if (threadSnapshot.exists()) {
-      const threadData = threadSnapshot.data() as MessageThreadType;
-      const updatedMessages = threadData.messages.map((message) =>
-        message.id === messageId ? { ...message, status } : message
-      );
-
-      await updateDoc(threadDoc, { messages: updatedMessages });
-
-      // Refresh current thread
-      loadThread(threadId);
-    }
   };
 
   useEffect(() => {
@@ -122,7 +130,8 @@ export const MessageProvider: React.FC<{
         currentThread,
         loadThread,
         updateThreadStatus,
-        updateMessageStatus
+        loadThreadMessages,
+        currentThreadMessages
       }}
     >
       {children}

@@ -1,38 +1,44 @@
-import React, { useEffect } from 'react';
-import { useMessages } from '../../context/MessageContext';
+import React, { useEffect, useState } from 'react';
 import { useUserContext } from '../../context/UserContext';
-import { MessageType } from './types';
-
-// TODO: add "read" and "unread" state for thread grouped messages
+import { useMessages } from '../../context/MessageContext';
 
 interface MessageThreadsProps {
-  onThreadSelect: (roleId: string) => void;
+  onThreadSelect: (threadId: string) => void;
 }
 
 const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
   const { account } = useUserContext();
   const { threads, loadThreads } = useMessages();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const accountId = account?.data?.uid;
     loadThreads(accountId);
-  }, []);
+  }, [account]);
 
   return (
     <div>
-      {threads.map((thread, i) => (
-        <div
-          key={`${thread.id}-${i}`}
-          onClick={() => onThreadSelect(thread.id)}
-        >
-          <h4>Role: {thread.id}</h4>
-          {thread.messages.slice(0, 1).map((message: MessageType) => (
-            <div key={message.id}>
-              <p>{message.message}</p> {/* TODO: design as a message preview */}
-            </div>
-          ))}
-        </div>
-      ))}
+      <h4>Threads Sidebar</h4>
+      {loading ? (
+        <>
+          {threads && threads.length ? (
+            <>
+              {threads.map((thread, i) => (
+                <div
+                  key={`${thread.id}-${i}`}
+                  onClick={() => onThreadSelect(thread.id)}
+                >
+                  {thread.last_message.content}
+                </div>
+              ))}
+            </>
+          ) : (
+            <></>
+          )}
+        </>
+      ) : (
+        <p>Loading Threads</p>
+      )}
     </div>
   );
 };
