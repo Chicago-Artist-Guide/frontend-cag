@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { useUserContext } from '../../context/UserContext';
@@ -11,7 +12,6 @@ type TalentMatchCardProps = {
   profile: ProfileAndName;
   productionId: string;
   roleId: string;
-  fetchFullNames: () => Promise<void>;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -54,9 +54,9 @@ const ConfirmationModal = ({
 export const TalentMatchCard = ({
   profile,
   productionId,
-  roleId,
-  fetchFullNames
+  roleId
 }: TalentMatchCardProps) => {
+  const navigate = useNavigate();
   const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -85,9 +85,7 @@ export const TalentMatchCard = ({
         true
       );
 
-      console.log(messageThreadId);
-
-      await fetchFullNames();
+      return messageThreadId;
     } catch (error) {
       let errorMessage = 'An unknown error occurred';
       if (error instanceof Error) {
@@ -106,11 +104,13 @@ export const TalentMatchCard = ({
     }
   };
 
-  const handleConfirm = () => {
-    if (matchType !== null) {
-      createMatch(matchType);
-    }
+  const handleConfirm = async () => {
     setIsModalVisible(false);
+
+    if (matchType !== null) {
+      const threadId = await createMatch(matchType);
+      navigate(`/profile/messages/${threadId}`);
+    }
   };
 
   const handleCancel = () => {

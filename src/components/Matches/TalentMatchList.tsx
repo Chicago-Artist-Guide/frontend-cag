@@ -52,7 +52,6 @@ export const TalentMatchList = () => {
           profile={profile}
           productionId={production?.production_id || ''}
           roleId={currentRoleId || ''}
-          fetchFullNames={fetchFullNames}
         />
       ))}
     </div>

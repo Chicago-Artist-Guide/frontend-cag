@@ -20,7 +20,7 @@ export interface LastMessage {
   timestamp: Date;
 }
 
-export interface MessageThread {
+export interface MessageThreadType {
   id: string;
   created_at: Date;
   last_message: LastMessage;

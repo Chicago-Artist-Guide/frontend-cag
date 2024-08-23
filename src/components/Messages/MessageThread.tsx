@@ -1,15 +1,19 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
+import { MessageThreadType } from './types';
 
 interface MessageThreadProps {
-  thread: string;
+  thread: MessageThreadType;
 }
 
 export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
-  // TODO: use context to get thread
+  const { threadId } = useParams();
+
+  console.log(thread);
 
   return (
     <div>
-      <p>Individual message thread for {thread}</p>
+      <p>Thread {threadId}</p>
     </div>
   );
 };

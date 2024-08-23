@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   Firestore,
   collection,
@@ -8,12 +8,12 @@ import {
   getDoc
 } from 'firebase/firestore';
 import { useUserContext } from './UserContext';
-import { MessageThread } from '../components/Messages/types';
+import { MessageThreadType } from '../components/Messages/types';
 
 interface MessageContextType {
-  threads: MessageThread[];
+  threads: MessageThreadType[];
   loadThreads: (accountId: string) => void;
-  currentThread: MessageThread | null;
+  currentThread: MessageThreadType | null;
   loadThread: (threadId: string) => void;
   updateThreadStatus: (threadId: string, status: string) => void;
   updateMessageStatus: (
@@ -37,10 +37,11 @@ export const useMessages = () => useContext(MessageContext);
 export const MessageProvider: React.FC<{
   children: React.ReactNode;
   firestore: Firestore;
-}> = ({ children, firestore }) => {
+  threadIdParam?: string;
+}> = ({ children, firestore, threadIdParam }) => {
   const { account } = useUserContext();
-  const [threads, setThreads] = useState<MessageThread[]>([]);
-  const [currentThread, setCurrentThread] = useState<MessageThread | null>(
+  const [threads, setThreads] = useState<MessageThreadType[]>([]);
+  const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
     null
   );
 
@@ -50,15 +51,17 @@ export const MessageProvider: React.FC<{
 
     if (!threadsSnapshot.empty) {
       const threadsData = threadsSnapshot.docs.map(
-        (doc) => doc.data() as MessageThread
+        (doc) => doc.data() as MessageThreadType
       );
-      setThreads(
-        threadsData.filter(
-          (thread) =>
-            thread.talent_account_id === accountId ||
-            thread.theater_account_id === accountId
-        )
+      const userThreads = threadsData.filter(
+        (thread) =>
+          thread.talent_account_id === accountId ||
+          thread.theater_account_id === accountId
       );
+
+      console.log(userThreads);
+
+      setThreads(userThreads);
     }
   };
 
@@ -67,13 +70,13 @@ export const MessageProvider: React.FC<{
     const threadSnapshot = await getDoc(threadDoc);
 
     if (threadSnapshot.exists()) {
-      const threadData = threadSnapshot.data() as MessageThread;
+      const threadData = threadSnapshot.data() as MessageThreadType;
       setCurrentThread(threadData);
     }
   };
 
   const updateThreadStatus = async (threadId: string, status: string) => {
-    const accountId = account?.data?.id;
+    const accountId = account?.data?.uid;
     const threadDoc = doc(firestore, 'threads', threadId);
 
     await updateDoc(threadDoc, { status });
@@ -91,7 +94,7 @@ export const MessageProvider: React.FC<{
     const threadSnapshot = await getDoc(threadDoc);
 
     if (threadSnapshot.exists()) {
-      const threadData = threadSnapshot.data() as MessageThread;
+      const threadData = threadSnapshot.data() as MessageThreadType;
       const updatedMessages = threadData.messages.map((message) =>
         message.id === messageId ? { ...message, status } : message
       );
@@ -102,6 +105,14 @@ export const MessageProvider: React.FC<{
       loadThread(threadId);
     }
   };
+
+  useEffect(() => {
+    if (!threadIdParam) {
+      return;
+    }
+
+    loadThread(threadIdParam);
+  }, [threadIdParam]);
 
   return (
     <MessageContext.Provider

@@ -14,9 +14,9 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
   const { threads, loadThreads } = useMessages();
 
   useEffect(() => {
-    const accountId = account?.data?.id;
+    const accountId = account?.data?.uid;
     loadThreads(accountId);
-  }, [loadThreads]);
+  }, []);
 
   return (
     <div>
