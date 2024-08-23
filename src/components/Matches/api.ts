@@ -88,7 +88,9 @@ export async function fetchTalentWithFilters(
   productionId: string,
   roleId: string
 ): Promise<IndividualProfileDataFullInit[]> {
-  const { matchStatus, ...profileFilters } = filters;
+  // NOTE: do not remove "accountType" from the destructuring below
+  // it's necessary that it's removed for filters to work
+  const { type: accountType, matchStatus, ...profileFilters } = filters;
   const profilesRef = collection(firebaseStore, 'profiles');
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);

@@ -1,15 +1,17 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
+import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { createTheaterTalentMatch } from './api';
+import { createMessageThread } from '../Messages/api';
 
 type TalentMatchCardProps = {
   profile: ProfileAndName;
   productionId: string;
   roleId: string;
-  fetchFullNames: () => Promise<void>;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -17,13 +19,51 @@ export type ProfileAndName = IndividualProfileDataFullInit & {
   matchStatus: boolean | null;
 };
 
+const ConfirmationModal = ({
+  onConfirm,
+  onCancel
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+}) => (
+  <div
+    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+    style={{ zIndex: 9999 }}
+  >
+    <div className="rounded bg-white p-4 shadow-lg">
+      <h2 className="text-lg font-bold">Confirm Match</h2>
+      <p>
+        Are you sure you want to accept this match? This action will create a
+        message thread with [name]
+      </p>
+      <div className="mt-4 flex justify-end space-x-2">
+        <button onClick={onCancel} className="bg-gray-300 rounded px-4 py-2">
+          Cancel
+        </button>
+        <button
+          onClick={onConfirm}
+          className="rounded bg-blue-500 px-4 py-2 text-white"
+        >
+          Confirm
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
 export const TalentMatchCard = ({
   profile,
   productionId,
-  roleId,
-  fetchFullNames
+  roleId
 }: TalentMatchCardProps) => {
+  const navigate = useNavigate();
+  const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [matchType, setMatchType] = useState<boolean | null>(null);
+  const { fullName, matchStatus } = profile;
+  const isDeclined = matchStatus === false;
+  const isAccepted = matchStatus === true;
 
   const createMatch = async (status: boolean) => {
     try {
@@ -37,7 +77,15 @@ export const TalentMatchCard = ({
         status
       );
 
-      await fetchFullNames();
+      const messageThreadId = await createMessageThread(
+        firebaseFirestore,
+        account.data.uid,
+        talentAccountId,
+        'Test first message',
+        true
+      );
+
+      return messageThreadId;
     } catch (error) {
       let errorMessage = 'An unknown error occurred';
       if (error instanceof Error) {
@@ -56,9 +104,19 @@ export const TalentMatchCard = ({
     }
   };
 
-  const { fullName, matchStatus } = profile;
-  const isDeclined = matchStatus === false;
-  const isAccepted = matchStatus === true;
+  const handleConfirm = async () => {
+    setIsModalVisible(false);
+
+    if (matchType !== null) {
+      const threadId = await createMatch(matchType);
+      navigate(`/profile/messages/${threadId}`);
+    }
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setMatchType(null);
+  };
 
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
@@ -113,7 +171,10 @@ export const TalentMatchCard = ({
 
       <div className="flex flex-none flex-col">
         <button
-          onClick={() => createMatch(true)}
+          onClick={() => {
+            setMatchType(true);
+            setIsModalVisible(true);
+          }}
           disabled={isAccepted}
           className={clsx('h-full bg-yoda/50 px-4 py-2 text-mint', {
             'cursor-not-allowed opacity-50': isAccepted,
@@ -167,6 +228,9 @@ export const TalentMatchCard = ({
           </span>
         </button>
       </div>
+      {isModalVisible && (
+        <ConfirmationModal onConfirm={handleConfirm} onCancel={handleCancel} />
+      )}
     </div>
   );
 };

@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useMessages } from '../../context/MessageContext';
 import { MessageThread } from './MessageThread';
 import MessageThreads from './MessageThreads';
 import MessageThreadsActionBar from './MessageThreadsActionBar';
-import { MessagesPagination } from './MessagesPagination';
+import { MessageThreadType } from './types';
 
 const MessagesContainer: React.FC = () => {
-  const [currentThread, setCurrentThread] = useState<string | null>(null);
+  const { currentThread: currThreadFromContext } = useMessages();
+  const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
+    null
+  );
 
-  const handleThreadSelect = (roleId: string) => {
-    setCurrentThread(roleId);
+  const handleThreadSelect = (threadId: string) => {
+    // setCurrentThread(threadId);
   };
 
   const handleBackToThreads = () => {
     setCurrentThread(null);
   };
 
+  useEffect(() => {
+    setCurrentThread(currThreadFromContext);
+  }, [currThreadFromContext]);
+
   return (
     <div>
       <MessageThreadsActionBar />
+      <MessageThreads onThreadSelect={handleThreadSelect} />
       {currentThread ? (
         <>
           <a href="#" onClick={handleBackToThreads}>
@@ -26,10 +35,7 @@ const MessagesContainer: React.FC = () => {
           <MessageThread thread={currentThread} />
         </>
       ) : (
-        <>
-          <MessageThreads onThreadSelect={handleThreadSelect} />
-          <MessagesPagination />
-        </>
+        <p>Please select a thread.</p>
       )}
     </div>
   );

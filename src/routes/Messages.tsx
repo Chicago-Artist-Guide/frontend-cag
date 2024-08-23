@@ -1,4 +1,5 @@
 import React from 'react';
+import { useParams } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import PageContainer from '../components/layout/PageContainer';
@@ -9,9 +10,10 @@ import { MessageProvider } from '../context/MessageContext';
 
 const Messages = () => {
   const { firebaseFirestore } = useFirebaseContext();
+  const { threadId } = useParams();
 
   return (
-    <MessageProvider firestore={firebaseFirestore}>
+    <MessageProvider firestore={firebaseFirestore} threadIdParam={threadId}>
       <PageContainer>
         <Row>
           <Col lg={12}>

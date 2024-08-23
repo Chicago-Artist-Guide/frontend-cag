@@ -39,7 +39,7 @@ const AppRoutes = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-up-2" element={<SignUp2 />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/profile/messages" element={<Messages />} />
+        <Route path="/profile/messages/:threadId?" element={<Messages />} />
         <Route
           path="/production/:productionId/manage"
           element={<ManageProduction />}
