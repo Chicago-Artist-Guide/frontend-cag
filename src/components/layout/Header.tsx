@@ -1,6 +1,7 @@
 import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
+import { NavDropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
@@ -34,9 +35,14 @@ const Header = () => {
           <Nav.Link as={Link} to="/donate">
             DONATE
           </Nav.Link>
-          <Nav.Link href="https://www.zeffy.com/ticketing/f021b4c4-c62b-4fbf-b975-689121ed5b71">
-            CAG-BARET
-          </Nav.Link>
+          <NavDropdown title="CAG-BARET" id="basic-nav-dropdown">
+            <NavDropdown.Item href="https://www.zeffy.com/ticketing/f021b4c4-c62b-4fbf-b975-689121ed5b71">
+              Get your tickets!
+            </NavDropdown.Item>
+            <NavDropdown.Item href="https://www.zeffy.com/ticketing/5a15d35d-d24e-4a21-926c-1acaec989b6e">
+              Silent Auction
+            </NavDropdown.Item>
+          </NavDropdown>
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">
               PROFILE
