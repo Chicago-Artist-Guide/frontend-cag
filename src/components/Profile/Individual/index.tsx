@@ -858,6 +858,17 @@ const IndividualProfile: React.FC<{
               </>
             )}
           </DetailsCard>
+          <DetailsCard>
+            <DetailsColTitle>
+              <div>Menu</div>
+            </DetailsColTitle>
+            <div>
+              <a href="/profile/search/roles">Find Roles</a>
+            </div>
+            <div>
+              <a href="/profile/messages">Messages</a>
+            </div>
+          </DetailsCard>
         </Col>
         <Col lg={8}>
           <div>
