@@ -1,5 +1,14 @@
 import { Firestore } from 'firebase/firestore';
-import React, { createContext, useContext, ReactNode, useState } from 'react';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect
+} from 'react';
+import { useUserContext } from './UserContext';
+import { fetchRolesForTalent } from '../components/Matches/api';
+import { ProductionRole } from '../components/Matches/types';
 
 interface RoleMatchContextValue {
   roles: any;
@@ -19,15 +28,26 @@ const defaultContextValue: RoleMatchContextValue = {
 const RoleMatchContext =
   createContext<RoleMatchContextValue>(defaultContextValue);
 
-export const useMatches = (): RoleMatchContextValue =>
+export const useRoleMatches = (): RoleMatchContextValue =>
   useContext(RoleMatchContext);
 
 export const RoleMatchProvider: React.FC<RoleMatchProviderProps> = ({
   firestore,
   children
 }) => {
-  const [roles, setRoles] = useState<any[]>([]);
+  const { profile } = useUserContext();
+  const [roles, setRoles] = useState<ProductionRole[]>([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const profileData = profile.data;
+
+    setLoading(true);
+    fetchRolesForTalent(firestore, profileData).then((filteredRoles) => {
+      setRoles(filteredRoles);
+      setLoading(false);
+    });
+  }, [profile]);
 
   const value: RoleMatchContextValue = {
     roles,
