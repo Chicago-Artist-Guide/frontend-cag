@@ -11,7 +11,6 @@ export const TalentMatchList = () => {
   const [profiles, setProfiles] = useState<ProfileAndName[]>([]);
   const [cardsLoading, setCardsLoading] = useState(true);
 
-  // TODO: check if an existing match status exists in theater_talent_matches
   const fetchFullNames = async () => {
     const profilesWithNames = await Promise.all(
       matches.map(async (m) => {

@@ -7,12 +7,16 @@ import React, {
   useEffect
 } from 'react';
 import { useUserContext } from './UserContext';
+import { Production } from '../components/Profile/Company/types';
+import { getProduction } from '../components/Profile/Company/api';
 import { fetchRolesForTalent } from '../components/Matches/api';
 import { ProductionRole } from '../components/Matches/types';
 
 interface RoleMatchContextValue {
-  roles: any;
+  productions: { [key: string]: Production };
+  roles: ProductionRole[];
   loading: boolean;
+  findProduction: (productionId: string) => Promise<Production | null>;
 }
 
 interface RoleMatchProviderProps {
@@ -21,8 +25,10 @@ interface RoleMatchProviderProps {
 }
 
 const defaultContextValue: RoleMatchContextValue = {
+  productions: {},
   roles: [],
-  loading: true
+  loading: true,
+  findProduction: async () => null
 };
 
 const RoleMatchContext =
@@ -36,6 +42,9 @@ export const RoleMatchProvider: React.FC<RoleMatchProviderProps> = ({
   children
 }) => {
   const { profile } = useUserContext();
+  const [productions, setProductions] = useState<{ [key: string]: Production }>(
+    {}
+  );
   const [roles, setRoles] = useState<ProductionRole[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -49,9 +58,37 @@ export const RoleMatchProvider: React.FC<RoleMatchProviderProps> = ({
     });
   }, [profile]);
 
+  const findProduction = async (
+    productionId: string
+  ): Promise<Production | null> => {
+    if (productions[productionId]) {
+      return productions[productionId];
+    }
+
+    try {
+      const production = await getProduction(firestore, productionId);
+
+      if (!production) {
+        throw new Error(`Could not find production with id: ${productionId}`);
+      }
+
+      setProductions((prevProductions) => ({
+        ...prevProductions,
+        [productionId]: production
+      }));
+
+      return production;
+    } catch (error) {
+      console.error('Error fetching production:', error);
+      return null;
+    }
+  };
+
   const value: RoleMatchContextValue = {
+    productions,
     roles,
-    loading
+    loading,
+    findProduction
   };
 
   return (
