@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PageContainer from '../components/layout/PageContainer';
 import ManageProductionBasic from '../components/Profile/Company/Production/Manage/ManageProductionBasic';
-import ManageProductionDates from '../components/Profile/Company/Production/Manage/ManageProductionDates';
 import ManageProductionMatches from '../components/Profile/Company/Production/Manage/ManageProductionMatches';
 import ManageProductionRoles from '../components/Profile/Company/Production/Manage/ManageProductionRoles';
 import { Title } from '../components/Profile/Company/ProfileStyles';
@@ -134,14 +133,6 @@ const ManageProduction = () => {
           <Tab eventKey="basic" title="Basic Info">
             <TabRow>
               <ManageProductionBasic
-                formValues={formValues}
-                setFormValues={setFormValues}
-              />
-            </TabRow>
-          </Tab>
-          <Tab eventKey="dates" title="important Dates">
-            <TabRow>
-              <ManageProductionDates
                 formValues={formValues}
                 setFormValues={setFormValues}
               />
