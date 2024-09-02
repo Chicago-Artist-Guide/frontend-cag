@@ -13,7 +13,7 @@ const FeaturesEdit: React.FC<{
 }> = ({ features, onCreditFieldChange, removeCreditBlock }) => {
   return (
     <Container>
-      {features.map((credit: any) => (
+      {features?.map((credit: any) => (
         <>
           <Form>
             <InputField
@@ -69,7 +69,7 @@ const FeaturesEdit: React.FC<{
               value={credit.musicalDirector}
             />
           </Form>
-          {features.length > 1 && (
+          {features?.length > 1 && (
             <DeleteRowLink
               href="#"
               onClick={(e: any) => removeCreditBlock(e, credit.id)}
