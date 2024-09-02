@@ -11,7 +11,6 @@ import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useUserContext } from '../../../../context/UserContext';
 import { getOptions } from '../../../../utils/helpers';
 import {
-  neighborhoods,
   productionEquities,
   productionStatuses
 } from '../../../../utils/lookups';
@@ -151,12 +150,11 @@ const CompanyAddShow: React.FC<{
               checked={formValues.equity}
               onChange={setFormValues}
             />
-            <FormSelect
+            <FormInput
               name="location"
               label="Location"
-              defaultValue="The Loop"
-              options={getOptions(neighborhoods)}
               onChange={setFormValues}
+              defaultValue={formValues?.location}
             />
             <FormInput
               name="musical_director"
