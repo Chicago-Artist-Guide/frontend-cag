@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { getOptions } from '../../../../../utils/helpers';
-import { productionStatuses } from '../../../../../utils/lookups';
+import {
+  productionStatuses,
+  productionEquities
+} from '../../../../../utils/lookups';
 import ImageUpload from '../../../../shared/ImageUpload';
-import { FormInput, FormRadio, FormTextArea } from '../../../Form/Inputs';
+import {
+  FormInput,
+  FormRadio,
+  FormTextArea,
+  FormDateRange
+} from '../../../Form/Inputs';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Production } from '../../types';
 
@@ -47,22 +55,19 @@ const ManageProductionBasic: React.FC<{
           defaultValue={formValues?.production_name}
           style={{ marginTop: 0 }}
         />
-        <FormRadio
-          name="type"
-          label="Type"
-          options={getOptions(types)}
-          checked={formValues.type}
+        <FormInput
+          name="writers"
+          label="Written By"
           onChange={setFormValues}
+          defaultValue={formValues?.writers}
         />
-        {showOtherType && (
-          <FormInput
-            name="type_other"
-            label=""
-            onChange={setFormValues}
-            defaultValue={formValues?.type_other}
-            style={{ marginTop: 0 }}
-          />
-        )}
+        <FormDateRange
+          name="open_and_close"
+          label="Open & Close"
+          onChange={setFormValues}
+          startValue={formValues?.open_and_close_start}
+          endValue={formValues?.open_and_close_end}
+        />
         <FormRadio
           name="status"
           label="Status"
@@ -82,30 +87,24 @@ const ManageProductionBasic: React.FC<{
           onChange={setFormValues}
           defaultValue={formValues?.director}
         />
+        <FormRadio
+          name="equity"
+          label="Equity"
+          options={getOptions(productionEquities)}
+          checked={formValues.equity}
+          onChange={setFormValues}
+        />
+        <FormInput
+          name="location"
+          label="Location"
+          onChange={setFormValues}
+          defaultValue={formValues?.location}
+        />
         <FormInput
           name="musical_director"
           label="Musical Director"
           onChange={setFormValues}
           defaultValue={formValues?.musical_director}
-        />
-        <FormInput
-          name="casting_director"
-          label="Casting Director"
-          onChange={setFormValues}
-          defaultValue={formValues?.casting_director}
-        />
-        <FormInput
-          name="casting_director_email"
-          label="Casting Director Email"
-          onChange={setFormValues}
-          defaultValue={formValues?.casting_director_email}
-        />
-        <FormRadio
-          name="equity"
-          label="Equity"
-          options={getOptions(equity)}
-          checked={formValues.equity}
-          onChange={setFormValues}
         />
       </RightCol>
     </>

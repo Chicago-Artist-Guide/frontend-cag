@@ -10,7 +10,6 @@ import styled from 'styled-components';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PageContainer from '../components/layout/PageContainer';
 import ManageProductionBasic from '../components/Profile/Company/Production/Manage/ManageProductionBasic';
-import ManageProductionDates from '../components/Profile/Company/Production/Manage/ManageProductionDates';
 import ManageProductionMatches from '../components/Profile/Company/Production/Manage/ManageProductionMatches';
 import ManageProductionRoles from '../components/Profile/Company/Production/Manage/ManageProductionRoles';
 import { Title } from '../components/Profile/Company/ProfileStyles';
@@ -19,6 +18,8 @@ import { Button } from '../components/shared';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { useUserContext } from '../context/UserContext';
 import { colors, fonts } from '../theme/styleVars';
+import ManageAuditionInfo from '../components/Profile/Company/Production/Manage/ManageAuditionInfo';
+import ManageOffStageInfo from '../components/Profile/Company/Production/Manage/ManageOffStageInfo';
 
 const ManageProduction = () => {
   const { productionId = '' } = useParams<{ productionId: string }>();
@@ -44,7 +45,15 @@ const ManageProduction = () => {
     equity: undefined,
     writers: '',
     roles: [],
-    location: ''
+    location: '',
+    audition_location: '',
+    contact_person_name_offstage: '',
+    contact_person_email_offstage: '',
+    additional_notes_offstage: '',
+    contact_person_name_audition: '',
+    contact_person_email_audition: '',
+    materials_to_prepare_audition: '',
+    additional_notes_audition: ''
   });
 
   useEffect(() => {
@@ -139,20 +148,28 @@ const ManageProduction = () => {
               />
             </TabRow>
           </Tab>
-          <Tab eventKey="dates" title="important Dates">
-            <TabRow>
-              <ManageProductionDates
-                formValues={formValues}
-                setFormValues={setFormValues}
-              />
-            </TabRow>
-          </Tab>
           <Tab eventKey="roles" title="Roles">
             <TabRow>
               <ManageProductionRoles
                 formValues={formValues}
                 setFormValues={setFormValues}
                 handleUpdate={handleUpdateDocument}
+              />
+            </TabRow>
+          </Tab>
+          <Tab eventKey="audition" title="Audition Info">
+            <TabRow>
+              <ManageAuditionInfo
+                formValues={formValues}
+                setFormValues={setFormValues}
+              />
+            </TabRow>
+          </Tab>
+          <Tab eventKey="hiring" title="Off-Stage Hiring Info">
+            <TabRow>
+              <ManageOffStageInfo
+                formValues={formValues}
+                setFormValues={setFormValues}
               />
             </TabRow>
           </Tab>

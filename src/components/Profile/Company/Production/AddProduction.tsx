@@ -11,7 +11,6 @@ import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useUserContext } from '../../../../context/UserContext';
 import { getOptions } from '../../../../utils/helpers';
 import {
-  neighborhoods,
   productionEquities,
   productionStatuses
 } from '../../../../utils/lookups';
@@ -50,7 +49,15 @@ const CompanyAddShow: React.FC<{
     equity: undefined,
     roles: [],
     writers: '',
-    location: ''
+    location: '',
+    audition_location: '',
+    contact_person_name_offstage: '',
+    contact_person_email_offstage: '',
+    additional_notes_offstage: '',
+    contact_person_name_audition: '',
+    contact_person_email_audition: '',
+    materials_to_prepare_audition: '',
+    additional_notes_audition: ''
   });
   const [_showOtherType, setShowOtherType] = useState(false);
 
@@ -151,12 +158,11 @@ const CompanyAddShow: React.FC<{
               checked={formValues.equity}
               onChange={setFormValues}
             />
-            <FormSelect
+            <FormInput
               name="location"
               label="Location"
-              defaultValue="The Loop"
-              options={getOptions(neighborhoods)}
               onChange={setFormValues}
+              defaultValue={formValues?.location}
             />
             <FormInput
               name="musical_director"

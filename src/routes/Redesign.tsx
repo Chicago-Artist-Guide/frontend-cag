@@ -1,5 +1,5 @@
 import React from 'react';
-import Hero from '/hero.jpeg';
+import Hero from '/hero.png';
 import Collapsible from '../components/layout/Collapsible';
 import Donate from '/donate.png';
 import { InputField } from '../components/shared';
@@ -78,16 +78,18 @@ const Redesign = () => {
             <br />
             next dream gig
           </h1>
-          <h3 className="text-md text-white">
+          <h3 className="text-md font-semibold text-white">
             {' '}
             Sign up for our network and have your next opportunity find you.
           </h3>
           <h3 className="text-sm font-medium text-white">
             Free for everyone. Proudly made in Chicago.
           </h3>
-          <button className="mt-12 rounded-full bg-butter px-14 py-3 text-xl font-semibold text-white hover:bg-yellow">
-            Get Started
-          </button>
+          <a href="/sign-up">
+            <button className="mt-12 rounded-full bg-butter px-14 py-3 text-xl font-semibold text-white hover:bg-yellow">
+              Get Started
+            </button>
+          </a>
         </div>
       </div>
       {/* FAQ */}
