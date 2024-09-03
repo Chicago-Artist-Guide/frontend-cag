@@ -12,9 +12,11 @@ import {
   where
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
+import { Production, Role } from '../Profile/Company/types';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
-  MatchingFilters
+  MatchingFilters,
+  ProductionRole
 } from './types';
 
 export const getTheaterTalentMatch = async (
@@ -81,7 +83,6 @@ export const createTheaterTalentMatch = async (
   return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
 };
 
-// TODO: add version for roles called fetchRolesWithFilters()
 export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
   filters: MatchingFilters,
@@ -174,4 +175,99 @@ export async function fetchTalentWithFilters(
   }
 
   return matches;
+}
+
+export async function fetchRolesForTalent(
+  firebaseStore: Firestore,
+  profile: IndividualProfileDataFullInit
+): Promise<ProductionRole[]> {
+  const roles: ProductionRole[] = [];
+  const activeProductionStatuses = ['Casting', 'Hiring', 'Pre-Production'];
+  const productionsRef = query(
+    collection(firebaseStore, 'productions'),
+    where('status', 'in', activeProductionStatuses)
+  );
+
+  try {
+    const productionsSnapshot = await getDocs(productionsRef);
+    const prods = productionsSnapshot.docs.map((p) => p.data() as Production);
+
+    for (let p = 0; p < prods.length; p++) {
+      const currProd = prods[p];
+
+      if (currProd.roles) {
+        const currProdRoles: Role[] = currProd.roles.filter((pR) => {
+          if (!pR) {
+            return false;
+          }
+
+          // stage role type
+          // TODO: do more granular search for off-stage role categories
+          if (profile.stage_role !== 'both-stage') {
+            if (profile.stage_role.toUpperCase() !== pR.type?.toUpperCase()) {
+              return false;
+            }
+          }
+
+          // ethnicites
+          if (
+            profile.ethnicities &&
+            pR.ethnicity &&
+            !pR.ethnicity?.includes('Open to all ethnicities')
+          ) {
+            const hasEthnicityMatch = profile.ethnicities.some((e) =>
+              pR.ethnicity?.includes(e)
+            );
+
+            if (!hasEthnicityMatch) {
+              return false;
+            }
+          }
+
+          // gender
+          if (
+            profile.gender_identity &&
+            pR.gender_identity &&
+            !pR.gender_identity?.includes('Open to all genders')
+          ) {
+            const hasGenderMatch = pR.gender_identity?.includes(
+              profile.gender_identity
+            );
+
+            if (!hasGenderMatch) {
+              return false;
+            }
+          }
+
+          // age range
+          if (
+            profile.age_ranges &&
+            pR.age_range &&
+            !pR.age_range?.includes('Open to all ages')
+          ) {
+            const hasAgeMatch = profile.age_ranges.some((a) =>
+              pR.age_range?.includes(a)
+            );
+
+            if (!hasAgeMatch) {
+              return false;
+            }
+          }
+
+          return pR;
+        });
+
+        currProdRoles.forEach((role) => {
+          roles.push({
+            ...role,
+            productionId: currProd.production_id
+          });
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Error fetching roles for talent:', error);
+  }
+
+  return roles;
 }

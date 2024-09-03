@@ -23,7 +23,6 @@ import {
   findOffstageCategoryDataProp
 } from '../components/Profile/shared/offstageRolesOptions';
 
-// TODO: broaden "matches" typing to support profiles OR roles
 interface MatchContextValue {
   matches: IndividualProfileDataFullInit[];
   loading: boolean;
@@ -169,7 +168,6 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
     setLoading(true);
 
-    // TODO: if "type" is "company", we need to update matches with fetchRolesWithFilters instead
     fetchTalentWithFilters(
       firestore,
       filters,

@@ -1,9 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useRoleMatches } from '../../context/RoleMatchContext';
+import { Production } from '../Profile/Company/types';
+import { ProductionRole } from './types';
 
-// TODO: broaden support for matches context to support profiles OR roles
-// Then, we can type "role" as a Role here
-export const CompanyMatchCard = ({ role }: any) => {
+export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
+  const { findProduction } = useRoleMatches();
+  const [production, setProduction] = useState<Production | null>(null);
+
+  useEffect(() => {
+    findProduction(role.productionId).then((p) => setProduction(p));
+  }, [role]);
+
+  console.log(production);
+
   return (
     <div>
       <p>CompanyMatchCard: {role.role_id}</p>
