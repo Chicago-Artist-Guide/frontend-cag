@@ -4,6 +4,7 @@ import {
   IndividualProfileDataFullInit,
   IndividualRoles
 } from '../SignUp/Individual/types';
+import { Role } from '../Profile/Company/types';
 
 // These are for situations where the filter value is an array
 // but the profile value itself is a single value (OR)
@@ -39,3 +40,5 @@ export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
       | 'offstage_roles_hair_makeup_costumes'
     >
   >;
+
+export type ProductionRole = Role & { productionId: string };
