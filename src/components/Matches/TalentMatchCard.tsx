@@ -153,7 +153,7 @@ export const TalentMatchCard = ({
           </div>
           <div>Age Range</div>
           <div className="font-semibold">
-            {profile.age_ranges?.join('; ') || 'N/A'}
+            {profile.age_ranges?.join(', ') || 'N/A'}
           </div>
           <div>Gender</div>
           <div className="font-semibold">
