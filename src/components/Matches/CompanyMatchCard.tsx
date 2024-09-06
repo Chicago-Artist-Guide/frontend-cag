@@ -75,11 +75,11 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
       <div className="relative flex flex-1 flex-col overflow-hidden px-8 py-4 font-montserrat -tracking-tighter">
-        <h3 className="mb-4 text-2xl font-bold">{role.role_name}</h3>
-        {role.description && (
-          <h4 className="-mt-4 mb-2 grid grid-cols-2 gap-2 text-base">
-            {role.description}
-          </h4>
+        <h2 className="mb-4 text-2xl font-bold">{role.role_name}</h2>
+        {production?.production_name && (
+          <h3 className="-mt-2 mb-2 grid grid-cols-2 gap-2 text-base font-bold">
+            {production.production_name}
+          </h3>
         )}
         <div className="grid grid-cols-2 gap-2 text-base">
           <div>Type</div>
@@ -96,10 +96,10 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
           <div className="font-semibold">
             {role.gender_identity?.join(', ') || 'N/A'}
           </div>
-
-          <div>Other</div>
-          <div className="font-semibold">N/A</div>
         </div>
+        {role.description && (
+          <h4 className="my-2 text-base">{role.description}</h4>
+        )}
       </div>
 
       <div className="flex flex-none flex-col">
