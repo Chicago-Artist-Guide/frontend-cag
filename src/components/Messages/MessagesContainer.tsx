@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMessages } from '../../context/MessageContext';
 import { MessageThread } from './MessageThread';
 import MessageThreads from './MessageThreads';
 import { MessageThreadType } from './types';
 
 const MessagesContainer: React.FC = () => {
+  const navigate = useNavigate();
   const { currentThread: currThreadFromContext } = useMessages();
   const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
     null
   );
 
   const handleThreadSelect = (threadId: string) => {
-    // setCurrentThread(threadId);
+    navigate(`/profile/messages/${threadId}`);
   };
 
   const handleBackToThreads = () => {

@@ -10,7 +10,8 @@ import {
   QueryDocumentSnapshot,
   QuerySnapshot,
   where,
-  updateDoc
+  updateDoc,
+  limit
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import { Production, Role } from '../Profile/Company/types';
@@ -295,3 +296,22 @@ export async function fetchRolesForTalent(
 
   return roles;
 }
+
+export const getProfileWithUid = async (
+  firebaseStore: Firestore,
+  accountId: string
+) => {
+  const profileQuery = query(
+    collection(firebaseStore, 'profiles'),
+    where('uid', '==', accountId),
+    limit(1)
+  );
+  const queryProfileSnapshot = await getDocs(profileQuery);
+
+  if (queryProfileSnapshot.empty) {
+    console.error('No profile found!');
+    return false;
+  }
+
+  return queryProfileSnapshot.docs[0].data();
+};

@@ -13,13 +13,15 @@ import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
 
 export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const navigate = useNavigate();
-  const { account } = useUserContext();
+  const { account, currentUser } = useUserContext();
   const { findProduction } = useRoleMatches();
   const { firebaseFirestore } = useFirebaseContext();
   const [production, setProduction] = useState<Production | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
   const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
+  const productionName = production?.production_name || '(Production N/A)';
+  const roleName = role.role_name;
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
@@ -69,11 +71,12 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       // update match state in this card
       await findMatch();
 
+      const messageContent = `I'm interested in the role of ${roleName} in ${productionName}. Please provide audition information if interested by emailing me at ${currentUser?.email}.`;
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
         theaterAccountId,
         talentAccountId,
-        'Test first message from talent to theater',
+        messageContent,
         'talent'
       );
 
@@ -112,21 +115,16 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     setMatchType(null);
   };
 
-  const returnModalMessage = () => {
-    const roleName = role.role_name;
-    const productionName = production?.production_name || '(Production N/A)';
-
-    return (
-      <>
-        Please confirm you would like to express interest in the following role:
-        <span className="mx-2 my-8 block rounded-xl bg-stone-200 px-4 py-2">
-          <strong>{roleName}</strong> in <em>{productionName}</em>
-        </span>
-        Once you click Confirm, a new message thread will be created with the
-        theater company.
-      </>
-    );
-  };
+  const returnModalMessage = () => (
+    <>
+      Please confirm you would like to express interest in the following role:
+      <span className="mx-2 my-8 block rounded-xl bg-stone-200 px-4 py-2">
+        <strong>{roleName}</strong> in <em>{productionName}</em>
+      </span>
+      Once you click Confirm, a new message thread will be created with the
+      theater company.
+    </>
+  );
 
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
