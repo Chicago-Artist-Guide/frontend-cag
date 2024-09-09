@@ -55,7 +55,7 @@ const Redesign = () => {
       {/* FAQ */}
       <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
         <div className="col-span-1 flex items-center justify-center">
-          <h1 className="text-black">
+          <h1 className="text-3xl text-black md:text-4xl lg:text-5xl">
             Frequently
             <br />
             Asked
