@@ -12,7 +12,9 @@ import { MatchConfirmationModal } from './MatchConfirmationModal';
 type TalentMatchCardProps = {
   profile: ProfileAndName;
   productionId: string;
+  productionName: string;
   roleId: string;
+  roleName: string;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -23,7 +25,9 @@ export type ProfileAndName = IndividualProfileDataFullInit & {
 export const TalentMatchCard = ({
   profile,
   productionId,
-  roleId
+  productionName,
+  roleId,
+  roleName
 }: TalentMatchCardProps) => {
   const navigate = useNavigate();
   const { account } = useUserContext();
@@ -89,6 +93,18 @@ export const TalentMatchCard = ({
     setIsModalVisible(false);
     setMatchType(null);
   };
+
+  const returnModalMessage = () => (
+    <>
+      Please confirm you would like to express interest in{' '}
+      <strong>{fullName}</strong> for the following role:
+      <span className="mx-2 my-8 block rounded-xl bg-stone-200 px-4 py-2">
+        <strong>{roleName}</strong> in <em>{productionName}</em>
+      </span>
+      Once you click Confirm, a new message thread will be created with the
+      talent.
+    </>
+  );
 
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
@@ -204,6 +220,7 @@ export const TalentMatchCard = ({
         <MatchConfirmationModal
           onConfirm={handleConfirm}
           onCancel={handleCancel}
+          message={returnModalMessage()}
         />
       )}
     </div>

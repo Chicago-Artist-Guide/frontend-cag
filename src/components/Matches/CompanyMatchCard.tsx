@@ -20,7 +20,6 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
   const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
-
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
@@ -67,6 +66,9 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         'talent'
       );
 
+      // update match state in this card
+      await findMatch();
+
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
         theaterAccountId,
@@ -110,13 +112,29 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     setMatchType(null);
   };
 
+  const returnModalMessage = () => {
+    const roleName = role.role_name;
+    const productionName = production?.production_name || '(Production N/A)';
+
+    return (
+      <>
+        Please confirm you would like to express interest in the following role:
+        <span className="mx-2 my-8 block rounded-xl bg-stone-200 px-4 py-2">
+          <strong>{roleName}</strong> in <em>{productionName}</em>
+        </span>
+        Once you click Confirm, a new message thread will be created with the
+        theater company.
+      </>
+    );
+  };
+
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
       <div className="relative flex flex-1 flex-col overflow-hidden px-8 py-4 font-montserrat -tracking-tighter">
         <h2 className="mb-4 text-2xl font-bold">{role.role_name}</h2>
         {production?.production_name && (
           <h3 className="-mt-2 mb-2 grid grid-cols-2 gap-2 text-base font-bold">
-            {production.production_name}
+            {production.production_name} by Theater Company Name
           </h3>
         )}
         <div className="grid grid-cols-2 gap-2 text-base">
@@ -203,6 +221,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         <MatchConfirmationModal
           onConfirm={handleConfirm}
           onCancel={handleCancel}
+          message={returnModalMessage()}
         />
       )}
     </div>
