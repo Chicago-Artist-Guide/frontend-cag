@@ -30,7 +30,7 @@ export const TalentMatchCard = ({
   roleName
 }: TalentMatchCardProps) => {
   const navigate = useNavigate();
-  const { account } = useUserContext();
+  const { account, currentUser, profile: userProfile } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
@@ -51,11 +51,12 @@ export const TalentMatchCard = ({
         'theater'
       );
 
+      const messageContent = `We're interested in you for ${roleName} in ${productionName}. Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}.`;
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
         account.data.uid,
         talentAccountId,
-        'Test first message from theater to talent',
+        messageContent,
         'theater'
       );
 
