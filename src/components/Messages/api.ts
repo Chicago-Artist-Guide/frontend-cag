@@ -9,13 +9,14 @@ import {
   updateDoc,
   Timestamp
 } from 'firebase/firestore';
+import { TheaterOrTalent } from '../Matches/types';
 
 export const createMessageThread = async (
   firebaseStore: Firestore,
   theaterAccountId: string,
   talentAccountId: string,
   initialMessageContent: string,
-  fromTheater = true
+  theaterOrTalent: TheaterOrTalent
 ) => {
   const threadsRef = collection(firebaseStore, 'threads');
   const messagesRef = collection(firebaseStore, 'messages');
@@ -23,8 +24,10 @@ export const createMessageThread = async (
   const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
 
   try {
-    const recipient_id = fromTheater ? talentAccountRef : theaterAccountRef;
-    const sender_id = fromTheater ? theaterAccountRef : talentAccountRef;
+    const recipient_id =
+      theaterOrTalent === 'theater' ? talentAccountRef : theaterAccountRef;
+    const sender_id =
+      theaterOrTalent === 'theater' ? theaterAccountRef : talentAccountRef;
 
     // Check if a thread already exists
     const threadQuery = query(

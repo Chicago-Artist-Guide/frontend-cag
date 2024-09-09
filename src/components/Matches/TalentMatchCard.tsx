@@ -56,7 +56,7 @@ export const TalentMatchCard = ({
         account.data.uid,
         talentAccountId,
         'Test first message from theater to talent',
-        true
+        'theater'
       );
 
       // TODO: send email

@@ -37,7 +37,7 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
           )}
         </>
       ) : (
-        <p>Loading Threads</p>
+        <p>Loading threads...</p>
       )}
     </div>
   );
