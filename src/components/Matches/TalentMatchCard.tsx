@@ -7,6 +7,7 @@ import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { createTheaterTalentMatch } from './api';
 import { createMessageThread } from '../Messages/api';
+import { MatchConfirmationModal } from './MatchConfirmationModal';
 
 type TalentMatchCardProps = {
   profile: ProfileAndName;
@@ -18,38 +19,6 @@ export type ProfileAndName = IndividualProfileDataFullInit & {
   fullName: string;
   matchStatus: boolean | null;
 };
-
-const ConfirmationModal = ({
-  onConfirm,
-  onCancel
-}: {
-  onConfirm: () => void;
-  onCancel: () => void;
-}) => (
-  <div
-    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-    style={{ zIndex: 9999 }}
-  >
-    <div className="rounded bg-white p-4 shadow-lg">
-      <h2 className="text-lg font-bold">Confirm Match</h2>
-      <p>
-        Are you sure you want to accept this match? This action will create a
-        message thread with [name]
-      </p>
-      <div className="mt-4 flex justify-end space-x-2">
-        <button onClick={onCancel} className="bg-gray-300 rounded px-4 py-2">
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          className="rounded bg-blue-500 px-4 py-2 text-white"
-        >
-          Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-);
 
 export const TalentMatchCard = ({
   profile,
@@ -74,16 +43,19 @@ export const TalentMatchCard = ({
         productionId,
         roleId,
         talentAccountId,
-        status
+        status,
+        'theater'
       );
 
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
         account.data.uid,
         talentAccountId,
-        'Test first message',
+        'Test first message from theater to talent',
         true
       );
+
+      // TODO: send email
 
       return messageThreadId;
     } catch (error) {
@@ -229,7 +201,10 @@ export const TalentMatchCard = ({
         </button>
       </div>
       {isModalVisible && (
-        <ConfirmationModal onConfirm={handleConfirm} onCancel={handleCancel} />
+        <MatchConfirmationModal
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
       )}
     </div>
   );

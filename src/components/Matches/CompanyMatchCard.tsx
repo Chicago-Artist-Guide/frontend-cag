@@ -1,45 +1,83 @@
 import React, { useEffect, useState } from 'react';
-import { useRoleMatches } from '../../context/RoleMatchContext';
-import { Production } from '../Profile/Company/types';
-import { ProductionRole } from './types';
-import clsx from 'clsx';
-import { createMessageThread } from '../Messages/api';
-import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
+import Swal from 'sweetalert2';
+import { useUserContext } from '../../context/UserContext';
+import { useRoleMatches } from '../../context/RoleMatchContext';
+import { useFirebaseContext } from '../../context/FirebaseContext';
+import { Production } from '../Profile/Company/types';
+import { createMessageThread } from '../Messages/api';
+import { MatchConfirmationModal } from './MatchConfirmationModal';
+import { ProductionRole } from './types';
+import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
 
 export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const navigate = useNavigate();
+  const { account } = useUserContext();
   const { findProduction } = useRoleMatches();
+  const { firebaseFirestore } = useFirebaseContext();
   const [production, setProduction] = useState<Production | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
-  const isDeclined = false;
-  const isAccepted = true;
+  const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
+
+  const isDeclined = matchStatus === false;
+  const isAccepted = matchStatus === true;
 
   useEffect(() => {
     findProduction(role.productionId).then((p) => setProduction(p));
   }, [role]);
 
-  console.log({ production, role });
+  useEffect(() => {
+    findMatch();
+  }, [production]);
+
+  const findMatch = async () => {
+    const productionId = production?.production_id || '';
+    const roleId = role.role_id || '';
+    const talentAccountId = account.data.uid;
+
+    const foundMatch = await getTheaterTalentMatch(
+      firebaseFirestore,
+      productionId,
+      roleId,
+      talentAccountId,
+      'talent'
+    );
+
+    if (foundMatch) {
+      const matchStatus = foundMatch.status;
+      setMatchStatus(matchStatus);
+    }
+  };
 
   const createMatch = async (status: boolean) => {
     try {
-      // const talentAccountId = profile.account_id;
-      // await create(
-      //   firebaseFirestore,
-      //   productionId,
-      //   roleId,
-      //   talentAccountId,
-      //   status
-      // );
-      // const messageThreadId = await createMessageThread(
-      //   firebaseFirestore,
-      //   account.data.uid,
-      //   talentAccountId,
-      //   'Test first message',
-      //   true
-      // );
-      // return messageThreadId;
+      const productionId = production?.production_id || '';
+      const roleId = role.role_id || '';
+      const talentAccountId = account.data.uid;
+      const theaterAccountId = production?.account_id || '';
+
+      await createTheaterTalentMatch(
+        firebaseFirestore,
+        productionId,
+        roleId,
+        talentAccountId,
+        status,
+        'talent'
+      );
+
+      const messageThreadId = await createMessageThread(
+        firebaseFirestore,
+        theaterAccountId,
+        talentAccountId,
+        'Test first message from talent to theater',
+        true
+      );
+
+      // TODO: send email
+
+      return messageThreadId;
     } catch (error) {
       let errorMessage = 'An unknown error occurred';
       if (error instanceof Error) {
@@ -162,40 +200,11 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         </button>
       </div>
       {isModalVisible && (
-        <ConfirmationModal onConfirm={handleConfirm} onCancel={handleCancel} />
+        <MatchConfirmationModal
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+        />
       )}
     </div>
   );
 };
-
-const ConfirmationModal = ({
-  onConfirm,
-  onCancel
-}: {
-  onConfirm: () => void;
-  onCancel: () => void;
-}) => (
-  <div
-    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-    style={{ zIndex: 9999 }}
-  >
-    <div className="rounded bg-white p-4 shadow-lg">
-      <h2 className="text-lg font-bold">Confirm Match</h2>
-      <p>
-        Are you sure you want to accept this match? This action will create a
-        message thread with [name]
-      </p>
-      <div className="mt-4 flex justify-end space-x-2">
-        <button onClick={onCancel} className="bg-gray-300 rounded px-4 py-2">
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          className="rounded bg-blue-500 px-4 py-2 text-white"
-        >
-          Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-);

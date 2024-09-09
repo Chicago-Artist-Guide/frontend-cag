@@ -22,8 +22,10 @@ export const TalentMatchList = () => {
           firebaseFirestore,
           production?.production_id || '',
           currentRoleId || '',
-          m.account_id
+          m.account_id,
+          'theater' // initiated by theater
         );
+
         return {
           ...m,
           fullName,

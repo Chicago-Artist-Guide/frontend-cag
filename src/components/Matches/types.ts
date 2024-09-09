@@ -42,3 +42,5 @@ export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
   >;
 
 export type ProductionRole = Role & { productionId: string };
+
+export type TheaterOrTalent = 'theater' | 'talent';
