@@ -68,11 +68,6 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link href="https://twitter.com/chiartistguide">
-                <FooterLogo src={Twitter} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
               <Nav.Link href="https://medium.com/chiartistguide">
                 <FooterLogo src={Medium} />
               </Nav.Link>
@@ -83,7 +78,7 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
           </Nav>
-          <CopyText>&copy; Chicago Artist Guide 2021</CopyText>
+          <CopyText>&copy; Chicago Artist Guide 2024</CopyText>
         </MidCol>
         <EdgeCols
           md={{ order: 3, span: 3 }}
