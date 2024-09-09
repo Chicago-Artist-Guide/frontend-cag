@@ -9,21 +9,25 @@ import {
   Query,
   QueryDocumentSnapshot,
   QuerySnapshot,
-  where
+  where,
+  updateDoc,
+  limit
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import { Production, Role } from '../Profile/Company/types';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
   MatchingFilters,
-  ProductionRole
+  ProductionRole,
+  TheaterOrTalent
 } from './types';
 
 export const getTheaterTalentMatch = async (
   firebaseStore: Firestore,
   productionId: string,
   roleId: string,
-  talentAccountId: string
+  talentAccountId: string,
+  initiatedBy?: TheaterOrTalent
 ) => {
   const productionRef = doc(firebaseStore, 'productions', productionId);
   const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
@@ -32,12 +36,20 @@ export const getTheaterTalentMatch = async (
     throw new Error('Invalid production or talent account');
   }
 
-  const matchesQuery = query(
-    collection(firebaseStore, 'theater_talent_matches'),
+  const matchesRef = collection(firebaseStore, 'theater_talent_matches');
+  let matchesQuery = query(
+    matchesRef,
     where('production_id', '==', productionRef),
     where('role_id', '==', roleId),
     where('talent_account_id', '==', talentAccountRef)
   );
+
+  if (initiatedBy) {
+    matchesQuery = query(
+      matchesQuery,
+      where('initiated_by', '==', initiatedBy)
+    );
+  }
 
   const querySnapshot = await getDocs(matchesQuery);
 
@@ -53,7 +65,8 @@ export const createTheaterTalentMatch = async (
   productionId: string,
   roleId: string,
   talentAccountId: string,
-  status: boolean
+  status: boolean,
+  theaterOrTalent: TheaterOrTalent
 ) => {
   const productionRef = doc(firebaseStore, 'productions', productionId);
   const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
@@ -69,15 +82,27 @@ export const createTheaterTalentMatch = async (
     talentAccountId
   );
 
+  // if match exists, consider this a confirmation or rejection from the other party
   if (theaterTalentMatchAlreadyExists) {
-    throw new Error('Match already exists');
+    const matchRef = doc(
+      firebaseStore,
+      'theater_talent_matches',
+      theaterTalentMatchAlreadyExists.id
+    );
+    const updateData = status
+      ? { confirmed_by: theaterOrTalent }
+      : { rejected_by: theaterOrTalent };
+
+    await updateDoc(matchRef, updateData);
+    return matchRef;
   }
 
   const data = {
     production_id: productionRef,
     role_id: roleId,
     status: status,
-    talent_account_id: talentAccountRef
+    talent_account_id: talentAccountRef,
+    initiated_by: theaterOrTalent
   };
 
   return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
@@ -271,3 +296,22 @@ export async function fetchRolesForTalent(
 
   return roles;
 }
+
+export const getProfileWithUid = async (
+  firebaseStore: Firestore,
+  accountId: string
+) => {
+  const profileQuery = query(
+    collection(firebaseStore, 'profiles'),
+    where('uid', '==', accountId),
+    limit(1)
+  );
+  const queryProfileSnapshot = await getDocs(profileQuery);
+
+  if (queryProfileSnapshot.empty) {
+    console.error('No profile found!');
+    return false;
+  }
+
+  return queryProfileSnapshot.docs[0].data();
+};
