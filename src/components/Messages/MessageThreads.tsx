@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {
-  getNameForAccount,
-  getTheaterNameForAccount
-} from '../Profile/shared/api';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
+import {
+  getNameForAccount,
+  getProfileWithUid,
+  getTheaterNameForAccount
+} from '../Profile/shared/api';
 import { getProduction } from '../Profile/Company/api';
-import { getProfileWithUid } from '../Matches/api';
 import { MessageThreadType } from './types';
 import { defaultPfp } from '../../images';
 

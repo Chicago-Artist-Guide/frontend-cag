@@ -1,5 +1,5 @@
 import { Firestore, doc, getDoc } from 'firebase/firestore';
-import { Production } from '../../Profile/Company/types';
+import { Production } from './types';
 
 export const getProduction = async (
   firebaseStore: Firestore,
