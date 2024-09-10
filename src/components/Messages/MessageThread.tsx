@@ -33,9 +33,9 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
     const senderId = accountType === 'company' ? theaterId : talentId;
     const recipientId = accountType === 'company' ? talentId : theaterId;
 
-    loadThreadMessages(senderId, recipientId);
+    loadThreadMessages(senderId, recipientId, threadId);
     setAccountId(accountIdStr);
-  }, [account]);
+  }, [account, threadId]);
 
   return (
     <div className="p-4">

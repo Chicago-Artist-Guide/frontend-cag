@@ -57,7 +57,9 @@ export const TalentMatchCard = ({
         account.data.uid,
         talentAccountId,
         messageContent,
-        'theater'
+        'theater',
+        productionId,
+        roleId
       );
 
       // TODO: send email

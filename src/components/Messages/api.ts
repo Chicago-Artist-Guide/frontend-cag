@@ -16,7 +16,9 @@ export const createMessageThread = async (
   theaterAccountId: string,
   talentAccountId: string,
   initialMessageContent: string,
-  theaterOrTalent: TheaterOrTalent
+  theaterOrTalent: TheaterOrTalent,
+  productionId?: string,
+  roleId?: string
 ) => {
   const threadsRef = collection(firebaseStore, 'threads');
   const messagesRef = collection(firebaseStore, 'messages');
@@ -47,6 +49,9 @@ export const createMessageThread = async (
     };
     const messageDocRef = await addDoc(messagesRef, messageData);
 
+    // we'll need to collect the threadRef to update the new message later
+    let threadRef;
+
     // Update the existing thread's last_message
     if (!threadSnapshot.empty) {
       const existingThreadDoc = threadSnapshot.docs[0];
@@ -59,7 +64,7 @@ export const createMessageThread = async (
         updated_at: Timestamp.now()
       });
 
-      return existingThreadDoc.id;
+      threadRef = existingThreadDoc.ref;
     } else {
       // or create a new thread
       const threadData = {
@@ -73,12 +78,21 @@ export const createMessageThread = async (
         talent_status: 'new',
         theater_account_id: theaterAccountRef,
         theater_status: 'new',
+        production_id: productionId ?? null,
+        role_id: roleId ?? null,
         updated_at: Timestamp.now()
       };
 
       const newThreadDocRef = await addDoc(threadsRef, threadData);
-      return newThreadDocRef.id;
+      threadRef = newThreadDocRef;
     }
+
+    // update new message with threadRef
+    await updateDoc(messageDocRef, {
+      thread_id: threadRef
+    });
+
+    return threadRef.id;
   } catch (error) {
     console.error('Error creating or updating message thread:', error);
     return false;

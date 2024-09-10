@@ -77,7 +77,9 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         theaterAccountId,
         talentAccountId,
         messageContent,
-        'talent'
+        'talent',
+        productionId,
+        roleId
       );
 
       // TODO: send email
