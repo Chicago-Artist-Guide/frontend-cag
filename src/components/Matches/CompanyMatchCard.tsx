@@ -81,8 +81,8 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     }
 
     const subject = `CAG: New Role Application for ${roleName} in ${productionName}`;
-    const messageContent = `My name is ${account?.data.first_name} ${account?.data.last_name} and I'm interested in the role of ${roleName} in ${productionName}. Please provide audition information if interested by emailing me at ${currentUser?.email}.`;
-    const messageContentHtml = `<p>My name is <strong>${account?.data.first_name} ${account?.data.last_name}</strong> and I'm interested in the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide audition information if interested by emailing me at ${currentUser?.email}.</p>`;
+    const messageContent = `My name is ${account?.data.first_name} ${account?.data.last_name} and I'm interested in the role of ${roleName} in ${productionName}. Please provide audition information if interested by emailing me at ${currentUser?.email}. You may also login to CAG and go to your Messages to respond.`;
+    const messageContentHtml = `<p>My name is <strong>${account?.data.first_name} ${account?.data.last_name}</strong> and I'm interested in the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide audition information if interested by emailing me at ${currentUser?.email}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
     let toEmail = theater?.primary_contact_email;
 
     // if there isn't a primary contact email, we need to find the account email

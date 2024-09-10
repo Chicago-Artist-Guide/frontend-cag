@@ -38,6 +38,16 @@ export const TalentMatchCard = ({
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
+  /*
+
+  Future email fields:
+
+    const subject = `CAG: New Role Interest for ${roleName} in ${productionName}`;
+    const messageContent = `We are ${userProfile?.data.theatre_name} and we're interested in you for the role of ${roleName} in ${productionName}. Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}. You may also login to CAG and go to your Messages to respond.`;
+    const messageContentHtml = `<p>We are <strong>${userProfile?.data.theatre_name}</strong> and we're interested in you for the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+
+  */
+
   const createMatch = async (status: boolean) => {
     try {
       const talentAccountId = profile.account_id;

@@ -151,6 +151,7 @@ export type IndividualAccountInit = {
   last_name: string;
   privacy_agreement: boolean;
   uid: string;
+  email?: string;
 };
 
 export type IndividualProfileInit = {
