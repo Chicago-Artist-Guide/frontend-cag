@@ -10,6 +10,25 @@ import {
 } from 'firebase/firestore';
 import { IndividualAccountInit } from '../../SignUp/Individual/types';
 
+export const getProfileWithUid = async (
+  firebaseStore: Firestore,
+  accountId: string
+) => {
+  const profileQuery = query(
+    collection(firebaseStore, 'profiles'),
+    where('uid', '==', accountId),
+    limit(1)
+  );
+  const queryProfileSnapshot = await getDocs(profileQuery);
+
+  if (queryProfileSnapshot.empty) {
+    console.error('No profile found!');
+    return false;
+  }
+
+  return queryProfileSnapshot.docs[0].data();
+};
+
 export const getNameForAccount = async (
   firebaseStore: Firestore,
   accountId: string

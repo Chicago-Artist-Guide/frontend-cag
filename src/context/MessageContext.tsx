@@ -19,7 +19,11 @@ interface MessageContextType {
   currentThread: MessageThreadType | null;
   loadThread: (threadId: string) => void;
   updateThreadStatus: (threadId: string, status: string) => void;
-  loadThreadMessages: (sender_id: string, recipient_id: string) => void;
+  loadThreadMessages: (
+    sender_id: string,
+    recipient_id: string,
+    thread_id?: string
+  ) => void;
   currentThreadMessages: MessageType[];
 }
 
@@ -79,20 +83,30 @@ export const MessageProvider: React.FC<{
 
   const loadThreadMessages = async (
     sender_id: string,
-    recipient_id: string
+    recipient_id: string,
+    thread_id?: string
   ) => {
     const messagesRef = collection(firestore, 'messages');
     const senderRef = doc(firestore, 'accounts', sender_id);
     const recipientRef = doc(firestore, 'accounts', recipient_id);
 
     try {
-      const messagesQuery = query(
+      let messagesQuery = query(
         messagesRef,
         or(
           where('sender_id', 'in', [senderRef, recipientRef]),
           where('recipient_id', 'in', [senderRef, recipientRef])
         )
       );
+
+      if (thread_id) {
+        const threadsRef = doc(firestore, 'threads', thread_id);
+        messagesQuery = query(
+          messagesQuery,
+          where('thread_id', '==', threadsRef)
+        );
+      }
+
       const messagesSnapshot = await getDocs(messagesQuery);
       const messagesDocs = messagesSnapshot.docs.map(
         (doc) => ({ id: doc.id, ...doc.data() }) as MessageType

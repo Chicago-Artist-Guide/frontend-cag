@@ -5,8 +5,12 @@ import Swal from 'sweetalert2';
 import { useUserContext } from '../../context/UserContext';
 import { useRoleMatches } from '../../context/RoleMatchContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { Production } from '../Profile/Company/types';
-import { createMessageThread } from '../Messages/api';
+import {
+  getTheaterByAccountUid,
+  getTheaterAccountByAccountId
+} from '../Profile/Company/api';
+import { Profile, Production } from '../Profile/Company/types';
+import { createMessageThread, createEmail } from '../Messages/api';
 import { MatchConfirmationModal } from './MatchConfirmationModal';
 import { ProductionRole } from './types';
 import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
@@ -20,18 +24,11 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
   const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
+  const [theater, setTheater] = useState<Profile | null>(null);
   const productionName = production?.production_name || '(Production N/A)';
   const roleName = role.role_name;
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
-
-  useEffect(() => {
-    findProduction(role.productionId).then((p) => setProduction(p));
-  }, [role]);
-
-  useEffect(() => {
-    findMatch();
-  }, [production]);
 
   const findMatch = async () => {
     const productionId = production?.production_id || '';
@@ -50,6 +47,64 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       const matchStatus = foundMatch.status;
       setMatchStatus(matchStatus);
     }
+  };
+
+  const findTheater = async () => {
+    if (!production || production === null) {
+      return false;
+    }
+
+    const theaterAccountId = production?.account_id || '';
+
+    if (!theaterAccountId || theaterAccountId == '') {
+      console.error('Could not find theater account id');
+      return false;
+    }
+
+    const getTheater = await getTheaterByAccountUid(
+      firebaseFirestore,
+      theaterAccountId
+    );
+
+    if (!getTheater) {
+      console.error('Could not find theater profile');
+      return false;
+    }
+
+    setTheater(getTheater);
+  };
+
+  const sendEmailToTheater = async () => {
+    if (!theater || theater === null) {
+      console.error('Could not find theater to send email');
+      return false;
+    }
+
+    const subject = `CAG: New Role Application for ${roleName} in ${productionName}`;
+    const messageContent = `My name is ${account?.data.first_name} ${account?.data.last_name} and I'm interested in the role of ${roleName} in ${productionName}. Please provide audition information if interested by emailing me at ${currentUser?.email}. You may also login to CAG and go to your Messages to respond.`;
+    const messageContentHtml = `<p>My name is <strong>${account?.data.first_name} ${account?.data.last_name}</strong> and I'm interested in the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide audition information if interested by emailing me at ${currentUser?.email}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+    let toEmail = theater?.primary_contact_email;
+
+    // if there isn't a primary contact email, we need to find the account email
+    if (!toEmail) {
+      const theaterAccount = await getTheaterAccountByAccountId(
+        firebaseFirestore,
+        theater.account_id
+      );
+
+      if (theaterAccount && theaterAccount.email) {
+        toEmail = theaterAccount.email;
+      }
+    }
+
+    toEmail &&
+      (await createEmail(
+        firebaseFirestore,
+        toEmail,
+        subject,
+        messageContent,
+        messageContentHtml
+      ));
   };
 
   const createMatch = async (status: boolean) => {
@@ -77,10 +132,13 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         theaterAccountId,
         talentAccountId,
         messageContent,
-        'talent'
+        'talent',
+        productionId,
+        roleId
       );
 
-      // TODO: send email
+      // send email
+      await sendEmailToTheater();
 
       return messageThreadId;
     } catch (error) {
@@ -100,6 +158,23 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    findProduction(role.productionId).then((p) => setProduction(p));
+  }, [role]);
+
+  useEffect(() => {
+    if (!production) {
+      return;
+    }
+
+    const productionChangeOrder = async () => {
+      await findMatch();
+      await findTheater();
+    };
+
+    productionChangeOrder();
+  }, [production]);
 
   const handleConfirm = async () => {
     setIsModalVisible(false);
@@ -132,7 +207,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         <h2 className="mb-4 text-2xl font-bold">{role.role_name}</h2>
         {production?.production_name && (
           <h3 className="-mt-2 mb-2 grid grid-cols-2 gap-2 text-base font-bold">
-            {production.production_name} by Theater Company Name
+            {production.production_name} by {theater?.theatre_name}
           </h3>
         )}
         <div className="grid grid-cols-2 gap-2 text-base">

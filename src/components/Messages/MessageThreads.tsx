@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import {
-  getNameForAccount,
-  getTheaterNameForAccount
-} from '../Profile/shared/api';
+import { useParams } from 'react-router-dom';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
-import { getProfileWithUid } from '../Matches/api';
+import {
+  getNameForAccount,
+  getProfileWithUid,
+  getTheaterNameForAccount
+} from '../Profile/shared/api';
+import { getProduction } from '../Profile/Company/api';
 import { MessageThreadType } from './types';
 import { defaultPfp } from '../../images';
 
@@ -21,6 +23,7 @@ type MessageThreadTypeExtended = MessageThreadType & {
 };
 
 const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
+  const { threadId } = useParams();
   const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const { threads, loadThreads, currentThread } = useMessages();
@@ -53,18 +56,37 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
             typeof recipientIdRef === 'string'
               ? recipientIdRef
               : recipientIdRef.id;
+
+          // start getting more data
           const getRecipientProfile = await getProfileWithUid(
             firebaseFirestore,
             recipientId
           );
-          const threadPreviewImg =
-            getRecipientProfile && getRecipientProfile?.profile_image_url
-              ? getRecipientProfile?.profile_image_url
-              : defaultPfp;
           const recipientName =
             account.data.type === 'company'
               ? await getNameForAccount(firebaseFirestore, recipientId)
               : await getTheaterNameForAccount(firebaseFirestore, recipientId);
+
+          let threadPreviewImg =
+            getRecipientProfile && getRecipientProfile?.profile_image_url
+              ? getRecipientProfile?.profile_image_url
+              : defaultPfp;
+
+          // if the theater company doesn't have a pfp, use the production image if there is one
+          if (threadPreviewImg === defaultPfp && thread.production_id) {
+            const productionId =
+              typeof thread.production_id === 'string'
+                ? thread.production_id
+                : thread.production_id.id;
+            const productionData = await getProduction(
+              firebaseFirestore,
+              productionId
+            );
+
+            if (productionData && productionData?.production_image_url) {
+              threadPreviewImg = productionData.production_image_url;
+            }
+          }
 
           return {
             ...thread,
@@ -83,7 +105,7 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
   }, [account, threads]);
 
   return (
-    <div className="p-4">
+    <div>
       <h4 className="mb-4 text-lg font-semibold">Threads</h4>
       {loading ? (
         <p>Loading threads...</p>
@@ -94,8 +116,8 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
               <div
                 key={`${thread.id}-${i}`}
                 onClick={() => onThreadSelect(thread.id)}
-                className={`flex cursor-pointer items-center rounded-lg border-b border-stone-200 p-2 ${
-                  currentThread?.id === thread.id
+                className={`flex cursor-pointer items-center rounded-lg border-b border-stone-200 p-2 pl-3 ${
+                  threadId === thread.id
                     ? 'bg-blue-100'
                     : thread.statusNew
                       ? 'bg-gray-100'
@@ -108,8 +130,10 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
                   className="mr-3 h-10 w-10 rounded-full"
                 />
                 <div className="flex-1">
-                  <p className="font-semibold">{thread.recipientName}</p>
-                  <p className="text-gray-600 line-clamp-1 text-sm">
+                  <h5 className="m-0 mb-2 p-0 font-semibold">
+                    {thread.recipientName}
+                  </h5>
+                  <p className="text-gray-600 m-0 line-clamp-1 p-0 text-sm">
                     {thread.last_message.content}
                   </p>
                 </div>
