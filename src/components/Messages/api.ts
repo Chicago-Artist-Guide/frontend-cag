@@ -98,3 +98,31 @@ export const createMessageThread = async (
     return false;
   }
 };
+
+export const createEmail = async (
+  firebaseStore: Firestore,
+  to: string,
+  subject: string,
+  messageText: string,
+  messageHtml: string
+) => {
+  const messageData = {
+    to: [to],
+    message: {
+      subject,
+      text: messageText,
+      html: messageHtml
+    }
+  };
+
+  console.log(messageData);
+
+  try {
+    const mailRef = collection(firebaseStore, 'mail');
+    await addDoc(mailRef, messageData);
+    return true;
+  } catch (error) {
+    console.error('Error creating email message in Firebase', error);
+    return false;
+  }
+};

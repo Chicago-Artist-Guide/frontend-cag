@@ -126,6 +126,10 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
   // get production and roles
   useEffect(() => {
+    if (!productionId) {
+      return;
+    }
+
     setLoading(true);
 
     getProduction(firestore, productionId).then((p) => {

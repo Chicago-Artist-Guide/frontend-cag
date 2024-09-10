@@ -11,6 +11,7 @@ export const MatchesPageContainer = () => {
 
   useEffect(() => {
     const accountData = account?.data;
+
     if (accountData) {
       setAccountType(accountData.type);
     }
@@ -18,20 +19,26 @@ export const MatchesPageContainer = () => {
 
   return (
     <div className="flex gap-12 pt-3">
-      <div className="flex-none">
-        {accountType === 'individual' ? (
-          <CompanyMatchesFilterBar />
-        ) : (
-          <TalentMatchesFilterBar />
-        )}
-      </div>
-      <div className="flex-1">
-        {accountType === 'individual' ? (
-          <CompanyMatchList />
-        ) : (
-          <TalentMatchList />
-        )}
-      </div>
+      {accountType !== null ? (
+        <>
+          <div className="flex-none">
+            {accountType === 'individual' ? (
+              <CompanyMatchesFilterBar />
+            ) : (
+              <TalentMatchesFilterBar />
+            )}
+          </div>
+          <div className="flex-1">
+            {accountType === 'individual' ? (
+              <CompanyMatchList />
+            ) : (
+              <TalentMatchList />
+            )}
+          </div>
+        </>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 };

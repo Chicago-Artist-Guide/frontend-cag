@@ -104,8 +104,6 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
     fetchThreadsData();
   }, [account, threads]);
 
-  console.log(currentThread);
-
   return (
     <div>
       <h4 className="mb-4 text-lg font-semibold">Threads</h4>
