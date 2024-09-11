@@ -16,6 +16,13 @@ import {
 import { TheaterTalentMatch, TheaterOrTalent } from '../Matches/types';
 import { createMessageThread } from './api';
 import { MessageThreadType } from './types';
+import {
+  NO_EMAIL,
+  UNKNOWN_ROLE,
+  UNKNOWN_PRODUCTION,
+  theaterToArtistMessage,
+  artistToTheaterMessage
+} from './messages';
 import Button from '../shared/Button';
 
 interface MessageThreadProps {
@@ -24,7 +31,7 @@ interface MessageThreadProps {
 
 export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
   const { threadId } = useParams();
-  const { account, profile } = useUserContext();
+  const { account, currentUser, profile } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const { loadThreadMessages, currentThreadMessages } = useMessages();
   const [accountId, setAccountId] = useState<string | null>(null);
@@ -114,13 +121,30 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
       );
 
       // calling createMessageThread should update the thread and send a new message
-      await createMessageThread(
-        firebaseFirestore,
-        theaterId,
-        talentId,
-        '', // craft message content depending on account
-        accountTypeForMatch
-      );
+      if (status) {
+        const messageResponse =
+          accountTypeForMatch === 'theater'
+            ? theaterToArtistMessage(
+                role?.role_name || UNKNOWN_ROLE,
+                production?.production_name || UNKNOWN_PRODUCTION,
+                profile.data.primary_contact_email ||
+                  currentUser?.email ||
+                  NO_EMAIL
+              )
+            : artistToTheaterMessage(
+                role?.role_name || UNKNOWN_ROLE,
+                production?.production_name || UNKNOWN_PRODUCTION,
+                currentUser?.email || NO_EMAIL
+              );
+
+        await createMessageThread(
+          firebaseFirestore,
+          theaterId,
+          talentId,
+          messageResponse,
+          accountTypeForMatch
+        );
+      }
 
       // trigger refresh of data, the ocky way
       setLoadTrigger((prevState) => prevState++);

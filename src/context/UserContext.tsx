@@ -3,6 +3,7 @@ import { User } from 'firebase/auth';
 import { createContext, useContext } from 'react';
 
 export type Document = {
+  id: string | null;
   ref: DocumentReference | null;
   data: any;
 };
@@ -20,12 +21,14 @@ export type UserContextType = {
 
 export const UserContext = createContext<UserContextType>({
   profile: {
+    id: null,
     ref: null,
     data: null
   },
   setProfileRef: () => null,
   setProfileData: () => null,
   account: {
+    id: null,
     ref: null,
     data: null
   },
