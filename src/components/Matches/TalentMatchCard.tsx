@@ -5,8 +5,9 @@ import Swal from 'sweetalert2';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
+import { getAccountWithAccountId } from '../Profile/shared/api';
+import { createMessageThread, createEmail } from '../Messages/api';
 import { createTheaterTalentMatch } from './api';
-import { createMessageThread } from '../Messages/api';
 import { MatchConfirmationModal } from './MatchConfirmationModal';
 
 type TalentMatchCardProps = {
@@ -38,15 +39,36 @@ export const TalentMatchCard = ({
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
-  /*
+  const sendEmailToTalent = async () => {
+    if (!profile.account_id) {
+      console.error('Could not find account id for profile');
+      return false;
+    }
 
-  Future email fields:
-
+    const talentAccount = await getAccountWithAccountId(
+      firebaseFirestore,
+      profile.account_id
+    );
     const subject = `CAG: New Role Interest for ${roleName} in ${productionName}`;
     const messageContent = `We are ${userProfile?.data.theatre_name} and we're interested in you for the role of ${roleName} in ${productionName}. Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}. You may also login to CAG and go to your Messages to respond.`;
     const messageContentHtml = `<p>We are <strong>${userProfile?.data.theatre_name}</strong> and we're interested in you for the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
 
-  */
+    if (!talentAccount || !talentAccount?.email) {
+      console.error(
+        'Could not find account or account email address for talent.'
+      );
+      return false;
+    }
+
+    const toEmail = talentAccount?.email;
+    await createEmail(
+      firebaseFirestore,
+      toEmail,
+      subject,
+      messageContent,
+      messageContentHtml
+    );
+  };
 
   const createMatch = async (status: boolean) => {
     try {
@@ -72,7 +94,8 @@ export const TalentMatchCard = ({
         roleId
       );
 
-      // TODO: send email
+      // send email
+      await sendEmailToTalent();
 
       return messageThreadId;
     } catch (error) {

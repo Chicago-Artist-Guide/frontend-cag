@@ -10,6 +10,21 @@ import {
 } from 'firebase/firestore';
 import { IndividualAccountInit } from '../../SignUp/Individual/types';
 
+export const getAccountWithAccountId = async (
+  firebaseStore: Firestore,
+  accountId: string
+) => {
+  const docRef = doc(firebaseStore, 'accounts', accountId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as IndividualAccountInit;
+    return data;
+  }
+
+  return false;
+};
+
 export const getProfileWithUid = async (
   firebaseStore: Firestore,
   accountId: string
@@ -33,19 +48,17 @@ export const getNameForAccount = async (
   firebaseStore: Firestore,
   accountId: string
 ) => {
-  const docRef = doc(firebaseStore, 'accounts', accountId);
-  const docSnap = await getDoc(docRef);
+  const findAccount = await getAccountWithAccountId(firebaseStore, accountId);
 
-  if (docSnap.exists()) {
-    const data = docSnap.data() as IndividualAccountInit;
-    const { first_name, last_name } = data;
+  if (findAccount) {
+    const { first_name, last_name } = findAccount;
 
     return first_name && last_name
-      ? `${data.first_name} ${data.last_name}`
+      ? `${first_name} ${last_name}`
       : `User ${accountId}`;
-  } else {
-    return 'Profile N/A';
   }
+
+  return 'Profile N/A';
 };
 
 export const getTheaterNameForAccount = async (
