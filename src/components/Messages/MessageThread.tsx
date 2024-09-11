@@ -70,11 +70,13 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
       talentId
     );
 
+    console.log(findMatch);
+
     findMatch && setMatch(findMatch);
   };
 
   const updateMatch = async (status: boolean) => {
-    if (!match || match !== null) {
+    if (!match || match === null) {
       console.error('Cannot update match. No match found.');
       return false;
     }
@@ -96,17 +98,19 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
         ? thread.theater_account_id
         : thread.theater_account_id.id;
     const talentId =
-      typeof thread.talent_account_id === 'string'
-        ? thread.talent_account_id
-        : thread.talent_account_id.id;
+      typeof talent_account_id === 'string'
+        ? talent_account_id
+        : talent_account_id.id;
+    const productionId =
+      typeof production_id === 'string' ? production_id : production_id.id;
 
     try {
       // calling createTheaterTalentMatch now should UPDATE the existing match for confirmed or rejected by
       await createTheaterTalentMatch(
         firebaseFirestore,
-        production_id,
+        productionId,
         role_id,
-        talent_account_id,
+        talentId,
         status,
         accountTypeForMatch
       );

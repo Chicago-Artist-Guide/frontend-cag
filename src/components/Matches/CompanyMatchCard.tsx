@@ -11,6 +11,14 @@ import {
 } from '../Profile/Company/api';
 import { Profile, Production } from '../Profile/Company/types';
 import { createMessageThread, createEmail } from '../Messages/api';
+import {
+  UNKNOWN_ROLE,
+  NO_EMAIL,
+  artistToTheaterMessage,
+  artistToTheaterEmailSubject,
+  artistToTheaterEmailText,
+  artistToTheaterEmailHtml
+} from '../Messages/messages';
 import { MatchConfirmationModal } from './MatchConfirmationModal';
 import { ProductionRole } from './types';
 import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
@@ -25,7 +33,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const [matchType, setMatchType] = useState<boolean | null>(null);
   const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
   const [theater, setTheater] = useState<Profile | null>(null);
-  const productionName = production?.production_name || '(Production N/A)';
+  const productionName = production?.production_name || '(Unknown Production)';
   const roleName = role.role_name;
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
@@ -80,9 +88,22 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       return false;
     }
 
-    const subject = `CAG: New Role Application for ${roleName} in ${productionName}`;
-    const messageContent = `My name is ${account?.data.first_name} ${account?.data.last_name} and I'm interested in the role of ${roleName} in ${productionName}. Please provide audition information if interested by emailing me at ${currentUser?.email}. You may also login to CAG and go to your Messages to respond.`;
-    const messageContentHtml = `<p>My name is <strong>${account?.data.first_name} ${account?.data.last_name}</strong> and I'm interested in the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide audition information if interested by emailing me at ${currentUser?.email}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+    const subject = artistToTheaterEmailSubject(
+      roleName || UNKNOWN_ROLE,
+      productionName
+    );
+    const messageContent = artistToTheaterEmailText(
+      `${account?.data.first_name} ${account?.data.last_name}`,
+      roleName || UNKNOWN_ROLE,
+      productionName,
+      currentUser?.email || NO_EMAIL
+    );
+    const messageContentHtml = artistToTheaterEmailHtml(
+      `${account?.data.first_name} ${account?.data.last_name}`,
+      roleName || UNKNOWN_ROLE,
+      productionName,
+      currentUser?.email || NO_EMAIL
+    );
     let toEmail = theater?.primary_contact_email;
 
     // if there isn't a primary contact email, we need to find the account email
@@ -126,7 +147,11 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       // update match state in this card
       await findMatch();
 
-      const messageContent = `I'm interested in the role of ${roleName} in ${productionName}. Please provide audition information if interested by emailing me at ${currentUser?.email}.`;
+      const messageContent = artistToTheaterMessage(
+        roleName || UNKNOWN_ROLE,
+        productionName,
+        currentUser?.email || NO_EMAIL
+      );
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
         theaterAccountId,

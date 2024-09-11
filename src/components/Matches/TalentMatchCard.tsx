@@ -7,6 +7,13 @@ import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { getAccountWithAccountId } from '../Profile/shared/api';
 import { createMessageThread, createEmail } from '../Messages/api';
+import {
+  NO_EMAIL,
+  theaterToArtistMessage,
+  theaterToArtistEmailSubject,
+  theaterToArtistEmailText,
+  theaterToArtistEmailHtml
+} from '../Messages/messages';
 import { createTheaterTalentMatch } from './api';
 import { MatchConfirmationModal } from './MatchConfirmationModal';
 
@@ -49,9 +56,19 @@ export const TalentMatchCard = ({
       firebaseFirestore,
       profile.account_id
     );
-    const subject = `CAG: New Role Interest for ${roleName} in ${productionName}`;
-    const messageContent = `We are ${userProfile?.data.theatre_name} and we're interested in you for the role of ${roleName} in ${productionName}. Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}. You may also login to CAG and go to your Messages to respond.`;
-    const messageContentHtml = `<p>We are <strong>${userProfile?.data.theatre_name}</strong> and we're interested in you for the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+    const subject = theaterToArtistEmailSubject(roleName, productionName);
+    const messageContent = theaterToArtistEmailText(
+      userProfile?.data.theatre_name,
+      roleName,
+      productionName,
+      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+    );
+    const messageContentHtml = theaterToArtistEmailHtml(
+      userProfile?.data.theatre_name,
+      roleName,
+      productionName,
+      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+    );
 
     if (!talentAccount || !talentAccount?.email) {
       console.error(
@@ -83,7 +100,11 @@ export const TalentMatchCard = ({
         'theater'
       );
 
-      const messageContent = `We're interested in you for ${roleName} in ${productionName}. Please provide your availability to audition by emailing ${userProfile.data.primary_contact_email || currentUser?.email || '(N/A)'}.`;
+      const messageContent = theaterToArtistMessage(
+        roleName,
+        productionName,
+        userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+      );
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
         account.data.uid,
