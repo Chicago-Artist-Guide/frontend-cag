@@ -207,16 +207,30 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
           </div>
           {match && (
             <div className="mt-4 flex justify-end space-x-4 border-t border-stone-200 pt-4">
-              <Button
-                onClick={() => updateMatch(false)}
-                text="Decline Match"
-                variant="danger"
-              />
-              <Button
-                onClick={() => updateMatch(true)}
-                text="Accept Match"
-                variant="primary"
-              />
+              {match.confirmed_by || match.rejected_by ? (
+                <p>
+                  <strong>Match Status:</strong>{' '}
+                  {match.confirmed_by && <>accepted by {match.confirmed_by}</>}{' '}
+                  {match.rejected_by && <>declined by {match.rejected_by}</>}
+                  <br />
+                  <em className="text-xs">
+                    Please check your email for further updates.
+                  </em>
+                </p>
+              ) : (
+                <>
+                  <Button
+                    onClick={() => updateMatch(false)}
+                    text="Decline Match"
+                    variant="danger"
+                  />
+                  <Button
+                    onClick={() => updateMatch(true)}
+                    text="Accept Match"
+                    variant="primary"
+                  />
+                </>
+              )}
             </div>
           )}
         </>

@@ -53,4 +53,6 @@ export type TheaterTalentMatch = {
   status: boolean;
   talent_account_id: DocumentReference<DocumentData> | string;
   initiated_by: TheaterOrTalent;
+  confirmed_by?: TheaterOrTalent;
+  rejected_by?: TheaterOrTalent;
 };
