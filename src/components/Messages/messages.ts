@@ -1,5 +1,6 @@
 // constants
 export const UNKNOWN_ROLE = '(Unknown Role)';
+export const UNKNOWN_PRODUCTION = '(Unknown Production)';
 export const NO_EMAIL = '(Email N/A)';
 
 // artist to theater
