@@ -104,7 +104,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
                 className={`max-w-xs rounded-lg px-4 py-2 ${
                   isSender
                     ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-800'
+                    : 'text-gray-800 bg-lighterGrey'
                 }`}
               >
                 {msg.content}

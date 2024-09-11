@@ -22,6 +22,18 @@ export const getAccountWithAccountId = async (
     return data;
   }
 
+  // try to find account if accountId is uid?
+  const accountQuery = query(
+    collection(firebaseStore, 'accounts'),
+    where('uid', '==', accountId),
+    limit(1)
+  );
+  const queryAccountSnapshot = await getDocs(accountQuery);
+
+  if (!queryAccountSnapshot.empty) {
+    return queryAccountSnapshot.docs[0].data();
+  }
+
   return false;
 };
 
