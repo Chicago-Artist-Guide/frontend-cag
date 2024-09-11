@@ -26,13 +26,13 @@ const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
   const { threadId } = useParams();
   const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
-  const { threads, loadThreads, currentThread } = useMessages();
+  const { threads, loadThreads } = useMessages();
   const [loading, setLoading] = useState(true);
   const [threadData, setThreadData] = useState<MessageThreadTypeExtended[]>([]);
 
   useEffect(() => {
     const loadThreadsAsync = async () => {
-      const accountId = account?.data?.uid;
+      const accountId = account.ref?.id || '';
       await loadThreads(accountId);
     };
 

@@ -11,8 +11,16 @@ import { useEffect, useState } from 'react';
 import { Document } from '../context/UserContext';
 
 const useProfileData = (currentUser: User | null, firestore: Firestore) => {
-  const [account, setAccount] = useState<Document>({ ref: null, data: null });
-  const [profile, setProfile] = useState<Document>({ ref: null, data: null });
+  const [account, setAccount] = useState<Document>({
+    id: null,
+    ref: null,
+    data: null
+  });
+  const [profile, setProfile] = useState<Document>({
+    id: null,
+    ref: null,
+    data: null
+  });
 
   useEffect(() => {
     if (!currentUser || !firestore) return;
@@ -35,6 +43,7 @@ const useProfileData = (currentUser: User | null, firestore: Firestore) => {
 
         if (!queryAccountSnapshot.empty) {
           setAccount({
+            id: queryAccountSnapshot.docs[0].id,
             ref: queryAccountSnapshot.docs[0].ref,
             data: queryAccountSnapshot.docs[0].data()
           });
@@ -42,6 +51,7 @@ const useProfileData = (currentUser: User | null, firestore: Firestore) => {
 
         if (!queryProfileSnapshot.empty) {
           setProfile({
+            id: queryProfileSnapshot.docs[0].id,
             ref: queryProfileSnapshot.docs[0].ref,
             data: queryProfileSnapshot.docs[0].data()
           });

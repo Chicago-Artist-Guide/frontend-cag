@@ -20,7 +20,6 @@ import {
   FormDateRange,
   FormInput,
   FormRadio,
-  FormSelect,
   FormTextArea
 } from '../../Form/Inputs';
 import { LeftCol, RightCol, Title } from '../ProfileStyles';
@@ -31,10 +30,10 @@ const CompanyAddShow: React.FC<{
 }> = ({ toggleEdit }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
-    account: { data: accountData }
+    profile: { data: profileData }
   } = useUserContext();
   const [formValues, setFormValues] = useForm<Production>({
-    account_id: accountData?.uid,
+    account_id: profileData?.account_id,
     production_id: '',
     production_name: '',
     production_image_url: '',

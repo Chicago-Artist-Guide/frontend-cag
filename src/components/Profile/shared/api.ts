@@ -6,9 +6,37 @@ import {
   collection,
   where,
   query,
-  limit
+  limit,
+  or
 } from 'firebase/firestore';
 import { IndividualAccountInit } from '../../SignUp/Individual/types';
+
+export const getAccountWithAccountId = async (
+  firebaseStore: Firestore,
+  accountId: string
+) => {
+  const docRef = doc(firebaseStore, 'accounts', accountId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as IndividualAccountInit;
+    return data;
+  }
+
+  // try to find account if accountId is uid?
+  const accountQuery = query(
+    collection(firebaseStore, 'accounts'),
+    where('uid', '==', accountId),
+    limit(1)
+  );
+  const queryAccountSnapshot = await getDocs(accountQuery);
+
+  if (!queryAccountSnapshot.empty) {
+    return queryAccountSnapshot.docs[0].data();
+  }
+
+  return false;
+};
 
 export const getProfileWithUid = async (
   firebaseStore: Firestore,
@@ -16,7 +44,7 @@ export const getProfileWithUid = async (
 ) => {
   const profileQuery = query(
     collection(firebaseStore, 'profiles'),
-    where('uid', '==', accountId),
+    or(where('uid', '==', accountId), where('account_id', '==', accountId)),
     limit(1)
   );
   const queryProfileSnapshot = await getDocs(profileQuery);
@@ -33,19 +61,17 @@ export const getNameForAccount = async (
   firebaseStore: Firestore,
   accountId: string
 ) => {
-  const docRef = doc(firebaseStore, 'accounts', accountId);
-  const docSnap = await getDoc(docRef);
+  const findAccount = await getAccountWithAccountId(firebaseStore, accountId);
 
-  if (docSnap.exists()) {
-    const data = docSnap.data() as IndividualAccountInit;
-    const { first_name, last_name } = data;
+  if (findAccount) {
+    const { first_name, last_name } = findAccount;
 
     return first_name && last_name
-      ? `${data.first_name} ${data.last_name}`
+      ? `${first_name} ${last_name}`
       : `User ${accountId}`;
-  } else {
-    return 'Profile N/A';
   }
+
+  return 'Profile N/A';
 };
 
 export const getTheaterNameForAccount = async (

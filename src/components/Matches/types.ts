@@ -1,3 +1,4 @@
+import { DocumentReference, DocumentData } from 'firebase/firestore';
 import {
   Gender,
   IndividualAccountInit,
@@ -44,3 +45,14 @@ export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
 export type ProductionRole = Role & { productionId: string };
 
 export type TheaterOrTalent = 'theater' | 'talent';
+
+export type TheaterTalentMatch = {
+  id: string;
+  production_id: DocumentReference<DocumentData> | string;
+  role_id: string;
+  status: boolean;
+  talent_account_id: DocumentReference<DocumentData> | string;
+  initiated_by: TheaterOrTalent;
+  confirmed_by?: TheaterOrTalent;
+  rejected_by?: TheaterOrTalent;
+};

@@ -8,7 +8,8 @@ import {
   getDoc,
   where,
   query,
-  or
+  or,
+  orderBy
 } from 'firebase/firestore';
 import { useUserContext } from './UserContext';
 import { MessageThreadType, MessageType } from '../components/Messages/types';
@@ -96,7 +97,8 @@ export const MessageProvider: React.FC<{
         or(
           where('sender_id', 'in', [senderRef, recipientRef]),
           where('recipient_id', 'in', [senderRef, recipientRef])
-        )
+        ),
+        orderBy('timestamp', 'asc')
       );
 
       if (thread_id) {
@@ -119,7 +121,7 @@ export const MessageProvider: React.FC<{
   };
 
   const updateThreadStatus = async (threadId: string, status: string) => {
-    const accountId = account?.data?.uid;
+    const accountId = account.ref?.id;
     const threadDoc = doc(firestore, 'threads', threadId);
 
     await updateDoc(threadDoc, { status });
