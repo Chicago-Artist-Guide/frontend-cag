@@ -115,8 +115,6 @@ export const createEmail = async (
     }
   };
 
-  console.log(messageData);
-
   try {
     const mailRef = collection(firebaseStore, 'mail');
     await addDoc(mailRef, messageData);

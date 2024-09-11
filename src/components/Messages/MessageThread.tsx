@@ -9,7 +9,14 @@ import {
 } from '../Profile/shared/api';
 import { getProduction } from '../Profile/Company/api';
 import { Production, Role } from '../Profile/Company/types';
+import {
+  getTheaterTalentMatch,
+  createTheaterTalentMatch
+} from '../Matches/api';
+import { TheaterTalentMatch, TheaterOrTalent } from '../Matches/types';
+import { createMessageThread } from './api';
 import { MessageThreadType } from './types';
+import Button from '../shared/Button';
 
 interface MessageThreadProps {
   thread: MessageThreadType;
@@ -25,6 +32,8 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
   const [production, setProduction] = useState<Production>();
   const [role, setRole] = useState<Role>();
   const [recipientName, setRecipientName] = useState<string | null>(null);
+  const [match, setMatch] = useState<TheaterTalentMatch | null>(null);
+  const [loadTrigger, setLoadTrigger] = useState<number>(0);
 
   const loadRecipientNameForThread = async (recipientId: string) => {
     const recipientName =
@@ -46,6 +55,76 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
 
       const findRole = productionData.roles?.find((r) => r.role_id === roleId);
       findRole && setRole(findRole);
+    }
+  };
+
+  const loadMatch = async (
+    productionId: string,
+    roleId: string,
+    talentId: string
+  ) => {
+    const findMatch = await getTheaterTalentMatch(
+      firebaseFirestore,
+      productionId,
+      roleId,
+      talentId
+    );
+
+    findMatch && setMatch(findMatch);
+  };
+
+  const updateMatch = async (status: boolean) => {
+    if (!match || match !== null) {
+      console.error('Cannot update match. No match found.');
+      return false;
+    }
+
+    const accountType = account?.data?.type || null;
+
+    if (accountType !== 'company' && accountType !== 'individual') {
+      console.error(
+        'Could not properly type the current account to update match.'
+      );
+      return false;
+    }
+
+    const { production_id, role_id, talent_account_id } = match;
+    const accountTypeForMatch: TheaterOrTalent =
+      accountType === 'company' ? 'theater' : 'talent';
+    const theaterId =
+      typeof thread.theater_account_id === 'string'
+        ? thread.theater_account_id
+        : thread.theater_account_id.id;
+    const talentId =
+      typeof thread.talent_account_id === 'string'
+        ? thread.talent_account_id
+        : thread.talent_account_id.id;
+
+    try {
+      // calling createTheaterTalentMatch now should UPDATE the existing match for confirmed or rejected by
+      await createTheaterTalentMatch(
+        firebaseFirestore,
+        production_id,
+        role_id,
+        talent_account_id,
+        status,
+        accountTypeForMatch
+      );
+
+      // calling createMessageThread should update the thread and send a new message
+      await createMessageThread(
+        firebaseFirestore,
+        theaterId,
+        talentId,
+        '', // craft message content depending on account
+        accountTypeForMatch
+      );
+
+      // trigger refresh of data, the ocky way
+      setLoadTrigger((prevState) => prevState++);
+    } catch (error) {
+      console.error('Error updating match', error);
+      return false;
     }
   };
 
@@ -75,11 +154,14 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
     loadThreadMessages(senderId, recipientId, threadId);
     setAccountId(accountIdStr);
     loadRecipientNameForThread(recipientId);
-    productionId &&
-      thread.role_id &&
+
+    if (productionId && thread.role_id) {
       loadProductionAndRoleForThread(productionId, thread.role_id);
+      loadMatch(productionId, thread.role_id, talentId);
+    }
+
     setLoading(false);
-  }, [account, thread, threadId]);
+  }, [account, thread, threadId, loadTrigger]);
 
   return (
     <div className="p-4">
@@ -119,6 +201,20 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
               );
             })}
           </div>
+          {match && (
+            <div className="mt-4 flex justify-end space-x-4 border-t border-stone-200 pt-4">
+              <Button
+                onClick={() => updateMatch(false)}
+                text="Decline Match"
+                variant="danger"
+              />
+              <Button
+                onClick={() => updateMatch(true)}
+                text="Accept Match"
+                variant="primary"
+              />
+            </div>
+          )}
         </>
       )}
     </div>
