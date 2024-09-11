@@ -6,7 +6,8 @@ import {
   collection,
   where,
   query,
-  limit
+  limit,
+  or
 } from 'firebase/firestore';
 import { IndividualAccountInit } from '../../SignUp/Individual/types';
 
@@ -43,7 +44,7 @@ export const getProfileWithUid = async (
 ) => {
   const profileQuery = query(
     collection(firebaseStore, 'profiles'),
-    where('uid', '==', accountId),
+    or(where('uid', '==', accountId), where('account_id', '==', accountId)),
     limit(1)
   );
   const queryProfileSnapshot = await getDocs(profileQuery);

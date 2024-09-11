@@ -136,6 +136,14 @@ const CompanyProfile: React.FC<{
               </DetailsCardItem>
             </div>
           </DetailsCard>
+          <DetailsCard>
+            <DetailsColTitle>
+              <div>Menu</div>
+            </DetailsColTitle>
+            <div>
+              <a href="/profile/messages">Messages</a>
+            </div>
+          </DetailsCard>
         </LeftCol>
         <RightCol lg={{ span: 7, offset: 1 }}>
           <TheatreName>{profileData?.theatre_name}</TheatreName>
