@@ -41,7 +41,12 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const findMatch = async () => {
     const productionId = production?.production_id || '';
     const roleId = role.role_id || '';
-    const talentAccountId = account.data.uid;
+    const talentAccountId = account.ref?.id;
+
+    if (!talentAccountId) {
+      console.error('Cannot find current user account ref');
+      return false;
+    }
 
     const foundMatch = await getTheaterTalentMatch(
       firebaseFirestore,
@@ -132,8 +137,13 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     try {
       const productionId = production?.production_id || '';
       const roleId = role.role_id || '';
-      const talentAccountId = account.data.uid;
+      const talentAccountId = account.ref?.id;
       const theaterAccountId = production?.account_id || '';
+
+      if (!talentAccountId) {
+        console.error('Cannot find current user account ref');
+        return false;
+      }
 
       await createTheaterTalentMatch(
         firebaseFirestore,

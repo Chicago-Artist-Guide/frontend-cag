@@ -24,7 +24,7 @@ interface MessageThreadProps {
 
 export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
   const { threadId } = useParams();
-  const { account } = useUserContext();
+  const { account, profile } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const { loadThreadMessages, currentThreadMessages } = useMessages();
   const [accountId, setAccountId] = useState<string | null>(null);
@@ -69,8 +69,6 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
       roleId,
       talentId
     );
-
-    console.log(findMatch);
 
     findMatch && setMatch(findMatch);
   };
@@ -133,7 +131,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
   };
 
   useEffect(() => {
-    const accountIdStr = account?.data?.uid || null;
+    const accountIdStr = account.ref?.id || null;
     const accountType = account?.data?.type || null;
 
     if (!accountIdStr || !accountType) {

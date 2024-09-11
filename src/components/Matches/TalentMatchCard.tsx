@@ -90,6 +90,7 @@ export const TalentMatchCard = ({
   const createMatch = async (status: boolean) => {
     try {
       const talentAccountId = profile.account_id;
+      const currUserAccountId = account.ref?.id;
 
       await createTheaterTalentMatch(
         firebaseFirestore,
@@ -100,6 +101,11 @@ export const TalentMatchCard = ({
         'theater'
       );
 
+      if (!currUserAccountId) {
+        console.error('Caanot find current user ref account id.');
+        return false;
+      }
+
       const messageContent = theaterToArtistMessage(
         roleName,
         productionName,
@@ -107,7 +113,7 @@ export const TalentMatchCard = ({
       );
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
-        account.data.uid,
+        currUserAccountId,
         talentAccountId,
         messageContent,
         'theater',
