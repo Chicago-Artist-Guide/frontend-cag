@@ -50,6 +50,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [match, setMatch] = useState<TheaterTalentMatch | null>(null);
   const [loadTrigger, setLoadTrigger] = useState<number>(0);
+  const [btnDisabled, setBtnDisabled] = useState<boolean>(false);
 
   const loadRecipientNameForThread = async (recipientId: string) => {
     const recipientName =
@@ -317,6 +318,28 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
     setLoading(false);
   }, [account, thread, threadId, loadTrigger]);
 
+  useEffect(() => {
+    if (!currentThreadMessages || !currentThreadMessages.length) {
+      return;
+    }
+
+    const lastMessage = currentThreadMessages.at(-1);
+    const accountIdStr = account.ref?.id || null;
+
+    if (!lastMessage || !accountIdStr || accountIdStr === null) {
+      return;
+    }
+
+    const senderIdStr =
+      typeof lastMessage.sender_id === 'string'
+        ? lastMessage.sender_id
+        : lastMessage.sender_id.id;
+    const isSender = senderIdStr === accountId;
+
+    // disable button if user is the sender of the last/most recent message
+    setBtnDisabled(isSender);
+  }, [currentThreadMessages]);
+
   return (
     <div className="p-4">
       {loading ? (
@@ -373,11 +396,13 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
                     onClick={() => updateMatch(false)}
                     text="Decline Match"
                     variant="danger"
+                    disabled={btnDisabled}
                   />
                   <Button
                     onClick={() => updateMatch(true)}
                     text="Accept Match"
                     variant="primary"
+                    disabled={btnDisabled}
                   />
                 </>
               )}
