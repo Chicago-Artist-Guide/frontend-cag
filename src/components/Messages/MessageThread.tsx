@@ -3,9 +3,12 @@ import { useParams } from 'react-router-dom';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
+import { getTheaterAccountByAccountId } from '../Profile/Company/api';
 import {
   getNameForAccount,
-  getTheaterNameForAccount
+  getTheaterNameForAccount,
+  getAccountWithAccountId,
+  getProfileWithUid
 } from '../Profile/shared/api';
 import { getProduction } from '../Profile/Company/api';
 import { Production, Role } from '../Profile/Company/types';
@@ -14,14 +17,20 @@ import {
   createTheaterTalentMatch
 } from '../Matches/api';
 import { TheaterTalentMatch, TheaterOrTalent } from '../Matches/types';
-import { createMessageThread } from './api';
+import { createMessageThread, createEmail } from './api';
 import { MessageThreadType } from './types';
 import {
   NO_EMAIL,
   UNKNOWN_ROLE,
   UNKNOWN_PRODUCTION,
   theaterToArtistMessage,
-  artistToTheaterMessage
+  artistToTheaterMessage,
+  theaterToArtistEmailSubject,
+  artistToTheaterEmailSubject,
+  theaterToArtistEmailText,
+  artistToTheaterEmailText,
+  theaterToArtistEmailHtml,
+  artistToTheaterEmailHtml
 } from './messages';
 import Button from '../shared/Button';
 
@@ -80,6 +89,145 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
     findMatch && setMatch(findMatch);
   };
 
+  const sendMatchActionMessage = async (
+    accountTypeForMatch: TheaterOrTalent,
+    theaterId: string,
+    talentId: string
+  ) => {
+    const messageResponse =
+      accountTypeForMatch === 'theater'
+        ? theaterToArtistMessage(
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION,
+            profile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+          )
+        : artistToTheaterMessage(
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION,
+            currentUser?.email || NO_EMAIL
+          );
+
+    // calling createMessageThread should update the thread and send a new message
+    await createMessageThread(
+      firebaseFirestore,
+      theaterId,
+      talentId,
+      messageResponse,
+      accountTypeForMatch
+    );
+  };
+
+  const sendMatchActionEmail = async (
+    accountTypeForMatch: TheaterOrTalent,
+    theaterId: string,
+    talentId: string
+  ) => {
+    let toEmail = null;
+
+    // find email address for talent or theater
+    if (accountTypeForMatch === 'theater') {
+      const talentAccount = await getAccountWithAccountId(
+        firebaseFirestore,
+        talentId
+      );
+
+      if (!talentAccount || !talentAccount?.email) {
+        console.error(
+          'Could not find account or account email address for talent.'
+        );
+        return false;
+      }
+
+      toEmail = talentAccount?.email;
+    } else {
+      const theaterProfile = await getProfileWithUid(
+        firebaseFirestore,
+        theaterId
+      );
+
+      if (!theaterProfile) {
+        console.error('Could not find profile for theater');
+        return false;
+      }
+
+      toEmail = theaterProfile?.primary_contact_email;
+
+      // if there isn't a primary contact email, we need to find the account email
+      if (!toEmail) {
+        const theaterAccount = await getTheaterAccountByAccountId(
+          firebaseFirestore,
+          theaterId
+        );
+
+        if (theaterAccount && theaterAccount.email) {
+          toEmail = theaterAccount.email;
+        } else {
+          console.log(
+            'Could not find account or account email address for theater'
+          );
+          return false;
+        }
+      }
+    }
+
+    const messageEmailAddress =
+      accountTypeForMatch === 'theater'
+        ? profile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+        : currentUser?.email || NO_EMAIL;
+
+    const emailSubject =
+      accountTypeForMatch === 'theater'
+        ? theaterToArtistEmailSubject(
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION
+          )
+        : artistToTheaterEmailSubject(
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION
+          );
+    const emailText =
+      accountTypeForMatch === 'theater'
+        ? theaterToArtistEmailText(
+            recipientName || 'Talent',
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION,
+            messageEmailAddress
+          )
+        : artistToTheaterEmailText(
+            recipientName || 'Theater',
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION,
+            messageEmailAddress
+          );
+    const emailHtml =
+      accountTypeForMatch === 'theater'
+        ? theaterToArtistEmailHtml(
+            recipientName || 'Talent',
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION,
+            messageEmailAddress
+          )
+        : artistToTheaterEmailHtml(
+            recipientName || 'Theater',
+            role?.role_name || UNKNOWN_ROLE,
+            production?.production_name || UNKNOWN_PRODUCTION,
+            messageEmailAddress
+          );
+
+    try {
+      await createEmail(
+        firebaseFirestore,
+        toEmail,
+        emailSubject,
+        emailText,
+        emailHtml
+      );
+    } catch (error) {
+      console.error('Could not send email from thread action.', error);
+      return false;
+    }
+  };
+
   const updateMatch = async (status: boolean) => {
     if (!match || match === null) {
       console.error('Cannot update match. No match found.');
@@ -120,30 +268,10 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
         accountTypeForMatch
       );
 
-      // calling createMessageThread should update the thread and send a new message
+      // if a status is positive, send messages and emails
       if (status) {
-        const messageResponse =
-          accountTypeForMatch === 'theater'
-            ? theaterToArtistMessage(
-                role?.role_name || UNKNOWN_ROLE,
-                production?.production_name || UNKNOWN_PRODUCTION,
-                profile.data.primary_contact_email ||
-                  currentUser?.email ||
-                  NO_EMAIL
-              )
-            : artistToTheaterMessage(
-                role?.role_name || UNKNOWN_ROLE,
-                production?.production_name || UNKNOWN_PRODUCTION,
-                currentUser?.email || NO_EMAIL
-              );
-
-        await createMessageThread(
-          firebaseFirestore,
-          theaterId,
-          talentId,
-          messageResponse,
-          accountTypeForMatch
-        );
+        await sendMatchActionMessage(accountTypeForMatch, theaterId, talentId);
+        await sendMatchActionEmail(accountTypeForMatch, theaterId, talentId);
       }
 
       // trigger refresh of data, the ocky way
