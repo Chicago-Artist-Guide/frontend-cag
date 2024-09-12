@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
@@ -39,6 +39,7 @@ interface MessageThreadProps {
 }
 
 export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
+  const navigate = useNavigate();
   const { threadId } = useParams();
   const { account, currentUser, profile } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
@@ -49,7 +50,6 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
   const [role, setRole] = useState<Role>();
   const [recipientName, setRecipientName] = useState<string | null>(null);
   const [match, setMatch] = useState<TheaterTalentMatch | null>(null);
-  const [loadTrigger, setLoadTrigger] = useState<number>(0);
   const [btnDisabled, setBtnDisabled] = useState<boolean>(false);
 
   const loadRecipientNameForThread = async (recipientId: string) => {
@@ -275,8 +275,8 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
         await sendMatchActionEmail(accountTypeForMatch, theaterId, talentId);
       }
 
-      // trigger refresh of data, the ocky way
-      setLoadTrigger((prevState) => prevState++);
+      // this is a terribly unelegant solution but we'll just reload the page to fetch all updated thread/msg data
+      navigate(0);
     } catch (error) {
       console.error('Error updating match', error);
       return false;
@@ -316,7 +316,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({ thread }) => {
     }
 
     setLoading(false);
-  }, [account, thread, threadId, loadTrigger]);
+  }, [account, thread, threadId]);
 
   useEffect(() => {
     if (!currentThreadMessages || !currentThreadMessages.length) {
