@@ -16,10 +16,6 @@ const MessagesContainer: React.FC = () => {
     navigate(`/profile/messages/${threadId}`);
   };
 
-  const handleBackToThreads = () => {
-    setCurrentThread(null);
-  };
-
   useEffect(() => {
     setCurrentThread(currThreadFromContext);
   }, [currThreadFromContext]);
