@@ -167,14 +167,14 @@ const RoleModal: React.FC<{
                   <CAGLabel>Pay</CAGLabel>
                   <RoleRate>
                     <FormInput
-                      name="rate_rate"
+                      name="role_rate"
                       label="Rate"
                       onChange={setFormState}
                       defaultValue={formValues?.role_rate}
                       type="number"
                     />
                     <Dropdown
-                      name="rate_rate_unit"
+                      name="role_rate_unit"
                       label="Unit"
                       options={[
                         {
