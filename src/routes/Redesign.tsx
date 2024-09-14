@@ -32,22 +32,22 @@ const Redesign = () => {
           alt="Hero"
           className="absolute inset-0 h-full w-full object-cover"
         />
-        <div className="relative z-10 py-64 pl-44">
-          <h1 className="text-7xl text-white">
-            Discover your
+        <div className="relative z-10 mt-24 px-6 py-8 md:px-12 md:py-24 lg:px-36 lg:py-36 xl:px-64 xl:py-48">
+          <h1 className="pb-3 text-2xl text-white md:text-5xl lg:text-7xl">
+            Discover your next
             <br />
-            next dream gig
+            dream gig
           </h1>
-          <h3 className="text-md font-semibold text-white">
+          <h3 className="md:text-md py-2 text-xs font-medium leading-loose text-white md:text-lg lg:text-xl">
             {' '}
             Sign up for our network and have your next opportunity find you.
           </h3>
-          <h3 className="text-sm font-medium text-white">
+          <h3 className="pt-3 text-xs font-light text-white md:text-sm lg:text-base">
             Free for everyone. Proudly made in Chicago.
           </h3>
           <a href="/sign-up">
-            <button className="mt-12 rounded-full bg-butter px-14 py-3 text-xl font-semibold text-white hover:bg-yellow">
-              Get Started
+            <button className="mt-12 w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
+              Join Now
             </button>
           </a>
         </div>
