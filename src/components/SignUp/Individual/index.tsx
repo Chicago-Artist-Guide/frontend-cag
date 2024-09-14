@@ -209,6 +209,7 @@ const IndividualSignUp: React.FC<{
             first_name: basicsFirstName,
             last_name: basicsLastName,
             privacy_agreement: true,
+            email: basicsEmailAddress,
             uid: userId
           };
           const accountRef = await addDoc(

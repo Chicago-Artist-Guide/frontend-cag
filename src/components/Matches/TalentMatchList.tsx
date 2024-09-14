@@ -7,11 +7,10 @@ import { ProfileAndName, TalentMatchCard } from './TalentMatchCard';
 
 export const TalentMatchList = () => {
   const { firebaseFirestore } = useFirebaseContext();
-  const { loading, matches, production, currentRoleId } = useMatches();
+  const { loading, matches, production, roles, currentRoleId } = useMatches();
   const [profiles, setProfiles] = useState<ProfileAndName[]>([]);
   const [cardsLoading, setCardsLoading] = useState(true);
 
-  // TODO: check if an existing match status exists in theater_talent_matches
   const fetchFullNames = async () => {
     const profilesWithNames = await Promise.all(
       matches.map(async (m) => {
@@ -23,8 +22,10 @@ export const TalentMatchList = () => {
           firebaseFirestore,
           production?.production_id || '',
           currentRoleId || '',
-          m.account_id
+          m.account_id,
+          'theater' // initiated by theater
         );
+
         return {
           ...m,
           fullName,
@@ -44,6 +45,8 @@ export const TalentMatchList = () => {
   if (loading || cardsLoading) return <p>Loading...</p>;
   if (!profiles.length) return <p>No matches found</p>;
 
+  const getCurrentRole = roles?.find((r) => r.role_id === currentRoleId);
+
   return (
     <div className="flex flex-col gap-6">
       {profiles.map((profile) => (
@@ -51,7 +54,9 @@ export const TalentMatchList = () => {
           key={`${profile.uid}-TalentMatchCard`}
           profile={profile}
           productionId={production?.production_id || ''}
+          productionName={production?.production_name || '(Production N/A)'}
           roleId={currentRoleId || ''}
+          roleName={getCurrentRole?.role_name || '(Role N/A)'}
         />
       ))}
     </div>

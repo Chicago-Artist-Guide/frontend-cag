@@ -3,9 +3,7 @@ import Hero from '/hero.png';
 import Collapsible from '../components/layout/Collapsible';
 import Donate from '/donate.png';
 import { InputField } from '../components/shared';
-//Unique productions square area
-//Donate
-//Newsletter
+import { homeFAQ } from '../components/FAQ/homeFAQ';
 
 const Redesign = () => {
   const sectionTitles = {
@@ -15,44 +13,6 @@ const Redesign = () => {
     jobs: 'How can my Theatre Company sign up to post jobs?',
     identity:
       'Will I be excluded from casting searches based on how I self-identify?'
-  };
-
-  const FAQ = {
-    about: [
-      {
-        id: 1,
-        question: '',
-        answer: 'Answer'
-      }
-    ],
-    price: [
-      {
-        id: 2,
-        question: '',
-        answer: 'Answer'
-      }
-    ],
-    profile: [
-      {
-        id: 3,
-        question: '',
-        answer: 'Answer'
-      }
-    ],
-    jobs: [
-      {
-        id: 4,
-        question: '',
-        answer: 'Answer'
-      }
-    ],
-    identity: [
-      {
-        id: 5,
-        question: '',
-        answer: 'Answer'
-      }
-    ]
   };
 
   const subContainer = (props: any) => {
@@ -95,7 +55,7 @@ const Redesign = () => {
       {/* FAQ */}
       <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
         <div className="col-span-1 flex items-center justify-center">
-          <h1 className="text-black">
+          <h1 className="text-3xl text-black md:text-4xl lg:text-5xl">
             Frequently
             <br />
             Asked
@@ -106,7 +66,7 @@ const Redesign = () => {
         <div className="col-span-2 mx-12">
           <Collapsible
             sectionTitles={sectionTitles}
-            subSections={FAQ}
+            subSections={homeFAQ}
             subContainer={subContainer}
             grid={false}
           />

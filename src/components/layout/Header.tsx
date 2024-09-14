@@ -42,6 +42,9 @@ const Header = () => {
             <NavDropdown.Item href="https://www.zeffy.com/ticketing/5a15d35d-d24e-4a21-926c-1acaec989b6e">
               Silent Auction
             </NavDropdown.Item>
+            <NavDropdown.Item href="https://www.canva.com/design/DAGQGLmC-7s/UOuITrpz7miEBS5RjPmOIg/view?utm_content=DAGQGLmC-7s&utm_campaign=designshare&utm_medium=link&utm_source=editor#1">
+              Digital Program
+            </NavDropdown.Item>
           </NavDropdown>
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">

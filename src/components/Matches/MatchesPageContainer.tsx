@@ -1,24 +1,44 @@
-import React from 'react';
-import { useMatches } from '../../context/MatchContext';
+import React, { useState, useEffect } from 'react';
+import { useUserContext } from '../../context/UserContext';
 import { CompanyMatchList } from './CompanyMatchList';
-import { MatchesFilterBar } from './MatchesFilterBar';
+import { TalentMatchesFilterBar } from './TalentMatchesFilterBar';
 import { TalentMatchList } from './TalentMatchList';
+import { CompanyMatchesFilterBar } from './CompanyMatchesFilterBar';
 
 export const MatchesPageContainer = () => {
-  const { filters } = useMatches();
+  const { account } = useUserContext();
+  const [accountType, setAccountType] = useState(null);
+
+  useEffect(() => {
+    const accountData = account?.data;
+
+    if (accountData) {
+      setAccountType(accountData.type);
+    }
+  }, [account]);
 
   return (
     <div className="flex gap-12 pt-3">
-      <div className="flex-none">
-        <MatchesFilterBar />
-      </div>
-      <div className="flex-1">
-        {filters.type === 'individual' ? (
-          <TalentMatchList />
-        ) : (
-          <CompanyMatchList />
-        )}
-      </div>
+      {accountType !== null ? (
+        <>
+          <div className="flex-none">
+            {accountType === 'individual' ? (
+              <CompanyMatchesFilterBar />
+            ) : (
+              <TalentMatchesFilterBar />
+            )}
+          </div>
+          <div className="flex-1">
+            {accountType === 'individual' ? (
+              <CompanyMatchList />
+            ) : (
+              <TalentMatchList />
+            )}
+          </div>
+        </>
+      ) : (
+        <p>Loading...</p>
+      )}
     </div>
   );
 };

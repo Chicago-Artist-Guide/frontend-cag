@@ -30,4 +30,6 @@ export interface MessageThreadType {
   theater_account_id: DocumentReference<DocumentData> | string;
   theater_status: string;
   updated_at: Date;
+  production_id?: DocumentReference<DocumentData> | string;
+  role_id?: string;
 }

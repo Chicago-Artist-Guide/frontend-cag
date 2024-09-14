@@ -6,6 +6,15 @@ import {
   StageRole
 } from '../shared/profile.types';
 
+export type TheaterAccount = {
+  id: string;
+  uid: string;
+  type: string;
+  email: string;
+  theater_name: string;
+  privacy_agreement: boolean;
+};
+
 export type Profile = {
   account_id: string;
   complete_profile: boolean;

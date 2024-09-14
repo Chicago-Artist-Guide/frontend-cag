@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { MatchingFilters } from '../../components/Matches/types';
-import { Role } from '../../components/Profile/Company/types';
-import Dropdown from '../../components/shared/Dropdown';
-import { skillCheckboxes } from '../../components/SignUp/Individual/types';
+import { MatchingFilters } from './types';
+import { Role } from '../Profile/Company/types';
+import Dropdown from '../shared/Dropdown';
+import { skillCheckboxes } from '../SignUp/Individual/types';
 import { useMatches } from '../../context/MatchContext';
 
-export const MatchesFilterBar = () => {
+export const TalentMatchesFilterBar = () => {
   const { currentRoleId, filters, updateFilters, roles, setCurrentRoleId } =
     useMatches();
   const [currentRole, setCurrentRole] = useState<Role>();

@@ -1,9 +1,11 @@
+import { DocumentReference, DocumentData } from 'firebase/firestore';
 import {
   Gender,
   IndividualAccountInit,
   IndividualProfileDataFullInit,
   IndividualRoles
 } from '../SignUp/Individual/types';
+import { Role } from '../Profile/Company/types';
 
 // These are for situations where the filter value is an array
 // but the profile value itself is a single value (OR)
@@ -39,3 +41,18 @@ export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
       | 'offstage_roles_hair_makeup_costumes'
     >
   >;
+
+export type ProductionRole = Role & { productionId: string };
+
+export type TheaterOrTalent = 'theater' | 'talent';
+
+export type TheaterTalentMatch = {
+  id: string;
+  production_id: DocumentReference<DocumentData> | string;
+  role_id: string;
+  status: boolean;
+  talent_account_id: DocumentReference<DocumentData> | string;
+  initiated_by: TheaterOrTalent;
+  confirmed_by?: TheaterOrTalent;
+  rejected_by?: TheaterOrTalent;
+};

@@ -5,13 +5,24 @@ import Swal from 'sweetalert2';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
+import { getAccountWithAccountId } from '../Profile/shared/api';
+import { createMessageThread, createEmail } from '../Messages/api';
+import {
+  NO_EMAIL,
+  theaterToArtistMessage,
+  theaterToArtistEmailSubject,
+  theaterToArtistEmailText,
+  theaterToArtistEmailHtml
+} from '../Messages/messages';
 import { createTheaterTalentMatch } from './api';
-import { createMessageThread } from '../Messages/api';
+import { MatchConfirmationModal } from './MatchConfirmationModal';
 
 type TalentMatchCardProps = {
   profile: ProfileAndName;
   productionId: string;
+  productionName: string;
   roleId: string;
+  roleName: string;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -19,45 +30,15 @@ export type ProfileAndName = IndividualProfileDataFullInit & {
   matchStatus: boolean | null;
 };
 
-const ConfirmationModal = ({
-  onConfirm,
-  onCancel
-}: {
-  onConfirm: () => void;
-  onCancel: () => void;
-}) => (
-  <div
-    className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
-    style={{ zIndex: 9999 }}
-  >
-    <div className="rounded bg-white p-4 shadow-lg">
-      <h2 className="text-lg font-bold">Confirm Match</h2>
-      <p>
-        Are you sure you want to accept this match? This action will create a
-        message thread with [name]
-      </p>
-      <div className="mt-4 flex justify-end space-x-2">
-        <button onClick={onCancel} className="bg-gray-300 rounded px-4 py-2">
-          Cancel
-        </button>
-        <button
-          onClick={onConfirm}
-          className="rounded bg-blue-500 px-4 py-2 text-white"
-        >
-          Confirm
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
 export const TalentMatchCard = ({
   profile,
   productionId,
-  roleId
+  productionName,
+  roleId,
+  roleName
 }: TalentMatchCardProps) => {
   const navigate = useNavigate();
-  const { account } = useUserContext();
+  const { account, currentUser, profile: userProfile } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
@@ -65,25 +46,83 @@ export const TalentMatchCard = ({
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
+  const sendEmailToTalent = async () => {
+    if (!profile.account_id) {
+      console.error('Could not find account id for profile');
+      return false;
+    }
+
+    const talentAccount = await getAccountWithAccountId(
+      firebaseFirestore,
+      profile.account_id
+    );
+    const subject = theaterToArtistEmailSubject(roleName, productionName);
+    const messageContent = theaterToArtistEmailText(
+      userProfile?.data.theatre_name,
+      roleName,
+      productionName,
+      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+    );
+    const messageContentHtml = theaterToArtistEmailHtml(
+      userProfile?.data.theatre_name,
+      roleName,
+      productionName,
+      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+    );
+
+    if (!talentAccount || !talentAccount?.email) {
+      console.error(
+        'Could not find account or account email address for talent.'
+      );
+      return false;
+    }
+
+    const toEmail = talentAccount?.email;
+    await createEmail(
+      firebaseFirestore,
+      toEmail,
+      subject,
+      messageContent,
+      messageContentHtml
+    );
+  };
+
   const createMatch = async (status: boolean) => {
     try {
       const talentAccountId = profile.account_id;
+      const currUserAccountId = account.ref?.id;
 
       await createTheaterTalentMatch(
         firebaseFirestore,
         productionId,
         roleId,
         talentAccountId,
-        status
+        status,
+        'theater'
       );
 
+      if (!currUserAccountId) {
+        console.error('Caanot find current user ref account id.');
+        return false;
+      }
+
+      const messageContent = theaterToArtistMessage(
+        roleName,
+        productionName,
+        userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+      );
       const messageThreadId = await createMessageThread(
         firebaseFirestore,
-        account.data.uid,
+        currUserAccountId,
         talentAccountId,
-        'Test first message',
-        true
+        messageContent,
+        'theater',
+        productionId,
+        roleId
       );
+
+      // send email
+      await sendEmailToTalent();
 
       return messageThreadId;
     } catch (error) {
@@ -117,6 +156,18 @@ export const TalentMatchCard = ({
     setIsModalVisible(false);
     setMatchType(null);
   };
+
+  const returnModalMessage = () => (
+    <>
+      Please confirm you would like to express interest in{' '}
+      <strong>{fullName}</strong> for the following role:
+      <span className="mx-2 my-8 block rounded-xl bg-stone-200 px-4 py-2">
+        <strong>{roleName}</strong> in <em>{productionName}</em>
+      </span>
+      Once you click Confirm, a new message thread will be created with the
+      talent.
+    </>
+  );
 
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
@@ -153,7 +204,7 @@ export const TalentMatchCard = ({
           </div>
           <div>Age Range</div>
           <div className="font-semibold">
-            {profile.age_ranges?.join('; ') || 'N/A'}
+            {profile.age_ranges?.join(', ') || 'N/A'}
           </div>
           <div>Gender</div>
           <div className="font-semibold">
@@ -229,7 +280,11 @@ export const TalentMatchCard = ({
         </button>
       </div>
       {isModalVisible && (
-        <ConfirmationModal onConfirm={handleConfirm} onCancel={handleCancel} />
+        <MatchConfirmationModal
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          message={returnModalMessage()}
+        />
       )}
     </div>
   );

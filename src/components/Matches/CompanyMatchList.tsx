@@ -1,18 +1,17 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
-import { useMatches } from '../../context/MatchContext';
+import { useRoleMatches } from '../../context/RoleMatchContext';
 import { CompanyMatchCard } from './CompanyMatchCard';
+import { ProductionRole } from './types';
 
-// TODO: fix "m as any" when Role matches are supported
 export const CompanyMatchList = () => {
-  const { matches } = useMatches();
+  const { roles } = useRoleMatches();
 
   return (
-    <div>
-      {matches.map((m) => (
+    <div className="flex flex-col gap-6">
+      {roles.map((role: ProductionRole) => (
         <CompanyMatchCard
-          key={`${(m as any).role_id}-CompanyMatchCard`}
-          role={m}
+          key={`${role.role_id}-CompanyMatchCard`}
+          role={role}
         />
       ))}
     </div>

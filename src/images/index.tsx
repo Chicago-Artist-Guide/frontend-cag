@@ -14,6 +14,7 @@ import wwww3 from './wwww-3.svg';
 import yellowBlob1 from './yellow_blob_1.svg';
 import yellowBlob2 from './yellow_blob_2.svg';
 import yellowBlob3 from './yellow_blob_3.svg';
+import defaultPfp from './defaultpfp.png';
 
 export {
   blueBlob,
@@ -31,5 +32,6 @@ export {
   wwww3,
   yellowBlob1,
   yellowBlob2,
-  yellowBlob3
+  yellowBlob3,
+  defaultPfp
 };
