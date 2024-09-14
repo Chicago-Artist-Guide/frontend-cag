@@ -4,6 +4,7 @@ import Collapsible from '../components/layout/Collapsible';
 import Donate from '/donate.png';
 import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
+import Values from '../components/Redesign/Values';
 
 const Redesign = () => {
   const sectionTitles = {
@@ -52,6 +53,7 @@ const Redesign = () => {
           </a>
         </div>
       </div>
+      <Values />
       {/* FAQ */}
       <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
         <div className="col-span-1 flex items-center justify-center">
