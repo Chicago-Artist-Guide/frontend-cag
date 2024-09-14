@@ -72,24 +72,31 @@ const Redesign = () => {
           />
         </div>
       </div>
-      {/* Diversify */}
-      <div className="grid grid-cols-1 lg:mx-44 lg:grid-cols-2">
-        <div className="items-center justify-center">
-          <h2 className="text-3xl">
-            Help us diversify the Chicago theater community!
-          </h2>
-          <h3 className="pt-2 text-base leading-loose">
-            Your support of the Chicago Artist Guide helps us offer this
-            platform to our users free of cost.
-          </h3>
-          <button className="mt-4 rounded-full bg-salmon px-14 py-3 text-xl font-semibold text-white hover:bg-blush">
-            Donate
-          </button>
-        </div>
-        <div className="flex items-center justify-center">
-          <img src={Donate} alt="Group of people happily posing" />
+      {/* Diversify max-w-7xl */}
+      <div className="flex w-full justify-center bg-white">
+        <div className="w-full max-w-7xl p-6">
+          <div className="my-6 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+            <div className="order-2 flex flex-col md:order-1">
+              <h2 className="text-xl md:text-3xl">
+                Help us diversify the Chicago theater community!
+              </h2>
+              <h3 className="pt-2 text-base leading-loose">
+                Your support of the Chicago Artist Guide helps us offer this
+                platform to our users free of cost.
+              </h3>
+              <a href="/donate">
+                <button className="mt-4 w-full rounded-full bg-salmon px-14 py-3 text-center text-xl font-semibold text-white hover:bg-blush md:w-fit">
+                  Donate
+                </button>
+              </a>
+            </div>
+            <div className="order-1 flex items-center justify-center md:order-2">
+              <img src={Donate} alt="Group of people happily posing" />
+            </div>
+          </div>
         </div>
       </div>
+
       {/* Newsletter */}
       <div>
         <h2 className="mt-24 text-center text-2xl text-slate">
