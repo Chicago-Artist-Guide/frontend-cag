@@ -416,7 +416,7 @@ const IndividualProfile: React.FC<{
       editProfile;
     const skillsProps = {
       additional_skills_checkboxes,
-      additional_skills_manual
+      additional_skills_manual: additional_skills_manual ?? []
     };
 
     try {
