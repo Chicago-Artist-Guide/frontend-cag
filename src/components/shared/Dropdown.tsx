@@ -30,7 +30,7 @@ const DropdownMenu = ({
       <CAGFormSelect
         name={name}
         aria-label={label}
-        defaultValue={value}
+        value={value}
         onChange={onChange}
         placeholder="Choose one..."
         style={{
