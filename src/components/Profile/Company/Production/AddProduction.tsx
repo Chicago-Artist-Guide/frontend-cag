@@ -33,7 +33,7 @@ const CompanyAddShow: React.FC<{
     profile: { data: profileData }
   } = useUserContext();
   const [formValues, setFormValues] = useForm<Production>({
-    account_id: profileData?.account_id,
+    account_id: profileData?.uid,
     production_id: '',
     production_name: '',
     production_image_url: '',
@@ -64,6 +64,8 @@ const CompanyAddShow: React.FC<{
     setShowOtherType(formValues.type === 'Other');
   }, [formValues.type]);
 
+  console.log(profileData);
+
   const setProfilePicture = (url: string) => {
     const target = {
       name: 'production_image_url',
@@ -79,6 +81,7 @@ const CompanyAddShow: React.FC<{
       production_id: productionId
     });
     toggleEdit();
+    console.log(productionId);
   };
 
   return (
