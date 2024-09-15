@@ -125,6 +125,8 @@ export async function fetchTalentWithFilters(
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
 
+  console.log('filters in fetchTalentWithFilters', filters, profileFilters);
+
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       if (Array.isArray(value)) {
@@ -133,8 +135,18 @@ export async function fetchTalentWithFilters(
 
           // if the comparison is array to single value
           if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
+            console.log(
+              'profileFilters: FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING',
+              field,
+              value
+            );
             profileQuery = query(profilesRef, where(field, 'in', value));
           } else {
+            console.log(
+              'profileFilters: comparison is array to array',
+              field,
+              value
+            );
             // we know the comparison is array to array
             profileQuery = query(
               profilesRef,
@@ -145,6 +157,7 @@ export async function fetchTalentWithFilters(
           snapshotPromises.push(getDocs(profileQuery));
         }
       } else {
+        console.log('profileFilters: single value to value', field, value);
         singleProfileQuery = query(
           singleProfileQuery,
           where(field, '==', value)
@@ -162,6 +175,8 @@ export async function fetchTalentWithFilters(
   );
   const matches: IndividualProfileDataFullInit[] = [];
 
+  console.log('matchesSet', matchesSet);
+
   // This is the complicated part: we have to find the intersection
   // Because we did multuple queries and only want profiles that match ALL of the filters
   for (let i = 0; i < snapshots.length; i++) {
@@ -169,8 +184,11 @@ export async function fetchTalentWithFilters(
       snapshots[i].docs.map((doc: QueryDocumentSnapshot<any>) => doc.id)
     );
 
+    console.log('currentSet in snaps loop', currentSet);
+
     for (const id of matchesSet) {
       if (!currentSet.has(id)) {
+        console.log('snap id was not found intersecting', id);
         matchesSet.delete(id);
       }
     }
@@ -185,6 +203,8 @@ export async function fetchTalentWithFilters(
     if (docSnap.exists()) {
       const profileData = docSnap.data() as IndividualProfileDataFullInit;
 
+      console.log('in final loop of matchesSet profileData', profileData);
+
       if (matchStatus !== null && matchStatus !== undefined) {
         const findMatch = await getTheaterTalentMatch(
           firebaseStore,
@@ -194,14 +214,31 @@ export async function fetchTalentWithFilters(
         );
         const foundMatchStatus = findMatch ? findMatch.status : null;
 
+        console.log(
+          'foundMatchStatus if matchStatus provided',
+          matchStatus,
+          foundMatchStatus
+        );
+
         if (foundMatchStatus === matchStatus) {
+          console.log(
+            'profileData pushed to matches if foundMatchStatus === matchStatus',
+            matchStatus,
+            foundMatchStatus
+          );
           matches.push({ ...profileData });
         }
       } else {
+        console.log(
+          'profileData pushed to matchs, no matchStatus',
+          profileData
+        );
         matches.push({ ...profileData });
       }
     }
   }
+
+  console.log('final matches', matches);
 
   return matches;
 }
