@@ -23,8 +23,10 @@ export const homeFAQ = {
     {
       id: 2,
       question: '',
-      answer:
-        'Yes! All features are currently free on Chicago Artist Guide thanks to our generous donors and sponsors. You can support our work here.'
+      answer: [
+        'Yes! All features are currently free on Chicago Artist Guide thanks to our generous donors and sponsors. You can support our work ',
+        <a href="/donate">here.</a>
+      ]
     }
   ],
   profile: [
