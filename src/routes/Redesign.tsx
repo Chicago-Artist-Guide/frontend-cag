@@ -112,7 +112,9 @@ const Redesign = () => {
           </a>
         </div>
       </div>
-      <Values />
+      <div className="mt-12 flex justify-center">
+        <Values />
+      </div>
       {/* FAQ */}
       <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
         <div className="col-span-1 flex items-center justify-center">
