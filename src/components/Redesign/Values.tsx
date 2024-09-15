@@ -112,9 +112,18 @@ const values: Values = {
 
 const Values = () => {
   const [member, setMember] = useState<MemberType>('Artists');
+  const [flipped, setFlipped] = useState([false, false, false, false]);
 
   const handleClick = (value: MemberType) => {
     setMember(value);
+  };
+
+  const handleFlip = (id: string) => {
+    setFlipped((prevFlipped) =>
+      prevFlipped.map((flippedState, index) =>
+        index === Number(id) - 1 ? !flippedState : flippedState
+      )
+    );
   };
 
   return (
@@ -170,15 +179,22 @@ const Values = () => {
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
             const currentItem = value[member];
-            const className = `bg-${currentItem.color} ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[200px] m-2 rounded-md`;
+            const className = `bg-${currentItem.color} ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[210px] m-2 rounded-md`;
+            const isFlipped = flipped[Number(key) - 1];
             return (
-              <div className={className}>
+              <div className={className} onClick={() => handleFlip(key)}>
                 <div className="mr-1 mt-1 text-right text-xl">
                   <FontAwesomeIcon icon={faRetweet} className="text-white" />
                 </div>
-                <h1 className={`p-2 text-white ${currentItem.font}`}>
-                  {currentItem.prop}
-                </h1>
+                {!isFlipped ? (
+                  <h1 className={`p-2 text-white ${currentItem.font}`}>
+                    {currentItem.prop}
+                  </h1>
+                ) : (
+                  <h2 className={'p-2 text-lg text-white'}>
+                    {currentItem.description}
+                  </h2>
+                )}
               </div>
             );
           })}
