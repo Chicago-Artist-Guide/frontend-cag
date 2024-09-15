@@ -157,25 +157,30 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       // update match state in this card
       await findMatch();
 
-      const messageContent = artistToTheaterMessage(
-        roleName || UNKNOWN_ROLE,
-        productionName,
-        currentUser?.email || NO_EMAIL
-      );
-      const messageThreadId = await createMessageThread(
-        firebaseFirestore,
-        theaterAccountId,
-        talentAccountId,
-        messageContent,
-        'talent',
-        productionId,
-        roleId
-      );
+      // only create messages and emails if accepted
+      if (status) {
+        const messageContent = artistToTheaterMessage(
+          roleName || UNKNOWN_ROLE,
+          productionName,
+          currentUser?.email || NO_EMAIL
+        );
+        const messageThreadId = await createMessageThread(
+          firebaseFirestore,
+          theaterAccountId,
+          talentAccountId,
+          messageContent,
+          'talent',
+          productionId,
+          roleId
+        );
 
-      // send email
-      await sendEmailToTheater();
+        // send email
+        await sendEmailToTheater();
 
-      return messageThreadId;
+        return messageThreadId;
+      }
+
+      return null;
     } catch (error) {
       let errorMessage = 'An unknown error occurred';
       if (error instanceof Error) {
