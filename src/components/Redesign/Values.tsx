@@ -51,7 +51,7 @@ const values: Values = {
       col: 'col-span-2',
       order: 2,
       animation: 'animate-slide-up',
-      color: 'blush',
+      color: ' blush',
       font: 'text-7xl'
     },
     Theatres: {
@@ -61,7 +61,7 @@ const values: Values = {
       col: 'col-span-2',
       order: 4,
       animation: 'animate-slide-down',
-      color: 'blush',
+      color: ' blush',
       font: 'text-6xl'
     }
   },
@@ -94,7 +94,7 @@ const values: Values = {
       col: 'col-span-1',
       order: 4,
       animation: 'animate-slide-right',
-      color: 'cornflower',
+      color: ' cornflower',
       font: 'text-6xl'
     },
     Theatres: {
@@ -104,7 +104,7 @@ const values: Values = {
       col: 'col-span-1',
       order: 3,
       animation: 'animate-slide-left',
-      color: 'cornflower',
+      color: ' cornflower',
       font: 'text-4xl'
     }
   }
