@@ -47,7 +47,7 @@ const Collapsible: React.FC<Props> = ({
               className="accordion-header row"
               onClick={() => toggleActive(index)}
             >
-              <h2 className="section-text">
+              <h2 className="section-text text-left">
                 {sect.title}
                 <FontAwesomeIcon
                   className="bod-icon"
