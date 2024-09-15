@@ -713,9 +713,11 @@ const IndividualProfile: React.FC<{
               Profile Complete!
             </h2>
             <p>
-              Our platform is scheduled to go live this summer, so please watch
-              for any email announcements coming from us in the next few months.
-              We've got big things coming soon!
+              We are working with theatre companies to get their roles posted.
+              You'll start to receive matches as they become available! Check
+              out the Find Roles and Messaging links below for matching. These
+              features are in beta and we welcome your feedback as an early
+              member!
             </p>
             <p>Thanks - The Chicago Artist Guide Team</p>
           </PreviewCard>
