@@ -190,7 +190,6 @@ const Values = () => {
                   transformStyle: 'preserve-3d'
                 }}
               >
-                {/* Front content here */}
                 <div
                   className={`absolute bg-${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
                   style={{
@@ -205,7 +204,6 @@ const Values = () => {
                     {currentItem.prop}
                   </h1>
                 </div>
-                {/* Back content here */}
                 <div
                   className={`absolute bg-${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
                   style={{
