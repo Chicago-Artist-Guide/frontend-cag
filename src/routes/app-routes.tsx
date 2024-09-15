@@ -9,7 +9,6 @@ import TOS from './TOS';
 import PrivacyPolicy from './PrivacyPolicy';
 import WhoWeAre from './WhoWeAre';
 import TheaterResources from './TheaterResources';
-import Redesign from './Redesign';
 
 const Login = lazy(() => import('./Login'));
 const Logout = lazy(() => import('./Logout'));
@@ -40,7 +39,6 @@ const AppRoutes = () => {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-up-2" element={<SignUp2 />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/redesign" element={<Redesign />} />
         <Route path="/profile/messages/:threadId?" element={<Messages />} />
         <Route
           path="/production/:productionId/manage"
