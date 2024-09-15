@@ -57,6 +57,7 @@ export const TalentMatchList = () => {
           productionName={production?.production_name || '(Production N/A)'}
           roleId={currentRoleId || ''}
           roleName={getCurrentRole?.role_name || '(Role N/A)'}
+          fetchFullNames={fetchFullNames}
         />
       ))}
     </div>
