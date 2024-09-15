@@ -106,25 +106,32 @@ export const TalentMatchCard = ({
         return false;
       }
 
-      const messageContent = theaterToArtistMessage(
-        roleName,
-        productionName,
-        userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
-      );
-      const messageThreadId = await createMessageThread(
-        firebaseFirestore,
-        currUserAccountId,
-        talentAccountId,
-        messageContent,
-        'theater',
-        productionId,
-        roleId
-      );
+      // only send message and email if accepted
+      if (status) {
+        const messageContent = theaterToArtistMessage(
+          roleName,
+          productionName,
+          userProfile.data.primary_contact_email ||
+            currentUser?.email ||
+            NO_EMAIL
+        );
+        const messageThreadId = await createMessageThread(
+          firebaseFirestore,
+          currUserAccountId,
+          talentAccountId,
+          messageContent,
+          'theater',
+          productionId,
+          roleId
+        );
 
-      // send email
-      await sendEmailToTalent();
+        // send email
+        await sendEmailToTalent();
 
-      return messageThreadId;
+        return messageThreadId;
+      }
+
+      return null;
     } catch (error) {
       let errorMessage = 'An unknown error occurred';
       if (error instanceof Error) {
