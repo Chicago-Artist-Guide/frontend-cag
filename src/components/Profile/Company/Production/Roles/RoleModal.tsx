@@ -140,7 +140,7 @@ const RoleModal: React.FC<{
                   <FormSelect
                     name="role_name"
                     label="Position"
-                    defaultValue={formValues?.offstage_role}
+                    defaultValue={formValues.role_name}
                     onChange={setFormState}
                     hasOptGroups={true}
                     options={transformedOffstageRoleOptions}
