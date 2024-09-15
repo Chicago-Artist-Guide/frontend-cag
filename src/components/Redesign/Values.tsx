@@ -10,7 +10,8 @@ type ValueDetails = {
   order: number;
   animation: string;
   color: string;
-  font: string;
+  bigFont: string;
+  smallFont: string;
 };
 
 type Values = {
@@ -30,7 +31,8 @@ const values: Values = {
       order: 1,
       animation: 'animate-slide-left',
       color: 'butter',
-      font: 'text-6xl'
+      bigFont: 'md:text-6xl',
+      smallFont: 'text-3xl'
     },
     Theatres: {
       prop: 'add shows',
@@ -40,7 +42,8 @@ const values: Values = {
       order: 2,
       animation: 'animate-slide-right',
       color: 'butter',
-      font: 'text-6xl'
+      bigFont: 'md:text-6xl',
+      smallFont: 'text-2xl'
     }
   },
   2: {
@@ -52,7 +55,8 @@ const values: Values = {
       order: 2,
       animation: 'animate-slide-up',
       color: 'salmon',
-      font: 'text-7xl'
+      bigFont: 'md:text-7xl',
+      smallFont: 'text-3xl'
     },
     Theatres: {
       prop: 'cast diverse talent',
@@ -62,7 +66,8 @@ const values: Values = {
       order: 4,
       animation: 'animate-slide-down',
       color: 'salmon',
-      font: 'text-6xl'
+      bigFont: 'md:text-6xl',
+      smallFont: 'text-3xl'
     }
   },
   3: {
@@ -74,7 +79,8 @@ const values: Values = {
       order: 3,
       animation: 'animate-slide-down',
       color: 'mint',
-      font: 'text-6xl'
+      bigFont: 'md:text-6xl',
+      smallFont: 'text-3xl'
     },
     Theatres: {
       prop: 'track your casting process',
@@ -84,7 +90,8 @@ const values: Values = {
       order: 1,
       animation: 'animate-slide-up',
       color: 'mint',
-      font: 'text-5xl'
+      bigFont: 'md:text-5xl',
+      smallFont: 'text-3xl'
     }
   },
   4: {
@@ -95,7 +102,8 @@ const values: Values = {
       order: 4,
       animation: 'animate-slide-right',
       color: 'darkGrey',
-      font: 'text-6xl'
+      bigFont: 'md:text-6xl',
+      smallFont: 'text-3xl'
     },
     Theatres: {
       prop: 'explore talent directory',
@@ -105,7 +113,8 @@ const values: Values = {
       order: 3,
       animation: 'animate-slide-left',
       color: 'darkGrey',
-      font: 'text-4xl'
+      bigFont: 'md:text-4xl',
+      smallFont: 'text-lg'
     }
   }
 };
@@ -127,21 +136,21 @@ const Values = () => {
   };
 
   return (
-    <div className="hidden w-fit flex-col items-center justify-center rounded-lg bg-white md:flex">
+    <div className="w-fit flex-col items-center justify-center rounded-lg bg-white md:flex">
       {/* Title */}
-      <div className="relative m-12 text-darkGrey">
+      <div className="relative text-darkGrey">
         <div className="flex items-start">
-          <h1 className="mr-3 text-4xl italic text-mint">Find</h1>
-          <div className="relative h-10 w-[700px] overflow-hidden">
+          <h1 className="mr-2 text-sm italic text-mint md:text-4xl">Find</h1>
+          <div className="relative h-5 w-[300px] overflow-hidden md:h-10 md:w-[700px]">
             <h1
-              className={`absolute w-full text-4xl transition-transform duration-500 ease-in-out ${
+              className={`absolute w-full text-sm transition-transform duration-500 ease-in-out md:text-4xl ${
                 member === 'Artists' ? 'translate-y-0' : '-translate-y-full'
               }`}
             >
               your next creative opportunity
             </h1>
             <h1
-              className={`absolute w-full text-4xl transition-transform duration-500 ease-in-out ${
+              className={`absolute w-full text-sm transition-transform duration-500 ease-in-out md:text-4xl ${
                 member === 'Artists' ? 'translate-y-full' : 'translate-y-0'
               }`}
             >
@@ -151,10 +160,10 @@ const Values = () => {
         </div>
       </div>
       {/* Toggle */}
-      <div className="flex w-fit items-center rounded-full bg-darkGrey p-2">
+      <div className="flex items-center justify-between rounded-full bg-darkGrey p-2 md:w-fit md:justify-center">
         <button
           onClick={() => handleClick('Artists')}
-          className={`transition-bg rounded-full px-4 py-1 duration-300 ${
+          className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
             member === 'Artists' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
@@ -164,7 +173,7 @@ const Values = () => {
         </button>
         <button
           onClick={() => handleClick('Theatres')}
-          className={`transition-bg ml-1 rounded-full px-4 py-1 duration-300 ${
+          className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
             member === 'Theatres' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
@@ -174,12 +183,12 @@ const Values = () => {
         </button>
       </div>
       {/* Values */}
-      <div className="my-12">
-        <div className="grid w-[700px] grid-cols-3 grid-rows-2 items-center">
+      <div className="my-6 md:my-12">
+        <div className="grid w-[350px] grid-cols-3 grid-rows-2 items-center md:w-[700px]">
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
             const currentItem = value[member];
-            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[210px] m-2 rounded-md transition-transform duration-1000`;
+            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[160px] md:h-[210px] m-[2px] md:m-2 rounded-md transition-transform duration-1000`;
             const isFlipped = flipped[Number(key) - 1];
             return (
               <div
@@ -197,10 +206,12 @@ const Values = () => {
                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
                   }}
                 >
-                  <div className="absolute right-2 top-2 text-xl">
+                  <div className="absolute right-1 top-1 text-sm md:right-2 md:top-2 md:text-xl">
                     <FontAwesomeIcon icon={faRetweet} className="text-white" />
                   </div>
-                  <h1 className={`p-2 text-white ${currentItem.font} mt-4`}>
+                  <h1
+                    className={`p-2 text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-4`}
+                  >
                     {currentItem.prop}
                   </h1>
                 </div>
@@ -211,10 +222,14 @@ const Values = () => {
                     transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)'
                   }}
                 >
-                  <div className="absolute right-2 top-2 text-xl">
+                  <div className="absolute right-1 top-1 text-sm md:right-2 md:top-2 md:text-xl">
                     <FontAwesomeIcon icon={faRetweet} className="text-white" />
                   </div>
-                  <h2 className={'mt-4 p-2 text-lg text-white'}>
+                  <h2
+                    className={
+                      'mt-2 p-2 text-xs font-normal text-white md:mt-4 md:text-lg md:font-bold'
+                    }
+                  >
                     {currentItem.description}
                   </h2>
                 </div>
