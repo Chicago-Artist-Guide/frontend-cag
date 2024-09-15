@@ -133,7 +133,7 @@ export async function fetchTalentWithFilters(
 
           // if the comparison is array to single value
           if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
-            profileQuery = query(profilesRef, where(field, 'in', value));
+            profileQuery = query(profileQuery, where(field, 'in', value));
           } else {
             // we know the comparison is array to array
             profileQuery = query(
