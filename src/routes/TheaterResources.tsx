@@ -13,7 +13,7 @@ const TheaterResources = () => {
     <PageContainer>
       <Row>
         <Col lg={8}>
-          <Title>THEATER RESOURCES</Title>
+          <Title>THEATRE RESOURCES</Title>
           <Tagline>Submit or view a resource!</Tagline>
           <p className="margin-container">
             Our collection of useful links and resources for actors, directors,
@@ -52,7 +52,7 @@ const TheaterResources = () => {
             scrolling="yes"
             seamless
             src="https://docs.google.com/forms/d/e/1FAIpQLSedgQdb2xR0IAlLyY9gmqf6poR_9abnS_ceRTSx5EbnDKCIuQ/viewform?embedded=true"
-            title="Submit and View Links to Theater Resources"
+            title="Submit and View Links to Theatre Resources"
             width="100%"
           />
         </Col>
