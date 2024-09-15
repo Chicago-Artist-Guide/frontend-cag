@@ -23,6 +23,7 @@ type TalentMatchCardProps = {
   productionName: string;
   roleId: string;
   roleName: string;
+  fetchFullNames: () => Promise<void>;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -35,7 +36,8 @@ export const TalentMatchCard = ({
   productionId,
   productionName,
   roleId,
-  roleName
+  roleName,
+  fetchFullNames
 }: TalentMatchCardProps) => {
   const navigate = useNavigate();
   const { account, currentUser, profile: userProfile } = useUserContext();
@@ -105,6 +107,8 @@ export const TalentMatchCard = ({
         console.error('Caanot find current user ref account id.');
         return false;
       }
+
+      await fetchFullNames();
 
       // only send message and email if accepted
       if (status) {

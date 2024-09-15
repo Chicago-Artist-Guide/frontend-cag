@@ -103,7 +103,10 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
     }
 
     if (findRole.gender_identity) {
-      newFilters['gender_identity'] = findRole.gender_identity as Gender[];
+      const genderCatchAll = 'Open to all genders';
+      newFilters['gender_identity'] = findRole.gender_identity.filter(
+        (g) => g !== genderCatchAll
+      ) as Gender[];
     }
 
     if (findRole.ethnicity) {

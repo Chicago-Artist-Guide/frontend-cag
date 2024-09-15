@@ -88,10 +88,7 @@ export const FormSelect: React.FC<{
         name={name}
         placeholder="Choose one..."
         onChange={onChange}
-        defaultValue={defaultValue}
-        style={{
-          color: defaultValue ? colors.secondaryFontColor : colors.lightGrey
-        }}
+        value={defaultValue}
       >
         {hasOptGroups ? (
           <>
