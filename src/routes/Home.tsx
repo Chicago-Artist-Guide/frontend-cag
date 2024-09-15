@@ -55,7 +55,7 @@ const Home = () => {
         <HomeRow>
           <Col lg={8}>
             <Title>CHICAGO ARTIST GUIDE</Title>
-            <Tagline>Diversifying theater one connection at a time.</Tagline>
+            <Tagline>Diversifying theatre one connection at a time.</Tagline>
             <Nav.Link as={StartButton} to="/donate">
               DONATE
             </Nav.Link>

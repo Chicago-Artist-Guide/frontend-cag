@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Hero from '/hero.png';
 import Collapsible from '../components/layout/Collapsible';
 import Donate from '/donate.png';
 import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
+import Values from '../components/Redesign/Values';
 
 const Redesign = () => {
   const sectionTitles = {
@@ -21,6 +22,65 @@ const Redesign = () => {
         <p>{props.answer}</p>
       </div>
     );
+  };
+
+  const [formData, setFormData] = useState({
+    FNAME: '',
+    LNAME: '',
+    EMAIL: ''
+  });
+
+  const handleChange = (e: any) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const name = formData.FNAME;
+    const spaceIndex = name.indexOf(' ');
+
+    let updatedFormData = { ...formData };
+
+    if (spaceIndex !== -1) {
+      const firstName = name.substring(0, spaceIndex).trim();
+      const lastName = name.substring(spaceIndex + 1).trim();
+      updatedFormData = {
+        ...formData,
+        FNAME: firstName,
+        LNAME: lastName
+      };
+    } else {
+      updatedFormData = {
+        ...formData,
+        LNAME: name
+      };
+    }
+
+    setFormData(updatedFormData);
+
+    const form = e.target;
+    const url = new URL(
+      'https://chicagoartistguide.us6.list-manage.com/subscribe/post'
+    );
+    url.searchParams.append('u', '5259e9388abb929652f950f67');
+    url.searchParams.append('id', '8117d0974f');
+
+    Object.keys(updatedFormData).forEach((key) => {
+      url.searchParams.append(
+        key,
+        updatedFormData[key as keyof typeof updatedFormData]
+      );
+    });
+    console.log('This works');
+
+    form.action = url.toString();
+    form.method = 'POST';
+    form.submit();
   };
 
   return (
@@ -52,6 +112,9 @@ const Redesign = () => {
           </a>
         </div>
       </div>
+      <div className="mt-12 flex justify-center">
+        <Values />
+      </div>
       {/* FAQ */}
       <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
         <div className="col-span-1 flex items-center justify-center">
@@ -78,7 +141,7 @@ const Redesign = () => {
           <div className="my-6 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="order-2 flex flex-col md:order-1">
               <h2 className="text-xl md:text-3xl">
-                Help us diversify the Chicago theater community!
+                Help us diversify the Chicago theatre community!
               </h2>
               <h3 className="pt-2 text-base leading-loose">
                 Your support of the Chicago Artist Guide helps us offer this
@@ -99,16 +162,37 @@ const Redesign = () => {
 
       {/* Newsletter */}
       <div>
-        <h2 className="mt-24 text-center text-2xl text-slate">
+        <h2 className="text-evergreen mt-24 px-2 text-start text-2xl md:text-center">
           Stay up to date with the Chicago Artist Guide’s Newsletter
         </h2>
-        <div className="flex justify-center gap-24">
-          <InputField placeholder="First and Last Name" />
-          <InputField placeholder="Email" />
-          <button className="mt-4 rounded-full bg-mint px-14 py-2 text-xl font-semibold text-white hover:bg-darkGrey">
+        <form
+          onSubmit={(e) => handleSubmit(e)}
+          className="flex flex-col justify-center px-5 md:flex-row md:gap-x-10 md:px-10"
+        >
+          <InputField
+            placeholder="First & Last Name"
+            value={formData.FNAME}
+            id="FNAME"
+            name="FNAME"
+            onChange={handleChange}
+            required
+          />
+          <InputField
+            placeholder="Email Address"
+            value={formData.EMAIL}
+            id="EMAIL"
+            name="EMAIL"
+            onChange={handleChange}
+            required
+          />
+          <button
+            type="submit"
+            className="hover:bg-evergreen mt-4 rounded-full bg-mint px-14 py-2 text-xl font-semibold text-white"
+            name="btnSubmit"
+          >
             Keep me posted!
           </button>
-        </div>
+        </form>
       </div>
     </>
   );
