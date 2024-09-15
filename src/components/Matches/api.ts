@@ -131,7 +131,7 @@ export async function fetchTalentWithFilters(
     if (value !== undefined) {
       if (Array.isArray(value)) {
         if (value.length > 0) {
-          let profileQuery: Query;
+          let profileQuery = query(profilesRef);
 
           // if the comparison is array to single value
           if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
@@ -140,7 +140,7 @@ export async function fetchTalentWithFilters(
               field,
               value
             );
-            profileQuery = query(profilesRef, where(field, 'in', value));
+            profileQuery = query(profileQuery, where(field, 'in', value));
           } else {
             console.log(
               'profileFilters: comparison is array to array',
@@ -149,7 +149,7 @@ export async function fetchTalentWithFilters(
             );
             // we know the comparison is array to array
             profileQuery = query(
-              profilesRef,
+              profileQuery,
               where(field, 'array-contains-any', value)
             );
           }
