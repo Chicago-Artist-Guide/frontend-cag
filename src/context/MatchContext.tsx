@@ -172,13 +172,6 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
     setLoading(true);
 
-    console.log(
-      'params for fetchTalentWithFilters in match context:',
-      filters,
-      production,
-      currentRoleId
-    );
-
     fetchTalentWithFilters(
       firestore,
       filters,
