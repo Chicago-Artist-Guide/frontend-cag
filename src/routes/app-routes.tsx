@@ -33,7 +33,7 @@ const AppRoutes = () => {
         <Route path="/terms-of-service" element={<TOS />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/about-us" element={<WhoWeAre />} />
-        <Route path="/theater-resources" element={<TheaterResources />} />
+        <Route path="/theatre-resources" element={<TheaterResources />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

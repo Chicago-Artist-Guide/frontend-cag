@@ -65,7 +65,7 @@ export const aboutQ = {
     },
     {
       id: 6,
-      question: 'How can my theater company sign up to post jobs?',
+      question: 'How can my theatre company sign up to post jobs?',
       answer: [
         'We are invitation-only for theatre companies right now in order to schedule one on one sessions to walk you through the setup process. Please email Executive Director, ',
         <a href="mailto: anna@chicagoartistguide.org">Anna Schutz</a>,
@@ -145,14 +145,14 @@ export const aboutQ = {
       id: 13,
       question: 'WHO IS ABLE TO SEE THE PROFILE INFORMATION?',
       answer: [
-        "Your profile is only viewable to theater companies on the platform in relation to their production requirements. Not all identity information is displayed on an individual's profile, however theatre companies can use certain filters to search for people who fit the demographic in which they are searching."
+        "Your profile is only viewable to theatre companies on the platform in relation to their production requirements. Not all identity information is displayed on an individual's profile, however theatre companies can use certain filters to search for people who fit the demographic in which they are searching."
       ]
     },
     {
       id: 14,
       question: 'CAN USERS CHOOSE NOT TO ENTER CERTAIN INFORMATION?',
       answer: [
-        'Users have the option to enter information that they see fit when creating their profile. We recommend filling in as much information as possible to be considered for more roles. You may update your information at any time. If information is missing, theater companies may contact you to provide further details.'
+        'Users have the option to enter information that they see fit when creating their profile. We recommend filling in as much information as possible to be considered for more roles. You may update your information at any time. If information is missing, theatre companies may contact you to provide further details.'
       ]
     },
     {

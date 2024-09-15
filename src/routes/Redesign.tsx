@@ -141,7 +141,7 @@ const Redesign = () => {
           <div className="my-6 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
             <div className="order-2 flex flex-col md:order-1">
               <h2 className="text-xl md:text-3xl">
-                Help us diversify the Chicago theater community!
+                Help us diversify the Chicago theatre community!
               </h2>
               <h3 className="pt-2 text-base leading-loose">
                 Your support of the Chicago Artist Guide helps us offer this

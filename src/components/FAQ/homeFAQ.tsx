@@ -15,7 +15,7 @@ export const homeFAQ = {
         "Chicago Artist Guide offers more equitable casting and hiring opportunities by removing barriers in connecting Chicago's theatre companies with local artists.",
         <br />,
         <br />,
-        'Chicago theaters will be able to use our platform to find artists from the communities that their productions represent and invite them directly to audition/apply, removing barriers in auditioning, casting, and hiring.'
+        'Chicago theatres will be able to use our platform to find artists from the communities that their productions represent and invite them directly to audition/apply, removing barriers in auditioning, casting, and hiring.'
       ]
     }
   ],

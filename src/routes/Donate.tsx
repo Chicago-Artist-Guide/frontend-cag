@@ -24,7 +24,7 @@ const Donate = () => {
             Chicago Artist Guide is building an online platform that will
             connect theatres with artists and help them diversify their casting
             and hiring. Thank you for supporting our efforts to foster and
-            support a more diversified Chicago theater community!
+            support a more diversified Chicago theatre community!
           </p>
         </Col>
         <Col lg={4}>
