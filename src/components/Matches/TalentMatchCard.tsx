@@ -182,14 +182,12 @@ export const TalentMatchCard = ({
 
   return (
     <div className="flex h-[272px] min-w-[812px] bg-white">
-      <div className="relative max-w-[272px] flex-none">
-        <img
-          src={profile.profile_image_url}
-          alt={fullName}
-          className="size-[272px] max-h-[272px] object-cover"
-          height={272}
-          width={272}
-        />
+      <div
+        className="relative w-[272px] flex-none bg-cover bg-no-repeat"
+        style={{
+          backgroundImage: `url(${profile.profile_image_url})`
+        }}
+      >
         <div className="absolute left-4 top-4">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -205,8 +203,7 @@ export const TalentMatchCard = ({
           </svg>
         </div>
       </div>
-
-      <div className="relative flex flex-1 flex-col overflow-hidden px-8 py-4 font-montserrat -tracking-tighter">
+      <div className="relative flex flex-1 flex-col px-8 py-4 font-montserrat -tracking-tighter">
         <h3 className="mb-4 text-2xl font-bold">{fullName}</h3>
         <div className="grid grid-cols-2 gap-2 text-base">
           <div>Ethnicity</div>

@@ -475,7 +475,9 @@ const IndividualProfile: React.FC<{
     setProfileForm('training_institutions', newTrainings);
   };
 
-  const addTrainingBlock = () => {
+  const addTrainingBlock = (e: any) => {
+    e.preventDefault();
+
     const newTrainingId = trainingId + 1;
 
     setProfileForm('training_institutions', [
@@ -499,7 +501,9 @@ const IndividualProfile: React.FC<{
     setProfileForm('upcoming_performances', newCredits);
   };
 
-  const addUpcomingInput = () => {
+  const addUpcomingInput = (e: any) => {
+    e.preventDefault();
+
     const newShowId = upcomingId + 1;
 
     setProfileForm('upcoming_performances', [
