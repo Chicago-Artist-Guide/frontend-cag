@@ -501,7 +501,9 @@ const IndividualProfile: React.FC<{
     setProfileForm('upcoming_performances', newCredits);
   };
 
-  const addUpcomingInput = () => {
+  const addUpcomingInput = (e: any) => {
+    e.preventDefault();
+
     const newShowId = upcomingId + 1;
 
     setProfileForm('upcoming_performances', [
