@@ -22,6 +22,7 @@ import { Button, Checkbox, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
 import { colors, fonts } from '../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
+import { forceHttp } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
 import {
   AgeRange,
@@ -853,7 +854,7 @@ const IndividualProfile: React.FC<{
                     <br />
                     {profile?.data?.websites.map((w: IndividualWebsite) => (
                       <React.Fragment key={`personal-website-${w.id}`}>
-                        <a href={w.url} target="_blank">
+                        <a href={forceHttp(w.url)} target="_blank">
                           Visit Website (<em>{w.websiteType}</em>)
                         </a>
                         <br />
