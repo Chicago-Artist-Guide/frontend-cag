@@ -32,9 +32,13 @@ const Header = () => {
           <Nav.Link as={Link} to="/about-us">
             ABOUT US
           </Nav.Link>
-          <Nav.Link as={Link} to="/donate">
+          <Nav.Link
+            as={Link}
+            to="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f"
+          >
             DONATE
           </Nav.Link>
+
           <NavDropdown title="CAG-BARET" id="basic-nav-dropdown">
             <NavDropdown.Item href="https://www.zeffy.com/ticketing/f021b4c4-c62b-4fbf-b975-689121ed5b71">
               Get your tickets!

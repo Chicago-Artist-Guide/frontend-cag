@@ -147,7 +147,7 @@ const Home = () => {
                 Your support of the Chicago Artist Guide helps us offer this
                 platform to our users free of cost.
               </h3>
-              <a href="/donate">
+              <a href="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f">
                 <button className="mt-4 w-full rounded-full bg-salmon px-14 py-3 text-center text-xl font-semibold text-white hover:bg-blush md:w-fit">
                   Donate
                 </button>
