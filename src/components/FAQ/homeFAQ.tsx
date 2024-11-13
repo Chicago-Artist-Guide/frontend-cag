@@ -25,7 +25,9 @@ export const homeFAQ = {
       question: '',
       answer: [
         'Yes! All features are currently free on Chicago Artist Guide thanks to our generous donors and sponsors. You can support our work ',
-        <a href="/donate">here.</a>
+        <a href="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f">
+          here.
+        </a>
       ]
     }
   ],
