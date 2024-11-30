@@ -181,7 +181,12 @@ export const TalentMatchCard = ({
   );
 
   return (
-    <div className="flex h-[272px] min-w-[812px] bg-white">
+    <div
+      className={clsx('flex min-h-[272px] max-w-[812px]', {
+        'border-4 border-mint bg-yoda/25': isAccepted,
+        'border-4 border-salmon bg-blush/25': isDeclined
+      })}
+    >
       <div
         className="relative w-[272px] flex-none bg-cover bg-no-repeat"
         style={{
@@ -205,7 +210,7 @@ export const TalentMatchCard = ({
       </div>
       <div className="relative flex flex-1 flex-col px-8 py-4 font-montserrat -tracking-tighter">
         <h3 className="mb-4 text-2xl font-bold">{fullName}</h3>
-        <div className="grid grid-cols-2 gap-2 text-base">
+        <div className="text-base xl:grid xl:grid-cols-2 xl:gap-2">
           <div>Ethnicity</div>
           <div className="font-semibold">
             {profile.ethnicities?.join(', ') || 'N/A'}
@@ -227,7 +232,6 @@ export const TalentMatchCard = ({
           <div className="font-semibold">N/A</div>
         </div>
       </div>
-
       <div className="flex flex-none flex-col">
         <button
           onClick={() => {

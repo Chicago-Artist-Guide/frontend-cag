@@ -26,11 +26,11 @@ export const CompanyMatchesFilterBar = () => {
         </span>
         Ethnicites
         <span className="col-span-2 font-bold">
-          {profileData?.ethnicities.join(', ') || 'All Ethnicities'}
+          {profileData?.ethnicities?.join(', ') || 'All Ethnicities'}
         </span>
         Age Ranges
         <span className="col-span-2 font-bold">
-          {profileData?.age_ranges.join(', ') || 'All Age Ranges'}
+          {profileData?.age_ranges?.join(', ') || 'All Age Ranges'}
         </span>
         Gender Identity
         <span className="col-span-2 font-bold">
