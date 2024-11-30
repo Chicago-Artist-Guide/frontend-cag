@@ -181,7 +181,12 @@ export const TalentMatchCard = ({
   );
 
   return (
-    <div className="flex h-[272px] min-w-[812px] bg-white">
+    <div
+      className={clsx('flex min-h-[272px] min-w-[812px]', {
+        'border-4 border-mint bg-yoda/25': isAccepted,
+        'border-4 border-salmon bg-blush/25': isDeclined
+      })}
+    >
       <div
         className="relative w-[272px] flex-none bg-cover bg-no-repeat"
         style={{
@@ -227,7 +232,6 @@ export const TalentMatchCard = ({
           <div className="font-semibold">N/A</div>
         </div>
       </div>
-
       <div className="flex flex-none flex-col">
         <button
           onClick={() => {
