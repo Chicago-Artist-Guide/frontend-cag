@@ -242,7 +242,12 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   );
 
   return (
-    <div className="flex h-[272px] min-w-[812px] bg-white">
+    <div
+      className={clsx('flex min-h-[272px] max-w-[812px]', {
+        'border-4 border-mint bg-yoda/25': isAccepted,
+        'border-4 border-salmon bg-blush/25': isDeclined
+      })}
+    >
       <div className="relative flex flex-1 flex-col overflow-hidden px-8 py-4 font-montserrat -tracking-tighter">
         <h2 className="mb-4 text-2xl font-bold">{role.role_name}</h2>
         {production?.production_name && (
@@ -250,7 +255,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             {production.production_name} by {theater?.theatre_name}
           </h3>
         )}
-        <div className="grid grid-cols-2 gap-2 text-base">
+        <div className="text-base xl:grid xl:grid-cols-2 xl:gap-2">
           <div>Type</div>
           <div className="font-semibold">{role.type}</div>
           <div>Ethnicity</div>
