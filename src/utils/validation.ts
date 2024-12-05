@@ -26,3 +26,7 @@ export const validateRegex = (
   type: keyof typeof validationRegex,
   value: string
 ) => !!value.match(validationRegex[type]);
+
+// function to force http:// on a url if not present
+export const forceHttp = (url: string) =>
+  url.startsWith('http') ? url : `http://${url}`;

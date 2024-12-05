@@ -187,6 +187,7 @@ const ActorInfo: React.FC<{
                     selectedValues={actorInfo2AgeRanges}
                     onSelect={onRangeChangeMulti}
                     onRemove={onRangeChangeMulti}
+                    selectionLimit={3}
                     placeholder="Select Age Ranges"
                   />
                 </Form.Group>
