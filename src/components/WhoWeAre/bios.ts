@@ -1,40 +1,35 @@
 // Board of Directors
 import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
 import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
-import Frazier from '../../images/who-we-are/board/Board_Frazier.jpg';
+import Frazier from '../../images/who-we-are/board/Board_Frazier.png';
+import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
 import Laws from '../../images/who-we-are/board/Board_Laws.jpg';
-import Lee from '../../images/who-we-are/board/Board_Lee.jpg';
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
 import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 
 // Artist Auxiliary Board
-import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.jpg';
+import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.png';
 import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
-import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
-import Kauffman from '../../images/who-we-are/board/Board_Kauffman.jpg';
+import Kauffman from '../../images/who-we-are/board/Board_Kauffman.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Silva from '../../images/who-we-are/board/Board_Silva.png';
+import Kester from '../../images/who-we-are/board/Board_Kester.jpg';
 import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
-import Adamy from '../../images/who-we-are/operations/Staff_Adamy.jpg';
-import Brown from '../../images/who-we-are/operations/Staff_Brown.png';
-import Hinton from '../../images/who-we-are/operations/Staff_Hinton.png';
-import Mwakasisi from '../../images/who-we-are/operations/Staff_Mwakasisi.jpg';
-import Newsome from '../../images/who-we-are/operations/Staff_Newsome.jpg';
-import Walker from '../../images/who-we-are/operations/Staff_Walker.jpg';
+import Adamy from '../../images/who-we-are/operations/Staff_Adamy.png';
+import Newsome from '../../images/who-we-are/operations/Staff_Newsome.png';
+import Walker from '../../images/who-we-are/operations/Staff_Walker.png';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
-import Wills from '../../images/who-we-are/operations/Staff_Wills.jpg';
 
 // Site Development
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
 import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
-import Hoskins from '../../images/who-we-are/technical/Staff_Hoskins.png';
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import Nagra from '../../images/who-we-are/technical/Staff_Nagra.jpg';
 import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
@@ -43,6 +38,7 @@ import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
 import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
 import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
+import Staros from '../../images/who-we-are/operations/Staff_Staros.png';
 
 const bioId = () => (<any>crypto).randomUUID();
 
@@ -69,16 +65,6 @@ const bios = {
       image: Dolezalek,
       linkedin: 'iamzeked',
       bio: 'In the workplace or in the community, Zeke has a passion for creating spaces in which people can thrive. As a People & Culture professional, Zeke strives to unite people together by encouraging conversations and empowering others. Over the course of his time at What if Syndicate, Zeke has overseen a near 200% increase of staff, over 6 new property openings, labor laws and employee relations in over 5 markets, and growth and development planning for several leaders and operators within our brands.\n\nWith a BFA in Musical Theatre from the Chicago College of Performing Arts, Zeke has spent time actively involved in the Chicago theatre community both on and off-stage. As a professional photographer, Zeke specializes in headshots, events, and production photography/B-roll. @iAmZekeD'
-    },
-    {
-      id: bioId(),
-      name: 'Tatum Lee',
-      role: 'Secretary',
-      pronouns: 'she/her',
-      affiliation: 'Consultant, Boston Consulting Group',
-      image: Lee,
-      linkedin: 'tatumlee',
-      bio: 'is currently a consultant at the Boston Consulting Group, and has worked with companies in the technology, retail, and entertainment industries. Tatum graduated from the University of Texas, where she studied Finance and Liberal Arts. She’s had a passion for theatre her whole life, and has previously worked as a stage manager and production assistant for various companies.'
     },
     {
       id: bioId(),
@@ -120,6 +106,16 @@ const bios = {
       image: Laws,
       linkedin: 'lisalaws',
       bio: "is a visionary leader committed to fostering growth and opportunity within the arts community. Born and raised in Hyde Park, Chicago, Lisa has deep roots in the city and a strong connection to its vibrant cultural landscape. With over 15 years of executive experience, Lisa serves as the Chief Operating Officer of 1871, a prominent non-profit tech hub in Chicago.\n\nBeyond her professional endeavors, Lisa is deeply passionate about supporting artists and cultural initiatives. Her commitment to social value is evident in her pivotal roles at Mayor Rahm Emanuel's Office and the Department of Cultural Affairs and Special Events (DCASE). In these positions, she led daily operations, coordinated significant events, and managed comprehensive infrastructure projects, demonstrating resilience and strategic insight in addressing the diverse needs of Chicago's vibrant arts community.\n\nLisa's academic achievements include an MBA from Northwestern's Kellogg School of Management, a Graduate Certificate in Infrastructure Engineering and Management from the Illinois Institute of Technology, and dual degrees from Tulane and Xavier University of Louisiana. Recognized for her contributions to STEM education, innovation, and diversity, Lisa is dedicated to advancing opportunities for artists and cultural organizations.\n\nAs a member of the Board of Directors for the Chicago Artist Guide, Lisa is poised to make a lasting impact, leveraging her expertise to support and elevate the vibrant arts community in Chicago and beyond. Lisa's passion for music and performance is evident in her involvement in the Kenwood Academy Concert Choir and the Chicago Children's Choir, now Uniting Voices Chicago, where she had the opportunity to tour extensively across the US and the globe."
+    },
+    {
+      id: bioId(),
+      name: 'Jorie Goins',
+      role: 'Secretary',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Goins,
+      linkedin: 'joriejgoins',
+      bio: "is a dancer based out of Chicago, Ill. Jorie earned a bachelor's degree in journalism with a minor in dance from Northwestern University in 2016. While at Northwestern, Jorie was a member of Tonik Tap, Northwestern's premiere tap dance company where she choreographed five original pieces. Jorie has danced with Noumenon Dance Ensemble, Praize Productions' Rize Pro-Elite company, and as a guest performer with Chicago Tap Theatre. She has performed works choreographed by Brenda Bufalino, Rich Ashworth, Mark Yonally, Nicole Clarke Springer and April Torneby."
     }
   ],
   artists: [
@@ -145,13 +141,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Jorie Goins',
-      role: 'Secretary',
+      name: 'Ema Kester',
+      role: 'Secretary/Treasurer',
       pronouns: 'she/her',
       affiliation: null,
-      image: Goins,
-      linkedin: 'joriejgoins',
-      bio: "is a dancer based out of Chicago, Ill. Jorie earned a bachelor's degree in journalism with a minor in dance from Northwestern University in 2016. While at Northwestern, Jorie was a member of Tonik Tap, Northwestern's premiere tap dance company where she choreographed five original pieces. Jorie has danced with Noumenon Dance Ensemble, Praize Productions' Rize Pro-Elite company, and as a guest performer with Chicago Tap Theatre. She has performed works choreographed by Brenda Bufalino, Rich Ashworth, Mark Yonally, Nicole Clarke Springer and April Torneby."
+      image: Kester,
+      linkedin: 'ema-kester',
+      bio: 'is a passionate and innovative theatre maker based in Chicago, known for their dynamic storytelling and dedication to creating transformative theatre experiences. A proud graduate of Loyola University Chicago, Ema has honed their craft through both academic study and practical experience, engaging with the city’s vibrant arts community. In addition to their work in theatre, Ema also manages a local coffee shop, blending their love for community building with their creative endeavors.\n\nEma is an Artistic Associate at Rivendell Theatre Ensemble, where they contribute to the development of new work and help nurture a collaborative environment for artists. Their work spans acting, directing, and producing, and they are committed to creating art that challenges, inspires, and engages audiences.'
     },
     {
       id: bioId(),
@@ -257,26 +253,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Supreme Hinton',
-      role: 'Development Associate',
-      pronouns: 'he/him',
-      affiliation: null,
-      image: Hinton,
-      linkedin: 'supremeh',
-      bio: 'is a new media artist and community manager based in Chicago, NYC, and San Francisco with over 8 years of experience in arts administration, community organization, and technological consulting. During his stay at The University of Chicago, Supreme founded Diversity in Business and Blockchain Chi to host accessible hackathons and programs for artists and pre-professionals in the Chicagoland area. During the pandemic, Supreme worked for Currents.fm, providing a digital venue space and tipping pipelines for over 5,000 artists across 150 countries. Ever since, his dedication towards bringing communities together has been constant.'
-    },
-    {
-      id: bioId(),
-      name: 'Tumpale Mwakasisi',
-      role: 'Social Media Associate',
-      pronouns: 'she/her',
-      affilitation: null,
-      image: Mwakasisi,
-      linkedin: 'tumpalemwakasisi',
-      bio: "is Chicago-based content creator who showcases the city's diverse food and culture through her videos and reviews at @malortandmoet. She creates engaging videos and reviews for various online platforms, sharing her insights and recommendations with her audience and beyond. Previously, Tumpale worked in tech program management for companies like Webflow and LinkedIn. She also has digital marketing experience from her previous roles at Bottle & Bottega and Northwestern. Tumpale is passionate about supporting local businesses and communities, and she is excited to join Chicago Artist Guide. She hopes to contribute to the organization's mission and vision with her skills and experience. When she is not creating content, Tumpale likes to watch Youtube and movies, play video games, listen to music, and watch TV."
-    },
-    {
-      id: bioId(),
       name: 'Ella Walker',
       role: 'Public Relations Associate',
       pronouns: 'she/her',
@@ -284,26 +260,6 @@ const bios = {
       image: Walker,
       linkedin: 'ella-walker10',
       bio: "is a director, choreographer, teaching artist, and marketing professional. With a passion for making theatre and arts spaces more equitable and inclusive, Ella is grateful to be part of Chicago Artist Guide. She holds a B.A. in Theatre Performance from Carthage College and is currently earning her M.S. in Leadership for Creative Enterprises from Northwestern University. When she's not directing, studying, or writing a press release, Ella loves to read, be in nature, and travel! "
-    },
-    {
-      id: bioId(),
-      name: 'Abby Wills',
-      role: 'Administrative Associate',
-      pronouns: 'she/her',
-      affilitation: null,
-      image: Wills,
-      linkedin: 'abbydwills',
-      bio: "is Chicago-based content creator who showcases the city's diverse food and culture through her videos and reviews at @malortandmoet. She creates engaging videos and reviews for various online platforms, sharing her insights and recommendations with her audience and beyond. Previously, Tumpale worked in tech program management for companies like Webflow and LinkedIn. She also has digital marketing experience from her previous roles at Bottle & Bottega and Northwestern. Tumpale is passionate about supporting local businesses and communities, and she is excited to join Chicago Artist Guide. She hopes to contribute to the organization's mission and vision with her skills and experience. When she is not creating content, Tumpale likes to watch Youtube and movies, play video games, listen to music, and watch TV."
-    },
-    {
-      id: bioId(),
-      name: 'Missy Staros',
-      role: 'Grant Writer',
-      pronouns: 'she/her',
-      affilitation: null,
-      image: Brown,
-      linkedin: 'missy-brown-a956a832',
-      bio: "has been in leadership with Trader Joe's for the last 28 years. With strong business acumen and a caring, inclusive, and community-minded approach, she has been regarded as a top leader and mentor in the company. She has a BA in Sociology, MA in Educational Leadership, and certification in Grant Writing. She began her grant writing journey to help the community on a different level and is optimistic for the future. Her varied interests include attending the theatre and live music, hiking, reading WWII fiction and mysteries of all kinds, yoga, cooking for friends, wine tasting, watching Top Chef, and photographing a sunset."
     }
   ],
   technical: [
@@ -336,7 +292,7 @@ const bios = {
         'Senior Engineering Manager @ Institutional Cash Distributors (ICD)',
       image: JewellAlex,
       linkedin: 'alexjewellcom',
-      bio: 'is a socially-driven software engineering leader in banking innovation, focusing on innovation and web3 for consumer banking. Blockchain and decentralization consultant and activist. Artisan foodporn director and social media marketing expert at @bestfoodalex. Leftist ghostwriter for political organizations, global economic forums, and watchdog groups dealing with the Fourth Industrial Revolution, futurism, and decentralization.'
+      bio: 'is a socially-driven software engineering leader in money markets and treasury, focusing on innovation for commercial investments. Artisan foodporn director and social media marketing expert at @bestfoodalex. Leftist ghostwriter for political organizations, global economic forums, and watchdog groups dealing with the Fourth Industrial Revolution, futurism, and decentralization.'
     },
     {
       id: bioId(),
@@ -367,16 +323,6 @@ const bios = {
       image: Nagra,
       linkedin: 'gissellenagra',
       bio: 'is a passionate UX researcher with a design background, dedicated to understanding and empathizing with users to bridge the gap between them and products. She earned her degree in psychology from UC Berkeley and a certificate in Design Innovation, applying these skills throughout her UX career. With prior experience in healthcare, she brings a diverse perspective to her work. Outside the office, she enjoys traveling and cherishing moments with her loyal sidekick, Zoey, her dog.'
-    },
-    {
-      id: bioId(),
-      name: 'Alan Hoskins',
-      role: 'Senior Frontend Engineer',
-      pronouns: 'he/him',
-      affiliation: null,
-      image: Hoskins,
-      linkedin: 'alanhoskins',
-      bio: 'is a software engineer based out of Indianapolis. He has always had a passion for technology. With expertise in developing web applications, Alan is dedicated to finding effective solutions to unique challenges and contributing to the growth of his company.'
     },
     {
       id: bioId(),
@@ -420,6 +366,16 @@ const bios = {
       image: Voghel,
       linkedin: 'alison-voghel',
       bio: 'received her BA in Environmental Design at CU Boulder in 2012 and her Masters in Architecture & Urban Design in 2017. She has worked in tech, architecture, urban design, and interior design but transitioned to UX and UI Design in 2020. Alison currently works full-time as a Senior UX Designer for a SaaS company based in Boston, remotely. She has never been involved in any theater-related organizations, but did have fun designing a theater for a student project. When not working or learning how to code, her creative outlet of choice is digital art/illustration.'
+    },
+    {
+      id: bioId(),
+      name: 'Missy Staros',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affilitation: 'Freelance Grant Writer',
+      image: Staros,
+      linkedin: 'missy-brown-a956a832',
+      bio: "has been in leadership with Trader Joe's for the last 28 years. With strong business acumen and a caring, inclusive, and community-minded approach, she has been regarded as a top leader and mentor in the company. She has a BA in Sociology, MA in Educational Leadership, and certification in Grant Writing. She began her grant writing journey to help the community on a different level and is optimistic for the future. Her varied interests include attending the theatre and live music, hiking, reading WWII fiction and mysteries of all kinds, yoga, cooking for friends, wine tasting, watching Top Chef, and photographing a sunset."
     }
   ]
 };
