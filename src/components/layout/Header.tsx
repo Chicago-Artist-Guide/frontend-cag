@@ -1,7 +1,6 @@
 import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { NavDropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
@@ -26,30 +25,12 @@ const Header = () => {
           <Nav.Link as={Link} to="/">
             HOME
           </Nav.Link>
-          {/* <Nav.Link as={Link} to="/night-at-the-cag-baret">
-            EVENTS
-          </Nav.Link> */}
           <Nav.Link as={Link} to="/about-us">
             ABOUT US
           </Nav.Link>
-          <Nav.Link
-            as={Link}
-            to="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f"
-          >
+          <Nav.Link as={Link} to="/donate">
             DONATE
           </Nav.Link>
-
-          <NavDropdown title="CAG-BARET" id="basic-nav-dropdown">
-            <NavDropdown.Item href="https://www.zeffy.com/ticketing/f021b4c4-c62b-4fbf-b975-689121ed5b71">
-              Get your tickets!
-            </NavDropdown.Item>
-            <NavDropdown.Item href="https://www.zeffy.com/ticketing/5a15d35d-d24e-4a21-926c-1acaec989b6e">
-              Silent Auction
-            </NavDropdown.Item>
-            <NavDropdown.Item href="https://www.canva.com/design/DAGQGLmC-7s/UOuITrpz7miEBS5RjPmOIg/view?utm_content=DAGQGLmC-7s&utm_campaign=designshare&utm_medium=link&utm_source=editor#1">
-              Digital Program
-            </NavDropdown.Item>
-          </NavDropdown>
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">
               PROFILE
