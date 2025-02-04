@@ -49,7 +49,9 @@ export default {
         white: '#ffffff',
         white80a: 'rgba(255, 255, 255, 0.8)',
         yellow: '#EFC93D',
-        yoda: '#B8D8C7'
+        yoda: '#B8D8C7',
+        evergreen: '#4A725D',
+        gold: '#D3991C'
       },
       keyframes: {
         slideRight: {
@@ -74,6 +76,12 @@ export default {
         'slide-left': 'slideLeft 1s ease-in-out',
         'slide-up': 'slideUp 1s ease-in-out',
         'slide-down': 'slideDown 1s ease-in-out',
+      },
+      fontSize: {
+        '36': ['36px', '1'],
+        '50': ['50px', '1'],
+        '60': ['60px', '1'],
+        '80': ['80px', '1'],
       },
     }
   },
