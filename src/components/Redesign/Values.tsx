@@ -136,11 +136,13 @@ const Values = () => {
   };
 
   return (
-    <div className="w-fit flex-col items-center justify-center rounded-lg bg-white md:flex">
+    <div className="w-fit flex-col items-center justify-center rounded-lg bg-white px-12 py-12 md:flex">
       {/* Title */}
       <div className="relative text-darkGrey">
         <div className="flex items-start">
-          <h1 className="mr-2 text-sm italic text-mint md:text-4xl">Find</h1>
+          <h1 className="mr-2 text-sm italic text-mint md:pr-1 md:text-4xl">
+            Find
+          </h1>
           <div className="relative h-5 w-[300px] overflow-hidden md:h-10 md:w-[700px]">
             <h1
               className={`absolute w-full text-sm transition-transform duration-500 ease-in-out md:text-4xl ${
@@ -160,7 +162,7 @@ const Values = () => {
         </div>
       </div>
       {/* Toggle */}
-      <div className="flex items-center justify-between rounded-full bg-darkGrey p-2 md:w-fit md:justify-center">
+      <div className="mt-4 flex items-center justify-between rounded-full bg-darkGrey p-2 md:mt-8 md:w-fit md:justify-center">
         <button
           onClick={() => handleClick('Artists')}
           className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
@@ -183,7 +185,7 @@ const Values = () => {
         </button>
       </div>
       {/* Values */}
-      <div className="my-6 md:my-12">
+      <div className="my-4 md:my-8">
         <div className="grid w-[350px] grid-cols-3 grid-rows-2 items-center md:w-[700px]">
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
