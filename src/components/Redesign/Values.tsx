@@ -10,6 +10,7 @@ type ValueDetails = {
   order: number;
   animation: string;
   color: string;
+  backColor: string;
   bigFont: string;
   smallFont: string;
 };
@@ -30,7 +31,8 @@ const values: Values = {
       col: 'col-span-1',
       order: 1,
       animation: 'animate-slide-left',
-      color: 'butter',
+      color: 'bg-butter',
+      backColor: 'bg-gold',
       bigFont: 'md:text-6xl',
       smallFont: 'text-3xl'
     },
@@ -41,7 +43,8 @@ const values: Values = {
       col: 'col-span-1',
       order: 2,
       animation: 'animate-slide-right',
-      color: 'butter',
+      color: 'bg-butter',
+      backColor: 'bg-gold',
       bigFont: 'md:text-6xl',
       smallFont: 'text-2xl'
     }
@@ -54,7 +57,8 @@ const values: Values = {
       col: 'col-span-2',
       order: 2,
       animation: 'animate-slide-up',
-      color: 'salmon',
+      color: 'bg-blush',
+      backColor: 'bg-salmon',
       bigFont: 'md:text-7xl',
       smallFont: 'text-3xl'
     },
@@ -65,7 +69,8 @@ const values: Values = {
       col: 'col-span-2',
       order: 4,
       animation: 'animate-slide-down',
-      color: 'salmon',
+      color: 'bg-blush',
+      backColor: 'bg-salmon',
       bigFont: 'md:text-6xl',
       smallFont: 'text-3xl'
     }
@@ -78,7 +83,8 @@ const values: Values = {
       col: 'col-span-2',
       order: 3,
       animation: 'animate-slide-down',
-      color: 'mint',
+      color: 'bg-mint',
+      backColor: 'bg-evergreen',
       bigFont: 'md:text-6xl',
       smallFont: 'text-3xl'
     },
@@ -89,7 +95,8 @@ const values: Values = {
       col: 'col-span-2',
       order: 1,
       animation: 'animate-slide-up',
-      color: 'mint',
+      color: 'bg-mint',
+      backColor: 'bg-evergreen',
       bigFont: 'md:text-5xl',
       smallFont: 'text-3xl'
     }
@@ -101,7 +108,8 @@ const values: Values = {
       col: 'col-span-1',
       order: 4,
       animation: 'animate-slide-right',
-      color: 'darkGrey',
+      color: 'bg-cornflower',
+      backColor: 'bg-darkGrey',
       bigFont: 'md:text-6xl',
       smallFont: 'text-3xl'
     },
@@ -112,7 +120,8 @@ const values: Values = {
       col: 'col-span-1',
       order: 3,
       animation: 'animate-slide-left',
-      color: 'darkGrey',
+      color: 'bg-cornflower',
+      backColor: 'bg-darkGrey',
       bigFont: 'md:text-4xl',
       smallFont: 'text-lg'
     }
@@ -202,7 +211,7 @@ const Values = () => {
                 }}
               >
                 <div
-                  className={`absolute bg-${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
+                  className={`absolute ${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
@@ -218,7 +227,7 @@ const Values = () => {
                   </h1>
                 </div>
                 <div
-                  className={`absolute bg-${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
+                  className={`absolute ${currentItem.backColor} h-full w-full rounded-md transition-transform duration-1000`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)'
