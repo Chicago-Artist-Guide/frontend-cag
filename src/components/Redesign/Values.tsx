@@ -33,7 +33,7 @@ const values: Values = {
       animation: 'animate-slide-left',
       color: 'bg-butter',
       backColor: 'bg-gold',
-      bigFont: 'md:text-6xl',
+      bigFont: 'md:text-60',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -45,7 +45,7 @@ const values: Values = {
       animation: 'animate-slide-right',
       color: 'bg-butter',
       backColor: 'bg-gold',
-      bigFont: 'md:text-6xl',
+      bigFont: 'md:text-60',
       smallFont: 'text-2xl'
     }
   },
@@ -59,7 +59,7 @@ const values: Values = {
       animation: 'animate-slide-up',
       color: 'bg-blush',
       backColor: 'bg-salmon',
-      bigFont: 'md:text-7xl',
+      bigFont: 'md:text-80',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -71,7 +71,7 @@ const values: Values = {
       animation: 'animate-slide-down',
       color: 'bg-blush',
       backColor: 'bg-salmon',
-      bigFont: 'md:text-6xl',
+      bigFont: 'md:text-60',
       smallFont: 'text-3xl'
     }
   },
@@ -85,7 +85,7 @@ const values: Values = {
       animation: 'animate-slide-down',
       color: 'bg-mint',
       backColor: 'bg-evergreen',
-      bigFont: 'md:text-6xl',
+      bigFont: 'md:text-50',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -97,7 +97,7 @@ const values: Values = {
       animation: 'animate-slide-up',
       color: 'bg-mint',
       backColor: 'bg-evergreen',
-      bigFont: 'md:text-5xl',
+      bigFont: 'md:text-50',
       smallFont: 'text-3xl'
     }
   },
@@ -110,7 +110,7 @@ const values: Values = {
       animation: 'animate-slide-right',
       color: 'bg-cornflower',
       backColor: 'bg-darkGrey',
-      bigFont: 'md:text-6xl',
+      bigFont: 'md:text-60',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -122,7 +122,7 @@ const values: Values = {
       animation: 'animate-slide-left',
       color: 'bg-cornflower',
       backColor: 'bg-darkGrey',
-      bigFont: 'md:text-4xl',
+      bigFont: 'md:text-36',
       smallFont: 'text-lg'
     }
   }

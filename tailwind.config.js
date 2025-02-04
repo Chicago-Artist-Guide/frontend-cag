@@ -77,6 +77,12 @@ export default {
         'slide-up': 'slideUp 1s ease-in-out',
         'slide-down': 'slideDown 1s ease-in-out',
       },
+      fontSize: {
+        '36': ['36px', '1.1'],
+        '50': ['50px', '1.1'],
+        '60': ['60px', '1.1'],
+        '80': ['80px', '1.1'],
+      },
     }
   },
   plugins: []
