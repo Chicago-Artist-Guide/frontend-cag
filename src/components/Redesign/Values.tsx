@@ -45,7 +45,7 @@ const values: Values = {
       animation: 'animate-slide-right',
       color: 'bg-butter',
       backColor: 'bg-gold',
-      bigFont: 'md:text-60',
+      bigFont: 'md:text-50',
       smallFont: 'text-2xl'
     }
   },
@@ -199,7 +199,7 @@ const Values = () => {
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
             const currentItem = value[member];
-            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[160px] md:h-[210px] m-[2px] md:m-2 rounded-md transition-transform duration-1000`;
+            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[160px] md:h-[200px] m-[2px] md:m-3 transition-transform duration-1000`;
             const isFlipped = flipped[Number(key) - 1];
             return (
               <div
@@ -211,7 +211,7 @@ const Values = () => {
                 }}
               >
                 <div
-                  className={`absolute ${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
+                  className={`absolute ${currentItem.color} flex h-full w-full items-center justify-center rounded-xl p-3 transition-transform duration-1000 md:rounded-3xl`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
@@ -221,13 +221,13 @@ const Values = () => {
                     <FontAwesomeIcon icon={faRetweet} className="text-white" />
                   </div>
                   <h1
-                    className={`p-2 text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-4`}
+                    className={`p-2 font-bold text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-4`}
                   >
                     {currentItem.prop}
                   </h1>
                 </div>
                 <div
-                  className={`absolute ${currentItem.backColor} h-full w-full rounded-md transition-transform duration-1000`}
+                  className={`absolute ${currentItem.backColor} flex h-full w-full items-center justify-center rounded-xl transition-transform duration-1000 md:rounded-3xl`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)'
@@ -238,7 +238,7 @@ const Values = () => {
                   </div>
                   <h2
                     className={
-                      'mt-2 p-2 text-xs font-normal text-white md:mt-4 md:text-lg md:font-bold'
+                      'px-2 text-xs font-bold text-white md:mx-4 md:mt-4 md:text-lg/5'
                     }
                   >
                     {currentItem.description}
