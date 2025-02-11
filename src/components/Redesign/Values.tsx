@@ -174,21 +174,21 @@ const Values = () => {
       <div className="mt-4 flex items-center justify-between rounded-full bg-darkGrey p-2 md:mt-8 md:w-fit md:justify-center">
         <button
           onClick={() => handleClick('Artists')}
-          className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
+          className={`transition-bg mx-1 rounded-full px-3 duration-300 ${
             member === 'Artists' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
-          <h2 className="text-base font-bold text-white md:text-2xl">
+          <h2 className="my-2 text-base font-bold text-white md:text-3xl">
             Artists
           </h2>
         </button>
         <button
           onClick={() => handleClick('Theatres')}
-          className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
+          className={`transition-bg mx-1 rounded-full px-3 duration-300 ${
             member === 'Theatres' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
-          <h2 className="text-base font-bold text-white md:text-2xl">
+          <h2 className="my-2 text-base font-bold text-white md:text-3xl">
             Theatres
           </h2>
         </button>
