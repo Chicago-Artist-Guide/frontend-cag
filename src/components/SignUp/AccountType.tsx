@@ -17,7 +17,6 @@ type Card = {
   className: string;
   name: string;
   text: React.ReactNode;
-  enabled: boolean;
 };
 
 const cards: Card[] = [
@@ -30,8 +29,7 @@ const cards: Card[] = [
         <CardHeading>Individual Artist</CardHeading>{' '}
         <p>Show off your skills and experience</p>
       </>
-    ),
-    enabled: true
+    )
   },
   {
     icon: Group,
@@ -40,24 +38,21 @@ const cards: Card[] = [
     text: (
       <>
         <CardHeading>Theatre Group</CardHeading>
-        <p>Tell prospective cast and crew about your company</p>
+        <p>
+          Request a registration link through this form to start posting your
+          jobs
+        </p>
       </>
-    ),
-    enabled: false
+    )
   }
 ];
 
 type Props = {
   accountType: string | null;
-  flag: string | (string | null)[] | null;
   setAccountType: (x: AccountTypeOptions | null) => void;
 };
 
-const AccountType: React.FC<Props> = ({
-  accountType,
-  flag,
-  setAccountType
-}) => {
+const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
   return (
     <Container className="margin-container">
       <Row>
@@ -77,15 +72,9 @@ const AccountType: React.FC<Props> = ({
             {cards.map(({ className, icon, text, name, enabled }: any) => (
               <StyledCard
                 key={name}
-                className={clsx(
-                  className,
-                  accountType === name && 'selected',
-                  !enabled && flag !== name && 'disabled'
-                )}
+                className={clsx(className, accountType === name && 'selected')}
                 lg="5"
-                onClick={() =>
-                  (enabled || flag === name) && setAccountType(name)
-                }
+                onClick={() => enabled && setAccountType(name)}
               >
                 <Image alt="" src={icon} />
                 <CardText>{text}</CardText>

@@ -57,7 +57,6 @@ const SignUp: React.FC = () => {
             </MobileWarning>
             <AccountType
               accountType={accountType}
-              flag={flag || ''}
               setAccountType={setAccountType}
             />
           </Col>
