@@ -2,5 +2,4 @@ User-agent: *
 Disallow: /login
 Disallow: /logout
 Disallow: /sign-up
-Disallow: /sign-up-2
 Disallow: /profile
