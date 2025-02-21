@@ -1,6 +1,5 @@
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import queryString from 'query-string';
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -10,7 +9,7 @@ import PageContainer from '../components/layout/PageContainer';
 import { PreviewCard } from '../components/Profile/shared/styles';
 import Button from '../components/shared/Button';
 import AccountType from '../components/SignUp/AccountType';
-import CompanySignUp from '../components/SignUp/Company';
+import TheatreSignUpRequest from '../components/SignUp/Company/TheatreSignUpRequest';
 import IndividualSignUp from '../components/SignUp/Individual';
 import {
   ButtonCol,
@@ -22,7 +21,6 @@ import { breakpoints } from '../theme/styleVars';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
-  const { flag } = queryString.parse(location.search);
   const { currentUser } = useUserContext();
   const [currentStep, setCurrentStep] = useState(-1);
   const [accountType, setAccountType] = useState<AccountTypeOptions | null>(
@@ -57,7 +55,6 @@ const SignUp: React.FC = () => {
             </MobileWarning>
             <AccountType
               accountType={accountType}
-              flag={flag || ''}
               setAccountType={setAccountType}
             />
           </Col>
@@ -90,12 +87,10 @@ const SignUp: React.FC = () => {
   }
 
   if (accountType === 'company') {
-    return (
-      <CompanySignUp
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-      />
-    );
+    // bypassing the full signup flow for now
+    // requiring theatre groups to request to signup first for screening
+
+    return <TheatreSignUpRequest />;
   }
 
   return <div>Something went wrong.</div>;

@@ -3,7 +3,6 @@ import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
-
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { useUserContext } from '../../../context/UserContext';
