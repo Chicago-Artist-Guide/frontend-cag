@@ -74,7 +74,7 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
                 key={name}
                 className={clsx(className, accountType === name && 'selected')}
                 lg="5"
-                onClick={() => enabled && setAccountType(name)}
+                onClick={() => setAccountType(name)}
               >
                 <Image alt="" src={icon} />
                 <CardText>{text}</CardText>
