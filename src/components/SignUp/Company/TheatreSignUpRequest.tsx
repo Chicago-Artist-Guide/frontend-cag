@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import {
-  Button,
   Col,
   Row,
   Form,
@@ -14,6 +13,7 @@ import {
 import { addDoc, collection } from 'firebase/firestore';
 import PageContainer from '../../layout/PageContainer';
 import { Title } from '../../layout/Titles';
+import Button from '../../../components/shared/Button';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 
 const TheatreSignUpRequest: React.FC = () => {
@@ -63,10 +63,6 @@ const TheatreSignUpRequest: React.FC = () => {
     }
   });
 
-  if (submitted) {
-    return <div>Thank you for your submission! We will be in touch soon.</div>;
-  }
-
   return (
     <PageContainer>
       <Row>
@@ -78,148 +74,163 @@ const TheatreSignUpRequest: React.FC = () => {
             takes up to 48 hours. Questions? Email Executive Director, Anna
             Schutz (she/her), anna@chicagoartistguide.org
           </p>
-          <hr />
+          {submitted && (
+            <p>
+              <strong>
+                Thank you for your submission! We will be in touch soon.
+              </strong>
+            </p>
+          )}
+          <hr className="mb-12 mt-12" />
         </Col>
       </Row>
-      <Form onSubmit={formik.handleSubmit}>
-        <Row>
-          <Col lg="6">
-            <FormGroup>
-              <Label for="theatreCompanyName">Theatre Company Name</Label>
-              <Input
-                id="theatreCompanyName"
-                name="theatreCompanyName"
-                type="text"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.theatreCompanyName}
-                invalid={
-                  formik.touched.theatreCompanyName &&
-                  !!formik.errors.theatreCompanyName
-                }
-              />
-              <FormFeedback>{formik.errors.theatreCompanyName}</FormFeedback>
-            </FormGroup>
-          </Col>
-          <Col lg="6">
-            <FormGroup>
-              <Label for="theatreWebsite">Theatre Website</Label>
-              <Input
-                id="theatreWebsite"
-                name="theatreWebsite"
-                type="url"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.theatreWebsite}
-                invalid={
-                  formik.touched.theatreWebsite &&
-                  !!formik.errors.theatreWebsite
-                }
-              />
-              <FormFeedback>{formik.errors.theatreWebsite}</FormFeedback>
-            </FormGroup>
-          </Col>
-        </Row>
-        <Row>
-          <Col lg="6">
-            <FormGroup>
-              <Label for="contactPerson">
-                Best person for CAG to contact if needed (Name, Title)
-                <em>Will not be shared externally</em>
+      {!submitted && (
+        <Form onSubmit={formik.handleSubmit}>
+          <Row>
+            <Col lg="6">
+              <FormGroup>
+                <Label for="theatreCompanyName">Theatre Company Name</Label>
+                <Input
+                  id="theatreCompanyName"
+                  name="theatreCompanyName"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.theatreCompanyName}
+                  invalid={
+                    formik.touched.theatreCompanyName &&
+                    !!formik.errors.theatreCompanyName
+                  }
+                />
+                <FormFeedback>{formik.errors.theatreCompanyName}</FormFeedback>
+              </FormGroup>
+            </Col>
+            <Col lg="6">
+              <FormGroup>
+                <Label for="theatreWebsite">Theatre Website</Label>
+                <Input
+                  id="theatreWebsite"
+                  name="theatreWebsite"
+                  type="url"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.theatreWebsite}
+                  invalid={
+                    formik.touched.theatreWebsite &&
+                    !!formik.errors.theatreWebsite
+                  }
+                />
+                <FormFeedback>{formik.errors.theatreWebsite}</FormFeedback>
+              </FormGroup>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg="6">
+              <FormGroup>
+                <Label for="contactPerson">
+                  Best person for CAG to contact if needed (Name, Title)
+                  <em className="block text-xs">
+                    Will not be shared externally
+                  </em>
+                </Label>
+                <Input
+                  id="contactPerson"
+                  name="contactPerson"
+                  type="text"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.contactPerson}
+                  invalid={
+                    formik.touched.contactPerson &&
+                    !!formik.errors.contactPerson
+                  }
+                />
+                <FormFeedback>{formik.errors.contactPerson}</FormFeedback>
+              </FormGroup>
+            </Col>
+            <Col lg="6">
+              <FormGroup>
+                <Label for="contactEmail">
+                  Contact Person's Email
+                  <em className="block text-xs">
+                    Will not be shared externally
+                  </em>
+                </Label>
+                <Input
+                  id="contactEmail"
+                  name="contactEmail"
+                  type="email"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.contactEmail}
+                  invalid={
+                    formik.touched.contactEmail && !!formik.errors.contactEmail
+                  }
+                />
+                <FormFeedback>{formik.errors.contactEmail}</FormFeedback>
+              </FormGroup>
+            </Col>
+          </Row>
+          <FormGroup tag="fieldset">
+            <legend className="text-base font-medium">
+              Would you like a 1:1 walkthrough with one of our User Experience
+              Designers?
+              <em className="block text-xs">
+                These are 30 minute virtual sessions to show you all the
+                features of the platform and a chance for you to share your
+                feedback
+              </em>
+            </legend>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="walkthrough"
+                  value="yes"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  checked={formik.values.walkthrough === 'yes'}
+                  invalid={
+                    formik.touched.walkthrough && !!formik.errors.walkthrough
+                  }
+                />
+                Yes
               </Label>
-              <Input
-                id="contactPerson"
-                name="contactPerson"
-                type="text"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.contactPerson}
-                invalid={
-                  formik.touched.contactPerson && !!formik.errors.contactPerson
-                }
-              />
-              <FormFeedback>{formik.errors.contactPerson}</FormFeedback>
             </FormGroup>
-          </Col>
-          <Col lg="6">
-            <FormGroup>
-              <Label for="contactEmail">
-                Contact Person's Email
-                <em>Will not be shared externally</em>
+            <FormGroup check>
+              <Label check>
+                <Input
+                  type="radio"
+                  name="walkthrough"
+                  value="no"
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  checked={formik.values.walkthrough === 'no'}
+                  invalid={
+                    formik.touched.walkthrough && !!formik.errors.walkthrough
+                  }
+                />
+                No
               </Label>
-              <Input
-                id="contactEmail"
-                name="contactEmail"
-                type="email"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.contactEmail}
-                invalid={
-                  formik.touched.contactEmail && !!formik.errors.contactEmail
-                }
-              />
-              <FormFeedback>{formik.errors.contactEmail}</FormFeedback>
             </FormGroup>
-          </Col>
-        </Row>
-        <FormGroup tag="fieldset">
-          <legend>
-            Would you like a 1:1 walkthrough with one of our User Experience
-            Designers?
-            <em>
-              These are 30 minute virtual sessions to show you all the features
-              of the platform and a chance for you to share your feedback
-            </em>
-          </legend>
-          <FormGroup check>
-            <Label check>
-              <Input
-                type="radio"
-                name="walkthrough"
-                value="yes"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                checked={formik.values.walkthrough === 'yes'}
-                invalid={
-                  formik.touched.walkthrough && !!formik.errors.walkthrough
-                }
-              />
-              Yes
-            </Label>
+            <FormFeedback>{formik.errors.walkthrough}</FormFeedback>
           </FormGroup>
-          <FormGroup check>
-            <Label check>
-              <Input
-                type="radio"
-                name="walkthrough"
-                value="no"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                checked={formik.values.walkthrough === 'no'}
-                invalid={
-                  formik.touched.walkthrough && !!formik.errors.walkthrough
-                }
-              />
-              No
+          <FormGroup>
+            <Label for="additionalInfo">
+              Anything else you'd like to share?
             </Label>
+            <Input
+              id="additionalInfo"
+              name="additionalInfo"
+              type="textarea"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.additionalInfo}
+            />
           </FormGroup>
-          <FormFeedback>{formik.errors.walkthrough}</FormFeedback>
-        </FormGroup>
-        <FormGroup>
-          <Label for="additionalInfo">Anything else you'd like to share?</Label>
-          <Input
-            id="additionalInfo"
-            name="additionalInfo"
-            type="textarea"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.additionalInfo}
-          />
-        </FormGroup>
-        <Button type="submit" color="primary">
-          Submit
-        </Button>
-      </Form>
+          <Button type="submit" text="Submit" variant="primary" />
+        </Form>
+      )}
     </PageContainer>
   );
 };
