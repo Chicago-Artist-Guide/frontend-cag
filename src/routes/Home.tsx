@@ -6,6 +6,11 @@ import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 
+// Partners
+import MPaact from '../images/partners/mpaact.jpg';
+import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera.png';
+import TheStoryTheatre from '../images/partners/the-story-theatre.png';
+
 const Home = () => {
   const sectionTitles = {
     about: 'What is Chicago Artist Guide (CAG)?',
@@ -18,7 +23,7 @@ const Home = () => {
 
   const subContainer = (props: any) => {
     return (
-      <div className="" key={props.id}>
+      <div key={props.id}>
         <p>{props.answer}</p>
       </div>
     );
@@ -76,12 +81,25 @@ const Home = () => {
         updatedFormData[key as keyof typeof updatedFormData]
       );
     });
-    console.log('This works');
 
     form.action = url.toString();
     form.method = 'POST';
     form.submit();
   };
+
+  const partners = [
+    { src: MPaact, alt: 'MPAACT', url: 'https://www.mpaact.org/' },
+    {
+      src: ChicagoFringeOpera,
+      alt: 'Chicago Fringe Opera',
+      url: 'https://www.chicagofringeopera.com/'
+    },
+    {
+      src: TheStoryTheatre,
+      alt: 'The Story Theatre',
+      url: 'https://thestorytheatre.org/'
+    }
+  ];
 
   return (
     <>
@@ -114,6 +132,27 @@ const Home = () => {
       </div>
       <div className="mt-12 flex justify-center">
         <Values />
+      </div>
+      {/* Partners max-w-7xl */}
+      <div className="mt-12 flex w-full justify-center bg-white">
+        <div className="flex w-full max-w-7xl flex-col items-center p-6">
+          <h2 className="max-w-xl pt-6 text-center text-5xl">
+            Our Theatre Company Members
+          </h2>
+          <div className="my-12 flex flex-wrap items-center justify-center gap-x-12">
+            {partners.map((partner) => {
+              return (
+                <a href={partner.url} key={partner.alt}>
+                  <img
+                    src={partner.src}
+                    alt={partner.alt}
+                    className="h-225 my-6 w-auto"
+                  />
+                </a>
+              );
+            })}
+          </div>
+        </div>
       </div>
       {/* FAQ */}
       <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">

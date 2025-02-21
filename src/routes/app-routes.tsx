@@ -14,7 +14,6 @@ const Login = lazy(() => import('./Login'));
 const Logout = lazy(() => import('./Logout'));
 const ForgotPassword = lazy(() => import('./ForgotPassword'));
 const SignUp = lazy(() => import('./SignUp'));
-const SignUp2 = lazy(() => import('./SignUp2'));
 const Profile = lazy(() => import('./Profile'));
 const Messages = lazy(() => import('./Messages'));
 const ManageProduction = lazy(() => import('./ManageProduction'));
@@ -37,7 +36,6 @@ const AppRoutes = () => {
         <Route path="/logout" element={<Logout />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/sign-up-2" element={<SignUp2 />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/profile/messages/:threadId?" element={<Messages />} />
         <Route
