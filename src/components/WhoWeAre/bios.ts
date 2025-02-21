@@ -27,12 +27,12 @@ import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 
 // Site Development
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
-import DeSant from '../../images/who-we-are/technical/Staff_DeSant.png';
+import DeSant from '../../images/who-we-are/technical/Staff_DeSant.jpg';
 import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
 import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import Nagra from '../../images/who-we-are/technical/Staff_Nagra.jpg';
-import Rose from '../../images/who-we-are/technical/Staff_Rose.jpg';
+import Knuteson from '../../images/who-we-are/technical/Staff_Knuteson.jpg';
 
 // Advisory Board
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
@@ -275,16 +275,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Dana Rose',
-      role: 'Product Manager',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Rose,
-      linkedin: 'dana-r-4b0633199',
-      bio: 'is interested in the intersection of business and technology and passionate about transforming ideas into valuable user focused products. She is honored to be involved with Chicago Artist Guide and contribute to its mission.'
-    },
-    {
-      id: bioId(),
       name: 'Alex Jewell',
       role: 'Engineering Lead',
       pronouns: 'he/him',
@@ -293,6 +283,26 @@ const bios = {
       image: JewellAlex,
       linkedin: 'alexjewellcom',
       bio: 'is a socially-driven software engineering leader in money markets and treasury, focusing on innovation for commercial investments. Artisan foodporn director and social media marketing expert at @bestfoodalex. Leftist ghostwriter for political organizations, global economic forums, and watchdog groups dealing with the Fourth Industrial Revolution, futurism, and decentralization.'
+    },
+    {
+      id: bioId(),
+      name: 'Christopher Knuteson',
+      role: 'Senior Engineer',
+      pronouns: 'he/him',
+      affiliation: null,
+      image: Knuteson,
+      linkedin: 'themuffinman',
+      bio: 'is a software engineer passionate about building intuitive, data-driven experiences. With a focus on search technologies, web applications, and serverless architectures, he enjoys solving complex problems with clean, efficient code. Outside of work, he loves spending time with his family and exploring new places.'
+    },
+    {
+      id: bioId(),
+      name: 'Luciana Mendez Gonzalez',
+      role: 'Engineer',
+      pronouns: 'she/her',
+      affiliation: 'Data Engineer',
+      image: MendezGonzalez,
+      linkedin: 'lmg25',
+      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
     },
     {
       id: bioId(),
@@ -323,16 +333,6 @@ const bios = {
       image: Nagra,
       linkedin: 'gissellenagra',
       bio: 'is a passionate UX researcher with a design background, dedicated to understanding and empathizing with users to bridge the gap between them and products. She earned her degree in psychology from UC Berkeley and a certificate in Design Innovation, applying these skills throughout her UX career. With prior experience in healthcare, she brings a diverse perspective to her work. Outside the office, she enjoys traveling and cherishing moments with her loyal sidekick, Zoey, her dog.'
-    },
-    {
-      id: bioId(),
-      name: 'Luciana Mendez Gonzalez',
-      role: 'Engineer',
-      pronouns: 'she/her',
-      affiliation: 'Data Engineer',
-      image: MendezGonzalez,
-      linkedin: 'lmg25',
-      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
     }
   ],
   artistAdvisory: [
