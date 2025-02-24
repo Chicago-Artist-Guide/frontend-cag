@@ -5,10 +5,12 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import queryString from 'query-string';
 import PageContainer from '../components/layout/PageContainer';
 import { PreviewCard } from '../components/Profile/shared/styles';
 import Button from '../components/shared/Button';
 import AccountType from '../components/SignUp/AccountType';
+import CompanySignUp from '../components/SignUp/Company';
 import TheatreSignUpRequest from '../components/SignUp/Company/TheatreSignUpRequest';
 import IndividualSignUp from '../components/SignUp/Individual';
 import {
@@ -21,6 +23,7 @@ import { breakpoints } from '../theme/styleVars';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
+  const { flag } = queryString.parse(location.search);
   const { currentUser } = useUserContext();
   const [currentStep, setCurrentStep] = useState(-1);
   const [accountType, setAccountType] = useState<AccountTypeOptions | null>(
@@ -87,10 +90,16 @@ const SignUp: React.FC = () => {
   }
 
   if (accountType === 'company') {
-    // bypassing the full signup flow for now
     // requiring theatre groups to request to signup first for screening
 
-    return <TheatreSignUpRequest />;
+    return flag ? (
+      <CompanySignUp
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+      />
+    ) : (
+      <TheatreSignUpRequest />
+    );
   }
 
   return <div>Something went wrong.</div>;
