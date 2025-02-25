@@ -26,7 +26,6 @@ const TheatreSignUpRequest: React.FC = () => {
       theatreWebsite: '',
       contactPerson: '',
       contactEmail: '',
-      walkthrough: '',
       additionalInfo: ''
     },
     validationSchema: Yup.object({
@@ -39,8 +38,7 @@ const TheatreSignUpRequest: React.FC = () => {
       contactPerson: Yup.string().required('Contact Person is required'),
       contactEmail: Yup.string()
         .email('Invalid email address')
-        .required('Contact Email is required'),
-      walkthrough: Yup.string().required('Please select an option')
+        .required('Contact Email is required')
     }),
     onSubmit: async (values) => {
       try {
@@ -171,50 +169,6 @@ const TheatreSignUpRequest: React.FC = () => {
               </FormGroup>
             </Col>
           </Row>
-          <FormGroup tag="fieldset">
-            <legend className="text-base font-medium">
-              Would you like a 1:1 walkthrough with one of our User Experience
-              Designers?
-              <em className="block text-xs">
-                These are 30 minute virtual sessions to show you all the
-                features of the platform and a chance for you to share your
-                feedback
-              </em>
-            </legend>
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="radio"
-                  name="walkthrough"
-                  value="yes"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  checked={formik.values.walkthrough === 'yes'}
-                  invalid={
-                    formik.touched.walkthrough && !!formik.errors.walkthrough
-                  }
-                />
-                Yes
-              </Label>
-            </FormGroup>
-            <FormGroup check>
-              <Label check>
-                <Input
-                  type="radio"
-                  name="walkthrough"
-                  value="no"
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  checked={formik.values.walkthrough === 'no'}
-                  invalid={
-                    formik.touched.walkthrough && !!formik.errors.walkthrough
-                  }
-                />
-                No
-              </Label>
-            </FormGroup>
-            <FormFeedback>{formik.errors.walkthrough}</FormFeedback>
-          </FormGroup>
           <FormGroup>
             <Label for="additionalInfo">
               Anything else you'd like to share?
