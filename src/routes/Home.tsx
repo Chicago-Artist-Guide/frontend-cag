@@ -5,6 +5,7 @@ import Donate from '/donate.png';
 import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
+import PartnerSlider from '../components/Redesign/PartnerSlider';
 
 // Partners
 import MPaact from '../images/partners/mpaact.jpg';
@@ -98,6 +99,18 @@ const Home = () => {
       src: TheStoryTheatre,
       alt: 'The Story Theatre',
       url: 'https://thestorytheatre.org/'
+    },
+    // mocking multiples
+    { src: MPaact, alt: 'MPAACT', url: 'https://www.mpaact.org/' },
+    {
+      src: ChicagoFringeOpera,
+      alt: 'Chicago Fringe Opera',
+      url: 'https://www.chicagofringeopera.com/'
+    },
+    {
+      src: TheStoryTheatre,
+      alt: 'The Story Theatre',
+      url: 'https://thestorytheatre.org/'
     }
   ];
 
@@ -133,24 +146,14 @@ const Home = () => {
       <div className="mt-12 flex justify-center">
         <Values />
       </div>
-      {/* Partners max-w-7xl */}
+      {/* Partners section - updated with slider */}
       <div className="mt-12 flex w-full justify-center bg-white">
         <div className="flex w-full max-w-7xl flex-col items-center p-6">
           <h2 className="max-w-xl pt-6 text-center text-5xl">
             Our Theatre Company Members
           </h2>
-          <div className="my-12 flex flex-wrap items-center justify-center gap-x-12">
-            {partners.map((partner) => {
-              return (
-                <a href={partner.url} key={partner.alt}>
-                  <img
-                    src={partner.src}
-                    alt={partner.alt}
-                    className="h-225 my-6 w-auto"
-                  />
-                </a>
-              );
-            })}
+          <div className="my-12 w-full">
+            <PartnerSlider partners={partners} />
           </div>
         </div>
       </div>
