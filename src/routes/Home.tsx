@@ -99,18 +99,6 @@ const Home = () => {
       src: TheStoryTheatre,
       alt: 'The Story Theatre',
       url: 'https://thestorytheatre.org/'
-    },
-    // mocking multiples
-    { src: MPaact, alt: 'MPAACT', url: 'https://www.mpaact.org/' },
-    {
-      src: ChicagoFringeOpera,
-      alt: 'Chicago Fringe Opera',
-      url: 'https://www.chicagofringeopera.com/'
-    },
-    {
-      src: TheStoryTheatre,
-      alt: 'The Story Theatre',
-      url: 'https://thestorytheatre.org/'
     }
   ];
 

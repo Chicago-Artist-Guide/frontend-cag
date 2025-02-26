@@ -25,7 +25,7 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
   const itemsPerView = isMobile ? 1 : 3;
 
   // Total number of possible positions (slides)
-  const totalSlides = Math.max(1, partners.length - itemsPerView + 1);
+  const totalSlides = Math.ceil(partners.length / itemsPerView);
 
   // Check if we're in mobile view
   useEffect(() => {
@@ -84,34 +84,48 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
           <div
             className="flex transition-transform duration-500 ease-in-out"
             style={{
-              transform: `translateX(-${activeIndex * (100 / partners.length) * itemsPerView}%)`,
-              width: `${(partners.length * 100) / itemsPerView}%`
+              transform: `translateX(-${activeIndex * (100 / totalSlides)}%)`,
+              width: `${totalSlides * 100}%`
             }}
           >
-            {partners.map((partner, index) => (
+            {Array.from({ length: totalSlides }).map((_, slideIndex) => (
               <div
-                key={index}
-                className="flex items-center justify-center p-4"
-                style={{ width: `${100 / partners.length}%` }}
-                onMouseEnter={() => setHoveredPartner(index)}
-                onMouseLeave={() => setHoveredPartner(null)}
+                key={slideIndex}
+                className="flex justify-center gap-x-12"
+                style={{ width: `${100 / totalSlides}%` }}
               >
-                <a
-                  href={partner.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex justify-center transition-all duration-300 ${
-                    hoveredPartner === index
-                      ? 'scale-105 transform rounded-lg bg-white shadow-lg'
-                      : ''
-                  }`}
-                >
-                  <img
-                    src={partner.src}
-                    alt={partner.alt}
-                    className="h-32 w-auto max-w-full p-4"
-                  />
-                </a>
+                {partners
+                  .slice(
+                    slideIndex * itemsPerView,
+                    slideIndex * itemsPerView + itemsPerView
+                  )
+                  .map((partner, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-center p-4"
+                      onMouseEnter={() =>
+                        setHoveredPartner(slideIndex * itemsPerView + index)
+                      }
+                      onMouseLeave={() => setHoveredPartner(null)}
+                    >
+                      <a
+                        href={partner.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`flex justify-center transition-all duration-300 ${
+                          hoveredPartner === slideIndex * itemsPerView + index
+                            ? 'scale-105 transform rounded-lg bg-white shadow-lg'
+                            : ''
+                        }`}
+                      >
+                        <img
+                          src={partner.src}
+                          alt={partner.alt}
+                          className="h-225 w-auto max-w-full p-4"
+                        />
+                      </a>
+                    </div>
+                  ))}
               </div>
             ))}
           </div>
