@@ -121,7 +121,7 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
                         <img
                           src={partner.src}
                           alt={partner.alt}
-                          className="h-225 w-auto max-w-full p-4"
+                          className="max-h-[150px] w-auto object-contain p-4"
                         />
                       </a>
                     </div>

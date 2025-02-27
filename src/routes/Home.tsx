@@ -8,9 +8,14 @@ import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
 
 // Partners
-import MPaact from '../images/partners/mpaact.jpg';
+import MPaact from '../images/partners/mpaact_1.jpg';
 import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera.png';
 import TheStoryTheatre from '../images/partners/the-story-theatre.png';
+import BabesBlades from '../images/partners/babes-blades.jpg';
+import CircaPinto from '../images/partners/circa-pintig.jpg';
+import Corn from '../images/partners/corn.jpg';
+import GreatWorks from '../images/partners/great-works.jpg';
+import Jackalope from '../images/partners/jackalope.png';
 
 const Home = () => {
   const sectionTitles = {
@@ -99,6 +104,31 @@ const Home = () => {
       src: TheStoryTheatre,
       alt: 'The Story Theatre',
       url: 'https://thestorytheatre.org/'
+    },
+    {
+      src: BabesBlades,
+      alt: 'Babes with Blades',
+      url: 'https://babeswithblades.org/'
+    },
+    {
+      src: CircaPinto,
+      alt: 'Circa Pinto',
+      url: 'https://www.circapinto.org/'
+    },
+    {
+      src: Corn,
+      alt: 'Corn',
+      url: 'https://www.cornservatory.org/'
+    },
+    {
+      src: GreatWorks,
+      alt: 'Great Works',
+      url: 'https://www.greatworkstheatre.com/'
+    },
+    {
+      src: Jackalope,
+      alt: 'Jackalope',
+      url: 'https://www.jackalopetheatre.org/'
     }
   ];
 
