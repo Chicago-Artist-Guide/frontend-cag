@@ -32,3 +32,6 @@ codeql-analysis.yml
 /.history
 
 dist
+
+.cursor
+knowledgebase
