@@ -113,7 +113,7 @@ const Home = () => {
     {
       src: CircaPinto,
       alt: 'Circa Pinto',
-      url: 'https://www.circapinto.org/'
+      url: 'https://www.circapintig.org/'
     },
     {
       src: Corn,
