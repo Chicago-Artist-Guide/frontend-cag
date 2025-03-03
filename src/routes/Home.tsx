@@ -5,11 +5,17 @@ import Donate from '/donate.png';
 import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
+import PartnerSlider from '../components/Redesign/PartnerSlider';
 
 // Partners
-import MPaact from '../images/partners/mpaact.jpg';
+import MPaact from '../images/partners/mpaact_1.jpg';
 import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera.png';
 import TheStoryTheatre from '../images/partners/the-story-theatre.png';
+import BabesBlades from '../images/partners/babes-blades.jpg';
+import CircaPinto from '../images/partners/circa-pintig.jpg';
+import Corn from '../images/partners/corn.jpg';
+import GreatWorks from '../images/partners/great-works.jpg';
+import Jackalope from '../images/partners/jackalope.png';
 
 const Home = () => {
   const sectionTitles = {
@@ -98,6 +104,31 @@ const Home = () => {
       src: TheStoryTheatre,
       alt: 'The Story Theatre',
       url: 'https://thestorytheatre.org/'
+    },
+    {
+      src: BabesBlades,
+      alt: 'Babes with Blades',
+      url: 'https://babeswithblades.org/'
+    },
+    {
+      src: CircaPinto,
+      alt: 'Circa Pinto',
+      url: 'https://www.circapintig.org/'
+    },
+    {
+      src: Corn,
+      alt: 'Corn',
+      url: 'https://www.cornservatory.org/'
+    },
+    {
+      src: GreatWorks,
+      alt: 'Great Works',
+      url: 'https://www.greatworkstheatre.com/'
+    },
+    {
+      src: Jackalope,
+      alt: 'Jackalope',
+      url: 'https://www.jackalopetheatre.org/'
     }
   ];
 
@@ -133,24 +164,14 @@ const Home = () => {
       <div className="mt-12 flex justify-center">
         <Values />
       </div>
-      {/* Partners max-w-7xl */}
+      {/* Partners section - updated with slider */}
       <div className="mt-12 flex w-full justify-center bg-white">
         <div className="flex w-full max-w-7xl flex-col items-center p-6">
           <h2 className="max-w-xl pt-6 text-center text-5xl">
             Our Theatre Company Members
           </h2>
-          <div className="my-12 flex flex-wrap items-center justify-center gap-x-12">
-            {partners.map((partner) => {
-              return (
-                <a href={partner.url} key={partner.alt}>
-                  <img
-                    src={partner.src}
-                    alt={partner.alt}
-                    className="h-225 my-6 w-auto"
-                  />
-                </a>
-              );
-            })}
+          <div className="my-12 w-full">
+            <PartnerSlider partners={partners} />
           </div>
         </div>
       </div>

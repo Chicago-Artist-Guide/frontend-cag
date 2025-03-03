@@ -16,6 +16,7 @@ export default defineConfig({
       }
     })
   ],
+  assetsInclude: ['**/*.JPG', '**/*.jpg', '**/*.PNG', '**/*.png'],
   define: {
     'process.env': {},
     // Add empty default values for your env vars
