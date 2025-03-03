@@ -8,7 +8,7 @@ import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
 
 // Partners
-import MPaact from '../images/partners/mpaact_1.jpg';
+import MPaact from '../images/partners/mpaact_hq.jpg';
 import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera.png';
 import TheStoryTheatre from '../images/partners/the-story-theatre.png';
 import BabesBlades from '../images/partners/babes-blades.jpg';
