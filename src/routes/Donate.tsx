@@ -11,6 +11,7 @@ import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
 import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
 import SponsorLawLynx from '../images/sponsors/lawlynx.jpg';
 import SponsorLetsRoam from '../images/sponsors/lets_roam_logo_horizontal_v3.jpg';
+import SponsorGios from '../images/sponsors/gios.jpg';
 import yellowBlob1 from '../images/yellow_blob_1.svg';
 import { breakpoints } from '../theme/styleVars';
 
@@ -103,9 +104,16 @@ const Donate = () => {
                 <Image src={SponsorCallForCulture} fluid />
               </a>
             </SponsorCol>
+          </Row>
+          <Row>
             <SponsorCol lg="3">
               <a href="https://thelynxverse.com/" target="_blank">
                 <Image src={SponsorLawLynx} fluid />
+              </a>
+            </SponsorCol>
+            <SponsorCol lg="3">
+              <a href="https://giosbbqbarandgrill.com/" target="_blank">
+                <Image src={SponsorGios} fluid />
               </a>
             </SponsorCol>
           </Row>
