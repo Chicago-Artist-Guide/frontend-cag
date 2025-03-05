@@ -16,7 +16,7 @@ import CircaPinto from '../images/partners/circa-pintig-1.jpg';
 import Corn from '../images/partners/corn-1.jpg';
 import GreatWorks from '../images/partners/great-works-1.jpg';
 import Jackalope from '../images/partners/jackalope-1.png';
-
+import Pegasus from '../images/partners/pegasus-logo-1.jpg';
 const Home = () => {
   const sectionTitles = {
     about: 'What is Chicago Artist Guide (CAG)?',
@@ -129,6 +129,11 @@ const Home = () => {
       src: Jackalope,
       alt: 'Jackalope',
       url: 'https://www.jackalopetheatre.org/'
+    },
+    {
+      src: Pegasus,
+      alt: 'Pegasus',
+      url: 'https://pegasustheatrechicago.org/'
     }
   ];
 
