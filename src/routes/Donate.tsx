@@ -9,7 +9,8 @@ import SVGLayer from '../components/SVGLayer';
 import homeDance from '../images/home_dance.svg';
 import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
 import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
-import SponsorDonutLogo from '../images/sponsors/donut.png';
+import SponsorLawLynx from '../images/sponsors/lawlynx.jpg';
+import SponsorLetsRoam from '../images/sponsors/lets_roam_logo_horizontal_v3.jpg';
 import yellowBlob1 from '../images/yellow_blob_1.svg';
 import { breakpoints } from '../theme/styleVars';
 
@@ -88,8 +89,8 @@ const Donate = () => {
           <TitleThree>Thank You to Our Generous Supporters</TitleThree>
           <Row>
             <SponsorCol lg="3">
-              <a href="https://www.donut.com/" target="_blank">
-                <Image src={SponsorDonutLogo} fluid />
+              <a href="https://www.letsroam.com/" target="_blank">
+                <Image src={SponsorLetsRoam} fluid />
               </a>
             </SponsorCol>
             <SponsorCol lg="3">
@@ -100,6 +101,11 @@ const Donate = () => {
             <SponsorCol lg="3">
               <a href="https://callforculture.com/" target="_blank">
                 <Image src={SponsorCallForCulture} fluid />
+              </a>
+            </SponsorCol>
+            <SponsorCol lg="3">
+              <a href="https://thelynxverse.com/" target="_blank">
+                <Image src={SponsorLawLynx} fluid />
               </a>
             </SponsorCol>
           </Row>
