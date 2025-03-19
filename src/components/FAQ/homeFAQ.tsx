@@ -1,4 +1,5 @@
 import React from 'react';
+import { zeffyUrl } from '../../utils/marketing';
 
 export const homeFAQ = {
   about: [
@@ -25,7 +26,7 @@ export const homeFAQ = {
       question: '',
       answer: [
         'Yes! All features are currently free on Chicago Artist Guide thanks to our generous donors and sponsors. You can support our work ',
-        <a href="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f">
+        <a href={zeffyUrl} target="_blank">
           here.
         </a>
       ]
@@ -44,9 +45,11 @@ export const homeFAQ = {
       id: 4,
       question: '',
       answer: [
-        'We are currently invitation-only for theatre companies. Please email Executive Director, ',
-        <a href="mailto: anna@chicagoartistguide.org">Anna Schutz</a>,
-        ', if you would like to schedule a one-on-one session to learn more and walk through the setup process.'
+        'Request a registration link through ',
+        <a href="/sign-up">this form</a>,
+        ' to start posting jobs. Questions? Reach out to Executive Director, ',
+        <a href="mailto:anna@chicagoartistguide.org">Anna Schutz</a>,
+        '.'
       ]
     }
   ],

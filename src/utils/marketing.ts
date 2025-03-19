@@ -122,3 +122,6 @@ export const submitLGLConstituent = async ({
       console.log('LGL Response for New Constituent:', response)
     );
 };
+
+export const zeffyUrl =
+  'https://www.zeffy.com/en-US/donation-form/bf4f5b40-de6b-44d1-9276-ef91daa82842';
