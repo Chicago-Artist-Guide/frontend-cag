@@ -42,7 +42,7 @@
     "styled-bootstrap-grid": "^3.1.0",
     "styled-components": "^5.3.5",
     "sweetalert2": "^11.12.4",
-    "vite": "^5.4.0",
+    "vite": "^5.4.13",
     "vite-tsconfig-paths": "^5.0.1",
     "yup": "^1.6.1"
   },
