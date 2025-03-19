@@ -6,6 +6,7 @@ import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
+import { zeffyUrl } from '../utils/marketing';
 
 // Partners
 import MPaact from '../images/partners/mpaact_hq-1.jpg';
@@ -17,6 +18,7 @@ import Corn from '../images/partners/corn-1.jpg';
 import GreatWorks from '../images/partners/great-works-1.jpg';
 import Jackalope from '../images/partners/jackalope-1.png';
 import Pegasus from '../images/partners/pegasus-logo-1.jpg';
+
 const Home = () => {
   const sectionTitles = {
     about: 'What is Chicago Artist Guide (CAG)?',
@@ -212,7 +214,7 @@ const Home = () => {
                 Your support of the Chicago Artist Guide helps us offer this
                 platform to our users free of cost.
               </h3>
-              <a href="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f">
+              <a href={zeffyUrl} target="_blank">
                 <button className="mt-4 w-full rounded-full bg-salmon px-14 py-3 text-center text-xl font-semibold text-white hover:bg-blush md:w-fit">
                   Donate
                 </button>
