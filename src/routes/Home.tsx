@@ -161,11 +161,18 @@ const Home = () => {
           <h3 className="pt-3 text-xs font-light text-white md:text-sm lg:text-base">
             Free for everyone. Proudly made in Chicago.
           </h3>
-          <a href="/sign-up">
-            <button className="mt-12 w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
-              Join Now
-            </button>
-          </a>
+          <div className="mt-12 flex flex-col gap-4 md:flex-row">
+            <a href="/sign-up">
+              <button className="w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
+                Join Now
+              </button>
+            </a>
+            <a href="/shows">
+              <button className="w-full rounded-full bg-mint px-14 py-2 text-lg font-semibold text-white hover:bg-mint/80 md:py-3 lg:w-fit">
+                Browse Shows
+              </button>
+            </a>
+          </div>
         </div>
       </div>
       <div className="mt-12 flex justify-center">
