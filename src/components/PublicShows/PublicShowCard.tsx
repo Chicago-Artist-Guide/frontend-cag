@@ -17,18 +17,26 @@ const PublicShowCard: React.FC<PublicShowCardProps> = ({ show }) => {
   const [theaterName, setTheaterName] = useState<string>('');
 
   useEffect(() => {
-    const fetchTheaterName = async () => {
-      if (show.account_id) {
-        try {
-          const accountRef = doc(
-            firebaseFirestore,
-            'accounts',
-            show.account_id
-          );
-          const accountDoc = await getDoc(accountRef);
+    // Flag to track if the component is mounted
+    let isMounted = true;
 
-          if (accountDoc.exists()) {
-            const accountData = accountDoc.data();
+    const fetchTheaterName = async () => {
+      if (!show || !show.account_id) {
+        if (isMounted) setTheaterName('Unknown Theater');
+        return;
+      }
+
+      try {
+        const accountRef = doc(firebaseFirestore, 'accounts', show.account_id);
+        const accountDoc = await getDoc(accountRef);
+
+        if (!isMounted) return;
+
+        if (accountDoc.exists()) {
+          const accountData = accountDoc.data();
+
+          // Check if profile_id exists before trying to access it
+          if (accountData && accountData.profile_id) {
             const profileRef = doc(
               firebaseFirestore,
               'profiles',
@@ -36,19 +44,39 @@ const PublicShowCard: React.FC<PublicShowCardProps> = ({ show }) => {
             );
             const profileDoc = await getDoc(profileRef);
 
+            if (!isMounted) return;
+
             if (profileDoc.exists()) {
               const profileData = profileDoc.data();
-              setTheaterName(profileData.theatre_name || 'Unknown Theater');
+              if (profileData && profileData.theatre_name) {
+                setTheaterName(profileData.theatre_name);
+              } else {
+                setTheaterName('Unknown Theater');
+              }
+            } else {
+              setTheaterName('Unknown Theater');
             }
+          } else {
+            setTheaterName('Unknown Theater');
           }
-        } catch (error) {
+        } else {
+          setTheaterName('Unknown Theater');
+        }
+      } catch (error) {
+        if (isMounted) {
           console.error('Error fetching theater name:', error);
+          setTheaterName('Unknown Theater');
         }
       }
     };
 
     fetchTheaterName();
-  }, [show, firebaseFirestore]);
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMounted = false;
+    };
+  }, [show?.account_id, firebaseFirestore]);
 
   return (
     <ShowCard>
@@ -68,13 +96,22 @@ const PublicShowCard: React.FC<PublicShowCardProps> = ({ show }) => {
               className="d-flex flex-shrink-1 flex-row"
               style={{ gap: '1em' }}
             >
-              <Link to={`/shows/${show.production_id}`}>
+              {show.production_id ? (
+                <Link to={`/shows/${show.production_id}`}>
+                  <ShowButton
+                    text="View Details"
+                    type="button"
+                    variant="primary"
+                  />
+                </Link>
+              ) : (
                 <ShowButton
-                  text="View Details"
+                  text="View Details (ID Missing)"
                   type="button"
                   variant="primary"
+                  disabled
                 />
-              </Link>
+              )}
             </div>
           </div>
         </RightCol>

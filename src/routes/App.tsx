@@ -2,6 +2,7 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { FirebaseContext } from '../context/FirebaseContext';
 import { MarketingContext } from '../context/MarketingContext';
+import { PaginationProvider } from '../context/PaginationContext';
 import { UserContext } from '../context/UserContext';
 import useAuthState from '../hooks/useAuthState';
 import useFirebase from '../hooks/useFirebase';
@@ -49,7 +50,9 @@ const App = () => {
         <MarketingContext.Provider
           value={{ lglApiKey: import.meta.env.VITE_APP_LGL_API_KEY || '' }}
         >
-          <RouterProvider router={router} />
+          <PaginationProvider>
+            <RouterProvider router={router} />
+          </PaginationProvider>
         </MarketingContext.Provider>
       </UserContext.Provider>
     </FirebaseContext.Provider>

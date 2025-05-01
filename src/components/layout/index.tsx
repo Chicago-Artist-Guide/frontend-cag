@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import GlobalStyle from '../../theme/globalStyles';
-import ScrollToTop from '../ScrollToTop';
+import { ScrollToTop } from '../shared';
 import BlobBox from './BlobBox';
 import CardBox from './CardBox';
 import Footer from './Footer';

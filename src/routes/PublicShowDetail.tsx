@@ -6,26 +6,37 @@ import { PageContainer } from '../components/layout';
 import { Title } from '../components/layout/Titles';
 import { Button } from '../components/shared';
 import { useFirebaseContext } from '../context/FirebaseContext';
+import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
 import { Production, Role } from '../components/Profile/Company/types';
 import styled from 'styled-components';
 import { colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
+import PublicShowDetailSkeleton from '../components/PublicShows/PublicShowDetailSkeleton';
 import PublicShowInterestForm from '../components/PublicShows/PublicShowInterestForm';
 
 const PublicShowDetail = () => {
   const { productionId } = useParams<{ productionId: string }>();
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
+  const { getPaginationState } = usePagination();
   const [show, setShow] = useState<Production | null>(null);
   const [theaterName, setTheaterName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [showInterestForm, setShowInterestForm] = useState(false);
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
+  // Get the saved pagination state
+  const savedPaginationState = getPaginationState('/shows');
+
   useEffect(() => {
+    // Flag to track if the component is mounted
+    let isMounted = true;
+
     const fetchShowDetails = async () => {
-      if (!productionId) return;
+      if (!productionId) {
+        return;
+      }
 
       try {
         const productionRef = doc(
@@ -35,8 +46,57 @@ const PublicShowDetail = () => {
         );
         const productionDoc = await getDoc(productionRef);
 
+        if (!isMounted) return;
+
         if (productionDoc.exists()) {
-          const productionData = productionDoc.data() as Production;
+          // Get the raw data
+          const rawData = productionDoc.data();
+
+          // Create a valid Production object with required fields
+          const productionData: Production = {
+            // Required fields with fallbacks
+            production_id: rawData.production_id || productionDoc.id,
+            production_name: rawData.production_name || 'Untitled Production',
+            account_id: rawData.account_id || '',
+            location: rawData.location || '',
+
+            // Optional fields
+            production_image_url: rawData.production_image_url,
+            type: rawData.type,
+            type_other: rawData.type_other,
+            status: rawData.status,
+            description: rawData.description,
+            director: rawData.director,
+            musical_director: rawData.musical_director,
+            casting_director: rawData.casting_director,
+            casting_director_email: rawData.casting_director_email,
+            equity: rawData.equity,
+            audition_start: rawData.audition_start,
+            audition_end: rawData.audition_end,
+            callback_start: rawData.callback_start,
+            callback_end: rawData.callback_end,
+            rehearsal_start: rawData.rehearsal_start,
+            rehearsal_end: rawData.rehearsal_end,
+            tech_week_start: rawData.tech_week_start,
+            tech_week_end: rawData.tech_week_end,
+            open_and_close_start: rawData.open_and_close_start,
+            open_and_close_end: rawData.open_and_close_end,
+            writers: rawData.writers,
+            roles: Array.isArray(rawData.roles) ? rawData.roles : [],
+            audition_location: rawData.audition_location,
+            contact_person_name_offstage: rawData.contact_person_name_offstage,
+            contact_person_email_offstage:
+              rawData.contact_person_email_offstage,
+            additional_notes_offstage: rawData.additional_notes_offstage,
+            contact_person_name_audition: rawData.contact_person_name_audition,
+            contact_person_email_audition:
+              rawData.contact_person_email_audition,
+            materials_to_prepare_audition:
+              rawData.materials_to_prepare_audition,
+            additional_notes_audition: rawData.additional_notes_audition
+          };
+
+          // Set the show data
           setShow(productionData);
 
           // Fetch theater name
@@ -48,31 +108,59 @@ const PublicShowDetail = () => {
             );
             const accountDoc = await getDoc(accountRef);
 
+            if (!isMounted) return;
+
             if (accountDoc.exists()) {
               const accountData = accountDoc.data();
-              const profileRef = doc(
-                firebaseFirestore,
-                'profiles',
-                accountData.profile_id
-              );
-              const profileDoc = await getDoc(profileRef);
 
-              if (profileDoc.exists()) {
-                const profileData = profileDoc.data();
-                setTheaterName(profileData.theatre_name || 'Unknown Theater');
+              // Check if profile_id exists before trying to access it
+              if (accountData && accountData.profile_id) {
+                const profileRef = doc(
+                  firebaseFirestore,
+                  'profiles',
+                  accountData.profile_id
+                );
+                const profileDoc = await getDoc(profileRef);
+
+                if (!isMounted) return;
+
+                if (profileDoc.exists()) {
+                  const profileData = profileDoc.data();
+                  if (profileData && profileData.theatre_name) {
+                    setTheaterName(profileData.theatre_name);
+                  } else {
+                    setTheaterName('Unknown Theater');
+                  }
+                } else {
+                  setTheaterName('Unknown Theater');
+                }
+              } else {
+                setTheaterName('Unknown Theater');
               }
+            } else {
+              setTheaterName('Unknown Theater');
             }
           }
         }
 
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       } catch (error) {
-        console.error('Error fetching show details:', error);
-        setLoading(false);
+        if (isMounted) {
+          console.error('Error fetching show details:', error);
+          setShow(null);
+          setLoading(false);
+        }
       }
     };
 
     fetchShowDetails();
+
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMounted = false;
+    };
   }, [productionId, firebaseFirestore]);
 
   const handleShowInterestClick = (role: Role | null) => {
@@ -88,32 +176,59 @@ const PublicShowDetail = () => {
   if (loading) {
     return (
       <PageContainer>
-        <p>Loading show details...</p>
+        <PublicShowDetailSkeleton />
       </PageContainer>
     );
   }
 
   if (!show) {
+    // Keep the console logs for debugging
+    console.log(
+      'Show is null or undefined, displaying "Show not found" message'
+    );
+    console.log('Current productionId:', productionId);
+
     return (
       <PageContainer>
-        <p>
-          Show not found. <Link to="/shows">View all shows</Link>
-        </p>
+        <BackLink to="/shows">
+          ← Back to shows (page {savedPaginationState.currentPage || 1})
+        </BackLink>
+        <div style={{ textAlign: 'center', marginTop: '40px' }}>
+          <h2>Show Not Found</h2>
+          <p>
+            We couldn't find the show you're looking for. It may have been
+            removed or is no longer active.
+          </p>
+          <p>
+            <Link to="/shows">
+              <ShowButton
+                text="Browse All Shows"
+                type="button"
+                variant="primary"
+              />
+            </Link>
+          </p>
+        </div>
       </PageContainer>
     );
   }
 
+  // Ensure show has roles property and it's an array
+  const roles = Array.isArray(show.roles) ? show.roles : [];
+
   // Filter roles by type
   const onStageRoles =
-    show.roles?.filter((role) => role.type === 'On-Stage') || [];
+    roles.filter((role) => role && role.type === 'On-Stage') || [];
   const offStageRoles =
-    show.roles?.filter((role) => role.type === 'Off-Stage') || [];
+    roles.filter((role) => role && role.type === 'Off-Stage') || [];
 
   return (
     <PageContainer>
       <Row>
         <Col lg={12}>
-          <BackLink to="/shows">← Back to all shows</BackLink>
+          <BackLink to="/shows">
+            ← Back to shows (page {savedPaginationState.currentPage || 1})
+          </BackLink>
           <Title>{show.production_name}</Title>
           <TheaterName>{theaterName}</TheaterName>
         </Col>
@@ -121,8 +236,8 @@ const PublicShowDetail = () => {
 
       <Row className="mt-4">
         <Col lg={4}>
-          <ShowImage src={show.production_image_url} fluid />
-          <ShowStatus>{show.status}</ShowStatus>
+          <ShowImage src={show.production_image_url || ''} fluid />
+          <ShowStatus>{show.status || 'Status Not Available'}</ShowStatus>
 
           {show.writers && (
             <InfoSection>
@@ -171,14 +286,16 @@ const PublicShowDetail = () => {
         </Col>
 
         <Col lg={8}>
-          <ShowDescription>{show.description}</ShowDescription>
+          <ShowDescription>
+            {show.description || 'No description available.'}
+          </ShowDescription>
 
           {onStageRoles.length > 0 && (
             <RolesSection>
               <SectionTitle>On-Stage Roles</SectionTitle>
-              {onStageRoles.map((role) => (
+              {onStageRoles.map((role, index) => (
                 <PublicRoleCard
-                  key={role.role_id}
+                  key={`${role.role_id || 'unknown'}-onstage-${index}`}
                   role={role}
                   onShowInterest={() => handleShowInterestClick(role)}
                   isLoggedIn={!!currentUser}
@@ -190,9 +307,9 @@ const PublicShowDetail = () => {
           {offStageRoles.length > 0 && (
             <RolesSection>
               <SectionTitle>Off-Stage Roles</SectionTitle>
-              {offStageRoles.map((role) => (
+              {offStageRoles.map((role, index) => (
                 <PublicRoleCard
-                  key={role.role_id}
+                  key={`${role.role_id || 'unknown'}-offstage-${index}`}
                   role={role}
                   onShowInterest={() => handleShowInterestClick(role)}
                   isLoggedIn={!!currentUser}

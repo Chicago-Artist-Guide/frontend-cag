@@ -1,5 +1,4 @@
 import React from 'react';
-import { Pagination as BSPagination } from 'react-bootstrap';
 import styled from 'styled-components';
 import { colors, fonts } from '../../theme/styleVars';
 
@@ -34,56 +33,71 @@ const Pagination: React.FC<PaginationProps> = ({
   const firstItem = (currentPage - 1) * itemsPerPage + 1;
   const lastItem = Math.min(currentPage * itemsPerPage, totalItems);
 
+  // Determine which page numbers to show
+  const getVisiblePageNumbers = () => {
+    const delta = 1; // Number of pages to show on each side of current page
+    const pages = [];
+
+    // Always include first page
+    if (currentPage > delta + 1) {
+      pages.push(1);
+      if (currentPage > delta + 2) {
+        pages.push('ellipsis');
+      }
+    }
+
+    // Add pages around current page
+    const rangeStart = Math.max(1, currentPage - delta);
+    const rangeEnd = Math.min(totalPages, currentPage + delta);
+
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      pages.push(i);
+    }
+
+    // Always include last page
+    if (currentPage < totalPages - delta) {
+      if (currentPage < totalPages - delta - 1) {
+        pages.push('ellipsis');
+      }
+      pages.push(totalPages);
+    }
+
+    return pages;
+  };
+
+  const visiblePages = getVisiblePageNumbers();
+
   return (
     <PaginationContainer>
-      <BSPagination>
-        <BSPagination.Prev
+      <PaginationWrapper>
+        <PaginationButton
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-        />
+        >
+          &lt;Previous
+        </PaginationButton>
 
-        {/* First page */}
-        {currentPage > 2 && (
-          <BSPagination.Item onClick={() => handlePageChange(1)}>
-            1
-          </BSPagination.Item>
+        {visiblePages.map((page, index) =>
+          page === 'ellipsis' ? (
+            <EllipsisItem key={`ellipsis-${index}`}>...</EllipsisItem>
+          ) : (
+            <PageNumberButton
+              key={`page-${page}`}
+              onClick={() => handlePageChange(page as number)}
+              active={page === currentPage}
+            >
+              {page}
+            </PageNumberButton>
+          )
         )}
 
-        {/* Ellipsis if needed */}
-        {currentPage > 3 && <BSPagination.Ellipsis disabled />}
-
-        {/* Page before current */}
-        {currentPage > 1 && (
-          <BSPagination.Item onClick={() => handlePageChange(currentPage - 1)}>
-            {currentPage - 1}
-          </BSPagination.Item>
-        )}
-
-        {/* Current page */}
-        <BSPagination.Item active>{currentPage}</BSPagination.Item>
-
-        {/* Page after current */}
-        {currentPage < totalPages && (
-          <BSPagination.Item onClick={() => handlePageChange(currentPage + 1)}>
-            {currentPage + 1}
-          </BSPagination.Item>
-        )}
-
-        {/* Ellipsis if needed */}
-        {currentPage < totalPages - 2 && <BSPagination.Ellipsis disabled />}
-
-        {/* Last page */}
-        {currentPage < totalPages - 1 && (
-          <BSPagination.Item onClick={() => handlePageChange(totalPages)}>
-            {totalPages}
-          </BSPagination.Item>
-        )}
-
-        <BSPagination.Next
+        <PaginationButton
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-        />
-      </BSPagination>
+        >
+          &gt;Next
+        </PaginationButton>
+      </PaginationWrapper>
 
       {showItemCount && (
         <ItemCount>
@@ -100,38 +114,78 @@ const PaginationContainer = styled.div`
   align-items: center;
   margin-top: 30px;
   margin-bottom: 20px;
+`;
 
-  .pagination {
-    margin-bottom: 10px;
+const PaginationWrapper = styled.div`
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid ${colors.lightGrey};
+  margin-bottom: 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+`;
 
-    .page-item {
-      .page-link {
-        color: ${colors.grayishBlue};
-        border-color: ${colors.lightGrey};
+const PaginationButton = styled.button<{ disabled?: boolean }>`
+  background-color: white;
+  border: none;
+  border-right: 1px solid ${colors.lightGrey};
+  padding: 12px 18px;
+  font-family: ${fonts.montserrat};
+  font-size: 14px;
+  font-weight: 500;
+  color: ${(props) => (props.disabled ? colors.lightGrey : colors.grayishBlue)};
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
+  transition: all 0.2s ease;
 
-        &:focus {
-          box-shadow: 0 0 0 0.2rem rgba(130, 178, 154, 0.25);
-        }
-      }
-
-      &.active .page-link {
-        background-color: ${colors.mint};
-        border-color: ${colors.mint};
-        color: white;
-      }
-
-      &:not(.disabled):hover .page-link {
-        background-color: ${colors.lightestGrey};
-        color: ${colors.mint};
-      }
-    }
+  &:last-child {
+    border-right: none;
   }
+
+  &:hover:not(:disabled) {
+    background-color: ${colors.lightestGrey};
+    color: ${colors.mint};
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+const PageNumberButton = styled(PaginationButton)<{ active: boolean }>`
+  background-color: ${(props) => (props.active ? colors.mint : 'white')};
+  color: ${(props) => (props.active ? 'white' : colors.grayishBlue)};
+  min-width: 50px;
+  text-align: center;
+  font-weight: ${(props) => (props.active ? '600' : '500')};
+  padding: ${(props) => (props.active ? '12px 18px' : '12px 18px')};
+
+  &:hover {
+    background-color: ${(props) =>
+      props.active ? colors.mint : colors.lightestGrey};
+    color: ${(props) => (props.active ? 'white' : colors.mint)};
+  }
+`;
+
+const EllipsisItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 15px;
+  border-right: 1px solid ${colors.lightGrey};
+  background-color: white;
+  color: ${colors.grayishBlue};
+  font-family: ${fonts.montserrat};
+  min-width: 50px;
+  text-align: center;
 `;
 
 const ItemCount = styled.div`
   font-family: ${fonts.montserrat};
-  font-size: 14px;
+  font-size: 15px;
   color: ${colors.grayishBlue};
+  margin-top: 12px;
+  text-align: center;
+  font-weight: 500;
 `;
 
 export default Pagination;
