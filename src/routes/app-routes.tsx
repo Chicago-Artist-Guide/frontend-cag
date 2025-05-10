@@ -9,6 +9,8 @@ import TOS from './TOS';
 import PrivacyPolicy from './PrivacyPolicy';
 import WhoWeAre from './WhoWeAre';
 import TheaterResources from './TheaterResources';
+import PublicShows from './PublicShows';
+import PublicShowDetail from './PublicShowDetail';
 
 const Login = lazy(() => import('./Login'));
 const Logout = lazy(() => import('./Logout'));
@@ -32,6 +34,8 @@ const AppRoutes = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/about-us" element={<WhoWeAre />} />
         <Route path="/theatre-resources" element={<TheaterResources />} />
+        <Route path="/shows" element={<PublicShows />} />
+        <Route path="/shows/:productionId" element={<PublicShowDetail />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

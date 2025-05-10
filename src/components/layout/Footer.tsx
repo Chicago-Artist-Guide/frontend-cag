@@ -92,6 +92,11 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
+              <Nav.Link as={Link} to="/shows">
+                SHOWS
+              </Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
               <Nav.Link as={Link} to="/theatre-resources">
                 THEATRE RESOURCES
               </Nav.Link>
