@@ -62,7 +62,8 @@ const ShowCard = styled.div`
   background-color: white;
 `;
 
-const ImageSkeleton = styled(SkeletonBase)`
+// TODO: understand why we need to use as any to resolve the TS error for circular propTypes
+const ImageSkeleton = styled(SkeletonBase as any)`
   width: 100%;
   height: 300px;
   border-radius: 8px;
@@ -72,31 +73,31 @@ const RightCol = styled(Col)`
   padding: 20px 0;
 `;
 
-const TitleSkeleton = styled(SkeletonBase)`
+const TitleSkeleton = styled(SkeletonBase as any)`
   height: 28px;
   width: 70%;
   margin-bottom: 10px;
 `;
 
-const TheaterSkeleton = styled(SkeletonBase)`
+const TheaterSkeleton = styled(SkeletonBase as any)`
   height: 20px;
   width: 50%;
   margin-bottom: 15px;
 `;
 
-const StatusSkeleton = styled(SkeletonBase)`
+const StatusSkeleton = styled(SkeletonBase as any)`
   height: 18px;
   width: 30%;
   margin-bottom: 15px;
 `;
 
-const DescriptionSkeleton = styled(SkeletonBase)`
+const DescriptionSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 100%;
   margin-bottom: 10px;
 `;
 
-const ButtonSkeleton = styled(SkeletonBase)`
+const ButtonSkeleton = styled(SkeletonBase as any)`
   height: 40px;
   width: 150px;
   margin-top: 20px;
