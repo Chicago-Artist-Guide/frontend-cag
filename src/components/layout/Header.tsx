@@ -34,12 +34,8 @@ const Header = () => {
           <Nav.Link as={Link} to="/donate">
             DONATE
           </Nav.Link>
-          <Nav.Link
-            as={Link}
-            to="https://www.zeffy.com/ticketing/2025-express-theatre-headshots"
-            target="_blank"
-          >
-            HEADSHOT EVENT
+          <Nav.Link as={Link} to="/events">
+            EVENTS
           </Nav.Link>
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">
