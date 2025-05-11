@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors, fonts } from '../../theme/styleVars';
 
-// SVG icons (single-color, outline)
+// TODO: Update these icons, because they're not working
 const CalendarIcon = () => (
   <svg
     width="28"
