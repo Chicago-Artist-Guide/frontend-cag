@@ -9,6 +9,7 @@ import Pagination from './Pagination';
 import PrivateLabel from './PrivateLabel';
 import RadioButton from './RadioButton';
 import ScrollToTop from './ScrollToTop';
+import EventCard from './EventCard';
 
 export {
   Button,
@@ -21,5 +22,6 @@ export {
   Pagination,
   PrivateLabel,
   RadioButton,
-  ScrollToTop
+  ScrollToTop,
+  EventCard
 };
