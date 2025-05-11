@@ -151,7 +151,8 @@ const PaginationButton = styled.button<{ disabled?: boolean }>`
   }
 `;
 
-const PageNumberButton = styled(PaginationButton)<{ active: boolean }>`
+// TODO: understand why we need to use as any to resolve the TS error for circular propTypes
+const PageNumberButton = styled(PaginationButton as any)<{ active: boolean }>`
   background-color: ${(props) => (props.active ? colors.mint : 'white')};
   color: ${(props) => (props.active ? 'white' : colors.grayishBlue)};
   min-width: 50px;

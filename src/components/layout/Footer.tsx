@@ -41,6 +41,11 @@ const Footer = () => (
                 DONATE
               </Nav.Link>
             </Nav.Item>
+            <Nav.Item>
+              <Nav.Link as={Link} to="/events">
+                EVENTS
+              </Nav.Link>
+            </Nav.Item>
           </Nav>
         </EdgeCols>
         <MidCol
