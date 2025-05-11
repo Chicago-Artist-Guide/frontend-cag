@@ -60,19 +60,20 @@ const RoleCardContainer = styled.div`
   margin-bottom: 20px;
 `;
 
-const RoleNameSkeleton = styled(SkeletonBase)`
+// TODO: understand why we need to use as any to resolve the TS error for circular propTypes
+const RoleNameSkeleton = styled(SkeletonBase as any)`
   height: 22px;
   width: 40%;
   margin-bottom: 10px;
 `;
 
-const RoleStatusSkeleton = styled(SkeletonBase)`
+const RoleStatusSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 25%;
   margin-bottom: 15px;
 `;
 
-const RoleDescriptionSkeleton = styled(SkeletonBase)`
+const RoleDescriptionSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 90%;
   margin-bottom: 5px;
@@ -94,7 +95,7 @@ const RoleDetailsSkeleton = styled.div`
   margin-top: 15px;
 `;
 
-const DetailItemSkeleton = styled(SkeletonBase)`
+const DetailItemSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 120px;
   margin-right: 15px;
@@ -117,7 +118,7 @@ const DetailItemSkeleton = styled(SkeletonBase)`
   }
 `;
 
-const RoleButtonSkeleton = styled(SkeletonBase)`
+const RoleButtonSkeleton = styled(SkeletonBase as any)`
   height: 40px;
   width: 100%;
 `;

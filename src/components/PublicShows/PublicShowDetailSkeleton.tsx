@@ -78,25 +78,26 @@ const SkeletonBase = styled.div`
   border-radius: 4px;
 `;
 
-const BackLinkSkeleton = styled(SkeletonBase)`
+// TODO: understand why we need to use as any to resolve the TS error for circular propTypes
+const BackLinkSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 120px;
   margin-bottom: 15px;
 `;
 
-const TitleSkeleton = styled(SkeletonBase)`
+const TitleSkeleton = styled(SkeletonBase as any)`
   height: 36px;
   width: 60%;
   margin-bottom: 10px;
 `;
 
-const TheaterNameSkeleton = styled(SkeletonBase)`
+const TheaterNameSkeleton = styled(SkeletonBase as any)`
   height: 24px;
   width: 40%;
   margin-bottom: 30px;
 `;
 
-const ImageSkeleton = styled(SkeletonBase)`
+const ImageSkeleton = styled(SkeletonBase as any)`
   width: 100%;
   height: 300px;
   border-radius: 8px;
@@ -107,31 +108,31 @@ const InfoSectionSkeleton = styled.div`
   margin-bottom: 15px;
 `;
 
-const InfoLabelSkeleton = styled(SkeletonBase)`
+const InfoLabelSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 30%;
   margin-bottom: 5px;
 `;
 
-const InfoValueSkeleton = styled(SkeletonBase)`
+const InfoValueSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 70%;
 `;
 
-const ButtonSkeleton = styled(SkeletonBase)`
+const ButtonSkeleton = styled(SkeletonBase as any)`
   height: 40px;
   width: 100%;
   margin-top: 20px;
   margin-bottom: 20px;
 `;
 
-const DescriptionSkeleton = styled(SkeletonBase)`
+const DescriptionSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 100%;
   margin-bottom: 10px;
 `;
 
-const SectionTitleSkeleton = styled(SkeletonBase)`
+const SectionTitleSkeleton = styled(SkeletonBase as any)`
   height: 24px;
   width: 200px;
   margin-top: 30px;
