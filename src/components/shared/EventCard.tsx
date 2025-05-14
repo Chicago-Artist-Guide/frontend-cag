@@ -51,7 +51,8 @@ export const EventCard: React.FC<{
   const dateString = dateObj.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
+    timeZone: 'CST'
   });
 
   return (
