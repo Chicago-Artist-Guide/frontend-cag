@@ -43,17 +43,24 @@ type EventType = {
   externalUrl: string;
 };
 
+const getDateStringForEvent = (event: EventType) => {
+  const dateObj = new Date(event.date);
+  if (isNaN(dateObj.getTime())) {
+    console.error(`Invalid date for event ${event.id}: ${event.date}`);
+    return null;
+  }
+  return dateObj.toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'America/Chicago'
+  });
+};
 export const EventCard: React.FC<{
   event: EventType;
   status: 'upcoming' | 'past';
 }> = ({ event, status }) => {
-  const dateObj = new Date(event.date);
-  const dateString = dateObj.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'CST'
-  });
+  const dateString = getDateStringForEvent(event);
 
   return (
     <CardLink
