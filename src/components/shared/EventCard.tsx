@@ -1,12 +1,12 @@
-import React from 'react';
-import styled from 'styled-components';
-import { colors, fonts } from '../../theme/styleVars';
+import React, { useEffect, useRef } from 'react';
+import styled, { keyframes } from 'styled-components';
+import { colors, fonts, breakpoints } from '../../theme/styleVars';
 
-// TODO: Update these icons, because they're not working
+// Calendar icon that matches the screenshots
 const CalendarIcon = () => (
   <svg
-    width="28"
-    height="28"
+    width="24"
+    height="24"
     fill="none"
     stroke="#2F4550"
     strokeWidth="2"
@@ -17,10 +17,11 @@ const CalendarIcon = () => (
   </svg>
 );
 
+// Location icon that matches the screenshots
 const LocationIcon = () => (
   <svg
-    width="28"
-    height="28"
+    width="24"
+    height="24"
     fill="none"
     stroke="#2F4550"
     strokeWidth="2"
@@ -43,26 +44,66 @@ type EventType = {
   externalUrl: string;
 };
 
+const getDateStringForEvent = (event: EventType) => {
+  const dateObj = new Date(event.date);
+  if (isNaN(dateObj.getTime())) {
+    console.error(`Invalid date for event ${event.id}: ${event.date}`);
+    return null;
+  }
+
+  const options = {
+    weekday: 'long' as const,
+    month: 'long' as const,
+    day: 'numeric' as const,
+    timeZone: 'America/Chicago'
+  };
+
+  return dateObj.toLocaleDateString('en-US', options);
+};
+
 export const EventCard: React.FC<{
   event: EventType;
   status: 'upcoming' | 'past';
-}> = ({ event, status }) => {
-  const dateObj = new Date(event.date);
-  const dateString = dateObj.toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-    timeZone: 'CST'
-  });
+  index?: number;
+}> = ({ event, status, index = 0 }) => {
+  const dateString = getDateStringForEvent(event);
+  const cardRef = useRef<HTMLAnchorElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    if (cardRef.current) {
+      observer.observe(cardRef.current);
+    }
+
+    return () => {
+      if (cardRef.current) {
+        observer.unobserve(cardRef.current);
+      }
+    };
+  }, []);
 
   return (
     <CardLink
       href={event.externalUrl}
       target="_blank"
       rel="noopener noreferrer"
+      ref={cardRef}
+      className={status}
+      style={{ animationDelay: `${index * 0.1}s` }}
     >
-      <CardContainer>
-        <LeftCol className={status}>
+      <CardContainer className={status}>
+        <MobileView className={status}>
           <IconRow>
             <CalendarIcon />
             <div>
@@ -74,39 +115,186 @@ export const EventCard: React.FC<{
             <LocationIcon />
             <LocationText>{event.location}</LocationText>
           </IconRow>
-        </LeftCol>
-        <RightCol>
           <Content>
             <EventTitle>{event.name}</EventTitle>
             <EventDescription>{event.details}</EventDescription>
             <EventPrice>Price: {event.price}</EventPrice>
             <MoreInfoButton>More Info</MoreInfoButton>
           </Content>
-          <EventImage src={event.image} alt={event.name} />
-        </RightCol>
+          {event.image && <EventImage src={event.image} alt={event.name} />}
+        </MobileView>
+
+        <TabletView className={status}>
+          <CardHeader className={status}>
+            <IconRow>
+              <CalendarIcon />
+              <div>
+                <DateText>{dateString}</DateText>
+                <TimeText>{event.time}</TimeText>
+              </div>
+            </IconRow>
+            <IconRow>
+              <LocationIcon />
+              <LocationText>{event.location}</LocationText>
+            </IconRow>
+          </CardHeader>
+
+          <CardContent>
+            <CardLeftSide>
+              <EventTitle>{event.name}</EventTitle>
+              <EventDescription>{event.details}</EventDescription>
+              <EventPrice>Price: {event.price}</EventPrice>
+              <MoreInfoButton>More Info</MoreInfoButton>
+            </CardLeftSide>
+
+            {event.image && (
+              <CardRightSide>
+                <EventImageTablet src={event.image} alt={event.name} />
+              </CardRightSide>
+            )}
+          </CardContent>
+        </TabletView>
+
+        <DesktopView>
+          <LeftCol className={status}>
+            <IconRow>
+              <CalendarIcon />
+              <div>
+                <DateText>{dateString}</DateText>
+                <TimeText>{event.time}</TimeText>
+              </div>
+            </IconRow>
+            <IconRow>
+              <LocationIcon />
+              <LocationText>{event.location}</LocationText>
+            </IconRow>
+          </LeftCol>
+          <RightCol>
+            <Content>
+              <EventTitle>{event.name}</EventTitle>
+              <EventDescription>{event.details}</EventDescription>
+              <EventPrice>Price: {event.price}</EventPrice>
+              <MoreInfoButton>More Info</MoreInfoButton>
+            </Content>
+            {event.image && <EventImage src={event.image} alt={event.name} />}
+          </RightCol>
+        </DesktopView>
       </CardContainer>
     </CardLink>
   );
 };
 
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
 const CardLink = styled.a`
   text-decoration: none;
   color: inherit;
+  display: block;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease-in-out;
+
+  &.visible {
+    animation: ${fadeInUp} 0.5s ease-out forwards;
+  }
+
   &:hover {
-    box-shadow: 0 4px 24px #00000022;
     text-decoration: none;
   }
 `;
 
 const CardContainer = styled.div`
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition:
+    box-shadow 0.3s ease-in-out,
+    transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-4px);
+  }
+
+  &.past {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+`;
+
+const MobileView = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: #fffbe7;
+
+  &.past {
+    background: #cad2e6;
+  }
+
+  @media (min-width: ${breakpoints.sm}) {
+    display: none;
+  }
+`;
+
+const TabletView = styled.div`
+  display: none;
+
+  @media (min-width: ${breakpoints.sm}) and (max-width: ${breakpoints.lg}) {
+    display: flex;
+  }
+`;
+
+const CardHeader = styled.div`
+  background: #fffbe7;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  &.past {
+    background: #cad2e6;
+  }
+`;
+
+const CardContent = styled.div`
   display: flex;
   flex-direction: row;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 12px #00000014;
-  overflow: hidden;
-  min-height: 200px;
-  max-width: 100%;
+  background: white;
+`;
+
+const CardLeftSide = styled.div`
+  flex: 2;
+  padding: 20px;
+`;
+
+const CardRightSide = styled.div`
+  flex: 1;
+  max-width: 35%;
+`;
+
+const EventImageTablet = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const DesktopView = styled.div`
+  display: none;
+
+  @media (min-width: ${breakpoints.lg}) {
+    display: flex;
+    flex-direction: row;
+  }
 `;
 
 const LeftCol = styled.div`
@@ -134,22 +322,36 @@ const IconRow = styled.div`
 const DateText = styled.div`
   font-family: ${fonts.montserrat};
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #2f4550;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.1rem;
+  }
 `;
 
 const TimeText = styled.div`
   font-family: ${fonts.montserrat};
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: #2f4550;
   margin-top: 2px;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1rem;
+  }
 `;
 
 const LocationText = styled.div`
   font-family: ${fonts.montserrat};
-  font-weight: 700;
-  font-size: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
   color: #2f4550;
+  word-break: break-word;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1rem;
+    font-weight: 700;
+  }
 `;
 
 const RightCol = styled.div`
@@ -161,40 +363,59 @@ const RightCol = styled.div`
 `;
 
 const Content = styled.div`
-  flex: 2;
-  padding: 32px 24px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   min-width: 0;
+
+  @media (min-width: ${breakpoints.md}) {
+    flex: 2;
+    padding: 32px 24px;
+  }
 `;
 
 const EventTitle = styled.h3`
   font-family: ${fonts.montserrat};
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  margin-bottom: 12px;
+  margin: 16px 0 10px;
   color: #2f4550;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+    margin-top: 0;
+  }
 `;
 
 const EventDescription = styled.p`
   font-family: ${fonts.lora};
-  font-size: 1.1rem;
+  font-size: 1rem;
   color: #444;
   margin-bottom: 16px;
-  max-width: 90%;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.1rem;
+    max-width: 90%;
+  }
 `;
 
 const EventPrice = styled.div`
   font-family: ${fonts.montserrat};
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.1rem;
+    margin-bottom: 18px;
+  }
 `;
 
 const MoreInfoButton = styled.div`
@@ -204,22 +425,44 @@ const MoreInfoButton = styled.div`
   font-family: ${fonts.montserrat};
   font-weight: 700;
   border-radius: 20px;
-  padding: 10px 28px;
-  font-size: 1.1rem;
+  padding: 8px 24px;
+  font-size: 1rem;
   text-align: center;
   width: fit-content;
-  margin-top: 8px;
+  transition:
+    background-color 0.2s ease-in-out,
+    transform 0.2s ease-in-out;
+
+  @media (min-width: ${breakpoints.md}) {
+    padding: 10px 28px;
+    font-size: 1.1rem;
+    margin-top: 8px;
+  }
+
+  &:hover {
+    background: #6fa086;
+    transform: scale(1.05);
+  }
 `;
 
 const EventImage = styled.img`
-  flex: 1;
-  min-width: 180px;
-  max-width: 220px;
+  width: 100%;
+  height: 200px;
   object-fit: cover;
   background: #eee;
-  border-top-right-radius: 16px;
-  border-bottom-right-radius: 16px;
-  align-self: stretch;
+  margin-top: 16px;
+  border-radius: 6px;
+
+  @media (min-width: ${breakpoints.lg}) {
+    flex: 1;
+    min-width: 180px;
+    max-width: 220px;
+    height: auto;
+    border-radius: 0;
+    margin-top: 0;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
 `;
 
 export default EventCard;
