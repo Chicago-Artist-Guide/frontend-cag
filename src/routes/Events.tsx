@@ -60,8 +60,13 @@ const Events: React.FC = () => {
         <p>No upcoming events at this time.</p>
       ) : (
         <EventList>
-          {upcomingEvents.map((event) => (
-            <EventCard key={event.id} event={event} status="upcoming" />
+          {upcomingEvents.map((event, index) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              status="upcoming"
+              index={index}
+            />
           ))}
         </EventList>
       )}
@@ -73,8 +78,13 @@ const Events: React.FC = () => {
         <p>No past events found.</p>
       ) : (
         <EventList>
-          {pastEvents.map((event) => (
-            <EventCard key={event.id} event={event} status="past" />
+          {pastEvents.map((event, index) => (
+            <EventCard
+              key={event.id}
+              event={event}
+              status="past"
+              index={index}
+            />
           ))}
         </EventList>
       )}
