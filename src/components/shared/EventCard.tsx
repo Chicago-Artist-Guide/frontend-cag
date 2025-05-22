@@ -45,7 +45,7 @@ type EventType = {
 };
 
 const getDateStringForEvent = (event: EventType) => {
-  const dateObj = new Date(event.date);
+  const dateObj = new Date(event.date + 'T00:00:00'); //server is in UTC
   if (isNaN(dateObj.getTime())) {
     console.error(`Invalid date for event ${event.id}: ${event.date}`);
     return null;
@@ -54,9 +54,9 @@ const getDateStringForEvent = (event: EventType) => {
   const options = {
     weekday: 'long' as const,
     month: 'long' as const,
-    day: 'numeric' as const,
-    timeZone: 'America/Chicago'
+    day: 'numeric' as const
   };
+  console.log(dateObj);
 
   return dateObj.toLocaleDateString('en-US', options);
 };
