@@ -56,7 +56,7 @@ const getDateStringForEvent = (event: EventType) => {
     month: 'long' as const,
     day: 'numeric' as const
   };
-  console.log(dateObj);
+  // dateObj is correct here, loses a day when the 'timezone' adjustment is applied. so remove it.
 
   return dateObj.toLocaleDateString('en-US', options);
 };
