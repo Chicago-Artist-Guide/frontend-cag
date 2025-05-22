@@ -50,9 +50,14 @@ const cards: Card[] = [
 type Props = {
   accountType: string | null;
   setAccountType: (x: AccountTypeOptions | null) => void;
+  onCardClick?: () => void;
 };
 
-const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
+const AccountType: React.FC<Props> = ({
+  accountType,
+  setAccountType,
+  onCardClick
+}) => {
   return (
     <Container className="margin-container">
       <Row>
@@ -69,12 +74,17 @@ const AccountType: React.FC<Props> = ({ accountType, setAccountType }) => {
       <Row>
         <Col lg={7}>
           <Row style={{ flexWrap: 'nowrap' }}>
-            {cards.map(({ className, icon, text, name, enabled }: any) => (
+            {cards.map(({ className, icon, text, name }: any) => (
               <StyledCard
                 key={name}
                 className={clsx(className, accountType === name && 'selected')}
                 lg="5"
-                onClick={() => setAccountType(name)}
+                onClick={() => {
+                  setAccountType(name);
+                  if (onCardClick) {
+                    onCardClick();
+                  }
+                }}
               >
                 <Image alt="" src={icon} />
                 <CardText>{text}</CardText>
