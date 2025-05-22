@@ -1,7 +1,7 @@
 import React from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
 import Logo from '../../images/cagLogo1.svg';
@@ -12,6 +12,20 @@ const Header = () => {
   const {
     profile: { ref: profileRef }
   } = useUserContext();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handle sign-up link click to reset to initial screen when already on sign-up page
+  const handleSignUpClick = (e: React.MouseEvent) => {
+    if (location.pathname === '/sign-up') {
+      e.preventDefault();
+      // Force a refresh of the sign-up page to reset the state
+      navigate('/', { replace: true });
+      setTimeout(() => {
+        navigate('/sign-up');
+      }, 0);
+    }
+  };
 
   return (
     <WhiteBackNav className="nav white-back container" expand="lg" sticky="top">
@@ -28,8 +42,14 @@ const Header = () => {
           <Nav.Link as={Link} to="/about-us">
             ABOUT US
           </Nav.Link>
+          {/* <Nav.Link as={Link} to="/shows">
+            SHOWS
+          </Nav.Link> */}
           <Nav.Link as={Link} to="/donate">
             DONATE
+          </Nav.Link>
+          <Nav.Link as={Link} to="/events">
+            EVENTS
           </Nav.Link>
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile">
@@ -37,7 +57,7 @@ const Header = () => {
             </Nav.Link>
           ) : (
             <>
-              <Nav.Link as={Link} to="/sign-up">
+              <Nav.Link as={Link} to="/sign-up" onClick={handleSignUpClick}>
                 SIGN UP
               </Nav.Link>
               <Nav.Link as={Link} to="/login">

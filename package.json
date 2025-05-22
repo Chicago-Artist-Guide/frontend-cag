@@ -20,7 +20,7 @@
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
     "@vitejs/plugin-react": "^4.3.1",
-    "axios": "^1.3.5",
+    "axios": "^1.8.2",
     "better-npm-audit": "^3.7.3",
     "bootstrap": "^4.6.2",
     "clsx": "^1.2.1",
@@ -42,7 +42,7 @@
     "styled-bootstrap-grid": "^3.1.0",
     "styled-components": "^5.3.5",
     "sweetalert2": "^11.12.4",
-    "vite": "^5.4.0",
+    "vite": "^5.4.13",
     "vite-tsconfig-paths": "^5.0.1",
     "yup": "^1.6.1"
   },
@@ -126,5 +126,6 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  }
+  },
+  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
 }

@@ -5,11 +5,19 @@ import Donate from '/donate.png';
 import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
+import PartnerSlider from '../components/Redesign/PartnerSlider';
+import { zeffyUrl } from '../utils/marketing';
 
 // Partners
-import MPaact from '../images/partners/mpaact.jpg';
-import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera.png';
-import TheStoryTheatre from '../images/partners/the-story-theatre.png';
+import MPaact from '../images/partners/mpaact_hq-1.jpg';
+import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera-1.png';
+import TheStoryTheatre from '../images/partners/the-story-theatre-1.png';
+import BabesBlades from '../images/partners/babes-blades-1.jpg';
+import CircaPinto from '../images/partners/circa-pintig-1.jpg';
+import Corn from '../images/partners/corn-1.jpg';
+import GreatWorks from '../images/partners/great-works-1.jpg';
+import Jackalope from '../images/partners/jackalope-1.png';
+import Pegasus from '../images/partners/pegasus-logo-1.jpg';
 
 const Home = () => {
   const sectionTitles = {
@@ -98,6 +106,36 @@ const Home = () => {
       src: TheStoryTheatre,
       alt: 'The Story Theatre',
       url: 'https://thestorytheatre.org/'
+    },
+    {
+      src: BabesBlades,
+      alt: 'Babes with Blades',
+      url: 'https://babeswithblades.org/'
+    },
+    {
+      src: CircaPinto,
+      alt: 'Circa Pinto',
+      url: 'https://www.circapintig.org/'
+    },
+    {
+      src: Corn,
+      alt: 'Corn',
+      url: 'https://www.cornservatory.org/'
+    },
+    {
+      src: GreatWorks,
+      alt: 'Great Works',
+      url: 'https://www.greatworkstheatre.com/'
+    },
+    {
+      src: Jackalope,
+      alt: 'Jackalope',
+      url: 'https://www.jackalopetheatre.org/'
+    },
+    {
+      src: Pegasus,
+      alt: 'Pegasus',
+      url: 'https://pegasustheatrechicago.org/'
     }
   ];
 
@@ -123,34 +161,31 @@ const Home = () => {
           <h3 className="pt-3 text-xs font-light text-white md:text-sm lg:text-base">
             Free for everyone. Proudly made in Chicago.
           </h3>
-          <a href="/sign-up">
-            <button className="mt-12 w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
-              Join Now
-            </button>
-          </a>
+          <div className="mt-12 flex flex-col gap-4 md:flex-row">
+            <a href="/sign-up">
+              <button className="w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
+                Join Now
+              </button>
+            </a>
+            <a href="/shows">
+              <button className="w-full rounded-full bg-mint px-14 py-2 text-lg font-semibold text-white hover:bg-mint/80 md:py-3 lg:w-fit">
+                Browse Shows
+              </button>
+            </a>
+          </div>
         </div>
       </div>
       <div className="mt-12 flex justify-center">
         <Values />
       </div>
-      {/* Partners max-w-7xl */}
+      {/* Partners section - updated with slider */}
       <div className="mt-12 flex w-full justify-center bg-white">
         <div className="flex w-full max-w-7xl flex-col items-center p-6">
           <h2 className="max-w-xl pt-6 text-center text-5xl">
             Our Theatre Company Members
           </h2>
-          <div className="my-12 flex flex-wrap items-center justify-center gap-x-12">
-            {partners.map((partner) => {
-              return (
-                <a href={partner.url} key={partner.alt}>
-                  <img
-                    src={partner.src}
-                    alt={partner.alt}
-                    className="h-225 my-6 w-auto"
-                  />
-                </a>
-              );
-            })}
+          <div className="my-12 w-full">
+            <PartnerSlider partners={partners} />
           </div>
         </div>
       </div>
@@ -186,7 +221,7 @@ const Home = () => {
                 Your support of the Chicago Artist Guide helps us offer this
                 platform to our users free of cost.
               </h3>
-              <a href="https://www.zeffy.com/fundraising/6e74fb4e-7a85-47e7-8ffe-7899706cb35f">
+              <a href={zeffyUrl} target="_blank">
                 <button className="mt-4 w-full rounded-full bg-salmon px-14 py-3 text-center text-xl font-semibold text-white hover:bg-blush md:w-fit">
                   Donate
                 </button>
