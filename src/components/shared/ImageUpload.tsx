@@ -148,9 +148,9 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
               <Button
                 disabled={uploadInProgress}
                 onClick={uploadFile}
-                text="Upload File"
+                text="Upload"
                 type="button"
-                variant="secondary"
+                variant="success"
               />
               {uploadInProgress ? (
                 <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
@@ -189,9 +189,9 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
             <Button
               disabled={uploadInProgress}
               onClick={uploadFile}
-              text="Upload File"
+              text="Upload"
               type="button"
-              variant="secondary"
+              variant="success"
             />
             {uploadInProgress ? (
               <ButtonLabel>Upload progress: {percent}%</ButtonLabel>

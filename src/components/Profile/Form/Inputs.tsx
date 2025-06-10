@@ -50,7 +50,16 @@ export const FormInput: React.FC<{
   onChange: SetForm;
   style?: CSSProperties;
   type?: 'text' | 'number';
-}> = ({ name, label, defaultValue, onChange, type = 'text', ...rest }) => {
+  placeholder?: string;
+}> = ({
+  name,
+  label,
+  defaultValue,
+  onChange,
+  type = 'text',
+  placeholder,
+  ...rest
+}) => {
   return (
     <FormGroup controlId={name} {...rest}>
       <Label>{label}</Label>
@@ -60,6 +69,7 @@ export const FormInput: React.FC<{
         onChange={onChange}
         defaultValue={defaultValue}
         type={type}
+        placeholder={placeholder}
       />
     </FormGroup>
   );
