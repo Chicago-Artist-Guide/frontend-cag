@@ -82,10 +82,11 @@ const ManageProductionBasic: React.FC<{
           defaultValue={formValues?.description}
         />
         <FormInput
-          name="director"
-          label="Director"
+          name="location"
+          label="Location"
+          placeholder="e.g., 123 Main St, Chicago, IL 60601"
           onChange={setFormValues}
-          defaultValue={formValues?.director}
+          defaultValue={formValues?.location}
         />
         <FormRadio
           name="equity"
@@ -94,17 +95,42 @@ const ManageProductionBasic: React.FC<{
           checked={formValues.equity}
           onChange={setFormValues}
         />
+        {/* Personnel Section */}
+        <div style={{ marginTop: 30, marginBottom: 20 }}>
+          <h5
+            style={{
+              color: '#537C8C',
+              fontFamily: '"Lora", serif',
+              fontStyle: 'italic',
+              marginBottom: 20
+            }}
+          >
+            Show Personnel
+          </h5>
+        </div>
         <FormInput
-          name="location"
-          label="Location"
+          name="director"
+          label="Director"
           onChange={setFormValues}
-          defaultValue={formValues?.location}
+          defaultValue={formValues?.director}
         />
         <FormInput
           name="musical_director"
           label="Musical Director"
           onChange={setFormValues}
           defaultValue={formValues?.musical_director}
+        />
+        <FormInput
+          name="choreographer"
+          label="Choreographer"
+          onChange={setFormValues}
+          defaultValue={formValues?.choreographer}
+        />
+        <FormInput
+          name="other_personnel"
+          label="Other"
+          onChange={setFormValues}
+          defaultValue={formValues?.other_personnel}
         />
       </RightCol>
     </>
