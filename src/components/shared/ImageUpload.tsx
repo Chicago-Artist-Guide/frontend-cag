@@ -264,7 +264,7 @@ const ButtonLabel = styled.p`
 `;
 
 const StyledMargin = styled.div`
-  margin-bottom: 100px;
+  margin-bottom: 20px;
 `;
 
 export default ImageUpload;

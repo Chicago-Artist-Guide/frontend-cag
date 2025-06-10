@@ -269,17 +269,38 @@ const DateRange = styled.div`
   display: flex;
   gap: 0.75em;
   align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5em;
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    gap: 0.5em;
+  }
 `;
 
 const DatePickerInput = styled(DatePicker)`
   height: 40px;
-  width: 148px;
+  width: 100%;
+  max-width: 148px;
   border-radius: 4px;
   border: 1px solid #d4d6df;
   padding-left: 10px;
   letter-spacing: 0.5px;
   color: ${colors.mainFont};
   opacity: 0.5;
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  @media (min-width: 769px) and (max-width: 992px) {
+    max-width: 140px;
+  }
 `;
 
 const Thru = styled.h6`
@@ -289,4 +310,10 @@ const Thru = styled.h6`
   line-height: 20px;
   letter-spacing: 0.25px;
   margin-bottom: 0;
+  white-space: nowrap;
+
+  @media (max-width: 768px) {
+    align-self: center;
+    margin: 0.25em 0;
+  }
 `;
