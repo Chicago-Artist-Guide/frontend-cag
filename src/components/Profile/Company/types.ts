@@ -84,11 +84,13 @@ export type Role = {
   offstage_role?: string;
   description?: string;
   role_rate?: number;
-  role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour';
+  role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour' | 'Per Show';
   gender_identity?: string[];
   ethnicity?: string[];
   role_status?: RoleStatus;
   age_range?: string[];
   additional_requirements?: string[];
+  singing_details?: string;
+  dancing_details?: string;
   union?: string;
 };

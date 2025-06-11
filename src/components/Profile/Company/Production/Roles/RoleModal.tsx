@@ -188,6 +188,10 @@ const RoleModal: React.FC<{
                         {
                           name: 'Per Hour',
                           value: 'Per Hour'
+                        },
+                        {
+                          name: 'Per Show',
+                          value: 'Per Show'
                         }
                       ]}
                       value={formValues?.role_rate_unit}
@@ -251,6 +255,32 @@ const RoleModal: React.FC<{
                           }}
                         />
                       ))}
+                      {isValueIncluded(
+                        'additional_requirements',
+                        'Requires singing'
+                      ) && (
+                        <FormInput
+                          name="singing_details"
+                          label="Singing Details"
+                          placeholder="Classical"
+                          onChange={setFormState}
+                          defaultValue={formValues?.singing_details}
+                          style={{ marginTop: 15 }}
+                        />
+                      )}
+                      {isValueIncluded(
+                        'additional_requirements',
+                        'Requires dancing'
+                      ) && (
+                        <FormInput
+                          name="dancing_details"
+                          label="Dancing Details"
+                          placeholder="Modern"
+                          onChange={setFormState}
+                          defaultValue={formValues?.dancing_details}
+                          style={{ marginTop: 15 }}
+                        />
+                      )}
                     </Form.Group>
                     <Form.Group
                       className="form-group"

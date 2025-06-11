@@ -65,6 +65,30 @@ const PublicRoleCard: React.FC<PublicRoleCardProps> = ({
                 </DetailValue>
               </DetailItem>
             )}
+
+            {role.additional_requirements &&
+              role.additional_requirements.length > 0 && (
+                <DetailItem>
+                  <DetailLabel>Additional Requirements:</DetailLabel>
+                  <DetailValue>
+                    {role.additional_requirements.join(', ')}
+                  </DetailValue>
+                </DetailItem>
+              )}
+
+            {role.singing_details && (
+              <DetailItem>
+                <DetailLabel>Singing Style:</DetailLabel>
+                <DetailValue>{role.singing_details}</DetailValue>
+              </DetailItem>
+            )}
+
+            {role.dancing_details && (
+              <DetailItem>
+                <DetailLabel>Dancing Style:</DetailLabel>
+                <DetailValue>{role.dancing_details}</DetailValue>
+              </DetailItem>
+            )}
           </RoleDetails>
         </Col>
 
