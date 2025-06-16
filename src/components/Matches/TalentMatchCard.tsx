@@ -24,6 +24,8 @@ type TalentMatchCardProps = {
   roleId: string;
   roleName: string;
   fetchFullNames: () => Promise<void>;
+  isFavorited: boolean;
+  onToggleFavorite: () => Promise<void>;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -37,14 +39,15 @@ export const TalentMatchCard = ({
   productionName,
   roleId,
   roleName,
-  fetchFullNames
+  fetchFullNames,
+  isFavorited,
+  onToggleFavorite
 }: TalentMatchCardProps) => {
   const navigate = useNavigate();
   const { account, currentUser, profile: userProfile } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
-  const [favorited, setFavorited] = useState(false);
   const { fullName, matchStatus } = profile;
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
@@ -196,9 +199,9 @@ export const TalentMatchCard = ({
       >
         <div
           className="absolute left-4 top-4 cursor-pointer transition-transform hover:scale-110"
-          onClick={() => setFavorited(!favorited)}
+          onClick={onToggleFavorite}
         >
-          {favorited ? (
+          {isFavorited ? (
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
