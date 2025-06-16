@@ -24,6 +24,8 @@ type TalentMatchCardProps = {
   roleId: string;
   roleName: string;
   fetchFullNames: () => Promise<void>;
+  favorited: boolean;
+  onFavoriteToggle: (profileId: string) => Promise<void>;
 };
 
 export type ProfileAndName = IndividualProfileDataFullInit & {
@@ -37,7 +39,9 @@ export const TalentMatchCard = ({
   productionName,
   roleId,
   roleName,
-  fetchFullNames
+  fetchFullNames,
+  favorited,
+  onFavoriteToggle
 }: TalentMatchCardProps) => {
   const navigate = useNavigate();
   const { account, currentUser, profile: userProfile } = useUserContext();
@@ -194,18 +198,40 @@ export const TalentMatchCard = ({
         }}
       >
         <div className="absolute left-4 top-4">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-10 text-banana"
+          <button
+            onClick={() => onFavoriteToggle(profile.uid)}
+            className="cursor-pointer transition-transform hover:scale-110"
           >
-            <path
-              fillRule="evenodd"
-              d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-              clipRule="evenodd"
-            />
-          </svg>
+            {favorited ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="size-10 text-banana"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-10 text-banana"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+                />
+              </svg>
+            )}
+          </button>
         </div>
       </div>
       <div className="relative flex flex-1 flex-col px-8 py-4 font-montserrat -tracking-tighter">
@@ -250,54 +276,22 @@ export const TalentMatchCard = ({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-20"
+            className="size-6"
           >
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
             />
           </svg>
-
-          <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
-            Accept
-          </span>
-        </button>
-        <button
-          onClick={() => createMatch(false)}
-          disabled={isDeclined}
-          className={clsx(
-            'flex h-full flex-col items-center justify-center bg-blush/50 px-4 py-2 text-salmon',
-            {
-              'cursor-not-allowed opacity-50': isDeclined,
-              'hover:bg-salmon/50 hover:text-white': !isDeclined
-            }
-          )}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="size-20"
-          >
-            <path
-              fillRule="evenodd"
-              d="m6.72 5.66 11.62 11.62A8.25 8.25 0 0 0 6.72 5.66Zm10.56 12.68L5.66 6.72a8.25 8.25 0 0 0 11.62 11.62ZM5.105 5.106c3.807-3.808 9.98-3.808 13.788 0 3.808 3.807 3.808 9.98 0 13.788-3.807 3.808-9.98 3.808-13.788 0-3.808-3.807-3.808-9.98 0-13.788Z"
-              clipRule="evenodd"
-            />
-          </svg>
-          <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
-            Decline
-          </span>
         </button>
       </div>
-      {isModalVisible && (
-        <MatchConfirmationModal
-          onConfirm={handleConfirm}
-          onCancel={handleCancel}
-          message={returnModalMessage()}
-        />
-      )}
+      <MatchConfirmationModal
+        isVisible={isModalVisible}
+        onConfirm={handleConfirm}
+        onCancel={handleCancel}
+        message={returnModalMessage()}
+      />
     </div>
   );
 };
