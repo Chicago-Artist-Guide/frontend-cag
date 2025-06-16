@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import Swal from 'sweetalert2';
+import clsx from 'clsx';
 import { getNameForAccount } from '../../components/Profile/shared/api';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMatches } from '../../context/MatchContext';
@@ -6,10 +8,7 @@ import { useUserContext } from '../../context/UserContext';
 import { getTheaterTalentMatch } from './api';
 import { ProfileAndName, TalentMatchCard } from './TalentMatchCard';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import Swal from 'sweetalert2';
-import clsx from 'clsx';
-
-type FilterType = 'all' | 'favorites';
+import { FilterFavoritesType } from './types';
 
 export const TalentMatchList = () => {
   const { firebaseFirestore } = useFirebaseContext();
@@ -18,7 +17,7 @@ export const TalentMatchList = () => {
   const [profiles, setProfiles] = useState<ProfileAndName[]>([]);
   const [cardsLoading, setCardsLoading] = useState(true);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-  const [filter, setFilter] = useState<FilterType>('all');
+  const [filter, setFilter] = useState<FilterFavoritesType>('all');
 
   const getFavoriteDocRef = (talentAccountId: string) => {
     if (!account?.ref?.id || !talentAccountId) return null;
