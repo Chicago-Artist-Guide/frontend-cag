@@ -48,6 +48,7 @@ export const DetailsCard = styled.div`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   padding: 25px 21px;
+  word-wrap: break-word;
 `;
 
 export const DetailsCardItem = styled.h6`
