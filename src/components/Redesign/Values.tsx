@@ -10,6 +10,7 @@ type ValueDetails = {
   order: number;
   animation: string;
   color: string;
+  backColor: string;
   bigFont: string;
   smallFont: string;
 };
@@ -30,8 +31,9 @@ const values: Values = {
       col: 'col-span-1',
       order: 1,
       animation: 'animate-slide-left',
-      color: 'butter',
-      bigFont: 'md:text-6xl',
+      color: 'bg-butter',
+      backColor: 'bg-gold',
+      bigFont: 'md:text-60',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -41,8 +43,9 @@ const values: Values = {
       col: 'col-span-1',
       order: 2,
       animation: 'animate-slide-right',
-      color: 'butter',
-      bigFont: 'md:text-6xl',
+      color: 'bg-butter',
+      backColor: 'bg-gold',
+      bigFont: 'md:text-50',
       smallFont: 'text-2xl'
     }
   },
@@ -54,8 +57,9 @@ const values: Values = {
       col: 'col-span-2',
       order: 2,
       animation: 'animate-slide-up',
-      color: 'salmon',
-      bigFont: 'md:text-7xl',
+      color: 'bg-blush',
+      backColor: 'bg-salmon',
+      bigFont: 'md:text-80',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -65,8 +69,9 @@ const values: Values = {
       col: 'col-span-2',
       order: 4,
       animation: 'animate-slide-down',
-      color: 'salmon',
-      bigFont: 'md:text-6xl',
+      color: 'bg-blush',
+      backColor: 'bg-salmon',
+      bigFont: 'md:text-60',
       smallFont: 'text-3xl'
     }
   },
@@ -78,8 +83,9 @@ const values: Values = {
       col: 'col-span-2',
       order: 3,
       animation: 'animate-slide-down',
-      color: 'mint',
-      bigFont: 'md:text-6xl',
+      color: 'bg-mint',
+      backColor: 'bg-evergreen',
+      bigFont: 'md:text-50',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -89,8 +95,9 @@ const values: Values = {
       col: 'col-span-2',
       order: 1,
       animation: 'animate-slide-up',
-      color: 'mint',
-      bigFont: 'md:text-5xl',
+      color: 'bg-mint',
+      backColor: 'bg-evergreen',
+      bigFont: 'md:text-50',
       smallFont: 'text-3xl'
     }
   },
@@ -101,8 +108,9 @@ const values: Values = {
       col: 'col-span-1',
       order: 4,
       animation: 'animate-slide-right',
-      color: 'darkGrey',
-      bigFont: 'md:text-6xl',
+      color: 'bg-cornflower',
+      backColor: 'bg-darkGrey',
+      bigFont: 'md:text-60',
       smallFont: 'text-3xl'
     },
     Theatres: {
@@ -112,8 +120,9 @@ const values: Values = {
       col: 'col-span-1',
       order: 3,
       animation: 'animate-slide-left',
-      color: 'darkGrey',
-      bigFont: 'md:text-4xl',
+      color: 'bg-cornflower',
+      backColor: 'bg-darkGrey',
+      bigFont: 'md:text-36',
       smallFont: 'text-lg'
     }
   }
@@ -136,11 +145,13 @@ const Values = () => {
   };
 
   return (
-    <div className="w-fit flex-col items-center justify-center rounded-lg bg-white md:flex">
+    <div className="w-fit flex-col items-center justify-center rounded-lg bg-white px-12 py-12 md:flex">
       {/* Title */}
       <div className="relative text-darkGrey">
         <div className="flex items-start">
-          <h1 className="mr-2 text-sm italic text-mint md:text-4xl">Find</h1>
+          <h1 className="mr-2 text-sm italic text-mint md:pr-1 md:text-4xl">
+            Find
+          </h1>
           <div className="relative h-5 w-[300px] overflow-hidden md:h-10 md:w-[700px]">
             <h1
               className={`absolute w-full text-sm transition-transform duration-500 ease-in-out md:text-4xl ${
@@ -160,35 +171,35 @@ const Values = () => {
         </div>
       </div>
       {/* Toggle */}
-      <div className="flex items-center justify-between rounded-full bg-darkGrey p-2 md:w-fit md:justify-center">
+      <div className="mt-4 flex items-center justify-between rounded-full bg-darkGrey p-2 md:mt-8 md:w-fit md:justify-center">
         <button
           onClick={() => handleClick('Artists')}
-          className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
+          className={`transition-bg mx-1 rounded-full px-3 duration-300 ${
             member === 'Artists' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
-          <h2 className="text-base font-bold text-white md:text-2xl">
+          <h2 className="my-2 text-base font-bold text-white md:text-3xl">
             Artists
           </h2>
         </button>
         <button
           onClick={() => handleClick('Theatres')}
-          className={`transition-bg rounded-full px-3 duration-300 md:px-4 md:py-1 ${
+          className={`transition-bg mx-1 rounded-full px-3 duration-300 ${
             member === 'Theatres' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
-          <h2 className="text-base font-bold text-white md:text-2xl">
+          <h2 className="my-2 text-base font-bold text-white md:text-3xl">
             Theatres
           </h2>
         </button>
       </div>
       {/* Values */}
-      <div className="my-6 md:my-12">
+      <div className="my-4 md:my-8">
         <div className="grid w-[350px] grid-cols-3 grid-rows-2 items-center md:w-[700px]">
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
             const currentItem = value[member];
-            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[160px] md:h-[210px] m-[2px] md:m-2 rounded-md transition-transform duration-1000`;
+            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[160px] md:h-[200px] m-[2px] md:m-3 transition-transform duration-1000`;
             const isFlipped = flipped[Number(key) - 1];
             return (
               <div
@@ -200,7 +211,7 @@ const Values = () => {
                 }}
               >
                 <div
-                  className={`absolute bg-${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
+                  className={`absolute ${currentItem.color} flex h-full w-full items-center justify-center rounded-xl p-3 transition-transform duration-1000 md:rounded-3xl`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
@@ -210,13 +221,13 @@ const Values = () => {
                     <FontAwesomeIcon icon={faRetweet} className="text-white" />
                   </div>
                   <h1
-                    className={`p-2 text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-4`}
+                    className={`p-2 font-bold text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-4`}
                   >
                     {currentItem.prop}
                   </h1>
                 </div>
                 <div
-                  className={`absolute bg-${currentItem.color} h-full w-full rounded-md transition-transform duration-1000`}
+                  className={`absolute ${currentItem.backColor} flex h-full w-full items-center justify-center rounded-xl transition-transform duration-1000 md:rounded-3xl`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)'
@@ -227,7 +238,7 @@ const Values = () => {
                   </div>
                   <h2
                     className={
-                      'mt-2 p-2 text-xs font-normal text-white md:mt-4 md:text-lg md:font-bold'
+                      'px-2 text-xs font-bold text-white md:mx-4 md:mt-4 md:text-lg/5'
                     }
                   >
                     {currentItem.description}

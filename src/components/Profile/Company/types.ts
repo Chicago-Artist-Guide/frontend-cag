@@ -49,6 +49,8 @@ export type Production = {
   description?: string;
   director?: string;
   musical_director?: string;
+  choreographer?: string;
+  other_personnel?: string;
   casting_director?: string;
   casting_director_email?: string;
   equity?: ProductionEquity;
@@ -82,11 +84,13 @@ export type Role = {
   offstage_role?: string;
   description?: string;
   role_rate?: number;
-  role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour';
+  role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour' | 'Per Show';
   gender_identity?: string[];
   ethnicity?: string[];
   role_status?: RoleStatus;
   age_range?: string[];
   additional_requirements?: string[];
+  singing_details?: string;
+  dancing_details?: string;
   union?: string;
 };

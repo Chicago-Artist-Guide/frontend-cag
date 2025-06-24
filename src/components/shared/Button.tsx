@@ -58,6 +58,17 @@ const CAGButton = styled(BSButton)`
     background: ${colors.salmon};
     border-color: ${colors.salmon};
   }
+
+  &.success-class {
+    background: ${colors.mint};
+    border-color: ${colors.mint};
+    color: white;
+  }
+
+  &.success-class:not(:disabled):not(.disabled):active {
+    background: ${colors.primary};
+    border-color: ${colors.primary};
+  }
 `;
 
 export default Button;

@@ -135,5 +135,7 @@ export const genders = [
 export const additionalRequirements = [
   'Requires singing',
   'Requires dancing',
+  'Requires stage combat',
+  'Requires intimacy direction/choreography',
   'LGBTQ+ only'
 ];

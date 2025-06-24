@@ -10,16 +10,26 @@ export const LeftCol = styled(Col)`
 
 export const RightCol = styled(Col)`
   @media (max-width: ${breakpoints.lg}) {
-    margin-top: 40px;
+    margin-top: 20px;
   }
 `;
 
 export const Title = styled.h1`
   text-transform: uppercase;
   font-family: ${fonts.montserrat};
-  font-size: 48px;
+  font-size: 28px;
   font-weight: bold;
-  margin-bottom: 76px;
+  margin-bottom: 30px;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 36px;
+    margin-bottom: 50px;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    font-size: 48px;
+    margin-bottom: 76px;
+  }
 `;
 
 export const DetailsColTitle = styled.h2`
