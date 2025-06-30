@@ -27,6 +27,7 @@ import Benda from '../../images/who-we-are/operations/Staff_Benda.jpg';
 import Huang from '../../images/who-we-are/operations/Staff_Huang.jpg';
 import Meyers from '../../images/who-we-are/operations/Staff_Meyers.jpg';
 import Ortega from '../../images/who-we-are/operations/Staff_Ortega.jpg';
+
 // Site Development
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.jpg';
@@ -35,6 +36,7 @@ import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
 import Nagra from '../../images/who-we-are/technical/Staff_Nagra.jpg';
 import Knuteson from '../../images/who-we-are/technical/Staff_Knuteson.jpg';
+import Goldstein from '../../images/who-we-are/technical/Staff_Goldstein.png';
 
 // Advisory Board
 import Voghel from '../../images/who-we-are/artists/Artist_Voghel.png';
@@ -96,7 +98,7 @@ const bios = {
       affiliation: 'CEO, Madrina Consulting',
       image: GomezBeloz,
       linkedin: 'sgomezbeloz',
-      bio: 'is a native of NW Indiana but has lived and worked across the country, and for a short time in South America, with her husband. She is also the CEO/Business Madrina of Madrina Consulting, a firm that works with nonprofit leaders and advocates in creating successful organizations, especially those led by women of color. Selina holds a Master of Library Science from the University of Illinois Urbana-Champaign and a Master of Nonprofit Management from DePaul University. Selina\'s creative outlets are primarily in fiber arts and cooking, but she deeply appreciates the theatre arts.'
+      bio: "is a native of NW Indiana but has lived and worked across the country, and for a short time in South America, with her husband. She is also the CEO/Business Madrina of Madrina Consulting, a firm that works with nonprofit leaders and advocates in creating successful organizations, especially those led by women of color. Selina holds a Master of Library Science from the University of Illinois Urbana-Champaign and a Master of Nonprofit Management from DePaul University. Selina's creative outlets are primarily in fiber arts and cooking, but she deeply appreciates the theatre arts."
     },
     {
       id: bioId(),
@@ -251,7 +253,7 @@ const bios = {
       affiliation: null,
       image: Benda,
       linkedin: 'michellebenda',
-      bio: 'After spending several years as a lighting designer and assistant in the Chicago theatre scene, Michelle is currently pivoting to grant writing work. Michelle\'s experience navigating the world as a wheelchair user has also made her a passionate advocate for accessibility, especially in performing arts spaces, both on stage and off. She is excited to join the Chicago Artist Guide and be part of this mission!'
+      bio: "After spending several years as a lighting designer and assistant in the Chicago theatre scene, Michelle is currently pivoting to grant writing work. Michelle's experience navigating the world as a wheelchair user has also made her a passionate advocate for accessibility, especially in performing arts spaces, both on stage and off. She is excited to join the Chicago Artist Guide and be part of this mission!"
     },
     {
       id: bioId(),
@@ -261,7 +263,7 @@ const bios = {
       affiliation: null,
       image: Huang,
       linkedin: 'les1iehuang',
-      bio: 'graduated from Purdue University in 2024 with a Bachelor\'s in Finance. She loves the stage which led her to volunteer with CAG! She hopes theatre can be an inclusive space for everyone to freely express themselves. In her free time, she loves to paint, draw, and has been getting more involved in digital art. Other activities include eating and sleeping.'
+      bio: "graduated from Purdue University in 2024 with a Bachelor's in Finance. She loves the stage which led her to volunteer with CAG! She hopes theatre can be an inclusive space for everyone to freely express themselves. In her free time, she loves to paint, draw, and has been getting more involved in digital art. Other activities include eating and sleeping."
     },
     {
       id: bioId(),
@@ -271,7 +273,7 @@ const bios = {
       affiliation: null,
       image: Meyers,
       linkedin: 'ciaranicolesimmons',
-      bio: 'is an administrative professional and training coordinator with a strong foundation in Learning & Development, client engagement, and cross-functional collaboration. With a bachelor\'s degree in Journalism and years of experience across finance, construction, and legal sectors, she brings a dynamic and detail-oriented approach to organizational training and operational excellence.\n\nCurrently, Ciara leads virtual training programs for hundreds of participants, manages analyst onboarding and development, and partners closely with HR to align training strategies with business goals. Her leadership in Employee Resource Groups and DEI initiatives reflects her passion for inclusive workplace culture and mentorship.'
+      bio: "is an administrative professional and training coordinator with a strong foundation in Learning & Development, client engagement, and cross-functional collaboration. With a bachelor's degree in Journalism and years of experience across finance, construction, and legal sectors, she brings a dynamic and detail-oriented approach to organizational training and operational excellence.\n\nCurrently, Ciara leads virtual training programs for hundreds of participants, manages analyst onboarding and development, and partners closely with HR to align training strategies with business goals. Her leadership in Employee Resource Groups and DEI initiatives reflects her passion for inclusive workplace culture and mentorship."
     },
     {
       id: bioId(),
@@ -281,7 +283,7 @@ const bios = {
       affiliation: null,
       image: Ortega,
       linkedin: 'jacquelineortegaa',
-      bio: 'a first-generation Latina, holds a Master\'s in Marketing and a Bachelor\'s in Marketing with a concentration in Digital Marketing and Promotions from the University of Illinois at Chicago. Her passion for marketing, particularly social media Marketing, stems from her love of creativity and innovation. She has gained hands-on experience through two prior internships. As a Social Media Management Intern, she created high-engagement Instagram content and developed growth strategies. As a Digital Marketing Intern, she increased engagement across Instagram, TikTok, and LinkedIn, researched influencers for client events, and presented social media insights. Outside of work, Jacky loves spending time with her family, making TikToks, and traveling.'
+      bio: "a first-generation Latina, holds a Master's in Marketing and a Bachelor's in Marketing with a concentration in Digital Marketing and Promotions from the University of Illinois at Chicago. Her passion for marketing, particularly social media Marketing, stems from her love of creativity and innovation. She has gained hands-on experience through two prior internships. As a Social Media Management Intern, she created high-engagement Instagram content and developed growth strategies. As a Digital Marketing Intern, she increased engagement across Instagram, TikTok, and LinkedIn, researched influencers for client events, and presented social media insights. Outside of work, Jacky loves spending time with her family, making TikToks, and traveling."
     }
   ],
   technical: [
@@ -294,6 +296,16 @@ const bios = {
       image: Fischer,
       linkedin: 'jeanninefischer',
       bio: "is an innovative product leader with experience in launching and scaling products at high-growth marketplace startups. Recognized on Product50 for her impact at Avail Car Sharing, Jeannine brings rich experience from diverse roles in Product, Finance, and Marketing at Allstate's startups and core businesses. Fueled by deep user empathy and a passion for people, she extends her impact beyond product management. As an inclusion advocate, Jeannine served as the President of the Young Professionals organization at Allstate, driving resources for underserved communities and influencing inclusive benefits decisions for 40K+ employees. Beyond tech, she's a music aficionado and outdoor enthusiast. When not building products, you'll find her catching the latest concert or exploring mountains through rock climbing or skiing."
+    },
+    {
+      id: bioId(),
+      name: 'Mhari Goldstein',
+      role: 'Product Manager',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Goldstein,
+      linkedin: 'mharigoldstein',
+      bio: 'Mhari is a relentless advocate for the power of technology to drive global nonprofit mission delivery. From early days of digital advocacy at an anti-gun violence NGO to implementing new products and platforms at an international service organization, Mhari believes that responsible technology can connect and empower communities. When not behind the screen she can often be found hiking a trail, cutting a rug, or rolling dice at a D&D table.'
     },
     {
       id: bioId(),
@@ -366,7 +378,7 @@ const bios = {
       affilitation: 'Founder, West Loop Soul',
       image: JewellJordin,
       linkedin: 'jordinjewell',
-      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That\'s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She\'s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she\'s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
+      bio: "has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That's why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She's excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she's not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles."
     },
     {
       id: bioId(),
@@ -376,7 +388,7 @@ const bios = {
       affiliation: null,
       image: Silva,
       linkedin: 'rj-silva-3080b178',
-      bio: 'is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ\'s Food Rocks.'
+      bio: "is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ's Food Rocks."
     },
     {
       id: bioId(),
