@@ -56,3 +56,5 @@ export type TheaterTalentMatch = {
   confirmed_by?: TheaterOrTalent;
   rejected_by?: TheaterOrTalent;
 };
+
+export type FilterFavoritesType = 'all' | 'favorites';
