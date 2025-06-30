@@ -176,6 +176,23 @@ const CompanyProfile: React.FC<{
                         <span>{award.show_title}</span>
                       </AwardField>
                     )}
+                    {award.website_links && (
+                      <div>
+                        <AwardLabel>Relevant Links:</AwardLabel>
+                        <div>
+                          {award.website_links.map((link) => (
+                            <a
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block"
+                            >
+                              {link}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
@@ -226,7 +243,6 @@ const AwardLabel = styled.span`
   font-size: 16px;
 `;
 
-// Flexbox for label/value pairs in awards
 const AwardField = styled.div`
   display: flex;
   margin-bottom: 6px;

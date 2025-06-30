@@ -13,7 +13,6 @@ import Facebook from '../../images/icons-footer/social_facebook.png';
 import Insta from '../../images/icons-footer/social_instagram.png';
 import Linkedin from '../../images/icons-footer/social_linkedin.png';
 import Medium from '../../images/icons-footer/social_medium.png';
-import Twitter from '../../images/icons-footer/social_twitter.png';
 import LogoSrc from '../../images/logoPlain.svg';
 
 const Footer = () => (

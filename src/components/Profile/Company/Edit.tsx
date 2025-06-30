@@ -92,6 +92,51 @@ const CompanyProfileEdit: React.FC<{
     });
   };
 
+  const handleAwardLinkChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    awardIdx: number,
+    linkIdx: number
+  ) => {
+    const newAwards = [...awards];
+    if (!newAwards[awardIdx].website_links)
+      newAwards[awardIdx].website_links = [''];
+    newAwards[awardIdx].website_links[linkIdx] = e.target.value;
+    setFormValues({
+      target: {
+        name: 'awards',
+        value: newAwards
+      }
+    });
+  };
+
+  const addAwardLink = (awardIdx: number) => {
+    const newAwards = [...awards];
+    if (!newAwards[awardIdx].website_links)
+      newAwards[awardIdx].website_links = [''];
+    newAwards[awardIdx].website_links.push('');
+    setFormValues({
+      target: {
+        name: 'awards',
+        value: newAwards
+      }
+    });
+  };
+
+  const removeAwardLink = (awardIdx: number, linkIdx: number) => {
+    const newAwards = [...awards];
+    if (!newAwards[awardIdx].website_links) return;
+    newAwards[awardIdx].website_links.splice(linkIdx, 1);
+    if (newAwards[awardIdx].website_links.length === 0) {
+      newAwards[awardIdx].website_links.push('');
+    }
+    setFormValues({
+      target: {
+        name: 'awards',
+        value: newAwards
+      }
+    });
+  };
+
   const removeAward = (index: number) => {
     const newAwards = [...awards];
     newAwards.splice(index, 1);
@@ -260,6 +305,54 @@ const CompanyProfileEdit: React.FC<{
                       />
                     </Col>
                   </Row>
+                  <div style={{ marginTop: 12 }}>
+                    <label>Relevant Links:</label>
+                    {(award.website_links && award.website_links.length > 0
+                      ? award.website_links
+                      : ['']
+                    ).map((link, linkIdx) => (
+                      <AwardWebsiteLinkRow key={linkIdx}>
+                        <FormInput
+                          name={`awards.${index}.website_links.${linkIdx}`}
+                          label=""
+                          defaultValue={link}
+                          onChange={(e) => {
+                            if (
+                              e &&
+                              'target' in e &&
+                              e.target &&
+                              (e.target as HTMLInputElement).value !== undefined
+                            ) {
+                              handleAwardLinkChange(
+                                e as React.ChangeEvent<HTMLInputElement>,
+                                index,
+                                linkIdx
+                              );
+                            }
+                          }}
+                          style={{ flex: 1, minWidth: 0, marginTop: 0 }}
+                          placeholder="https://www.example.com"
+                        />
+                        {award.website_links &&
+                          award.website_links.length > 1 && (
+                            <AwardWebsiteCloseBtn
+                              type="button"
+                              variant="danger"
+                              icon={faClose}
+                              text=""
+                              onClick={() => removeAwardLink(index, linkIdx)}
+                            />
+                          )}
+                      </AwardWebsiteLinkRow>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      text="Add Link"
+                      onClick={() => addAwardLink(index)}
+                      style={{ marginTop: 4 }}
+                    />
+                  </div>
                 </div>
               ))}
               <div className="mt-4">
@@ -291,6 +384,26 @@ const CloseIcon = styled(FontAwesomeIcon)`
   cursor: pointer;
   &:hover {
     color: ${colors.slate};
+  }
+`;
+
+const AwardWebsiteLinkRow = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  max-width: 500px;
+`;
+
+const AwardWebsiteCloseBtn = styled(Button)`
+  margin-left: 8;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  & > svg {
+    margin-right: 0;
   }
 `;
 

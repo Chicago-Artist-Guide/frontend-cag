@@ -37,6 +37,7 @@ export type Award = {
   award_year: string;
   awarded_by: string;
   show_title?: string;
+  website_links?: string[];
 };
 
 export type Production = {
