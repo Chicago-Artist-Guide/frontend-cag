@@ -169,6 +169,12 @@ const CompanyProfile: React.FC<{
                     <AwardLabel className="col-md-3">Year:</AwardLabel>
                     <div className="col">{award.award_year}</div>
                   </div>
+                  {award.show_title && (
+                    <div className="row mt-2">
+                      <AwardLabel className="col-md-3">Show Title:</AwardLabel>
+                      <div className="col">{award.show_title}</div>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

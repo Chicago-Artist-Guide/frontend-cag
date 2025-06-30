@@ -222,24 +222,44 @@ const CompanyProfileEdit: React.FC<{
                       onClick={() => removeAward(index)}
                     />
                   </div>
-                  <FormInput
-                    name={`awards.${index}.award_name`}
-                    label="Award Name"
-                    defaultValue={award.award_name}
-                    onChange={(e) => handleAwardChange(e, index, 'award_name')}
-                  />
-                  <FormInput
-                    name={`awards.${index}.award_year`}
-                    label="Award Year"
-                    defaultValue={award.award_year}
-                    onChange={(e) => handleAwardChange(e, index, 'award_year')}
-                  />
-                  <FormInput
-                    name={`awards.${index}.awarded_by`}
-                    label="Awarded By"
-                    defaultValue={award.awarded_by}
-                    onChange={(e) => handleAwardChange(e, index, 'awarded_by')}
-                  />
+                  <Row>
+                    <Col md={6} xs={12}>
+                      <FormInput
+                        name={`awards.${index}.award_name`}
+                        label="Award Name"
+                        defaultValue={award.award_name}
+                        onChange={(e) =>
+                          handleAwardChange(e, index, 'award_name')
+                        }
+                      />
+                      <FormInput
+                        name={`awards.${index}.award_year`}
+                        label="Award Year"
+                        defaultValue={award.award_year}
+                        onChange={(e) =>
+                          handleAwardChange(e, index, 'award_year')
+                        }
+                      />
+                    </Col>
+                    <Col md={6} xs={12}>
+                      <FormInput
+                        name={`awards.${index}.awarded_by`}
+                        label="Awarded By"
+                        defaultValue={award.awarded_by}
+                        onChange={(e) =>
+                          handleAwardChange(e, index, 'awarded_by')
+                        }
+                      />
+                      <FormInput
+                        name={`awards.${index}.show_title`}
+                        label="Show Title"
+                        defaultValue={award.show_title}
+                        onChange={(e) =>
+                          handleAwardChange(e, index, 'show_title')
+                        }
+                      />
+                    </Col>
+                  </Row>
                 </div>
               ))}
               <div className="mt-4">
