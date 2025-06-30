@@ -2,6 +2,7 @@
 import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
 import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.png';
+import GomezBeloz from '../../images/who-we-are/board/Board_Gomez-Beloz.jpg';
 import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
 import Laws from '../../images/who-we-are/board/Board_Laws.jpg';
 import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
@@ -14,7 +15,6 @@ import Kauffman from '../../images/who-we-are/board/Board_Kauffman.png';
 import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
 import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Kester from '../../images/who-we-are/board/Board_Kester.jpg';
-import Stiles from '../../images/who-we-are/board/Board_Stiles.png';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 
 // Business Operations
@@ -22,9 +22,11 @@ import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Adamy from '../../images/who-we-are/operations/Staff_Adamy.png';
 import Newsome from '../../images/who-we-are/operations/Staff_Newsome.png';
-import Walker from '../../images/who-we-are/operations/Staff_Walker.png';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
-
+import Benda from '../../images/who-we-are/operations/Staff_Benda.jpg';
+import Huang from '../../images/who-we-are/operations/Staff_Huang.jpg';
+import Meyers from '../../images/who-we-are/operations/Staff_Meyers.jpg';
+import Ortega from '../../images/who-we-are/operations/Staff_Ortega.jpg';
 // Site Development
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
 import DeSant from '../../images/who-we-are/technical/Staff_DeSant.jpg';
@@ -46,14 +48,13 @@ const bios = {
   board: [
     {
       id: bioId(),
-      name: 'Joey M. McCall, Esq.',
+      name: 'Jorie Goins',
       role: 'President',
-      pronouns: 'he/him',
-      affiliation:
-        'Founder & Managing Partner, McCall | Atten; Founder & Chief Vision Officer, Law Lynx',
-      image: McCall,
-      linkedin: 'joey-m-mccall-esq-303356143',
-      bio: 'is the founding Principal and Managing Partner of McCall | Atten, International, PLLC. McCall | Atten, International provides legal representation in the following areas: Real Estate Transactional Services, Real Estate Litigation, Civil Litigation, Immigration, and Outside General Counsel Services for Small to Mid-Sized Businesses. With a strong foundation rooted in establishing quality long-lasting relationships, both business and personal, Mr. McCall identifies the most effective legal solutions to the individual legal needs his clients may encounter during their professional and personal lives. Mr. McCall continuously strives to resolve all conflicts for his clients in the most optimal and effective manner.'
+      pronouns: 'she/her',
+      affiliation: 'Communications Director, American Heart Association',
+      image: Goins,
+      linkedin: 'joriejgoins',
+      bio: "is a dancer based out of Chicago, Ill. Jorie earned a bachelor's degree in journalism with a minor in dance from Northwestern University in 2016. While at Northwestern, Jorie was a member of Tonik Tap, Northwestern's premiere tap dance company where she choreographed five original pieces. Jorie has danced with Noumenon Dance Ensemble, Praize Productions' Rize Pro-Elite company, and as a guest performer with Chicago Tap Theatre. She has performed works choreographed by Brenda Bufalino, Rich Ashworth, Mark Yonally, Nicole Clarke Springer and April Torneby."
     },
     {
       id: bioId(),
@@ -79,7 +80,7 @@ const bios = {
     {
       id: bioId(),
       name: 'Cheryl Frazier',
-      role: 'Artist Board Liaison',
+      role: 'Board Member',
       pronouns: 'she/her',
       affiliation:
         'Director of Test Adjudication, Southland College Prep Charter HS',
@@ -89,8 +90,18 @@ const bios = {
     },
     {
       id: bioId(),
+      name: 'Selina Gomez-Beloz',
+      role: 'Board Member',
+      pronouns: 'she/her',
+      affiliation: 'CEO, Madrina Consulting',
+      image: GomezBeloz,
+      linkedin: 'sgomezbeloz',
+      bio: 'is a native of NW Indiana but has lived and worked across the country, and for a short time in South America, with her husband. She is also the CEO/Business Madrina of Madrina Consulting, a firm that works with nonprofit leaders and advocates in creating successful organizations, especially those led by women of color. Selina holds a Master of Library Science from the University of Illinois Urbana-Champaign and a Master of Nonprofit Management from DePaul University. Selina\'s creative outlets are primarily in fiber arts and cooking, but she deeply appreciates the theatre arts.'
+    },
+    {
+      id: bioId(),
       name: 'Alicia Webb',
-      role: 'Board Development Co-Chair',
+      role: 'Board Member',
       pronouns: 'she/her',
       affiliation: 'Principal, Bright Spot Public Relations',
       image: Webb,
@@ -109,13 +120,14 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Jorie Goins',
-      role: 'Secretary',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Goins,
-      linkedin: 'joriejgoins',
-      bio: "is a dancer based out of Chicago, Ill. Jorie earned a bachelor's degree in journalism with a minor in dance from Northwestern University in 2016. While at Northwestern, Jorie was a member of Tonik Tap, Northwestern's premiere tap dance company where she choreographed five original pieces. Jorie has danced with Noumenon Dance Ensemble, Praize Productions' Rize Pro-Elite company, and as a guest performer with Chicago Tap Theatre. She has performed works choreographed by Brenda Bufalino, Rich Ashworth, Mark Yonally, Nicole Clarke Springer and April Torneby."
+      name: 'Joey M. McCall, Esq.',
+      role: 'Past President & Board Consult',
+      pronouns: 'he/him',
+      affiliation:
+        'Founder & Managing Partner, McCall | Atten; Founder & Chief Vision Officer, Law Lynx',
+      image: McCall,
+      linkedin: 'joey-m-mccall-esq-303356143',
+      bio: 'is the founding Principal and Managing Partner of McCall | Atten, International, PLLC. McCall | Atten, International provides legal representation in the following areas: Real Estate Transactional Services, Real Estate Litigation, Civil Litigation, Immigration, and Outside General Counsel Services for Small to Mid-Sized Businesses. With a strong foundation rooted in establishing quality long-lasting relationships, both business and personal, Mr. McCall identifies the most effective legal solutions to the individual legal needs his clients may encounter during their professional and personal lives. Mr. McCall continuously strives to resolve all conflicts for his clients in the most optimal and effective manner.'
     }
   ],
   artists: [
@@ -131,19 +143,9 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'RJ Silva',
-      role: 'Vice President',
-      pronouns: 'he/him',
-      affiliation: null,
-      image: Silva,
-      linkedin: 'rj-silva-3080b178',
-      bio: "is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ's Food Rocks."
-    },
-    {
-      id: bioId(),
       name: 'Ema Kester',
       role: 'Secretary/Treasurer',
-      pronouns: 'she/her',
+      pronouns: 'they/she',
       affiliation: null,
       image: Kester,
       linkedin: 'ema-kester',
@@ -168,16 +170,6 @@ const bios = {
       image: Lewis,
       linkedin: null,
       bio: 'is a Chicago Actor and Dad originally from Connecticut. Excited to be apart of the Artist Board, his previous Chicago Theatre Credits: The Secret Council (First Folio Theatre), The Last Pair of Earlies (Raven Theatre), Short Changed (Factory Theatre), YPF at Pegasus (Pegasus Theatre), Titus Andronicus (Haven Theatre), Grace, Or the art of climbing (Brown Paper Box co). His TV credits include: 2 Broke Girls, True Blood and Real Husbands of Hollywood. James also attended The Theatre School at DePaul University for undergrad. James also is a writer and multi-instrumentalist but his greatest job is being a dad to the two greatest kids in the world, Amari and Naomi.'
-    },
-    {
-      id: bioId(),
-      name: 'Rachel Stiles',
-      role: 'Artist Board Member',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Stiles,
-      linkedin: 'rachelannestiles',
-      bio: "is a theatre professional and artist working in Milwaukee and Chicago with a specially in wigs and makeup. Her resume includes Lyric Opera of Chicago, Florentine Opera, Central City Opera, Broadway in Milwaukee, and The Milwaukee Rep, among others. A midwest girl at heart, her passion is helping people get a head's start in working in the arts, no matter their background. She created Stage Creatives Network to help theatre professionals find peace, prosperity and joy through the 4 pillars of a sustainable career: connection, financial literacy, work-life balance and self expression. If it's all about who you know, let's get to know each other!"
     },
     {
       id: bioId(),
@@ -253,13 +245,43 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Ella Walker',
-      role: 'Public Relations Associate',
+      name: 'Michelle E. Benda',
+      role: 'Grant Writer',
       pronouns: 'she/her',
-      affilitation: null,
-      image: Walker,
-      linkedin: 'ella-walker10',
-      bio: "is a director, choreographer, teaching artist, and marketing professional. With a passion for making theatre and arts spaces more equitable and inclusive, Ella is grateful to be part of Chicago Artist Guide. She holds a B.A. in Theatre Performance from Carthage College and is currently earning her M.S. in Leadership for Creative Enterprises from Northwestern University. When she's not directing, studying, or writing a press release, Ella loves to read, be in nature, and travel! "
+      affiliation: null,
+      image: Benda,
+      linkedin: 'michellebenda',
+      bio: 'After spending several years as a lighting designer and assistant in the Chicago theatre scene, Michelle is currently pivoting to grant writing work. Michelle\'s experience navigating the world as a wheelchair user has also made her a passionate advocate for accessibility, especially in performing arts spaces, both on stage and off. She is excited to join the Chicago Artist Guide and be part of this mission!'
+    },
+    {
+      id: bioId(),
+      name: 'Leslie Huang',
+      role: 'Social Media Associate',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Huang,
+      linkedin: 'les1iehuang',
+      bio: 'graduated from Purdue University in 2024 with a Bachelor\'s in Finance. She loves the stage which led her to volunteer with CAG! She hopes theatre can be an inclusive space for everyone to freely express themselves. In her free time, she loves to paint, draw, and has been getting more involved in digital art. Other activities include eating and sleeping.'
+    },
+    {
+      id: bioId(),
+      name: 'Ciara Meyers',
+      role: 'Administrative Associate',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Meyers,
+      linkedin: 'ciaranicolesimmons',
+      bio: 'is an administrative professional and training coordinator with a strong foundation in Learning & Development, client engagement, and cross-functional collaboration. With a bachelor\'s degree in Journalism and years of experience across finance, construction, and legal sectors, she brings a dynamic and detail-oriented approach to organizational training and operational excellence.\n\nCurrently, Ciara leads virtual training programs for hundreds of participants, manages analyst onboarding and development, and partners closely with HR to align training strategies with business goals. Her leadership in Employee Resource Groups and DEI initiatives reflects her passion for inclusive workplace culture and mentorship.'
+    },
+    {
+      id: bioId(),
+      name: 'Jacky Ortega',
+      role: 'Social Media Associate',
+      pronouns: 'she/her',
+      affiliation: null,
+      image: Ortega,
+      linkedin: 'jacquelineortegaa',
+      bio: 'a first-generation Latina, holds a Master\'s in Marketing and a Bachelor\'s in Marketing with a concentration in Digital Marketing and Promotions from the University of Illinois at Chicago. Her passion for marketing, particularly social media Marketing, stems from her love of creativity and innovation. She has gained hands-on experience through two prior internships. As a Social Media Management Intern, she created high-engagement Instagram content and developed growth strategies. As a Digital Marketing Intern, she increased engagement across Instagram, TikTok, and LinkedIn, researched influencers for client events, and presented social media insights. Outside of work, Jacky loves spending time with her family, making TikToks, and traveling.'
     }
   ],
   technical: [
@@ -344,7 +366,27 @@ const bios = {
       affilitation: 'Founder, West Loop Soul',
       image: JewellJordin,
       linkedin: 'jordinjewell',
-      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That’s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She’s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she’s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
+      bio: 'has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That\'s why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She\'s excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she\'s not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles.'
+    },
+    {
+      id: bioId(),
+      name: 'RJ Silva',
+      role: 'Advisory Board Member',
+      pronouns: 'he/him',
+      affiliation: null,
+      image: Silva,
+      linkedin: 'rj-silva-3080b178',
+      bio: 'is a creative professional in Chicago, born and raised in the Philippines, and a theatre alumni from Loyola University Chicago, RJ has previously worked as a producer for Disney and performed and produced theatre in Orlando. His current creative pursuits include playwriting, having previously written for PlayGround Chicago in their inaugural year, and as a producer and director for 2nd Story Chicago. He also creates content for The Ampliverse, an inclusive multimedia channel for pop culture, hosting and producing the podcast Did You Read the Group Chat? and videos for RJ\'s Food Rocks.'
+    },
+    {
+      id: bioId(),
+      name: 'Missy Staros',
+      role: 'Advisory Board Member',
+      pronouns: 'she/her',
+      affilitation: 'Freelance Grant Writer',
+      image: Staros,
+      linkedin: 'missy-brown-a956a832',
+      bio: "has been in leadership with Trader Joe's for the last 28 years. With strong business acumen and a caring, inclusive, and community-minded approach, she has been regarded as a top leader and mentor in the company. She has a BA in Sociology, MA in Educational Leadership, and certification in Grant Writing. She began her grant writing journey to help the community on a different level and is optimistic for the future. Her varied interests include attending the theatre and live music, hiking, reading WWII fiction and mysteries of all kinds, yoga, cooking for friends, wine tasting, watching Top Chef, and photographing a sunset."
     },
     {
       id: bioId(),
@@ -366,16 +408,6 @@ const bios = {
       image: Voghel,
       linkedin: 'alison-voghel',
       bio: 'received her BA in Environmental Design at CU Boulder in 2012 and her Masters in Architecture & Urban Design in 2017. She has worked in tech, architecture, urban design, and interior design but transitioned to UX and UI Design in 2020. Alison currently works full-time as a Senior UX Designer for a SaaS company based in Boston, remotely. She has never been involved in any theater-related organizations, but did have fun designing a theater for a student project. When not working or learning how to code, her creative outlet of choice is digital art/illustration.'
-    },
-    {
-      id: bioId(),
-      name: 'Missy Staros',
-      role: 'Advisory Board Member',
-      pronouns: 'she/her',
-      affilitation: 'Freelance Grant Writer',
-      image: Staros,
-      linkedin: 'missy-brown-a956a832',
-      bio: "has been in leadership with Trader Joe's for the last 28 years. With strong business acumen and a caring, inclusive, and community-minded approach, she has been regarded as a top leader and mentor in the company. She has a BA in Sociology, MA in Educational Leadership, and certification in Grant Writing. She began her grant writing journey to help the community on a different level and is optimistic for the future. Her varied interests include attending the theatre and live music, hiking, reading WWII fiction and mysteries of all kinds, yoga, cooking for friends, wine tasting, watching Top Chef, and photographing a sunset."
     }
   ]
 };
