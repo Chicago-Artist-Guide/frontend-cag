@@ -276,6 +276,7 @@ const CompanyProfileEdit: React.FC<{
                         onChange={(e) =>
                           handleAwardChange(e, index, 'award_name')
                         }
+                        placeholder="Best Play"
                       />
                       <FormInput
                         name={`awards.${index}.award_year`}
@@ -284,6 +285,7 @@ const CompanyProfileEdit: React.FC<{
                         onChange={(e) =>
                           handleAwardChange(e, index, 'award_year')
                         }
+                        placeholder="2019"
                       />
                     </Col>
                     <Col md={6} xs={12}>
@@ -294,6 +296,7 @@ const CompanyProfileEdit: React.FC<{
                         onChange={(e) =>
                           handleAwardChange(e, index, 'awarded_by')
                         }
+                        placeholder="Theatre Awards"
                       />
                       <FormInput
                         name={`awards.${index}.show_title`}
@@ -302,6 +305,7 @@ const CompanyProfileEdit: React.FC<{
                         onChange={(e) =>
                           handleAwardChange(e, index, 'show_title')
                         }
+                        placeholder="Death of a Salesman"
                       />
                     </Col>
                   </Row>
