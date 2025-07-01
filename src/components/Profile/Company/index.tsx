@@ -153,25 +153,50 @@ const CompanyProfile: React.FC<{
           {profileData?.description && <Bio>{profileData.description}</Bio>}
 
           <DetailSection title="Awards & Recognition">
-            {awards.map((award, index) => (
-              <div key={award.award_id}>
-                <AwardTitle>Award #{index + 1}</AwardTitle>
-                <div className="d-flex flex-column ml-4">
-                  <div className="row">
-                    <AwardLabel className="col-md-3">Award</AwardLabel>
-                    <div className="col">{award.award_name}</div>
-                  </div>
-                  <div className="row mt-2">
-                    <AwardLabel className="col-md-3">Awarded By: </AwardLabel>
-                    <div className="col">{award.awarded_by}</div>
-                  </div>
-                  <div className="row mt-2">
-                    <AwardLabel className="col-md-3">Year:</AwardLabel>
-                    <div className="col">{award.award_year}</div>
+            <AwardsGrid>
+              {awards.map((award, index) => (
+                <div className="award-card" key={award.award_id}>
+                  <AwardTitle>Award #{index + 1}</AwardTitle>
+                  <div className="d-flex flex-column ml-4">
+                    <AwardField>
+                      <AwardLabel>Award</AwardLabel>
+                      <span>{award.award_name}</span>
+                    </AwardField>
+                    <AwardField>
+                      <AwardLabel>Awarded By:</AwardLabel>
+                      <span>{award.awarded_by}</span>
+                    </AwardField>
+                    <AwardField>
+                      <AwardLabel>Year:</AwardLabel>
+                      <span>{award.award_year}</span>
+                    </AwardField>
+                    {award.show_title && (
+                      <AwardField>
+                        <AwardLabel>Show Title:</AwardLabel>
+                        <span>{award.show_title}</span>
+                      </AwardField>
+                    )}
+                    {award.website_links && (
+                      <div>
+                        <AwardLabel>Relevant Links:</AwardLabel>
+                        <div>
+                          {award.website_links.map((link) => (
+                            <a
+                              href={link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="block"
+                            >
+                              {link}
+                            </a>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </AwardsGrid>
             <div className="mt-3">
               <DetailAdd
                 text="Add an award or recognition"
@@ -216,6 +241,24 @@ const AwardLabel = styled.span`
   font-style: normal;
   font-weight: 700;
   font-size: 16px;
+`;
+
+const AwardField = styled.div`
+  display: flex;
+  margin-bottom: 6px;
+  align-items: flex-start;
+
+  ${AwardLabel} {
+    min-width: 110px;
+    font-weight: 700;
+    margin-right: 8px;
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    word-break: break-word;
+  }
 `;
 
 const TheatreName = styled.h2`
@@ -274,6 +317,19 @@ const AdditionalImage = styled(Image)`
 
   @media (min-width: ${breakpoints.lg}) {
     max-width: 332px;
+  }
+`;
+
+const AwardsGrid = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px; /* adjust as needed */
+  margin-bottom: 16px;
+
+  .award-card {
+    flex: 1 1 calc(50% - 12px); /* 2 per row, minus half the gap */
+    min-width: 300px; /* adjust as needed for responsiveness */
+    box-sizing: border-box;
   }
 `;
 
