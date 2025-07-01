@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
-import { Alert, Modal } from 'react-bootstrap';
-import 'react-image-crop/dist/ReactCrop.css';
-import Button from '../../../components/shared/Button';
-import ImageUpload from '../../shared/ImageUpload';
+import React from 'react';
+import ResponsiveImageUploadModal from '../../shared/ResponsiveImageUploadModal';
 
 type ImageUploadType = 'User' | 'Poster';
 
@@ -10,7 +7,7 @@ interface ImageUploadModalProps {
   show: boolean;
   onHide: () => void;
   onSave: (imageUrl: string) => void;
-  editProfile: any;
+  editProfile?: any; // Legacy prop, kept for compatibility
   currentImgUrl: string;
   type: ImageUploadType;
 }
@@ -22,22 +19,31 @@ const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
   currentImgUrl,
   type
 }) => {
-  const [error] = useState('');
+  // Convert legacy type to new image type format
+  const imageType = type === 'User' ? 'user' : 'poster';
+
+  // Get appropriate title based on type
+  const getTitle = () => {
+    switch (type) {
+      case 'User':
+        return 'Upload Profile Picture';
+      case 'Poster':
+        return 'Upload Poster Image';
+      default:
+        return 'Upload Image';
+    }
+  };
 
   return (
-    <Modal show={show} onHide={onHide} backdrop="static">
-      <Modal.Header>
-        <Modal.Title>Profile Picture</Modal.Title>
-        <Button onClick={onHide} text="Cancel" type="danger" variant="danger" />
-      </Modal.Header>
-      {error && <Alert variant="danger">{error}</Alert>}
-      <ImageUpload
-        onSave={onSave}
-        currentImgUrl={currentImgUrl}
-        modal={true}
-        type={type}
-      />
-    </Modal>
+    <ResponsiveImageUploadModal
+      show={show}
+      onHide={onHide}
+      onSave={onSave}
+      currentImageUrl={currentImgUrl}
+      imageType={imageType}
+      title={getTitle()}
+      maxSizeInMB={5}
+    />
   );
 };
 

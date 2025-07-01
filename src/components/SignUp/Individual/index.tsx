@@ -10,7 +10,7 @@ import { useUserContext } from '../../../context/UserContext';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
 import { Tagline, Title } from '../../layout/Titles';
-import ImageUpload from '../../shared/ImageUpload';
+import { ImageUploadComponent } from '../../shared';
 import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
 import OffstageRoles from './OffstageRoles';
@@ -102,6 +102,7 @@ const IndividualSignUp: React.FC<{
   const [submitBasicsErr, setSubmitBasicsErr] = useState<
     SubmitBasicsResp | undefined
   >(undefined);
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   // default state for form validation error states per step
   const [stepErrors, setStepErrors] = useState(
@@ -156,6 +157,14 @@ const IndividualSignUp: React.FC<{
     }
   }, [formData.stageRole]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Update step errors when image is uploading to disable Finish button
+  useEffect(() => {
+    setStepErrors((prev) => ({
+      ...prev,
+      profilePhoto: isImageUploading
+    }));
+  }, [isImageUploading]);
+
   // we are just manually assuming they've agreed to this right now
   // remove once we clean this up
   const setPrivacyAgree = () => {
@@ -172,6 +181,7 @@ const IndividualSignUp: React.FC<{
       value: url
     };
     setForm({ target });
+    setIsImageUploading(false); // Upload completed
   };
 
   // submit basics to Firebase, get response, set session
@@ -435,11 +445,13 @@ const IndividualSignUp: React.FC<{
             <Tagline>
               We just need one for now, but you can add more later.
             </Tagline>
-            <ImageUpload
-              type="User"
+            <ImageUploadComponent
               onSave={(pfpImgUrl: string) => setProfilePicture(pfpImgUrl)}
-              currentImgUrl=""
-              modal={false}
+              currentImageUrl={formData.profilePhotoUrl || ''}
+              imageType="user"
+              showCrop={true}
+              maxSizeInMB={5}
+              onUploadStateChange={setIsImageUploading}
             />
           </>
         );

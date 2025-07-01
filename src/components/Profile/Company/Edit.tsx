@@ -17,7 +17,7 @@ import { ErrorMessage } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
 import AdditionalPhoto from '../Form/AdditionalPhoto';
 import { FormInput, FormSelect, FormTextArea, Input } from '../Form/Inputs';
-import FormPhoto from '../Form/Photo';
+import { ImageUploadComponent } from '../../shared';
 import DetailAdd from '../shared/DetailAdd';
 import DetailSection from '../shared/DetailSection';
 import {
@@ -31,9 +31,9 @@ import {
 } from './ProfileStyles';
 import { Award, Profile } from './types';
 
-const CompanyProfileEdit: React.FC<{
-  toggleEdit: () => void;
-}> = ({ toggleEdit }) => {
+const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
+  toggleEdit
+}) => {
   const {
     profile: { ref, data },
     setProfileData
@@ -54,12 +54,7 @@ const CompanyProfileEdit: React.FC<{
   useEffect(() => {
     if (data) {
       Object.entries(data).map(([key, value]) =>
-        setFormValues({
-          target: {
-            name: key,
-            value: value
-          }
-        })
+        setFormValues({ target: { name: key, value: value } })
       );
     }
   }, [data]);
@@ -84,12 +79,7 @@ const CompanyProfileEdit: React.FC<{
   const handleAwardChange = (event: any, index: number, field: keyof Award) => {
     const newAwards = [...awards];
     newAwards[index][field] = event.target.value;
-    setFormValues({
-      target: {
-        name: 'awards',
-        value: newAwards
-      }
-    });
+    setFormValues({ target: { name: 'awards', value: newAwards } });
   };
 
   const handleAwardLinkChange = (
@@ -101,12 +91,7 @@ const CompanyProfileEdit: React.FC<{
     if (!newAwards[awardIdx].website_links)
       newAwards[awardIdx].website_links = [''];
     newAwards[awardIdx].website_links[linkIdx] = e.target.value;
-    setFormValues({
-      target: {
-        name: 'awards',
-        value: newAwards
-      }
-    });
+    setFormValues({ target: { name: 'awards', value: newAwards } });
   };
 
   const addAwardLink = (awardIdx: number) => {
@@ -114,12 +99,7 @@ const CompanyProfileEdit: React.FC<{
     if (!newAwards[awardIdx].website_links)
       newAwards[awardIdx].website_links = [''];
     newAwards[awardIdx].website_links.push('');
-    setFormValues({
-      target: {
-        name: 'awards',
-        value: newAwards
-      }
-    });
+    setFormValues({ target: { name: 'awards', value: newAwards } });
   };
 
   const removeAwardLink = (awardIdx: number, linkIdx: number) => {
@@ -129,23 +109,13 @@ const CompanyProfileEdit: React.FC<{
     if (newAwards[awardIdx].website_links.length === 0) {
       newAwards[awardIdx].website_links.push('');
     }
-    setFormValues({
-      target: {
-        name: 'awards',
-        value: newAwards
-      }
-    });
+    setFormValues({ target: { name: 'awards', value: newAwards } });
   };
 
   const removeAward = (index: number) => {
     const newAwards = [...awards];
     newAwards.splice(index, 1);
-    setFormValues({
-      target: {
-        name: 'awards',
-        value: newAwards
-      }
-    });
+    setFormValues({ target: { name: 'awards', value: newAwards } });
   };
 
   const addAward = () => {
@@ -176,10 +146,16 @@ const CompanyProfileEdit: React.FC<{
         </Row>
         <Row>
           <LeftCol lg={4}>
-            <FormPhoto
-              src={formValues?.profile_image_url}
-              name="profile_image_url"
-              onChange={setFormValues}
+            <ImageUploadComponent
+              onSave={(imageUrl: string) => {
+                setFormValues({
+                  target: { name: 'profile_image_url', value: imageUrl }
+                });
+              }}
+              currentImageUrl={formValues?.profile_image_url}
+              imageType="company"
+              showCrop={true}
+              maxSizeInMB={5}
             />
             <AdditionalPhotos className="d-flex justify-content-between flex-wrap">
               {images.map((_, index) => (

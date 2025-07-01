@@ -1,12 +1,14 @@
 import { uuidv4 } from '@firebase/util';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Col } from 'react-bootstrap';
 import Row from 'react-bootstrap/Row';
-import ReactCrop, { Crop } from 'react-image-crop';
 import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../context/FirebaseContext';
+import ResponsiveImageUpload from './ResponsiveImageUpload';
+import ResponsiveImageCrop, { CropResult } from './ResponsiveImageCrop';
+import { createCroppedImage, getAspectRatio } from '../../utils/cropImage';
 import Button from './Button';
 import { colors } from '../../theme/styleVars';
 
@@ -25,137 +27,115 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
   modal,
   type
 }) => {
-  const [file, setFile] = useState<File | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState(false);
-  const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
+  const [cropResult, setCropResult] = useState<CropResult | null>(null);
+  const [showCrop, setShowCrop] = useState(false);
   const { firebaseStorage } = useFirebaseContext();
-  const [percent, setPercent] = useState(0);
-  const [src, setSrc] = useState(null as string | null);
-  const [crop, setCrop] = useState<Crop>({
-    height: type === 'User' ? 50 : 50 / (2 / 3),
-    width: 50,
-    x: 0,
-    y: 0,
-    unit: 'px'
-  });
+  const dropzoneRef = useRef<HTMLDivElement>(null);
 
   const imageId = uuidv4();
-  const placeholderUrl =
-    'https://firebasestorage.googleapis.com/v0/b/chicago-artist-guide-dev.appspot.com/o/5a35def2-4f2e-42ac-b619-c6bfa2a5bd11-1234.png?alt=media&token=45772221-1f35-40be-b134-e60f84494b5f';
+  const aspectRatio = getAspectRatio(type === 'User' ? 'user' : 'poster');
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleFileSelect = useCallback((file: File) => {
+    setSelectedFile(file);
+    const url = URL.createObjectURL(file);
+    setImagePreviewUrl(url);
+    setShowCrop(true);
+  }, []);
 
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const reader = new FileReader();
-      const file = e.target.files[0];
-      setFile(file);
-      reader.addEventListener('load', () => setSrc(reader.result as string));
-      reader.readAsDataURL(file);
-    }
-  };
+  const handleCropComplete = useCallback((result: CropResult) => {
+    setCropResult(result);
+  }, []);
 
-  const uploadFile = () => {
-    if (!croppedImageBlob) {
+  const handleCropSave = useCallback(async () => {
+    if (!selectedFile || !imagePreviewUrl || !cropResult) {
       return;
     }
 
-    setUploadInProgress(true);
+    try {
+      setUploadInProgress(true);
+      setUploadProgress(0);
 
-    const storageRef = ref(firebaseStorage, `/${imageId}-${file?.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
-    uploadTask.on(
-      'state_changed',
-      (snapshot) => {
-        const currentPercent = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setPercent(currentPercent);
-      },
-      (err) => {
-        console.log('Error uploading image', err);
-        setUploadInProgress(false);
-      },
-      () => {
-        // download url
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          console.log('Uploaded image url:', url);
-          onSave(url);
-        });
-      }
-    );
-  };
+      // Create cropped image blob
+      const croppedBlob = await createCroppedImage(
+        imagePreviewUrl,
+        cropResult.croppedAreaPixels,
+        cropResult.rotation
+      );
 
-  const onCropComplete = useCallback(
-    (crop, pixelCrop) => {
-      const imageEl =
-        document.querySelector<HTMLImageElement>('.ReactCrop__image');
-      if (imageEl && crop.width && crop.height) {
-        const canvas = document.createElement('canvas');
-        const scaleX = imageEl.naturalWidth / imageEl.width;
-        const scaleY = imageEl.naturalHeight / imageEl.height;
-        const targetX = (imageEl.width * pixelCrop.x * scaleX) / 100;
-        const targetY = (imageEl.height * pixelCrop.y * scaleY) / 100;
-        const targetWidth = (imageEl.width * pixelCrop.width * scaleX) / 100;
-        const targetHeight = (imageEl.height * pixelCrop.height * scaleY) / 100;
-        canvas.width = crop.width;
-        canvas.height = crop.height;
-        const ctx = canvas.getContext('2d');
-        ctx?.drawImage(
-          imageEl,
-          targetX,
-          targetY,
-          targetWidth,
-          targetHeight,
-          0,
-          0,
-          crop.width,
-          crop.height
-        );
-        canvas.toBlob((blob) => {
-          setCroppedImageBlob(blob);
-        }, file?.type);
-      }
-    },
-    [file?.type]
-  );
+      // Upload to Firebase
+      const storageRef = ref(
+        firebaseStorage,
+        `/${imageId}-${selectedFile.name}`
+      );
+      const uploadTask = uploadBytesResumable(storageRef, croppedBlob);
 
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const currentPercent = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(currentPercent);
+        },
+        (err) => {
+          console.log('Error uploading image', err);
+          setUploadInProgress(false);
+        },
+        () => {
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            console.log('Uploaded image url:', url);
+            setUploadInProgress(false);
+            // Reset crop state after successful upload
+            setShowCrop(false);
+            setSelectedFile(null);
+            setImagePreviewUrl(null);
+            setCropResult(null);
+            onSave(url);
+          });
+        }
+      );
+    } catch (err) {
+      console.error('Error processing image:', err);
+      setUploadInProgress(false);
+    }
+  }, [
+    selectedFile,
+    imagePreviewUrl,
+    cropResult,
+    firebaseStorage,
+    imageId,
+    onSave
+  ]);
+
+  const handleCropCancel = useCallback(() => {
+    setShowCrop(false);
+    setSelectedFile(null);
+    setImagePreviewUrl(null);
+    setCropResult(null);
+  }, []);
+
+  // Mobile buttons for modal mode
   const MobileButtons = () => {
     return (
       <StyledRow>
         <Col>
-          <>
-            <Button
-              disabled={uploadInProgress}
-              onClick={() => fileInputRef?.current?.click()}
-              text="Choose File"
-              type="button"
-              variant="secondary"
-            />
-            <input
-              onChange={onFileChange}
-              multiple={false}
-              ref={fileInputRef}
-              type="file"
-              hidden
-            />
-            <ButtonLabel>File size limit: 5MB</ButtonLabel>
-          </>
-        </Col>
-        <Col>
-          {file && (
+          {cropResult && (
             <>
               <Button
                 disabled={uploadInProgress}
-                onClick={uploadFile}
+                onClick={handleCropSave}
                 text="Upload"
                 type="button"
                 variant="success"
               />
               {uploadInProgress ? (
-                <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
+                <ButtonLabel>Upload progress: {uploadProgress}%</ButtonLabel>
               ) : (
-                <ButtonLabel>{file.name}</ButtonLabel>
+                <ButtonLabel>{selectedFile?.name}</ButtonLabel>
               )}
             </>
           )}
@@ -164,39 +144,23 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
     );
   };
 
+  // Desktop buttons for non-modal mode
   const DesktopButtons = () => {
     return (
       <Col>
-        <StyledMargin>
-          <Button
-            disabled={uploadInProgress}
-            onClick={() => fileInputRef?.current?.click()}
-            text="Choose File"
-            type="button"
-            variant="secondary"
-          />
-          <input
-            onChange={onFileChange}
-            multiple={false}
-            ref={fileInputRef}
-            type="file"
-            hidden
-          />
-          <ButtonLabel>File size limit: 5MB</ButtonLabel>
-        </StyledMargin>
-        {file && (
+        {cropResult && (
           <>
             <Button
               disabled={uploadInProgress}
-              onClick={uploadFile}
+              onClick={handleCropSave}
               text="Upload"
               type="button"
               variant="success"
             />
             {uploadInProgress ? (
-              <ButtonLabel>Upload progress: {percent}%</ButtonLabel>
+              <ButtonLabel>Upload progress: {uploadProgress}%</ButtonLabel>
             ) : (
-              <ButtonLabel>{file.name}</ButtonLabel>
+              <ButtonLabel>{selectedFile?.name}</ButtonLabel>
             )}
           </>
         )}
@@ -208,26 +172,70 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
     <Container>
       {modal && <MobileButtons />}
       <Row>
-        {src ? (
+        {showCrop && imagePreviewUrl ? (
           <CropContainer>
-            <ReactCrop
-              crop={crop}
-              onChange={(newCrop: Crop) => setCrop(newCrop)}
-              onComplete={onCropComplete}
-              aspect={type === 'User' ? 1 : 2 / 3}
-            >
-              <img className="ReactCrop__image" src={src} />
-            </ReactCrop>
+            <ResponsiveImageCrop
+              imageSrc={imagePreviewUrl}
+              onCropComplete={handleCropComplete}
+              onCancel={handleCropCancel}
+              onSave={handleCropSave}
+              aspect={aspectRatio}
+              cropShape={type === 'User' ? 'round' : 'rect'}
+              disabled={uploadInProgress}
+            />
           </CropContainer>
         ) : (
-          <PhotoContainer
-            style={{
-              backgroundImage:
-                imgUrl !== null ? `url(${imgUrl})` : `url(${placeholderUrl})`
-            }}
-          ></PhotoContainer>
+          <>
+            <PhotoContainer
+              style={{ backgroundImage: imgUrl ? `url(${imgUrl})` : undefined }}
+            >
+              {!imgUrl && !showCrop && (
+                <div ref={dropzoneRef}>
+                  <ResponsiveImageUpload
+                    onFileSelect={handleFileSelect}
+                    currentImageUrl={imgUrl}
+                    showUploadButton={true}
+                    disabled={uploadInProgress}
+                    helperText="Max file size: 500mb. Recommended: .png, .jpg"
+                  />
+                </div>
+              )}
+            </PhotoContainer>
+            {!modal && <DesktopButtons />}
+            {!modal && !showCrop && (
+              <UploadButtonContainer>
+                <Button
+                  onClick={() => {
+                    // If there's an existing image, we need to trigger file selection differently
+                    if (imgUrl) {
+                      // Create a temporary file input to trigger file selection
+                      const fileInput = document.createElement('input');
+                      fileInput.type = 'file';
+                      fileInput.accept = 'image/*';
+                      fileInput.onchange = (e) => {
+                        const file = (e.target as HTMLInputElement).files?.[0];
+                        if (file) {
+                          handleFileSelect(file);
+                        }
+                      };
+                      fileInput.click();
+                    } else if (dropzoneRef.current) {
+                      // Find the dropzone container and click it
+                      const dropzoneContainer =
+                        dropzoneRef.current.querySelector('div') as HTMLElement;
+                      if (dropzoneContainer) {
+                        dropzoneContainer.click();
+                      }
+                    }
+                  }}
+                  text={imgUrl ? 'CHANGE IMAGE' : 'UPLOAD FILE'}
+                  type="button"
+                  variant="secondary"
+                />
+              </UploadButtonContainer>
+            )}
+          </>
         )}
-        {!modal && <DesktopButtons />}
       </Row>
     </Container>
   );
@@ -245,6 +253,8 @@ const PhotoContainer = styled.div`
   text-align: center;
   display: flex;
   justify-content: center;
+  align-items: center;
+  min-height: 200px;
 `;
 
 const CropContainer = styled.div`
@@ -252,6 +262,7 @@ const CropContainer = styled.div`
   text-align: center;
   justify-content: center;
   align-items: center;
+  width: 100%;
 `;
 
 const StyledRow = styled(Row)`
@@ -261,10 +272,13 @@ const StyledRow = styled(Row)`
 
 const ButtonLabel = styled.p`
   padding-top: 10px;
+  font-size: 12px;
+  color: ${colors.gray};
 `;
 
-const StyledMargin = styled.div`
-  margin-bottom: 20px;
+const UploadButtonContainer = styled.div`
+  margin-top: 15px;
+  text-align: center;
 `;
 
 export default ImageUpload;
