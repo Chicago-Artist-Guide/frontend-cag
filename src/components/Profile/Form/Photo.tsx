@@ -1,12 +1,11 @@
-import { faCamera } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
-import React, { useRef, useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
+import ResponsiveImageUpload from '../../shared/ResponsiveImageUpload';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useUserContext } from '../../../context/UserContext';
-import { breakpoints, colors } from '../../../theme/styleVars';
+import { breakpoints } from '../../../theme/styleVars';
 import { Profile } from '../Company/types';
 
 const FormPhoto: React.FC<{
@@ -18,82 +17,80 @@ const FormPhoto: React.FC<{
   const {
     profile: { data }
   }: { profile: { data: Profile } } = useUserContext();
-  const [imgUrl, setImgUrl] = useState<string | undefined>(src);
-  const fileInput = useRef<HTMLInputElement | null>(null);
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(
+    src
+  );
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleFileInput = () => {
-    if (fileInput.current) {
-      fileInput.current.click();
-    }
-  };
+  const handleFileSelect = useCallback((file: File) => {
+    // Create preview URL
+    const previewUrl = URL.createObjectURL(file);
+    setCurrentImageUrl(previewUrl);
+  }, []);
 
-  const onFileChange = (e: any) => {
-    const file = e.target.files[0];
-    if (file) {
-      setImgUrl(URL.createObjectURL(file));
+  const handleUpload = useCallback(
+    async (file: File) => {
+      if (!file || !data?.account_id) {
+        return;
+      }
+
+      setIsUploading(true);
+      setUploadProgress(0);
+
       const storageRef = ref(
         firebaseStorage,
         `/files/${data.account_id}/${file.name}`
       );
       const uploadTask = uploadBytesResumable(storageRef, file);
 
-      uploadTask.then(() => {
-        getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-          setImgUrl(url);
-          onChange({
-            target: {
-              name: name,
-              value: url
-            }
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setUploadProgress(progress);
+        },
+        (err) => {
+          console.error('Error uploading image', err);
+          setIsUploading(false);
+        },
+        () => {
+          setIsUploading(false);
+          getDownloadURL(uploadTask.snapshot.ref).then((url) => {
+            setCurrentImageUrl(url);
+            onChange({ target: { name: name, value: url } });
           });
-        });
-      });
-    }
-  };
+        }
+      );
+    },
+    [firebaseStorage, data?.account_id, name, onChange]
+  );
 
   return (
-    <>
-      <ProfileImage
-        onClick={handleFileInput}
-        style={{
-          backgroundImage: imgUrl !== null ? `url(${imgUrl})` : undefined
-        }}
-      >
-        {!imgUrl && (
-          <FontAwesomeIcon className="camera" icon={faCamera} size="lg" />
-        )}
-      </ProfileImage>
-      <input
+    <ResponsiveImageContainer>
+      <ResponsiveImageUpload
+        onFileSelect={handleFileSelect}
+        onUpload={handleUpload}
+        currentImageUrl={currentImageUrl}
         accept="image/*"
-        id="icon-button-file"
-        type="file"
-        style={{ display: 'none' }}
-        ref={fileInput}
-        onChange={onFileChange}
+        maxSize={5 * 1024 * 1024} // 5MB
+        disabled={isUploading}
+        uploadProgress={uploadProgress}
+        isUploading={isUploading}
+        helperText="File size limit: 5MB. Recommended: .png, .jpg"
       />
-    </>
+    </ResponsiveImageContainer>
   );
 };
 
-const ProfileImage = styled.div`
-  box-shadow: 0 0 8px 4px ${colors.black05a};
-  cursor: pointer;
-  align-items: center;
-  background: ${colors.lightGrey};
-  color: white;
-  display: flex;
-  font-size: 86px;
-  justify-content: center;
-  height: 312px;
-  width: 312px;
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 8px;
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
+const ResponsiveImageContainer = styled.div`
+  max-width: 400px;
+  margin: 0 auto;
 
-  @media (min-width: ${breakpoints.lg}) {
-    max-width: 332px;
+  @media (max-width: ${breakpoints.md}) {
+    max-width: 100%;
   }
 `;
 

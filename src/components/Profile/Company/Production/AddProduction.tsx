@@ -17,7 +17,7 @@ import {
   productionStatuses
 } from '../../../../utils/lookups';
 import PageContainer from '../../../layout/PageContainer';
-import ImageUpload from '../../../shared/ImageUpload';
+import { ImageUploadComponent } from '../../../shared';
 import {
   FormDateRange,
   FormInput,
@@ -42,9 +42,9 @@ const FormSection = styled.div`
   }
 `;
 
-const CompanyAddShow: React.FC<{
-  toggleEdit: () => void;
-}> = ({ toggleEdit }) => {
+const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
+  toggleEdit
+}) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     profile: { data: profileData }
@@ -86,10 +86,7 @@ const CompanyAddShow: React.FC<{
   console.log(profileData);
 
   const setProfilePicture = (url: string) => {
-    const target = {
-      name: 'production_image_url',
-      value: url
-    };
+    const target = { name: 'production_image_url', value: url };
     setFormValues({ target });
   };
 
@@ -125,13 +122,14 @@ const CompanyAddShow: React.FC<{
           <Row>
             <LeftCol xs={12} lg={4}>
               <FormSection>
-                <ImageUpload
-                  type="Poster"
+                <ImageUploadComponent
+                  imageType="poster"
                   onSave={(production_image_url: string) =>
                     setProfilePicture(production_image_url)
                   }
-                  currentImgUrl={formValues?.production_image_url}
-                  modal={false}
+                  currentImageUrl={formValues?.production_image_url}
+                  showCrop={true}
+                  maxSizeInMB={5}
                 />
               </FormSection>
             </LeftCol>

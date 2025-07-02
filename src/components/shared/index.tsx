@@ -10,6 +10,10 @@ import PrivateLabel from './PrivateLabel';
 import RadioButton from './RadioButton';
 import ScrollToTop from './ScrollToTop';
 import EventCard from './EventCard';
+import ResponsiveImageUpload from './ResponsiveImageUpload';
+import ResponsiveImageCrop from './ResponsiveImageCrop';
+import ResponsiveImageUploadModal from './ResponsiveImageUploadModal';
+import ImageUploadComponent from './ImageUploadComponent';
 
 export {
   Button,
@@ -23,5 +27,9 @@ export {
   PrivateLabel,
   RadioButton,
   ScrollToTop,
-  EventCard
+  EventCard,
+  ResponsiveImageUpload,
+  ResponsiveImageCrop,
+  ResponsiveImageUploadModal,
+  ImageUploadComponent
 };
