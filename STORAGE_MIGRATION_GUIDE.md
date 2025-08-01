@@ -1,61 +1,31 @@
-# Firebase Storage Migration Guide
+# Firebase Storage Migration Guide - MVP Version
 
 ## Overview
-This guide outlines the changes needed to migrate from the current wide-open Firebase Storage rules to properly secured rules that match your Firestore security model.
+This guide outlines the simple migration from wide-open Firebase Storage rules to basic authenticated-only rules for MVP.
 
 ## New Storage Rules Structure
 
-### File Paths
-- **Profile Pictures**: `/profiles/{userId}/profile-picture/{fileName}`
-- **Production Images**: `/productions/{productionId}/images/{fileName}`
-- **Event Images**: `/events/{eventId}/images/{fileName}`
-- **Company Logos**: `/companies/{companyId}/logo/{fileName}`
-- **General User Uploads**: `/users/{userId}/uploads/{fileName}`
-- **Temporary Files**: `/temp/{userId}/{fileName}`
+### Simple Security Rules
+- **Authentication Required**: All file access requires user authentication
+- **No Path Restrictions**: Existing upload paths continue to work unchanged
+- **No File Migration Needed**: All existing files remain accessible
 
-### Security Rules
-- Most file access requires authentication
-- Users can only upload/modify their own files
-- Production owners can upload production images
-- Event images are publicly readable (since events are public)
-- Default deny for all unspecified paths
+## What Changed
 
-## Code Changes Made
+### 1. Storage Rules (`storage.rules`)
+- **Old**: Complete public access (`allow read, write: if true`)
+- **New**: Authenticated users only (`allow read, write: if isAuthenticated()`)
 
-### 1. Updated Components
+### 2. Code Changes
+- **None Required**: All existing upload paths and components work unchanged
+- **No Migration**: Existing files remain in their current locations
 
-#### Profile Photo Components
-- `src/components/SignUp/Individual/ProfilePhoto.tsx`
-  - **Old**: `/files-${data.uid}/${data.account_id}-${file.name}`
-  - **New**: `/profiles/${data.uid}/profile-picture/${file.name}`
+## Benefits
 
-- `src/components/SignUp/Company/Photo.tsx`
-  - **Old**: `/files-${data?.account_id}/${file.name}`
-  - **New**: `/profiles/${data?.uid}/profile-picture/${file.name}`
-
-- `src/components/Profile/Form/Photo.tsx`
-  - **Old**: `/files/${data.account_id}/${file.name}`
-  - **New**: `/profiles/${data.uid}/profile-picture/${file.name}`
-
-#### Production Image Components
-- `src/components/shared/ImageUpload.tsx`
-  - Added `productionId` prop
-  - Updated to use proper paths based on type:
-    - User type: `/profiles/${data.uid}/profile-picture/${file?.name}`
-    - Poster type with productionId: `/productions/${productionId}/images/${file?.name}`
-    - Fallback: `/users/${data.uid}/uploads/${file?.name}`
-
-- `src/components/Profile/Company/Production/Manage/ManageProductionBasic.tsx`
-  - Added `productionId={formValues?.production_id}` prop to ImageUpload
-
-#### Additional Photos
-- `src/components/Profile/Form/AdditionalPhoto.tsx`
-  - **Old**: `/files-${data.account_id}/${file.name}`
-  - **New**: `/users/${data.uid}/uploads/${file.name}`
-
-### 2. Storage Rules File
-- Created `storage.rules` with comprehensive security rules
-- Replaces the current wide-open rules
+✅ **Security**: Prevents unauthorized access to files  
+✅ **No Code Changes**: Existing upload functionality works unchanged  
+✅ **No File Migration**: All existing files remain accessible  
+✅ **MVP Ready**: Simple deployment with minimal risk  
 
 ## Deployment Steps
 
@@ -64,15 +34,17 @@ This guide outlines the changes needed to migrate from the current wide-open Fir
    firebase deploy --only storage
    ```
 
-2. **Test Uploads**: Verify that all image uploads work correctly with the new paths
+2. **Test**: Verify that authenticated users can still upload and view images
 
 3. **Monitor**: Check Firebase Console for any permission errors
 
-## Notes
+## Future Enhancements (Optional)
 
-- The `ProductionPhoto.tsx` component appears to be unused and can be removed if not needed
-- For new productions (AddProduction), images will initially upload to `/users/{userId}/uploads/` since no production ID exists yet
-- All existing images will need to be migrated to the new paths or the old paths will need to be added to the storage rules temporarily
+When you're ready for more granular security, you can:
+
+1. **Organize File Structure**: Move to organized paths like `/profiles/{userId}/`, `/productions/{productionId}/`
+2. **Add Ownership Rules**: Restrict users to only access their own files
+3. **Public/Private Controls**: Make some files publicly readable while keeping uploads restricted
 
 ## Rollback Plan
 

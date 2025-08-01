@@ -7,7 +7,6 @@ import ReactCrop, { Crop } from 'react-image-crop';
 import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { useUserContext } from '../../context/UserContext';
 import Button from './Button';
 import { colors } from '../../theme/styleVars';
 
@@ -18,23 +17,18 @@ interface ImageUploadModalProps {
   currentImgUrl: string | undefined;
   modal: boolean;
   type: ImageUploadType;
-  productionId?: string; // Add production ID for production images
 }
 
 const ImageUpload: React.FC<ImageUploadModalProps> = ({
   onSave,
   currentImgUrl: imgUrl = '',
   modal,
-  type,
-  productionId
+  type
 }) => {
   const [file, setFile] = useState<File | null>(null);
   const [uploadInProgress, setUploadInProgress] = useState(false);
   const [croppedImageBlob, setCroppedImageBlob] = useState(null as Blob | null);
   const { firebaseStorage } = useFirebaseContext();
-  const {
-    profile: { data }
-  } = useUserContext();
   const [percent, setPercent] = useState(0);
   const [src, setSrc] = useState(null as string | null);
   const [crop, setCrop] = useState<Crop>({
@@ -68,20 +62,7 @@ const ImageUpload: React.FC<ImageUploadModalProps> = ({
 
     setUploadInProgress(true);
 
-    // Determine storage path based on type
-    let storagePath: string;
-    if (type === 'User') {
-      // Profile picture
-      storagePath = `/profiles/${data.uid}/profile-picture/${file?.name}`;
-    } else if (type === 'Poster' && productionId) {
-      // Production image
-      storagePath = `/productions/${productionId}/images/${file?.name}`;
-    } else {
-      // Fallback to general user uploads
-      storagePath = `/users/${data.uid}/uploads/${file?.name}`;
-    }
-
-    const storageRef = ref(firebaseStorage, storagePath);
+    const storageRef = ref(firebaseStorage, `/${imageId}-${file?.name}`);
     const uploadTask = uploadBytesResumable(storageRef, croppedImageBlob);
     uploadTask.on(
       'state_changed',
