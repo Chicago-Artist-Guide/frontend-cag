@@ -7,7 +7,7 @@ service firebase.storage {
     }
     
     // Event images - publicly readable, authenticated users can upload
-    match /events/{eventId}/images/{fileName} {
+    match /events/{fileName} {
       allow read: if true; // Public read access for event images
       allow write: if isAuthenticated();
     }
