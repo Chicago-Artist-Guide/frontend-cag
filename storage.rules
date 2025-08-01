@@ -1,0 +1,21 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Event images - publicly readable, authenticated users can upload
+    match /events/{fileName} {
+      allow read: if true; // Public read access for event images
+      allow write: if isAuthenticated();
+    }
+    
+    // All other files - authenticated users only
+    // This includes profile pictures, production images, etc.
+    match /{allPaths=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+} 

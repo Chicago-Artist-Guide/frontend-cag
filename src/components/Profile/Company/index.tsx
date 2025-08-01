@@ -180,8 +180,9 @@ const CompanyProfile: React.FC<{
                       <div>
                         <AwardLabel>Relevant Links:</AwardLabel>
                         <div>
-                          {award.website_links.map((link) => (
+                          {award.website_links.map((link, linkIndex) => (
                             <a
+                              key={linkIndex}
                               href={link}
                               target="_blank"
                               rel="noopener noreferrer"
