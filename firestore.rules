@@ -1,0 +1,113 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the document
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if user owns the account
+    function ownsAccount(accountData) {
+      return isAuthenticated() && request.auth.uid == accountData.uid;
+    }
+    
+    // Helper function to check if user owns the profile
+    function ownsProfile(profileData) {
+      return isAuthenticated() && request.auth.uid == profileData.uid;
+    }
+
+    // Helper function to check if user is a theater company
+    function isTheaterCompany(accountData) {
+      return isAuthenticated() && accountData.type == 'company';
+    }
+
+    // Helper function to check if user is an individual talent
+    function isIndividualTalent(accountData) {
+      return isAuthenticated() && accountData.type == 'individual';
+    }
+
+    // Accounts collection - simplified: authenticated users can read, owners can write
+    match /accounts/{accountId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.uid);
+    }
+
+    // Profiles collection - simplified: authenticated users can read, owners can write
+    match /profiles/{profileId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.uid);
+    }
+
+    // Productions collection - simplified: authenticated users can read, owners can write
+    match /productions/{productionId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.uid);
+    }
+
+    // Events collection - simplified: authenticated users can read, owners can write
+    match /events/{eventId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.uid);
+    }
+
+    // Threads collection - users can only access threads they're part of
+    match /threads/{threadId} {
+      allow read, write: if isAuthenticated() && 
+        (resource == null || 
+         request.auth.uid in resource.data.participants || 
+         request.auth.uid == resource.data.created_by);
+    }
+
+    // Messages collection - users can only access messages in their threads
+    match /messages/{messageId} {
+      allow read, write: if isAuthenticated() && 
+        (resource == null || 
+         request.auth.uid == resource.data.sender_id || 
+         request.auth.uid in resource.data.recipients);
+    }
+
+    // Mail collection - users can only access their own mail
+    match /mail/{mailId} {
+      allow read, write: if isAuthenticated() && 
+        (resource == null || 
+         request.auth.uid == resource.data.to_user_id || 
+         request.auth.uid == resource.data.from_user_id);
+    }
+
+    // Theater talent matches - simplified: authenticated users can read/write
+    match /theater_talent_matches/{matchId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Public interests - anyone can read, authenticated users can create
+    match /public_interests/{interestId} {
+      allow read: if true; // Public data
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.user_id);
+    }
+
+    // Theatre requests - authenticated users can create, admins can read
+    match /theatre_requests/{requestId} {
+      allow create: if isAuthenticated();
+      allow read, update, delete: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.user_id);
+    }
+
+    // Default deny all other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+} 

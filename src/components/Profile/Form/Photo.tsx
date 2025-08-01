@@ -33,7 +33,7 @@ const FormPhoto: React.FC<{
       setImgUrl(URL.createObjectURL(file));
       const storageRef = ref(
         firebaseStorage,
-        `/files/${data.account_id}/${file.name}`
+        `/profiles/${data.uid}/profile-picture/${file.name}`
       );
       const uploadTask = uploadBytesResumable(storageRef, file);
 

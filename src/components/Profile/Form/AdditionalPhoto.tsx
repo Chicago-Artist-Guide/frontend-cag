@@ -32,7 +32,7 @@ const AdditionalPhoto: React.FC<{
       setImgUrl(URL.createObjectURL(file));
       const storageRef = ref(
         firebaseStorage,
-        `/files-${data.account_id}/${file.name}`
+        `/users/${data.uid}/uploads/${file.name}`
       );
       const uploadTask = uploadBytesResumable(storageRef, file);
 

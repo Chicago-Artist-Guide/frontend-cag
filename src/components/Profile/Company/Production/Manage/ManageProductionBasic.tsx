@@ -45,6 +45,7 @@ const ManageProductionBasic: React.FC<{
           currentImgUrl={formValues?.production_image_url}
           modal={false}
           type={'Poster'}
+          productionId={formValues?.production_id}
         />
       </LeftCol>
       <RightCol lg={{ span: 7, offset: 1 }}>

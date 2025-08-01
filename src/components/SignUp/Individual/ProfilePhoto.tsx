@@ -48,7 +48,7 @@ const ProfilePhoto: React.FC<{
 
     const storageRef = ref(
       firebaseStorage,
-      `/files-${data.uid}/${data.account_id}-${file.name}`
+      `/profiles/${data.uid}/profile-picture/${file.name}`
     );
     const uploadTask = uploadBytesResumable(storageRef, file);
 

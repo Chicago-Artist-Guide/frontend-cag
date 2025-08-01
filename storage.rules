@@ -1,0 +1,70 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // Helper function to check if user owns the file
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if file belongs to user's profile
+    function ownsProfileFile(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if file belongs to user's production
+    function ownsProductionFile(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    // Helper function to check if file belongs to user's event
+    function ownsEventFile(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Profile pictures - users can upload/update their own, authenticated users can view
+    match /profiles/{userId}/profile-picture/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if ownsProfileFile(userId);
+    }
+
+    // Production images - users can upload/update their own productions, authenticated users can view
+    match /productions/{productionId}/images/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated(); // Production owners can upload, simplified for now
+    }
+
+    // Event images - users can upload/update their own events, public can view
+    match /events/{eventId}/images/{fileName} {
+      allow read: if true; // Public events should have public images
+      allow write: if isAuthenticated(); // Event owners can upload, simplified for now
+    }
+
+    // Company logos - companies can upload their own logos, authenticated users can view
+    match /companies/{companyId}/logo/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated() && request.auth.uid == companyId;
+    }
+
+    // General user uploads - users can upload to their own folder
+    match /users/{userId}/uploads/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if ownsProfileFile(userId);
+    }
+
+    // Temporary uploads - allow authenticated users to upload temporarily
+    match /temp/{userId}/{fileName} {
+      allow read: if isAuthenticated();
+      allow write: if ownsProfileFile(userId);
+    }
+
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+} 
