@@ -4,7 +4,7 @@ import {
   productionStatuses,
   productionEquities
 } from '../../../../../utils/lookups';
-import ImageUpload from '../../../../shared/ImageUpload';
+import { ImageUploadComponent } from '../../../../shared';
 import {
   FormInput,
   FormRadio,
@@ -28,23 +28,21 @@ const ManageProductionBasic: React.FC<{
   }, [formValues.type]);
 
   const setProfilePicture = (url: string) => {
-    const target = {
-      name: 'production_image_url',
-      value: url
-    };
+    const target = { name: 'production_image_url', value: url };
     setFormValues({ target });
   };
 
   return (
     <>
       <LeftCol lg={4}>
-        <ImageUpload
+        <ImageUploadComponent
           onSave={(production_image_url: string) =>
             setProfilePicture(production_image_url)
           }
-          currentImgUrl={formValues?.production_image_url}
-          modal={false}
-          type={'Poster'}
+          currentImageUrl={formValues?.production_image_url}
+          imageType="poster"
+          showCrop={true}
+          maxSizeInMB={5}
         />
       </LeftCol>
       <RightCol lg={{ span: 7, offset: 1 }}>

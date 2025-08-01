@@ -39,7 +39,7 @@ import {
   WebsiteTypes
 } from '../../SignUp/Individual/types';
 import DetailSection from '../shared/DetailSection';
-import ImageUploadModal from '../shared/ImageUploadModal';
+import { ImageUploadComponent } from '../../shared';
 import { PreviewCard } from '../shared/styles';
 import EditPersonalDetails from './EditPersonalDetails';
 import Awards from './ProfileSections/Awards';
@@ -52,9 +52,9 @@ import SpecialSkills from './ProfileSections/SpecialSkills';
 import Training from './ProfileSections/Training';
 import type { EditModeSections } from './types';
 
-const IndividualProfile: React.FC<{
-  previewMode?: boolean;
-}> = ({ previewMode = false }) => {
+const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
+  previewMode = false
+}) => {
   const { account, profile, setAccountData, setProfileData } = useUserContext();
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,
@@ -68,9 +68,6 @@ const IndividualProfile: React.FC<{
   });
   const [editProfile, setEditProfile] = useState(profile?.data);
   const [editAccount, setEditAccount] = useState(account?.data);
-
-  // pfp
-  const [pfpModalShow, setPfpModalShow] = useState<boolean>(false);
 
   // websites
   const [websiteId, setWebsiteId] = useState(1);
@@ -201,10 +198,7 @@ const IndividualProfile: React.FC<{
   ) => {
     e.preventDefault();
 
-    setEditMode({
-      ...editMode,
-      [editModeSection]: editModeVal ?? true
-    });
+    setEditMode({ ...editMode, [editModeSection]: editModeVal ?? true });
   };
 
   const setProfileForm = (field: string, value: any) => {
@@ -290,11 +284,10 @@ const IndividualProfile: React.FC<{
     setProfileForm('websites', newWebsiteInputs);
   };
 
-  const savePfpUrlModal = async (pfpImgUrl: string) => {
+  const saveProfilePicture = async (pfpImgUrl: string) => {
     try {
       if (profile.ref) {
         await updateDoc(profile.ref, { ['profile_image_url']: pfpImgUrl });
-        setPfpModalShow(false);
       } else {
         // no profile.ref
         // look up?
@@ -335,10 +328,7 @@ const IndividualProfile: React.FC<{
       if (profile.ref) {
         await updateDoc(profile.ref, { ...personalDetailsData });
 
-        setEditMode({
-          ...editMode,
-          personalDetails: false
-        });
+        setEditMode({ ...editMode, personalDetails: false });
       } else {
         // no profile.ref
         // look up?
@@ -352,10 +342,7 @@ const IndividualProfile: React.FC<{
     const { first_name, last_name } = editAccount;
     const { pronouns, pronouns_other, profile_tagline, bio } = editProfile;
 
-    const headlineAccountDetails = {
-      first_name,
-      last_name
-    };
+    const headlineAccountDetails = { first_name, last_name };
     const headlineProfileDetails = {
       pronouns,
       pronouns_other,
@@ -368,10 +355,7 @@ const IndividualProfile: React.FC<{
         await updateDoc(account.ref, { ...headlineAccountDetails });
         await updateDoc(profile.ref, { ...headlineProfileDetails });
 
-        setEditMode({
-          ...editMode,
-          headline: false
-        });
+        setEditMode({ ...editMode, headline: false });
       } else {
         // no profile.ref
         // look up?
@@ -399,10 +383,7 @@ const IndividualProfile: React.FC<{
       if (profile.ref) {
         await updateDoc(profile.ref, { [section]: newData });
 
-        setEditMode({
-          ...editMode,
-          [editModeName]: false
-        });
+        setEditMode({ ...editMode, [editModeName]: false });
       } else {
         // no profile.ref
         // look up?
@@ -424,10 +405,7 @@ const IndividualProfile: React.FC<{
       if (profile.ref) {
         await updateDoc(profile.ref, { ...skillsProps });
 
-        setEditMode({
-          ...editMode,
-          skills: false
-        });
+        setEditMode({ ...editMode, skills: false });
       } else {
         // no profile.ref
         // look up?
@@ -443,10 +421,7 @@ const IndividualProfile: React.FC<{
         await updateDoc(profile.ref, { [key]: value } as {
           [key: string]: string;
         });
-        setEditMode({
-          ...editMode,
-          offstage_roles: false
-        });
+        setEditMode({ ...editMode, offstage_roles: false });
       } else {
         // no profile.ref
         // look up?
@@ -735,32 +710,13 @@ const IndividualProfile: React.FC<{
       </Row>
       <Row>
         <Col lg={4}>
-          {profile?.data?.profile_image_url ? (
-            <ProfileImage src={profile?.data?.profile_image_url} fluid />
-          ) : (
-            <PlaceholderImage>
-              <FontAwesomeIcon className="bod-icon" icon={faCamera} size="lg" />
-            </PlaceholderImage>
-          )}
-          <ImageUploadModal
-            editProfile={editProfile}
-            show={pfpModalShow}
-            onHide={() => setPfpModalShow(false)}
-            onSave={(pfpImgUrl: string) => savePfpUrlModal(pfpImgUrl)}
-            currentImgUrl={profile?.data?.profile_image_url}
-            type="User"
+          <ImageUploadComponent
+            onSave={(pfpImgUrl: string) => saveProfilePicture(pfpImgUrl)}
+            currentImageUrl={profile?.data?.profile_image_url}
+            imageType="user"
+            showCrop={true}
+            maxSizeInMB={5}
           />
-          <p>
-            <a
-              href="#"
-              onClick={(e: React.MouseEvent<HTMLElement>) => {
-                e.preventDefault();
-                setPfpModalShow(true);
-              }}
-            >
-              Change Profile Picture
-            </a>
-          </p>
           <DetailsCard>
             <DetailsColTitle>
               <div>

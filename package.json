@@ -33,6 +33,8 @@
     "react-bootstrap": "^2.5.0",
     "react-datepicker": "^3.6.0",
     "react-dom": "^16.13.1",
+    "react-dropzone": "^14.3.8",
+    "react-easy-crop": "^5.4.2",
     "react-hooks-helper": "^1.6.0",
     "react-image-crop": "^10.1.5",
     "react-masonry-css": "^1.0.16",
