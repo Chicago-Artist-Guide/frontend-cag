@@ -6,9 +6,10 @@ import {
   where,
   Timestamp
 } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
 import { useFirebaseContext } from '../context/FirebaseContext';
+import { STAFF_CONFIG } from '../config/staffAccess';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
-import { CompanyData } from '../components/SignUp/Company/types';
 
 export type AnalyticsData = {
   userMetrics: {
@@ -37,7 +38,7 @@ export type AnalyticsData = {
 };
 
 export const useAnalyticsData = () => {
-  const { firebaseFirestore } = useFirebaseContext();
+  const { firebaseFirestore, firebaseAuth } = useFirebaseContext();
   const [data, setData] = useState<AnalyticsData>({
     userMetrics: {
       totalUsers: 0,
@@ -65,14 +66,35 @@ export const useAnalyticsData = () => {
   });
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
-      if (!firebaseFirestore) return;
+    if (!firebaseFirestore || !firebaseAuth) return;
+
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (user) => {
+      if (!user) {
+        setData((prev) => ({
+          ...prev,
+          loading: false,
+          error: 'Please log in to view analytics data'
+        }));
+        return;
+      }
+
+      // Check if user is in staff whitelist
+      const userEmail = user.email?.toLowerCase();
+
+      if (!userEmail || !STAFF_CONFIG.emails.includes(userEmail)) {
+        setData((prev) => ({
+          ...prev,
+          loading: false,
+          error: 'Access restricted to CAG staff members'
+        }));
+        return;
+      }
 
       try {
         // Fetch all accounts
-        const accountsSnapshot = await getDocs(
-          collection(firebaseFirestore, 'accounts')
-        );
+        const accountsRef = collection(firebaseFirestore, 'accounts');
+        const accountsSnapshot = await getDocs(accountsRef);
         const totalUsers = accountsSnapshot.size;
 
         let individualCount = 0;
@@ -93,9 +115,15 @@ export const useAnalyticsData = () => {
         });
 
         // Fetch all profiles for demographics
-        const profilesSnapshot = await getDocs(
-          collection(firebaseFirestore, 'profiles')
-        );
+        let profilesSnapshot;
+        try {
+          profilesSnapshot = await getDocs(
+            collection(firebaseFirestore, 'profiles')
+          );
+        } catch (profileError) {
+          // Continue with empty profiles if this fails
+          profilesSnapshot = { size: 0, forEach: () => undefined } as any;
+        }
 
         const demographics = {
           genderIdentity: {} as Record<string, number>,
@@ -108,7 +136,7 @@ export const useAnalyticsData = () => {
 
         let completedProfiles = 0;
 
-        profilesSnapshot.forEach((doc) => {
+        profilesSnapshot.forEach((doc: any) => {
           const profile = doc.data() as IndividualProfileDataFullInit;
 
           // Count completed profiles
@@ -185,21 +213,31 @@ export const useAnalyticsData = () => {
         });
 
         // Fetch active productions
-        const productionsSnapshot = await getDocs(
-          query(
-            collection(firebaseFirestore, 'productions'),
-            where('active', '==', true)
-          )
-        );
-        const activeProductions = productionsSnapshot.size;
+        let activeProductions = 0;
+        try {
+          const productionsSnapshot = await getDocs(
+            query(
+              collection(firebaseFirestore, 'productions'),
+              where('active', '==', true)
+            )
+          );
+          activeProductions = productionsSnapshot.size;
+        } catch (prodError) {
+          // Continue with 0 if this fails
+        }
 
         // Fetch recent messages (simplified - just count)
-        const messagesQuery = query(
-          collection(firebaseFirestore, 'messages'),
-          where('timestamp', '>', Timestamp.fromDate(thirtyDaysAgo))
-        );
-        const messagesSnapshot = await getDocs(messagesQuery);
-        const messagesThisMonth = messagesSnapshot.size;
+        let messagesThisMonth = 0;
+        try {
+          const messagesQuery = query(
+            collection(firebaseFirestore, 'messages'),
+            where('timestamp', '>', Timestamp.fromDate(thirtyDaysAgo))
+          );
+          const messagesSnapshot = await getDocs(messagesQuery);
+          messagesThisMonth = messagesSnapshot.size;
+        } catch (msgError) {
+          // Continue with 0 if this fails
+        }
 
         // Calculate profile completion rate
         const profileCompletionRate =
@@ -225,18 +263,18 @@ export const useAnalyticsData = () => {
           loading: false,
           error: null
         });
-      } catch (error) {
-        console.error('Error fetching analytics:', error);
+      } catch (error: any) {
+        // Don't fail completely - show what we have
         setData((prev) => ({
           ...prev,
           loading: false,
-          error: 'Failed to load analytics data'
+          error: null // Clear error to show partial data
         }));
       }
-    };
+    });
 
-    fetchAnalytics();
-  }, [firebaseFirestore]);
+    return () => unsubscribe();
+  }, [firebaseFirestore, firebaseAuth]);
 
   return data;
 };

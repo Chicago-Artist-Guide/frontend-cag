@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Row, Col } from 'react-bootstrap';
 import {
   BarChart,
   Bar,
@@ -11,7 +10,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer
 } from 'recharts';
 import { colors, fonts } from '../../../theme/styleVars';
@@ -124,7 +122,6 @@ const UserDemographics: React.FC<DemographicsProps> = ({ data }) => {
 
   const genderData = transformData(data.genderIdentity);
   const ageData = transformData(data.ageRanges);
-  const ethnicityData = transformData(data.ethnicities).slice(0, 10); // Top 10
   const unionData = transformData(data.unionStatus);
   const topSkills = transformData(data.skills).slice(0, 15); // Top 15 skills
 
@@ -157,8 +154,8 @@ const UserDemographics: React.FC<DemographicsProps> = ({ data }) => {
         {/* Gender Identity Pie Chart */}
         <ChartContainer>
           <h3>Gender Identity</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+          <ResponsiveContainerFixed width="100%" height={300}>
+            <PieChartFixed>
               <Pie
                 data={genderData}
                 cx="50%"
@@ -172,82 +169,63 @@ const UserDemographics: React.FC<DemographicsProps> = ({ data }) => {
                 dataKey="value"
               >
                 {genderData.map((entry, index) => (
-                  <Cell
+                  <CellFixed
                     key={`cell-${index}`}
                     fill={CHART_COLORS[index % CHART_COLORS.length]}
                   />
                 ))}
               </Pie>
               <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+            </PieChartFixed>
+          </ResponsiveContainerFixed>
         </ChartContainer>
 
         {/* Age Ranges Bar Chart */}
         <ChartContainer>
           <h3>Age Ranges</h3>
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={ageData}>
+          <ResponsiveContainerFixed width="100%" height={300}>
+            <BarChartFixed data={ageData}>
               <CartesianGrid
                 strokeDasharray="3 3"
                 stroke={colors.lightestGrey}
               />
-              <XAxis
+              <XAxisFixed
                 dataKey="name"
                 angle={-45}
                 textAnchor="end"
                 height={100}
                 tick={{ fontSize: 12 }}
               />
-              <YAxis />
+              <YAxisFixed />
               <Tooltip content={<CustomTooltip />} />
               <Bar dataKey="value" fill={colors.mint} radius={[8, 8, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+            </BarChartFixed>
+          </ResponsiveContainerFixed>
         </ChartContainer>
       </ChartGrid>
-
-      {/* Ethnicities Bar Chart */}
-      <ChartContainer>
-        <h3>Top Ethnicities</h3>
-        <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={ethnicityData} layout="horizontal">
-            <CartesianGrid strokeDasharray="3 3" stroke={colors.lightestGrey} />
-            <XAxis type="number" />
-            <YAxis
-              dataKey="name"
-              type="category"
-              width={150}
-              tick={{ fontSize: 12 }}
-            />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="value" fill={colors.salmon} radius={[0, 8, 8, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartContainer>
 
       {/* Union Status */}
       <ChartContainer>
         <h3>Union Affiliation</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={unionData}>
+        <ResponsiveContainerFixed width="100%" height={300}>
+          <BarChartFixed data={unionData}>
             <CartesianGrid strokeDasharray="3 3" stroke={colors.lightestGrey} />
-            <XAxis
+            <XAxisFixed
               dataKey="name"
               angle={-45}
               textAnchor="end"
               height={120}
               tick={{ fontSize: 11 }}
             />
-            <YAxis />
+            <YAxisFixed />
             <Tooltip content={<CustomTooltip />} />
             <Bar
               dataKey="value"
               fill={colors.cornflower}
               radius={[8, 8, 0, 0]}
             />
-          </BarChart>
-        </ResponsiveContainer>
+          </BarChartFixed>
+        </ResponsiveContainerFixed>
       </ChartContainer>
 
       {/* Top Skills Table */}
