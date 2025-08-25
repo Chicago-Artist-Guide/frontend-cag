@@ -1,11 +1,16 @@
 import React from 'react';
-import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
 import Button from '../../../components/shared/Button';
 import { goToTop } from '../../../utils/goToTop';
-import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
+import {
+  PageFooterRow,
+  FooterContent,
+  ButtonSection,
+  ButtonCol,
+  PaginationSection,
+  Pagination
+} from '../SignUpFooterStyles';
 
-// for dev
 const FORM_VALIDATION_ON = true;
 
 export type SubmitBasicsResp = {
@@ -34,24 +39,6 @@ const SignUpFooter: React.FC<{
   stepErrors,
   goToProfile
 }) => {
-  /*
-    SPECIAL CASES:
-    1. We don't want a back button unless we're:
-      - Past the Landing step OR
-      - Past the 1st step of the Landing step
-    2. We don't want to show our global navigation next button unless we're:
-      - Past the Landing step OR
-      - Past the 1st step of the Landing step OR
-      - A Theater Group was selected (meaning no 2nd internal Landing step)
-      - Not on the Privacy Step (we have a different callback for Privacy in order to set agreement)
-    3. We need to show different button text for the Privacy Agreement step
-    4. We need to set our form field "privacyAgreement" to true if we Agree & Continue in the Privacy step
-    5. We don't want to show our Next button if we're on the last step (Awards)
-      - We'll show "Go to Profile" when we tackle that step in development
-    6. We disable the Next button if we have form validation errors or req fields not filled in
-      - Done using stepErrors prop for current step (stepErrors[step])
-  */
-
   const { next, previous } = navigation;
   const navigationNext = landingStep === 2 || currentStep !== 'privacy';
   const stepIndex = steps.findIndex((step) => step.id === currentStep);
@@ -71,7 +58,6 @@ const SignUpFooter: React.FC<{
 
   const prevButtonAction = (landingStep: number) => {
     goToTop();
-
     return landingStep === 0 ? setLandingStep(-1) : previous?.();
   };
 
@@ -97,39 +83,47 @@ const SignUpFooter: React.FC<{
     return setLandingStep(2);
   };
 
+  const isDisabled = stepErrors[currentStep] && FORM_VALIDATION_ON;
+
   return (
     <PageFooterRow>
-      <Col lg="4">
-        <Button
-          onClick={() => prevButtonAction(landingStep)}
-          text="Back"
-          type="button"
-          variant="secondary"
-        />
-      </Col>
-      <Col lg="4">
-        <Pagination>
-          {steps.map((_step, i: number) => (
-            <li
-              className={
-                i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
-              }
-              key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
-            >
-              <span>{i + 1}</span>
-            </li>
-          ))}
-        </Pagination>
-      </Col>
-      <ButtonCol lg="4">
-        <Button
-          disabled={stepErrors[currentStep] && FORM_VALIDATION_ON}
-          onClick={() => nextButtonAction(navigationNext, currentStep)}
-          text={continueText}
-          type="button"
-          variant="primary"
-        />
-      </ButtonCol>
+      <FooterContent>
+        <PaginationSection>
+          <Pagination>
+            {steps.map((_step, i: number) => (
+              <li
+                className={
+                  i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
+                }
+                key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
+              >
+                <span>{i + 1}</span>
+              </li>
+            ))}
+          </Pagination>
+        </PaginationSection>
+
+        <ButtonSection>
+          <ButtonCol className="back-button">
+            <Button
+              onClick={() => prevButtonAction(landingStep)}
+              text="Back"
+              type="button"
+              variant="secondary"
+            />
+          </ButtonCol>
+          <ButtonCol className="continue-button">
+            <Button
+              disabled={isDisabled}
+              onClick={() => nextButtonAction(navigationNext, currentStep)}
+              text={continueText}
+              type="button"
+              variant="primary"
+              style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+            />
+          </ButtonCol>
+        </ButtonSection>
+      </FooterContent>
     </PageFooterRow>
   );
 };
