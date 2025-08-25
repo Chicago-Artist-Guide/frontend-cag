@@ -1,9 +1,9 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
-import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { useUserContext } from '../../../context/UserContext';
@@ -468,9 +468,7 @@ const IndividualSignUp: React.FC<{
 
   return (
     <PageContainer>
-      <Row>
-        <Col lg={12}>{stepFrame()}</Col>
-      </Row>
+      <SignUpContent>{stepFrame()}</SignUpContent>
       <SignUpFooter
         landingStep={index}
         navigation={navigation}
@@ -487,3 +485,12 @@ const IndividualSignUp: React.FC<{
 };
 
 export default IndividualSignUp;
+
+const SignUpContent = styled.div`
+  min-height: calc(100vh - 200px);
+  padding-bottom: 32px;
+
+  @media (min-width: 768px) {
+    padding-bottom: 48px;
+  }
+`;
