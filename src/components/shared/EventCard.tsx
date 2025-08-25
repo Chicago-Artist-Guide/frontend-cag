@@ -234,8 +234,9 @@ const CardContainer = styled.div`
 const MobileView = styled.div`
   display: flex;
   flex-direction: column;
-  padding: 16px;
+  padding: 20px;
   background: #fffbe7;
+  gap: 16px;
 
   &.past {
     background: #cad2e6;
@@ -251,15 +252,16 @@ const TabletView = styled.div`
 
   @media (min-width: ${breakpoints.sm}) and (max-width: ${breakpoints.lg}) {
     display: flex;
+    flex-direction: column;
   }
 `;
 
 const CardHeader = styled.div`
   background: #fffbe7;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 
   &.past {
     background: #cad2e6;
@@ -274,7 +276,7 @@ const CardContent = styled.div`
 
 const CardLeftSide = styled.div`
   flex: 2;
-  padding: 20px;
+  padding: 24px;
 `;
 
 const CardRightSide = styled.div`
@@ -316,7 +318,7 @@ const IconRow = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  margin-bottom: 8px;
+  margin-bottom: 0;
 `;
 
 const DateText = styled.div`
@@ -324,6 +326,7 @@ const DateText = styled.div`
   font-weight: 700;
   font-size: 1rem;
   color: #2f4550;
+  line-height: 1.3;
 
   @media (min-width: ${breakpoints.md}) {
     font-size: 1.1rem;
@@ -334,7 +337,8 @@ const TimeText = styled.div`
   font-family: ${fonts.montserrat};
   font-size: 0.9rem;
   color: #2f4550;
-  margin-top: 2px;
+  margin-top: 4px;
+  line-height: 1.3;
 
   @media (min-width: ${breakpoints.md}) {
     font-size: 1rem;
@@ -347,6 +351,7 @@ const LocationText = styled.div`
   font-size: 0.9rem;
   color: #2f4550;
   word-break: break-word;
+  line-height: 1.4;
 
   @media (min-width: ${breakpoints.md}) {
     font-size: 1rem;
@@ -366,34 +371,37 @@ const Content = styled.div`
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
+  padding: 0;
 
   @media (min-width: ${breakpoints.md}) {
     flex: 2;
     padding: 32px 24px;
+    justify-content: center;
   }
 `;
 
 const EventTitle = styled.h3`
   font-family: ${fonts.montserrat};
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  margin: 16px 0 10px;
+  margin: 0 0 12px 0;
   color: #2f4550;
+  line-height: 1.3;
 
   @media (min-width: ${breakpoints.md}) {
     font-size: 1.5rem;
-    margin-bottom: 12px;
-    margin-top: 0;
+    margin-bottom: 16px;
   }
 `;
 
 const EventDescription = styled.p`
   font-family: ${fonts.lora};
-  font-size: 1rem;
+  font-size: 0.95rem;
   color: #444;
   margin-bottom: 16px;
+  line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -410,7 +418,8 @@ const EventPrice = styled.div`
   font-family: ${fonts.montserrat};
   font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+  color: #2f4550;
 
   @media (min-width: ${breakpoints.md}) {
     font-size: 1.1rem;
@@ -424,9 +433,9 @@ const MoreInfoButton = styled.div`
   color: #fff;
   font-family: ${fonts.montserrat};
   font-weight: 700;
-  border-radius: 20px;
-  padding: 8px 24px;
-  font-size: 1rem;
+  border-radius: 24px;
+  padding: 12px 28px;
+  font-size: 0.95rem;
   text-align: center;
   width: fit-content;
   transition:
@@ -450,8 +459,8 @@ const EventImage = styled.img`
   height: 200px;
   object-fit: cover;
   background: #eee;
-  margin-top: 16px;
-  border-radius: 6px;
+  margin-top: 0;
+  border-radius: 8px;
 
   @media (min-width: ${breakpoints.lg}) {
     flex: 1;
