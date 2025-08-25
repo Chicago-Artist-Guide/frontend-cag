@@ -145,23 +145,23 @@ const Values = () => {
   };
 
   return (
-    <div className="w-fit flex-col items-center justify-center rounded-lg bg-white px-12 py-12 md:flex">
+    <div className="w-full max-w-sm flex-col items-center justify-center rounded-lg bg-white px-4 py-8 sm:max-w-md sm:px-6 sm:py-10 md:flex md:max-w-4xl md:px-8 md:py-12 lg:max-w-6xl lg:px-12">
       {/* Title */}
       <div className="relative text-darkGrey">
         <div className="flex items-start">
-          <h1 className="mr-2 text-sm italic text-mint md:pr-1 md:text-4xl">
+          <h1 className="mr-1 text-sm italic text-mint sm:mr-2 sm:text-lg md:mr-3 md:text-2xl lg:text-4xl">
             Find
           </h1>
-          <div className="relative h-5 w-[300px] overflow-hidden md:h-10 md:w-[700px]">
+          <div className="relative h-5 w-[280px] overflow-hidden sm:h-6 sm:w-[320px] md:h-8 md:w-[500px] lg:h-10 lg:w-[700px]">
             <h1
-              className={`absolute w-full text-sm transition-transform duration-500 ease-in-out md:text-4xl ${
+              className={`absolute w-full text-sm transition-transform duration-500 ease-in-out sm:text-lg md:text-2xl lg:text-4xl ${
                 member === 'Artists' ? 'translate-y-0' : '-translate-y-full'
               }`}
             >
               your next creative opportunity
             </h1>
             <h1
-              className={`absolute w-full text-sm transition-transform duration-500 ease-in-out md:text-4xl ${
+              className={`absolute w-full text-sm transition-transform duration-500 ease-in-out sm:text-lg md:text-2xl lg:text-4xl ${
                 member === 'Artists' ? 'translate-y-full' : 'translate-y-0'
               }`}
             >
@@ -170,39 +170,42 @@ const Values = () => {
           </div>
         </div>
       </div>
+
       {/* Toggle */}
-      <div className="mt-4 flex items-center justify-between rounded-full bg-darkGrey p-2 md:mt-8 md:w-fit md:justify-center">
+      <div className="mt-3 flex w-full items-center justify-center rounded-full bg-darkGrey p-1.5 sm:mt-4 sm:p-2 md:mt-8 md:w-fit md:justify-center">
         <button
           onClick={() => handleClick('Artists')}
-          className={`transition-bg mx-1 rounded-full px-3 duration-300 ${
+          className={`transition-bg mx-0.5 flex-1 rounded-full px-2 py-1 duration-300 sm:mx-1 sm:px-3 sm:py-1.5 md:flex-none ${
             member === 'Artists' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
-          <h2 className="my-2 text-base font-bold text-white md:text-3xl">
+          <h2 className="text-sm font-bold text-white sm:text-base md:my-2 md:text-3xl">
             Artists
           </h2>
         </button>
         <button
           onClick={() => handleClick('Theatres')}
-          className={`transition-bg mx-1 rounded-full px-3 duration-300 ${
+          className={`transition-bg mx-0.5 flex-1 rounded-full px-2 py-1 duration-300 sm:mx-1 sm:px-3 sm:py-1.5 md:flex-none ${
             member === 'Theatres' ? 'bg-mint' : 'bg-transparent'
           }`}
         >
-          <h2 className="my-2 text-base font-bold text-white md:text-3xl">
+          <h2 className="text-sm font-bold text-white sm:text-base md:my-2 md:text-3xl">
             Theatres
           </h2>
         </button>
       </div>
+
       {/* Values */}
-      <div className="my-4 md:my-8">
-        <div className="grid w-[350px] grid-cols-3 grid-rows-2 items-center md:w-[700px]">
+      <div className="my-3 sm:my-4 md:my-8">
+        <div className="grid w-[320px] grid-cols-3 grid-rows-2 items-center gap-1 sm:w-[350px] sm:gap-[2px] md:w-[700px] md:gap-3 lg:w-[800px]">
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
             const currentItem = value[member];
-            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[160px] md:h-[200px] m-[2px] md:m-3 transition-transform duration-1000`;
+            const className = `relative ${currentItem.col} order-${currentItem.order} ${currentItem.animation} h-[120px] sm:h-[140px] md:h-[200px] lg:h-[220px] transition-transform duration-1000`;
             const isFlipped = flipped[Number(key) - 1];
             return (
               <div
+                key={key}
                 className={className}
                 onClick={() => handleFlip(key)}
                 style={{
@@ -211,36 +214,32 @@ const Values = () => {
                 }}
               >
                 <div
-                  className={`absolute ${currentItem.color} flex h-full w-full items-center justify-center rounded-xl p-3 transition-transform duration-1000 md:rounded-3xl`}
+                  className={`absolute ${currentItem.color} flex h-full w-full items-center justify-center rounded-lg p-2 transition-transform duration-1000 sm:rounded-xl sm:p-3 md:rounded-3xl`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
                   }}
                 >
-                  <div className="absolute right-1 top-1 text-sm md:right-2 md:top-2 md:text-xl">
+                  <div className="absolute right-1 top-1 text-xs sm:text-sm md:right-2 md:top-2 md:text-xl">
                     <FontAwesomeIcon icon={faRetweet} className="text-white" />
                   </div>
                   <h1
-                    className={`p-2 font-bold text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-4`}
+                    className={`p-1 font-bold text-white ${currentItem.smallFont} ${currentItem.bigFont} mt-2 sm:mt-3 sm:p-2 md:mt-4`}
                   >
                     {currentItem.prop}
                   </h1>
                 </div>
                 <div
-                  className={`absolute ${currentItem.backColor} flex h-full w-full items-center justify-center rounded-xl transition-transform duration-1000 md:rounded-3xl`}
+                  className={`absolute ${currentItem.backColor} flex h-full w-full items-center justify-center rounded-lg transition-transform duration-1000 sm:rounded-xl md:rounded-3xl`}
                   style={{
                     backfaceVisibility: 'hidden',
                     transform: isFlipped ? 'rotateY(0deg)' : 'rotateY(-180deg)'
                   }}
                 >
-                  <div className="absolute right-1 top-1 text-sm md:right-2 md:top-2 md:text-xl">
+                  <div className="absolute right-1 top-1 text-xs sm:text-sm md:right-2 md:top-2 md:text-xl">
                     <FontAwesomeIcon icon={faRetweet} className="text-white" />
                   </div>
-                  <h2
-                    className={
-                      'px-2 text-xs font-bold text-white md:mx-4 md:mt-4 md:text-lg/5'
-                    }
-                  >
+                  <h2 className="px-1 text-xs font-bold text-white sm:px-2 sm:text-xs md:mx-4 md:mt-4 md:text-lg/5">
                     {currentItem.description}
                   </h2>
                 </div>
