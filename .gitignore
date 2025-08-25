@@ -35,3 +35,6 @@ dist
 
 .cursor
 knowledgebase
+.playwright-mcp
+.claude
+CLAUDE.md

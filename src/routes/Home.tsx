@@ -7,6 +7,7 @@ import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
 import { zeffyUrl } from '../utils/marketing';
+import { Link } from 'react-router-dom';
 
 // Partners
 import MPaact from '../images/partners/mpaact_hq-1.jpg';
@@ -143,56 +144,95 @@ const Home = () => {
     <>
       {/* Hero */}
       <div className="relative">
+        {/* Mobile/Small screens - full background image */}
         <img
           src={Hero}
           alt="Hero"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover md:hidden"
         />
-        <div className="relative z-10 mt-24 px-6 py-8 md:px-12 md:py-24 lg:px-36 lg:py-36 xl:px-64 xl:py-48">
-          <h1 className="pb-3 text-2xl text-white md:text-5xl lg:text-7xl">
-            Discover your next
-            <br />
-            dream gig
-          </h1>
-          <h3 className="md:text-md py-2 text-xs font-medium leading-loose text-white md:text-lg lg:text-xl">
-            {' '}
-            Sign up for our network and have your next opportunity find you.
-          </h3>
-          <h3 className="pt-3 text-xs font-light text-white md:text-sm lg:text-base">
-            Free for everyone. Proudly made in Chicago.
-          </h3>
-          <div className="mt-12 flex flex-col gap-4 md:flex-row">
-            <a href="/sign-up">
-              <button className="w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
-                Join Now
-              </button>
-            </a>
-            <a href="/shows">
-              <button className="w-full rounded-full bg-mint px-14 py-2 text-lg font-semibold text-white hover:bg-mint/80 md:py-3 lg:w-fit">
-                Browse Shows
-              </button>
-            </a>
+
+        {/* Mobile/Small tablet layout */}
+        <div className="relative z-10 mt-16 px-4 py-6 sm:mt-20 sm:px-6 sm:py-8 md:hidden">
+          <div className="max-w-sm sm:max-w-md">
+            <h2 className="pb-1 text-xs font-normal text-white sm:text-sm">
+              Chicago artist guide
+            </h2>
+            <h1 className="pb-3 text-xl font-bold leading-tight text-white sm:text-2xl">
+              Find your next role at any stage.
+            </h1>
+            <h3 className="py-2 text-xs leading-relaxed text-white sm:text-sm">
+              Diversifying theatre one FREE connection at a time.
+            </h3>
+            <div className="flex flex-col gap-3 pt-4">
+              <Link to="/sign-up" className="w-full">
+                <button className="w-full rounded-full bg-mint px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-mint/90 sm:py-3 sm:text-base">
+                  Join Now
+                </button>
+              </Link>
+              <p className="text-xs text-white sm:text-sm">
+                Totally Free, Locally Provided.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tablet/Desktop layout - side by side */}
+        <div className="relative z-10 hidden md:block md:bg-white">
+          <div className="grid md:min-h-[547px] md:grid-cols-2 md:items-center">
+            {/* Left column - Text content */}
+            <div className="md:px-12 md:py-16 lg:px-16 xl:px-24">
+              <div className="max-w-lg">
+                <h2 className="pb-1 text-base font-normal text-darkGrey md:text-lg">
+                  Chicago artist guide
+                </h2>
+                <h1 className="pb-4 text-2xl font-bold leading-tight text-darkGrey md:text-4xl lg:text-5xl">
+                  Find your next role at any stage.
+                </h1>
+                <h3 className="py-2 text-base leading-relaxed text-darkGrey md:text-lg">
+                  Diversifying theatre one FREE connection at a time.
+                </h3>
+                <div className="flex flex-col gap-3 pt-6">
+                  <Link to="/sign-up" className="w-fit">
+                    <button className="rounded-full bg-mint px-8 py-3 text-lg font-bold text-white transition-colors hover:bg-mint/90">
+                      Join Now
+                    </button>
+                  </Link>
+                  <p className="text-sm text-darkGrey">
+                    Totally Free, Locally Provided.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column - Image */}
+            <div className="md:p-8 lg:p-12">
+              <img
+                src={Hero}
+                alt="Hero"
+                className="h-full w-full rounded-lg object-cover md:min-h-[400px]"
+              />
+            </div>
           </div>
         </div>
       </div>
-      <div className="mt-12 flex justify-center">
+      <div className="mt-8 flex justify-center px-4 sm:mt-10 sm:px-6 md:mt-12 md:px-0">
         <Values />
       </div>
       {/* Partners section - updated with slider */}
-      <div className="mt-12 flex w-full justify-center bg-white">
-        <div className="flex w-full max-w-7xl flex-col items-center p-6">
-          <h2 className="max-w-xl pt-6 text-center text-5xl">
+      <div className="mt-8 flex w-full justify-center bg-white sm:mt-10 md:mt-12">
+        <div className="flex w-full max-w-7xl flex-col items-center p-4 sm:p-6">
+          <h2 className="max-w-xl pt-4 text-center text-2xl font-bold sm:pt-6 sm:text-3xl md:text-4xl lg:text-5xl">
             Our Theatre Company Members
           </h2>
-          <div className="my-12 w-full">
+          <div className="my-8 w-full sm:my-10 md:my-12">
             <PartnerSlider partners={partners} />
           </div>
         </div>
       </div>
       {/* FAQ */}
-      <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
-        <div className="col-span-1 flex items-center justify-center">
-          <h1 className="text-3xl text-black md:text-4xl lg:text-5xl">
+      <div className="mx-4 my-16 grid grid-cols-1 gap-6 sm:mx-8 sm:my-20 md:mx-12 md:my-24 lg:grid-cols-3 lg:gap-0">
+        <div className="col-span-1 flex items-center justify-center lg:justify-start">
+          <h1 className="text-center text-xl text-black sm:text-2xl md:text-3xl lg:text-left lg:text-4xl xl:text-5xl">
             Frequently
             <br />
             Asked
@@ -200,7 +240,7 @@ const Home = () => {
             Questions
           </h1>
         </div>
-        <div className="col-span-2 mx-12">
+        <div className="col-span-1 lg:col-span-2 lg:mx-12">
           <Collapsible
             sectionTitles={sectionTitles}
             subSections={homeFAQ}
@@ -211,61 +251,70 @@ const Home = () => {
       </div>
       {/* Diversify max-w-7xl */}
       <div className="flex w-full justify-center bg-white">
-        <div className="w-full max-w-7xl p-6">
-          <div className="my-6 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+        <div className="w-full max-w-7xl p-4 sm:p-6">
+          <div className="my-6 grid grid-cols-1 items-center gap-8 sm:gap-10 md:grid-cols-2 md:gap-12">
             <div className="order-2 flex flex-col md:order-1">
-              <h2 className="text-xl md:text-3xl">
+              <h2 className="text-xl font-bold sm:text-2xl md:text-3xl">
                 Help us diversify the Chicago theatre community!
               </h2>
-              <h3 className="pt-2 text-base leading-loose">
+              <h3 className="pt-2 text-sm leading-relaxed sm:text-base">
                 Your support of the Chicago Artist Guide helps us offer this
                 platform to our users free of cost.
               </h3>
-              <a href={zeffyUrl} target="_blank">
-                <button className="mt-4 w-full rounded-full bg-salmon px-14 py-3 text-center text-xl font-semibold text-white hover:bg-blush md:w-fit">
+              <a href={zeffyUrl} target="_blank" className="mt-4 md:w-fit">
+                <button className="w-full rounded-full bg-salmon px-8 py-3 text-center text-lg font-semibold text-white hover:bg-blush sm:px-12 sm:text-xl md:w-fit md:px-14">
                   Donate
                 </button>
               </a>
             </div>
             <div className="order-1 flex items-center justify-center md:order-2">
-              <img src={Donate} alt="Group of people happily posing" />
+              <img
+                src={Donate}
+                alt="Group of people happily posing"
+                className="h-auto max-w-full"
+              />
             </div>
           </div>
         </div>
       </div>
 
       {/* Newsletter */}
-      <div>
-        <h2 className="text-evergreen mt-24 px-2 text-start text-2xl md:text-center">
-          Stay up to date with the Chicago Artist Guide’s Newsletter
+      <div className="px-4 sm:px-6 md:px-8 lg:px-12">
+        <h2 className="mt-16 text-center text-lg font-medium text-evergreen sm:mt-20 sm:text-xl md:mt-24 md:text-2xl">
+          Stay up to date with the Chicago Artist Guide's Newsletter
         </h2>
         <form
           onSubmit={(e) => handleSubmit(e)}
-          className="flex flex-col justify-center px-5 md:flex-row md:gap-x-10 md:px-10"
+          className="mt-6 flex flex-col justify-center gap-4 sm:mt-8 md:mx-auto md:mt-10 md:max-w-4xl md:flex-row md:gap-4 lg:gap-6"
         >
-          <InputField
-            placeholder="First & Last Name"
-            value={formData.FNAME}
-            id="FNAME"
-            name="FNAME"
-            onChange={handleChange}
-            required
-          />
-          <InputField
-            placeholder="Email Address"
-            value={formData.EMAIL}
-            id="EMAIL"
-            name="EMAIL"
-            onChange={handleChange}
-            required
-          />
-          <button
-            type="submit"
-            className="hover:bg-evergreen mt-4 rounded-full bg-mint px-14 py-2 text-xl font-semibold text-white"
-            name="btnSubmit"
-          >
-            Keep me posted!
-          </button>
+          <div className="flex-1 md:max-w-xs lg:max-w-sm">
+            <InputField
+              placeholder="First & Last Name"
+              value={formData.FNAME}
+              id="FNAME"
+              name="FNAME"
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="flex-1 md:max-w-xs lg:max-w-sm">
+            <InputField
+              placeholder="Email Address"
+              value={formData.EMAIL}
+              id="EMAIL"
+              name="EMAIL"
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="md:flex-shrink-0">
+            <button
+              type="submit"
+              className="w-full rounded-full bg-mint px-6 py-3 text-sm font-semibold text-white hover:bg-mint/90 sm:text-base md:w-auto md:px-8 lg:px-12"
+            >
+              Sign Up
+            </button>
+          </div>
         </form>
       </div>
     </>

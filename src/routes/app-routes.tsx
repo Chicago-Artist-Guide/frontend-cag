@@ -22,6 +22,9 @@ const Messages = lazy(() => import('./Messages'));
 const ManageProduction = lazy(() => import('./ManageProduction'));
 const Matches = lazy(() => import('./Matches'));
 const NotFound = lazy(() => import('./NotFound'));
+const AnalyticsDashboard = lazy(
+  () => import('../components/Staff/Analytics/Dashboard')
+);
 
 const AppRoutes = () => {
   return (
@@ -53,6 +56,7 @@ const AppRoutes = () => {
           path="/profile/search/talent/:productionId/:roleId?"
           element={<Matches />}
         />
+        <Route path="/staff/analytics" element={<AnalyticsDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
