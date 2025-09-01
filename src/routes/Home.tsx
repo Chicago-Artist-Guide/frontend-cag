@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Hero from '/hero.png';
 import Collapsible from '../components/layout/Collapsible';
 import Donate from '/donate.png';
-import { InputField } from '../components/shared';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
@@ -35,64 +34,6 @@ const Home = () => {
         <p>{props.answer}</p>
       </div>
     );
-  };
-
-  const [formData, setFormData] = useState({
-    FNAME: '',
-    LNAME: '',
-    EMAIL: ''
-  });
-
-  const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
-
-  const handleSubmit = async (e: any) => {
-    e.preventDefault();
-
-    const name = formData.FNAME;
-    const spaceIndex = name.indexOf(' ');
-
-    let updatedFormData = { ...formData };
-
-    if (spaceIndex !== -1) {
-      const firstName = name.substring(0, spaceIndex).trim();
-      const lastName = name.substring(spaceIndex + 1).trim();
-      updatedFormData = {
-        ...formData,
-        FNAME: firstName,
-        LNAME: lastName
-      };
-    } else {
-      updatedFormData = {
-        ...formData,
-        LNAME: name
-      };
-    }
-
-    setFormData(updatedFormData);
-
-    const form = e.target;
-    const url = new URL(
-      'https://chicagoartistguide.us6.list-manage.com/subscribe/post'
-    );
-    url.searchParams.append('u', '5259e9388abb929652f950f67');
-    url.searchParams.append('id', '8117d0974f');
-
-    Object.keys(updatedFormData).forEach((key) => {
-      url.searchParams.append(
-        key,
-        updatedFormData[key as keyof typeof updatedFormData]
-      );
-    });
-
-    form.action = url.toString();
-    form.method = 'POST';
-    form.submit();
   };
 
   const partners = [
@@ -236,37 +177,28 @@ const Home = () => {
 
       {/* Newsletter */}
       <div>
-        <h2 className="text-evergreen mt-24 px-2 text-start text-2xl md:text-center">
+        <h2 className="mt-24 px-2 text-start text-2xl text-evergreen md:text-center">
           Stay up to date with the Chicago Artist Guide’s Newsletter
         </h2>
-        <form
-          onSubmit={(e) => handleSubmit(e)}
-          className="flex flex-col justify-center px-5 md:flex-row md:gap-x-10 md:px-10"
-        >
-          <InputField
-            placeholder="First & Last Name"
-            value={formData.FNAME}
-            id="FNAME"
-            name="FNAME"
-            onChange={handleChange}
-            required
-          />
-          <InputField
-            placeholder="Email Address"
-            value={formData.EMAIL}
-            id="EMAIL"
-            name="EMAIL"
-            onChange={handleChange}
-            required
-          />
-          <button
-            type="submit"
-            className="hover:bg-evergreen mt-4 rounded-full bg-mint px-14 py-2 text-xl font-semibold text-white"
-            name="btnSubmit"
-          >
-            Keep me posted!
-          </button>
-        </form>
+        <div className="px-5 md:px-10">
+          <div className="relative h-96 w-full">
+            <iframe
+              title="Signup form powered by Zeffy"
+              style={{
+                position: 'absolute',
+                border: 0,
+                top: 0,
+                left: 0,
+                bottom: 0,
+                right: 0,
+                width: '100%',
+                height: '100%'
+              }}
+              src="https://www.zeffy.com/en-US/embed/newsletter-form/sign-up-for-our-newsletter-859"
+              allowTransparency={true}
+            />
+          </div>
+        </div>
       </div>
     </>
   );
