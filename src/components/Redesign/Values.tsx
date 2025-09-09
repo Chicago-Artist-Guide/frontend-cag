@@ -145,7 +145,7 @@ const Values = () => {
   };
 
   return (
-    <div className="w-full max-w-sm flex-col items-center justify-center rounded-lg bg-white px-4 py-8 sm:max-w-md sm:px-6 sm:py-10 md:flex md:max-w-4xl md:px-8 md:py-12 lg:max-w-6xl lg:px-12">
+    <div className="xs:px-4 xs:py-8 w-full max-w-sm flex-col items-center justify-center overflow-hidden rounded-lg bg-white px-2 py-6 sm:max-w-md sm:px-6 sm:py-10 md:flex md:max-w-4xl md:px-8 md:py-12 lg:max-w-6xl lg:px-12">
       {/* Title */}
       <div className="relative text-darkGrey">
         <div className="flex items-start">
@@ -197,7 +197,7 @@ const Values = () => {
 
       {/* Values */}
       <div className="my-3 sm:my-4 md:my-8">
-        <div className="grid w-[320px] grid-cols-3 grid-rows-2 items-center gap-1 sm:w-[350px] sm:gap-[2px] md:w-[700px] md:gap-3 lg:w-[800px]">
+        <div className="grid w-full max-w-[320px] grid-cols-3 grid-rows-2 items-center gap-1 sm:w-[350px] sm:max-w-none sm:gap-[2px] md:w-[700px] md:gap-3 lg:w-[800px]">
           {Object.keys(values).map((key) => {
             const value = values[Number(key)];
             const currentItem = value[member];
