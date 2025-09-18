@@ -9,11 +9,13 @@ interface Partner {
 interface PartnerSliderProps {
   partners: Partner[];
   autoSlideInterval?: number;
+  itemsPerSlide?: number;
 }
 
 const PartnerSlider: React.FC<PartnerSliderProps> = ({
   partners,
-  autoSlideInterval = 5000
+  autoSlideInterval = 5000,
+  itemsPerSlide = 3
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
@@ -22,7 +24,7 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Number of items to show per view
-  const itemsPerView = isMobile ? 1 : 3;
+  const itemsPerView = isMobile ? 1 : itemsPerSlide;
 
   // Total number of possible positions (slides)
   const totalSlides = Math.ceil(partners.length / itemsPerView);
@@ -114,7 +116,7 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
                         rel="noopener noreferrer"
                         className={`flex justify-center transition-all duration-300 ${
                           hoveredPartner === slideIndex * itemsPerView + index
-                            ? 'scale-105 transform rounded-lg bg-white shadow-lg'
+                            ? 'scale-105 transform rounded-lg shadow-lg'
                             : ''
                         }`}
                       >

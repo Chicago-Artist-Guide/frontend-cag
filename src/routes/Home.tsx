@@ -18,6 +18,12 @@ import GreatWorks from '../images/partners/great-works-1.jpg';
 import Jackalope from '../images/partners/jackalope-1.png';
 import Pegasus from '../images/partners/pegasus-logo-1.jpg';
 
+// Supporters
+import Driehaus from '../images/supporters/driehaus.svg';
+import LawLynx from '../images/supporters/lawlynx.jpg';
+import Gios from '../images/supporters/gios.png';
+import PFM from '../images/supporters/pfm.webp';
+
 const Home = () => {
   const sectionTitles = {
     about: 'What is Chicago Artist Guide (CAG)?',
@@ -80,6 +86,21 @@ const Home = () => {
     }
   ];
 
+  const supporters = [
+    {
+      src: Driehaus,
+      alt: 'Driehaus Foundation',
+      url: 'https://www.driehausfoundation.org/'
+    },
+    { src: LawLynx, alt: 'Law Lynx, Inc.', url: 'https://thelynxverse.com/' },
+    {
+      src: Gios,
+      alt: 'Gios Bar & Grill',
+      url: 'https://giosbbqbarandgrill.com/'
+    },
+    { src: PFM, alt: 'PFM', url: 'https://www.pfm.com/' }
+  ];
+
   return (
     <>
       {/* Hero */}
@@ -127,6 +148,17 @@ const Home = () => {
           </h2>
           <div className="my-12 w-full">
             <PartnerSlider partners={partners} />
+          </div>
+        </div>
+      </div>
+      {/* Supporters section */}
+      <div className="mt-12 flex w-full justify-center bg-white">
+        <div className="flex w-full max-w-7xl flex-col items-center p-6">
+          <h2 className="max-w-xl pt-6 text-center text-5xl">
+            Chicago Artist Guide is Supported By
+          </h2>
+          <div className="my-12 w-full">
+            <PartnerSlider partners={supporters} itemsPerSlide={4} />
           </div>
         </div>
       </div>
