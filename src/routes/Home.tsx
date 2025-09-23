@@ -6,7 +6,6 @@ import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
 import { zeffyUrl } from '../utils/marketing';
-import { Link } from 'react-router-dom';
 
 // Partners
 import MPaact from '../images/partners/mpaact_hq-1.jpg';
@@ -105,75 +104,67 @@ const Home = () => {
   return (
     <>
       {/* Hero */}
-      <div className="relative">
-        {/* Mobile/Small screens - full background image */}
+      <div className="relative md:hidden">
         <img
           src={Hero}
           alt="Hero"
-          className="absolute inset-0 h-full w-full object-cover md:hidden"
+          className="absolute inset-0 h-full w-full object-cover"
         />
-
-        {/* Mobile/Small tablet layout */}
-        <div className="relative z-10 mt-16 px-4 py-6 sm:mt-20 sm:px-6 sm:py-8 md:hidden">
-          <div className="max-w-sm sm:max-w-md">
-            <h2 className="pb-1 text-xs font-normal text-white sm:text-sm">
-              Chicago artist guide
-            </h2>
-            <h1 className="pb-3 text-xl font-bold leading-tight text-white sm:text-2xl">
-              Find your next role at any stage.
-            </h1>
-            <h3 className="py-2 text-xs leading-relaxed text-white sm:text-sm">
-              Diversifying theatre one FREE connection at a time.
-            </h3>
-            <div className="flex flex-col gap-3 pt-4">
-              <Link to="/sign-up" className="w-full">
-                <button className="w-full rounded-full bg-mint px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-mint/90 sm:py-3 sm:text-base">
-                  Join Now
-                </button>
-              </Link>
-              <p className="text-xs text-white sm:text-sm">
-                Totally Free, Locally Provided.
-              </p>
-            </div>
+        <div className="relative z-10 mt-16 px-4 py-6 sm:mt-20 sm:px-6 sm:py-8">
+          <h1 className="pb-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+            Discover your next
+            <br />
+            dream gig
+          </h1>
+          <h3 className="py-2 text-sm font-medium leading-relaxed text-white sm:text-base">
+            Sign up for our network and have your next opportunity find you.
+          </h3>
+          <h3 className="pt-3 text-xs font-light text-white sm:text-sm">
+            Free for everyone. Proudly made in Chicago.
+          </h3>
+          <div className="mt-8 flex flex-col gap-4">
+            <a href="/sign-up">
+              <button className="w-full rounded-full bg-butter px-8 py-3 text-base font-semibold text-white hover:bg-yellow">
+                Join Now
+              </button>
+            </a>
+            <a href="/shows">
+              <button className="w-full rounded-full bg-mint px-8 py-3 text-base font-semibold text-white hover:bg-mint/80">
+                Browse Shows
+              </button>
+            </a>
           </div>
         </div>
-
-        {/* Tablet/Desktop layout - side by side */}
-        <div className="relative z-10 hidden md:block md:bg-white">
-          <div className="grid md:min-h-[547px] md:grid-cols-2 md:items-center">
-            {/* Left column - Text content */}
-            <div className="md:px-12 md:py-16 lg:px-16 xl:px-24">
-              <div className="max-w-lg">
-                <h2 className="pb-1 text-base font-normal text-darkGrey md:text-lg">
-                  Chicago artist guide
-                </h2>
-                <h1 className="pb-4 text-2xl font-bold leading-tight text-darkGrey md:text-4xl lg:text-5xl">
-                  Find your next role at any stage.
-                </h1>
-                <h3 className="py-2 text-base leading-relaxed text-darkGrey md:text-lg">
-                  Diversifying theatre one FREE connection at a time.
-                </h3>
-                <div className="flex flex-col gap-3 pt-6">
-                  <Link to="/sign-up" className="w-fit">
-                    <button className="rounded-full bg-mint px-8 py-3 text-lg font-bold text-white transition-colors hover:bg-mint/90">
-                      Join Now
-                    </button>
-                  </Link>
-                  <p className="text-sm text-darkGrey">
-                    Totally Free, Locally Provided.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Right column - Image */}
-            <div className="md:p-8 lg:p-12">
-              <img
-                src={Hero}
-                alt="Hero"
-                className="h-full w-full rounded-lg object-cover md:min-h-[400px]"
-              />
-            </div>
+      </div>
+      <div className="relative hidden md:block">
+        <img
+          src={Hero}
+          alt="Hero"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="relative z-10 mt-24 px-6 py-8 md:px-12 md:py-24 lg:px-36 lg:py-36 xl:px-64 xl:py-48">
+          <h1 className="pb-3 text-2xl text-white md:text-5xl lg:text-7xl">
+            Discover your next
+            <br />
+            dream gig
+          </h1>
+          <h3 className="md:text-md py-2 text-xs font-medium leading-loose text-white md:text-lg lg:text-xl">
+            Sign up for our network and have your next opportunity find you.
+          </h3>
+          <h3 className="pt-3 text-xs font-light text-white md:text-sm lg:text-base">
+            Free for everyone. Proudly made in Chicago.
+          </h3>
+          <div className="mt-12 flex flex-col gap-4 md:flex-row">
+            <a href="/sign-up">
+              <button className="w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
+                Join Now
+              </button>
+            </a>
+            <a href="/shows">
+              <button className="w-full rounded-full bg-mint px-14 py-2 text-lg font-semibold text-white hover:bg-mint/80 md:py-3 lg:w-fit">
+                Browse Shows
+              </button>
+            </a>
           </div>
         </div>
       </div>
@@ -203,9 +194,9 @@ const Home = () => {
         </div>
       </div>
       {/* FAQ */}
-      <div className="mx-4 my-16 grid grid-cols-1 gap-6 sm:mx-8 sm:my-20 md:mx-12 md:my-24 lg:grid-cols-3 lg:gap-0">
-        <div className="col-span-1 flex items-center justify-center lg:justify-start">
-          <h1 className="text-center text-xl text-black sm:text-2xl md:text-3xl lg:text-left lg:text-4xl xl:text-5xl">
+      <div className="mx-4 my-16 grid grid-cols-1 sm:mx-8 sm:my-20 md:mx-12 md:my-24 lg:grid-cols-3">
+        <div className="col-span-1 flex items-center justify-center">
+          <h1 className="text-center text-3xl text-black md:text-4xl lg:text-5xl">
             Frequently
             <br />
             Asked
@@ -213,7 +204,7 @@ const Home = () => {
             Questions
           </h1>
         </div>
-        <div className="col-span-1 lg:col-span-2 lg:mx-12">
+        <div className="col-span-1 mx-4 sm:mx-8 lg:col-span-2 lg:mx-12 xl:mx-20">
           <Collapsible
             sectionTitles={sectionTitles}
             subSections={homeFAQ}
