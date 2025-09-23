@@ -1,9 +1,15 @@
 import React from 'react';
-import Col from 'react-bootstrap/Col';
 import { NavigationProps, Step } from 'react-hooks-helper';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/shared/Button';
-import { ButtonCol, PageFooterRow, Pagination } from '../SignUpFooterStyles';
+import {
+  ButtonCol,
+  ButtonSection,
+  FooterContent,
+  PageFooterRow,
+  Pagination,
+  PaginationSection
+} from '../SignUpFooterStyles';
 import { FormStep, SubmitResponse } from './types';
 
 const FORM_VALIDATION_ON = true;
@@ -60,39 +66,44 @@ const SignUpFooter: React.FC<{
 
   return (
     <PageFooterRow>
-      <Col lg="4">
-        <Button
-          disabled={formStep === 'privacy'}
-          onClick={onPreviousClick}
-          text="Back"
-          type="button"
-          variant="secondary"
-        />
-      </Col>
-      <Col lg="4">
-        <Pagination>
-          {steps.map((_step, i: number) => (
-            <li
-              className={
-                i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
-              }
-              key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
-            >
-              <span>{i + 1}</span>
-            </li>
-          ))}
-        </Pagination>
-      </Col>
-      <ButtonCol lg="4">
-        <Button
-          disabled={isDisabled}
-          onClick={onNextClick}
-          text={nextText}
-          type="button"
-          variant="primary"
-          style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
-        />
-      </ButtonCol>
+      <FooterContent>
+        <PaginationSection>
+          <Pagination>
+            {steps.map((_step, i: number) => (
+              <li
+                className={
+                  i < stepIndex ? 'complete' : stepIndex === i ? 'active' : ''
+                }
+                key={`sign-up-footer-page-bubble-${stepIndex}-${i}`}
+              >
+                <span>{i + 1}</span>
+              </li>
+            ))}
+          </Pagination>
+        </PaginationSection>
+
+        <ButtonSection>
+          <ButtonCol className="back-button">
+            <Button
+              disabled={formStep === 'privacy'}
+              onClick={onPreviousClick}
+              text="Back"
+              type="button"
+              variant="secondary"
+            />
+          </ButtonCol>
+          <ButtonCol className="continue-button">
+            <Button
+              disabled={isDisabled}
+              onClick={onNextClick}
+              text={nextText}
+              type="button"
+              variant="primary"
+              style={{ cursor: isDisabled ? 'not-allowed' : 'pointer' }}
+            />
+          </ButtonCol>
+        </ButtonSection>
+      </FooterContent>
     </PageFooterRow>
   );
 };
