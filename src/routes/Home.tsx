@@ -22,7 +22,7 @@ import Pegasus from '../images/partners/pegasus-logo-1.jpg';
 import Driehaus from '../images/supporters/driehaus.svg';
 import LawLynx from '../images/supporters/lawlynx.jpg';
 import Gios from '../images/supporters/gios.png';
-import PFM from '../images/supporters/pfm.webp';
+import PFM from '../images/supporters/pfm.png';
 
 const Home = () => {
   const sectionTitles = {
