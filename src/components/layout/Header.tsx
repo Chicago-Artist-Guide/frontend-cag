@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
 import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
+import { zeffyUrl } from '../../utils/marketing';
 
 const Header = () => {
   const { currentUser } = useUserContext();
@@ -45,9 +46,7 @@ const Header = () => {
           {/* <Nav.Link as={Link} to="/shows">
             SHOWS
           </Nav.Link> */}
-          <Nav.Link as={Link} to="/donate">
-            DONATE
-          </Nav.Link>
+          <Nav.Link href={zeffyUrl}>DONATE</Nav.Link>
           <Nav.Link as={Link} to="/events">
             EVENTS
           </Nav.Link>
