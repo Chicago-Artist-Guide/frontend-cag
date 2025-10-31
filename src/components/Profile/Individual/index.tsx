@@ -1266,7 +1266,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     profile?.data?.offstage_roles_scenic_and_properties
                   }
                   offstage_roles_lighting={
-                    profile?.data?.offstage_roles_lightning
+                    profile?.data?.offstage_roles_lighting
                   }
                   offstage_roles_sound={profile?.data?.offstage_roles_sound}
                   offstage_roles_hair_makeup_costumes={
@@ -1281,7 +1281,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                   profile?.data?.offstage_roles_production?.length > 0 ||
                   profile?.data?.offstage_roles_scenic_and_properties?.length >
                     0 ||
-                  profile?.data?.offstage_roles_lightning?.length > 0 ||
+                  profile?.data?.offstage_roles_lighting?.length > 0 ||
                   profile?.data?.offstage_roles_sound?.length > 0 ||
                   profile?.data?.offstage_roles_hair_makeup_costumes?.length >
                     0) && (
@@ -1297,7 +1297,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                         profile?.data?.offstage_roles_scenic_and_properties
                       }
                       offstage_roles_lighting={
-                        profile?.data?.offstage_roles_lightning
+                        profile?.data?.offstage_roles_lighting
                       }
                       offstage_roles_sound={profile?.data?.offstage_roles_sound}
                       offstage_roles_hair_makeup_costumes={
