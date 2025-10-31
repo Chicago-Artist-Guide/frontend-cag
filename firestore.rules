@@ -77,11 +77,11 @@ service cloud.firestore {
          request.auth.uid in resource.data.recipients);
     }
 
-    // Mail collection - users can only access their own mail
+    // Mail collection - anyone can create; only recipients/senders can access existing mail
     match /mail/{mailId} {
-      allow read, write: if isAuthenticated() && 
-        (resource == null || 
-         request.auth.uid == resource.data.to_user_id || 
+      allow create: if true;
+      allow read, update, delete: if isAuthenticated() && 
+        (request.auth.uid == resource.data.to_user_id || 
          request.auth.uid == resource.data.from_user_id);
     }
 
@@ -100,7 +100,7 @@ service cloud.firestore {
 
     // Theatre requests - authenticated users can create, admins can read
     match /theatre_requests/{requestId} {
-      allow create: if isAuthenticated();
+      allow create: if true;
       allow read, update, delete: if isAuthenticated() && 
         (resource == null || request.auth.uid == resource.data.user_id);
     }
