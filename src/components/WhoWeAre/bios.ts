@@ -1,5 +1,6 @@
 // Board of Directors
 import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
+import Cooper from '../../images/who-we-are/board/Board_Cooper.png';
 import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
 import Frazier from '../../images/who-we-are/board/Board_Frazier.png';
 import GomezBeloz from '../../images/who-we-are/board/Board_Gomez-Beloz.jpg';
@@ -12,29 +13,24 @@ import Webb from '../../images/who-we-are/board/Board_Webb.jpg';
 import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.png';
 import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
 import Kauffman from '../../images/who-we-are/board/Board_Kauffman.png';
-import Lewis from '../../images/who-we-are/board/Board_Lewis.png';
+import Mangren from '../../images/who-we-are/board/Board_Mangren.jpg';
 import Silva from '../../images/who-we-are/board/Board_Silva.png';
 import Kester from '../../images/who-we-are/board/Board_Kester.jpg';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 
 // Business Operations
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
-import Torres from '../../images/who-we-are/board/Staff_Torres.jpg';
 import Adamy from '../../images/who-we-are/operations/Staff_Adamy.png';
 import Newsome from '../../images/who-we-are/operations/Staff_Newsome.png';
 import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
 import Benda from '../../images/who-we-are/operations/Staff_Benda.jpg';
-import Huang from '../../images/who-we-are/operations/Staff_Huang.jpg';
+import Ledesma from '../../images/who-we-are/operations/Staff_Ledesma.png';
 import Meyers from '../../images/who-we-are/operations/Staff_Meyers.jpg';
-import Ortega from '../../images/who-we-are/operations/Staff_Ortega.jpg';
 
 // Site Development
 import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
-import DeSant from '../../images/who-we-are/technical/Staff_DeSant.jpg';
 import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
-import Hernandez from '../../images/who-we-are/technical/Staff_Hernandez.png';
 import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
-import Nagra from '../../images/who-we-are/technical/Staff_Nagra.jpg';
 import Knuteson from '../../images/who-we-are/technical/Staff_Knuteson.jpg';
 import Goldstein from '../../images/who-we-are/technical/Staff_Goldstein.png';
 
@@ -68,6 +64,17 @@ const bios = {
       image: Dolezalek,
       linkedin: 'iamzeked',
       bio: 'In the workplace or in the community, Zeke has a passion for creating spaces in which people can thrive. As a People & Culture professional, Zeke strives to unite people together by encouraging conversations and empowering others. Over the course of his time at What if Syndicate, Zeke has overseen a near 200% increase of staff, over 6 new property openings, labor laws and employee relations in over 5 markets, and growth and development planning for several leaders and operators within our brands.\n\nWith a BFA in Musical Theatre from the Chicago College of Performing Arts, Zeke has spent time actively involved in the Chicago theatre community both on and off-stage. As a professional photographer, Zeke specializes in headshots, events, and production photography/B-roll. @iAmZekeD'
+    },
+    {
+      id: bioId(),
+      name: 'Dr. Tracy Cooper',
+      role: 'Secretary',
+      pronouns: 'she/her',
+      affiliation:
+        'Licensed Clinical Social Worker, neurobehavioral practitioner, and trauma specialist',
+      image: Cooper,
+      linkedin: 'dr-tracy-cooper-196a54',
+      bio: 'Dr. Tracy Cooper is a Doctor of Clinical Social Work, Licensed Clinical Social Worker, neurobehavioral practitioner, and trauma specialist with 24 years of experience in the field. She has provided direct clinical care and consultation services for infants, children, youth, families, and individuals with mental health needs, developmental and neurobehavioral disabilities, trauma, and medical care continuity challenges. As an entrepreneur, Dr. Cooper founded and evolved her solo mental health practice into a fully incorporated mental health agency, where she currently serves as CEO and owner. She is deeply committed to advancing access to services for underserved populations and actively contributes to local and state policy initiatives aimed at addressing systemic barriers within the healthcare and social services sectors. Dr. Cooper is also a 35-year member of Zeta Phi Beta Sorority, Inc., where she has held numerous elected and appointed leadership positions at the local, regional, and international levels, promoting service, advocacy, and sustainable community change. For Dr. Tracy Cooper, this work is more than a career—it is a lifelong journey of purpose. Every step she takes is fueled by her unwavering belief that everyone deserves the opportunity to heal, grow, and reach their full potential.'
     },
     {
       id: bioId(),
@@ -165,23 +172,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'James Lewis',
+      name: 'Izzy Mangren',
       role: 'Artist Board Member',
-      pronouns: 'he/him',
+      pronouns: 'she/her',
       affiliation: null,
-      image: Lewis,
+      image: Mangren,
       linkedin: null,
-      bio: 'is a Chicago Actor and Dad originally from Connecticut. Excited to be apart of the Artist Board, his previous Chicago Theatre Credits: The Secret Council (First Folio Theatre), The Last Pair of Earlies (Raven Theatre), Short Changed (Factory Theatre), YPF at Pegasus (Pegasus Theatre), Titus Andronicus (Haven Theatre), Grace, Or the art of climbing (Brown Paper Box co). His TV credits include: 2 Broke Girls, True Blood and Real Husbands of Hollywood. James also attended The Theatre School at DePaul University for undergrad. James also is a writer and multi-instrumentalist but his greatest job is being a dad to the two greatest kids in the world, Amari and Naomi.'
-    },
-    {
-      id: bioId(),
-      name: 'Camille Cadenhead',
-      role: 'Artist Board Member',
-      pronouns: 'they/she',
-      affiliation: null,
-      image: Cadenhead,
-      linkedin: 'camille-cadenhead-9708b0174',
-      bio: 'is an actor and writer of Chicago, having worked with numerous theater companies including 16th Street Theater, Red Tape Theater, Prologue Theater, Eta Theater, MPAACT Theater, and many others. They have also co-written sketch shows performed at The Second City Training Center with sketch group, The Family Robot. Camille’s training in theater and performance includes The Second City Conservatory, iO, and most recently The Black Box Academy. Their BA is in Theater from Columbia College.'
+      bio: ''
     }
   ],
   operations: [
@@ -217,13 +214,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Yazmin Torres',
+      name: 'Camille Cadenhead',
       role: 'Business Manager',
-      pronouns: 'she/her',
+      pronouns: 'they/she',
       affiliation: null,
-      image: Torres,
-      linkedin: 'yazmint',
-      bio: 'holds a BA from the University of Illinois at Chicago and an MBA from DePaul University. Yazmin is a driven, problem solving professional with great interpersonal skills and a commitment to team success. She currently is the coordinator of business services and financials at the UIC School of Architecture. Prior to joining the staff at UIC, she worked in a variety of fields, including business operations and inventory management for start-up companies. At DePaul University, Yazmin explored her interests in supply-chain data management as the VP of the Supply Chain Management Society and in community-building as a crisis intervention advocate. As an MBA student, she was able to see how her passion for social justice issues, coordination, and collaboration with channel partners interests.'
+      image: Cadenhead,
+      linkedin: 'camille-cadenhead-9708b0174',
+      bio: 'is an actor and writer of Chicago, having worked with numerous theater companies including 16th Street Theater, Red Tape Theater, Prologue Theater, Eta Theater, MPAACT Theater, and many others. They have also co-written sketch shows performed at The Second City Training Center with sketch group, The Family Robot. Camille’s training in theater and performance includes The Second City Conservatory, iO, and most recently The Black Box Academy. Their BA is in Theater from Columbia College.'
     },
     {
       id: bioId(),
@@ -257,16 +254,6 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Leslie Huang',
-      role: 'Social Media Associate',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Huang,
-      linkedin: 'les1iehuang',
-      bio: "graduated from Purdue University in 2024 with a Bachelor's in Finance. She loves the stage which led her to volunteer with CAG! She hopes theatre can be an inclusive space for everyone to freely express themselves. In her free time, she loves to paint, draw, and has been getting more involved in digital art. Other activities include eating and sleeping."
-    },
-    {
-      id: bioId(),
       name: 'Ciara Meyers',
       role: 'Administrative Associate',
       pronouns: 'she/her',
@@ -277,13 +264,13 @@ const bios = {
     },
     {
       id: bioId(),
-      name: 'Jacky Ortega',
-      role: 'Social Media Associate',
+      name: 'Jennifer Ledesma',
+      role: 'Social Media Manager',
       pronouns: 'she/her',
       affiliation: null,
-      image: Ortega,
-      linkedin: 'jacquelineortegaa',
-      bio: "a first-generation Latina, holds a Master's in Marketing and a Bachelor's in Marketing with a concentration in Digital Marketing and Promotions from the University of Illinois at Chicago. Her passion for marketing, particularly social media Marketing, stems from her love of creativity and innovation. She has gained hands-on experience through two prior internships. As a Social Media Management Intern, she created high-engagement Instagram content and developed growth strategies. As a Digital Marketing Intern, she increased engagement across Instagram, TikTok, and LinkedIn, researched influencers for client events, and presented social media insights. Outside of work, Jacky loves spending time with her family, making TikToks, and traveling."
+      image: Ledesma,
+      linkedin: 'jenniferledesma',
+      bio: 'is a Chicago-based actor, singer, dancer, and musician who received her Bachelor of Arts in Musical Theatre from Columbia College Chicago. She is thrilled to be a part of the Chicago Artist Guide team as she has always had a passion for advocacy work and diversifying the theatre community is a value that is close to her heart. Within equity and diversity circles, she has been a Board Member for Chicago Arts Access, and worked within other nonprofits like Genders and Sexualities Network, Queer Cultural Center, and Orange County Human Relations. Most recently, she served as a Program Coordinator in Community Engagement at the Office for Diversity, Literacy, and Outreach Services (ODLOS) at American Library Association.\n\nAs a theatre artist, Jennifer has worked with theaters like Drury Lane, Porchlight Music Theatre, Kokandy Productions, TheatreSquared, Little Theatre on the Square, and Music Theatre Works, among others. She is proudly represented by Big Mouth Talent. In her free time, she loves consuming too much reality television, reading romance novels with just a bit of spice, and exploring different neighborhoods around Chicago that always feel like home.'
     }
   ],
   technical: [
@@ -327,46 +314,6 @@ const bios = {
       image: Knuteson,
       linkedin: 'themuffinman',
       bio: 'is a software engineer passionate about building intuitive, data-driven experiences. With a focus on search technologies, web applications, and serverless architectures, he enjoys solving complex problems with clean, efficient code. Outside of work, he loves spending time with his family and exploring new places.'
-    },
-    {
-      id: bioId(),
-      name: 'Luciana Mendez Gonzalez',
-      role: 'Engineer',
-      pronouns: 'she/her',
-      affiliation: 'Data Engineer',
-      image: MendezGonzalez,
-      linkedin: 'lmg25',
-      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
-    },
-    {
-      id: bioId(),
-      name: 'Grace DeSant',
-      role: 'UX Designer',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: DeSant,
-      linkedin: 'grace-desant',
-      bio: "holds a BA in Theatre from Millikin University, where she also minored in dance. She has worked as a theatre artist in Chicago for the past decade as a performer, producer, director, choreographer, and prop designer. In the past, she was co-chair of the Executive Board for Awakenings, a nonprofit art gallery that makes visible the experiences of sexual assault survivors. She also moonlights as a burlesque performer and producer Foxie la Fleur and co-founded Crescent Moon Nerdlesque in 2018. Grace is passionate about creating equal opportunities for artists and advocates for pay transparency within the performing arts community. In 2020, Grace decided to dive into UX Design through General Assembly's immersive program to marry her creative flair for visual design and passion for helping others. She aims to get certified in accessibility design in the future. She is thrilled to continue her journey as a UX designer with Chicago Artist Guide!"
-    },
-    {
-      id: bioId(),
-      name: 'Nicole Hernandez',
-      role: 'UX Designer',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Hernandez,
-      linkedin: 'nicolehernandez-design',
-      bio: 'has an academic background in Child and Adolescent Development. After teaching at an elementary school for 8 years, she decided to pursue a different career path. She discovered UX/UI design and got her training through General Assembly User Experience Design Immersive course. When she’s not ‘designing’ you can find Nicole hanging out with her dog, Boo, working out, or trying the newest local restaurants.'
-    },
-    {
-      id: bioId(),
-      name: 'Gisselle Nagra',
-      role: 'UX Designer',
-      pronouns: 'she/her',
-      affiliation: null,
-      image: Nagra,
-      linkedin: 'gissellenagra',
-      bio: 'is a passionate UX researcher with a design background, dedicated to understanding and empathizing with users to bridge the gap between them and products. She earned her degree in psychology from UC Berkeley and a certificate in Design Innovation, applying these skills throughout her UX career. With prior experience in healthcare, she brings a diverse perspective to her work. Outside the office, she enjoys traveling and cherishing moments with her loyal sidekick, Zoey, her dog.'
     }
   ],
   artistAdvisory: [
@@ -379,6 +326,16 @@ const bios = {
       image: JewellJordin,
       linkedin: 'jordinjewell',
       bio: "has specialized in marketing for over 9 years, dabbling in everything from graphic design to business development to strategy. Through her roles ranging from Social Media Strategist to Director of Marketing to Associate Strategic Director, she worked tirelessly to ideate unique, thoughtful solutions to revive marketing programs for clients ranging from local nonprofits to national brands. While she loved the work, her true passion is helping small businesses stand out on social media. That's why she left her full-time agency career to focus on building a content marketing boutique agency with an emphasis on organic social media. As the founder of West Loop Soul, she helps small business owners and entrepreneurs uncover the soul of their brand through content marketing while making a big impact with a reasonable budget. She's excited to bring this work to Chicago Artist Guide, helping support the vibrant Chicago theater community and the diverse talents that comprise it. When she's not creating content for her clients, you can find her at the dog park with her boys, Chicken and Waffles."
+    },
+    {
+      id: bioId(),
+      name: 'Luciana Mendez Gonzalez',
+      role: 'CAG Founding Engineer',
+      pronouns: 'she/her',
+      affiliation: 'Data Engineer',
+      image: MendezGonzalez,
+      linkedin: 'lmg25',
+      bio: 'is a data engineer currently based in Guadalajara, Mexico. She graduated from DePaul University with a degree in Mathematics and Computer Science in 2019. As the daughter of a theatre owner and producer, Luciana is excited to give back to a community that has given her so many memories and love. When she is not programming you can find her taking long walks, listening to music, or attending a concert.'
     },
     {
       id: bioId(),
