@@ -73,7 +73,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   const [websiteId, setWebsiteId] = useState(1);
 
   // training
-  const [trainingId, setTrainingId] = useState(1);
+  const [trainingId, setTrainingId] = useState(0);
 
   // upcoming and past shows
   const [showPastId, setShowPastId] = useState(1);
@@ -129,15 +129,27 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const updateTrainingState = () => {
-    if (!profile?.data?.training_institutions) {
+    const existingTrainings = profile?.data?.training_institutions as
+      | TrainingInstitution[]
+      | undefined;
+
+    if (!existingTrainings || !existingTrainings.length) {
       setEditProfile((prevState: any) => ({
         ...prevState,
         training_institutions: []
       }));
+      setTrainingId(0);
       return;
     }
 
-    const maxId = profile.data.training_institutions.length || 1;
+    const maxId = existingTrainings.reduce(
+      (currentMax: number, training: TrainingInstitution) => {
+        const trainingIdValue = Number(training?.id) || 0;
+        return trainingIdValue > currentMax ? trainingIdValue : currentMax;
+      },
+      0
+    );
+
     setTrainingId(maxId);
   };
 
