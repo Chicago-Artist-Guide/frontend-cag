@@ -20,6 +20,7 @@ import { useUserContext } from '../context/UserContext';
 import { colors, fonts } from '../theme/styleVars';
 import ManageAuditionInfo from '../components/Profile/Company/Production/Manage/ManageAuditionInfo';
 import ManageOffStageInfo from '../components/Profile/Company/Production/Manage/ManageOffStageInfo';
+import { sanitizeDataForFirestore } from '../utils/firestore';
 
 const ManageProduction = () => {
   const { productionId = '' } = useParams<{ productionId: string }>();
@@ -28,9 +29,10 @@ const ManageProduction = () => {
   const {
     account: { data: accountData }
   } = useUserContext();
+  const ownerAccountId = accountData?.uid || accountData?.account_id || '';
   const [showConfirm, setShowConfirm] = useState(false);
   const [formValues, setFormValues] = useForm<Production>({
-    account_id: accountData?.account_id,
+    account_id: ownerAccountId,
     production_id: '',
     production_name: '',
     production_image_url: '',
@@ -72,7 +74,7 @@ const ManageProduction = () => {
 
     if (docSnap.exists()) {
       const data = docSnap.data() as Production;
-      Object.entries(data).map(([key, value]) =>
+      Object.entries(data).forEach(([key, value]) =>
         setFormValues({
           target: {
             name: key,
@@ -80,6 +82,24 @@ const ManageProduction = () => {
           }
         })
       );
+
+      if (!data.production_id) {
+        setFormValues({
+          target: {
+            name: 'production_id',
+            value: productionId
+          }
+        });
+      }
+
+      if (!data.account_id && ownerAccountId) {
+        setFormValues({
+          target: {
+            name: 'account_id',
+            value: ownerAccountId
+          }
+        });
+      }
     } else {
       console.log('No such document!');
       goToProfile();
@@ -88,12 +108,22 @@ const ManageProduction = () => {
 
   const handleUpdateDocument = async (values: Production) => {
     const docRef = doc(db, 'productions', productionId);
-    await updateDoc(docRef, values);
+    const payload = sanitizeDataForFirestore({
+      ...values,
+      production_id: values.production_id || productionId,
+      account_id: values.account_id || ownerAccountId
+    });
+
+    await updateDoc(docRef, payload);
   };
 
   const handleSave = async () => {
-    await handleUpdateDocument(formValues);
-    goToProfile();
+    try {
+      await handleUpdateDocument(formValues);
+      goToProfile();
+    } catch (error) {
+      console.error('Error saving production:', error);
+    }
   };
 
   const goToProfile = () => {
@@ -101,9 +131,13 @@ const ManageProduction = () => {
   };
 
   const onDeleteConfirm = async () => {
-    const docRef = doc(db, 'productions', productionId);
-    await deleteDoc(docRef);
-    goToProfile();
+    try {
+      const docRef = doc(db, 'productions', productionId);
+      await deleteDoc(docRef);
+      goToProfile();
+    } catch (error) {
+      console.error('Error deleting production:', error);
+    }
   };
 
   const onDeleteCancel = () => {
