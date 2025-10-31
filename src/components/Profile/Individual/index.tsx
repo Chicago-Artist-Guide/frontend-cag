@@ -73,7 +73,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   const [websiteId, setWebsiteId] = useState(1);
 
   // training
-  const [trainingId, setTrainingId] = useState(1);
+  const [trainingId, setTrainingId] = useState(0);
 
   // upcoming and past shows
   const [showPastId, setShowPastId] = useState(1);
@@ -129,15 +129,27 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const updateTrainingState = () => {
-    if (!profile?.data?.training_institutions) {
+    const existingTrainings = profile?.data?.training_institutions as
+      | TrainingInstitution[]
+      | undefined;
+
+    if (!existingTrainings || !existingTrainings.length) {
       setEditProfile((prevState: any) => ({
         ...prevState,
         training_institutions: []
       }));
+      setTrainingId(0);
       return;
     }
 
-    const maxId = profile.data.training_institutions.length || 1;
+    const maxId = existingTrainings.reduce(
+      (currentMax: number, training: TrainingInstitution) => {
+        const trainingIdValue = Number(training?.id) || 0;
+        return trainingIdValue > currentMax ? trainingIdValue : currentMax;
+      },
+      0
+    );
+
     setTrainingId(maxId);
   };
 
@@ -394,11 +406,17 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const updateSkills = async () => {
-    const { additional_skills_checkboxes, additional_skills_manual } =
-      editProfile;
+    if (!editProfile) {
+      return;
+    }
+
+    const additionalSkillsCheckboxes =
+      editProfile.additional_skills_checkboxes ?? [];
+    const additionalSkillsManual = editProfile.additional_skills_manual ?? [];
+
     const skillsProps = {
-      additional_skills_checkboxes,
-      additional_skills_manual: additional_skills_manual ?? []
+      additional_skills_checkboxes: additionalSkillsCheckboxes,
+      additional_skills_manual: additionalSkillsManual
     };
 
     try {
@@ -1108,7 +1126,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                         addCreditBlock();
                       }}
                     >
-                      + Save and add another past performance
+                      + Save and add another previous production
                     </a>
                   </Col>
                 </Row>
@@ -1138,7 +1156,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
             ) : (
               <>
                 {hasNonEmptyValues(profile?.data?.past_performances) && (
-                  <DetailSection title="Past Performances">
+                  <DetailSection title="Previous Productions">
                     <Features
                       features={profile.data.past_performances}
                       emptyPlaceholder=""
@@ -1151,7 +1169,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     onEditModeClick(e, 'past', !editMode['past'])
                   }
                 >
-                  + Add Past Performances
+                  + Add Previous Productions
                 </a>
               </>
             )}
@@ -1260,7 +1278,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     profile?.data?.offstage_roles_scenic_and_properties
                   }
                   offstage_roles_lighting={
-                    profile?.data?.offstage_roles_lightning
+                    profile?.data?.offstage_roles_lighting
                   }
                   offstage_roles_sound={profile?.data?.offstage_roles_sound}
                   offstage_roles_hair_makeup_costumes={
@@ -1275,7 +1293,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                   profile?.data?.offstage_roles_production?.length > 0 ||
                   profile?.data?.offstage_roles_scenic_and_properties?.length >
                     0 ||
-                  profile?.data?.offstage_roles_lightning?.length > 0 ||
+                  profile?.data?.offstage_roles_lighting?.length > 0 ||
                   profile?.data?.offstage_roles_sound?.length > 0 ||
                   profile?.data?.offstage_roles_hair_makeup_costumes?.length >
                     0) && (
@@ -1291,7 +1309,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                         profile?.data?.offstage_roles_scenic_and_properties
                       }
                       offstage_roles_lighting={
-                        profile?.data?.offstage_roles_lightning
+                        profile?.data?.offstage_roles_lighting
                       }
                       offstage_roles_sound={profile?.data?.offstage_roles_sound}
                       offstage_roles_hair_makeup_costumes={

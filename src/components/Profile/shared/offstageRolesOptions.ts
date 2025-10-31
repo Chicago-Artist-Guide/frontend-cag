@@ -104,8 +104,8 @@ export const offstageRolesOptions: OffStageRoleByCategory = {
         value: 'Special Effect Design'
       },
       {
-        label: 'Master Electrician',
-        value: 'Master Electrician'
+        label: 'Head Electrician',
+        value: 'Head Electrician'
       }
     ]
   },

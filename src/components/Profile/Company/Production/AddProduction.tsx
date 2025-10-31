@@ -18,6 +18,7 @@ import {
 } from '../../../../utils/lookups';
 import PageContainer from '../../../layout/PageContainer';
 import { ImageUploadComponent } from '../../../shared';
+import { sanitizeDataForFirestore } from '../../../../utils/firestore';
 import {
   FormDateRange,
   FormInput,
@@ -47,10 +48,12 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
 }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
-    profile: { data: profileData }
+    profile: { data: profileData },
+    account: { data: accountData }
   } = useUserContext();
+  const ownerAccountId = accountData?.uid || profileData?.uid || '';
   const [formValues, setFormValues] = useForm<Production>({
-    account_id: profileData?.uid,
+    account_id: ownerAccountId,
     production_id: '',
     production_name: '',
     production_image_url: '',
@@ -92,12 +95,19 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
 
   const handleSubmit = async () => {
     const productionId = uuidv4();
-    await setDoc(doc(db, 'productions', productionId), {
-      ...formValues,
-      production_id: productionId
-    });
-    toggleEdit();
-    console.log(productionId);
+    try {
+      const payload = sanitizeDataForFirestore({
+        ...formValues,
+        production_id: productionId,
+        account_id: formValues.account_id || ownerAccountId
+      });
+
+      await setDoc(doc(db, 'productions', productionId), payload);
+      toggleEdit();
+      console.log(productionId);
+    } catch (error) {
+      console.error('Error creating production:', error);
+    }
   };
 
   return (
