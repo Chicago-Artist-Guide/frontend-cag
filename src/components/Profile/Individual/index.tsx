@@ -394,11 +394,17 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const updateSkills = async () => {
-    const { additional_skills_checkboxes, additional_skills_manual } =
-      editProfile;
+    if (!editProfile) {
+      return;
+    }
+
+    const additionalSkillsCheckboxes =
+      editProfile.additional_skills_checkboxes ?? [];
+    const additionalSkillsManual = editProfile.additional_skills_manual ?? [];
+
     const skillsProps = {
-      additional_skills_checkboxes,
-      additional_skills_manual: additional_skills_manual ?? []
+      additional_skills_checkboxes: additionalSkillsCheckboxes,
+      additional_skills_manual: additionalSkillsManual
     };
 
     try {
