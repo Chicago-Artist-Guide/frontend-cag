@@ -1108,7 +1108,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                         addCreditBlock();
                       }}
                     >
-                      + Save and add another past performance
+                      + Save and add another previous production
                     </a>
                   </Col>
                 </Row>
@@ -1138,7 +1138,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
             ) : (
               <>
                 {hasNonEmptyValues(profile?.data?.past_performances) && (
-                  <DetailSection title="Past Performances">
+                  <DetailSection title="Previous Productions">
                     <Features
                       features={profile.data.past_performances}
                       emptyPlaceholder=""
@@ -1151,7 +1151,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     onEditModeClick(e, 'past', !editMode['past'])
                   }
                 >
-                  + Add Past Performances
+                  + Add Previous Productions
                 </a>
               </>
             )}
