@@ -58,20 +58,28 @@ const CompanyProfile: React.FC<{
       where('account_id', '==', uid)
     );
     const querySnapshot = await getDocs(q);
-    const productions = (
-      querySnapshot.docs.map((doc) => doc.data()) as Production[]
-    ).reduce(
-      (acc, cur) => {
-        if (cur.status === 'Show Complete') {
-          acc.inactive.push(cur);
-        } else {
-          acc.active.push(cur);
-        }
-        return acc;
-      },
-      { active: [] as Production[], inactive: [] as Production[] }
-    );
-    setProductions(productions);
+    const productionsByStatus = querySnapshot.docs
+      .map((docSnap) => {
+        const data = docSnap.data() as Production;
+
+        return {
+          ...data,
+          production_id: data.production_id || docSnap.id
+        };
+      })
+      .reduce(
+        (acc, cur) => {
+          if (cur.status === 'Show Complete') {
+            acc.inactive.push(cur);
+          } else {
+            acc.active.push(cur);
+          }
+          return acc;
+        },
+        { active: [] as Production[], inactive: [] as Production[] }
+      );
+
+    setProductions(productionsByStatus);
   };
 
   const toggleEdit = async () => {

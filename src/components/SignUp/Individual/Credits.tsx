@@ -72,7 +72,7 @@ const Credits: React.FC<{
     <Container>
       <Row>
         <Col lg="12">
-          <Title>ADD YOUR PAST PERFORMANCES</Title>
+          <Title>ADD YOUR PREVIOUS PRODUCTIONS</Title>
           <Tagline>Where might we have seen you?</Tagline>
         </Col>
       </Row>
@@ -147,7 +147,7 @@ const Credits: React.FC<{
               addCreditBlock();
             }}
           >
-            + Save and add another past performance
+            + Save and add another previous production
           </SaveAndAddLink>
         </Col>
       </Row>

@@ -7,6 +7,7 @@ import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
 import { media } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
+import { zeffyUrl } from '../../utils/marketing';
 import FooterBg from '../../images/footer-background.png';
 import Envelope from '../../images/icons-footer/email.png';
 import Facebook from '../../images/icons-footer/social_facebook.png';
@@ -36,9 +37,7 @@ const Footer = () => (
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link as={Link} to="/donate">
-                DONATE
-              </Nav.Link>
+              <Nav.Link href={zeffyUrl}>DONATE</Nav.Link>
             </Nav.Item>
             <Nav.Item>
               <Nav.Link as={Link} to="/events">
