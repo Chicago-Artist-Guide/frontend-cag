@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import Checkbox from '../../../components/shared/Checkbox';
 import InputField from '../../../components/shared/Input';
 import Red_Blob from '../../../images/red_blob.svg';
-import { colors } from '../../../theme/styleVars';
+import { colors, breakpoints } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
 import { Title } from '../../layout/Titles';
 import { SubmitBasicsResp } from './SignUpFooter';
@@ -107,7 +107,7 @@ const IndividualBasics: React.FC<{
   return (
     <Container>
       <Row>
-        <Col lg="8">
+        <Col lg="8" xs="12">
           <PaddingTitle>LET'S GET TO KNOW EACH OTHER</PaddingTitle>
           {submitBasicsErr?.code && !submitBasicsErr.ok && (
             <Alert key="danger" variant="danger">
@@ -117,7 +117,7 @@ const IndividualBasics: React.FC<{
         </Col>
       </Row>
       <Row>
-        <Col lg="4">
+        <Col lg="4" xs="12">
           <Form>
             <InputField
               hasErrorCallback={customErrorCallbackField}
@@ -198,8 +198,8 @@ const IndividualBasics: React.FC<{
             Already a member? <Link to="/login">Log in here</Link>
           </LoginLink>
         </Col>
-        <Col lg="2" />
-        <Col lg="6">
+        <Col lg="2" className="d-none d-lg-block" />
+        <Col lg="6" className="d-none d-lg-block">
           <img alt="Chicago Artist Guide" src={Red_Blob} />
         </Col>
       </Row>
@@ -209,6 +209,11 @@ const IndividualBasics: React.FC<{
 
 const PaddingTitle = styled(Title)`
   padding: 48px 0px;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 24px 0px;
+    font-size: 24px;
+  }
 `;
 
 const LoginLink = styled.p`
@@ -220,16 +225,40 @@ const LoginLink = styled.p`
 
   a {
     color: ${colors.salmon};
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 24px;
+    font-size: 14px;
   }
 `;
 
 const PasswordReq = styled.p`
   font-size: 10px;
   font-style: italic;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 12px;
+    margin-top: 8px;
+  }
 `;
 
 const CAGCheckbox = styled(Checkbox)`
   margin-top: 2em;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 1.5em;
+
+    label {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+    }
+  }
 `;
 
 export default IndividualBasics;

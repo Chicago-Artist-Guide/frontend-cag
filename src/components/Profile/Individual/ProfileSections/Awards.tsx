@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
+import { breakpoints } from '../../../../theme/styleVars';
 
 const Awards: React.FC<{
   awards: any;
@@ -49,10 +50,23 @@ const AwardContainer = styled.div`
   justify-content: space-between;
   font-weight: bold;
   margin: 6px;
+  align-items: center;
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 12px 0;
+    gap: 8px;
+  }
 `;
 
 const Bold = styled.p`
   font-weight: bolder;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 14px;
+    margin: 0;
+  }
 `;
 
 export default Awards;

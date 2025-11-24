@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Title, TitleThree, TitleTwo } from '../../layout';
+import { breakpoints } from '../../../theme/styleVars';
 
 type Props = {
   pre?: string;
@@ -20,6 +21,10 @@ const SignUpHeader: React.FC<Props> = ({ pre, title, subtitle }) => {
 
 const PaddingHeader = styled.div`
   padding: 40px 0px;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 24px 0px;
+  }
 `;
 
 export default SignUpHeader;

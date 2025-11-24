@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import { ImageUploadComponent } from '../../../components/shared';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { Tagline, Title } from '../../layout/Titles';
+import { breakpoints } from '../../../theme/styleVars';
 import type { IndividualData } from './types';
 
 const ProfilePhoto: React.FC<{
@@ -32,7 +33,7 @@ const ProfilePhoto: React.FC<{
             We just need one for now, but you can add more later.
           </Tagline>
           <PhotoUploadRow>
-            <Col lg="6">
+            <Col lg="6" xs="12">
               <ImageUploadComponent
                 onSave={handleImageSave}
                 currentImageUrl={formData.profilePhotoUrl}
@@ -41,7 +42,7 @@ const ProfilePhoto: React.FC<{
                 maxSizeInMB={5}
               />
             </Col>
-            <ImageCol lg="6">
+            <ImageCol lg="6" className="d-none d-lg-flex">
               <Image alt="" src={yellow_blob} />
             </ImageCol>
           </PhotoUploadRow>
@@ -54,6 +55,10 @@ const ProfilePhoto: React.FC<{
 const PhotoUploadRow = styled(Row)`
   margin-top: 40px;
   align-items: center;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 24px;
+  }
 `;
 
 const ImageCol = styled(Col)`

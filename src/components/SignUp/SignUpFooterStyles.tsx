@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { colors, fonts } from '../../theme/styleVars';
+import { colors, fonts, breakpoints } from '../../theme/styleVars';
 
 export const PageFooterRow = styled.div`
   padding: 32px 16px;
@@ -41,17 +41,20 @@ export const ButtonSection = styled.div`
   justify-content: space-between;
   gap: 16px;
   order: 2;
+  flex-direction: column;
 
   @media (min-width: 768px) {
     order: 1;
     flex: 1;
     max-width: 200px;
+    flex-direction: row;
   }
 `;
 
 export const ButtonCol = styled.div`
   flex: 1;
   display: flex;
+  width: 100%;
 
   &.back-button {
     justify-content: flex-start;
@@ -61,13 +64,25 @@ export const ButtonCol = styled.div`
     justify-content: flex-end;
   }
 
+  button {
+    width: 100%;
+    min-height: 44px;
+  }
+
   @media (min-width: 768px) {
+    width: auto;
+
     &.back-button {
       justify-content: flex-start;
     }
 
     &.continue-button {
       justify-content: flex-end;
+    }
+
+    button {
+      width: auto;
+      min-width: 120px;
     }
   }
 `;
