@@ -17,7 +17,7 @@ import { Production } from '../components/Profile/Company/types';
 import { Button } from '../components/shared';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { useUserContext } from '../context/UserContext';
-import { colors, fonts } from '../theme/styleVars';
+import { breakpoints, colors, fonts } from '../theme/styleVars';
 import ManageAuditionInfo from '../components/Profile/Company/Production/Manage/ManageAuditionInfo';
 import ManageOffStageInfo from '../components/Profile/Company/Production/Manage/ManageOffStageInfo';
 import { sanitizeDataForFirestore } from '../utils/firestore';
@@ -31,6 +31,7 @@ const ManageProduction = () => {
   } = useUserContext();
   const ownerAccountId = accountData?.uid || accountData?.account_id || '';
   const [showConfirm, setShowConfirm] = useState(false);
+  const [productionExists, setProductionExists] = useState(false);
   const [formValues, setFormValues] = useForm<Production>({
     account_id: ownerAccountId,
     production_id: '',
@@ -73,6 +74,7 @@ const ManageProduction = () => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
+      setProductionExists(true);
       const data = docSnap.data() as Production;
       Object.entries(data).forEach(([key, value]) =>
         setFormValues({
@@ -102,6 +104,7 @@ const ManageProduction = () => {
       }
     } else {
       console.log('No such document!');
+      setProductionExists(false);
       goToProfile();
     }
   };
@@ -156,16 +159,16 @@ const ManageProduction = () => {
       <Form>
         <Row>
           <Col lg={12}>
-            <div className="d-flex justify-content-between flex-row">
+            <HeaderWrapper>
               <Title>Manage Production</Title>
-              <Button
+              <TopSaveButton
                 onClick={handleSave}
                 text="Save Show"
                 icon={faFloppyDisk}
                 type="button"
                 variant="primary"
               />
-            </div>
+            </HeaderWrapper>
           </Col>
         </Row>
 
@@ -219,30 +222,35 @@ const ManageProduction = () => {
 
         <Row>
           <Col lg={12} style={{ marginTop: 20 }}>
-            <div className="d-flex justify-content-between flex-row">
+            <BottomButtonContainer className="d-flex justify-content-between flex-column flex-md-row">
               <Button
                 onClick={goToProfile}
                 text="Cancel"
                 type="button"
                 variant="danger"
+                className="mb-md-0 mb-3"
               />
-              <div className="d-flex flex-row">
-                <Button
-                  onClick={() => setShowConfirm(true)}
-                  text="Delete"
-                  type="button"
-                  variant="danger"
-                  className="mr-3"
-                />
-                <Button
-                  onClick={handleSave}
-                  text="Save Show"
-                  icon={faFloppyDisk}
-                  type="button"
-                  variant="primary"
-                />
-              </div>
-            </div>
+              <BottomButtonGroup className="d-flex flex-column flex-md-row justify-content-center">
+                {productionExists && (
+                  <Button
+                    onClick={() => setShowConfirm(true)}
+                    text="Delete"
+                    type="button"
+                    variant="danger"
+                    className="mb-md-0 mr-md-3 mb-3"
+                  />
+                )}
+                <SaveShowButtonWrapper>
+                  <Button
+                    onClick={handleSave}
+                    text="Save Show"
+                    icon={faFloppyDisk}
+                    type="button"
+                    variant="primary"
+                  />
+                </SaveShowButtonWrapper>
+              </BottomButtonGroup>
+            </BottomButtonContainer>
           </Col>
         </Row>
       </Form>
@@ -253,10 +261,45 @@ const ManageProduction = () => {
 const TabRow = styled(Row)`
   padding-top: 40px;
   padding-bottom: 40px;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
 `;
 
 const ProductionTabs = styled(Tabs)`
   border-bottom: 1px solid ${colors.paginationGray};
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: ${colors.paginationGray} transparent;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: ${colors.paginationGray};
+    border-radius: 3px;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 16px;
+  }
+
   li {
     font-family: ${fonts.montserrat};
     font-style: normal;
@@ -265,12 +308,20 @@ const ProductionTabs = styled(Tabs)`
     letter-spacing: 0.07em;
     color: ${colors.mainFont};
     margin-right: 20px;
+    flex-shrink: 0;
+
+    @media (max-width: ${breakpoints.md}) {
+      font-size: 16px;
+      margin-right: 20px;
+      padding: 8px 4px;
+    }
   }
   &.nav-tabs .nav-link {
     font-weight: 500;
     border: none;
     background-color: transparent;
     border-color: none;
+    white-space: nowrap;
   }
   &.nav-tabs .nav-link.active {
     font-weight: 700;
@@ -278,6 +329,63 @@ const ProductionTabs = styled(Tabs)`
     background-color: transparent;
     border-color: none;
     border-bottom: 4px solid ${colors.peach};
+  }
+`;
+
+const HeaderWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`;
+
+const TopSaveButton = styled(Button)`
+  @media (max-width: ${breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const BottomButtonContainer = styled.div`
+  gap: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    gap: 12px;
+    align-items: center;
+  }
+`;
+
+const BottomButtonGroup = styled.div`
+  gap: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    gap: 12px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
+`;
+
+const SaveShowButtonWrapper = styled.div`
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    button {
+      width: auto;
+      min-width: 200px;
+    }
   }
 `;
 

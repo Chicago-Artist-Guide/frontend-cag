@@ -3,7 +3,7 @@ import React from 'react';
 import { Row } from 'react-bootstrap';
 import styled from 'styled-components';
 import { Button } from '../../../../../components/shared';
-import { colors, fonts } from '../../../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../../../theme/styleVars';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Role } from '../../types';
 
@@ -20,26 +20,21 @@ const RoleCard: React.FC<{
           <RoleStatus>{role.role_status}</RoleStatus>
         </LeftCol>
         <RightCol>
-          <div className="d-flex flex-column flex-row-reverse">
-            <div
-              className="d-flex flex-shrink-1 mt-1 flex-row"
-              style={{ gap: '1em' }}
-            >
-              <RoleButton
-                onClick={onEdit}
-                text="Edit"
-                type="button"
-                variant="primary"
-                icon={faEdit}
-              />
-              <RoleButton
-                onClick={onViewMatches}
-                text="View Matches"
-                type="button"
-                variant="primary"
-              />
-            </div>
-          </div>
+          <RoleButtonContainer className="d-flex flex-column flex-md-row-reverse">
+            <RoleButton
+              onClick={onEdit}
+              text="Edit"
+              type="button"
+              variant="primary"
+              icon={faEdit}
+            />
+            <RoleButton
+              onClick={onViewMatches}
+              text="View Matches"
+              type="button"
+              variant="primary"
+            />
+          </RoleButtonContainer>
         </RightCol>
       </Row>
     </RolesCard>
@@ -78,6 +73,21 @@ const RoleName = styled.h2`
 const RoleButton = styled(Button)`
   background: ${colors.slate};
   border-color: ${colors.slate};
+  min-height: 44px;
+`;
+
+const RoleButtonContainer = styled.div`
+  gap: 1em;
+  margin-top: 1em;
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    gap: 12px;
+
+    button {
+      width: 100%;
+    }
+  }
 `;
 
 export default RoleCard;
