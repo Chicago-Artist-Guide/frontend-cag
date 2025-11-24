@@ -5,7 +5,7 @@ import { Col, Form, Modal, Row } from 'react-bootstrap';
 import { FormTarget } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, Checkbox, Dropdown } from '../../../../../components/shared';
-import { colors, fonts } from '../../../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../../../theme/styleVars';
 import { getOptions } from '../../../../../utils/helpers';
 import {
   additionalRequirements,
@@ -385,7 +385,7 @@ const RoleModal: React.FC<{
                 )}
               </Col>
             </Row>
-            <div className="d-flex mt-3 flex-row flex-row-reverse">
+            <ModalButtonContainer className="d-flex flex-column-reverse flex-md-row flex-md-row-reverse mt-3">
               <Button
                 onClick={() => onSave(formValues)}
                 text="Save + Close"
@@ -397,9 +397,9 @@ const RoleModal: React.FC<{
                 text="Delete"
                 type="button"
                 variant="danger"
-                className="mr-3"
+                className="mb-md-0 mr-md-3 mb-3"
               />
-            </div>
+            </ModalButtonContainer>
           </Form>
         </Modal.Body>
       </Modal>
@@ -432,6 +432,20 @@ const RoleRate = styled.div`
   display: flex;
   gap: 0.75em;
   align-items: center;
+`;
+
+const ModalButtonContainer = styled.div`
+  gap: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    gap: 12px;
+    width: 100%;
+
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
 `;
 
 export default RoleModal;

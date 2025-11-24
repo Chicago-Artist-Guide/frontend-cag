@@ -11,7 +11,7 @@ import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
-import { colors, fonts } from '../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import { neighborhoods } from '../../../utils/lookups';
 import { ErrorMessage } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
@@ -132,7 +132,7 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
       <Form>
         <Row>
           <Col lg={12}>
-            <div className="d-flex justify-content-between flex-row">
+            <EditHeaderWrapper className="d-flex justify-content-between flex-column flex-md-row align-items-start align-items-md-center">
               <Title>Edit your profile</Title>
               <Button
                 onClick={handleSubmit}
@@ -140,8 +140,9 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                 icon={faFloppyDisk}
                 type="button"
                 variant="secondary"
+                className="mt-md-0 mt-3"
               />
-            </div>
+            </EditHeaderWrapper>
           </Col>
         </Row>
         <Row>
@@ -233,8 +234,8 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
 
             <DetailSection title="Awards & Recognition">
               {awards.map((award, index) => (
-                <div key={index} className="mt-3">
-                  <div className="d-flex">
+                <AwardFormContainer key={index} className="mt-3">
+                  <div className="d-flex align-items-center justify-content-between">
                     <AwardTitle>Award #{index + 1}</AwardTitle>
                     <CloseIcon
                       icon={faClose}
@@ -333,7 +334,7 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                       style={{ marginTop: 4 }}
                     />
                   </div>
-                </div>
+                </AwardFormContainer>
               ))}
               <div className="mt-4">
                 <DetailAdd
@@ -357,13 +358,42 @@ const AwardTitle = styled.h2`
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: ${colors.mainFont};
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 20px;
+  }
+`;
+
+const EditHeaderWrapper = styled.div`
+  width: 100%;
+`;
+
+const AwardFormContainer = styled.div`
+  @media (max-width: ${breakpoints.md}) {
+    padding: 16px;
+    background: ${colors.white};
+    border-radius: 8px;
+    box-shadow: 0 0 4px 2px ${colors.black05a};
+    margin-bottom: 16px;
+  }
 `;
 
 const CloseIcon = styled(FontAwesomeIcon)`
   color: ${colors.black};
   cursor: pointer;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+
   &:hover {
     color: ${colors.slate};
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-shrink: 0;
   }
 `;
 
@@ -372,10 +402,17 @@ const AwardWebsiteLinkRow = styled.div`
   align-items: center;
   margin-bottom: 8px;
   max-width: 500px;
+
+  @media (max-width: ${breakpoints.md}) {
+    max-width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
 `;
 
 const AwardWebsiteCloseBtn = styled(Button)`
-  margin-left: 8;
+  margin-left: 8px;
   min-width: 32px;
   height: 32px;
   padding: 0;
@@ -384,6 +421,13 @@ const AwardWebsiteCloseBtn = styled(Button)`
   justify-content: center;
   & > svg {
     margin-right: 0;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-left: 0;
+    align-self: flex-start;
+    min-width: 44px;
+    min-height: 44px;
   }
 `;
 

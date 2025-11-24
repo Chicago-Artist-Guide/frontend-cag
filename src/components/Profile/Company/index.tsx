@@ -1,6 +1,7 @@
 import { faPenToSquare } from '@fortawesome/free-regular-svg-icons';
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
@@ -29,7 +30,7 @@ import { Production, Profile } from './types';
 
 type Edit = 'profile' | 'add-production' | null;
 
-const images = Array(6).fill(1);
+const MAX_ADDITIONAL_PHOTOS = 6;
 
 const CompanyProfile: React.FC<{
   previewMode?: boolean;
@@ -48,54 +49,59 @@ const CompanyProfile: React.FC<{
   }>();
   const profileData = profile?.data as Profile;
 
+  const getProductions = useCallback(async () => {
+    if (!uid || !db) {
+      return;
+    }
+
+    try {
+      const q = query(
+        collection(db, 'productions'),
+        where('account_id', '==', uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const productionsByStatus = querySnapshot.docs
+        .map((docSnap) => {
+          const data = docSnap.data() as Production;
+
+          return {
+            ...data,
+            production_id: data.production_id || docSnap.id
+          };
+        })
+        .reduce(
+          (acc, cur) => {
+            if (cur.status === 'Show Complete') {
+              acc.inactive.push(cur);
+            } else {
+              acc.active.push(cur);
+            }
+            return acc;
+          },
+          { active: [] as Production[], inactive: [] as Production[] }
+        );
+
+      setProductions(productionsByStatus);
+    } catch (error) {
+      console.error('Error fetching productions:', error);
+    }
+  }, [uid, db]);
+
   useEffect(() => {
     getProductions();
-  }, []);
-
-  const getProductions = async () => {
-    const q = query(
-      collection(db, 'productions'),
-      where('account_id', '==', uid)
-    );
-    const querySnapshot = await getDocs(q);
-    const productionsByStatus = querySnapshot.docs
-      .map((docSnap) => {
-        const data = docSnap.data() as Production;
-
-        return {
-          ...data,
-          production_id: data.production_id || docSnap.id
-        };
-      })
-      .reduce(
-        (acc, cur) => {
-          if (cur.status === 'Show Complete') {
-            acc.inactive.push(cur);
-          } else {
-            acc.active.push(cur);
-          }
-          return acc;
-        },
-        { active: [] as Production[], inactive: [] as Production[] }
-      );
-
-    setProductions(productionsByStatus);
-  };
+  }, [getProductions]);
 
   const toggleEdit = async () => {
     await getProductions();
     setEditing(null);
   };
 
-  if (editing !== null) {
-    switch (editing) {
-      case 'profile':
-        return <CompanyProfileEdit toggleEdit={toggleEdit} />;
-      case 'add-production':
-        return <AddProduction toggleEdit={toggleEdit} />;
-      default:
-        setEditing(null);
-    }
+  if (editing === 'profile') {
+    return <CompanyProfileEdit toggleEdit={toggleEdit} />;
+  }
+
+  if (editing === 'add-production') {
+    return <AddProduction toggleEdit={toggleEdit} />;
   }
 
   const awards = profileData?.awards || [];
@@ -104,8 +110,13 @@ const CompanyProfile: React.FC<{
     <PageContainer>
       <Row>
         <Col lg={12}>
-          <div className="d-flex justify-content-between flex-row">
-            <Title>YOUR PROFILE</Title>
+          <Title>YOUR PROFILE</Title>
+        </Col>
+      </Row>
+      <Row>
+        <LeftCol lg={4}>
+          <ProfileImage src={profileData?.profile_image_url} fluid />
+          <EditProfileButtonWrapper>
             <Button
               onClick={() => setEditing('profile')}
               text="Edit Profile"
@@ -113,23 +124,24 @@ const CompanyProfile: React.FC<{
               type="button"
               variant="secondary"
             />
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <LeftCol lg={4}>
-          <ProfileImage src={profileData?.profile_image_url} fluid />
-          {profileData?.additional_photos && (
-            <AdditionalPhotos className="d-flex justify-content-between flex-wrap">
-              {images.map((_, index) => (
-                <AdditionalImage
-                  key={index}
-                  src={profileData?.additional_photos?.[index]}
-                  fluid
-                />
-              ))}
-            </AdditionalPhotos>
-          )}
+          </EditProfileButtonWrapper>
+          {profileData?.additional_photos &&
+            Object.keys(profileData.additional_photos).length > 0 && (
+              <AdditionalPhotos className="d-flex justify-content-between flex-wrap">
+                {Array.from({ length: MAX_ADDITIONAL_PHOTOS }, (_, index) => {
+                  const photoUrl = profileData.additional_photos?.[index];
+                  if (!photoUrl) return null;
+                  return (
+                    <AdditionalImage
+                      key={index}
+                      src={photoUrl}
+                      fluid
+                      alt={`Additional photo ${index + 1}`}
+                    />
+                  );
+                })}
+              </AdditionalPhotos>
+            )}
           <DetailsCard>
             <DetailsColTitle>Basic Group Info</DetailsColTitle>
             <div>
@@ -148,17 +160,23 @@ const CompanyProfile: React.FC<{
             <DetailsColTitle>
               <div>Menu</div>
             </DetailsColTitle>
-            <div>
-              <a href="/profile/messages">Messages</a>
-            </div>
+            <MenuLinkContainer>
+              <MenuLink to="/profile/messages">Messages</MenuLink>
+            </MenuLinkContainer>
           </DetailsCard>
         </LeftCol>
         <RightCol lg={{ span: 7, offset: 1 }}>
-          <TheatreName>{profileData?.theatre_name}</TheatreName>
+          <TheatreInfoCard>
+            {profileData?.theatre_name && (
+              <TheatreName>{profileData.theatre_name}</TheatreName>
+            )}
 
-          {profileData?.location && <Location>{profileData.location}</Location>}
+            {profileData?.location && (
+              <Location>{profileData.location}</Location>
+            )}
 
-          {profileData?.description && <Bio>{profileData.description}</Bio>}
+            {profileData?.description && <Bio>{profileData.description}</Bio>}
+          </TheatreInfoCard>
 
           <DetailSection title="Awards & Recognition">
             <AwardsGrid>
@@ -243,6 +261,64 @@ const AwardTitle = styled.h3`
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: ${colors.mainFont};
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 20px;
+  }
+`;
+
+const EditProfileButtonWrapper = styled.div`
+  margin-top: 20px;
+  width: 100%;
+
+  @media (max-width: ${breakpoints.md}) {
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    button {
+      width: auto;
+    }
+  }
+`;
+
+const TheatreInfoCard = styled.div`
+  background: ${colors.white};
+  box-shadow: 0 0 8px 4px ${colors.black05a};
+  border-radius: 8px;
+  padding: 30px 25px;
+  margin-bottom: 20px;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 24px 20px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: ${breakpoints.sm}) {
+    padding: 20px 16px;
+  }
+`;
+
+const MenuLinkContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`;
+
+const MenuLink = styled(Link)`
+  font-family: ${fonts.montserrat};
+  font-size: 16px;
+  color: ${colors.mainFont};
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${colors.primary};
+    text-decoration: underline;
+  }
 `;
 
 const AwardLabel = styled.span`
@@ -262,11 +338,26 @@ const AwardField = styled.div`
     font-weight: 700;
     margin-right: 8px;
     flex-shrink: 0;
+
+    @media (max-width: ${breakpoints.sm}) {
+      min-width: 90px;
+      font-size: 14px;
+    }
   }
 
   span {
     flex: 1;
     word-break: break-word;
+  }
+
+  @media (max-width: ${breakpoints.sm}) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    ${AwardLabel} {
+      margin-bottom: 4px;
+      margin-right: 0;
+    }
   }
 `;
 
@@ -279,6 +370,13 @@ const TheatreName = styled.h2`
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: ${colors.mainFont};
+  margin: 0 0 16px 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 24px;
+    line-height: 32px;
+    margin-bottom: 14px;
+  }
 `;
 
 const Location = styled.h5`
@@ -287,6 +385,13 @@ const Location = styled.h5`
   font-weight: 500;
   font-size: 18px;
   line-height: 24px;
+  margin: 0 0 20px 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+    line-height: 22px;
+    margin-bottom: 18px;
+  }
 `;
 
 const Bio = styled.div`
@@ -294,10 +399,16 @@ const Bio = styled.div`
   font-style: normal;
   font-weight: 400;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 28px;
   letter-spacing: 0.5px;
   color: ${colors.black};
-  margin-top: 15px;
+  margin: 0;
+  word-wrap: break-word;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 14px;
+    line-height: 24px;
+  }
 `;
 
 const ProfileImage = styled(Image)`
@@ -309,6 +420,12 @@ const ProfileImage = styled(Image)`
   width: 312px;
   margin-left: auto;
   margin-right: auto;
+  max-width: 100%;
+
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    min-height: auto;
+  }
 
   @media (min-width: ${breakpoints.lg}) {
     max-width: 332px;
@@ -332,13 +449,18 @@ const AdditionalImage = styled(Image)`
 const AwardsGrid = styled.div`
   display: flex;
   flex-wrap: wrap;
-  gap: 24px; /* adjust as needed */
+  gap: 24px;
   margin-bottom: 16px;
 
   .award-card {
-    flex: 1 1 calc(50% - 12px); /* 2 per row, minus half the gap */
-    min-width: 300px; /* adjust as needed for responsiveness */
+    flex: 1 1 calc(50% - 12px);
+    min-width: 300px;
     box-sizing: border-box;
+
+    @media (max-width: ${breakpoints.md}) {
+      flex: 1 1 100%;
+      min-width: 0;
+    }
   }
 `;
 
