@@ -79,6 +79,11 @@ const MobileButtonSection = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 16px;
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    gap: 12px;
+  }
 `;
 
 const MobileButtonCol = styled.div`
@@ -88,6 +93,17 @@ const MobileButtonCol = styled.div`
   button {
     width: 100%;
     min-height: 44px;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    &:last-child {
+      justify-content: center;
+
+      button {
+        width: auto;
+        min-width: 200px;
+      }
+    }
   }
 `;
 

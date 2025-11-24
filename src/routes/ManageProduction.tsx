@@ -230,7 +230,7 @@ const ManageProduction = () => {
                 variant="danger"
                 className="mb-md-0 mb-3"
               />
-              <BottomButtonGroup className="d-flex flex-column flex-md-row">
+              <BottomButtonGroup className="d-flex flex-column flex-md-row justify-content-center">
                 {productionExists && (
                   <Button
                     onClick={() => setShowConfirm(true)}
@@ -240,13 +240,15 @@ const ManageProduction = () => {
                     className="mb-md-0 mr-md-3 mb-3"
                   />
                 )}
-                <Button
-                  onClick={handleSave}
-                  text="Save Show"
-                  icon={faFloppyDisk}
-                  type="button"
-                  variant="primary"
-                />
+                <SaveShowButtonWrapper>
+                  <Button
+                    onClick={handleSave}
+                    text="Save Show"
+                    icon={faFloppyDisk}
+                    type="button"
+                    variant="primary"
+                  />
+                </SaveShowButtonWrapper>
               </BottomButtonGroup>
             </BottomButtonContainer>
           </Col>
@@ -259,6 +261,13 @@ const ManageProduction = () => {
 const TabRow = styled(Row)`
   padding-top: 40px;
   padding-bottom: 40px;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
 `;
 
 const ProductionTabs = styled(Tabs)`
@@ -288,6 +297,7 @@ const ProductionTabs = styled(Tabs)`
     overflow-x: auto;
     overflow-y: hidden;
     -webkit-overflow-scrolling: touch;
+    padding: 0 16px;
   }
 
   li {
@@ -302,7 +312,8 @@ const ProductionTabs = styled(Tabs)`
 
     @media (max-width: ${breakpoints.md}) {
       font-size: 16px;
-      margin-right: 16px;
+      margin-right: 20px;
+      padding: 8px 4px;
     }
   }
   &.nav-tabs .nav-link {
@@ -345,6 +356,7 @@ const BottomButtonContainer = styled.div`
 
   @media (max-width: ${breakpoints.md}) {
     gap: 12px;
+    align-items: center;
   }
 `;
 
@@ -354,10 +366,25 @@ const BottomButtonGroup = styled.div`
   @media (max-width: ${breakpoints.md}) {
     gap: 12px;
     width: 100%;
+    align-items: center;
+    justify-content: center;
 
     button {
       width: 100%;
       min-height: 44px;
+    }
+  }
+`;
+
+const SaveShowButtonWrapper = styled.div`
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    button {
+      width: auto;
+      min-width: 200px;
     }
   }
 `;

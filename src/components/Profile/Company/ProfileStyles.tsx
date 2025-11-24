@@ -13,7 +13,13 @@ export const LeftCol = styled(Col)`
 `;
 
 export const RightCol = styled(Col)`
-  @media (max-width: ${breakpoints.lg}) {
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  @media (min-width: ${breakpoints.md}) and (max-width: ${breakpoints.lg}) {
     margin-top: 0;
     padding-left: 0;
     padding-right: 0;
