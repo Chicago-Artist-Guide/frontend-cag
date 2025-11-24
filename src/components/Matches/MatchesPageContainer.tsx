@@ -18,17 +18,17 @@ export const MatchesPageContainer = () => {
   }, [account]);
 
   return (
-    <div className="flex gap-6 pt-3 xl:gap-12">
+    <div className="flex flex-col gap-6 pt-3 lg:flex-row lg:gap-12">
       {accountType !== null ? (
         <>
-          <div className="flex-none">
+          <div className="w-full flex-none lg:w-auto">
             {accountType === 'individual' ? (
               <CompanyMatchesFilterBar />
             ) : (
               <TalentMatchesFilterBar />
             )}
           </div>
-          <div className="flex-initial">
+          <div className="w-full flex-1">
             {accountType === 'individual' ? (
               <CompanyMatchList />
             ) : (

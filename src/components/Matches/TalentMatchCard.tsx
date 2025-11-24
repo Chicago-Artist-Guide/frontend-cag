@@ -186,19 +186,19 @@ export const TalentMatchCard = ({
 
   return (
     <div
-      className={clsx('flex min-h-[272px] max-w-[812px]', {
+      className={clsx('flex min-h-[272px] max-w-[812px] flex-col lg:flex-row', {
         'border-4 border-mint bg-yoda/25': isAccepted,
         'border-4 border-salmon bg-blush/25': isDeclined
       })}
     >
       <div
-        className="relative w-[272px] flex-none bg-cover bg-no-repeat"
+        className="relative h-64 w-full flex-none bg-cover bg-no-repeat lg:h-auto lg:w-[272px]"
         style={{
           backgroundImage: `url(${profile.profile_image_url})`
         }}
       >
         <div
-          className="absolute left-4 top-4 cursor-pointer transition-transform hover:scale-110"
+          className="absolute left-2 top-2 cursor-pointer transition-transform hover:scale-110 sm:left-4 sm:top-4"
           onClick={onToggleFavorite}
         >
           {isFavorited ? (
@@ -206,7 +206,7 @@ export const TalentMatchCard = ({
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="size-10 text-banana"
+              className="size-8 text-banana sm:size-10"
             >
               <path
                 fillRule="evenodd"
@@ -221,7 +221,7 @@ export const TalentMatchCard = ({
               fill="none"
               stroke="currentColor"
               strokeWidth="1.5"
-              className="size-10 text-banana"
+              className="size-8 text-banana sm:size-10"
             >
               <path
                 strokeLinecap="round"
@@ -232,9 +232,9 @@ export const TalentMatchCard = ({
           )}
         </div>
       </div>
-      <div className="relative flex flex-1 flex-col px-8 py-4 font-montserrat -tracking-tighter">
-        <h3 className="mb-4 text-2xl font-bold">{fullName}</h3>
-        <div className="text-base xl:grid xl:grid-cols-2 xl:gap-2">
+      <div className="relative flex flex-1 flex-col px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
+        <h3 className="mb-4 text-xl font-bold lg:text-2xl">{fullName}</h3>
+        <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
           <div>Ethnicity</div>
           <div className="font-semibold">
             {profile.ethnicities?.join(', ') || 'N/A'}
@@ -256,17 +256,20 @@ export const TalentMatchCard = ({
           <div className="font-semibold">N/A</div>
         </div>
       </div>
-      <div className="flex flex-none flex-col">
+      <div className="flex flex-none flex-row lg:flex-col">
         <button
           onClick={() => {
             setMatchType(true);
             setIsModalVisible(true);
           }}
           disabled={isAccepted}
-          className={clsx('h-full bg-yoda/50 px-4 py-2 text-mint', {
-            'cursor-not-allowed opacity-50': isAccepted,
-            'hover:bg-mint/50 hover:text-white': !isAccepted
-          })}
+          className={clsx(
+            'flex min-h-[60px] flex-1 flex-col items-center justify-center bg-yoda/50 px-4 py-3 text-mint lg:h-full lg:min-h-0 lg:flex-initial',
+            {
+              'cursor-not-allowed opacity-50': isAccepted,
+              'hover:bg-mint/50 hover:text-white': !isAccepted
+            }
+          )}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -274,7 +277,7 @@ export const TalentMatchCard = ({
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-20"
+            className="size-8 lg:size-20"
           >
             <path
               strokeLinecap="round"
@@ -283,7 +286,7 @@ export const TalentMatchCard = ({
             />
           </svg>
 
-          <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
+          <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
             Accept
           </span>
         </button>
@@ -291,7 +294,7 @@ export const TalentMatchCard = ({
           onClick={() => createMatch(false)}
           disabled={isDeclined}
           className={clsx(
-            'flex h-full flex-col items-center justify-center bg-blush/50 px-4 py-2 text-salmon',
+            'flex min-h-[60px] flex-1 flex-col items-center justify-center bg-blush/50 px-4 py-3 text-salmon lg:h-full lg:min-h-0 lg:flex-initial',
             {
               'cursor-not-allowed opacity-50': isDeclined,
               'hover:bg-salmon/50 hover:text-white': !isDeclined
@@ -302,7 +305,7 @@ export const TalentMatchCard = ({
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="size-20"
+            className="size-8 lg:size-20"
           >
             <path
               fillRule="evenodd"
@@ -310,7 +313,7 @@ export const TalentMatchCard = ({
               clipRule="evenodd"
             />
           </svg>
-          <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
+          <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
             Decline
           </span>
         </button>

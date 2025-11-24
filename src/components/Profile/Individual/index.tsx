@@ -20,7 +20,7 @@ import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import { Button, Checkbox, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
-import { colors, fonts } from '../../../theme/styleVars';
+import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import { forceHttp } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
@@ -92,6 +92,24 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   // awards
   const [awardId, setAwardId] = useState(1);
   const [yearOptions, setYearOptions] = useState([] as number[]);
+
+  // Profile complete panel visibility (stored in sessionStorage)
+  const [showProfileCompletePanel, setShowProfileCompletePanel] = useState(
+    () => {
+      if (typeof window !== 'undefined') {
+        const stored = sessionStorage.getItem('profileCompletePanelClosed');
+        return stored !== 'true';
+      }
+      return true;
+    }
+  );
+
+  const handleCloseProfileCompletePanel = () => {
+    setShowProfileCompletePanel(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('profileCompletePanelClosed', 'true');
+    }
+  };
 
   const PageWrapper = previewMode ? Container : PageContainer;
 
@@ -700,9 +718,15 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
 
   return (
     <PageWrapper>
-      {profile?.data?.completed_profile && (
+      {profile?.data?.completed_profile && showProfileCompletePanel && (
         <Row>
           <PreviewCard>
+            <CloseButton
+              onClick={handleCloseProfileCompletePanel}
+              aria-label="Close profile complete message"
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </CloseButton>
             <h2>
               <FontAwesomeIcon
                 style={{ marginRight: '12px' }}
@@ -727,7 +751,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
         </Col>
       </Row>
       <Row>
-        <Col lg={4}>
+        <Col lg={4} xs={12}>
           <ImageUploadComponent
             onSave={(pfpImgUrl: string) => saveProfilePicture(pfpImgUrl)}
             currentImageUrl={profile?.data?.profile_image_url}
@@ -851,9 +875,9 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
             </div>
           </DetailsCard>
         </Col>
-        <Col lg={8}>
+        <Col lg={8} xs={12}>
           <div>
-            <a
+            <EditLink
               href="#"
               onClick={(e: React.MouseEvent<HTMLElement>) =>
                 onEditModeClick(e, 'headline', !editMode['headline'])
@@ -862,7 +886,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
               <FontAwesomeIcon
                 icon={editMode['headline'] ? faXmark : faPenToSquare}
               />
-            </a>
+            </EditLink>
             {editMode['headline'] ? (
               <div>
                 <CAGLabel>Edit Profile</CAGLabel>
@@ -889,7 +913,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                 <Form.Group className="form-group">
                   <Container>
                     <Row>
-                      <PaddedCol lg="6">
+                      <PaddedCol lg="6" xs="12">
                         <CAGLabel>Pronouns</CAGLabel>
                         <Form.Control
                           aria-label="pronouns"
@@ -908,7 +932,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                           ))}
                         </Form.Control>
                       </PaddedCol>
-                      <PaddedCol lg="6">
+                      <PaddedCol lg="6" xs="12">
                         <CAGLabel>Other</CAGLabel>
                         <Form.Control
                           aria-label="pronouns"
@@ -926,7 +950,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                 <CAGLabel>Profile Headline &amp; Personal Bio</CAGLabel>
                 <Container>
                   <Row>
-                    <PaddedCol lg="10">
+                    <PaddedCol lg="10" xs="12">
                       <Form.Group className="form-group">
                         <CAGFormControl
                           aria-label="bio headline"
@@ -1032,14 +1056,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <a
+                <AddLink
                   href="#"
                   onClick={(e: React.MouseEvent<HTMLElement>) =>
                     onEditModeClick(e, 'training', !editMode['training'])
                   }
                 >
                   + Add Training
-                </a>
+                </AddLink>
               </>
             )}
             <hr />
@@ -1098,14 +1122,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <a
+                <AddLink
                   href="#"
                   onClick={(e: React.MouseEvent<HTMLElement>) =>
                     onEditModeClick(e, 'upcoming', !editMode['upcoming'])
                   }
                 >
                   + Add Upcoming Features
-                </a>
+                </AddLink>
               </>
             )}
             <hr />
@@ -1163,14 +1187,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <a
+                <AddLink
                   href="#"
                   onClick={(e: React.MouseEvent<HTMLElement>) =>
                     onEditModeClick(e, 'past', !editMode['past'])
                   }
                 >
                   + Add Previous Productions
-                </a>
+                </AddLink>
               </>
             )}
             <hr />
@@ -1256,14 +1280,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <a
+                <AddLink
                   href="#"
                   onClick={(e: React.MouseEvent<HTMLElement>) =>
                     onEditModeClick(e, 'skills', !editMode['skills'])
                   }
                 >
                   + Add Skills
-                </a>
+                </AddLink>
               </>
             )}
             <hr />
@@ -1318,7 +1342,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <a
+                <AddLink
                   href="#"
                   onClick={(e: React.MouseEvent<HTMLElement>) =>
                     onEditModeClick(
@@ -1329,7 +1353,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                   }
                 >
                   + Add Off Stage Roles
-                </a>
+                </AddLink>
               </>
             )}
             <hr />
@@ -1427,14 +1451,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <a
+                <AddLink
                   href="#"
                   onClick={(e: React.MouseEvent<HTMLElement>) =>
                     onEditModeClick(e, 'awards', !editMode['awards'])
                   }
                 >
                   + Add Awards &amp; Recognition
-                </a>
+                </AddLink>
               </>
             )}
           </div>
@@ -1449,6 +1473,11 @@ const Title = styled.h1`
   font-size: 48px;
   font-weight: bold;
   margin-bottom: 76px;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 32px;
+    margin-bottom: 32px;
+  }
 `;
 
 const ProfileImage = styled(Image)`
@@ -1481,6 +1510,11 @@ const DetailsCard = styled.div`
   box-shadow: 0 0 8px 4px ${colors.black05a};
   border-radius: 8px;
   padding: 25px 21px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 24px;
+    padding: 16px;
+  }
 `;
 
 const DetailsColTitle = styled.h2`
@@ -1494,6 +1528,11 @@ const DetailsColTitle = styled.h2`
 
     a {
       margin-left: auto;
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 
@@ -1508,6 +1547,11 @@ const DetailsColTitle = styled.h2`
     );
     border-radius: 4px;
   }
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+    line-height: 22px;
+  }
 `;
 
 const HeaderNamePronouns = styled.div`
@@ -1517,6 +1561,16 @@ const HeaderNamePronouns = styled.div`
   p {
     margin-left: 1.15rem;
   }
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    align-items: flex-start;
+
+    p {
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+  }
 `;
 
 const ProfileFlex = styled.div`
@@ -1524,12 +1578,28 @@ const ProfileFlex = styled.div`
   flex-wrap: wrap;
   gap: 12px;
   padding: 24px 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    width: 100%;
+    gap: 8px;
+    padding: 16px 0;
+
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
 `;
 
 const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+  }
 `;
 
 const PaddedCol = styled(Col)`
@@ -1544,6 +1614,12 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 10px;
+    padding-left: 12px;
+    font-size: 16px;
+  }
 `;
 
 const CAGInput = styled.div`
@@ -1567,6 +1643,23 @@ const CAGInput = styled.div`
     font-size: 40px;
     cursor: pointer;
     color: ${colors.mint};
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+    }
+
+    button {
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 32px;
+    }
   }
 `;
 
@@ -1577,6 +1670,12 @@ const CAGContainer = styled.div`
   overflow: scroll;
   padding-left: none;
   width: 600%;
+
+  @media (max-width: ${breakpoints.md}) {
+    max-width: 100%;
+    width: 100%;
+    flex-wrap: wrap;
+  }
 `;
 
 const CAGTag = styled.div`
@@ -1603,6 +1702,15 @@ const CAGTag = styled.div`
     background-color: unset;
     cursor: pointer;
     color: ${colors.lightGrey};
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    .tag {
+      margin: 10px 10px 10px 0;
+      font-size: 14px;
+    }
   }
 `;
 
@@ -1630,16 +1738,99 @@ const AwardRow = styled(Row)`
   &:not(:first-child) {
     border-top: 1px solid ${colors.lightGrey};
   }
+
+  @media (max-width: ${breakpoints.md}) {
+    padding-top: 1.5em;
+    padding-bottom: 1.5em;
+  }
 `;
 
 const CAGButton = styled.div`
   a {
     display: block;
     margin: 1em 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
 
     &.delete {
       color: ${colors.salmon};
     }
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    a {
+      margin: 0.75em 0;
+      padding: 12px 0;
+    }
+  }
+`;
+
+const EditLink = styled.a`
+  display: inline-block;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: ${colors.primary};
+  text-decoration: none;
+
+  &:hover {
+    opacity: 0.8;
+  }
+`;
+
+const AddLink = styled.a`
+  display: inline-block;
+  min-height: 44px;
+  padding: 12px 0;
+  color: ${colors.primary};
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 10px 0;
+    font-size: 16px;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${colors.dark};
+  font-size: 20px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    top: 12px;
+    right: 12px;
+    font-size: 18px;
+    min-width: 40px;
+    min-height: 40px;
   }
 `;
 

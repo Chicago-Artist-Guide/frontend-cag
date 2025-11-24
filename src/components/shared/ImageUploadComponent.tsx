@@ -42,6 +42,9 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   const [state, setState] = useState<UploadState>('idle');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [croppedPreviewUrl, setCroppedPreviewUrl] = useState<string | null>(
+    null
+  );
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [userIsChanging, setUserIsChanging] = useState(false);
@@ -63,6 +66,18 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
       setState('complete');
     }
   }, [currentImageUrl, userIsChanging]);
+
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      if (croppedPreviewUrl) {
+        URL.revokeObjectURL(croppedPreviewUrl);
+      }
+    };
+  }, [previewUrl, croppedPreviewUrl]);
 
   // Helper text based on image type
   const getHelperText = () => {
@@ -88,6 +103,7 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
   const resetComponent = useCallback(() => {
     setSelectedFile(null);
     setPreviewUrl(null);
+    setCroppedPreviewUrl(null);
     setUploadProgress(0);
     setError(null);
     setCrop({ x: 0, y: 0 });
@@ -126,6 +142,12 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
           return;
         }
 
+        // Clean up previous cropped preview if it exists
+        if (croppedPreviewUrl) {
+          URL.revokeObjectURL(croppedPreviewUrl);
+          setCroppedPreviewUrl(null);
+        }
+
         setSelectedFile(file);
         const url = URL.createObjectURL(file);
         setPreviewUrl(url);
@@ -137,7 +159,7 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
         }
       }
     },
-    [maxSizeInMB, showCrop, state]
+    [maxSizeInMB, showCrop, state, croppedPreviewUrl]
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -155,9 +177,35 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
     []
   );
 
-  const handleCropSave = useCallback(() => {
-    setState('selected');
-  }, []);
+  const handleCropSave = useCallback(async () => {
+    if (!previewUrl || !croppedAreaPixels) {
+      setError('Crop data is missing. Please try again.');
+      return;
+    }
+
+    try {
+      // Create a cropped preview image
+      const croppedBlob = await createCroppedImage(
+        previewUrl,
+        croppedAreaPixels,
+        rotation
+      );
+
+      // Create a URL for the cropped preview
+      const croppedUrl = URL.createObjectURL(croppedBlob);
+
+      // Clean up previous cropped preview if it exists
+      if (croppedPreviewUrl) {
+        URL.revokeObjectURL(croppedPreviewUrl);
+      }
+
+      setCroppedPreviewUrl(croppedUrl);
+      setState('selected');
+    } catch (error) {
+      console.error('Error creating cropped preview:', error);
+      setError('Failed to apply crop. Please try again.');
+    }
+  }, [previewUrl, croppedAreaPixels, rotation]);
 
   const handleCropCancel = useCallback(() => {
     resetComponent();
@@ -175,12 +223,20 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
       let fileToUpload: Blob = selectedFile;
 
       // Create cropped image if needed
+      // Use croppedPreviewUrl if available (already cropped), otherwise crop from original
       if (showCrop && croppedAreaPixels && previewUrl) {
-        fileToUpload = await createCroppedImage(
-          previewUrl,
-          croppedAreaPixels,
-          rotation
-        );
+        if (croppedPreviewUrl) {
+          // If we have a cropped preview, use it directly
+          const response = await fetch(croppedPreviewUrl);
+          fileToUpload = await response.blob();
+        } else {
+          // Otherwise, create cropped image from original
+          fileToUpload = await createCroppedImage(
+            previewUrl,
+            croppedAreaPixels,
+            rotation
+          );
+        }
       }
 
       // Upload to Firebase
@@ -212,9 +268,12 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
             setUserIsChanging(false);
             onUploadStateChange?.(false); // Notify that upload completed
 
-            // Clean up preview URL
+            // Clean up preview URLs
             if (previewUrl) {
               URL.revokeObjectURL(previewUrl);
+            }
+            if (croppedPreviewUrl) {
+              URL.revokeObjectURL(croppedPreviewUrl);
             }
           });
         }
@@ -229,6 +288,7 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
     showCrop,
     croppedAreaPixels,
     previewUrl,
+    croppedPreviewUrl,
     rotation,
     firebaseStorage,
     imageType,
@@ -335,9 +395,12 @@ const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
 
   const renderSelectedState = () => (
     <SelectedContainer>
-      {previewUrl && (
+      {(croppedPreviewUrl || previewUrl) && (
         <PreviewImageContainer>
-          <PreviewImage src={previewUrl} alt="Selected image" />
+          <PreviewImage
+            src={croppedPreviewUrl || previewUrl || ''}
+            alt="Selected image"
+          />
         </PreviewImageContainer>
       )}
 

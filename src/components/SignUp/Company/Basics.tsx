@@ -7,7 +7,7 @@ import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import InputField from '../../../components/shared/Input';
-import { colors, fonts } from '../../../theme/styleVars';
+import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
@@ -38,7 +38,7 @@ const CompanyBasics: React.FC<{
         <SignUpHeader title="LET'S GET STARTED" />
       </Row>
       <Row>
-        <SignUpBody lg="4">
+        <SignUpBody lg="4" xs="12">
           <Form>
             <InputField
               required
@@ -98,6 +98,15 @@ const LoginLink = styled.p`
   font-family: ${fonts.lora};
   a {
     color: ${colors.salmon};
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 16px;
+    margin-left: 0;
+    font-size: 14px;
   }
 `;
 

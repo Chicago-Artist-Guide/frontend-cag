@@ -5,7 +5,7 @@ import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import { Button, Checkbox } from '../../../components/shared';
-import { colors, fonts } from '../../../theme/styleVars';
+import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import {
   AgeRange,
   ageRanges,
@@ -63,7 +63,7 @@ const EditPersonalDetails = ({
         <CAGLabel>Height</CAGLabel>
         <Container>
           <Row>
-            <PaddedCol lg="6">
+            <PaddedCol lg="6" xs="12">
               <Form.Control
                 aria-label="height feet"
                 as="select"
@@ -81,7 +81,7 @@ const EditPersonalDetails = ({
                 ))}
               </Form.Control>
             </PaddedCol>
-            <PaddedCol lg="6">
+            <PaddedCol lg="6" xs="12">
               <Form.Control
                 aria-label="height inches"
                 as="select"
@@ -175,7 +175,7 @@ const EditPersonalDetails = ({
         <CAGLabel>Union</CAGLabel>
         <Container>
           <Row>
-            <PaddedCol lg="5">
+            <PaddedCol lg="5" xs="12">
               <CAGFormControl
                 aria-label="union"
                 as="select"
@@ -191,7 +191,7 @@ const EditPersonalDetails = ({
                 <option value="Other">Other</option>
               </CAGFormControl>
             </PaddedCol>
-            <PaddedCol lg="5">
+            <PaddedCol lg="5" xs="12">
               <CAGFormControl
                 aria-label="union"
                 defaultValue={editProfile?.union_other}
@@ -267,30 +267,32 @@ const EditPersonalDetails = ({
                     ))}
                   </CAGFormControl>
                   {editProfile.websites.length > 1 && (
-                    <a
+                    <DeleteLink
                       href="#"
                       onClick={(e: any) => removeWebsiteInput(e, websiteRow.id)}
                     >
-                      X
-                    </a>
+                      X Delete
+                    </DeleteLink>
                   )}
                 </div>
               ))}
               <div>
-                <a href="#" onClick={addWebsiteInput}>
+                <AddLink href="#" onClick={addWebsiteInput}>
                   + Add Website
-                </a>
+                </AddLink>
               </div>
             </PaddedCol>
           </Row>
         </Container>
       </Form.Group>
-      <Button
-        onClick={updatePersonalDetails}
-        text="Save"
-        type="button"
-        variant="primary"
-      />
+      <ButtonContainer>
+        <Button
+          onClick={updatePersonalDetails}
+          text="Save"
+          type="button"
+          variant="primary"
+        />
+      </ButtonContainer>
     </div>
   );
 };
@@ -303,16 +305,75 @@ const CAGFormControl = styled(Form.Control)`
   padding: 5px;
   padding-left: 10px;
   width: 100%;
+
+  @media (max-width: ${breakpoints.md}) {
+    padding: 10px;
+    padding-left: 12px;
+    font-size: 16px;
+  }
 `;
 
 const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+  }
 `;
 
 const PaddedCol = styled(Col)`
   padding-left: 0;
+`;
+
+const DeleteLink = styled.a`
+  color: ${colors.salmon};
+  display: inline-block;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.5em;
+  font-weight: 500;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+  }
+`;
+
+const AddLink = styled.a`
+  color: ${colors.primary};
+  display: inline-block;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 1em;
+  font-weight: 500;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 24px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 20px;
+
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
 `;
 
 export default EditPersonalDetails;

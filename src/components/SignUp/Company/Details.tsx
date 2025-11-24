@@ -48,7 +48,7 @@ const CompanyDetails: React.FC<{
         <SignUpHeader title="Let's get some details" />
       </Row>
       <Row>
-        <SignUpBody lg="6">
+        <SignUpBody lg="6" xs="12">
           <Dropdown
             name="numberOfMembers"
             label="Number of Members"

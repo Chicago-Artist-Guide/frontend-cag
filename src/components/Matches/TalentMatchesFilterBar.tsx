@@ -87,8 +87,8 @@ export const TalentMatchesFilterBar = () => {
   };
 
   return (
-    <div className="max-w-md bg-white p-4">
-      <h2 className="font-open-sans text-2xl font-bold tracking-[0.5px]">
+    <div className="w-full max-w-md bg-white p-4">
+      <h2 className="font-open-sans text-xl font-bold tracking-[0.5px] lg:text-2xl">
         Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}
       </h2>
       {roles?.length && (
@@ -106,38 +106,38 @@ export const TalentMatchesFilterBar = () => {
           )}
 
           {currentRole && (
-            <div className="text-md grid grid-cols-3 gap-3 pt-3 font-open-sans font-normal tracking-[0.5px] text-dark">
-              Role Status
-              <span className="col-span-2 font-bold">
+            <div className="text-md grid grid-cols-1 gap-3 pt-3 font-open-sans font-normal tracking-[0.5px] text-dark sm:grid-cols-3">
+              <div className="sm:col-span-1">Role Status</div>
+              <span className="col-span-1 font-bold sm:col-span-2">
                 {currentRole.role_status}
               </span>
               {currentRole.ethnicity && (
                 <>
-                  Ethnicity
-                  <span className="col-span-2 font-bold">
+                  <div className="sm:col-span-1">Ethnicity</div>
+                  <span className="col-span-1 font-bold sm:col-span-2">
                     {currentRole.ethnicity?.join(', ')}
                   </span>
                 </>
               )}
               {currentRole.age_range && (
                 <>
-                  Age Range
-                  <span className="col-span-2 font-bold">
+                  <div className="sm:col-span-1">Age Range</div>
+                  <span className="col-span-1 font-bold sm:col-span-2">
                     {currentRole.age_range?.join('; ')}
                   </span>
                 </>
               )}
               {currentRole.age_range && (
                 <>
-                  Gender
-                  <span className="col-span-2 font-bold">
+                  <div className="sm:col-span-1">Gender</div>
+                  <span className="col-span-1 font-bold sm:col-span-2">
                     {currentRole.gender_identity?.join(', ')}
                   </span>
                 </>
               )}
-              <span className="col-span-3">LGBTQ+</span>
+              <span className="col-span-1 sm:col-span-3">LGBTQ+</span>
               {currentRole.additional_requirements && (
-                <span className="col-span-3 font-bold">
+                <span className="col-span-1 font-bold sm:col-span-3">
                   {currentRole.additional_requirements?.join(', ')}
                 </span>
               )}
