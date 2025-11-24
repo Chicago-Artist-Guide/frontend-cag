@@ -93,6 +93,24 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   const [awardId, setAwardId] = useState(1);
   const [yearOptions, setYearOptions] = useState([] as number[]);
 
+  // Profile complete panel visibility (stored in sessionStorage)
+  const [showProfileCompletePanel, setShowProfileCompletePanel] = useState(
+    () => {
+      if (typeof window !== 'undefined') {
+        const stored = sessionStorage.getItem('profileCompletePanelClosed');
+        return stored !== 'true';
+      }
+      return true;
+    }
+  );
+
+  const handleCloseProfileCompletePanel = () => {
+    setShowProfileCompletePanel(false);
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('profileCompletePanelClosed', 'true');
+    }
+  };
+
   const PageWrapper = previewMode ? Container : PageContainer;
 
   const updatePerformanceState = () => {
@@ -700,9 +718,15 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
 
   return (
     <PageWrapper>
-      {profile?.data?.completed_profile && (
+      {profile?.data?.completed_profile && showProfileCompletePanel && (
         <Row>
           <PreviewCard>
+            <CloseButton
+              onClick={handleCloseProfileCompletePanel}
+              aria-label="Close profile complete message"
+            >
+              <FontAwesomeIcon icon={faXmark} />
+            </CloseButton>
             <h2>
               <FontAwesomeIcon
                 style={{ marginRight: '12px' }}
@@ -1772,6 +1796,41 @@ const AddLink = styled.a`
   @media (max-width: ${breakpoints.md}) {
     padding: 10px 0;
     font-size: 16px;
+  }
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: ${colors.dark};
+  font-size: 20px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
+  &:active {
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    top: 12px;
+    right: 12px;
+    font-size: 18px;
+    min-width: 40px;
+    min-height: 40px;
   }
 `;
 

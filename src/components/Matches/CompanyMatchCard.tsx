@@ -243,19 +243,19 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
 
   return (
     <div
-      className={clsx('flex min-h-[272px] max-w-[812px]', {
+      className={clsx('flex min-h-[272px] max-w-[812px] flex-col lg:flex-row', {
         'border-4 border-mint bg-yoda/25': isAccepted,
         'border-4 border-salmon bg-blush/25': isDeclined
       })}
     >
-      <div className="relative flex flex-1 flex-col overflow-hidden px-8 py-4 font-montserrat -tracking-tighter">
-        <h2 className="mb-4 text-2xl font-bold">{role.role_name}</h2>
+      <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
+        <h2 className="mb-4 text-xl font-bold lg:text-2xl">{role.role_name}</h2>
         {production?.production_name && (
-          <h3 className="-mt-2 mb-2 grid grid-cols-2 gap-2 text-base font-bold">
+          <h3 className="-mt-2 mb-2 text-sm font-bold sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
             {production.production_name} by {theater?.theatre_name}
           </h3>
         )}
-        <div className="text-base xl:grid xl:grid-cols-2 xl:gap-2">
+        <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
           <div>Type</div>
           <div className="font-semibold">{role.type}</div>
           <div>Ethnicity</div>
@@ -275,17 +275,20 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
           <h4 className="my-2 text-base">{role.description}</h4>
         )}
       </div>
-      <div className="flex flex-none flex-col">
+      <div className="flex flex-none flex-row lg:flex-col">
         <button
           onClick={() => {
             setMatchType(true);
             setIsModalVisible(true);
           }}
           disabled={isAccepted}
-          className={clsx('h-full bg-yoda/50 px-4 py-2 text-mint', {
-            'cursor-not-allowed opacity-50': isAccepted,
-            'hover:bg-mint/50 hover:text-white': !isAccepted
-          })}
+          className={clsx(
+            'flex min-h-[60px] flex-1 flex-col items-center justify-center bg-yoda/50 px-4 py-3 text-mint lg:h-full lg:min-h-0 lg:flex-initial',
+            {
+              'cursor-not-allowed opacity-50': isAccepted,
+              'hover:bg-mint/50 hover:text-white': !isAccepted
+            }
+          )}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -293,7 +296,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-20"
+            className="size-8 lg:size-20"
           >
             <path
               strokeLinecap="round"
@@ -301,7 +304,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
               d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
             />
           </svg>
-          <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
+          <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
             Accept
           </span>
         </button>
@@ -309,7 +312,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
           onClick={() => createMatch(false)}
           disabled={isDeclined}
           className={clsx(
-            'flex h-full flex-col items-center justify-center bg-blush/50 px-4 py-2 text-salmon',
+            'flex min-h-[60px] flex-1 flex-col items-center justify-center bg-blush/50 px-4 py-3 text-salmon lg:h-full lg:min-h-0 lg:flex-initial',
             {
               'cursor-not-allowed opacity-50': isDeclined,
               'hover:bg-salmon/50 hover:text-white': !isDeclined
@@ -320,7 +323,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
             fill="currentColor"
-            className="size-20"
+            className="size-8 lg:size-20"
           >
             <path
               fillRule="evenodd"
@@ -328,7 +331,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
               clipRule="evenodd"
             />
           </svg>
-          <span className="font-montserrat text-base font-bold uppercase -tracking-tighter">
+          <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
             Decline
           </span>
         </button>

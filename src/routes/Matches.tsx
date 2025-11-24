@@ -25,7 +25,7 @@ const Matches = () => {
   const InsideMatchPage = () => (
     <PageContainer>
       <div className="-mx-4 flex flex-wrap">
-        <div className="w-full px-4">
+        <div className="w-full px-2 sm:px-4">
           <Title>Matches</Title>
           <MatchesPageContainer />
         </div>

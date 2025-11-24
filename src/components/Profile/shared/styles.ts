@@ -2,6 +2,7 @@ import styled from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
 
 export const PreviewCard = styled.div`
+  position: relative;
   height: auto;
   display: block;
   padding: 26px 12% 26px 32px;

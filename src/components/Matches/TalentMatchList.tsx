@@ -134,9 +134,11 @@ export const TalentMatchList = () => {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-4 border-b border-stone-200 pb-4">
-        <span className="font-montserrat text-lg font-semibold">Show:</span>
-        <div className="flex gap-2">
+      <div className="flex flex-col gap-2 border-b border-stone-200 pb-4 sm:flex-row sm:items-center sm:gap-4">
+        <span className="font-montserrat text-base font-semibold sm:text-lg">
+          Show:
+        </span>
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => setFilter('all')}
             className={clsx(
