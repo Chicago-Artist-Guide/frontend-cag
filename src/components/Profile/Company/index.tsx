@@ -28,7 +28,7 @@ import {
 } from './ProfileStyles';
 import { Production, Profile } from './types';
 
-type Edit = 'profile' | 'add-production' | null;
+type Edit = 'profile' | 'add-production' | 'add-award' | null;
 
 const MAX_ADDITIONAL_PHOTOS = 6;
 
@@ -96,8 +96,13 @@ const CompanyProfile: React.FC<{
     setEditing(null);
   };
 
-  if (editing === 'profile') {
-    return <CompanyProfileEdit toggleEdit={toggleEdit} />;
+  if (editing === 'profile' || editing === 'add-award') {
+    return (
+      <CompanyProfileEdit
+        toggleEdit={toggleEdit}
+        autoAddAward={editing === 'add-award'}
+      />
+    );
   }
 
   if (editing === 'add-production') {
@@ -227,7 +232,7 @@ const CompanyProfile: React.FC<{
             <div className="mt-3">
               <DetailAdd
                 text="Add an award or recognition"
-                onClick={() => setEditing('profile')}
+                onClick={() => setEditing('add-award')}
               />
             </div>
           </DetailSection>

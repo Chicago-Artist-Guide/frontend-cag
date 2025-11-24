@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import { Button } from '../../../../components/shared';
 import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useUserContext } from '../../../../context/UserContext';
-import { breakpoints } from '../../../../theme/styleVars';
+import { breakpoints, colors } from '../../../../theme/styleVars';
 import { getOptions } from '../../../../utils/helpers';
 import {
   productionEquities,
@@ -40,6 +40,54 @@ const FormSection = styled.div`
 
   @media (max-width: ${breakpoints.sm}) {
     margin-bottom: 0.75rem;
+  }
+`;
+
+const DesktopSaveButton = styled(Button)`
+  @media (max-width: ${breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const DesktopButtonRow = styled(Row)`
+  @media (max-width: ${breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const MobileFooter = styled.div`
+  display: none;
+
+  @media (max-width: ${breakpoints.md}) {
+    display: block;
+    padding: 16px;
+    border-top: 1px solid #e5e7eb;
+    background: ${colors.white};
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-top: 32px;
+  }
+`;
+
+const MobileFooterContent = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const MobileButtonSection = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+`;
+
+const MobileButtonCol = styled.div`
+  flex: 1;
+  display: flex;
+
+  button {
+    width: 100%;
+    min-height: 44px;
   }
 `;
 
@@ -117,7 +165,7 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
           <Col xs={12}>
             <div className="d-flex justify-content-between align-items-start flex-column flex-md-row">
               <Title>Add a new show</Title>
-              <Button
+              <DesktopSaveButton
                 onClick={handleSubmit}
                 text="Save Show"
                 icon={faFloppyDisk}
@@ -248,7 +296,7 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
             </RightCol>
           </Row>
         </MobileFormContainer>
-        <Row>
+        <DesktopButtonRow>
           <Col xs={12} style={{ marginTop: 20 }}>
             <div className="d-flex justify-content-between flex-column flex-sm-row">
               <Button
@@ -267,7 +315,30 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
               />
             </div>
           </Col>
-        </Row>
+        </DesktopButtonRow>
+        <MobileFooter>
+          <MobileFooterContent>
+            <MobileButtonSection>
+              <MobileButtonCol>
+                <Button
+                  onClick={toggleEdit}
+                  text="Cancel"
+                  type="button"
+                  variant="danger"
+                />
+              </MobileButtonCol>
+              <MobileButtonCol>
+                <Button
+                  onClick={handleSubmit}
+                  text="Save Show"
+                  icon={faFloppyDisk}
+                  type="button"
+                  variant="primary"
+                />
+              </MobileButtonCol>
+            </MobileButtonSection>
+          </MobileFooterContent>
+        </MobileFooter>
       </Form>
     </PageContainer>
   );

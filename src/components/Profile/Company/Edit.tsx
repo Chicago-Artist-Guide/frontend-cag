@@ -1,9 +1,7 @@
 import { getDoc, updateDoc } from '@firebase/firestore';
 import { uuidv4 } from '@firebase/util';
-import { faFloppyDisk } from '@fortawesome/free-regular-svg-icons';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect } from 'react';
+import { faFloppyDisk, faTrashCan } from '@fortawesome/free-regular-svg-icons';
+import React, { useEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
@@ -31,18 +29,21 @@ import {
 } from './ProfileStyles';
 import { Award, Profile } from './types';
 
-const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
-  toggleEdit
-}) => {
+const CompanyProfileEdit: React.FC<{
+  toggleEdit: () => void;
+  autoAddAward?: boolean;
+}> = ({ toggleEdit, autoAddAward = false }) => {
   const {
     profile: { ref, data },
     setProfileData
   } = useUserContext();
-  const [formValues, setFormValues] = useForm<Profile>({
-    additional_photos: {},
-    awards: [],
-    ...data
-  });
+  // Initialize form values directly from data - no useEffect needed
+  const [formValues, setFormValues] = useForm<Profile>(
+    data || {
+      additional_photos: {},
+      awards: []
+    }
+  );
   const locations = [
     { name: 'Choose one...', value: 'choose' },
     ...neighborhoods.map((neighborhood) => ({
@@ -50,14 +51,6 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
       value: neighborhood
     }))
   ];
-
-  useEffect(() => {
-    if (data) {
-      Object.entries(data).map(([key, value]) =>
-        setFormValues({ target: { name: key, value: value } })
-      );
-    }
-  }, [data]);
 
   const handleSubmit = async () => {
     if (ref && JSON.stringify(data) !== JSON.stringify(formValues)) {
@@ -75,6 +68,7 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
 
   const images = Array(6).fill(1);
   const awards = formValues?.awards || [];
+  const awardsSectionRef = useRef<HTMLDivElement>(null);
 
   const handleAwardChange = (event: any, index: number, field: keyof Award) => {
     const newAwards = [...awards];
@@ -127,20 +121,43 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
     });
   };
 
+  // Auto-add award and scroll to awards section when entering from "Add award" button
+  useEffect(() => {
+    if (autoAddAward) {
+      // Add a new award if coming from "Add award" button
+      if (awards.length === 0 || awards[awards.length - 1].award_name) {
+        addAward();
+      }
+      // Scroll to awards section after a brief delay to ensure render
+      setTimeout(() => {
+        awardsSectionRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 100);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoAddAward]);
+
   return (
     <PageContainer>
       <Form>
         <Row>
           <Col lg={12}>
-            <EditHeaderWrapper className="d-flex justify-content-between flex-column flex-md-row align-items-start align-items-md-center">
+            <EditHeaderWrapper>
+              <BackButton
+                onClick={toggleEdit}
+                text="Back to Profile"
+                type="button"
+                variant="secondary"
+              />
               <Title>Edit your profile</Title>
-              <Button
+              <SaveProfileButton
                 onClick={handleSubmit}
                 text="Save Profile"
                 icon={faFloppyDisk}
                 type="button"
-                variant="secondary"
-                className="mt-md-0 mt-3"
+                variant="primary"
               />
             </EditHeaderWrapper>
           </Col>
@@ -232,23 +249,26 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
               defaultValue={formValues?.description}
             />
 
-            <DetailSection title="Awards & Recognition">
+            <AwardsSection ref={awardsSectionRef}>
+              <AwardsSectionHeader>
+                <AwardsSectionTitle>Awards & Recognition</AwardsSectionTitle>
+                {awards.length > 0 && (
+                  <AwardsHelpText>
+                    Each award saves individually. Fill in required fields (*),
+                    then click "Save" on each award.
+                  </AwardsHelpText>
+                )}
+              </AwardsSectionHeader>
               {awards.map((award, index) => (
                 <AwardFormContainer key={index} className="mt-3">
-                  <div className="d-flex align-items-center justify-content-between">
+                  <AwardHeader>
                     <AwardTitle>Award #{index + 1}</AwardTitle>
-                    <CloseIcon
-                      icon={faClose}
-                      className="ml-auto"
-                      size="lg"
-                      onClick={() => removeAward(index)}
-                    />
-                  </div>
+                  </AwardHeader>
                   <Row>
                     <Col md={6} xs={12}>
                       <FormInput
                         name={`awards.${index}.award_name`}
-                        label="Award Name"
+                        label="Award Name *"
                         defaultValue={award.award_name}
                         onChange={(e) =>
                           handleAwardChange(e, index, 'award_name')
@@ -257,7 +277,7 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                       />
                       <FormInput
                         name={`awards.${index}.award_year`}
-                        label="Award Year"
+                        label="Award Year *"
                         defaultValue={award.award_year}
                         onChange={(e) =>
                           handleAwardChange(e, index, 'award_year')
@@ -268,7 +288,7 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                     <Col md={6} xs={12}>
                       <FormInput
                         name={`awards.${index}.awarded_by`}
-                        label="Awarded By"
+                        label="Awarded By *"
                         defaultValue={award.awarded_by}
                         onChange={(e) =>
                           handleAwardChange(e, index, 'awarded_by')
@@ -286,40 +306,43 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                       />
                     </Col>
                   </Row>
-                  <div style={{ marginTop: 12 }}>
-                    <label>Relevant Links:</label>
+                  <LinksSection>
+                    <LinksLabel>Relevant Links:</LinksLabel>
                     {(award.website_links && award.website_links.length > 0
                       ? award.website_links
                       : ['']
                     ).map((link, linkIdx) => (
                       <AwardWebsiteLinkRow key={linkIdx}>
-                        <FormInput
-                          name={`awards.${index}.website_links.${linkIdx}`}
-                          label=""
-                          defaultValue={link}
-                          onChange={(e) => {
-                            if (
-                              e &&
-                              'target' in e &&
-                              e.target &&
-                              (e.target as HTMLInputElement).value !== undefined
-                            ) {
-                              handleAwardLinkChange(
-                                e as React.ChangeEvent<HTMLInputElement>,
-                                index,
-                                linkIdx
-                              );
-                            }
-                          }}
-                          style={{ flex: 1, minWidth: 0, marginTop: 0 }}
-                          placeholder="https://www.example.com"
-                        />
+                        <LinkInputWrapper>
+                          <FormInput
+                            name={`awards.${index}.website_links.${linkIdx}`}
+                            label=""
+                            defaultValue={link}
+                            onChange={(e) => {
+                              if (
+                                e &&
+                                'target' in e &&
+                                e.target &&
+                                (e.target as HTMLInputElement).value !==
+                                  undefined
+                              ) {
+                                handleAwardLinkChange(
+                                  e as React.ChangeEvent<HTMLInputElement>,
+                                  index,
+                                  linkIdx
+                                );
+                              }
+                            }}
+                            style={{ marginTop: 0 }}
+                            placeholder="https://www.example.com"
+                          />
+                        </LinkInputWrapper>
                         {award.website_links &&
                           award.website_links.length > 1 && (
-                            <AwardWebsiteCloseBtn
+                            <AwardWebsiteDeleteBtn
                               type="button"
                               variant="danger"
-                              icon={faClose}
+                              icon={faTrashCan}
                               text=""
                               onClick={() => removeAwardLink(index, linkIdx)}
                             />
@@ -331,9 +354,30 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                       variant="secondary"
                       text="Add Link"
                       onClick={() => addAwardLink(index)}
-                      style={{ marginTop: 4 }}
+                      style={{ marginTop: 8 }}
                     />
-                  </div>
+                  </LinksSection>
+                  <AwardActions>
+                    <SaveAwardButton
+                      type="button"
+                      variant="primary"
+                      icon={faFloppyDisk}
+                      text="Save"
+                      onClick={() => handleSubmit()}
+                      disabled={
+                        !award.award_name ||
+                        !award.award_year ||
+                        !award.awarded_by
+                      }
+                    />
+                    <DeleteButton
+                      type="button"
+                      variant="danger"
+                      icon={faTrashCan}
+                      text="Remove"
+                      onClick={() => removeAward(index)}
+                    />
+                  </AwardActions>
                 </AwardFormContainer>
               ))}
               <div className="mt-4">
@@ -342,13 +386,68 @@ const CompanyProfileEdit: React.FC<{ toggleEdit: () => void }> = ({
                   onClick={addAward}
                 />
               </div>
-            </DetailSection>
+            </AwardsSection>
           </RightCol>
         </Row>
       </Form>
     </PageContainer>
   );
 };
+
+const AwardsSection = styled.div`
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 2px solid ${colors.lightGrey};
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 24px;
+    padding-top: 24px;
+  }
+`;
+
+const AwardsSectionHeader = styled.div`
+  margin-bottom: 20px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-bottom: 16px;
+  }
+`;
+
+const AwardsSectionTitle = styled.h3`
+  font-family: ${fonts.montserrat};
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: ${colors.mainFont};
+  margin: 0 0 8px 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 18px;
+  }
+`;
+
+const AwardsHelpText = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 14px;
+  color: ${colors.slate};
+  margin: 0;
+  font-style: italic;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 13px;
+  }
+`;
+
+const AwardHeader = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-bottom: 12px;
+  }
+`;
 
 const AwardTitle = styled.h2`
   font-family: ${fonts.montserrat};
@@ -358,14 +457,63 @@ const AwardTitle = styled.h2`
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: ${colors.mainFont};
+  margin: 0;
 
   @media (max-width: ${breakpoints.md}) {
-    font-size: 20px;
+    font-size: 18px;
+  }
+`;
+
+const AwardActions = styled.div`
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid ${colors.lightGrey};
+
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding-top: 12px;
   }
 `;
 
 const EditHeaderWrapper = styled.div`
   width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  ${Title} {
+    @media (max-width: ${breakpoints.md}) {
+      order: 1;
+      text-align: center;
+    }
+  }
+`;
+
+const BackButton = styled(Button)`
+  @media (max-width: ${breakpoints.md}) {
+    order: 3;
+    width: 100%;
+  }
+`;
+
+const SaveProfileButton = styled(Button)`
+  @media (max-width: ${breakpoints.md}) {
+    order: 2;
+    width: 100%;
+  }
 `;
 
 const AwardFormContainer = styled.div`
@@ -378,56 +526,77 @@ const AwardFormContainer = styled.div`
   }
 `;
 
-const CloseIcon = styled(FontAwesomeIcon)`
-  color: ${colors.black};
-  cursor: pointer;
-  min-width: 44px;
+const SaveAwardButton = styled(Button)`
   min-height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-
-  &:hover {
-    color: ${colors.slate};
-  }
+  padding: 8px 16px;
+  flex-shrink: 0;
+  white-space: nowrap;
 
   @media (max-width: ${breakpoints.md}) {
-    flex-shrink: 0;
+    font-size: 14px;
+    padding: 8px 12px;
+    flex: 1;
   }
+`;
+
+const DeleteButton = styled(Button)`
+  min-height: 44px;
+  padding: 8px 16px;
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 14px;
+    padding: 8px 12px;
+    flex: 1;
+  }
+`;
+
+const LinksSection = styled.div`
+  margin-top: 16px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 12px;
+  }
+`;
+
+const LinksLabel = styled.label`
+  font-family: ${fonts.montserrat};
+  font-weight: 600;
+  font-size: 14px;
+  display: block;
+  margin-bottom: 8px;
+  color: ${colors.mainFont};
+`;
+
+const LinkInputWrapper = styled.div`
+  flex: 1;
+  min-width: 0;
 `;
 
 const AwardWebsiteLinkRow = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 8px;
   margin-bottom: 8px;
-  max-width: 500px;
 
   @media (max-width: ${breakpoints.md}) {
-    max-width: 100%;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
+    align-items: center;
   }
 `;
 
-const AwardWebsiteCloseBtn = styled(Button)`
-  margin-left: 8px;
-  min-width: 32px;
-  height: 32px;
+const AwardWebsiteDeleteBtn = styled(Button)`
+  min-width: 44px;
+  min-height: 44px;
   padding: 0;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: 0;
+
   & > svg {
     margin-right: 0;
-  }
-
-  @media (max-width: ${breakpoints.md}) {
-    margin-left: 0;
-    align-self: flex-start;
-    min-width: 44px;
-    min-height: 44px;
   }
 `;
 

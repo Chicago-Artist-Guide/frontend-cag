@@ -61,6 +61,7 @@ export const RightCol = styled(Col)`
 
   @media (max-width: ${breakpoints.lg}) {
     padding: 0;
+    margin-top: 4px;
   }
 `;
 
@@ -79,11 +80,13 @@ export const ShowDescription = styled.p`
   letter-spacing: 0.25px;
   max-width: 294px;
   word-wrap: break-word;
+  margin-bottom: 0;
 
   @media (max-width: ${breakpoints.md}) {
     max-width: 100%;
     font-size: 14px;
     line-height: 22px;
+    margin-top: 8px;
   }
 `;
 
@@ -96,6 +99,11 @@ export const ShowStatus = styled.h3`
   line-height: 14px;
   letter-spacing: 0.4px;
   color: ${colors.slate};
+  margin: 4px 0 8px 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin: 6px 0 4px 0;
+  }
 `;
 
 export const ShowName = styled.h2`
@@ -105,6 +113,13 @@ export const ShowName = styled.h2`
   font-size: 18px;
   line-height: 24px;
   letter-spacing: 0.07em;
+  margin: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 20px;
+    line-height: 28px;
+    margin-bottom: 2px;
+  }
 `;
 
 export const ShowImage = styled(Image)`
@@ -120,8 +135,8 @@ export const ShowImage = styled(Image)`
   @media (max-width: ${breakpoints.lg}) {
     position: relative;
     height: auto;
-    min-height: 200px;
-    margin-bottom: 16px;
+    min-height: 240px;
+    margin-bottom: 20px;
   }
 
   @media (min-width: ${breakpoints.lg}) {
@@ -137,7 +152,8 @@ export const ShowCard = styled.div`
   padding: 25px 21px;
 
   @media (max-width: ${breakpoints.md}) {
-    padding: 20px 16px;
+    padding: 24px 20px;
+    margin-bottom: 24px;
   }
 `;
 
@@ -147,10 +163,12 @@ const ButtonContainer = styled.div`
 
   @media (max-width: ${breakpoints.md}) {
     gap: 12px;
+    margin-top: 20px;
 
     button {
       width: 100%;
-      min-height: 44px;
+      min-height: 48px;
+      font-size: 14px;
     }
   }
 `;
