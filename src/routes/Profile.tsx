@@ -1,6 +1,6 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import CompanyProfile from '../components/Profile/Company';
@@ -30,6 +30,12 @@ const Profile: React.FC<{
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewingOtherProfile, setViewingOtherProfile] = useState(false);
+  // Separate state for viewing other user's profile to avoid polluting context
+  const [viewedProfile, setViewedProfile] = useState<any>(null);
+  const [viewedAccount, setViewedAccount] = useState<any>(null);
+  // Refs to store original user data when viewing another profile
+  const originalAccountRef = useRef<any>(null);
+  const originalProfileRef = useRef<any>(null);
 
   const getProfileData = useCallback(async () => {
     // If viewing another user's profile
@@ -42,8 +48,9 @@ const Profile: React.FC<{
         ]);
 
         if (profileData && accountData) {
-          setProfileData(profileData);
-          setAccountData(accountData);
+          // Store in separate state to avoid polluting user context
+          setViewedProfile(profileData);
+          setViewedAccount(accountData);
           setError(null);
         } else {
           setError('Profile not found');
@@ -65,6 +72,8 @@ const Profile: React.FC<{
 
     try {
       setViewingOtherProfile(false);
+      setViewedProfile(null);
+      setViewedAccount(null);
       const [profileData, accountData] = await Promise.all([
         getDoc(profileRef),
         getDoc(accountRef)
@@ -122,11 +131,46 @@ const Profile: React.FC<{
     );
   }
 
-  if (account?.type === 'company') {
+  // Handle viewing other profiles - temporarily set context and restore when done
+  useEffect(() => {
+    if (viewingOtherProfile && viewedAccount && viewedProfile) {
+      // Save original data if not already saved
+      if (!originalAccountRef.current) {
+        originalAccountRef.current = account;
+        // Don't save profile ref as it's a DocumentReference
+      }
+
+      // Temporarily set viewed profile in context
+      setAccountData(viewedAccount);
+      setProfileData(viewedProfile);
+    }
+
+    // Restore original data when no longer viewing other profile
+    return () => {
+      if (originalAccountRef.current && !accountId) {
+        setAccountData(originalAccountRef.current);
+        originalAccountRef.current = null;
+      }
+    };
+  }, [
+    viewingOtherProfile,
+    viewedAccount,
+    viewedProfile,
+    accountId,
+    account,
+    setAccountData,
+    setProfileData
+  ]);
+
+  // Determine which account to display (viewed or current)
+  const displayAccount =
+    viewingOtherProfile && viewedAccount ? viewedAccount : account;
+
+  if (displayAccount?.type === 'company') {
     return <CompanyProfile previewMode={previewMode || viewingOtherProfile} />;
   }
 
-  if (account?.type === 'individual') {
+  if (displayAccount?.type === 'individual') {
     return (
       <IndividualProfile previewMode={previewMode || viewingOtherProfile} />
     );
