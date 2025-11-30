@@ -233,7 +233,15 @@ export const TalentMatchCard = ({
         </div>
       </div>
       <div className="relative flex flex-1 flex-col px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
-        <h3 className="mb-4 text-xl font-bold lg:text-2xl">{fullName}</h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-xl font-bold lg:text-2xl">{fullName}</h3>
+          <button
+            onClick={() => navigate(`/profile/view/${profile.account_id}`)}
+            className="rounded bg-yoda/50 px-3 py-1.5 text-sm font-semibold text-mint hover:bg-mint/50 hover:text-white"
+          >
+            View Profile
+          </button>
+        </div>
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
           <div>Ethnicity</div>
           <div className="font-semibold">

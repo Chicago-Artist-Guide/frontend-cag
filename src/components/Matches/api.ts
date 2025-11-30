@@ -15,6 +15,8 @@ import {
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import { Production, Role } from '../Profile/Company/types';
+import { getProduction } from '../Profile/Company/api';
+import { expandEthnicityForMatching } from '../../utils/helpers';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
   MatchingFilters,
@@ -125,6 +127,13 @@ export async function fetchTalentWithFilters(
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
 
+  // Expand ethnicity filters to include subcategories if parent category is selected
+  if (profileFilters.ethnicities && Array.isArray(profileFilters.ethnicities)) {
+    profileFilters.ethnicities = expandEthnicityForMatching(
+      profileFilters.ethnicities
+    );
+  }
+
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       if (Array.isArray(value)) {
@@ -199,6 +208,38 @@ export async function fetchTalentWithFilters(
         }
       } else {
         matches.push({ ...profileData });
+      }
+    }
+  }
+
+  // Filter by singing/dancing requirements if specified in role
+  if (productionId && roleId) {
+    const production = await getProduction(firebaseStore, productionId);
+    if (production && production.roles) {
+      const role = production.roles.find((r) => r.role_id === roleId);
+      if (role && role.additional_requirements) {
+        const requiresSinging =
+          role.additional_requirements.includes('Requires singing');
+        const requiresDancing =
+          role.additional_requirements.includes('Requires dancing');
+
+        if (requiresSinging || requiresDancing) {
+          const filteredMatches = matches.filter((profile) => {
+            const skills = profile.additional_skills_checkboxes || [];
+            const hasSinging = skills.includes('Singing');
+            const hasDancing = skills.includes('Dancing');
+
+            if (requiresSinging && requiresDancing) {
+              return hasSinging && hasDancing;
+            } else if (requiresSinging) {
+              return hasSinging;
+            } else if (requiresDancing) {
+              return hasDancing;
+            }
+            return true;
+          });
+          return filteredMatches;
+        }
       }
     }
   }

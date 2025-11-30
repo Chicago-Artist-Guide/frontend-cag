@@ -15,7 +15,8 @@ import { Production, Role } from '../components/Profile/Company/types';
 import {
   IndividualRoles,
   Gender,
-  AgeRange
+  AgeRange,
+  SkillCheckbox
 } from '../components/SignUp/Individual/types';
 import {
   findCategoryByValue,
@@ -121,6 +122,20 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
       newFilters['age_ranges'] = findRole.age_range.filter(
         (a) => a !== ageCatchAll
       ) as AgeRange[];
+    }
+
+    // Add singing/dancing requirements to filters
+    if (findRole.additional_requirements) {
+      const skills: SkillCheckbox[] = [];
+      if (findRole.additional_requirements.includes('Requires singing')) {
+        skills.push('Singing');
+      }
+      if (findRole.additional_requirements.includes('Requires dancing')) {
+        skills.push('Dancing');
+      }
+      if (skills.length > 0) {
+        newFilters['additional_skills_checkboxes'] = skills;
+      }
     }
 
     setFilters(newFilters);

@@ -132,10 +132,13 @@ export const genders = [
   'Non Binary/Agender'
 ] as const;
 
-export const additionalRequirements = [
-  'Requires singing',
-  'Requires dancing',
-  'Requires stage combat',
-  'Requires intimacy direction/choreography',
-  'LGBTQ+ only'
-];
+export const roleGenders = [
+  'Open to all genders',
+  'Female',
+  'Male',
+  'Trans Female',
+  'Trans Man',
+  'Nonbinary'
+] as const;
+
+export const additionalRequirements = ['Requires singing', 'Requires dancing'];

@@ -1,19 +1,26 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import CompanyProfile from '../components/Profile/Company';
 import IndividualProfile from '../components/Profile/Individual';
 import PageContainer from '../components/layout/PageContainer';
 import { useUserContext } from '../context/UserContext';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import {
+  getProfileWithUid,
+  getAccountWithAccountId
+} from '../components/Profile/shared/api';
 import { colors, fonts } from '../theme/styleVars';
 
 const Profile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
   const navigate = useNavigate();
+  const { accountId } = useParams<{ accountId?: string }>();
   const auth = getAuth();
+  const { firebaseFirestore } = useFirebaseContext();
   const {
     account: { ref: accountRef, data: account },
     setAccountData,
@@ -22,14 +29,42 @@ const Profile: React.FC<{
   } = useUserContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewingOtherProfile, setViewingOtherProfile] = useState(false);
 
   const getProfileData = useCallback(async () => {
+    // If viewing another user's profile
+    if (accountId && accountId !== account?.id) {
+      try {
+        setViewingOtherProfile(true);
+        const [profileData, accountData] = await Promise.all([
+          getProfileWithUid(firebaseFirestore, accountId),
+          getAccountWithAccountId(firebaseFirestore, accountId)
+        ]);
+
+        if (profileData && accountData) {
+          setProfileData(profileData);
+          setAccountData(accountData);
+          setError(null);
+        } else {
+          setError('Profile not found');
+        }
+      } catch (err) {
+        console.error('Error loading profile data:', err);
+        setError('Failed to load profile data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Otherwise, load current user's profile
     if (!profileRef || !accountRef) {
       setLoading(false);
       return;
     }
 
     try {
+      setViewingOtherProfile(false);
       const [profileData, accountData] = await Promise.all([
         getDoc(profileRef),
         getDoc(accountRef)
@@ -44,11 +79,19 @@ const Profile: React.FC<{
     } finally {
       setLoading(false);
     }
-  }, [profileRef, accountRef, setProfileData, setAccountData]);
+  }, [
+    accountId,
+    account?.id,
+    profileRef,
+    accountRef,
+    setProfileData,
+    setAccountData,
+    firebaseFirestore
+  ]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      if (!user && !accountId) {
         navigate('/login');
       }
     });
@@ -56,7 +99,7 @@ const Profile: React.FC<{
     getProfileData();
 
     return () => unsubscribe();
-  }, [auth, navigate, getProfileData]);
+  }, [auth, navigate, getProfileData, accountId]);
 
   if (loading) {
     return (
@@ -80,11 +123,13 @@ const Profile: React.FC<{
   }
 
   if (account?.type === 'company') {
-    return <CompanyProfile previewMode={previewMode} />;
+    return <CompanyProfile previewMode={previewMode || viewingOtherProfile} />;
   }
 
   if (account?.type === 'individual') {
-    return <IndividualProfile previewMode={previewMode} />;
+    return (
+      <IndividualProfile previewMode={previewMode || viewingOtherProfile} />
+    );
   }
 
   return (
