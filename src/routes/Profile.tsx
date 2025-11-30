@@ -35,7 +35,7 @@ const Profile: React.FC<{
   const [viewedAccount, setViewedAccount] = useState<any>(null);
   // Refs to store original user data when viewing another profile
   const originalAccountRef = useRef<any>(null);
-  const originalProfileRef = useRef<any>(null);
+  const contextSwappedRef = useRef(false);
 
   const getProfileData = useCallback(async () => {
     // If viewing another user's profile
@@ -110,6 +110,28 @@ const Profile: React.FC<{
     return () => unsubscribe();
   }, [auth, navigate, getProfileData, accountId]);
 
+  // Handle viewing other profiles - MUST be before conditional returns (Rules of Hooks)
+  useEffect(() => {
+    if (viewingOtherProfile && viewedAccount && viewedProfile && !contextSwappedRef.current) {
+      // Save original data before swapping
+      if (!originalAccountRef.current && account) {
+        originalAccountRef.current = account;
+      }
+
+      // Set viewed profile in context
+      setAccountData(viewedAccount);
+      setProfileData(viewedProfile);
+      contextSwappedRef.current = true;
+    } else if (!viewingOtherProfile && contextSwappedRef.current && originalAccountRef.current) {
+      // Restore original data
+      setAccountData(originalAccountRef.current);
+      originalAccountRef.current = null;
+      contextSwappedRef.current = false;
+    }
+    // Note: 'account' not in deps to avoid loops (we save it in ref before it changes)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewingOtherProfile, viewedAccount, viewedProfile, setAccountData, setProfileData]);
+
   if (loading) {
     return (
       <PageContainer>
@@ -130,37 +152,6 @@ const Profile: React.FC<{
       </PageContainer>
     );
   }
-
-  // Handle viewing other profiles - temporarily set context and restore when done
-  useEffect(() => {
-    if (viewingOtherProfile && viewedAccount && viewedProfile) {
-      // Save original data if not already saved
-      if (!originalAccountRef.current) {
-        originalAccountRef.current = account;
-        // Don't save profile ref as it's a DocumentReference
-      }
-
-      // Temporarily set viewed profile in context
-      setAccountData(viewedAccount);
-      setProfileData(viewedProfile);
-    }
-
-    // Restore original data when no longer viewing other profile
-    return () => {
-      if (originalAccountRef.current && !accountId) {
-        setAccountData(originalAccountRef.current);
-        originalAccountRef.current = null;
-      }
-    };
-  }, [
-    viewingOtherProfile,
-    viewedAccount,
-    viewedProfile,
-    accountId,
-    account,
-    setAccountData,
-    setProfileData
-  ]);
 
   // Determine which account to display (viewed or current)
   const displayAccount =
