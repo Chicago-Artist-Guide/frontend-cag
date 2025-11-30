@@ -103,11 +103,15 @@ export const SelectDirections = styled.p`
 export const CAGFormControl = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
+  background-color: ${colors.white} !important;
+  color: ${colors.secondaryFontColor} !important;
 `;
 
 export const CAGFormSelect = styled(Form.Select)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
+  background-color: ${colors.white} !important;
+  color: ${colors.secondaryFontColor} !important;
 `;
 
 export const CAGFormGroup = styled(Form.Group)`

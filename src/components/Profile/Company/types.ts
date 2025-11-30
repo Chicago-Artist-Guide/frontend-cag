@@ -95,4 +95,5 @@ export type Role = {
   singing_details?: string;
   dancing_details?: string;
   union?: string;
+  lgbtq_only?: boolean;
 };

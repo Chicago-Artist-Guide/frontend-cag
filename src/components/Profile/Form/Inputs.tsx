@@ -236,6 +236,8 @@ export const Input = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
   max-width: 300px;
+  background-color: ${colors.white} !important;
+  color: ${colors.secondaryFontColor} !important;
 
   @media (max-width: ${breakpoints.md}) {
     width: 100%;
@@ -251,6 +253,8 @@ export const Select = styled(Form.Select)`
   fontweight: 400;
   height: 52px;
   max-width: 300px;
+  background-color: ${colors.white} !important;
+  color: ${colors.secondaryFontColor} !important;
 
   @media (max-width: ${breakpoints.md}) {
     width: 100%;
@@ -271,8 +275,11 @@ export const TextArea = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
   border: 1px solid ${colors.lightGrey};
+  background-color: ${colors.white} !important;
   color: ${(props) =>
-    props.defaultValue ? colors.secondaryFontColor : colors.lightGrey};
+    props.defaultValue
+      ? colors.secondaryFontColor
+      : colors.lightGrey} !important;
   fontweight: 400;
   maxwidth: 800px;
 

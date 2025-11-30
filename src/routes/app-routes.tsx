@@ -46,6 +46,7 @@ const AppRoutes = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/view/:accountId" element={<Profile />} />
         <Route path="/profile/messages/:threadId?" element={<Messages />} />
         <Route
           path="/production/:productionId/manage"
