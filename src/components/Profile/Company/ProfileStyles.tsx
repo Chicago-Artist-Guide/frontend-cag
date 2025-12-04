@@ -3,14 +3,26 @@ import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 
 export const LeftCol = styled(Col)`
+  @media (max-width: ${breakpoints.lg}) {
+    margin-bottom: 20px;
+  }
+
   @media (min-width: ${breakpoints.lg}) {
     max-width: 362px;
   }
 `;
 
 export const RightCol = styled(Col)`
-  @media (max-width: ${breakpoints.lg}) {
-    margin-top: 20px;
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  @media (min-width: ${breakpoints.md}) and (max-width: ${breakpoints.lg}) {
+    margin-top: 0;
+    padding-left: 0;
+    padding-right: 0;
   }
 `;
 
@@ -59,6 +71,11 @@ export const DetailsCard = styled.div`
   border-radius: 8px;
   padding: 25px 21px;
   word-wrap: break-word;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 30px;
+    padding: 20px 16px;
+  }
 `;
 
 export const DetailsCardItem = styled.h6`
@@ -69,10 +86,19 @@ export const DetailsCardItem = styled.h6`
   line-height: 24px;
   letter-spacing: 0.07em;
   margin-top: 5px;
+
+  @media (max-width: ${breakpoints.sm}) {
+    font-size: 14px;
+    line-height: 20px;
+  }
 `;
 
 export const AdditionalPhotos = styled.div`
   margin-top: 20px;
+
+  @media (max-width: ${breakpoints.md}) {
+    justify-content: center;
+  }
 
   @media (min-width: ${breakpoints.lg}) {
     max-width: 332px;

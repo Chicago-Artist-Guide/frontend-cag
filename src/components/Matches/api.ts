@@ -15,6 +15,8 @@ import {
 } from 'firebase/firestore';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import { Production, Role } from '../Profile/Company/types';
+import { getProduction } from '../Profile/Company/api';
+import { expandEthnicityForMatching } from '../../utils/helpers';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
   MatchingFilters,
@@ -125,6 +127,13 @@ export async function fetchTalentWithFilters(
   const snapshotPromises: Promise<QuerySnapshot<any>>[] = [];
   let singleProfileQuery = query(profilesRef);
 
+  // Expand ethnicity filters to include subcategories if parent category is selected
+  if (profileFilters.ethnicities && Array.isArray(profileFilters.ethnicities)) {
+    profileFilters.ethnicities = expandEthnicityForMatching(
+      profileFilters.ethnicities
+    );
+  }
+
   for (const [field, value] of Object.entries(profileFilters)) {
     if (value !== undefined) {
       if (Array.isArray(value)) {
@@ -203,6 +212,51 @@ export async function fetchTalentWithFilters(
     }
   }
 
+  // Filter by role requirements if specified
+  if (productionId && roleId) {
+    const production = await getProduction(firebaseStore, productionId);
+    if (production && production.roles) {
+      const role = production.roles.find((r) => r.role_id === roleId);
+      if (role) {
+        let filteredMatches = matches;
+
+        // Filter by LGBTQ+ only requirement
+        if (role.lgbtq_only) {
+          filteredMatches = filteredMatches.filter(
+            (profile) => profile.lgbtqia === 'Yes'
+          );
+        }
+
+        // Filter by singing/dancing requirements
+        if (role.additional_requirements) {
+          const requiresSinging =
+            role.additional_requirements.includes('Requires singing');
+          const requiresDancing =
+            role.additional_requirements.includes('Requires dancing');
+
+          if (requiresSinging || requiresDancing) {
+            filteredMatches = filteredMatches.filter((profile) => {
+              const skills = profile.additional_skills_checkboxes || [];
+              const hasSinging = skills.includes('Singing');
+              const hasDancing = skills.includes('Dancing');
+
+              if (requiresSinging && requiresDancing) {
+                return hasSinging && hasDancing;
+              } else if (requiresSinging) {
+                return hasSinging;
+              } else if (requiresDancing) {
+                return hasDancing;
+              }
+              return true;
+            });
+          }
+        }
+
+        return filteredMatches;
+      }
+    }
+  }
+
   return matches;
 }
 
@@ -244,8 +298,12 @@ export async function fetchRolesForTalent(
             pR.ethnicity &&
             !pR.ethnicity?.includes('Open to all ethnicities')
           ) {
+            // Expand role ethnicities to include subcategories for umbrella matching
+            const expandedRoleEthnicities = expandEthnicityForMatching(
+              pR.ethnicity
+            );
             const hasEthnicityMatch = profile.ethnicities.some((e) =>
-              pR.ethnicity?.includes(e)
+              expandedRoleEthnicities?.includes(e)
             );
 
             if (!hasEthnicityMatch) {
@@ -279,6 +337,27 @@ export async function fetchRolesForTalent(
             );
 
             if (!hasAgeMatch) {
+              return false;
+            }
+          }
+
+          // LGBTQ+ only roles
+          if (pR.lgbtq_only && profile.lgbtqia !== 'Yes') {
+            return false;
+          }
+
+          // Singing/dancing requirements
+          if (pR.additional_requirements) {
+            const skills = profile.additional_skills_checkboxes || [];
+            const requiresSinging =
+              pR.additional_requirements.includes('Requires singing');
+            const requiresDancing =
+              pR.additional_requirements.includes('Requires dancing');
+
+            if (requiresSinging && !skills.includes('Singing')) {
+              return false;
+            }
+            if (requiresDancing && !skills.includes('Dancing')) {
               return false;
             }
           }

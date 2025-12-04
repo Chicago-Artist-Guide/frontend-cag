@@ -3,7 +3,7 @@ import { Form } from 'react-bootstrap';
 import DatePicker from 'react-datepicker';
 import { SetForm } from 'react-hooks-helper';
 import styled, { CSSProperties } from 'styled-components';
-import { colors, fonts } from '../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -236,6 +236,14 @@ export const Input = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
   max-width: 300px;
+  background-color: ${colors.white} !important;
+  color: ${colors.secondaryFontColor} !important;
+
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 16px;
+  }
 `;
 
 export const Select = styled(Form.Select)`
@@ -245,6 +253,14 @@ export const Select = styled(Form.Select)`
   fontweight: 400;
   height: 52px;
   max-width: 300px;
+  background-color: ${colors.white} !important;
+  color: ${colors.secondaryFontColor} !important;
+
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 16px;
+  }
 `;
 
 export const Radio = styled(Form.Check)`
@@ -259,10 +275,19 @@ export const TextArea = styled(Form.Control)`
   border-radius: 4px;
   padding: 8px 13px 8px 13px;
   border: 1px solid ${colors.lightGrey};
+  background-color: ${colors.white} !important;
   color: ${(props) =>
-    props.defaultValue ? colors.secondaryFontColor : colors.lightGrey};
+    props.defaultValue
+      ? colors.secondaryFontColor
+      : colors.lightGrey} !important;
   fontweight: 400;
   maxwidth: 800px;
+
+  @media (max-width: ${breakpoints.md}) {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px 16px;
+  }
 `;
 
 const DateRange = styled.div`
@@ -271,13 +296,13 @@ const DateRange = styled.div`
   align-items: center;
   flex-wrap: wrap;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${breakpoints.md}) {
     flex-direction: column;
     align-items: stretch;
     gap: 0.5em;
   }
 
-  @media (min-width: 769px) and (max-width: 992px) {
+  @media (min-width: ${breakpoints.md}) and (max-width: ${breakpoints.lg}) {
     gap: 0.5em;
   }
 `;
@@ -293,12 +318,13 @@ const DatePickerInput = styled(DatePicker)`
   color: ${colors.mainFont};
   opacity: 0.5;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${breakpoints.md}) {
     max-width: 100%;
     width: 100%;
+    padding-left: 12px;
   }
 
-  @media (min-width: 769px) and (max-width: 992px) {
+  @media (min-width: ${breakpoints.md}) and (max-width: ${breakpoints.lg}) {
     max-width: 140px;
   }
 `;
@@ -312,7 +338,7 @@ const Thru = styled.h6`
   margin-bottom: 0;
   white-space: nowrap;
 
-  @media (max-width: 768px) {
+  @media (max-width: ${breakpoints.md}) {
     align-self: center;
     margin: 0.25em 0;
   }

@@ -104,7 +104,39 @@ const Home = () => {
   return (
     <>
       {/* Hero */}
-      <div className="relative">
+      <div className="relative md:hidden">
+        <img
+          src={Hero}
+          alt="Hero"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="relative z-10 mt-16 px-4 py-6 sm:mt-20 sm:px-6 sm:py-8">
+          <h1 className="pb-3 text-3xl font-semibold leading-tight text-white sm:text-4xl">
+            Discover your next
+            <br />
+            dream gig
+          </h1>
+          <h3 className="py-2 text-sm font-medium leading-relaxed text-white sm:text-base">
+            Sign up for our network and have your next opportunity find you.
+          </h3>
+          <h3 className="pt-3 text-xs font-light text-white sm:text-sm">
+            Free for everyone. Proudly made in Chicago.
+          </h3>
+          <div className="mt-8 flex flex-col gap-4">
+            <a href="/sign-up">
+              <button className="w-full rounded-full bg-butter px-8 py-3 text-base font-semibold text-white hover:bg-yellow">
+                Join Now
+              </button>
+            </a>
+            <a href="/shows">
+              <button className="w-full rounded-full bg-mint px-8 py-3 text-base font-semibold text-white hover:bg-mint/80">
+                Browse Shows
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div className="relative hidden md:block">
         <img
           src={Hero}
           alt="Hero"
@@ -117,7 +149,6 @@ const Home = () => {
             dream gig
           </h1>
           <h3 className="md:text-md py-2 text-xs font-medium leading-loose text-white md:text-lg lg:text-xl">
-            {' '}
             Sign up for our network and have your next opportunity find you.
           </h3>
           <h3 className="pt-3 text-xs font-light text-white md:text-sm lg:text-base">
@@ -137,16 +168,16 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="mt-12 flex justify-center">
+      <div className="mt-8 flex justify-center px-4 sm:mt-10 sm:px-6 md:mt-12 md:px-0">
         <Values />
       </div>
       {/* Partners section - updated with slider */}
-      <div className="mt-12 flex w-full justify-center bg-white">
-        <div className="flex w-full max-w-7xl flex-col items-center p-6">
-          <h2 className="max-w-xl pt-6 text-center text-5xl">
+      <div className="mt-8 flex w-full justify-center bg-white sm:mt-10 md:mt-12">
+        <div className="flex w-full max-w-7xl flex-col items-center p-4 sm:p-6">
+          <h2 className="max-w-xl pt-4 text-center text-2xl font-bold sm:pt-6 sm:text-3xl md:text-4xl lg:text-5xl">
             Our Theatre Company Members
           </h2>
-          <div className="my-12 w-full">
+          <div className="my-8 w-full sm:my-10 md:my-12">
             <PartnerSlider partners={partners} />
           </div>
         </div>
@@ -163,9 +194,9 @@ const Home = () => {
         </div>
       </div>
       {/* FAQ */}
-      <div className="mx-12 my-24 grid grid-cols-1 lg:grid-cols-3">
+      <div className="mx-4 my-16 grid grid-cols-1 sm:mx-8 sm:my-20 md:mx-12 md:my-24 lg:grid-cols-3">
         <div className="col-span-1 flex items-center justify-center">
-          <h1 className="text-3xl text-black md:text-4xl lg:text-5xl">
+          <h1 className="text-center text-3xl text-black md:text-4xl lg:text-5xl">
             Frequently
             <br />
             Asked
@@ -173,7 +204,7 @@ const Home = () => {
             Questions
           </h1>
         </div>
-        <div className="col-span-2 mx-12">
+        <div className="col-span-1 mx-4 sm:mx-8 lg:col-span-2 lg:mx-12 xl:mx-20">
           <Collapsible
             sectionTitles={sectionTitles}
             subSections={homeFAQ}
@@ -184,24 +215,28 @@ const Home = () => {
       </div>
       {/* Diversify max-w-7xl */}
       <div className="flex w-full justify-center bg-white">
-        <div className="w-full max-w-7xl p-6">
-          <div className="my-6 grid grid-cols-1 items-center gap-12 md:grid-cols-2">
+        <div className="w-full max-w-7xl p-4 sm:p-6">
+          <div className="my-6 grid grid-cols-1 items-center gap-8 sm:gap-10 md:grid-cols-2 md:gap-12">
             <div className="order-2 flex flex-col md:order-1">
-              <h2 className="text-xl md:text-3xl">
+              <h2 className="text-xl font-bold sm:text-2xl md:text-3xl">
                 Help us diversify the Chicago theatre community!
               </h2>
-              <h3 className="pt-2 text-base leading-loose">
+              <h3 className="pt-2 text-sm leading-relaxed sm:text-base">
                 Your support of the Chicago Artist Guide helps us offer this
                 platform to our users free of cost.
               </h3>
-              <a href={zeffyUrl} target="_blank">
-                <button className="mt-4 w-full rounded-full bg-salmon px-14 py-3 text-center text-xl font-semibold text-white hover:bg-blush md:w-fit">
+              <a href={zeffyUrl} target="_blank" className="mt-4 md:w-fit">
+                <button className="w-full rounded-full bg-salmon px-8 py-3 text-center text-lg font-semibold text-white hover:bg-blush sm:px-12 sm:text-xl md:w-fit md:px-14">
                   Donate
                 </button>
               </a>
             </div>
             <div className="order-1 flex items-center justify-center md:order-2">
-              <img src={Donate} alt="Group of people happily posing" />
+              <img
+                src={Donate}
+                alt="Group of people happily posing"
+                className="h-auto max-w-full"
+              />
             </div>
           </div>
         </div>
@@ -210,7 +245,7 @@ const Home = () => {
       {/* Newsletter */}
       <div>
         <h2 className="mt-24 px-2 text-start text-2xl text-evergreen md:text-center">
-          Stay up to date with the Chicago Artist Guide’s Newsletter
+          Stay up to date with the Chicago Artist Guide's Newsletter
         </h2>
         <div className="px-5 md:px-10">
           <div className="relative h-96 w-full">

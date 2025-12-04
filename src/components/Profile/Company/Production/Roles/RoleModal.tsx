@@ -5,16 +5,16 @@ import { Col, Form, Modal, Row } from 'react-bootstrap';
 import { FormTarget } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, Checkbox, Dropdown } from '../../../../../components/shared';
-import { colors, fonts } from '../../../../../theme/styleVars';
+import { breakpoints, colors, fonts } from '../../../../../theme/styleVars';
 import { getOptions } from '../../../../../utils/helpers';
 import {
   additionalRequirements,
   ageRanges,
-  ethnicities,
-  genders,
+  roleGenders,
   productionEquities,
   roleStatuses
 } from '../../../../../utils/lookups';
+import { ethnicityTypes } from '../../../../SignUp/Individual/types';
 import ConfirmDialog from '../../../../ConfirmDialog';
 import { CAGLabel } from '../../../../SignUp/SignUpStyles';
 import {
@@ -82,6 +82,73 @@ const RoleModal: React.FC<{
     const fieldValue = formValues[field] as string[];
     if (!fieldValue) return false;
     return fieldValue.includes(value);
+  };
+
+  const handleOpenToAllChange = (
+    field: 'gender_identity' | 'ethnicity' | 'age_range',
+    checked: boolean
+  ) => {
+    if (checked) {
+      const openToAllValue =
+        field === 'gender_identity'
+          ? 'Open to all genders'
+          : field === 'ethnicity'
+            ? 'Open to all ethnicities'
+            : 'Open to all ages';
+      setFormValues({ ...formValues, [field]: [openToAllValue] });
+    }
+  };
+
+  const handleSpecificOptionChange = (
+    field: 'gender_identity' | 'ethnicity' | 'age_range',
+    value: string,
+    checked: boolean
+  ) => {
+    const currentValues = (formValues[field] as string[]) || [];
+    const openToAllValue =
+      field === 'gender_identity'
+        ? 'Open to all genders'
+        : field === 'ethnicity'
+          ? 'Open to all ethnicities'
+          : 'Open to all ages';
+
+    if (checked) {
+      // Remove "Open to all" if present, add specific value
+      const filtered = currentValues.filter((v) => v !== openToAllValue);
+      setFormValues({ ...formValues, [field]: [...filtered, value] });
+    } else {
+      // Remove the unchecked value
+      const filtered = currentValues.filter((v) => v !== value);
+      setFormValues({ ...formValues, [field]: filtered });
+    }
+  };
+
+  const isOpenToAllSelected = (
+    field: 'gender_identity' | 'ethnicity' | 'age_range'
+  ) => {
+    const fieldValue = formValues[field] as string[];
+    if (!fieldValue || fieldValue.length === 0) return false;
+    const openToAllValue =
+      field === 'gender_identity'
+        ? 'Open to all genders'
+        : field === 'ethnicity'
+          ? 'Open to all ethnicities'
+          : 'Open to all ages';
+    return fieldValue.includes(openToAllValue);
+  };
+
+  const hasSpecificSelections = (
+    field: 'gender_identity' | 'ethnicity' | 'age_range'
+  ) => {
+    const fieldValue = formValues[field] as string[];
+    if (!fieldValue || fieldValue.length === 0) return false;
+    const openToAllValue =
+      field === 'gender_identity'
+        ? 'Open to all genders'
+        : field === 'ethnicity'
+          ? 'Open to all ethnicities'
+          : 'Open to all ages';
+    return fieldValue.some((v) => v !== openToAllValue);
   };
 
   const onDeleteConfirm = () => {
@@ -287,105 +354,180 @@ const RoleModal: React.FC<{
                       style={{ marginTop: 30 }}
                     >
                       <CAGLabel>Gender Identity</CAGLabel>
-                      {genders.map((gender) => (
-                        <Checkbox
-                          checked={isValueIncluded('gender_identity', gender)}
-                          fieldType="checkbox"
-                          key={`gender_identity_${gender}`}
-                          label={gender}
-                          name={gender}
-                          onChange={(e: any) => {
-                            let genders = formValues.gender_identity || [];
-                            const selected = e.target.name;
-                            if (
-                              genders?.includes(gender) &&
-                              !e.target.checked
-                            ) {
-                              genders = genders?.filter(
-                                (range) => range !== gender
-                              );
-                            } else if (e.target.checked) {
-                              genders.push(selected);
-                            }
-                            setFormValues({
-                              ...formValues,
-                              gender_identity: genders
-                            });
-                          }}
-                        />
-                      ))}
+                      {roleGenders.map((gender) => {
+                        const isOpenToAll = gender === 'Open to all genders';
+                        const isDisabled =
+                          isOpenToAll &&
+                          hasSpecificSelections('gender_identity');
+                        const isChecked = isValueIncluded(
+                          'gender_identity',
+                          gender
+                        );
+                        return (
+                          <Checkbox
+                            checked={isChecked}
+                            disabled={isDisabled}
+                            fieldType="checkbox"
+                            key={`gender_identity_${gender}`}
+                            label={gender}
+                            name={gender}
+                            onChange={(e: any) => {
+                              if (isOpenToAll) {
+                                handleOpenToAllChange(
+                                  'gender_identity',
+                                  e.target.checked
+                                );
+                              } else {
+                                handleSpecificOptionChange(
+                                  'gender_identity',
+                                  gender,
+                                  e.target.checked
+                                );
+                              }
+                            }}
+                          />
+                        );
+                      })}
                     </Form.Group>
                     <Form.Group
                       className="form-group"
                       style={{ marginTop: 20 }}
                     >
                       <CAGLabel>Character Age Range</CAGLabel>
-                      {ageRanges.map((ageRange) => (
-                        <Checkbox
-                          checked={isValueIncluded('age_range', ageRange)}
-                          fieldType="checkbox"
-                          key={`age_range_${ageRange}`}
-                          label={ageRange}
-                          name={ageRange}
-                          onChange={(e: any) => {
-                            let ageRanges = formValues.age_range || [];
-                            const selectedRange = e.target.name;
-                            if (
-                              ageRanges?.includes(ageRange) &&
-                              !e.target.checked
-                            ) {
-                              ageRanges = ageRanges?.filter(
-                                (range) => range !== ageRange
-                              );
-                            } else if (e.target.checked) {
-                              ageRanges.push(selectedRange);
-                            }
-                            setFormValues({
-                              ...formValues,
-                              age_range: ageRanges
-                            });
-                          }}
-                        />
-                      ))}
+                      {ageRanges.map((ageRange) => {
+                        const isOpenToAll = ageRange === 'Open to all ages';
+                        const isDisabled =
+                          isOpenToAll && hasSpecificSelections('age_range');
+                        const isChecked = isValueIncluded(
+                          'age_range',
+                          ageRange
+                        );
+                        return (
+                          <Checkbox
+                            checked={isChecked}
+                            disabled={isDisabled}
+                            fieldType="checkbox"
+                            key={`age_range_${ageRange}`}
+                            label={ageRange}
+                            name={ageRange}
+                            onChange={(e: any) => {
+                              if (isOpenToAll) {
+                                handleOpenToAllChange(
+                                  'age_range',
+                                  e.target.checked
+                                );
+                              } else {
+                                handleSpecificOptionChange(
+                                  'age_range',
+                                  ageRange,
+                                  e.target.checked
+                                );
+                              }
+                            }}
+                          />
+                        );
+                      })}
                     </Form.Group>
                     <Form.Group
                       className="form-group"
                       style={{ marginTop: 20 }}
                     >
                       <CAGLabel>Ethnicity</CAGLabel>
-                      {ethnicities.map((ethnicity) => (
-                        <Checkbox
-                          checked={isValueIncluded('ethnicity', ethnicity)}
-                          fieldType="checkbox"
-                          key={`age_range_${ethnicity}`}
-                          label={ethnicity}
-                          name={ethnicity}
-                          onChange={(e: any) => {
-                            let ethnicities = formValues.ethnicity || [];
-                            const selectedRange = e.target.name;
-                            if (
-                              ethnicities?.includes(ethnicity) &&
-                              !e.target.checked
-                            ) {
-                              ethnicities = ethnicities?.filter(
-                                (range) => range !== ethnicity
-                              );
-                            } else if (e.target.checked) {
-                              ethnicities.push(selectedRange);
-                            }
-                            setFormValues({
-                              ...formValues,
-                              ethnicity: ethnicities
-                            });
-                          }}
-                        />
-                      ))}
+                      <Checkbox
+                        checked={isValueIncluded(
+                          'ethnicity',
+                          'Open to all ethnicities'
+                        )}
+                        disabled={hasSpecificSelections('ethnicity')}
+                        fieldType="checkbox"
+                        key="ethnicity-open-to-all"
+                        label="Open to all ethnicities"
+                        name="Open to all ethnicities"
+                        onChange={(e: any) => {
+                          handleOpenToAllChange('ethnicity', e.target.checked);
+                        }}
+                      />
+                      {ethnicityTypes.map((eth) => {
+                        const isParentChecked = isValueIncluded(
+                          'ethnicity',
+                          eth.name
+                        );
+                        const isParentDisabled =
+                          isOpenToAllSelected('ethnicity');
+                        return (
+                          <React.Fragment key={`parent-frag-chk-${eth.name}`}>
+                            <Checkbox
+                              checked={isParentChecked}
+                              disabled={isParentDisabled}
+                              fieldType="checkbox"
+                              key={`first-level-chk-${eth.name}`}
+                              label={eth.name}
+                              name={eth.name}
+                              onChange={(e: any) => {
+                                handleSpecificOptionChange(
+                                  'ethnicity',
+                                  eth.name,
+                                  e.target.checked
+                                );
+                              }}
+                            />
+                            {eth.values.length > 0 && (
+                              <div style={{ paddingLeft: '1.25rem' }}>
+                                {eth.values.map((ethV) => {
+                                  const isSubChecked = isValueIncluded(
+                                    'ethnicity',
+                                    ethV
+                                  );
+                                  const isSubDisabled =
+                                    isOpenToAllSelected('ethnicity');
+                                  return (
+                                    <Checkbox
+                                      checked={isSubChecked}
+                                      disabled={isSubDisabled}
+                                      fieldType="checkbox"
+                                      key={`${eth.name}-child-chk-${ethV}`}
+                                      label={ethV}
+                                      name={ethV}
+                                      onChange={(e: any) => {
+                                        handleSpecificOptionChange(
+                                          'ethnicity',
+                                          ethV,
+                                          e.target.checked
+                                        );
+                                      }}
+                                    />
+                                  );
+                                })}
+                              </div>
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </Form.Group>
+                    <Form.Group
+                      className="form-group"
+                      style={{ marginTop: 20 }}
+                    >
+                      <CAGLabel>LGBTQ+</CAGLabel>
+                      <Checkbox
+                        checked={formValues.lgbtq_only || false}
+                        fieldType="checkbox"
+                        key="lgbtq_only"
+                        label="LGBTQ+ only"
+                        name="lgbtq_only"
+                        onChange={(e: any) => {
+                          setFormValues({
+                            ...formValues,
+                            lgbtq_only: e.target.checked
+                          });
+                        }}
+                      />
                     </Form.Group>
                   </>
                 )}
               </Col>
             </Row>
-            <div className="d-flex mt-3 flex-row flex-row-reverse">
+            <ModalButtonContainer className="d-flex flex-column-reverse flex-md-row flex-md-row-reverse mt-3">
               <Button
                 onClick={() => onSave(formValues)}
                 text="Save + Close"
@@ -397,9 +539,9 @@ const RoleModal: React.FC<{
                 text="Delete"
                 type="button"
                 variant="danger"
-                className="mr-3"
+                className="mb-md-0 mr-md-3 mb-3"
               />
-            </div>
+            </ModalButtonContainer>
           </Form>
         </Modal.Body>
       </Modal>
@@ -432,6 +574,20 @@ const RoleRate = styled.div`
   display: flex;
   gap: 0.75em;
   align-items: center;
+`;
+
+const ModalButtonContainer = styled.div`
+  gap: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    gap: 12px;
+    width: 100%;
+
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
 `;
 
 export default RoleModal;

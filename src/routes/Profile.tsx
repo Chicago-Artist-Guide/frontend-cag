@@ -1,16 +1,26 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import styled from 'styled-components';
 import CompanyProfile from '../components/Profile/Company';
 import IndividualProfile from '../components/Profile/Individual';
+import PageContainer from '../components/layout/PageContainer';
 import { useUserContext } from '../context/UserContext';
+import { useFirebaseContext } from '../context/FirebaseContext';
+import {
+  getProfileWithUid,
+  getAccountWithAccountId
+} from '../components/Profile/shared/api';
+import { colors, fonts } from '../theme/styleVars';
 
 const Profile: React.FC<{
   previewMode?: boolean;
 }> = ({ previewMode = false }) => {
   const navigate = useNavigate();
+  const { accountId } = useParams<{ accountId?: string }>();
   const auth = getAuth();
+  const { firebaseFirestore } = useFirebaseContext();
   const {
     account: { ref: accountRef, data: account },
     setAccountData,
@@ -18,43 +28,229 @@ const Profile: React.FC<{
     setProfileData
   } = useUserContext();
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [viewingOtherProfile, setViewingOtherProfile] = useState(false);
+  // Separate state for viewing other user's profile to avoid polluting context
+  const [viewedProfile, setViewedProfile] = useState<any>(null);
+  const [viewedAccount, setViewedAccount] = useState<any>(null);
+  // Refs to store original user data when viewing another profile
+  const originalAccountRef = useRef<any>(null);
+  const contextSwappedRef = useRef(false);
+
+  const getProfileData = useCallback(async () => {
+    // If viewing another user's profile
+    if (accountId && accountId !== account?.id) {
+      try {
+        setViewingOtherProfile(true);
+        const [profileData, accountData] = await Promise.all([
+          getProfileWithUid(firebaseFirestore, accountId),
+          getAccountWithAccountId(firebaseFirestore, accountId)
+        ]);
+
+        if (profileData && accountData) {
+          // Store in separate state to avoid polluting user context
+          setViewedProfile(profileData);
+          setViewedAccount(accountData);
+          setError(null);
+        } else {
+          setError('Profile not found');
+        }
+      } catch (err) {
+        console.error('Error loading profile data:', err);
+        setError('Failed to load profile data. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Otherwise, load current user's profile
+    if (!profileRef || !accountRef) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setViewingOtherProfile(false);
+      setViewedProfile(null);
+      setViewedAccount(null);
+      const [profileData, accountData] = await Promise.all([
+        getDoc(profileRef),
+        getDoc(accountRef)
+      ]);
+
+      setProfileData(profileData.data());
+      setAccountData(accountData.data());
+      setError(null);
+    } catch (err) {
+      console.error('Error loading profile data:', err);
+      setError('Failed to load profile data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    accountId,
+    account?.id,
+    profileRef,
+    accountRef,
+    setProfileData,
+    setAccountData,
+    firebaseFirestore
+  ]);
 
   useEffect(() => {
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (!user && !accountId) {
         navigate('/login');
       }
     });
 
     getProfileData();
-  }, [accountRef, profileRef]);
 
-  const getProfileData = async () => {
-    if (!profileRef || !accountRef) {
-      return;
+    return () => unsubscribe();
+  }, [auth, navigate, getProfileData, accountId]);
+
+  // Handle viewing other profiles - MUST be before conditional returns (Rules of Hooks)
+  useEffect(() => {
+    if (viewingOtherProfile && viewedAccount && viewedProfile && !contextSwappedRef.current) {
+      // Save original data before swapping
+      if (!originalAccountRef.current && account) {
+        originalAccountRef.current = account;
+      }
+
+      // Set viewed profile in context
+      setAccountData(viewedAccount);
+      setProfileData(viewedProfile);
+      contextSwappedRef.current = true;
+    } else if (!viewingOtherProfile && contextSwappedRef.current && originalAccountRef.current) {
+      // Restore original data
+      setAccountData(originalAccountRef.current);
+      originalAccountRef.current = null;
+      contextSwappedRef.current = false;
     }
-
-    const profileData = await getDoc(profileRef);
-    const accountData = await getDoc(accountRef);
-
-    setProfileData(profileData.data());
-    setAccountData(accountData.data());
-    setLoading(false);
-  };
+    // Note: 'account' not in deps to avoid loops (we save it in ref before it changes)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewingOtherProfile, viewedAccount, viewedProfile, setAccountData, setProfileData]);
 
   if (loading) {
-    return <div>Loading</div>;
+    return (
+      <PageContainer>
+        <LoadingContainer>
+          <LoadingText>Loading profile...</LoadingText>
+        </LoadingContainer>
+      </PageContainer>
+    );
   }
 
-  if (account?.type === 'company') {
-    return <CompanyProfile previewMode={previewMode} />;
+  if (error) {
+    return (
+      <PageContainer>
+        <ErrorContainer>
+          <ErrorText>{error}</ErrorText>
+          <RetryButton onClick={getProfileData}>Retry</RetryButton>
+        </ErrorContainer>
+      </PageContainer>
+    );
   }
 
-  if (account?.type === 'individual') {
-    return <IndividualProfile previewMode={previewMode} />;
+  // Determine which account to display (viewed or current)
+  const displayAccount =
+    viewingOtherProfile && viewedAccount ? viewedAccount : account;
+
+  if (displayAccount?.type === 'company') {
+    return <CompanyProfile previewMode={previewMode || viewingOtherProfile} />;
   }
 
-  return <div>No Profile</div>;
+  if (displayAccount?.type === 'individual') {
+    return (
+      <IndividualProfile previewMode={previewMode || viewingOtherProfile} />
+    );
+  }
+
+  return (
+    <PageContainer>
+      <NoProfileContainer>
+        <NoProfileText>No profile found</NoProfileText>
+        <NoProfileSubtext>
+          Please contact support if you believe this is an error.
+        </NoProfileSubtext>
+      </NoProfileContainer>
+    </PageContainer>
+  );
 };
+
+const LoadingContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+`;
+
+const LoadingText = styled.p`
+  font-family: ${fonts.montserrat};
+  font-size: 18px;
+  color: ${colors.grayishBlue};
+  margin: 0;
+`;
+
+const ErrorContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+`;
+
+const ErrorText = styled.p`
+  font-family: ${fonts.montserrat};
+  font-size: 16px;
+  color: ${colors.salmon};
+  margin-bottom: 1.5rem;
+  text-align: center;
+`;
+
+const RetryButton = styled.button`
+  background: ${colors.primary};
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 12px 24px;
+  font-family: ${fonts.montserrat};
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: background 0.2s;
+
+  &:hover {
+    background: ${colors.darkPrimary};
+  }
+`;
+
+const NoProfileContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+`;
+
+const NoProfileText = styled.h2`
+  font-family: ${fonts.montserrat};
+  font-size: 24px;
+  color: ${colors.mainFont};
+  margin-bottom: 0.5rem;
+`;
+
+const NoProfileSubtext = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 16px;
+  color: ${colors.grayishBlue};
+  text-align: center;
+  margin: 0;
+`;
 
 export default Profile;

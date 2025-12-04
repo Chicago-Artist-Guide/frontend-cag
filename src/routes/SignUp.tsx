@@ -1,20 +1,14 @@
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useEffect, useState } from 'react';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import queryString from 'query-string';
 import PageContainer from '../components/layout/PageContainer';
-import { PreviewCard } from '../components/Profile/shared/styles';
 import AccountType from '../components/SignUp/AccountType';
 import CompanySignUp from '../components/SignUp/Company';
 import TheatreSignUpRequest from '../components/SignUp/Company/TheatreSignUpRequest';
 import IndividualSignUp from '../components/SignUp/Individual';
 import { AccountTypeOptions } from '../components/SignUp/types';
 import { useUserContext } from '../context/UserContext';
-import { breakpoints } from '../theme/styleVars';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -34,30 +28,13 @@ const SignUp: React.FC = () => {
   if (currentStep === -1) {
     return (
       <PageContainer>
-        <Row>
-          <Col lg={12}>
-            <MobileWarning>
-              <h2>
-                <FontAwesomeIcon
-                  style={{ marginRight: '12px' }}
-                  icon={faExclamationTriangle}
-                />{' '}
-                Mobile Sign-Up Not Supported
-              </h2>
-              <p>
-                We've detected you're using a mobile device to sign up. It is
-                suggested you use a desktop computer because this process has
-                not been designed for an enjoyable mobile experience yet. Mobile
-                sign-up is coming soon!
-              </p>
-            </MobileWarning>
-            <AccountType
-              accountType={accountType}
-              setAccountType={setAccountType}
-              onCardClick={() => setCurrentStep(0)}
-            />
-          </Col>
-        </Row>
+        <ContentWrapper>
+          <AccountType
+            accountType={accountType}
+            setAccountType={setAccountType}
+            onCardClick={() => setCurrentStep(0)}
+          />
+        </ContentWrapper>
       </PageContainer>
     );
   }
@@ -73,7 +50,6 @@ const SignUp: React.FC = () => {
 
   if (accountType === 'company') {
     // requiring theatre groups to request to signup first for screening
-
     return flag ? (
       <CompanySignUp
         currentStep={currentStep}
@@ -84,16 +60,41 @@ const SignUp: React.FC = () => {
     );
   }
 
-  return <div>Something went wrong.</div>;
+  return (
+    <ErrorWrapper>
+      <ErrorMessage>
+        Something went wrong. Please refresh the page and try again.
+      </ErrorMessage>
+    </ErrorWrapper>
+  );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const MobileWarning = styled(PreviewCard as any)`
-  display: block;
+export default SignUp;
 
-  @media (min-width: ${breakpoints.md}) {
-    display: none;
-  }
+const ContentWrapper = styled.div`
+  max-width: 100%;
+  margin: 0 auto;
 `;
 
-export default SignUp;
+const ErrorWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  padding: 20px;
+`;
+
+const ErrorMessage = styled.div`
+  text-align: center;
+  font-size: 1rem;
+  color: #666;
+  background: #f8f9fa;
+  padding: 24px;
+  border-radius: 8px;
+  border-left: 4px solid #e17b60;
+
+  @media (min-width: 640px) {
+    font-size: 1.125rem;
+    padding: 32px;
+  }
+`;

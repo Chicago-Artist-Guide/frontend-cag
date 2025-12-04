@@ -22,6 +22,9 @@ const Messages = lazy(() => import('./Messages'));
 const ManageProduction = lazy(() => import('./ManageProduction'));
 const Matches = lazy(() => import('./Matches'));
 const NotFound = lazy(() => import('./NotFound'));
+const AnalyticsDashboard = lazy(
+  () => import('../components/Staff/Analytics/Dashboard')
+);
 
 const AppRoutes = () => {
   return (
@@ -43,6 +46,7 @@ const AppRoutes = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/view/:accountId" element={<Profile />} />
         <Route path="/profile/messages/:threadId?" element={<Messages />} />
         <Route
           path="/production/:productionId/manage"
@@ -53,6 +57,7 @@ const AppRoutes = () => {
           path="/profile/search/talent/:productionId/:roleId?"
           element={<Matches />}
         />
+        <Route path="/staff/analytics" element={<AnalyticsDashboard />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

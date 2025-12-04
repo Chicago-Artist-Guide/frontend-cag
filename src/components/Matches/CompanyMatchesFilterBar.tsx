@@ -13,27 +13,27 @@ export const CompanyMatchesFilterBar = () => {
   }, [profile]);
 
   return (
-    <div className="max-w-md bg-white p-4">
-      <h2 className="font-open-sans text-2xl font-bold tracking-[0.5px]">
+    <div className="w-full max-w-md bg-white p-4">
+      <h2 className="font-open-sans text-xl font-bold tracking-[0.5px] lg:text-2xl">
         Role Options
       </h2>
-      <div className="text-md grid grid-cols-3 gap-3 pt-3 font-open-sans font-normal tracking-[0.5px] text-dark">
-        Stage Role
-        <span className="col-span-2 font-bold">
+      <div className="text-md grid grid-cols-1 gap-3 pt-3 font-open-sans font-normal tracking-[0.5px] text-dark sm:grid-cols-3">
+        <div className="sm:col-span-1">Stage Role</div>
+        <span className="col-span-1 font-bold sm:col-span-2">
           {profileData?.stage_role !== 'both-stage'
             ? profileData?.stage_role
             : 'All Roles'}
         </span>
-        Ethnicites
-        <span className="col-span-2 font-bold">
+        <div className="sm:col-span-1">Ethnicites</div>
+        <span className="col-span-1 font-bold sm:col-span-2">
           {profileData?.ethnicities?.join(', ') || 'All Ethnicities'}
         </span>
-        Age Ranges
-        <span className="col-span-2 font-bold">
+        <div className="sm:col-span-1">Age Ranges</div>
+        <span className="col-span-1 font-bold sm:col-span-2">
           {profileData?.age_ranges?.join(', ') || 'All Age Ranges'}
         </span>
-        Gender Identity
-        <span className="col-span-2 font-bold">
+        <div className="sm:col-span-1">Gender Identity</div>
+        <span className="col-span-1 font-bold sm:col-span-2">
           {profileData?.gender_identity || 'Any'}
         </span>
       </div>

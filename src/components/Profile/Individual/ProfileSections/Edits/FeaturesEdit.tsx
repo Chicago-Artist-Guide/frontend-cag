@@ -3,7 +3,7 @@ import React from 'react';
 import { Container, Form } from 'react-bootstrap';
 import styled from 'styled-components';
 import { InputField } from '../../../../../components/shared';
-import { colors } from '../../../../../theme/styleVars';
+import { colors, breakpoints } from '../../../../../theme/styleVars';
 
 const FeaturesEdit: React.FC<{
   features: any;
@@ -77,7 +77,7 @@ const FeaturesEdit: React.FC<{
               X Delete
             </DeleteRowLink>
           )}
-          <hr />
+          <Divider />
         </>
       ))}
     </Container>
@@ -88,9 +88,28 @@ const DeleteRowLink = styled.a`
   color: ${colors.salmon};
   display: block;
   margin-top: 1em;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
 
   &:hover {
     color: ${colors.salmon};
+    opacity: 0.8;
+  }
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 1.5em;
+    padding: 8px 0;
+    font-size: 16px;
+  }
+`;
+
+const Divider = styled.hr`
+  margin: 2em 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin: 1.5em 0;
   }
 `;
 

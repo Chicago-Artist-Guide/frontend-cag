@@ -3,6 +3,7 @@ import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { Button, Checkbox } from '../../../../../components/shared';
 import { offstageRolesOptions } from '../../../shared/offstageRolesOptions';
+import { breakpoints } from '../../../../../theme/styleVars';
 
 interface SelectedRolesType {
   offstage_roles_general: string[];
@@ -98,26 +99,30 @@ const OffStageSkillsEdit: React.FC<PropType> = ({
   return (
     <Container>
       {data.map((section) => (
-        <div key={section.key}>
+        <SectionContainer key={section.key}>
           <Bold>{section.name}</Bold>
-          {section.roles.map((role) => (
-            <Checkbox
-              checked={roleIsSelected(role, section.key)}
-              fieldType="checkbox"
-              key={role}
-              label={role}
-              value={role}
-              onChange={() => handleRoleSelection(role, section.key)}
-            />
-          ))}
-        </div>
+          <CheckboxContainer>
+            {section.roles.map((role) => (
+              <Checkbox
+                checked={roleIsSelected(role, section.key)}
+                fieldType="checkbox"
+                key={role}
+                label={role}
+                value={role}
+                onChange={() => handleRoleSelection(role, section.key)}
+              />
+            ))}
+          </CheckboxContainer>
+        </SectionContainer>
       ))}
-      <Button
-        onClick={handleSubmit}
-        text="Save"
-        type="button"
-        variant="primary"
-      />
+      <ButtonContainer>
+        <Button
+          onClick={handleSubmit}
+          text="Save"
+          type="button"
+          variant="primary"
+        />
+      </ButtonContainer>
     </Container>
   );
 };
@@ -126,6 +131,51 @@ const Bold = styled.p`
   font-weight: 500;
   font-size: 20px;
   margin-top: 25px;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 18px;
+    margin-top: 20px;
+  }
+`;
+
+const SectionContainer = styled.div`
+  margin-bottom: 24px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-bottom: 20px;
+  }
+`;
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+
+  @media (max-width: ${breakpoints.md}) {
+    gap: 8px;
+    margin-top: 10px;
+
+    label {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+    }
+  }
+`;
+
+const ButtonContainer = styled.div`
+  margin-top: 24px;
+
+  @media (max-width: ${breakpoints.md}) {
+    margin-top: 20px;
+
+    button {
+      width: 100%;
+      min-height: 44px;
+    }
+  }
 `;
 
 export default OffStageSkillsEdit;

@@ -35,6 +35,7 @@ const DropdownMenu = ({
         placeholder="Choose one..."
         style={{
           border: `1px solid ${colors.lightGrey}`,
+          backgroundColor: colors.white,
           color: value ? colors.secondaryFontColor : 'rgb(110, 115, 120)',
           fontWeight: 400,
           height: 40,

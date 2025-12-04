@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { MatchingFilters } from './types';
 import { Role } from '../Profile/Company/types';
 import Dropdown from '../shared/Dropdown';
-import { skillCheckboxes } from '../SignUp/Individual/types';
 import { useMatches } from '../../context/MatchContext';
 
 export const TalentMatchesFilterBar = () => {
@@ -38,17 +37,6 @@ export const TalentMatchesFilterBar = () => {
     }
   ];
 
-  const skillOptions = [
-    {
-      name: 'All Skills',
-      value: ''
-    },
-    ...skillCheckboxes.map((s) => ({
-      name: s,
-      value: s
-    }))
-  ];
-
   const existingMatchOptions = [
     {
       name: 'All Matches',
@@ -69,13 +57,6 @@ export const TalentMatchesFilterBar = () => {
     updateFilters({ union_status: unionStatusValue } as MatchingFilters);
   };
 
-  const updateSkills = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const skillValue = e.target.value === '' ? undefined : e.target.value;
-    updateFilters({
-      additional_skills_checkboxes: skillValue ? [skillValue] : undefined
-    } as MatchingFilters);
-  };
-
   const updateMatchStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const matchStatusValue =
       e.target.value === ''
@@ -87,8 +68,8 @@ export const TalentMatchesFilterBar = () => {
   };
 
   return (
-    <div className="max-w-md bg-white p-4">
-      <h2 className="font-open-sans text-2xl font-bold tracking-[0.5px]">
+    <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-sm">
+      <h2 className="mb-6 font-open-sans text-xl font-bold tracking-[0.5px] lg:text-2xl">
         Filter {filters.type === 'individual' ? 'Talent' : 'Roles'}
       </h2>
       {roles?.length && (
@@ -106,41 +87,67 @@ export const TalentMatchesFilterBar = () => {
           )}
 
           {currentRole && (
-            <div className="text-md grid grid-cols-3 gap-3 pt-3 font-open-sans font-normal tracking-[0.5px] text-dark">
-              Role Status
-              <span className="col-span-2 font-bold">
-                {currentRole.role_status}
-              </span>
-              {currentRole.ethnicity && (
-                <>
-                  Ethnicity
-                  <span className="col-span-2 font-bold">
-                    {currentRole.ethnicity?.join(', ')}
+            <div className="mt-6 space-y-5 border-t border-stone-200 pt-6">
+              <div className="space-y-3.5">
+                <div className="flex flex-nowrap items-center justify-between gap-4">
+                  <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
+                    Role Status
                   </span>
-                </>
-              )}
-              {currentRole.age_range && (
-                <>
-                  Age Range
-                  <span className="col-span-2 font-bold">
-                    {currentRole.age_range?.join('; ')}
+                  <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+                    {currentRole.role_status}
                   </span>
-                </>
-              )}
-              {currentRole.age_range && (
-                <>
-                  Gender
-                  <span className="col-span-2 font-bold">
-                    {currentRole.gender_identity?.join(', ')}
+                </div>
+                {currentRole.ethnicity && currentRole.ethnicity.length > 0 && (
+                  <div className="flex flex-nowrap items-center justify-between gap-4">
+                    <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
+                      Ethnicity
+                    </span>
+                    <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+                      {currentRole.ethnicity.join(', ')}
+                    </span>
+                  </div>
+                )}
+                {currentRole.age_range && currentRole.age_range.length > 0 && (
+                  <div className="flex flex-nowrap items-center justify-between gap-4">
+                    <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
+                      Age Range
+                    </span>
+                    <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+                      {currentRole.age_range.join(', ')}
+                    </span>
+                  </div>
+                )}
+                {currentRole.gender_identity &&
+                  currentRole.gender_identity.length > 0 && (
+                    <div className="flex flex-nowrap items-center justify-between gap-4">
+                      <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
+                        Gender
+                      </span>
+                      <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+                        {currentRole.gender_identity.join(', ')}
+                      </span>
+                    </div>
+                  )}
+                <div className="flex flex-nowrap items-center justify-between gap-4">
+                  <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
+                    LGBTQ+
                   </span>
-                </>
-              )}
-              <span className="col-span-3">LGBTQ+</span>
-              {currentRole.additional_requirements && (
-                <span className="col-span-3 font-bold">
-                  {currentRole.additional_requirements?.join(', ')}
-                </span>
-              )}
+                  <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+                    {currentRole.lgbtq_only ? 'Yes' : 'No'}
+                  </span>
+                </div>
+              </div>
+              {currentRole.additional_requirements &&
+                currentRole.additional_requirements.length > 0 && (
+                  <div className="border-t border-stone-200 pt-4">
+                    <div className="mb-2 font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+                      Special Requirements
+                    </div>
+                    <div className="font-open-sans text-sm font-normal tracking-[0.5px] text-stone-700">
+                      {currentRole.additional_requirements.join(', ')}
+                    </div>
+                  </div>
+                )}
             </div>
           )}
 
@@ -150,13 +157,6 @@ export const TalentMatchesFilterBar = () => {
             options={unionStatusOptions}
             value={''}
             onChange={updateUnionStatus}
-          />
-          <Dropdown
-            name="skills"
-            label="Special Skills"
-            options={skillOptions}
-            value={''}
-            onChange={updateSkills}
           />
           <Dropdown
             name="existingMatches"
