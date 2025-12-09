@@ -93,6 +93,17 @@ export const productionStatuses: ProductionStatus[] = [
   'Show Complete'
 ];
 export const productionEquities: ProductionEquity[] = ['Union', 'Non-Union'];
+
+// Union options for roles and individual profiles
+export const unionOptions = [
+  'Non-Union',
+  'AEA (actors, stage managers, directors)',
+  'IATSE (stage hands)',
+  'Union Scenic Artist (designers)'
+] as const;
+
+export type UnionOption = (typeof unionOptions)[number];
+
 export const productionTypes: ProductionType[] = ['Musical', 'Play', 'Other'];
 export const stageRoles: StageRole[] = ['On-Stage', 'Off-Stage'];
 export const roleStatuses: RoleStatus[] = ['Open', 'Closed'];

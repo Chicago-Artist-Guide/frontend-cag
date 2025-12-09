@@ -94,6 +94,6 @@ export type Role = {
   additional_requirements?: string[];
   singing_details?: string;
   dancing_details?: string;
-  union?: string;
+  union?: string[];
   lgbtq_only?: boolean;
 };

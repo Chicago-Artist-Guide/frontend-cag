@@ -138,6 +138,15 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
       }
     }
 
+    // Union status - filter talent by role's union requirements
+    if (
+      findRole.union &&
+      Array.isArray(findRole.union) &&
+      findRole.union.length > 0
+    ) {
+      newFilters['union_status'] = findRole.union;
+    }
+
     setFilters(newFilters);
     return newFilters;
   };

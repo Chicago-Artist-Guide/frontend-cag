@@ -177,7 +177,22 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
     }
 
     setWebsiteId(profile?.data?.websites?.length || 1);
-    setEditProfile(profile?.data);
+
+    // Backward compatibility: convert legacy string union_status to array
+    const profileData = profile?.data;
+    if (profileData) {
+      const normalizedProfile = {
+        ...profileData,
+        union_status:
+          typeof profileData.union_status === 'string'
+            ? [profileData.union_status]
+            : profileData.union_status || []
+      };
+      setEditProfile(normalizedProfile);
+    } else {
+      setEditProfile(profileData);
+    }
+
     updatePerformanceState();
     updatePastPerformanceState();
     updateTrainingState();

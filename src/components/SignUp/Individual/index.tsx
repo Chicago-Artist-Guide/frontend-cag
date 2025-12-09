@@ -74,7 +74,7 @@ const defaultData: IndividualData = {
   demographicsAgency: '',
   demographicsBioHeadline: '',
   demographicsBio: '',
-  demographicsUnionStatus: '',
+  demographicsUnionStatus: [],
   demographicsUnionStatusOther: '',
   demographicsWebsites: [{ id: 1, url: '', websiteType: '' as WebsiteTypes }],
   emailListAgree: true,

@@ -362,6 +362,20 @@ export async function fetchRolesForTalent(
             }
           }
 
+          // Union matching - role union requirements vs profile union status
+          if (pR.union && Array.isArray(pR.union) && pR.union.length > 0) {
+            const profileUnionStatus = profile.union_status || [];
+
+            // Check if at least one union status matches
+            const hasUnionMatch = pR.union.some((roleUnion) =>
+              profileUnionStatus.includes(roleUnion)
+            );
+
+            if (!hasUnionMatch) {
+              return false;
+            }
+          }
+
           return pR;
         });
 

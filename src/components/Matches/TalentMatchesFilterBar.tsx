@@ -3,6 +3,7 @@ import { MatchingFilters } from './types';
 import { Role } from '../Profile/Company/types';
 import Dropdown from '../shared/Dropdown';
 import { useMatches } from '../../context/MatchContext';
+import { unionOptions } from '../../utils/lookups';
 
 export const TalentMatchesFilterBar = () => {
   const { currentRoleId, filters, updateFilters, roles, setCurrentRoleId } =
@@ -27,14 +28,10 @@ export const TalentMatchesFilterBar = () => {
       name: 'All Options',
       value: ''
     },
-    {
-      name: 'Yes',
-      value: 'Yes'
-    },
-    {
-      name: 'No',
-      value: 'No'
-    }
+    ...unionOptions.map((option) => ({
+      name: option,
+      value: option
+    }))
   ];
 
   const existingMatchOptions = [
@@ -53,7 +50,8 @@ export const TalentMatchesFilterBar = () => {
   ];
 
   const updateUnionStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const unionStatusValue = e.target.value === '' ? undefined : e.target.value;
+    const unionStatusValue =
+      e.target.value === '' ? undefined : [e.target.value];
     updateFilters({ union_status: unionStatusValue } as MatchingFilters);
   };
 

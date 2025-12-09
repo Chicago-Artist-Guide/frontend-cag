@@ -36,6 +36,12 @@ export const CompanyMatchesFilterBar = () => {
         <span className="col-span-1 font-bold sm:col-span-2">
           {profileData?.gender_identity || 'Any'}
         </span>
+        <div className="sm:col-span-1">Union Status</div>
+        <span className="col-span-1 font-bold sm:col-span-2">
+          {profileData?.union_status && profileData.union_status.length > 0
+            ? profileData.union_status.join(', ')
+            : 'All Options'}
+        </span>
       </div>
     </div>
   );

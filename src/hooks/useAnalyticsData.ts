@@ -166,10 +166,12 @@ export const useAnalyticsData = () => {
             });
           }
 
-          // Union Status
-          if (profile.union_status) {
-            demographics.unionStatus[profile.union_status] =
-              (demographics.unionStatus[profile.union_status] || 0) + 1;
+          // Union Status (array field)
+          if (profile.union_status && Array.isArray(profile.union_status)) {
+            profile.union_status.forEach((unionStatus) => {
+              demographics.unionStatus[unionStatus] =
+                (demographics.unionStatus[unionStatus] || 0) + 1;
+            });
           }
 
           // Skills from offstage roles
