@@ -128,7 +128,7 @@ export type IndividualData = {
   demographicsAgency: string;
   demographicsBioHeadline: string;
   demographicsBio: string;
-  demographicsUnionStatus: string;
+  demographicsUnionStatus: string[];
   demographicsUnionStatusOther: string;
   demographicsWebsites: IndividualWebsite[];
   emailListAgree: boolean;
@@ -182,7 +182,7 @@ export type IndividualProfile = {
   offstage_roles_sound: string[];
   offstage_roles_hair_makeup_costumes: string[];
   profile_image_url: string;
-  union_status: string;
+  union_status: string[];
   union_other: string;
   agency: string;
   websites: IndividualWebsite[];

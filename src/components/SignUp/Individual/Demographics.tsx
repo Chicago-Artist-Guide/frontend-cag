@@ -8,6 +8,8 @@ import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../../theme/styleVars';
+import { unionOptions } from '../../../utils/lookups';
+import { Checkbox } from '../../shared';
 import { Tagline, Title, TitleThree } from '../../layout/Titles';
 import {
   IndividualData,
@@ -22,13 +24,40 @@ const Demographics: React.FC<{
 }> = (props) => {
   const { formData, setForm } = props;
   const {
-    demographicsUnionStatus, // checkboxes for Unions or non-union
+    demographicsUnionStatus, // array of union selections
     demographicsAgency,
     demographicsWebsites, // { url: string, websiteType: string }
     demographicsBioHeadline,
     demographicsBio
   } = formData;
   const [websiteId, setWebsiteId] = useState(1);
+
+  const handleUnionChange = (option: string, checked: boolean) => {
+    const currentUnions = Array.isArray(demographicsUnionStatus)
+      ? demographicsUnionStatus
+      : [];
+
+    let newUnions: string[];
+    if (checked) {
+      newUnions = [...currentUnions, option];
+    } else {
+      newUnions = currentUnions.filter((u) => u !== option);
+    }
+
+    const target = {
+      name: 'demographicsUnionStatus',
+      value: newUnions
+    };
+
+    setForm({ target });
+  };
+
+  const isUnionSelected = (option: string): boolean => {
+    if (!Array.isArray(demographicsUnionStatus)) {
+      return false;
+    }
+    return demographicsUnionStatus.includes(option);
+  };
 
   const onWebsiteInputChange = <T extends keyof IndividualWebsite>(
     fieldValue: IndividualWebsite[T],
@@ -95,29 +124,20 @@ const Demographics: React.FC<{
               <TitleThree>Union</TitleThree>
               <Container>
                 <Row>
-                  <PaddedCol lg="5">
-                    <CAGFormControl
-                      aria-label="union"
-                      as="select"
-                      defaultValue={demographicsUnionStatus}
-                      name="demographicsUnionStatus"
-                      onChange={setForm}
-                    >
-                      <option value={undefined}>Select union status</option>
-                      <option value="Union">Union</option>
-                      <option value="Non-Union">Non-Union</option>
-                      <option value="Other">Other</option>
-                    </CAGFormControl>
-                  </PaddedCol>
-                  <PaddedCol lg="5">
-                    <CAGFormControl
-                      aria-label="union"
-                      defaultValue=""
-                      disabled={demographicsUnionStatus !== 'Other'}
-                      name="demographicsUnionStatusOther"
-                      onChange={setForm}
-                      placeholder="Other"
-                    ></CAGFormControl>
+                  <PaddedCol lg="10">
+                    <Form.Group className="form-group">
+                      {unionOptions.map((option) => (
+                        <Checkbox
+                          key={`union-option-${option}`}
+                          checked={isUnionSelected(option)}
+                          label={option}
+                          name={option}
+                          onChange={(e: any) =>
+                            handleUnionChange(option, e.currentTarget.checked)
+                          }
+                        />
+                      ))}
+                    </Form.Group>
                   </PaddedCol>
                 </Row>
               </Container>
