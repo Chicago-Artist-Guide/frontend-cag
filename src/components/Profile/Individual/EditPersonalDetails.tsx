@@ -6,6 +6,7 @@ import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import { Button, Checkbox } from '../../../components/shared';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
+import { unionOptions } from '../../../utils/lookups';
 import {
   AgeRange,
   ageRanges,
@@ -41,6 +42,27 @@ const EditPersonalDetails = ({
   setProfileForm,
   ethnicityChange
 }: EditPersonalDetailsProps<any>) => {
+  const handleUnionChange = (option: string, checked: boolean) => {
+    const currentUnions = Array.isArray(editProfile?.union_status)
+      ? editProfile.union_status
+      : [];
+
+    let newUnions: string[];
+    if (checked) {
+      newUnions = [...currentUnions, option];
+    } else {
+      newUnions = currentUnions.filter((u) => u !== option);
+    }
+
+    setProfileForm('union_status', newUnions);
+  };
+
+  const isUnionSelected = (option: string): boolean => {
+    if (!Array.isArray(editProfile?.union_status)) {
+      return false;
+    }
+    return editProfile.union_status.includes(option);
+  };
   return (
     <div>
       <Form.Group className="form-group">
@@ -175,33 +197,20 @@ const EditPersonalDetails = ({
         <CAGLabel>Union</CAGLabel>
         <Container>
           <Row>
-            <PaddedCol lg="5" xs="12">
-              <CAGFormControl
-                aria-label="union"
-                as="select"
-                name="demographicsUnionStatus"
-                value={editProfile?.union_status}
-                onChange={(e: any) =>
-                  setProfileForm('union_status', e.target.value)
-                }
-              >
-                <option value={undefined}>Select union status</option>
-                <option value="Union">Union</option>
-                <option value="Non-Union">Non-Union</option>
-                <option value="Other">Other</option>
-              </CAGFormControl>
-            </PaddedCol>
-            <PaddedCol lg="5" xs="12">
-              <CAGFormControl
-                aria-label="union"
-                defaultValue={editProfile?.union_other}
-                disabled={false}
-                name="demographicsUnionStatusOther"
-                onChange={(e: any) =>
-                  setProfileForm('union_other', e.target.value)
-                }
-                placeholder="Other"
-              />
+            <PaddedCol lg="10" xs="12">
+              <Form.Group className="form-group">
+                {unionOptions.map((option) => (
+                  <Checkbox
+                    key={`union-option-${option}`}
+                    checked={isUnionSelected(option)}
+                    label={option}
+                    name={option}
+                    onChange={(e: any) =>
+                      handleUnionChange(option, e.currentTarget.checked)
+                    }
+                  />
+                ))}
+              </Form.Group>
             </PaddedCol>
           </Row>
         </Container>

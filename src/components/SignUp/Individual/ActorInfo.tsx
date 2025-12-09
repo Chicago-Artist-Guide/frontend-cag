@@ -31,7 +31,6 @@ const ActorInfo: React.FC<{
   const { formData, setForm, hasErrorCallback } = props;
   const {
     stageRole,
-    demographicsUnionStatus,
     actorInfo2AgeRanges,
     actorInfo1Ethnicities,
     actorInfo2Gender,
@@ -44,7 +43,7 @@ const ActorInfo: React.FC<{
 
   const optLabel = '(Optional)';
   const isOffStage = stageRole === 'off-stage';
-  const requiredFields = ['demographicsUnionStatus'];
+  const requiredFields: string[] = [];
 
   // most fields are optional for off-stage
   if (!isOffStage) {
@@ -90,7 +89,6 @@ const ActorInfo: React.FC<{
   useEffect(() => {
     setFormErrors(createDefaultFormErrorsData());
   }, [
-    demographicsUnionStatus,
     actorInfo2AgeRanges,
     actorInfo1Ethnicities,
     actorInfo2Gender,
@@ -152,28 +150,6 @@ const ActorInfo: React.FC<{
           <PaddingTitle>LET'S GET SOME DETAILS</PaddingTitle>
           <Row>
             <Col lg="12">
-              <Form.Group className="form-group">
-                <CAGLabel>
-                  Are you part of the Actor's Equity Association?{' '}
-                  <PrivateLabel />
-                </CAGLabel>
-                <Checkbox
-                  checked={demographicsUnionStatus === 'Yes'}
-                  fieldType="radio"
-                  label="Yes"
-                  name="demographicsUnionStatus"
-                  onChange={setForm}
-                  value="Yes"
-                />
-                <Checkbox
-                  checked={demographicsUnionStatus === 'No'}
-                  fieldType="radio"
-                  label="No"
-                  name="demographicsUnionStatus"
-                  onChange={setForm}
-                  value="No"
-                />
-              </Form.Group>
               {!isOffStage && (
                 <Form.Group className="form-group">
                   <CAGLabel>

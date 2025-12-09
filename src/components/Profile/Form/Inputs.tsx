@@ -27,10 +27,22 @@ export const FormTextArea: React.FC<{
   onChange: SetForm;
   style?: CSSProperties;
   rows?: number;
-}> = ({ name, label, defaultValue, onChange, rows = 10, ...rest }) => {
+  required?: boolean;
+}> = ({
+  name,
+  label,
+  defaultValue,
+  onChange,
+  rows = 10,
+  required = false,
+  ...rest
+}) => {
   return (
     <FormGroup controlId={name} {...rest}>
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+      </Label>
       <TextArea
         as="textarea"
         rows={rows}
@@ -51,6 +63,7 @@ export const FormInput: React.FC<{
   style?: CSSProperties;
   type?: 'text' | 'number';
   placeholder?: string;
+  required?: boolean;
 }> = ({
   name,
   label,
@@ -58,11 +71,15 @@ export const FormInput: React.FC<{
   onChange,
   type = 'text',
   placeholder,
+  required = false,
   ...rest
 }) => {
   return (
     <FormGroup controlId={name} {...rest}>
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+      </Label>
       <Input
         aria-label={name}
         name={name}
@@ -82,17 +99,22 @@ export const FormSelect: React.FC<{
   onChange: SetForm;
   options: SelectValue[] | OptGroupSelectValue;
   hasOptGroups?: boolean;
+  required?: boolean;
 }> = ({
   name,
   label,
   defaultValue,
   onChange,
   options,
-  hasOptGroups = false
+  hasOptGroups = false,
+  required = false
 }) => {
   return (
     <FormGroup controlId={name}>
-      <Label>{label}</Label>
+      <Label>
+        {label}
+        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+      </Label>
       <Select
         aria-label={name}
         name={name}
@@ -342,4 +364,10 @@ const Thru = styled.h6`
     align-self: center;
     margin: 0.25em 0;
   }
+`;
+
+const RequiredAsterisk = styled.span`
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: 600;
 `;

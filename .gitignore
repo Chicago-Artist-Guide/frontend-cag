@@ -38,5 +38,7 @@ knowledgebase
 .playwright-mcp
 .claude
 CLAUDE.md
+.kiro
+.vscode
 
 docs/

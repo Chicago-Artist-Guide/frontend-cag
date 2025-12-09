@@ -12,7 +12,8 @@ import {
   ageRanges,
   roleGenders,
   productionEquities,
-  roleStatuses
+  roleStatuses,
+  unionOptions
 } from '../../../../../utils/lookups';
 import { ethnicityTypes } from '../../../../SignUp/Individual/types';
 import ConfirmDialog from '../../../../ConfirmDialog';
@@ -41,17 +42,24 @@ const RoleModal: React.FC<{
   if (!show) return null;
   const [showConfirm, setShowConfirm] = useState(false);
   const [formValues, setFormValues] = useState<Role>({});
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     if (role.role_id) {
-      setFormValues(role);
+      // Backward compatibility: convert legacy string union to array
+      const normalizedRole = {
+        ...role,
+        union: typeof role.union === 'string' ? [role.union] : role.union || []
+      };
+      setFormValues(normalizedRole);
     } else {
       setFormValues({
         type: type,
         role_status: 'Open',
         gender_identity: ['Open to all genders'],
         age_range: ['Open to all ages'],
-        ethnicity: ['Open to all ethnicities']
+        ethnicity: ['Open to all ethnicities'],
+        union: []
       });
     }
     console.log(formValues);
@@ -70,7 +78,33 @@ const RoleModal: React.FC<{
     }));
   };
 
+  const validateForm = (): { valid: boolean; errors: string[] } => {
+    const errors: string[] = [];
+
+    // Role name/position required
+    if (!formValues.role_name?.trim()) {
+      errors.push(isOnStage ? 'Role Name is required' : 'Position is required');
+    }
+
+    // Pay required and must be positive
+    if (!formValues.role_rate || Number(formValues.role_rate) <= 0) {
+      errors.push('Pay must be a positive number');
+    }
+
+    return { valid: errors.length === 0, errors };
+  };
+
   const onSave = async (role: Role) => {
+    const validation = validateForm();
+
+    if (!validation.valid) {
+      // Display errors to user
+      setValidationErrors(validation.errors);
+      return;
+    }
+
+    // Clear any previous errors
+    setValidationErrors([]);
     onSubmit(role);
     setFormValues({});
   };
@@ -151,6 +185,95 @@ const RoleModal: React.FC<{
     return fieldValue.some((v) => v !== openToAllValue);
   };
 
+  const handleUmbrellaEthnicityChange = (
+    umbrella: string,
+    checked: boolean
+  ) => {
+    const umbrellaObj = ethnicityTypes.find((e) => e.name === umbrella);
+    if (!umbrellaObj) return;
+
+    const currentEthnicities = (formValues.ethnicity as string[]) || [];
+
+    if (checked) {
+      // Remove "Open to all ethnicities" if present
+      const filtered = currentEthnicities.filter(
+        (e) => e !== 'Open to all ethnicities'
+      );
+      // Add umbrella and all subcategories
+      const newEthnicities = [
+        ...filtered.filter(
+          (e) => e !== umbrella && !umbrellaObj.values.includes(e)
+        ),
+        umbrella,
+        ...umbrellaObj.values
+      ];
+      setFormValues({ ...formValues, ethnicity: newEthnicities });
+    } else {
+      // Remove umbrella and all subcategories
+      const newEthnicities = currentEthnicities.filter(
+        (e) => e !== umbrella && !umbrellaObj.values.includes(e)
+      );
+      setFormValues({ ...formValues, ethnicity: newEthnicities });
+    }
+  };
+
+  const handleSubcategoryEthnicityChange = (
+    subcategory: string,
+    checked: boolean
+  ) => {
+    const umbrellaObj = ethnicityTypes.find((e) =>
+      e.values.includes(subcategory)
+    );
+    if (!umbrellaObj) return;
+
+    const currentEthnicities = (formValues.ethnicity as string[]) || [];
+
+    if (checked) {
+      // Remove "Open to all ethnicities" if present
+      const filtered = currentEthnicities.filter(
+        (e) => e !== 'Open to all ethnicities'
+      );
+      const newEthnicities = [...filtered, subcategory];
+
+      // Check if all subcategories now selected
+      const allSubcategoriesSelected = umbrellaObj.values.every((v) =>
+        newEthnicities.includes(v)
+      );
+
+      if (
+        allSubcategoriesSelected &&
+        !newEthnicities.includes(umbrellaObj.name)
+      ) {
+        newEthnicities.push(umbrellaObj.name);
+      }
+
+      setFormValues({ ...formValues, ethnicity: newEthnicities });
+    } else {
+      // Remove subcategory and umbrella if present
+      const newEthnicities = currentEthnicities.filter(
+        (e) => e !== subcategory && e !== umbrellaObj.name
+      );
+      setFormValues({ ...formValues, ethnicity: newEthnicities });
+    }
+  };
+
+  const handleUnionChange = (option: string, checked: boolean) => {
+    const currentUnions = (formValues.union as string[]) || [];
+
+    if (checked) {
+      setFormValues({ ...formValues, union: [...currentUnions, option] });
+    } else {
+      setFormValues({
+        ...formValues,
+        union: currentUnions.filter((u) => u !== option)
+      });
+    }
+  };
+
+  const isUnionSelected = (option: string): boolean => {
+    return ((formValues.union as string[]) || []).includes(option);
+  };
+
   const onDeleteConfirm = () => {
     onDelete(formValues);
   };
@@ -211,6 +334,7 @@ const RoleModal: React.FC<{
                     onChange={setFormState}
                     hasOptGroups={true}
                     options={transformedOffstageRoleOptions}
+                    required={true}
                   />
                 ) : (
                   <FormInput
@@ -219,6 +343,7 @@ const RoleModal: React.FC<{
                     onChange={setFormState}
                     defaultValue={formValues?.role_name}
                     style={{ marginTop: 0 }}
+                    required={true}
                   />
                 )}
                 <FormTextArea
@@ -231,7 +356,9 @@ const RoleModal: React.FC<{
                   rows={4}
                 />
                 <Form.Group className="form-group" style={{ marginTop: 30 }}>
-                  <CAGLabel>Pay</CAGLabel>
+                  <CAGLabel>
+                    Pay<RequiredAsterisk>*</RequiredAsterisk>
+                  </CAGLabel>
                   <RoleRate>
                     <FormInput
                       name="role_rate"
@@ -274,16 +401,22 @@ const RoleModal: React.FC<{
                   onChange={setFormState}
                   style={{ marginTop: 0 }}
                 />
-                {!isOnStage ? (
-                  <Dropdown
-                    name="union"
-                    label="Union"
-                    options={equities}
-                    value={formValues.union}
-                    onChange={setFormState}
-                    style={{ marginTop: 20 }}
-                  />
-                ) : (
+                <Form.Group className="form-group" style={{ marginTop: 30 }}>
+                  <CAGLabel>Union Status</CAGLabel>
+                  {unionOptions.map((option) => (
+                    <Checkbox
+                      checked={isUnionSelected(option)}
+                      fieldType="checkbox"
+                      key={`union_${option}`}
+                      label={option}
+                      name={option}
+                      onChange={(e: any) => {
+                        handleUnionChange(option, e.target.checked);
+                      }}
+                    />
+                  ))}
+                </Form.Group>
+                {isOnStage && (
                   <>
                     <Form.Group
                       className="form-group"
@@ -452,20 +585,16 @@ const RoleModal: React.FC<{
                           'ethnicity',
                           eth.name
                         );
-                        const isParentDisabled =
-                          isOpenToAllSelected('ethnicity');
                         return (
                           <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                             <Checkbox
                               checked={isParentChecked}
-                              disabled={isParentDisabled}
                               fieldType="checkbox"
                               key={`first-level-chk-${eth.name}`}
                               label={eth.name}
                               name={eth.name}
                               onChange={(e: any) => {
-                                handleSpecificOptionChange(
-                                  'ethnicity',
+                                handleUmbrellaEthnicityChange(
                                   eth.name,
                                   e.target.checked
                                 );
@@ -478,19 +607,15 @@ const RoleModal: React.FC<{
                                     'ethnicity',
                                     ethV
                                   );
-                                  const isSubDisabled =
-                                    isOpenToAllSelected('ethnicity');
                                   return (
                                     <Checkbox
                                       checked={isSubChecked}
-                                      disabled={isSubDisabled}
                                       fieldType="checkbox"
                                       key={`${eth.name}-child-chk-${ethV}`}
                                       label={ethV}
                                       name={ethV}
                                       onChange={(e: any) => {
-                                        handleSpecificOptionChange(
-                                          'ethnicity',
+                                        handleSubcategoryEthnicityChange(
                                           ethV,
                                           e.target.checked
                                         );
@@ -527,6 +652,13 @@ const RoleModal: React.FC<{
                 )}
               </Col>
             </Row>
+            {validationErrors.length > 0 && (
+              <ValidationErrorContainer>
+                {validationErrors.map((error, index) => (
+                  <ValidationError key={index}>{error}</ValidationError>
+                ))}
+              </ValidationErrorContainer>
+            )}
             <ModalButtonContainer className="d-flex flex-column-reverse flex-md-row flex-md-row-reverse mt-3">
               <Button
                 onClick={() => onSave(formValues)}
@@ -588,6 +720,28 @@ const ModalButtonContainer = styled.div`
       min-height: 44px;
     }
   }
+`;
+
+const ValidationErrorContainer = styled.div`
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+`;
+
+const ValidationError = styled.div`
+  color: #721c24;
+  font-size: 14px;
+  margin: 4px 0;
+  font-family: ${fonts.montserrat};
+`;
+
+const RequiredAsterisk = styled.span`
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: 600;
 `;
 
 export default RoleModal;
