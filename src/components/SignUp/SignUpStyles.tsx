@@ -131,8 +131,11 @@ export const CAGLabel = styled(Form.Label)`
 `;
 
 export const CAGError = styled.span`
-  color: red;
-  font-size: 12px;
+  color: ${colors.salmon};
+  font-size: 0.875rem;
+  margin-top: 4px;
+  display: block;
+  line-height: 1.4;
 `;
 
 export const CAGHelperText = styled.div`

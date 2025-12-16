@@ -12,6 +12,7 @@ import TheaterResources from './TheaterResources';
 import PublicShows from './PublicShows';
 import PublicShowDetail from './PublicShowDetail';
 import Events from './Events';
+import GetInvolved from './GetInvolved';
 
 const Login = lazy(() => import('./Login'));
 const Logout = lazy(() => import('./Logout'));
@@ -41,6 +42,7 @@ const AppRoutes = () => {
         <Route path="/shows" element={<PublicShows />} />
         <Route path="/shows/:productionId" element={<PublicShowDetail />} />
         <Route path="/events" element={<Events />} />
+        <Route path="/get-involved" element={<GetInvolved />} />
         <Route path="/login" element={<Login />} />
         <Route path="/logout" element={<Logout />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

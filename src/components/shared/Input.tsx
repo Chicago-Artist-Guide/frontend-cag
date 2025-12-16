@@ -167,7 +167,7 @@ const InputField = (props: Props) => {
   const marginTop = first ? '0' : '25px';
 
   return (
-    <>
+    <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
       <CAGFormGroup controlId={name} style={{ marginTop: marginTop }}>
         <CAGLabel>{label}</CAGLabel>
         <CAGFormControl
@@ -183,7 +183,7 @@ const InputField = (props: Props) => {
       </CAGFormGroup>
       {hasError && <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>}
       {helperText && <CAGHelperText>{helperText}</CAGHelperText>}
-    </>
+    </div>
   );
 };
 
