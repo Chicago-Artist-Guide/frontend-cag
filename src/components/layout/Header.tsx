@@ -97,6 +97,9 @@ const Header = () => {
           <Nav.Link href={zeffyUrl} onClick={handleNavClick}>
             DONATE
           </Nav.Link>
+          <Nav.Link as={Link} to="/get-involved" onClick={handleNavClick}>
+            GET INVOLVED
+          </Nav.Link>
           <Nav.Link as={Link} to="/events" onClick={handleNavClick}>
             EVENTS
           </Nav.Link>

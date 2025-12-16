@@ -96,4 +96,5 @@ export type Role = {
   dancing_details?: string;
   union?: string[];
   lgbtq_only?: boolean;
+  google_form_url?: string;
 };
