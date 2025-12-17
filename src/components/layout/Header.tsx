@@ -7,7 +7,6 @@ import { useUserContext } from '../../context/UserContext';
 import { useStaffAuth } from '../../hooks/useStaffAuth';
 import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
-import { zeffyUrl } from '../../utils/marketing';
 
 const Header = () => {
   const { currentUser } = useUserContext();
@@ -94,7 +93,7 @@ const Header = () => {
           {/* <Nav.Link as={Link} to="/shows" onClick={handleNavClick}>
             SHOWS
           </Nav.Link> */}
-          <Nav.Link href={zeffyUrl} onClick={handleNavClick}>
+          <Nav.Link as={Link} to="/donate" onClick={handleNavClick}>
             DONATE
           </Nav.Link>
           <Nav.Link as={Link} to="/get-involved" onClick={handleNavClick}>
