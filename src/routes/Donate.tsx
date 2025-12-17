@@ -5,16 +5,12 @@ import PartnerSlider from '../components/Redesign/PartnerSlider';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import { zeffyUrl } from '../utils/marketing';
 
-// Supporter images
-import Driehaus from '../images/supporters/driehaus.svg';
-import LawLynx from '../images/supporters/lawlynx.jpg';
-import Gios from '../images/supporters/gios.png';
-import PFM from '../images/supporters/pfm.png';
-
-// Additional sponsor images
+// Additional sponsor images (for other sections)
 import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
 import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
 import SponsorLetsRoam from '../images/sponsors/lets_roam_logo_horizontal_v3.jpg';
+
+import { supporters as corporateSponsors } from '../utils/supporters';
 
 // Donate impact icons
 import KeysIcon from '../images/donate/keys.png';
@@ -25,36 +21,6 @@ import LaptopIcon from '../images/donate/laptop.png';
 import StageLightIcon from '../images/donate/stage_light.png';
 
 const Donate = () => {
-  const corporateSponsors = [
-    {
-      src: Driehaus,
-      alt: 'Driehaus Foundation',
-      url: 'https://www.driehausfoundation.org/'
-    },
-    { src: LawLynx, alt: 'Law Lynx', url: 'https://thelynxverse.com/' },
-    {
-      src: Gios,
-      alt: "Gio's BBQ Bar and Grill",
-      url: 'https://giosbbqbarandgrill.com/'
-    },
-    { src: PFM, alt: 'PFM', url: 'https://www.pfm.com/' },
-    {
-      src: SponsorLetsRoam,
-      alt: "Let's Roam",
-      url: 'https://www.letsroam.com/'
-    },
-    {
-      src: SponsorCliffLogo,
-      alt: 'Cliff Foundation',
-      url: 'https://cliff-chicago.org/foundation/'
-    },
-    {
-      src: SponsorCallForCulture,
-      alt: 'Call for Culture',
-      url: 'https://callforculture.com/'
-    }
-  ];
-
   return (
     <PageContainer className="!px-0 !py-0">
       <ContentWrapper>
@@ -219,8 +185,8 @@ const Donate = () => {
               </SponsorshipColumn>
             </SponsorshipGrid>
             <ContactInfo>
-              For more information please contact our Executive Director, Anna
-              Schutz.
+              For more information please contact our Executive Director,{' '}
+              <a href="mailto:anna@chicagoartistguide.org">Anna Schutz</a>.
             </ContactInfo>
           </SectionContentWrapper>
         </CorporateSponsorshipSection>
@@ -230,11 +196,7 @@ const Donate = () => {
           <SectionContentWrapper>
             <SectionTitle>Chicago Artist Guide is Supported By</SectionTitle>
             <CarouselWrapper>
-              <PartnerSlider
-                partners={corporateSponsors}
-                itemsPerSlide={4}
-                autoSlideInterval={5000}
-              />
+              <PartnerSlider partners={corporateSponsors} staticMode={true} />
             </CarouselWrapper>
           </SectionContentWrapper>
         </SponsorsSection>
@@ -703,6 +665,18 @@ const ContactInfo = styled.p`
   color: ${colors.mainFont};
   text-align: center;
   margin: 0;
+
+  a {
+    color: ${colors.mint};
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: ${colors.darkPrimary};
+      text-decoration: underline;
+    }
+  }
 
   @media (min-width: ${breakpoints.md}) {
     font-size: 1.0625rem;
