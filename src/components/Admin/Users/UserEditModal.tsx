@@ -13,6 +13,8 @@ import { faTimes, faSave } from '@fortawesome/free-solid-svg-icons';
 import {
   doc,
   updateDoc,
+  setDoc,
+  deleteDoc,
   serverTimestamp,
   collection,
   query,
@@ -381,11 +383,10 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
       }
 
       // Handle admin role changes (super_admin only, cannot change own role)
-      if (
-        isSuperAdmin &&
-        !isEditingSelf &&
-        values.admin_role !== user.admin_role
-      ) {
+      const adminRoleChanged =
+        isSuperAdmin && !isEditingSelf && values.admin_role !== user.admin_role;
+
+      if (adminRoleChanged) {
         accountUpdates.admin_role = values.admin_role || null;
         accountUpdates.admin_role_assigned_at = serverTimestamp();
         accountUpdates.admin_role_assigned_by = currentUser.email;
@@ -395,6 +396,23 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
         changes.before.admin_role = user.admin_role;
         changes.after.admin_role = values.admin_role;
         changes.fields_changed.push('admin_role');
+
+        // Sync admin_users collection (required for Firestore rules enforcement)
+        // Document ID must be the user's auth UID for direct lookup in rules
+        const adminUserRef = doc(firebaseFirestore, 'admin_users', user.uid);
+
+        if (values.admin_role) {
+          // Create or update admin_users document
+          await setDoc(adminUserRef, {
+            role: values.admin_role,
+            email: values.email || user.email,
+            assigned_at: serverTimestamp(),
+            assigned_by: currentUser.email
+          });
+        } else {
+          // Remove admin_users document if role is cleared
+          await deleteDoc(adminUserRef);
+        }
       }
 
       if (user.type === 'company') {

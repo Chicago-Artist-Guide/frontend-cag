@@ -31,7 +31,11 @@ import {
   query,
   where,
   getDocs,
-  limit
+  getDoc,
+  setDoc,
+  doc,
+  limit,
+  serverTimestamp
 } from 'firebase/firestore';
 import {
   AdminRole,
@@ -198,6 +202,48 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
             console.log('[AdminContext] ✅ Admin role SET:', adminRole);
             console.log('[AdminContext] Permissions:', rolePermissions);
             setPermissions(rolePermissions);
+
+            // Sync admin_users collection for Firestore rules enforcement
+            // This ensures existing admins have the required document
+            // Note: This is best-effort - sync failure should not affect admin status
+            try {
+              const adminUserRef = doc(
+                firestore,
+                'admin_users',
+                currentUser.uid
+              );
+              const adminUserDoc = await getDoc(adminUserRef);
+
+              if (!adminUserDoc.exists()) {
+                console.log(
+                  '[AdminContext] Creating admin_users document for rules enforcement'
+                );
+                await setDoc(adminUserRef, {
+                  role: adminRole,
+                  email: currentUser.email,
+                  synced_at: serverTimestamp()
+                });
+              } else if (adminUserDoc.data()?.role !== adminRole) {
+                // Update if role changed
+                console.log('[AdminContext] Updating admin_users role');
+                await setDoc(
+                  adminUserRef,
+                  {
+                    role: adminRole,
+                    email: currentUser.email,
+                    synced_at: serverTimestamp()
+                  },
+                  { merge: true }
+                );
+              }
+              console.log('[AdminContext] admin_users sync complete');
+            } catch (syncError) {
+              // Sync failure is non-fatal - admin role from accounts is still valid
+              console.warn(
+                '[AdminContext] admin_users sync failed (will retry on next login):',
+                syncError
+              );
+            }
           } else {
             // No admin role or invalid role - user is not an admin
             console.log('[AdminContext] ❌ No valid admin role found');

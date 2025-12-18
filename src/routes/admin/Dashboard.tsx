@@ -430,15 +430,16 @@ const Dashboard: React.FC = () => {
           </QuickActionCard>
         )}
 
-        {/* Openings Management */}
+        {/* CAG Job Openings */}
         {hasAnyPermissionOn(adminRole, 'openings') && (
           <QuickActionCard to="/staff/admin/openings">
             <div className="icon-container">
               <FontAwesomeIcon icon={faBriefcase} />
             </div>
-            <div className="title">Manage Openings</div>
+            <div className="title">CAG Job Openings</div>
             <div className="description">
-              View all role opportunities and moderate content.
+              Manage staff, volunteer, and board positions for /get-involved
+              page.
             </div>
           </QuickActionCard>
         )}
