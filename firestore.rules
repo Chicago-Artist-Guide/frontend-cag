@@ -62,6 +62,14 @@ service cloud.firestore {
         (resource == null || request.auth.uid == resource.data.uid);
     }
 
+    // Role opportunities collection - public read, authenticated users can write
+    match /roleOpportunities/{roleId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && 
+        (resource == null || request.auth.uid == resource.data.uid);
+    }
+
     // Threads collection - users can only access threads they're part of
     match /threads/{threadId} {
       allow read, write: if isAuthenticated() && 
