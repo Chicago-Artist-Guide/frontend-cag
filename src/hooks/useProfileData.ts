@@ -7,7 +7,7 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Document } from '../context/UserContext';
 
 const useProfileData = (currentUser: User | null, firestore: Firestore) => {
@@ -62,12 +62,22 @@ const useProfileData = (currentUser: User | null, firestore: Firestore) => {
     queryAccountAndProfile();
   }, [currentUser, firestore]);
 
-  const setAccountRef = (ref: any) => setAccount((prev) => ({ ...prev, ref }));
-  const setAccountData = (data: any) =>
-    setAccount((prev) => ({ ...prev, data }));
-  const setProfileRef = (ref: any) => setProfile((prev) => ({ ...prev, ref }));
-  const setProfileData = (data: any) =>
-    setProfile((prev) => ({ ...prev, data }));
+  const setAccountRef = useCallback(
+    (ref: any) => setAccount((prev) => ({ ...prev, ref })),
+    []
+  );
+  const setAccountData = useCallback(
+    (data: any) => setAccount((prev) => ({ ...prev, data })),
+    []
+  );
+  const setProfileRef = useCallback(
+    (ref: any) => setProfile((prev) => ({ ...prev, ref })),
+    []
+  );
+  const setProfileData = useCallback(
+    (data: any) => setProfile((prev) => ({ ...prev, data })),
+    []
+  );
 
   return {
     account,

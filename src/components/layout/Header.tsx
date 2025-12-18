@@ -4,7 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
-import { useStaffAuth } from '../../hooks/useStaffAuth';
+import { useAdminAuth } from '../../hooks/useAdminAuth';
 import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
 
@@ -13,7 +13,7 @@ const Header = () => {
   const {
     profile: { ref: profileRef }
   } = useUserContext();
-  const { isStaff } = useStaffAuth();
+  const { isAdmin, adminRole } = useAdminAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
@@ -123,9 +123,9 @@ const Header = () => {
               </Nav.Link>
             </>
           )}
-          {isStaff && (
-            <Nav.Link as={Link} to="/staff/analytics" onClick={handleNavClick}>
-              ANALYTICS
+          {isAdmin && (
+            <Nav.Link as={Link} to="/staff/admin" onClick={handleNavClick}>
+              ADMIN
             </Nav.Link>
           )}
           {currentUser !== null && (

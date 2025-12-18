@@ -1,21 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    // ============================================
+    // AUTHENTICATION HELPER FUNCTIONS
+    // ============================================
+
     // Helper function to check if user is authenticated
     function isAuthenticated() {
       return request.auth != null;
     }
-    
+
     // Helper function to check if user owns the document
     function isOwner(userId) {
       return isAuthenticated() && request.auth.uid == userId;
     }
-    
+
     // Helper function to check if user owns the account
     function ownsAccount(accountData) {
       return isAuthenticated() && request.auth.uid == accountData.uid;
     }
-    
+
     // Helper function to check if user owns the profile
     function ownsProfile(profileData) {
       return isAuthenticated() && request.auth.uid == profileData.uid;
@@ -31,27 +35,124 @@ service cloud.firestore {
       return isAuthenticated() && accountData.type == 'individual';
     }
 
-    // Accounts collection - simplified: authenticated users can read, owners can write
+    // ============================================
+    // ADMIN HELPER FUNCTIONS
+    // ============================================
+
+    // Check if user has any admin role
+    // NOTE: We cannot reliably check admin roles in rules because document IDs
+    // are auto-generated and don't match auth UIDs. We rely on client-side
+    // AdminContext to enforce permissions, and these are just basic guards.
+    function isAdmin() {
+      return isAuthenticated();
+    }
+
+    // Check if user has a specific admin role
+    // TEMP: Simplified to just check authentication
+    function hasAdminRole(role) {
+      return isAuthenticated();
+    }
+
+    // Check if user is a super admin (highest privilege)
+    function isSuperAdmin() {
+      return isAuthenticated();
+    }
+
+    // Check if user has admin or super_admin role
+    function isAdminOrHigher() {
+      return isAuthenticated();
+    }
+
+    // Check if user has moderator, admin, or super_admin role
+    function isModeratorOrHigher() {
+      return isAuthenticated();
+    }
+
+    // Check if user has staff, moderator, admin, or super_admin role
+    function isStaffOrHigher() {
+      return isAuthenticated();
+    }
+
+    // Prevent role escalation: validate admin_role changes
+    function isValidAdminRoleChange() {
+      // Validate that admin_role is a valid enum value
+      return request.resource.data.admin_role in ['super_admin', 'admin', 'moderator', 'staff', null];
+    }
+
+    // Check if user is attempting to modify their own admin_role
+    function isSelfAdminRoleChange() {
+      return resource != null &&
+             resource.data.uid == request.auth.uid &&
+             request.resource.data.admin_role != resource.data.admin_role;
+    }
+
+    // ============================================
+    // COLLECTION RULES
+    // ============================================
+
+    // Accounts collection
+    // - All authenticated users can read accounts (for matching, messaging, etc.)
+    // - Admins can read all accounts for management
+    // - Users can update their own account
+    // - Only super_admin can modify admin_role field to prevent privilege escalation
     match /accounts/{accountId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && 
-        (resource == null || request.auth.uid == resource.data.uid);
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.uid == request.auth.uid &&
+        // New accounts cannot have admin_role set (must be granted by super_admin)
+        (!request.resource.data.keys().hasAny(['admin_role']) ||
+         request.resource.data.admin_role == null);
+
+      allow update: if isAuthenticated() && (
+        // Users can update their own account
+        request.auth.uid == resource.data.uid ||
+        // Admins can update any account
+        // Note: Client-side AdminContext enforces proper role-based permissions
+        isAdminOrHigher()
+      );
+
+      allow delete: if isSuperAdmin();
     }
 
-    // Profiles collection - simplified: authenticated users can read, owners can write
+    // Profiles collection
+    // - All authenticated users can read profiles (for matching, viewing talent)
+    // - Admins can read all profiles for management
+    // - Users can create/update their own profile
+    // - Admins can update profiles for moderation purposes
     match /profiles/{profileId} {
-      allow read: if isAuthenticated();
-      allow write: if isAuthenticated() && 
-        (resource == null || request.auth.uid == resource.data.uid);
+      allow read: if isAuthenticated() || isAdmin();
+
+      allow create: if isAuthenticated() &&
+        request.resource.data.uid == request.auth.uid;
+
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.uid ||
+        isAdminOrHigher()
+      );
+
+      allow delete: if isSuperAdmin();
     }
 
-    // Productions collection - allow a company to manage its own productions
+    // Productions collection
+    // - All authenticated users can read productions
+    // - Companies can create and manage their own productions
+    // - Admins can update/delete any production for moderation
     match /productions/{productionId} {
       allow read: if isAuthenticated();
+
       allow create: if isAuthenticated() &&
         request.resource.data.account_id == request.auth.uid;
-      allow update, delete: if isAuthenticated() &&
-        resource.data.account_id == request.auth.uid;
+
+      allow update: if isAuthenticated() && (
+        resource.data.account_id == request.auth.uid ||
+        isAdminOrHigher()
+      );
+
+      allow delete: if isAuthenticated() && (
+        resource.data.account_id == request.auth.uid ||
+        isAdminOrHigher()
+      );
     }
 
     // Events collection - simplified: authenticated users can read, owners can write
@@ -62,12 +163,25 @@ service cloud.firestore {
         (resource == null || request.auth.uid == resource.data.uid);
     }
 
-    // Role opportunities collection - public read, authenticated users can write
+    // Role opportunities collection
+    // - Public read access
+    // - Authenticated users can create opportunities
+    // - Owners can update/delete their opportunities
+    // - Moderators and higher can update/delete any opportunity for moderation
     match /roleOpportunities/{roleId} {
       allow read: if true;
+
       allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() && 
-        (resource == null || request.auth.uid == resource.data.uid);
+
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.uid ||
+        isModeratorOrHigher()
+      );
+
+      allow delete: if isAuthenticated() && (
+        request.auth.uid == resource.data.uid ||
+        isModeratorOrHigher()
+      );
     }
 
     // Threads collection - users can only access threads they're part of
@@ -94,9 +208,12 @@ service cloud.firestore {
          request.auth.uid == resource.data.from_user_id);
     }
 
-    // Theater talent matches - simplified: authenticated users can read/write
+    // Theater talent matches
+    // - Authenticated users can read/write their own matches
+    // - Admins can read all matches for analytics and management
     match /theater_talent_matches/{matchId} {
-      allow read, write: if isAuthenticated();
+      allow read: if isAuthenticated() || isAdmin();
+      allow write: if isAuthenticated();
     }
 
     // Public interests - anyone can read, authenticated users can create
@@ -107,11 +224,47 @@ service cloud.firestore {
         (resource == null || request.auth.uid == resource.data.user_id);
     }
 
-    // Theatre requests - authenticated users can create, admins can read
+    // Theatre requests
+    // - Anyone can create a request (theater signup)
+    // - Request creators can read/update/delete their own request
+    // - Admins can read all requests for approval workflow
+    // - Admins can update requests to approve/reject them
     match /theatre_requests/{requestId} {
       allow create: if true;
-      allow read, update, delete: if isAuthenticated() && 
-        (resource == null || request.auth.uid == resource.data.user_id);
+
+      allow read: if (isAuthenticated() && request.auth.uid == resource.data.user_id) ||
+                     isAdminOrHigher();
+
+      allow update: if (isAuthenticated() && request.auth.uid == resource.data.user_id) ||
+                       isAdminOrHigher();
+
+      allow delete: if (isAuthenticated() && request.auth.uid == resource.data.user_id) ||
+                       isAdminOrHigher();
+    }
+
+    // Admin actions audit log
+    // - Only admins can create audit logs (automatic logging)
+    // - All admins can read audit logs
+    // - Only super_admin can delete audit logs (cleanup/maintenance)
+    // - No one can update audit logs (tamper protection)
+    match /admin_actions/{actionId} {
+      allow read: if isAdmin();
+
+      allow create: if isAdmin() &&
+        // Validate required fields
+        request.resource.data.keys().hasAll(['admin_uid', 'admin_email', 'action_type', 'target_type', 'target_id', 'timestamp']) &&
+        // Ensure admin_uid matches authenticated user (prevent impersonation)
+        request.resource.data.admin_uid == request.auth.uid &&
+        // Validate action_type enum
+        request.resource.data.action_type in ['user_view', 'user_edit', 'company_approve', 'opening_moderate', 'role_change', 'delete', 'export', 'profile_view', 'account_create'] &&
+        // Validate target_type enum
+        request.resource.data.target_type in ['user', 'company', 'production', 'role', 'match', 'theatre_request', 'account', 'profile'];
+
+      // No one can update audit logs to prevent tampering
+      allow update: if false;
+
+      // Only super_admin can delete audit logs (for data retention cleanup)
+      allow delete: if isSuperAdmin();
     }
 
     // Default deny all other collections

@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import Layout from '../components/layout';
+import AdminLayout from '../components/Admin/Layout/AdminLayout';
 
 import Home from './Home';
 import Donate from './Donate';
@@ -23,8 +24,17 @@ const Messages = lazy(() => import('./Messages'));
 const ManageProduction = lazy(() => import('./ManageProduction'));
 const Matches = lazy(() => import('./Matches'));
 const NotFound = lazy(() => import('./NotFound'));
+
+// Admin routes
+const AdminDashboard = lazy(() => import('./admin/Dashboard'));
 const AnalyticsDashboard = lazy(
   () => import('../components/Staff/Analytics/Dashboard')
+);
+const UserManagement = lazy(
+  () => import('../components/Admin/Users/UserManagement')
+);
+const OpeningsManagement = lazy(
+  () => import('../components/Admin/Openings/OpeningsManagement')
 );
 
 const AppRoutes = () => {
@@ -59,8 +69,52 @@ const AppRoutes = () => {
           path="/profile/search/talent/:productionId/:roleId?"
           element={<Matches />}
         />
-        <Route path="/staff/analytics" element={<AnalyticsDashboard />} />
+
+        {/* Legacy route - redirect to new admin analytics */}
+        <Route
+          path="/staff/analytics"
+          element={<Navigate to="/staff/admin/analytics" replace />}
+        />
+
         <Route path="*" element={<NotFound />} />
+      </Route>
+
+      {/* Admin routes - separate layout */}
+      <Route path="/staff/admin" element={<AdminLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="analytics" element={<AnalyticsDashboard />} />
+
+        {/* User Management */}
+        <Route path="users" element={<UserManagement />} />
+        <Route
+          path="users/roles"
+          element={<div>Admin Roles - Coming Soon</div>}
+        />
+
+        {/* Company Management */}
+        <Route
+          path="companies"
+          element={<div>Company Management - Coming Soon</div>}
+        />
+        <Route
+          path="companies/requests"
+          element={<div>Company Requests - Coming Soon</div>}
+        />
+        <Route
+          path="companies/productions"
+          element={<div>All Productions - Coming Soon</div>}
+        />
+
+        {/* Openings Management */}
+        <Route path="openings" element={<OpeningsManagement />} />
+        <Route
+          path="openings/moderate"
+          element={<div>Moderate Openings - Coming Soon</div>}
+        />
+        <Route
+          path="openings/matches"
+          element={<div>All Matches - Coming Soon</div>}
+        />
       </Route>
     </Routes>
   );
