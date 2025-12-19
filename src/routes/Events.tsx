@@ -16,6 +16,7 @@ type EventType = {
   price: string;
   image: string;
   externalUrl: string;
+  status?: 'published' | 'draft' | 'cancelled';
 };
 
 /**
@@ -111,13 +112,19 @@ const Events: React.FC = () => {
   }, [firebaseFirestore]);
 
   const now = new Date();
-  const upcomingEvents = events
+
+  // Only show published events (or events without status for backwards compatibility)
+  const publishedEvents = events.filter(
+    (event) => !event.status || event.status === 'published'
+  );
+
+  const upcomingEvents = publishedEvents
     .filter((event) => getEventDateTime(event) >= now)
     .sort(
       (a, b) => getEventDateTime(a).getTime() - getEventDateTime(b).getTime()
     );
 
-  const pastEvents = events
+  const pastEvents = publishedEvents
     .filter((event) => getEventDateTime(event) < now)
     .sort(
       (a, b) => getEventDateTime(b).getTime() - getEventDateTime(a).getTime()
