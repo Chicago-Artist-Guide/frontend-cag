@@ -28,7 +28,7 @@ const OffStageSkills: React.FC<{
           <Bold>General</Bold>
           <Flex>
             {offstage_roles_general?.map((skill: string) => (
-              <SkillBadge>{skill}</SkillBadge>
+              <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
           </Flex>
         </>
@@ -40,7 +40,7 @@ const OffStageSkills: React.FC<{
           <Bold>Production</Bold>
           <Flex>
             {offstage_roles_production?.map((skill: string) => (
-              <SkillBadge>{skill}</SkillBadge>
+              <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
           </Flex>
         </>
@@ -54,7 +54,7 @@ const OffStageSkills: React.FC<{
           <Bold>Scenic</Bold>
           <Flex>
             {offstage_roles_scenic_and_properties?.map((skill: string) => (
-              <SkillBadge>{skill}</SkillBadge>
+              <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
           </Flex>
         </>
@@ -66,7 +66,7 @@ const OffStageSkills: React.FC<{
           <Bold>Lighting</Bold>
           <Flex>
             {offstage_roles_lighting?.map((skill: string) => (
-              <SkillBadge>{skill}</SkillBadge>
+              <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
           </Flex>
         </>
@@ -78,7 +78,7 @@ const OffStageSkills: React.FC<{
           <Bold>Sound</Bold>
           <Flex>
             {offstage_roles_sound?.map((skill: string) => (
-              <SkillBadge>{skill}</SkillBadge>
+              <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
           </Flex>
         </>
@@ -91,7 +91,7 @@ const OffStageSkills: React.FC<{
           <Bold>Hair, Makeup and Costumes</Bold>
           <Flex>
             {offstage_roles_hair_makeup_costumes?.map((skill: string) => (
-              <SkillBadge>{skill}</SkillBadge>
+              <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
           </Flex>
         </>

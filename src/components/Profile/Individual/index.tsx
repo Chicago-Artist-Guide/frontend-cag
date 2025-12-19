@@ -172,7 +172,9 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   useEffect(() => {
-    if (editMode.personalDetails || editMode.headline || editMode.upcoming) {
+    // Don't reset profile data while any section is being edited
+    const isAnyEditModeActive = Object.values(editMode).some(Boolean);
+    if (isAnyEditModeActive) {
       return;
     }
 
@@ -419,19 +421,22 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
     editModeName: keyof EditModeSections
   ) => {
     const newData = editProfile[section];
-    console.log(section);
     if (!newData) {
-      console.log('This is your error');
+      // If no data exists, save an empty array to allow clearing
+      try {
+        if (profile.ref) {
+          await updateDoc(profile.ref, { [section]: [] });
+          setEditMode({ ...editMode, [editModeName]: false });
+        }
+      } catch (err) {
+        console.error('Error updating profile data:', err);
+      }
       return;
     }
     try {
       if (profile.ref) {
         await updateDoc(profile.ref, { [section]: newData });
-
         setEditMode({ ...editMode, [editModeName]: false });
-      } else {
-        // no profile.ref
-        // look up?
       }
     } catch (err) {
       console.error('Error updating profile data:', err);
@@ -467,17 +472,18 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const submitOffStageSkills = async (selectedRoles: any) => {
-    Object.entries(selectedRoles).forEach(async ([key, value]) => {
-      if (profile.ref) {
-        await updateDoc(profile.ref, { [key]: value } as {
-          [key: string]: string;
-        });
-        setEditMode({ ...editMode, offstage_roles: false });
-      } else {
-        // no profile.ref
-        // look up?
-      }
-    });
+    if (!profile.ref) {
+      console.error('No profile ref found');
+      return;
+    }
+
+    try {
+      // Combine all updates into a single updateDoc call
+      await updateDoc(profile.ref, selectedRoles);
+      setEditMode({ ...editMode, offstage_roles: false });
+    } catch (err) {
+      console.error('Error updating off stage skills:', err);
+    }
   };
 
   const onTrainingFieldChange = <T extends keyof TrainingInstitution>(
@@ -490,7 +496,6 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
 
     newTrainings[findIndex][fieldName] = fieldValue;
     setProfileForm('training_institutions', newTrainings);
-    console.log(editProfile);
   };
 
   const removeTrainingBlock = (e: any, id: number) => {
@@ -684,13 +689,26 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
 
   useEffect(() => {
     const newYears = [] as number[];
+    const currentYear = new Date().getFullYear();
 
-    for (let i = 2024; i > 1949; i--) {
+    for (let i = currentYear; i > 1949; i--) {
       newYears.push(i);
     }
 
     setYearOptions(newYears);
   }, []);
+
+  // Initialize awardId from existing awards to avoid ID conflicts
+  useEffect(() => {
+    const existingAwards = profile?.data?.awards as ProfileAwards[] | undefined;
+    if (existingAwards && existingAwards.length > 0) {
+      const maxId = existingAwards.reduce((max, award) => {
+        const id = Number(award?.id) || 0;
+        return id > max ? id : max;
+      }, 0);
+      setAwardId(maxId);
+    }
+  }, [profile?.data?.awards]);
 
   const onAwardInputChange = <T extends keyof ProfileAwards>(
     fieldValue: ProfileAwards[T],
@@ -767,31 +785,39 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
       </Row>
       <Row>
         <Col lg={4} xs={12}>
-          <ImageUploadComponent
-            onSave={(pfpImgUrl: string) => saveProfilePicture(pfpImgUrl)}
-            currentImageUrl={profile?.data?.profile_image_url}
-            imageType="user"
-            showCrop={true}
-            maxSizeInMB={5}
-          />
+          {previewMode ? (
+            <ProfileImage src={profile?.data?.profile_image_url} fluid />
+          ) : (
+            <ImageUploadComponent
+              onSave={(pfpImgUrl: string) => saveProfilePicture(pfpImgUrl)}
+              currentImageUrl={profile?.data?.profile_image_url}
+              imageType="user"
+              showCrop={true}
+              maxSizeInMB={5}
+            />
+          )}
           <DetailsCard>
             <DetailsColTitle>
               <div>
                 Personal Details
-                <a
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(
-                      e,
-                      'personalDetails',
-                      !editMode['personalDetails']
-                    )
-                  }
-                >
-                  <FontAwesomeIcon
-                    icon={editMode['personalDetails'] ? faXmark : faPenToSquare}
-                  />
-                </a>
+                {!previewMode && (
+                  <a
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) =>
+                      onEditModeClick(
+                        e,
+                        'personalDetails',
+                        !editMode['personalDetails']
+                      )
+                    }
+                  >
+                    <FontAwesomeIcon
+                      icon={
+                        editMode['personalDetails'] ? faXmark : faPenToSquare
+                      }
+                    />
+                  </a>
+                )}
               </div>
             </DetailsColTitle>
             {editMode['personalDetails'] ? (
@@ -878,31 +904,35 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
               </>
             )}
           </DetailsCard>
-          <DetailsCard>
-            <DetailsColTitle>
-              <div>Menu</div>
-            </DetailsColTitle>
-            <div>
-              <a href="/profile/search/roles">Find Roles</a>
-            </div>
-            <div>
-              <a href="/profile/messages">Messages</a>
-            </div>
-          </DetailsCard>
+          {!previewMode && (
+            <DetailsCard>
+              <DetailsColTitle>
+                <div>Menu</div>
+              </DetailsColTitle>
+              <div>
+                <a href="/profile/search/roles">Find Roles</a>
+              </div>
+              <div>
+                <a href="/profile/messages">Messages</a>
+              </div>
+            </DetailsCard>
+          )}
         </Col>
         <Col lg={8} xs={12}>
           <div>
-            <EditLink
-              href="#"
-              onClick={(e: React.MouseEvent<HTMLElement>) =>
-                onEditModeClick(e, 'headline', !editMode['headline'])
-              }
-            >
-              <FontAwesomeIcon
-                icon={editMode['headline'] ? faXmark : faPenToSquare}
-              />
-            </EditLink>
-            {editMode['headline'] ? (
+            {!previewMode && (
+              <EditLink
+                href="#"
+                onClick={(e: React.MouseEvent<HTMLElement>) =>
+                  onEditModeClick(e, 'headline', !editMode['headline'])
+                }
+              >
+                <FontAwesomeIcon
+                  icon={editMode['headline'] ? faXmark : faPenToSquare}
+                />
+              </EditLink>
+            )}
+            {!previewMode && editMode['headline'] ? (
               <div>
                 <CAGLabel>Edit Profile</CAGLabel>
                 <InputField
@@ -1071,14 +1101,33 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <AddLink
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(e, 'training', !editMode['training'])
-                  }
-                >
-                  + Add Training
-                </AddLink>
+                {!previewMode && (
+                  <AddLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) => {
+                      e.preventDefault();
+                      // Auto-add first entry if none exist
+                      if (
+                        !editProfile?.training_institutions ||
+                        editProfile.training_institutions.length === 0
+                      ) {
+                        const newTrainingId = trainingId + 1;
+                        setTrainingId(newTrainingId);
+                        setProfileForm('training_institutions', [
+                          {
+                            id: newTrainingId,
+                            trainingYear: '',
+                            trainingInstitution: '',
+                            trainingDegree: ''
+                          }
+                        ]);
+                      }
+                      setEditMode({ ...editMode, training: true });
+                    }}
+                  >
+                    + Add Training
+                  </AddLink>
+                )}
               </>
             )}
             <hr />
@@ -1137,14 +1186,39 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <AddLink
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(e, 'upcoming', !editMode['upcoming'])
-                  }
-                >
-                  + Add Upcoming Features
-                </AddLink>
+                {!previewMode && (
+                  <AddLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) => {
+                      e.preventDefault();
+                      // Auto-add first entry if none exist
+                      if (
+                        !editProfile?.upcoming_performances ||
+                        editProfile.upcoming_performances.length === 0
+                      ) {
+                        const newShowId = upcomingId + 1;
+                        setShowUpcomingId(newShowId);
+                        setProfileForm('upcoming_performances', [
+                          {
+                            id: newShowId,
+                            title: '',
+                            group: '',
+                            location: '',
+                            startDate: '',
+                            endDate: '',
+                            url: '',
+                            role: '',
+                            director: '',
+                            musicalDirector: ''
+                          }
+                        ]);
+                      }
+                      setEditMode({ ...editMode, upcoming: true });
+                    }}
+                  >
+                    + Add Upcoming Features
+                  </AddLink>
+                )}
               </>
             )}
             <hr />
@@ -1202,14 +1276,39 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <AddLink
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(e, 'past', !editMode['past'])
-                  }
-                >
-                  + Add Previous Productions
-                </AddLink>
+                {!previewMode && (
+                  <AddLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) => {
+                      e.preventDefault();
+                      // Auto-add first entry if none exist
+                      if (
+                        !editProfile?.past_performances ||
+                        editProfile.past_performances.length === 0
+                      ) {
+                        const newShowId = showPastId + 1;
+                        setShowPastId(newShowId);
+                        setProfileForm('past_performances', [
+                          {
+                            id: newShowId,
+                            title: '',
+                            group: '',
+                            location: '',
+                            startDate: '',
+                            endDate: '',
+                            url: '',
+                            role: '',
+                            director: '',
+                            musicalDirector: ''
+                          }
+                        ]);
+                      }
+                      setEditMode({ ...editMode, past: true });
+                    }}
+                  >
+                    + Add Previous Productions
+                  </AddLink>
+                )}
               </>
             )}
             <hr />
@@ -1295,14 +1394,16 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <AddLink
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(e, 'skills', !editMode['skills'])
-                  }
-                >
-                  + Add Skills
-                </AddLink>
+                {!previewMode && (
+                  <AddLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) =>
+                      onEditModeClick(e, 'skills', !editMode['skills'])
+                    }
+                  >
+                    + Add Skills
+                  </AddLink>
+                )}
               </>
             )}
             <hr />
@@ -1324,6 +1425,9 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     profile?.data?.offstage_roles_hair_makeup_costumes
                   }
                   submitOffStageSkills={submitOffStageSkills}
+                  onCancel={() =>
+                    setEditMode({ ...editMode, offstage_roles: false })
+                  }
                 />
               </>
             ) : (
@@ -1357,18 +1461,20 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <AddLink
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(
-                      e,
-                      'offstage_roles',
-                      !editMode['offstage_roles']
-                    )
-                  }
-                >
-                  + Add Off Stage Roles
-                </AddLink>
+                {!previewMode && (
+                  <AddLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) =>
+                      onEditModeClick(
+                        e,
+                        'offstage_roles',
+                        !editMode['offstage_roles']
+                      )
+                    }
+                  >
+                    + Add Off Stage Roles
+                  </AddLink>
+                )}
               </>
             )}
             <hr />
@@ -1389,7 +1495,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                           )
                         }
                         placeholder="Award or Recognition"
-                        value={awardRow.title}
+                        value={awardRow.title || ''}
                       />
                       <CAGFormControl
                         as="select"
@@ -1401,14 +1507,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                             awardRow.id
                           )
                         }
-                        value={awardRow.year}
+                        value={String(awardRow.year || '')}
                       >
-                        <option disabled selected value="">
-                          Year Received
-                        </option>
-                        {yearOptions.map((year) => {
-                          return <option value={year}>{year}</option>;
-                        })}
+                        <option value="">Year Received</option>
+                        {yearOptions.map((year) => (
+                          <option key={year} value={String(year)}>
+                            {year}
+                          </option>
+                        ))}
                       </CAGFormControl>
                       {editProfile?.awards?.length > 1 && (
                         <CAGButton>
@@ -1466,14 +1572,34 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                     />
                   </DetailSection>
                 )}
-                <AddLink
-                  href="#"
-                  onClick={(e: React.MouseEvent<HTMLElement>) =>
-                    onEditModeClick(e, 'awards', !editMode['awards'])
-                  }
-                >
-                  + Add Awards &amp; Recognition
-                </AddLink>
+                {!previewMode && (
+                  <AddLink
+                    href="#"
+                    onClick={(e: React.MouseEvent<HTMLElement>) => {
+                      e.preventDefault();
+                      // Auto-add first award if none exist
+                      if (
+                        !editProfile?.awards ||
+                        editProfile.awards.length === 0
+                      ) {
+                        const newAwardId = awardId + 1;
+                        setAwardId(newAwardId);
+                        setProfileForm('awards', [
+                          {
+                            id: newAwardId,
+                            title: '',
+                            year: '',
+                            url: '',
+                            description: ''
+                          }
+                        ]);
+                      }
+                      setEditMode({ ...editMode, awards: true });
+                    }}
+                  >
+                    + Add Awards &amp; Recognition
+                  </AddLink>
+                )}
               </>
             )}
           </div>

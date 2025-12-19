@@ -10,12 +10,16 @@ interface PartnerSliderProps {
   partners: Partner[];
   autoSlideInterval?: number;
   itemsPerSlide?: number;
+  staticMode?: boolean;
+  showCards?: boolean;
 }
 
 const PartnerSlider: React.FC<PartnerSliderProps> = ({
   partners,
   autoSlideInterval = 5000,
-  itemsPerSlide = 3
+  itemsPerSlide = 3,
+  staticMode = false,
+  showCards = true
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
@@ -73,6 +77,38 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
   // Show navigation only if we have more partners than we can display at once
   const showNavigation = partners.length > itemsPerView;
 
+  // Static mode: render a simple grid without carousel
+  if (staticMode) {
+    return (
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 md:gap-6 lg:grid-cols-4 lg:gap-8">
+          {partners.map((partner, index) => (
+            <div
+              key={index}
+              className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition-all duration-300 hover:shadow-lg"
+              onMouseEnter={() => setHoveredPartner(index)}
+              onMouseLeave={() => setHoveredPartner(null)}
+              style={{ aspectRatio: '16/9', minHeight: '140px', width: '100%' }}
+            >
+              <a
+                href={partner.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex h-full w-full items-center justify-center transition-transform duration-300 group-hover:scale-105"
+              >
+                <img
+                  src={partner.src}
+                  alt={partner.alt}
+                  className="h-full w-full rounded-xl object-contain p-4"
+                />
+              </a>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="mx-auto w-full max-w-7xl"
@@ -93,7 +129,7 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
             {Array.from({ length: totalSlides }).map((_, slideIndex) => (
               <div
                 key={slideIndex}
-                className="flex justify-center gap-x-12"
+                className="flex justify-center gap-6"
                 style={{ width: `${100 / totalSlides}%` }}
               >
                 {partners
@@ -104,28 +140,56 @@ const PartnerSlider: React.FC<PartnerSliderProps> = ({
                   .map((partner, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-center p-4"
+                      className="flex items-center justify-center"
                       onMouseEnter={() =>
                         setHoveredPartner(slideIndex * itemsPerView + index)
                       }
                       onMouseLeave={() => setHoveredPartner(null)}
                     >
-                      <a
-                        href={partner.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`flex justify-center transition-all duration-300 ${
-                          hoveredPartner === slideIndex * itemsPerView + index
-                            ? 'scale-105 transform rounded-lg shadow-lg'
-                            : ''
-                        }`}
-                      >
-                        <img
-                          src={partner.src}
-                          alt={partner.alt}
-                          className="max-h-[150px] w-auto object-contain p-4"
-                        />
-                      </a>
+                      {showCards ? (
+                        <div
+                          className={`rounded-xl bg-white p-6 shadow-sm transition-all duration-300 ${
+                            hoveredPartner === slideIndex * itemsPerView + index
+                              ? 'scale-105 shadow-lg'
+                              : 'hover:shadow-lg'
+                          }`}
+                          style={{
+                            minHeight: '140px',
+                            width: '100%',
+                            maxWidth: '280px'
+                          }}
+                        >
+                          <a
+                            href={partner.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-full w-full items-center justify-center"
+                          >
+                            <img
+                              src={partner.src}
+                              alt={partner.alt}
+                              className="max-h-[150px] w-auto object-contain"
+                            />
+                          </a>
+                        </div>
+                      ) : (
+                        <a
+                          href={partner.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`flex justify-center transition-all duration-300 ${
+                            hoveredPartner === slideIndex * itemsPerView + index
+                              ? 'scale-105 transform rounded-lg shadow-lg'
+                              : ''
+                          }`}
+                        >
+                          <img
+                            src={partner.src}
+                            alt={partner.alt}
+                            className="max-h-[150px] w-auto object-contain p-4"
+                          />
+                        </a>
+                      )}
                     </div>
                   ))}
               </div>

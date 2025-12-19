@@ -14,7 +14,7 @@ const FeaturesEdit: React.FC<{
   return (
     <Container>
       {features?.map((credit: any) => (
-        <>
+        <div key={credit.id}>
           <Form>
             <InputField
               name="title"
@@ -22,7 +22,7 @@ const FeaturesEdit: React.FC<{
                 onCreditFieldChange('title', e.target.value, credit.id)
               }
               placeholder="Show Title"
-              value={credit.title}
+              value={credit.title || ''}
             />
             <InputField
               name="group"
@@ -30,7 +30,7 @@ const FeaturesEdit: React.FC<{
                 onCreditFieldChange('group', e.target.value, credit.id)
               }
               placeholder="Theatre Group"
-              value={credit.group}
+              value={credit.group || ''}
             />
             <InputField
               name="year"
@@ -38,7 +38,7 @@ const FeaturesEdit: React.FC<{
                 onCreditFieldChange('year', e.target.value, credit.id)
               }
               placeholder="Year"
-              value={credit.year}
+              value={credit.year || ''}
             />
             <InputField
               name="role"
@@ -46,7 +46,7 @@ const FeaturesEdit: React.FC<{
                 onCreditFieldChange('role', e.target.value, credit.id)
               }
               placeholder="Role/Position"
-              value={credit.role}
+              value={credit.role || ''}
             />
             <InputField
               name="director"
@@ -54,7 +54,7 @@ const FeaturesEdit: React.FC<{
                 onCreditFieldChange('director', e.target.value, credit.id)
               }
               placeholder="Director"
-              value={credit.director}
+              value={credit.director || ''}
             />
             <InputField
               name="musicalDirector"
@@ -66,7 +66,7 @@ const FeaturesEdit: React.FC<{
                 )
               }
               placeholder="Musical Director"
-              value={credit.musicalDirector}
+              value={credit.musicalDirector || ''}
             />
           </Form>
           {features?.length > 1 && (
@@ -78,7 +78,7 @@ const FeaturesEdit: React.FC<{
             </DeleteRowLink>
           )}
           <Divider />
-        </>
+        </div>
       ))}
     </Container>
   );

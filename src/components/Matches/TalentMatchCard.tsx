@@ -243,25 +243,26 @@ export const TalentMatchCard = ({
           </button>
         </div>
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
-          <div>Ethnicity</div>
+          <div>Union(s)</div>
           <div className="font-semibold">
-            {profile.ethnicities?.join(', ') || 'N/A'}
-          </div>
-          <div>Age Range</div>
-          <div className="font-semibold">
-            {profile.age_ranges?.join(', ') || 'N/A'}
-          </div>
-          <div>Gender</div>
-          <div className="font-semibold">
-            {profile.gender_identity || 'N/A'}
+            {profile.union_status?.join(', ') || 'N/A'}
           </div>
           <div>Special Skills</div>
           <div className="font-semibold">
-            {profile.additional_skills_checkboxes?.join(', ')}{' '}
-            {profile.additional_skills_manual?.join(', ')}
+            {[
+              ...(profile.additional_skills_checkboxes || []),
+              ...(profile.additional_skills_manual || [])
+            ].join(', ') || 'N/A'}
           </div>
-          <div>Other</div>
-          <div className="font-semibold">N/A</div>
+          {profile.offstage_roles_general &&
+            profile.offstage_roles_general.length > 0 && (
+              <>
+                <div>Offstage Positions</div>
+                <div className="font-semibold">
+                  {profile.offstage_roles_general.join(', ')}
+                </div>
+              </>
+            )}
         </div>
       </div>
       <div className="flex flex-none flex-row lg:flex-col">

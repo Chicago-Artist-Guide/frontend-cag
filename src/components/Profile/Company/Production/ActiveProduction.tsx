@@ -6,7 +6,10 @@ import { Button } from '../../../../components/shared';
 import { breakpoints, colors, fonts } from '../../../../theme/styleVars';
 import { Production } from '../types';
 
-const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
+const ActiveProduction: React.FC<{
+  show: Production;
+  previewMode?: boolean;
+}> = ({ show, previewMode = false }) => {
   const navigate = useNavigate();
   const roles = show?.roles ?? [];
   const hasRoles = roles?.length > 0;
@@ -34,21 +37,23 @@ const ActiveProduction: React.FC<{ show: Production }> = ({ show }) => {
               <ShowStatus>{show?.status}</ShowStatus>
               <ShowDescription>{show?.description}</ShowDescription>
             </div>
-            <ButtonContainer className="d-flex flex-shrink-1 flex-column flex-md-row">
-              <ShowButton
-                onClick={manageProduction}
-                text="Manage"
-                type="button"
-                variant="primary"
-              />
-              <ShowButton
-                disabled={!hasRoles}
-                onClick={viewMatches}
-                text="View Matches"
-                type="button"
-                variant="primary"
-              />
-            </ButtonContainer>
+            {!previewMode && (
+              <ButtonContainer className="d-flex flex-shrink-1 flex-column flex-md-row">
+                <ShowButton
+                  onClick={manageProduction}
+                  text="Manage"
+                  type="button"
+                  variant="primary"
+                />
+                <ShowButton
+                  disabled={!hasRoles}
+                  onClick={viewMatches}
+                  text="View Matches"
+                  type="button"
+                  variant="primary"
+                />
+              </ButtonContainer>
+            )}
           </div>
         </RightCol>
       </Row>

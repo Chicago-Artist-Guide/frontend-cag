@@ -24,17 +24,11 @@ export const CompanyMatchesFilterBar = () => {
             ? profileData?.stage_role
             : 'All Roles'}
         </span>
-        <div className="sm:col-span-1">Ethnicites</div>
+        <div className="sm:col-span-1">Union Status</div>
         <span className="col-span-1 font-bold sm:col-span-2">
-          {profileData?.ethnicities?.join(', ') || 'All Ethnicities'}
-        </span>
-        <div className="sm:col-span-1">Age Ranges</div>
-        <span className="col-span-1 font-bold sm:col-span-2">
-          {profileData?.age_ranges?.join(', ') || 'All Age Ranges'}
-        </span>
-        <div className="sm:col-span-1">Gender Identity</div>
-        <span className="col-span-1 font-bold sm:col-span-2">
-          {profileData?.gender_identity || 'Any'}
+          {profileData?.union_status && profileData.union_status.length > 0
+            ? profileData.union_status.join(', ')
+            : 'All Options'}
         </span>
         <div className="sm:col-span-1">Union Status</div>
         <span className="col-span-1 font-bold sm:col-span-2">

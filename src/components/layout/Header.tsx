@@ -4,17 +4,16 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
-import { useStaffAuth } from '../../hooks/useStaffAuth';
+import { useAdminAuth } from '../../hooks/useAdminAuth';
 import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
-import { zeffyUrl } from '../../utils/marketing';
 
 const Header = () => {
   const { currentUser } = useUserContext();
   const {
     profile: { ref: profileRef }
   } = useUserContext();
-  const { isStaff } = useStaffAuth();
+  const { isAdmin, adminRole } = useAdminAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
@@ -94,8 +93,11 @@ const Header = () => {
           {/* <Nav.Link as={Link} to="/shows" onClick={handleNavClick}>
             SHOWS
           </Nav.Link> */}
-          <Nav.Link href={zeffyUrl} onClick={handleNavClick}>
+          <Nav.Link as={Link} to="/donate" onClick={handleNavClick}>
             DONATE
+          </Nav.Link>
+          <Nav.Link as={Link} to="/get-involved" onClick={handleNavClick}>
+            GET INVOLVED
           </Nav.Link>
           <Nav.Link as={Link} to="/events" onClick={handleNavClick}>
             EVENTS
@@ -121,9 +123,9 @@ const Header = () => {
               </Nav.Link>
             </>
           )}
-          {isStaff && (
-            <Nav.Link as={Link} to="/staff/analytics" onClick={handleNavClick}>
-              ANALYTICS
+          {isAdmin && (
+            <Nav.Link as={Link} to="/admin" onClick={handleNavClick}>
+              ADMIN
             </Nav.Link>
           )}
           {currentUser !== null && (

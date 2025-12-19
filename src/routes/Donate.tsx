@@ -1,147 +1,204 @@
 import React from 'react';
 import styled from 'styled-components';
 import PageContainer from '../components/layout/PageContainer';
-import SVGLayer from '../components/SVGLayer';
-import homeDance from '../images/home_dance.svg';
+import PartnerSlider from '../components/Redesign/PartnerSlider';
+import { breakpoints, colors, fonts } from '../theme/styleVars';
+import { zeffyUrl } from '../utils/marketing';
+
+// Additional sponsor images (for other sections)
 import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
 import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
-import SponsorLawLynx from '../images/sponsors/lawlynx.jpg';
 import SponsorLetsRoam from '../images/sponsors/lets_roam_logo_horizontal_v3.jpg';
-import SponsorGios from '../images/sponsors/gios.jpg';
-import yellowBlob1 from '../images/yellow_blob_1.svg';
-import { breakpoints } from '../theme/styleVars';
-import { zeffyUrl } from '../utils/marketing';
+
+import { supporters as corporateSponsors } from '../utils/supporters';
+
+// Donate impact icons
+import KeysIcon from '../images/donate/keys.png';
+import StageBowIcon from '../images/donate/stage_bow.png';
+import CoinsIcon from '../images/donate/coins.png';
+import SignBoardIcon from '../images/donate/sign_board.png';
+import LaptopIcon from '../images/donate/laptop.png';
+import StageLightIcon from '../images/donate/stage_light.png';
 
 const Donate = () => {
   return (
-    <PageContainer>
+    <PageContainer className="!px-0 !py-0">
       <ContentWrapper>
-        {/* Header Section */}
-        <HeaderSection>
+        {/* Hero Section */}
+        <HeroSectionWrapper>
           <HeroSection>
             <HeroContent>
-              <PageTitle>DONATE</PageTitle>
-              <Tagline>Support Us</Tagline>
-              <DividerBar />
-              <HeroText>
-                Chicago Artist Guide is building an online platform that will
-                connect theatres with artists and help them diversify their
-                casting and hiring. Thank you for supporting our efforts to
-                foster and support a more diversified Chicago theatre community!
-              </HeroText>
+              <PageTitle>Donate to Support Chicago Artists</PageTitle>
+              <HeroSubtitle>
+                Chicago Artist Guide connects local theatre companies with
+                diverse on- and off-stage talent — building a more inclusive and
+                representative creative community.
+              </HeroSubtitle>
+              <HeroDescription>
+                Your donation helps us keep the platform free for artists and
+                theatres while funding outreach, education, and community
+                programming.
+              </HeroDescription>
+              <HeroBoldText>
+                Every dollar goes directly toward supporting our mission — and
+                thanks to our ZERO-FEE donation processor powered by Zeffy, your
+                full contribution reaches us.
+              </HeroBoldText>
             </HeroContent>
-            <HeroGraphic>
-              <SVGLayer blob={yellowBlob1} dancer={homeDance} />
-            </HeroGraphic>
+
+            <DonationSidebar>
+              <SidebarText>
+                Donate securely through our form which accepts credit cards,
+                debit cards, Apple Pay, Google Pay, checks and bank transfers.
+              </SidebarText>
+              <DonateButton
+                href={zeffyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Donate Securely Now
+                <ArrowIcon>↗</ArrowIcon>
+              </DonateButton>
+              <TaxDeductibleText>
+                Chicago Artist Guide NFP is a 501(c)(3) and donations are tax
+                deductible to the fullest extent of the law.
+              </TaxDeductibleText>
+            </DonationSidebar>
           </HeroSection>
-        </HeaderSection>
+        </HeroSectionWrapper>
 
-        {/* Donation Section */}
-        <DonationSection>
-          <SectionTitle>Two Ways to Give</SectionTitle>
+        {/* Mobile Sticky CTA */}
+        <StickyDonateCTA
+          href={zeffyUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Donate Securely Now
+          <ArrowIcon>↗</ArrowIcon>
+        </StickyDonateCTA>
 
-          <DonationMethodsWrapper>
-            <OnlineDonationSection>
-              <MethodTitle>
-                <strong>1. Online:</strong>
-              </MethodTitle>
-              <IFrameWrapper>
-                <DonationIFrame
-                  allowTransparency
-                  allow="payment"
-                  title="Donate to Chicago Artist Guide online. Donation form powered by Zeffy."
-                  src={zeffyUrl}
-                >
-                  <a href={zeffyUrl} target="_blank" rel="noopener noreferrer">
-                    Click here to donate to CAG on Zeffy!
-                  </a>
-                </DonationIFrame>
-              </IFrameWrapper>
-            </OnlineDonationSection>
+        {/* Where Your Donation Goes Section */}
+        <WhereItGoesSection>
+          <SectionContentWrapper>
+            <SectionTitle>Where your donation goes</SectionTitle>
+            <ImpactLayoutWrapper>
+              <ImpactColumn>
+                <ImpactCard>
+                  <IconWrapper>
+                    <img src={KeysIcon} alt="Keys" />
+                  </IconWrapper>
+                  <ImpactContent>
+                    <ImpactTitle>Artist Access</ImpactTitle>
+                    <ImpactDescription>
+                      Maintaining a free, inclusive talent platform
+                    </ImpactDescription>
+                  </ImpactContent>
+                </ImpactCard>
 
-            <MailDonationSection>
-              <MethodTitle>
-                <strong>2. OR by mail:</strong>
-              </MethodTitle>
-              <MailInfo>
-                <MailLabel>
-                  <em>Mail a check to:</em>
-                </MailLabel>
-                <AddressBlock>
-                  Chicago Artist Guide
-                  <br />
-                  c/o Anna Schutz
-                  <br />
-                  4814 N Damen Ave 212
-                  <br />
-                  Chicago, IL 60625
-                </AddressBlock>
-              </MailInfo>
-            </MailDonationSection>
-          </DonationMethodsWrapper>
+                <ImpactCard>
+                  <IconWrapper>
+                    <img src={SignBoardIcon} alt="Sign Board" />
+                  </IconWrapper>
+                  <ImpactContent>
+                    <ImpactTitle>Community Programs</ImpactTitle>
+                    <ImpactDescription>
+                      Workshops and networking for emerging artists
+                    </ImpactDescription>
+                  </ImpactContent>
+                </ImpactCard>
 
-          <TaxDeductibleNote>
-            <em>
-              Chicago Artist Guide NFP is a 501(c)(3) and donations are tax
-              deductible to the fullest extent of the law.
-            </em>
-          </TaxDeductibleNote>
-        </DonationSection>
+                <ImpactCard>
+                  <IconWrapper>
+                    <img src={CoinsIcon} alt="Coins" />
+                  </IconWrapper>
+                  <ImpactContent>
+                    <ImpactTitle>Pay Equity</ImpactTitle>
+                    <ImpactDescription>
+                      Ensure our team is paid fairly for their time
+                    </ImpactDescription>
+                  </ImpactContent>
+                </ImpactCard>
+              </ImpactColumn>
 
-        {/* Sponsors Section */}
+              <CenterImageWrapper>
+                <img src={StageBowIcon} alt="Theater Stage" />
+              </CenterImageWrapper>
+
+              <ImpactColumn>
+                <ImpactCard>
+                  <IconWrapper>
+                    <img src={StageLightIcon} alt="Stage Light" />
+                  </IconWrapper>
+                  <ImpactContent>
+                    <ImpactTitle>Theatre Diversity</ImpactTitle>
+                    <ImpactDescription>
+                      Tools and resources for equitable casting
+                    </ImpactDescription>
+                  </ImpactContent>
+                </ImpactCard>
+
+                <ImpactCard>
+                  <IconWrapper>
+                    <img src={LaptopIcon} alt="Laptop" />
+                  </IconWrapper>
+                  <ImpactContent>
+                    <ImpactTitle>Technology & Accessibility</ImpactTitle>
+                    <ImpactDescription>
+                      Ongoing improvements to make the site more user-friendly
+                      and inclusive
+                    </ImpactDescription>
+                  </ImpactContent>
+                </ImpactCard>
+              </ImpactColumn>
+            </ImpactLayoutWrapper>
+          </SectionContentWrapper>
+        </WhereItGoesSection>
+
+        {/* Corporate Sponsorship Opportunities Section */}
+        <CorporateSponsorshipSection>
+          <SectionContentWrapper>
+            <SectionTitle>Corporate Sponsorship Opportunities</SectionTitle>
+            <SponsorshipGrid>
+              <SponsorshipColumn>
+                <SponsorshipText>
+                  Is your company looking to support Diversity, Equity, and
+                  Inclusion, the arts, and Chicago economic growth? We want to
+                  work with you! For as little as $500 a year, you can take part
+                  of CAG's community programming, social media and email
+                  marketing, and promotion at our annual "A Night at the
+                  CAG-Baret" gala.
+                </SponsorshipText>
+              </SponsorshipColumn>
+              <SponsorshipColumn>
+                <WaysToHelpTitle>Other ways you can help:</WaysToHelpTitle>
+                <WaysToHelpList>
+                  <li>
+                    In-kind donations (silent auction items, free space for
+                    events)
+                  </li>
+                  <li>Sharing this with other potential sponsor companies</li>
+                  <li>
+                    Checking if your company offers any grant, volunteer, or
+                    matching benefits
+                  </li>
+                </WaysToHelpList>
+              </SponsorshipColumn>
+            </SponsorshipGrid>
+            <ContactInfo>
+              For more information please contact our Executive Director,{' '}
+              <a href="mailto:anna@chicagoartistguide.org">Anna Schutz</a>.
+            </ContactInfo>
+          </SectionContentWrapper>
+        </CorporateSponsorshipSection>
+
+        {/* Sponsors Carousel Section */}
         <SponsorsSection>
-          <SectionDivider />
-          <SectionTitle>Thank You to Our Generous Supporters</SectionTitle>
-          <SponsorsGrid>
-            <SponsorItem>
-              <SponsorLink
-                href="https://www.letsroam.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SponsorImage src={SponsorLetsRoam} alt="Let's Roam" />
-              </SponsorLink>
-            </SponsorItem>
-            <SponsorItem>
-              <SponsorLink
-                href="https://cliff-chicago.org/foundation/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SponsorImage src={SponsorCliffLogo} alt="Cliff Foundation" />
-              </SponsorLink>
-            </SponsorItem>
-            <SponsorItem>
-              <SponsorLink
-                href="https://callforculture.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SponsorImage
-                  src={SponsorCallForCulture}
-                  alt="Call for Culture"
-                />
-              </SponsorLink>
-            </SponsorItem>
-            <SponsorItem>
-              <SponsorLink
-                href="https://thelynxverse.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SponsorImage src={SponsorLawLynx} alt="Law Lynx" />
-              </SponsorLink>
-            </SponsorItem>
-            <SponsorItem>
-              <SponsorLink
-                href="https://giosbbqbarandgrill.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <SponsorImage src={SponsorGios} alt="Gio's BBQ Bar and Grill" />
-              </SponsorLink>
-            </SponsorItem>
-          </SponsorsGrid>
+          <SectionContentWrapper>
+            <SectionTitle>Chicago Artist Guide is Supported By</SectionTitle>
+            <CarouselWrapper>
+              <PartnerSlider partners={corporateSponsors} staticMode={true} />
+            </CarouselWrapper>
+          </SectionContentWrapper>
         </SponsorsSection>
       </ContentWrapper>
     </PageContainer>
@@ -150,15 +207,21 @@ const Donate = () => {
 
 export default Donate;
 
+// Styled Components
 const ContentWrapper = styled.div`
   max-width: 100%;
 `;
 
-const HeaderSection = styled.div`
-  margin-bottom: 48px;
+const HeroSectionWrapper = styled.div`
+  background: ${colors.white};
+  padding: 48px 24px;
 
-  @media (min-width: 768px) {
-    margin-bottom: 64px;
+  @media (min-width: ${breakpoints.md}) {
+    padding: 64px 48px;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    padding: 80px 64px;
   }
 `;
 
@@ -166,282 +229,473 @@ const HeroSection = styled.div`
   display: flex;
   flex-direction: column;
   gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
 
-  @media (min-width: 1024px) {
+  @media (min-width: ${breakpoints.md}) {
     flex-direction: row;
-    align-items: flex-start;
     gap: 48px;
+    align-items: flex-start;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    gap: 64px;
   }
 `;
 
 const HeroContent = styled.div`
   flex: 2;
-  text-align: center;
-
-  @media (min-width: 1024px) {
-    text-align: left;
-  }
-`;
-
-const HeroGraphic = styled.div`
-  flex: 1;
-  display: none;
-
-  @media (min-width: 1024px) {
-    display: block;
-  }
 `;
 
 const PageTitle = styled.h1`
+  font-family: ${fonts.montserrat};
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 16px;
-  color: #2f4550;
-  text-transform: uppercase;
-
-  @media (min-width: 640px) {
-    font-size: 2.5rem;
-    margin-bottom: 20px;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 3rem;
-    margin-bottom: 24px;
-  }
-`;
-
-const Tagline = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 400;
+  color: ${colors.secondaryFontColor};
   margin-bottom: 24px;
-  color: #666;
+  line-height: 1.2;
 
-  @media (min-width: 640px) {
-    font-size: 1.5rem;
-    margin-bottom: 32px;
+  @media (min-width: ${breakpoints.sm}) {
+    font-size: 2.5rem;
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 3rem;
   }
 `;
 
-const DividerBar = styled.div`
-  width: 100%;
-  max-width: 200px;
-  height: 3px;
-  border-radius: 2px;
-  margin: 0 auto 32px auto;
-  background-image: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
-
-  @media (min-width: 640px) {
-    max-width: 250px;
-    height: 4px;
-    margin-bottom: 40px;
-  }
-
-  @media (min-width: 768px) {
-    max-width: 300px;
-  }
-
-  @media (min-width: 1024px) {
-    margin-left: 0;
-  }
-`;
-
-const HeroText = styled.p`
+const HeroSubtitle = styled.p`
+  font-family: ${fonts.mainFont};
   font-size: 1rem;
   line-height: 1.6;
-  color: #444;
-  margin: 0;
+  color: ${colors.mainFont};
+  margin-bottom: 20px;
 
-  @media (min-width: 640px) {
-    font-size: 1.1rem;
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.125rem;
     line-height: 1.7;
   }
+`;
 
-  @media (min-width: 768px) {
+const HeroDescription = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 1rem;
+  line-height: 1.6;
+  color: ${colors.mainFont};
+  margin-bottom: 20px;
+
+  @media (min-width: ${breakpoints.md}) {
     font-size: 1.125rem;
+    line-height: 1.7;
   }
 `;
 
-const DonationSection = styled.div`
-  margin-bottom: 64px;
-
-  @media (min-width: 768px) {
-    margin-bottom: 80px;
-  }
-`;
-
-const SectionTitle = styled.h2`
-  font-size: 1.75rem;
+const HeroBoldText = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 1rem;
   font-weight: 700;
-  margin-bottom: 32px;
-  color: #2f4550;
-  text-align: center;
+  line-height: 1.6;
+  color: ${colors.mainFont};
+  margin: 0;
 
-  @media (min-width: 640px) {
-    font-size: 2rem;
-    margin-bottom: 40px;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 2.25rem;
-    margin-bottom: 48px;
-    text-align: left;
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.125rem;
+    line-height: 1.7;
   }
 `;
 
-const DonationMethodsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 48px;
-
-  @media (min-width: 1024px) {
-    flex-direction: row;
-    gap: 64px;
-    align-items: flex-start;
-  }
-`;
-
-const OnlineDonationSection = styled.div`
-  flex: 2;
-`;
-
-const MailDonationSection = styled.div`
+const DonationSidebar = styled.div`
   flex: 1;
-  background: #f8f9fa;
+  background: ${colors.bodyBg};
   border-radius: 12px;
-  padding: 24px;
+  padding: 28px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: none;
 
-  @media (min-width: 640px) {
+  @media (min-width: ${breakpoints.md}) {
+    display: block;
     padding: 32px;
   }
 `;
 
-const MethodTitle = styled.h3`
-  font-size: 1.25rem;
+const SidebarText = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: ${colors.mainFont};
   margin-bottom: 24px;
-  color: #2f4550;
 
-  @media (min-width: 640px) {
-    font-size: 1.375rem;
-    margin-bottom: 32px;
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1rem;
   }
 `;
 
-const IFrameWrapper = styled.div`
-  width: 100%;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-`;
-
-const DonationIFrame = styled.iframe`
-  width: 100%;
-  border: none;
-  height: 1620px;
-
-  @media screen and (max-width: ${breakpoints.sm}) {
-    height: 1740px;
-  }
-
-  @media screen and (max-width: 480px) {
-    height: 1800px;
-  }
-`;
-
-const MailInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const MailLabel = styled.p`
-  font-size: 1rem;
-  margin: 0;
-  color: #666;
-`;
-
-const AddressBlock = styled.p`
-  font-size: 1rem;
-  line-height: 1.6;
-  margin: 0;
-  color: #2f4550;
-  font-weight: 500;
-`;
-
-const TaxDeductibleNote = styled.div`
-  margin-top: 48px;
-  padding: 24px;
-  background: #f0f8ff;
-  border-radius: 8px;
-  text-align: center;
-
-  em {
-    font-size: 0.95rem;
-    color: #555;
-    line-height: 1.5;
-
-    @media (min-width: 640px) {
-      font-size: 1rem;
-    }
-  }
-`;
-
-const SponsorsSection = styled.div`
-  margin-top: 64px;
-`;
-
-const SectionDivider = styled.hr`
-  border: none;
-  height: 2px;
-  background: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
-  margin-bottom: 48px;
-
-  @media (min-width: 768px) {
-    margin-bottom: 64px;
-  }
-`;
-
-const SponsorsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 32px;
+const DonateButton = styled.a`
+  display: inline-flex;
   align-items: center;
-
-  @media (min-width: 640px) {
-    gap: 40px;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  }
-
-  @media (min-width: 1024px) {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 48px;
-  }
-`;
-
-const SponsorItem = styled.div`
-  display: flex;
   justify-content: center;
-  align-items: center;
-  height: 120px;
-
-  @media (min-width: 640px) {
-    height: 140px;
-  }
-`;
-
-const SponsorLink = styled.a`
-  display: block;
+  gap: 8px;
+  background: ${colors.mint};
+  color: ${colors.white};
+  font-family: ${fonts.montserrat};
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 24px;
+  padding: 14px 28px;
+  text-decoration: none;
   width: 100%;
-  height: 100%;
-  transition: transform 0.2s ease-in-out;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+  margin-bottom: 20px;
 
   &:hover {
-    transform: scale(1.05);
+    background: ${colors.darkPrimary};
+    transform: scale(1.02);
+    text-decoration: none;
+    color: ${colors.white};
   }
 `;
 
-const SponsorImage = styled.img`
+const TaxDeductibleText = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: #666;
+  margin: 0;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 0.875rem;
+  }
+`;
+
+const StickyDonateCTA = styled.a`
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: ${colors.mint};
+  color: ${colors.white};
+  padding: 16px 24px;
+  text-align: center;
+  text-decoration: none;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
+  font-family: ${fonts.montserrat};
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background: ${colors.darkPrimary};
+    text-decoration: none;
+    color: ${colors.white};
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    display: none;
+  }
+`;
+
+const ArrowIcon = styled.span`
+  font-size: 18px;
+  line-height: 1;
+`;
+
+const SectionContentWrapper = styled.div`
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 24px;
+
+  @media (min-width: ${breakpoints.md}) {
+    padding: 0 48px;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    padding: 0 64px;
+  }
+`;
+
+const WhereItGoesSection = styled.section`
+  padding: 64px 0;
+  background: ${colors.bodyBg};
+
+  @media (min-width: ${breakpoints.md}) {
+    padding: 80px 0;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    padding: 96px 0;
+  }
+`;
+
+const SectionTitle = styled.h2`
+  font-family: ${fonts.montserrat};
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: ${colors.mainFont};
+  text-align: center;
+  margin-bottom: 40px;
+
+  @media (min-width: ${breakpoints.sm}) {
+    font-size: 2rem;
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 2.25rem;
+    margin-bottom: 48px;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    font-size: 2.5rem;
+  }
+`;
+
+const ImpactLayoutWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: center;
+
+  @media (min-width: ${breakpoints.lg}) {
+    flex-direction: row;
+    gap: 32px;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+`;
+
+const ImpactColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
+
+  @media (min-width: ${breakpoints.lg}) {
+    flex: 1;
+    max-width: 320px;
+  }
+`;
+
+const CenterImageWrapper = styled.div`
+  width: 100%;
+  max-width: 400px;
+  margin: 20px 0;
+  display: none;
+
+  img {
+    width: 100%;
+    height: auto;
+    border-radius: 16px;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    display: block;
+    flex: 0 0 auto;
+    max-width: 450px;
+  }
+`;
+
+const ImpactCard = styled.div`
+  background: ${colors.white};
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    padding: 24px;
+  }
+`;
+
+const IconWrapper = styled.div`
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${colors.bodyBg};
+  border-radius: 12px;
+  padding: 8px;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    width: 64px;
+    height: 64px;
+    padding: 10px;
+  }
+`;
+
+const ImpactContent = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`;
+
+const ImpactTitle = styled.h3`
+  font-family: ${fonts.montserrat};
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: ${colors.secondaryFontColor};
+  margin-bottom: 6px;
+  line-height: 1.3;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.1875rem;
+  }
+`;
+
+const ImpactDescription = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #555;
+  margin: 0;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 0.9375rem;
+  }
+`;
+
+const CorporateSponsorshipSection = styled.section`
+  padding: 64px 0;
+  background: ${colors.white};
+
+  @media (min-width: ${breakpoints.md}) {
+    padding: 80px 0;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    padding: 96px 0;
+  }
+`;
+
+const SponsorshipGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  margin-bottom: 40px;
+
+  @media (min-width: ${breakpoints.md}) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px;
+    margin-bottom: 48px;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    gap: 64px;
+  }
+`;
+
+const SponsorshipColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SponsorshipText = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 1rem;
+  line-height: 1.6;
+  color: ${colors.mainFont};
+  margin: 0;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.0625rem;
+  }
+`;
+
+const WaysToHelpTitle = styled.h3`
+  font-family: ${fonts.montserrat};
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: ${colors.secondaryFontColor};
+  margin-bottom: 16px;
+  line-height: 1.3;
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.25rem;
+  }
+`;
+
+const WaysToHelpList = styled.ul`
+  font-family: ${fonts.mainFont};
+  font-size: 1rem;
+  line-height: 1.7;
+  color: ${colors.mainFont};
+  margin: 0;
+  padding-left: 24px;
+
+  li {
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.0625rem;
+  }
+`;
+
+const ContactInfo = styled.p`
+  font-family: ${fonts.mainFont};
+  font-size: 1rem;
+  line-height: 1.6;
+  color: ${colors.mainFont};
+  text-align: center;
+  margin: 0;
+
+  a {
+    color: ${colors.mint};
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: ${colors.darkPrimary};
+      text-decoration: underline;
+    }
+  }
+
+  @media (min-width: ${breakpoints.md}) {
+    font-size: 1.0625rem;
+  }
+`;
+
+const SponsorsSection = styled.section`
+  padding: 64px 0;
+  background: ${colors.bodyBg};
+
+  @media (min-width: ${breakpoints.md}) {
+    padding: 80px 0;
+  }
+
+  @media (min-width: ${breakpoints.lg}) {
+    padding: 96px 0;
+  }
+`;
+
+const CarouselWrapper = styled.div`
+  width: 100%;
 `;

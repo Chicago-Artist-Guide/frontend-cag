@@ -28,27 +28,6 @@ const PublicRoleCard: React.FC<PublicRoleCardProps> = ({
           )}
 
           <RoleDetails>
-            {role.gender_identity && role.gender_identity.length > 0 && (
-              <DetailItem>
-                <DetailLabel>Gender Identity:</DetailLabel>
-                <DetailValue>{role.gender_identity.join(', ')}</DetailValue>
-              </DetailItem>
-            )}
-
-            {role.age_range && role.age_range.length > 0 && (
-              <DetailItem>
-                <DetailLabel>Age Range:</DetailLabel>
-                <DetailValue>{role.age_range.join(', ')}</DetailValue>
-              </DetailItem>
-            )}
-
-            {role.ethnicity && role.ethnicity.length > 0 && (
-              <DetailItem>
-                <DetailLabel>Ethnicity:</DetailLabel>
-                <DetailValue>{role.ethnicity.join(', ')}</DetailValue>
-              </DetailItem>
-            )}
-
             {role.union && (
               <DetailItem>
                 <DetailLabel>Union:</DetailLabel>
@@ -63,30 +42,6 @@ const PublicRoleCard: React.FC<PublicRoleCardProps> = ({
                   {role.role_rate}{' '}
                   {role.role_rate_unit && `per ${role.role_rate_unit}`}
                 </DetailValue>
-              </DetailItem>
-            )}
-
-            {role.additional_requirements &&
-              role.additional_requirements.length > 0 && (
-                <DetailItem>
-                  <DetailLabel>Additional Requirements:</DetailLabel>
-                  <DetailValue>
-                    {role.additional_requirements.join(', ')}
-                  </DetailValue>
-                </DetailItem>
-              )}
-
-            {role.singing_details && (
-              <DetailItem>
-                <DetailLabel>Singing Style:</DetailLabel>
-                <DetailValue>{role.singing_details}</DetailValue>
-              </DetailItem>
-            )}
-
-            {role.dancing_details && (
-              <DetailItem>
-                <DetailLabel>Dancing Style:</DetailLabel>
-                <DetailValue>{role.dancing_details}</DetailValue>
               </DetailItem>
             )}
           </RoleDetails>

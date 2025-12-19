@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { FirebaseContext } from '../context/FirebaseContext';
 import { MarketingContext } from '../context/MarketingContext';
 import { PaginationProvider } from '../context/PaginationContext';
 import { UserContext } from '../context/UserContext';
+import { AdminProvider } from '../context/AdminContext';
 import useAuthState from '../hooks/useAuthState';
 import useFirebase from '../hooks/useFirebase';
 import useProfileData from '../hooks/useProfileData';
@@ -25,6 +26,29 @@ const App = () => {
     setProfileData
   } = useProfileData(currentUser, firestore);
 
+  const userContextValue = useMemo(
+    () => ({
+      account,
+      setAccountRef,
+      setAccountData,
+      profile,
+      setProfileRef,
+      setProfileData,
+      currentUser,
+      setCurrentUser
+    }),
+    [
+      account,
+      setAccountRef,
+      setAccountData,
+      profile,
+      setProfileRef,
+      setProfileData,
+      currentUser,
+      setCurrentUser
+    ]
+  );
+
   return (
     <FirebaseContext.Provider
       value={{
@@ -35,25 +59,16 @@ const App = () => {
         firebaseStorage: storage
       }}
     >
-      <UserContext.Provider
-        value={{
-          account,
-          setAccountRef,
-          setAccountData,
-          profile,
-          setProfileRef,
-          setProfileData,
-          currentUser,
-          setCurrentUser
-        }}
-      >
-        <MarketingContext.Provider
-          value={{ lglApiKey: import.meta.env.VITE_APP_LGL_API_KEY || '' }}
-        >
-          <PaginationProvider>
-            <RouterProvider router={router} />
-          </PaginationProvider>
-        </MarketingContext.Provider>
+      <UserContext.Provider value={userContextValue}>
+        <AdminProvider currentUser={currentUser} firestore={firestore}>
+          <MarketingContext.Provider
+            value={{ lglApiKey: import.meta.env.VITE_APP_LGL_API_KEY || '' }}
+          >
+            <PaginationProvider>
+              <RouterProvider router={router} />
+            </PaginationProvider>
+          </MarketingContext.Provider>
+        </AdminProvider>
       </UserContext.Provider>
     </FirebaseContext.Provider>
   );

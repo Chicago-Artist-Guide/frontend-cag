@@ -241,6 +241,35 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     </>
   );
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null;
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatPay = () => {
+    if (!role.role_rate) return null;
+    const rate = `$${role.role_rate}`;
+    const unit = role.role_rate_unit ? ` ${role.role_rate_unit}` : '';
+    return `${rate}${unit}`;
+  };
+
+  const getAuditionDates = () => {
+    const start = formatDate(production?.audition_start);
+    const end = formatDate(production?.audition_end);
+    if (start && end) return `${start} - ${end}`;
+    if (start) return start;
+    if (end) return end;
+    return null;
+  };
+
   return (
     <div
       className={clsx('flex min-h-[272px] max-w-[812px] flex-col lg:flex-row', {
@@ -248,31 +277,61 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         'border-4 border-salmon bg-blush/25': isDeclined
       })}
     >
+      {production?.production_image_url && (
+        <div
+          className="relative h-64 w-full flex-none bg-cover bg-center bg-no-repeat lg:h-auto lg:w-[200px]"
+          style={{
+            backgroundImage: `url(${production.production_image_url})`
+          }}
+        />
+      )}
       <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
-        <h2 className="mb-4 text-xl font-bold lg:text-2xl">{role.role_name}</h2>
+        <h2 className="mb-2 text-xl font-bold lg:text-2xl">{role.role_name}</h2>
         {production?.production_name && (
-          <h3 className="-mt-2 mb-2 text-sm font-bold sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
-            {production.production_name} by {theater?.theatre_name}
-          </h3>
+          <div className="mb-4">
+            <button
+              onClick={() => navigate(`/shows/${production.production_id}`)}
+              className="text-left text-base font-semibold text-cornflower hover:underline"
+            >
+              {production.production_name}
+            </button>
+            {theater?.theatre_name && (
+              <>
+                {' by '}
+                <button
+                  onClick={() =>
+                    navigate(`/profile/view/${theater.account_id}`)
+                  }
+                  className="text-base font-semibold text-cornflower hover:underline"
+                >
+                  {theater.theatre_name}
+                </button>
+              </>
+            )}
+          </div>
         )}
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
-          <div>Type</div>
-          <div className="font-semibold">{role.type}</div>
-          <div>Ethnicity</div>
-          <div className="font-semibold">
-            {role.ethnicity?.join(', ') || 'N/A'}
-          </div>
-          <div>Age Range</div>
-          <div className="font-semibold">
-            {role.age_range?.join(', ') || 'N/A'}
-          </div>
-          <div>Gender</div>
-          <div className="font-semibold">
-            {role.gender_identity?.join(', ') || 'N/A'}
-          </div>
+          {getAuditionDates() && (
+            <>
+              <div>Audition Dates</div>
+              <div className="font-semibold">{getAuditionDates()}</div>
+            </>
+          )}
+          {production?.location && (
+            <>
+              <div>Venue</div>
+              <div className="font-semibold">{production.location}</div>
+            </>
+          )}
+          {formatPay() && (
+            <>
+              <div>Pay</div>
+              <div className="font-semibold">{formatPay()}</div>
+            </>
+          )}
         </div>
         {role.description && (
-          <h4 className="my-2 text-base">{role.description}</h4>
+          <p className="mt-3 text-sm text-stone-600">{role.description}</p>
         )}
       </div>
       <div className="flex flex-none flex-row lg:flex-col">

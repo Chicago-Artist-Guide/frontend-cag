@@ -95,45 +95,6 @@ export const TalentMatchesFilterBar = () => {
                     {currentRole.role_status}
                   </span>
                 </div>
-                {currentRole.ethnicity && currentRole.ethnicity.length > 0 && (
-                  <div className="flex flex-nowrap items-center justify-between gap-4">
-                    <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
-                      Ethnicity
-                    </span>
-                    <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
-                      {currentRole.ethnicity.join(', ')}
-                    </span>
-                  </div>
-                )}
-                {currentRole.age_range && currentRole.age_range.length > 0 && (
-                  <div className="flex flex-nowrap items-center justify-between gap-4">
-                    <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
-                      Age Range
-                    </span>
-                    <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
-                      {currentRole.age_range.join(', ')}
-                    </span>
-                  </div>
-                )}
-                {currentRole.gender_identity &&
-                  currentRole.gender_identity.length > 0 && (
-                    <div className="flex flex-nowrap items-center justify-between gap-4">
-                      <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
-                        Gender
-                      </span>
-                      <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
-                        {currentRole.gender_identity.join(', ')}
-                      </span>
-                    </div>
-                  )}
-                <div className="flex flex-nowrap items-center justify-between gap-4">
-                  <span className="flex-shrink-0 font-open-sans text-sm font-medium tracking-[0.5px] text-stone-600">
-                    LGBTQ+
-                  </span>
-                  <span className="min-w-0 flex-1 text-right font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
-                    {currentRole.lgbtq_only ? 'Yes' : 'No'}
-                  </span>
-                </div>
               </div>
               {currentRole.additional_requirements &&
                 currentRole.additional_requirements.length > 0 && (
