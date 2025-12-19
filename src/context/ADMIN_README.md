@@ -26,32 +26,32 @@ Never rely on these client-side checks for security decisions.
 
 Four role levels are supported, stored in the `admin_role` field of the accounts collection:
 
-### 1. Viewer (Level 1)
-Read-only access to admin dashboard
-- Can view users, companies, openings, productions
-- Can view analytics
-- Cannot make any changes
+### 1. Staff (`staff`)
+Analytics view-only access
+- Can view analytics dashboard
+- Cannot access user/company/opening management
+- **Use case**: Data analysts, reporting staff
 
-### 2. Moderator (Level 2)
+### 2. Moderator (`moderator`)
 Content moderation capabilities
-- All viewer permissions
-- Can moderate and delete openings
-- Can export data
-- Cannot edit users or approve companies
+- All staff permissions
+- Can view users, companies, openings
+- Can moderate openings (flag inappropriate content)
+- Cannot edit or delete resources
+- Cannot export data
 
-### 3. Admin (Level 3)
+### 3. Admin (`admin`)
 Full management capabilities
 - All moderator permissions
-- Can edit and delete users
-- Can approve, edit, and delete companies
-- Can edit and delete productions
-- Can view system logs
+- Can edit and delete users, companies, openings
+- Can approve companies
+- Can export data
+- Cannot manage admin roles
 
-### 4. Super Admin (Level 4)
+### 4. Super Admin (`super_admin`)
 Complete system access
 - All admin permissions
-- Can modify system settings
-- Can manage other admins
+- Can manage admin roles (assign/revoke admin privileges)
 - Full control over platform
 
 ## Setup
@@ -86,7 +86,7 @@ To grant admin access to a user, add an `admin_role` field to their account docu
 ```javascript
 // In Firestore console or via admin script
 db.collection('accounts').doc(userId).update({
-  admin_role: 'admin' // or 'superadmin', 'moderator', 'viewer'
+  admin_role: 'admin' // Valid values: 'super_admin', 'admin', 'moderator', 'staff'
 });
 ```
 
@@ -165,7 +165,7 @@ function AdminNav() {
         <Link to="/admin/companies">Companies</Link>
       )}
 
-      {adminRole === 'superadmin' && (
+      {adminRole === 'super_admin' && (
         <Link to="/admin/settings">System Settings</Link>
       )}
     </nav>
@@ -365,7 +365,7 @@ test('shows edit button for admins', () => {
 ## Troubleshooting
 
 ### User has admin_role but shows as not admin
-1. Check that admin_role value is exactly: 'viewer', 'moderator', 'admin', or 'superadmin'
+1. Check that admin_role value is exactly: 'staff', 'moderator', 'admin', or 'super_admin'
 2. Verify Firestore connection is working
 3. Check browser console for AdminContext errors
 4. Ensure AdminProvider is in the component tree

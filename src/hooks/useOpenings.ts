@@ -4,7 +4,7 @@
  * Fetches roleOpportunities from Firestore with filtering, sorting, and pagination.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import {
@@ -119,20 +119,25 @@ export function useOpenings(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalOpenings, setTotalOpenings] = useState(0);
+  const mountedRef = useRef(true);
 
   /**
    * Fetch all openings from Firestore
    */
   const fetchOpenings = useCallback(async () => {
     if (!firebaseFirestore) {
-      setError('Firestore not initialized');
-      setLoading(false);
+      if (mountedRef.current) {
+        setError('Firestore not initialized');
+        setLoading(false);
+      }
       return;
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      if (mountedRef.current) {
+        setLoading(true);
+        setError(null);
+      }
 
       // Check cache
       if (openingCache && Date.now() - openingCache.timestamp < CACHE_TTL) {
@@ -150,8 +155,10 @@ export function useOpenings(
         const endIndex = startIndex + pagination.pageSize;
         const paginated = sorted.slice(startIndex, endIndex);
 
-        setOpenings(paginated);
-        setLoading(false);
+        if (mountedRef.current) {
+          setOpenings(paginated);
+          setLoading(false);
+        }
         return;
       }
 
@@ -212,15 +219,16 @@ export function useOpenings(
       // Apply sorting
       const sorted = applySorting(filtered, filters.sortBy, filters.sortOrder);
 
-      setTotalOpenings(sorted.length);
-
       // Apply pagination
       const startIndex = (pagination.page - 1) * pagination.pageSize;
       const endIndex = startIndex + pagination.pageSize;
       const paginated = sorted.slice(startIndex, endIndex);
 
-      setOpenings(paginated);
-      setLoading(false);
+      if (mountedRef.current) {
+        setTotalOpenings(sorted.length);
+        setOpenings(paginated);
+        setLoading(false);
+      }
     } catch (err: any) {
       console.error('[useOpenings] Error fetching openings:', err);
 
@@ -232,10 +240,14 @@ export function useOpenings(
       } else if (err.message?.includes('index')) {
         setError('Database index required. Check console for details.');
       } else {
-        setError('Failed to load job openings. Please try again.');
+        if (mountedRef.current) {
+          setError('Failed to load job openings. Please try again.');
+        }
       }
 
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [firebaseFirestore, filters, pagination.page, pagination.pageSize]);
 
@@ -251,7 +263,12 @@ export function useOpenings(
    * Fetch on mount and when dependencies change
    */
   useEffect(() => {
+    mountedRef.current = true;
     fetchOpenings();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchOpenings]);
 
   return {

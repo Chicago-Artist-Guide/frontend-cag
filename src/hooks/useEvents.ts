@@ -4,7 +4,7 @@
  * Fetches events from Firestore with filtering, sorting, and pagination.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { Event, EventSearchFilters, EventPagination } from '../types/event';
@@ -153,20 +153,25 @@ export function useEvents(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalEvents, setTotalEvents] = useState(0);
+  const mountedRef = useRef(true);
 
   /**
    * Fetch all events from Firestore
    */
   const fetchEvents = useCallback(async () => {
     if (!firebaseFirestore) {
-      setError('Firestore not initialized');
-      setLoading(false);
+      if (mountedRef.current) {
+        setError('Firestore not initialized');
+        setLoading(false);
+      }
       return;
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      if (mountedRef.current) {
+        setLoading(true);
+        setError(null);
+      }
 
       // Check cache
       if (eventCache && Date.now() - eventCache.timestamp < CACHE_TTL) {
@@ -184,8 +189,10 @@ export function useEvents(
         const endIndex = startIndex + pagination.pageSize;
         const paginated = sorted.slice(startIndex, endIndex);
 
-        setEvents(paginated);
-        setLoading(false);
+        if (mountedRef.current) {
+          setEvents(paginated);
+          setLoading(false);
+        }
         return;
       }
 
@@ -244,15 +251,16 @@ export function useEvents(
       // Apply sorting
       const sorted = applySorting(filtered, filters.sortBy, filters.sortOrder);
 
-      setTotalEvents(sorted.length);
-
       // Apply pagination
       const startIndex = (pagination.page - 1) * pagination.pageSize;
       const endIndex = startIndex + pagination.pageSize;
       const paginated = sorted.slice(startIndex, endIndex);
 
-      setEvents(paginated);
-      setLoading(false);
+      if (mountedRef.current) {
+        setTotalEvents(sorted.length);
+        setEvents(paginated);
+        setLoading(false);
+      }
     } catch (err: unknown) {
       console.error('[useEvents] Error fetching events:', err);
 
@@ -265,10 +273,14 @@ export function useEvents(
       } else if (errorObj.message?.includes('index')) {
         setError('Database index required. Check console for details.');
       } else {
-        setError('Failed to load events. Please try again.');
+        if (mountedRef.current) {
+          setError('Failed to load events. Please try again.');
+        }
       }
 
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [firebaseFirestore, filters, pagination.page, pagination.pageSize]);
 
@@ -284,7 +296,12 @@ export function useEvents(
    * Fetch on mount and when dependencies change
    */
   useEffect(() => {
+    mountedRef.current = true;
     fetchEvents();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchEvents]);
 
   return {

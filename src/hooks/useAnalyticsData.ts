@@ -286,14 +286,14 @@ export const useAnalyticsData = () => {
             individualArtists: individualCount,
             theaterCompanies: companyCount,
             newUsersThisMonth,
-            activeUsersThisMonth: Math.round(totalUsers * 0.3) // Estimate for now
+            activeUsersThisMonth: newUsersThisMonth // Use new users as proxy for active
           },
           demographics,
           engagement: {
             profileCompletionRate,
             messagesThisMonth,
             productionsActive: activeProductions,
-            averageProfileViews: Math.round(Math.random() * 50 + 20) // Placeholder
+            averageProfileViews: 0 // Not yet implemented - requires view tracking
           },
           loading: false,
           error: null

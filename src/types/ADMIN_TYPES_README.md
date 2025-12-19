@@ -95,6 +95,8 @@ interface AdminPermissions {
 | View              | ✓           | ✓     | ✓         | ✓     |
 | Export            | ✓           | ✓     | ✗         | ✗     |
 
+> **Note**: The `admin_users` collection is automatically synced by `AdminContext` when a user's `admin_role` is set in the `accounts` collection. This allows Firestore rules to efficiently check admin status without querying accounts.
+
 ## Usage
 
 ### Basic Permission Check
@@ -162,17 +164,28 @@ interface UserAccount {
   // ... existing fields (uid, email, displayName, type, etc.)
 
   // Admin fields
-  adminRole: AdminRole; // 'super_admin' | 'admin' | 'moderator' | 'staff' | null
-  adminRoleAssignedAt?: Timestamp;
-  adminRoleAssignedBy?: string; // UID of admin who assigned the role
-  adminRoleNotes?: string; // Notes about why role was assigned
-  adminActive: boolean; // Whether admin access is currently active
+  admin_role: AdminRole; // 'super_admin' | 'admin' | 'moderator' | 'staff' | null
+  admin_role_assigned_at?: Timestamp;
+  admin_role_assigned_by?: string; // UID of admin who assigned the role
+  admin_role_notes?: string; // Notes about why role was assigned
+  admin_active: boolean; // Whether admin access is currently active
+}
+```
+
+Additionally, AdminContext auto-syncs admin users to the `admin_users` collection for efficient Firestore rules:
+
+```typescript
+// admin_users/{uid}
+interface AdminUserDoc {
+  uid: string;
+  admin_role: AdminRole;
+  synced_at: Timestamp;
 }
 ```
 
 ### Audit Logging
 
-All admin actions should be logged to an `admin_audit_logs` collection:
+All admin actions are logged to the `admin_actions` collection:
 
 ```typescript
 import { AdminAuditLog } from './admin';
@@ -183,7 +196,7 @@ const auditLog: AdminAuditLog = {
   adminUserId: 'admin-uid',
   adminEmail: 'admin@example.com',
   adminRole: 'admin',
-  action: 'user.delete',
+  action: 'user_delete',
   resource: 'users',
   resourceId: 'deleted-user-uid',
   metadata: { reason: 'Policy violation' },

@@ -5,7 +5,7 @@
  * and provides filtering, sorting, and pagination.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import {
@@ -131,20 +131,25 @@ export function useUsers(
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [totalUsers, setTotalUsers] = useState(0);
+  const mountedRef = useRef(true);
 
   /**
    * Fetch all users from Firestore
    */
   const fetchUsers = useCallback(async () => {
     if (!firebaseFirestore) {
-      setError('Firestore not initialized');
-      setLoading(false);
+      if (mountedRef.current) {
+        setError('Firestore not initialized');
+        setLoading(false);
+      }
       return;
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      if (mountedRef.current) {
+        setLoading(true);
+        setError(null);
+      }
 
       // Check cache
       if (userCache && Date.now() - userCache.timestamp < CACHE_TTL) {
@@ -162,8 +167,10 @@ export function useUsers(
         const endIndex = startIndex + pagination.pageSize;
         const paginated = sorted.slice(startIndex, endIndex);
 
-        setUsers(paginated);
-        setLoading(false);
+        if (mountedRef.current) {
+          setUsers(paginated);
+          setLoading(false);
+        }
         return;
       }
 
@@ -229,19 +236,22 @@ export function useUsers(
       // Apply sorting
       const sorted = applySorting(filtered, filters.sortBy, filters.sortOrder);
 
-      setTotalUsers(sorted.length);
-
       // Apply pagination
       const startIndex = (pagination.page - 1) * pagination.pageSize;
       const endIndex = startIndex + pagination.pageSize;
       const paginated = sorted.slice(startIndex, endIndex);
 
-      setUsers(paginated);
-      setLoading(false);
+      if (mountedRef.current) {
+        setTotalUsers(sorted.length);
+        setUsers(paginated);
+        setLoading(false);
+      }
     } catch (err: any) {
       console.error('[useUsers] Error fetching users:', err);
-      setError('Failed to load users. Please try again.');
-      setLoading(false);
+      if (mountedRef.current) {
+        setError('Failed to load users. Please try again.');
+        setLoading(false);
+      }
     }
   }, [firebaseFirestore, filters, pagination.page, pagination.pageSize]);
 
@@ -257,7 +267,12 @@ export function useUsers(
    * Fetch on mount and when dependencies change
    */
   useEffect(() => {
+    mountedRef.current = true;
     fetchUsers();
+
+    return () => {
+      mountedRef.current = false;
+    };
   }, [fetchUsers]);
 
   return {
