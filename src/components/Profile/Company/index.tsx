@@ -34,7 +34,7 @@ const MAX_ADDITIONAL_PHOTOS = 6;
 
 const CompanyProfile: React.FC<{
   previewMode?: boolean;
-}> = () => {
+}> = ({ previewMode = false }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     profile,
@@ -115,21 +115,23 @@ const CompanyProfile: React.FC<{
     <PageContainer>
       <Row>
         <Col lg={12}>
-          <Title>YOUR PROFILE</Title>
+          <Title>{previewMode ? 'THEATRE PROFILE' : 'YOUR PROFILE'}</Title>
         </Col>
       </Row>
       <Row>
         <LeftCol lg={4}>
           <ProfileImage src={profileData?.profile_image_url} fluid />
-          <EditProfileButtonWrapper>
-            <Button
-              onClick={() => setEditing('profile')}
-              text="Edit Profile"
-              icon={faPenToSquare}
-              type="button"
-              variant="secondary"
-            />
-          </EditProfileButtonWrapper>
+          {!previewMode && (
+            <EditProfileButtonWrapper>
+              <Button
+                onClick={() => setEditing('profile')}
+                text="Edit Profile"
+                icon={faPenToSquare}
+                type="button"
+                variant="secondary"
+              />
+            </EditProfileButtonWrapper>
+          )}
           {profileData?.additional_photos &&
             Object.keys(profileData.additional_photos).length > 0 && (
               <AdditionalPhotos className="d-flex justify-content-between flex-wrap">
@@ -161,14 +163,16 @@ const CompanyProfile: React.FC<{
               </DetailsCardItem>
             </div>
           </DetailsCard>
-          <DetailsCard>
-            <DetailsColTitle>
-              <div>Menu</div>
-            </DetailsColTitle>
-            <MenuLinkContainer>
-              <MenuLink to="/profile/messages">Messages</MenuLink>
-            </MenuLinkContainer>
-          </DetailsCard>
+          {!previewMode && (
+            <DetailsCard>
+              <DetailsColTitle>
+                <div>Menu</div>
+              </DetailsColTitle>
+              <MenuLinkContainer>
+                <MenuLink to="/profile/messages">Messages</MenuLink>
+              </MenuLinkContainer>
+            </DetailsCard>
+          )}
         </LeftCol>
         <RightCol lg={{ span: 7, offset: 1 }}>
           <TheatreInfoCard>
@@ -229,21 +233,29 @@ const CompanyProfile: React.FC<{
                 </div>
               ))}
             </AwardsGrid>
-            <div className="mt-3">
-              <DetailAdd
-                text="Add an award or recognition"
-                onClick={() => setEditing('add-award')}
-              />
-            </div>
+            {!previewMode && (
+              <div className="mt-3">
+                <DetailAdd
+                  text="Add an award or recognition"
+                  onClick={() => setEditing('add-award')}
+                />
+              </div>
+            )}
           </DetailSection>
           <DetailSection title="Active Shows">
             {productions?.active?.map((show) => (
-              <ActiveProduction key={show.production_id} show={show} />
+              <ActiveProduction
+                key={show.production_id}
+                show={show}
+                previewMode={previewMode}
+              />
             ))}
-            <DetailAdd
-              text="Add a new show"
-              onClick={() => setEditing('add-production')}
-            />
+            {!previewMode && (
+              <DetailAdd
+                text="Add a new show"
+                onClick={() => setEditing('add-production')}
+              />
+            )}
           </DetailSection>
           {!!productions?.inactive?.length && (
             <DetailSection title="Inactive Shows">

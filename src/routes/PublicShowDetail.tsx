@@ -230,7 +230,9 @@ const PublicShowDetail = () => {
             ← Back to shows (page {savedPaginationState.currentPage || 1})
           </BackLink>
           <Title>{show.production_name}</Title>
-          <TheaterName>{theaterName}</TheaterName>
+          <TheaterNameLink to={`/profile/view/${show.account_id}`}>
+            {theaterName}
+          </TheaterNameLink>
         </Col>
       </Row>
 
@@ -260,12 +262,15 @@ const PublicShowDetail = () => {
             </InfoSection>
           )}
 
-          {show.open_and_close_start && show.open_and_close_end && (
+          {(show.audition_start || show.audition_end) && (
             <InfoSection>
-              <InfoLabel>Dates:</InfoLabel>
+              <InfoLabel>Audition Dates:</InfoLabel>
               <InfoValue>
-                {new Date(show.open_and_close_start).toLocaleDateString()} -
-                {new Date(show.open_and_close_end).toLocaleDateString()}
+                {show.audition_start &&
+                  new Date(show.audition_start).toLocaleDateString()}
+                {show.audition_start && show.audition_end && ' - '}
+                {show.audition_end &&
+                  new Date(show.audition_end).toLocaleDateString()}
               </InfoValue>
             </InfoSection>
           )}
@@ -351,12 +356,19 @@ const BackLink = styled(Link)`
   }
 `;
 
-const TheaterName = styled.h2`
+const TheaterNameLink = styled(Link)`
+  display: block;
   font-family: ${fonts.montserrat};
   font-weight: 500;
   font-size: 20px;
   color: ${colors.grayishBlue};
   margin-bottom: 20px;
+  text-decoration: none;
+
+  &:hover {
+    color: ${colors.mint};
+    text-decoration: underline;
+  }
 `;
 
 const ShowImage = styled(Image)`

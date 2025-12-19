@@ -9,7 +9,7 @@ const Features: React.FC<{
   return (
     <Container>
       {features.map((feature: any) => (
-        <div>
+        <div key={feature.id || feature.title}>
           <FeatureTitle>
             <Bold>
               {feature.title} <Group> - {feature.group}</Group>

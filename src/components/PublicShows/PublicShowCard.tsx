@@ -88,7 +88,9 @@ const PublicShowCard: React.FC<PublicShowCardProps> = ({ show }) => {
           <div className="d-flex flex-column" style={{ height: '100%' }}>
             <div className="flex-grow-1">
               <ShowName>{show?.production_name}</ShowName>
-              <TheaterName>{theaterName}</TheaterName>
+              <TheaterNameLink to={`/profile/view/${show?.account_id}`}>
+                {theaterName}
+              </TheaterNameLink>
               <ShowStatus>{show?.status}</ShowStatus>
               <ShowDescription>{show?.description}</ShowDescription>
             </div>
@@ -146,12 +148,19 @@ const ShowName = styled.h3`
   margin-bottom: 5px;
 `;
 
-const TheaterName = styled.h4`
+const TheaterNameLink = styled(Link)`
+  display: block;
   font-family: ${fonts.montserrat};
   font-weight: 500;
   font-size: 18px;
   margin-bottom: 10px;
   color: ${colors.grayishBlue};
+  text-decoration: none;
+
+  &:hover {
+    color: ${colors.mint};
+    text-decoration: underline;
+  }
 `;
 
 const ShowStatus = styled.p`

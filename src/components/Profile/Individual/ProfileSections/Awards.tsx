@@ -15,7 +15,7 @@ const Awards: React.FC<{
     return (
       <div>
         {awards.map((award: any) => (
-          <AwardContainer>
+          <AwardContainer key={award.id || award.title}>
             <Bold>{award.title}</Bold>
             <Bold>{award.year}</Bold>
             <FontAwesomeIcon icon={faXmark} />
@@ -35,7 +35,7 @@ const Awards: React.FC<{
         <i>Add Awards Recognition</i>
       ) : (
         awards.map((award: any) => (
-          <AwardContainer>
+          <AwardContainer key={award.id || award.title}>
             <Bold>{award.title}</Bold>
             <Bold>{award.year}</Bold>
           </AwardContainer>
