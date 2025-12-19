@@ -4,12 +4,14 @@ import {
   getDocs,
   query,
   where,
+  limit,
   Timestamp
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { STAFF_CONFIG } from '../config/staffAccess';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
+import { isAdminRole, ROLE_PERMISSIONS } from '../types/admin';
 
 export type AnalyticsData = {
   userMetrics: {
@@ -79,10 +81,41 @@ export const useAnalyticsData = () => {
         return;
       }
 
-      // Check if user is in staff whitelist
+      // Check if user has analytics access via admin role or legacy email whitelist
       const userEmail = user.email?.toLowerCase();
+      const isInLegacyWhitelist =
+        userEmail && STAFF_CONFIG.emails.includes(userEmail);
 
-      if (!userEmail || !STAFF_CONFIG.emails.includes(userEmail)) {
+      // Check admin_role in accounts collection
+      let hasAnalyticsAccess = isInLegacyWhitelist;
+
+      if (!hasAnalyticsAccess) {
+        try {
+          const accountQuery = query(
+            collection(firebaseFirestore, 'accounts'),
+            where('uid', '==', user.uid),
+            limit(1)
+          );
+          const accountSnapshot = await getDocs(accountQuery);
+
+          if (!accountSnapshot.empty) {
+            const accountData = accountSnapshot.docs[0].data();
+            const adminRole = accountData?.admin_role;
+
+            // Check if user has an admin role with analytics.view permission
+            if (adminRole && isAdminRole(adminRole)) {
+              hasAnalyticsAccess = ROLE_PERMISSIONS[adminRole].analytics.view;
+            }
+          }
+        } catch (roleCheckError) {
+          console.warn(
+            '[useAnalyticsData] Error checking admin role:',
+            roleCheckError
+          );
+        }
+      }
+
+      if (!hasAnalyticsAccess) {
         setData((prev) => ({
           ...prev,
           loading: false,

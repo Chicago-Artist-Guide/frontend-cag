@@ -282,8 +282,11 @@ const UserManagement: React.FC = () => {
 
       {!loading && !error && (
         <UserGrid>
-          {users.map((user) => (
-            <UserCard key={user.uid} onClick={() => handleUserClick(user)}>
+          {users.map((user, index) => (
+            <UserCard
+              key={user.uid || `user-${index}`}
+              onClick={() => handleUserClick(user)}
+            >
               <div className="avatar">{getInitials(user)}</div>
               <div className="name">{getDisplayName(user)}</div>
               <div className="email">{user.email || 'No email'}</div>

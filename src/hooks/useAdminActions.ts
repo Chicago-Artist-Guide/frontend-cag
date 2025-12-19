@@ -5,7 +5,7 @@
  * for audit trail and compliance.
  */
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { useUserContext } from '../context/UserContext';
@@ -74,6 +74,15 @@ export function useAdminActions() {
   const { adminRole } = useAdminAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+
+  // Track mounted state to prevent state updates after unmount
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   /**
    * Log an admin action
@@ -95,8 +104,10 @@ export function useAdminActions() {
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      if (mountedRef.current) {
+        setLoading(true);
+        setError(null);
+      }
 
       const actionData = {
         // Admin info
@@ -124,11 +135,15 @@ export function useAdminActions() {
       await addDoc(actionsRef, actionData);
 
       console.log('[useAdminActions] Action logged:', params.action_type);
-      setLoading(false);
+      if (mountedRef.current) {
+        setLoading(false);
+      }
     } catch (err: any) {
       console.error('[useAdminActions] Error logging action:', err);
-      setError('Failed to log action');
-      setLoading(false);
+      if (mountedRef.current) {
+        setError('Failed to log action');
+        setLoading(false);
+      }
       // Don't throw - audit logging failure shouldn't block the action
     }
   };
