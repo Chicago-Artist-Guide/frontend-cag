@@ -411,8 +411,8 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
         accountUpdates.admin_role_notes = values.admin_role_notes || '';
         accountUpdates.admin_active = true;
 
-        changes.before.admin_role = user.admin_role;
-        changes.after.admin_role = values.admin_role;
+        changes.before.admin_role = user.admin_role ?? null;
+        changes.after.admin_role = values.admin_role ?? null;
         changes.fields_changed.push('admin_role');
 
         // Sync admin_users collection (required for Firestore rules enforcement)
