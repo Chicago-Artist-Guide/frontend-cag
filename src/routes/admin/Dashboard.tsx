@@ -12,19 +12,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChartLine,
   faUsers,
-  faTheaterMasks,
-  faFileContract,
   faBriefcase,
-  faKey
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
+import { useAnalyticsData } from '../../hooks/useAnalyticsData';
 import { colors } from '../../theme/styleVars';
-import {
-  canManageUsers,
-  canApproveCompanies,
-  canModerateOpenings,
-  hasAnyPermissionOn
-} from '../../utils/adminPermissions';
+import { hasAnyPermissionOn } from '../../utils/adminPermissions';
 
 /**
  * Dashboard container
@@ -333,6 +327,8 @@ const getRoleLabel = (role: string | null): string => {
  */
 const Dashboard: React.FC = () => {
   const { adminRole, permissions } = useAdminAuth();
+  const analyticsData = useAnalyticsData();
+  const { userMetrics, engagement, loading } = analyticsData;
 
   return (
     <DashboardContainer>
@@ -350,23 +346,45 @@ const Dashboard: React.FC = () => {
       <StatsGrid>
         <StatCard>
           <div className="label">Total Users</div>
-          <div className="value">-</div>
-          <div className="change">Coming soon</div>
+          <div className="value">
+            {loading ? '...' : userMetrics.totalUsers.toLocaleString()}
+          </div>
+          <div className="change">
+            {loading
+              ? 'Loading'
+              : `+${userMetrics.newUsersThisMonth} this month`}
+          </div>
         </StatCard>
         <StatCard>
-          <div className="label">Active Companies</div>
-          <div className="value">-</div>
-          <div className="change">Coming soon</div>
+          <div className="label">Individual Artists</div>
+          <div className="value">
+            {loading ? '...' : userMetrics.individualArtists.toLocaleString()}
+          </div>
+          <div className="change">
+            {loading
+              ? 'Loading'
+              : `${userMetrics.totalUsers > 0 ? ((userMetrics.individualArtists / userMetrics.totalUsers) * 100).toFixed(1) : 0}% of users`}
+          </div>
         </StatCard>
         <StatCard>
-          <div className="label">Open Roles</div>
-          <div className="value">-</div>
-          <div className="change">Coming soon</div>
+          <div className="label">Theater Companies</div>
+          <div className="value">
+            {loading ? '...' : userMetrics.theaterCompanies.toLocaleString()}
+          </div>
+          <div className="change">
+            {loading
+              ? 'Loading'
+              : `${userMetrics.totalUsers > 0 ? ((userMetrics.theaterCompanies / userMetrics.totalUsers) * 100).toFixed(1) : 0}% of users`}
+          </div>
         </StatCard>
         <StatCard>
-          <div className="label">Pending Requests</div>
-          <div className="value">-</div>
-          <div className="change">Coming soon</div>
+          <div className="label">Active Productions</div>
+          <div className="value">
+            {loading ? '...' : engagement.productionsActive.toLocaleString()}
+          </div>
+          <div className="change">
+            {loading ? 'Loading' : 'Currently active'}
+          </div>
         </StatCard>
       </StatsGrid>
 
@@ -379,7 +397,7 @@ const Dashboard: React.FC = () => {
       <QuickActionsGrid>
         {/* Analytics - always visible to admins */}
         {permissions?.analytics.view && (
-          <QuickActionCard to="/staff/admin/analytics">
+          <QuickActionCard to="/admin/analytics">
             <div className="icon-container">
               <FontAwesomeIcon icon={faChartLine} />
             </div>
@@ -393,46 +411,20 @@ const Dashboard: React.FC = () => {
 
         {/* User Management */}
         {hasAnyPermissionOn(adminRole, 'users') && (
-          <QuickActionCard to="/staff/admin/users">
+          <QuickActionCard to="/admin/users">
             <div className="icon-container">
               <FontAwesomeIcon icon={faUsers} />
             </div>
             <div className="title">Manage Users</div>
             <div className="description">
-              View and manage user accounts, profiles, and admin roles.
-            </div>
-          </QuickActionCard>
-        )}
-
-        {/* Company Management */}
-        {hasAnyPermissionOn(adminRole, 'companies') && (
-          <QuickActionCard to="/staff/admin/companies">
-            <div className="icon-container">
-              <FontAwesomeIcon icon={faTheaterMasks} />
-            </div>
-            <div className="title">Manage Companies</div>
-            <div className="description">
-              View theater companies, manage profiles, and review productions.
-            </div>
-          </QuickActionCard>
-        )}
-
-        {/* Pending Requests */}
-        {canApproveCompanies(adminRole) && (
-          <QuickActionCard to="/staff/admin/companies/requests">
-            <div className="icon-container">
-              <FontAwesomeIcon icon={faFileContract} />
-            </div>
-            <div className="title">Review Requests</div>
-            <div className="description">
-              Approve or reject pending theater company signup requests.
+              View and manage user accounts and profiles.
             </div>
           </QuickActionCard>
         )}
 
         {/* CAG Job Openings */}
         {hasAnyPermissionOn(adminRole, 'openings') && (
-          <QuickActionCard to="/staff/admin/openings">
+          <QuickActionCard to="/admin/openings">
             <div className="icon-container">
               <FontAwesomeIcon icon={faBriefcase} />
             </div>
@@ -444,15 +436,15 @@ const Dashboard: React.FC = () => {
           </QuickActionCard>
         )}
 
-        {/* Admin Roles */}
-        {canManageUsers(adminRole) && (
-          <QuickActionCard to="/staff/admin/users/roles">
+        {/* Events */}
+        {hasAnyPermissionOn(adminRole, 'events') && (
+          <QuickActionCard to="/admin/events">
             <div className="icon-container">
-              <FontAwesomeIcon icon={faKey} />
+              <FontAwesomeIcon icon={faCalendarAlt} />
             </div>
-            <div className="title">Admin Roles</div>
+            <div className="title">Events</div>
             <div className="description">
-              Assign and manage admin roles for staff members.
+              Manage events that appear on the /events page.
             </div>
           </QuickActionCard>
         )}

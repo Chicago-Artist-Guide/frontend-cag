@@ -340,6 +340,7 @@ export function getResourceAccessSummary(
       users: 'none',
       companies: 'none',
       openings: 'none',
+      events: 'none',
       analytics: 'none'
     };
   }
@@ -363,6 +364,12 @@ export function getResourceAccessSummary(
       permissions.openings.edit || permissions.openings.delete
         ? 'manage'
         : permissions.openings.view
+          ? 'view'
+          : 'none',
+    events:
+      permissions.events.edit || permissions.events.delete
+        ? 'manage'
+        : permissions.events.view
           ? 'view'
           : 'none',
     analytics: permissions.analytics.export

@@ -27,7 +27,12 @@ export type AdminRole = 'super_admin' | 'admin' | 'moderator' | 'staff' | null;
 /**
  * Resource types that can have permissions applied
  */
-export type AdminResource = 'users' | 'companies' | 'openings' | 'analytics';
+export type AdminResource =
+  | 'users'
+  | 'companies'
+  | 'openings'
+  | 'events'
+  | 'analytics';
 
 /**
  * Granular permission structure for admin users
@@ -79,6 +84,20 @@ export interface AdminPermissions {
   };
 
   /**
+   * Permissions for managing events
+   */
+  events: {
+    /** View all events */
+    view: boolean;
+    /** Create and edit events */
+    edit: boolean;
+    /** Delete events */
+    delete: boolean;
+    /** Publish/unpublish events */
+    publish: boolean;
+  };
+
+  /**
    * Permissions for analytics and reporting
    */
   analytics: {
@@ -118,6 +137,12 @@ export const ROLE_PERMISSIONS: Record<
       delete: true,
       moderate: true
     },
+    events: {
+      view: true,
+      edit: true,
+      delete: true,
+      publish: true
+    },
     analytics: {
       view: true,
       export: true
@@ -142,6 +167,12 @@ export const ROLE_PERMISSIONS: Record<
       edit: true,
       delete: true,
       moderate: true
+    },
+    events: {
+      view: true,
+      edit: true,
+      delete: true,
+      publish: true
     },
     analytics: {
       view: true,
@@ -168,6 +199,12 @@ export const ROLE_PERMISSIONS: Record<
       delete: false,
       moderate: true // Moderators can flag/moderate content
     },
+    events: {
+      view: true,
+      edit: false,
+      delete: false,
+      publish: false
+    },
     analytics: {
       view: true,
       export: false
@@ -192,6 +229,12 @@ export const ROLE_PERMISSIONS: Record<
       edit: false,
       delete: false,
       moderate: false
+    },
+    events: {
+      view: false,
+      edit: false,
+      delete: false,
+      publish: false
     },
     analytics: {
       view: true, // Staff can view analytics
@@ -224,6 +267,12 @@ export type AdminActionType =
   | 'opening.delete'
   | 'opening.moderate'
   | 'opening.flag'
+  // Event actions
+  | 'event.view'
+  | 'event.create'
+  | 'event.edit'
+  | 'event.delete'
+  | 'event.publish'
   // Analytics actions
   | 'analytics.view'
   | 'analytics.export'
@@ -390,6 +439,7 @@ export type FlatPermissionKey =
   | `users.${keyof AdminPermissions['users']}`
   | `companies.${keyof AdminPermissions['companies']}`
   | `openings.${keyof AdminPermissions['openings']}`
+  | `events.${keyof AdminPermissions['events']}`
   | `analytics.${keyof AdminPermissions['analytics']}`;
 
 /**
@@ -420,6 +470,13 @@ export const ACTION_PERMISSION_MAP: Record<
   'opening.delete': 'openings.delete',
   'opening.moderate': 'openings.moderate',
   'opening.flag': 'openings.moderate',
+
+  // Event actions
+  'event.view': 'events.view',
+  'event.create': 'events.edit',
+  'event.edit': 'events.edit',
+  'event.delete': 'events.delete',
+  'event.publish': 'events.publish',
 
   // Analytics actions
   'analytics.view': 'analytics.view',
@@ -462,6 +519,12 @@ export const EMPTY_PERMISSIONS: AdminPermissions = {
     edit: false,
     delete: false,
     moderate: false
+  },
+  events: {
+    view: false,
+    edit: false,
+    delete: false,
+    publish: false
   },
   analytics: {
     view: false,

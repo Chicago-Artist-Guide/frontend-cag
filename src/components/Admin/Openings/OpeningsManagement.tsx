@@ -10,9 +10,9 @@ import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faBriefcase,
   faMapMarkerAlt,
-  faDollarSign
+  faDollarSign,
+  faPlus
 } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 import { useOpenings } from '../../../hooks/useOpenings';
@@ -24,12 +24,51 @@ import {
 import { PageTitle, PageSubtitle } from '../shared/Typography';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import OpeningDetailsModal from './OpeningDetailsModal';
-import OpeningEditModal from './OpeningEditModal';
+import OpeningFormModal from './OpeningFormModal';
 import { colors } from '../../../theme/styleVars';
 
 const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
+`;
+
+const HeaderRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+`;
+
+const HeaderContent = styled.div``;
+
+const AddButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: ${colors.mint};
+  color: white;
+
+  &:hover {
+    background: ${colors.cornflower};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  svg {
+    font-size: 0.875rem;
+  }
 `;
 
 const SearchBar = styled.input`
@@ -224,7 +263,7 @@ const OpeningsManagement: React.FC = () => {
   const [selectedOpening, setSelectedOpening] =
     useState<RoleOpportunity | null>(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [showFormModal, setShowFormModal] = useState(false);
 
   // Debounce search
   const handleSearch = (value: string) => {
@@ -240,15 +279,21 @@ const OpeningsManagement: React.FC = () => {
     setShowDetailsModal(true);
   };
 
+  // Handle add new opening
+  const handleAddClick = () => {
+    setSelectedOpening(null);
+    setShowFormModal(true);
+  };
+
   // Handle edit from details modal
   const handleEditClick = (opening: RoleOpportunity) => {
     setShowDetailsModal(false);
     setSelectedOpening(opening);
-    setShowEditModal(true);
+    setShowFormModal(true);
   };
 
-  // Handle edit success
-  const handleEditSuccess = () => {
+  // Handle form success (add or edit)
+  const handleFormSuccess = () => {
     refreshOpenings();
   };
 
@@ -260,10 +305,20 @@ const OpeningsManagement: React.FC = () => {
 
   return (
     <Container>
-      <PageTitle>CAG Job Openings</PageTitle>
-      <PageSubtitle>
-        Manage staff, volunteer, and board positions for /get-involved page
-      </PageSubtitle>
+      <HeaderRow>
+        <HeaderContent>
+          <PageTitle>CAG Job Openings</PageTitle>
+          <PageSubtitle>
+            Manage staff, volunteer, and board positions for /get-involved page
+          </PageSubtitle>
+        </HeaderContent>
+        {hasPermission('openings', 'edit') && (
+          <AddButton onClick={handleAddClick}>
+            <FontAwesomeIcon icon={faPlus} />
+            Add Opening
+          </AddButton>
+        )}
+      </HeaderRow>
 
       <SearchBar
         type="text"
@@ -358,14 +413,14 @@ const OpeningsManagement: React.FC = () => {
         />
       )}
 
-      {showEditModal && selectedOpening && (
-        <OpeningEditModal
+      {showFormModal && (
+        <OpeningFormModal
           opening={selectedOpening}
           onClose={() => {
-            setShowEditModal(false);
+            setShowFormModal(false);
             setSelectedOpening(null);
           }}
-          onSuccess={handleEditSuccess}
+          onSuccess={handleFormSuccess}
         />
       )}
     </Container>

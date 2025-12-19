@@ -24,12 +24,24 @@ export type AdminActionType =
   | 'company_approve'
   | 'opening_view'
   | 'opening_edit'
-  | 'opening_moderate';
+  | 'opening_moderate'
+  | 'opening_create'
+  | 'opening_delete'
+  | 'event_view'
+  | 'event_create'
+  | 'event_edit'
+  | 'event_delete'
+  | 'event_publish';
 
 /**
  * Admin action target types
  */
-export type AdminActionTargetType = 'user' | 'company' | 'opening' | 'system';
+export type AdminActionTargetType =
+  | 'user'
+  | 'company'
+  | 'opening'
+  | 'event'
+  | 'system';
 
 /**
  * Parameters for logging an admin action

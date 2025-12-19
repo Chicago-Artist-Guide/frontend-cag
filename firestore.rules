@@ -2,7 +2,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ============================================
-    // AUTHENTICATION HELPER FUNCTIONS (from master)
+    // AUTHENTICATION HELPER FUNCTIONS
     // ============================================
 
     // Helper function to check if user is authenticated
@@ -143,11 +143,17 @@ service cloud.firestore {
     }
 
     // Events collection
+    // - Public read access (for /events page)
+    // - Admins can create/update/delete events
+    // - Creators can update/delete their own events
     match /events/{eventId} {
       allow read: if true;
-      allow create: if isAuthenticated();
-      allow update, delete: if isAuthenticated() &&
-        (resource == null || request.auth.uid == resource.data.uid);
+      allow create: if isAdminOrHigher();
+      allow update, delete: if isAuthenticated() && (
+        isAdminOrHigher() ||
+        request.auth.uid == resource.data.createdBy ||
+        request.auth.uid == resource.data.created_by
+      );
     }
 
     // Threads collection
@@ -225,7 +231,7 @@ service cloud.firestore {
         request.auth.uid == resource.data.account_id;
     }
 
-    // Admin actions audit log - NEW
+    // Admin actions audit log
     // - Admins can read and create audit logs
     // - No updates allowed (tamper protection)
     // - No deletes (preserve audit trail)
@@ -234,8 +240,14 @@ service cloud.firestore {
       allow create: if isAdmin() &&
         request.resource.data.keys().hasAll(['admin_uid', 'admin_email', 'action_type', 'target_type', 'target_id', 'timestamp']) &&
         request.resource.data.admin_uid == request.auth.uid &&
-        request.resource.data.action_type in ['user_view', 'user_edit', 'company_approve', 'opening_view', 'opening_moderate', 'role_change', 'delete', 'export', 'profile_view', 'account_create'] &&
-        request.resource.data.target_type in ['user', 'company', 'production', 'role', 'opening', 'match', 'theatre_request', 'account', 'profile'];
+        request.resource.data.action_type in [
+          'user_view', 'user_edit', 'user_delete',
+          'company_view', 'company_edit', 'company_approve',
+          'opening_view', 'opening_edit', 'opening_moderate', 'opening_create', 'opening_delete',
+          'event_view', 'event_create', 'event_edit', 'event_delete', 'event_publish',
+          'role_change', 'delete', 'export', 'profile_view', 'account_create'
+        ] &&
+        request.resource.data.target_type in ['user', 'company', 'production', 'role', 'opening', 'event', 'match', 'theatre_request', 'account', 'profile', 'system'];
       allow update: if false;
       allow delete: if false;
     }

@@ -6,29 +6,19 @@
  */
 
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faChartLine,
   faChartBar,
   faUsers,
-  faKey,
-  faTheaterMasks,
-  faFileContract,
-  faFilm,
   faBriefcase,
-  faShieldAlt,
-  faHandshake
+  faCalendarAlt
 } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 import { colors, fonts } from '../../../theme/styleVars';
-import {
-  canManageUsers,
-  canApproveCompanies,
-  canModerateOpenings,
-  hasAnyPermissionOn
-} from '../../../utils/adminPermissions';
+import { hasAnyPermissionOn } from '../../../utils/adminPermissions';
 
 /**
  * Sidebar container
@@ -166,7 +156,6 @@ const SidebarFooter = styled.div`
  */
 const AdminSidebar: React.FC = () => {
   const { adminRole, permissions } = useAdminAuth();
-  const location = useLocation();
 
   // Get role display name
   const getRoleLabel = (role: string | null): string => {
@@ -219,35 +208,6 @@ const AdminSidebar: React.FC = () => {
               <FontAwesomeIcon icon={faUsers} />
               <span>All Users</span>
             </StyledNavLink>
-            {canManageUsers(adminRole) && (
-              <StyledNavLink to="/admin/users/roles">
-                <FontAwesomeIcon icon={faKey} />
-                <span>Admin Roles</span>
-              </StyledNavLink>
-            )}
-          </NavSection>
-        )}
-
-        {/* Company Management - visible to those with company permissions */}
-        {hasAnyPermissionOn(adminRole, 'companies') && (
-          <NavSection>
-            <SectionTitle>Companies</SectionTitle>
-            <StyledNavLink to="/admin/companies">
-              <FontAwesomeIcon icon={faTheaterMasks} />
-              <span>All Companies</span>
-            </StyledNavLink>
-            {canApproveCompanies(adminRole) && (
-              <StyledNavLink to="/admin/companies/requests">
-                <FontAwesomeIcon icon={faFileContract} />
-                <span>Pending Requests</span>
-              </StyledNavLink>
-            )}
-            {permissions?.companies.view && (
-              <StyledNavLink to="/admin/companies/productions">
-                <FontAwesomeIcon icon={faFilm} />
-                <span>All Productions</span>
-              </StyledNavLink>
-            )}
           </NavSection>
         )}
 
@@ -259,18 +219,17 @@ const AdminSidebar: React.FC = () => {
               <FontAwesomeIcon icon={faBriefcase} />
               <span>All Openings</span>
             </StyledNavLink>
-            {canModerateOpenings(adminRole) && (
-              <StyledNavLink to="/admin/openings/moderate">
-                <FontAwesomeIcon icon={faShieldAlt} />
-                <span>Moderate</span>
-              </StyledNavLink>
-            )}
-            {permissions?.openings.view && (
-              <StyledNavLink to="/admin/openings/matches">
-                <FontAwesomeIcon icon={faHandshake} />
-                <span>Matches</span>
-              </StyledNavLink>
-            )}
+          </NavSection>
+        )}
+
+        {/* Events Management - visible to those with events permissions */}
+        {hasAnyPermissionOn(adminRole, 'events') && (
+          <NavSection>
+            <SectionTitle>Events</SectionTitle>
+            <StyledNavLink to="/admin/events">
+              <FontAwesomeIcon icon={faCalendarAlt} />
+              <span>All Events</span>
+            </StyledNavLink>
           </NavSection>
         )}
       </NavMenu>
