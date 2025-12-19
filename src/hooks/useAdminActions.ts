@@ -21,7 +21,9 @@ export type AdminActionType =
   | 'role_change'
   | 'company_view'
   | 'company_edit'
+  | 'company_create'
   | 'company_approve'
+  | 'company_reject'
   | 'opening_view'
   | 'opening_edit'
   | 'opening_moderate'
@@ -39,6 +41,7 @@ export type AdminActionType =
 export type AdminActionTargetType =
   | 'user'
   | 'company'
+  | 'theatre_request'
   | 'opening'
   | 'event'
   | 'system';
@@ -61,6 +64,8 @@ export interface AdminActionParams {
     after?: Record<string, any>;
     fields_changed?: string[];
   };
+  /** Additional details/metadata */
+  details?: Record<string, any>;
   /** Additional notes */
   notes?: string;
 }
@@ -123,6 +128,9 @@ export function useAdminActions() {
 
         // Changes (if any)
         changes: params.changes || null,
+
+        // Additional details
+        details: params.details || null,
 
         // Notes
         notes: params.notes || '',

@@ -14,7 +14,8 @@ import {
   faChartBar,
   faUsers,
   faBriefcase,
-  faCalendarAlt
+  faCalendarAlt,
+  faBuilding
 } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 import { colors, fonts } from '../../../theme/styleVars';
@@ -207,6 +208,17 @@ const AdminSidebar: React.FC = () => {
             <StyledNavLink to="/admin/users">
               <FontAwesomeIcon icon={faUsers} />
               <span>All Users</span>
+            </StyledNavLink>
+          </NavSection>
+        )}
+
+        {/* Theatre Companies - visible to those who can manage companies */}
+        {hasAnyPermissionOn(adminRole, 'companies') && (
+          <NavSection>
+            <SectionTitle>Theatre Companies</SectionTitle>
+            <StyledNavLink to="/admin/companies">
+              <FontAwesomeIcon icon={faBuilding} />
+              <span>All Companies</span>
             </StyledNavLink>
           </NavSection>
         )}
