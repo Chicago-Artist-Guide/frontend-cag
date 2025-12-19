@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  collection,
-  getDocs,
-  query,
-  where,
-  limit as firestoreLimit
-} from 'firebase/firestore';
+import { collection, getDocs, query } from 'firebase/firestore';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
@@ -13,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/layout';
 import { Title, Tagline } from '../components/layout/Titles';
 import { useFirebaseContext } from '../context/FirebaseContext';
-import { Production, Role } from '../components/Profile/Company/types';
 import InputField from '../components/shared/Input';
 import Button from '../components/shared/Button';
 import { colors, fonts, breakpoints } from '../theme/styleVars';
@@ -159,63 +152,6 @@ const GetInvolved: React.FC = () => {
             'Error fetching role opportunities from Firebase:',
             error
           );
-        }
-
-        // Also fetch roles from productions (existing functionality)
-        try {
-          const activeProductionStatuses = [
-            'Casting',
-            'Hiring',
-            'Pre-Production'
-          ];
-
-          const productionsRef = query(
-            collection(firebaseFirestore, 'productions'),
-            where('status', 'in', activeProductionStatuses),
-            firestoreLimit(10)
-          );
-
-          const snapshot = await getDocs(productionsRef);
-
-          snapshot.docs.forEach((doc) => {
-            const production = doc.data() as Production;
-            if (production.roles && Array.isArray(production.roles)) {
-              production.roles.forEach((role: Role, index: number) => {
-                // Only include roles that are open
-                if (
-                  role.role_status === 'Open' &&
-                  role.role_name &&
-                  role.description
-                ) {
-                  // Determine role type
-                  const roleType =
-                    role.type === 'On-Stage' ? 'Onstage' : 'Offstage';
-
-                  // Format pay if available
-                  let pay: string | undefined;
-                  if (role.role_rate) {
-                    const unit = role.role_rate_unit || 'Total';
-                    pay = `$${role.role_rate}${unit !== 'Total' ? ` (${unit})` : ''}`;
-                  }
-
-                  rolesList.push({
-                    id: `${doc.id}-${index}`,
-                    roleName: role.role_name,
-                    productionName: production.production_name,
-                    description: role.description,
-                    productionId: production.production_id,
-                    googleFormUrl: role.google_form_url || undefined,
-                    moreInfoUrl: `/shows/${production.production_id}`,
-                    roleType,
-                    pay,
-                    location: production.location || 'Chicago'
-                  });
-                }
-              });
-            }
-          });
-        } catch (error) {
-          console.error('Error fetching roles from productions:', error);
         }
 
         setRoles(rolesList.slice(0, 6)); // Limit to 6 roles for display
