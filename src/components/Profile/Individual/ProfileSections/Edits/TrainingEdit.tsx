@@ -16,7 +16,6 @@ const TrainingEdit: React.FC<{
   onTrainingFieldChange,
   removeTrainingBlock
 }) => {
-  console.log(training_institutions);
   return (
     <Container>
       {training_institutions.map((training: any) => (
@@ -33,7 +32,7 @@ const TrainingEdit: React.FC<{
                   )
                 }
                 placeholder="Institution"
-                value={training.trainingInstitution}
+                value={training.trainingInstitution || ''}
               />
               <InputField
                 name="trainingYear"
@@ -45,7 +44,7 @@ const TrainingEdit: React.FC<{
                   )
                 }
                 placeholder="Year"
-                value={training.trainingYear}
+                value={training.trainingYear || ''}
               />
               <InputField
                 name="trainingDegree"
@@ -57,7 +56,7 @@ const TrainingEdit: React.FC<{
                   )
                 }
                 placeholder="Degree"
-                value={training.trainingDegree}
+                value={training.trainingDegree || ''}
               />
               {training_institutions.length > 1 && (
                 <DeleteRowLink

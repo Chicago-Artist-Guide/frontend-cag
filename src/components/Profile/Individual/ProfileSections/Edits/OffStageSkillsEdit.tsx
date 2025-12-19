@@ -22,6 +22,7 @@ interface PropType {
   offstage_roles_sound: string[];
   offstage_roles_hair_makeup_costumes: string[];
   submitOffStageSkills: (selectedRoles: any) => void;
+  onCancel: () => void;
 }
 
 const OffStageSkillsEdit: React.FC<PropType> = ({
@@ -31,7 +32,8 @@ const OffStageSkillsEdit: React.FC<PropType> = ({
   offstage_roles_lighting,
   offstage_roles_sound,
   offstage_roles_hair_makeup_costumes,
-  submitOffStageSkills
+  submitOffStageSkills,
+  onCancel
 }) => {
   const [selectedRoles, setSelectedRoles] = useState({
     offstage_roles_general: offstage_roles_general || [],
@@ -122,6 +124,12 @@ const OffStageSkillsEdit: React.FC<PropType> = ({
           type="button"
           variant="primary"
         />
+        <Button
+          onClick={onCancel}
+          text="Cancel"
+          type="button"
+          variant="secondary"
+        />
       </ButtonContainer>
     </Container>
   );
@@ -166,10 +174,14 @@ const CheckboxContainer = styled.div`
 `;
 
 const ButtonContainer = styled.div`
+  display: flex;
+  gap: 12px;
   margin-top: 24px;
 
   @media (max-width: ${breakpoints.md}) {
+    flex-direction: column;
     margin-top: 20px;
+    gap: 8px;
 
     button {
       width: 100%;
