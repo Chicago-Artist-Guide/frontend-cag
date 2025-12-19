@@ -13,7 +13,8 @@ import {
   faChartLine,
   faUsers,
   faBriefcase,
-  faCalendarAlt
+  faCalendarAlt,
+  faBuilding
 } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { useAnalyticsData } from '../../hooks/useAnalyticsData';
@@ -418,6 +419,19 @@ const Dashboard: React.FC = () => {
             <div className="title">Manage Users</div>
             <div className="description">
               View and manage user accounts and profiles.
+            </div>
+          </QuickActionCard>
+        )}
+
+        {/* Theatre Companies */}
+        {hasAnyPermissionOn(adminRole, 'companies') && (
+          <QuickActionCard to="/admin/companies">
+            <div className="icon-container">
+              <FontAwesomeIcon icon={faBuilding} />
+            </div>
+            <div className="title">Theatre Companies</div>
+            <div className="description">
+              Manage theatre company accounts and approve sign-up requests.
             </div>
           </QuickActionCard>
         )}

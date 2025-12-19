@@ -91,15 +91,20 @@ service cloud.firestore {
     // Accounts collection
     // - Authenticated users can read
     // - Owners can write (create/update/delete their own)
+    // - Admins can create accounts for other users (for company management)
     // - Admins can update any account (for user management)
     // - Only super_admin can modify admin_role field (prevents privilege escalation)
     // - Cannot modify your own admin_role (prevents self-escalation/accidental self-demotion)
     match /accounts/{accountId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() &&
-        request.resource.data.uid == request.auth.uid &&
-        // New accounts cannot set admin_role
-        !request.resource.data.keys().hasAny(['admin_role']);
+      allow create: if isAuthenticated() && (
+        // Users can create their own account
+        (request.resource.data.uid == request.auth.uid &&
+         !request.resource.data.keys().hasAny(['admin_role'])) ||
+        // Admins can create accounts for other users (company creation)
+        (isAdminOrHigher() &&
+         !request.resource.data.keys().hasAny(['admin_role']))
+      );
       allow update: if isAuthenticated() && (
         // Owner can update their own account (but not admin_role)
         (request.auth.uid == resource.data.uid &&
@@ -118,11 +123,16 @@ service cloud.firestore {
     // Profiles collection
     // - Authenticated users can read
     // - Owners can write (create/update/delete their own)
+    // - Admins can create profiles for other users (for company management)
     // - Admins can update any profile (for user management)
     match /profiles/{profileId} {
       allow read: if isAuthenticated();
-      allow create: if isAuthenticated() &&
-        request.resource.data.uid == request.auth.uid;
+      allow create: if isAuthenticated() && (
+        // Users can create their own profile
+        request.resource.data.uid == request.auth.uid ||
+        // Admins can create profiles for other users
+        isAdminOrHigher()
+      );
       allow update: if isAuthenticated() && (
         request.auth.uid == resource.data.uid ||
         isAdminOrHigher()
@@ -194,10 +204,19 @@ service cloud.firestore {
     }
 
     // Theatre requests
+    // - Anyone can create (public sign-up form)
+    // - Admins can read, update, delete (for approval workflow)
+    // - Owners can read their own requests (if user_id field exists)
     match /theatre_requests/{requestId} {
       allow create: if true;
-      allow read, update, delete: if isAuthenticated() &&
-        (resource == null || request.auth.uid == resource.data.user_id);
+      allow read: if isAuthenticated() && (
+        isAdminOrHigher() ||
+        (resource.data.keys().hasAny(['user_id']) && request.auth.uid == resource.data.user_id)
+      );
+      allow update, delete: if isAuthenticated() && (
+        isAdminOrHigher() ||
+        (resource.data.keys().hasAny(['user_id']) && request.auth.uid == resource.data.user_id)
+      );
     }
 
     // ============================================
@@ -242,7 +261,7 @@ service cloud.firestore {
         request.resource.data.admin_uid == request.auth.uid &&
         request.resource.data.action_type in [
           'user_view', 'user_edit', 'user_delete',
-          'company_view', 'company_edit', 'company_approve',
+          'company_view', 'company_edit', 'company_create', 'company_approve', 'company_reject',
           'opening_view', 'opening_edit', 'opening_moderate', 'opening_create', 'opening_delete',
           'event_view', 'event_create', 'event_edit', 'event_delete', 'event_publish',
           'role_change', 'delete', 'export', 'profile_view', 'account_create'
