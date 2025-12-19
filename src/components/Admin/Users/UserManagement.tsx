@@ -141,7 +141,7 @@ const UserManagement: React.FC = () => {
 
   // Permission check
   if (!hasPermission('users', 'view')) {
-    return <Navigate to="/staff/admin" replace />;
+    return <Navigate to="/admin" replace />;
   }
 
   const [searchTerm, setSearchTerm] = useState('');

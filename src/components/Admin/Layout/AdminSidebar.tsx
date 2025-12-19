@@ -194,7 +194,7 @@ const AdminSidebar: React.FC = () => {
       <NavMenu>
         {/* Dashboard - always visible to all admins */}
         <NavSection>
-          <StyledNavLink to="/staff/admin" end>
+          <StyledNavLink to="/admin" end>
             <FontAwesomeIcon icon={faChartLine} />
             <span>Dashboard</span>
           </StyledNavLink>
@@ -204,7 +204,7 @@ const AdminSidebar: React.FC = () => {
         {permissions?.analytics.view && (
           <NavSection>
             <SectionTitle>Analytics</SectionTitle>
-            <StyledNavLink to="/staff/admin/analytics">
+            <StyledNavLink to="/admin/analytics">
               <FontAwesomeIcon icon={faChartBar} />
               <span>Analytics</span>
             </StyledNavLink>
@@ -215,12 +215,12 @@ const AdminSidebar: React.FC = () => {
         {hasAnyPermissionOn(adminRole, 'users') && (
           <NavSection>
             <SectionTitle>User Management</SectionTitle>
-            <StyledNavLink to="/staff/admin/users">
+            <StyledNavLink to="/admin/users">
               <FontAwesomeIcon icon={faUsers} />
               <span>All Users</span>
             </StyledNavLink>
             {canManageUsers(adminRole) && (
-              <StyledNavLink to="/staff/admin/users/roles">
+              <StyledNavLink to="/admin/users/roles">
                 <FontAwesomeIcon icon={faKey} />
                 <span>Admin Roles</span>
               </StyledNavLink>
@@ -232,18 +232,18 @@ const AdminSidebar: React.FC = () => {
         {hasAnyPermissionOn(adminRole, 'companies') && (
           <NavSection>
             <SectionTitle>Companies</SectionTitle>
-            <StyledNavLink to="/staff/admin/companies">
+            <StyledNavLink to="/admin/companies">
               <FontAwesomeIcon icon={faTheaterMasks} />
               <span>All Companies</span>
             </StyledNavLink>
             {canApproveCompanies(adminRole) && (
-              <StyledNavLink to="/staff/admin/companies/requests">
+              <StyledNavLink to="/admin/companies/requests">
                 <FontAwesomeIcon icon={faFileContract} />
                 <span>Pending Requests</span>
               </StyledNavLink>
             )}
             {permissions?.companies.view && (
-              <StyledNavLink to="/staff/admin/companies/productions">
+              <StyledNavLink to="/admin/companies/productions">
                 <FontAwesomeIcon icon={faFilm} />
                 <span>All Productions</span>
               </StyledNavLink>
@@ -255,18 +255,18 @@ const AdminSidebar: React.FC = () => {
         {hasAnyPermissionOn(adminRole, 'openings') && (
           <NavSection>
             <SectionTitle>Current Openings</SectionTitle>
-            <StyledNavLink to="/staff/admin/openings">
+            <StyledNavLink to="/admin/openings">
               <FontAwesomeIcon icon={faBriefcase} />
               <span>All Openings</span>
             </StyledNavLink>
             {canModerateOpenings(adminRole) && (
-              <StyledNavLink to="/staff/admin/openings/moderate">
+              <StyledNavLink to="/admin/openings/moderate">
                 <FontAwesomeIcon icon={faShieldAlt} />
                 <span>Moderate</span>
               </StyledNavLink>
             )}
             {permissions?.openings.view && (
-              <StyledNavLink to="/staff/admin/openings/matches">
+              <StyledNavLink to="/admin/openings/matches">
                 <FontAwesomeIcon icon={faHandshake} />
                 <span>Matches</span>
               </StyledNavLink>

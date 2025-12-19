@@ -91,19 +91,44 @@ service cloud.firestore {
     // Accounts collection
     // - Authenticated users can read
     // - Owners can write (create/update/delete their own)
+    // - Admins can update any account (for user management)
+    // - Only super_admin can modify admin_role field (prevents privilege escalation)
+    // - Cannot modify your own admin_role (prevents self-escalation/accidental self-demotion)
     match /accounts/{accountId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() &&
-        (resource == null || request.auth.uid == resource.data.uid);
+      allow create: if isAuthenticated() &&
+        request.resource.data.uid == request.auth.uid &&
+        // New accounts cannot set admin_role
+        !request.resource.data.keys().hasAny(['admin_role']);
+      allow update: if isAuthenticated() && (
+        // Owner can update their own account (but not admin_role)
+        (request.auth.uid == resource.data.uid &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_role'])) ||
+        // Admins can update any account (but not admin_role)
+        (isAdminOrHigher() &&
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_role'])) ||
+        // Only super_admin can modify admin_role, but not their own
+        (isSuperAdmin() &&
+         resource.data.uid != request.auth.uid)
+      );
+      allow delete: if isAuthenticated() &&
+        request.auth.uid == resource.data.uid;
     }
 
     // Profiles collection
     // - Authenticated users can read
     // - Owners can write (create/update/delete their own)
+    // - Admins can update any profile (for user management)
     match /profiles/{profileId} {
       allow read: if isAuthenticated();
-      allow write: if isAuthenticated() &&
-        (resource == null || request.auth.uid == resource.data.uid);
+      allow create: if isAuthenticated() &&
+        request.resource.data.uid == request.auth.uid;
+      allow update: if isAuthenticated() && (
+        request.auth.uid == resource.data.uid ||
+        isAdminOrHigher()
+      );
+      allow delete: if isAuthenticated() &&
+        request.auth.uid == resource.data.uid;
     }
 
     // Productions collection
@@ -175,21 +200,18 @@ service cloud.firestore {
 
     // Admin users collection
     // - Document ID must be the user's auth UID for rule lookups
-    // - Users can create/update their OWN doc (for AdminContext auto-sync)
-    // - Super admins can manage all admin users
-    // - Security: accounts.admin_role is source of truth; AdminContext only syncs if it exists
+    // - Only super_admins can manage admin users (prevents privilege escalation)
+    // - Cannot modify your own admin_users doc (prevents self-escalation/accidental self-demotion)
+    // - Bootstrap: First super_admin must be created manually in Firebase Console
     match /admin_users/{userId} {
       allow read: if isAuthenticated();
-      // Allow self-sync OR super_admin management
-      allow create, update: if isAuthenticated() && (
-        // User can sync their own document
-        (request.auth.uid == userId &&
-         request.resource.data.role in ['staff', 'moderator', 'admin', 'super_admin']) ||
-        // Super admin can manage any admin user
-        isSuperAdmin()
-      );
-      // Only super_admin can delete admin users
-      allow delete: if isSuperAdmin();
+      // Super admin can create/update others' admin docs, but not their own
+      allow create, update: if isSuperAdmin() &&
+        userId != request.auth.uid &&
+        request.resource.data.role in ['staff', 'moderator', 'admin', 'super_admin'];
+      // Super admin can delete others' admin docs, but not their own
+      allow delete: if isSuperAdmin() &&
+        userId != request.auth.uid;
     }
 
     // Role opportunities collection (CAG job openings)

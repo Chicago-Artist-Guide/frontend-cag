@@ -165,7 +165,7 @@ const generateBreadcrumbs = (pathname: string) => {
   // Always start with Admin
   breadcrumbs.push({
     label: 'Admin',
-    path: '/staff/admin'
+    path: '/admin'
   });
 
   // Map segments to readable names

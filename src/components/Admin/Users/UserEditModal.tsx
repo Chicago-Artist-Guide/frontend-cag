@@ -319,6 +319,12 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
   const isSuperAdmin = adminRole === 'super_admin';
   const isEditingSelf = currentUser?.uid === user.uid;
 
+  console.log('[UserEditModal] User data:', {
+    uid: user.uid,
+    admin_role: user.admin_role,
+    email: user.email
+  });
+
   // Initial form values
   const initialValues: UserEditFormData = {
     email: user.email || '',
@@ -383,11 +389,23 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
       }
 
       // Handle admin role changes (super_admin only, cannot change own role)
+      // Normalize empty string to null for comparison
+      const newRole = values.admin_role || null;
+      const oldRole = user.admin_role || null;
       const adminRoleChanged =
-        isSuperAdmin && !isEditingSelf && values.admin_role !== user.admin_role;
+        isSuperAdmin && !isEditingSelf && newRole !== oldRole;
+
+      console.log('[UserEditModal] Role check:', {
+        'values.admin_role': values.admin_role,
+        newRole,
+        oldRole,
+        isSuperAdmin,
+        isEditingSelf,
+        adminRoleChanged
+      });
 
       if (adminRoleChanged) {
-        accountUpdates.admin_role = values.admin_role || null;
+        accountUpdates.admin_role = newRole;
         accountUpdates.admin_role_assigned_at = serverTimestamp();
         accountUpdates.admin_role_assigned_by = currentUser.email;
         accountUpdates.admin_role_notes = values.admin_role_notes || '';
@@ -400,18 +418,30 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
         // Sync admin_users collection (required for Firestore rules enforcement)
         // Document ID must be the user's auth UID for direct lookup in rules
         const adminUserRef = doc(firebaseFirestore, 'admin_users', user.uid);
+        console.log('[UserEditModal] Syncing admin_users for uid:', user.uid);
+        console.log('[UserEditModal] Setting role to:', newRole);
 
-        if (values.admin_role) {
+        if (newRole) {
           // Create or update admin_users document
-          await setDoc(adminUserRef, {
-            role: values.admin_role,
-            email: values.email || user.email,
-            assigned_at: serverTimestamp(),
-            assigned_by: currentUser.email
-          });
+          try {
+            await setDoc(adminUserRef, {
+              role: newRole,
+              email: values.email || user.email,
+              assigned_at: serverTimestamp(),
+              assigned_by: currentUser.email
+            });
+            console.log('[UserEditModal] ✅ admin_users doc created/updated');
+          } catch (adminUserError: any) {
+            console.error(
+              '[UserEditModal] ❌ Failed to sync admin_users:',
+              adminUserError
+            );
+            throw adminUserError; // Re-throw to trigger error handling
+          }
         } else {
           // Remove admin_users document if role is cleared
           await deleteDoc(adminUserRef);
+          console.log('[UserEditModal] admin_users doc deleted');
         }
       }
 
@@ -504,7 +534,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
           validationSchema={getValidationSchema(user.type)}
           onSubmit={handleSubmit}
         >
-          {({ errors, touched, isSubmitting }) => (
+          {({ errors, touched, isSubmitting, setFieldValue, values }) => (
             <Form>
               <Body>
                 {/* Basic Information */}
@@ -595,11 +625,28 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
 
                     <FormGroup>
                       <Label htmlFor="admin_role">Admin Role</Label>
-                      <Select
-                        as="select"
+                      <select
                         name="admin_role"
                         id="admin_role"
                         disabled={isEditingSelf}
+                        value={values.admin_role || ''}
+                        onChange={(e) => {
+                          console.log(
+                            '[UserEditModal] Role dropdown changed to:',
+                            e.target.value
+                          );
+                          setFieldValue('admin_role', e.target.value);
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '0.75rem 1rem',
+                          border: '1px solid #E5E5E5',
+                          borderRadius: '8px',
+                          fontSize: '1rem',
+                          backgroundColor: isEditingSelf ? '#F8F9FA' : 'white',
+                          color: isEditingSelf ? '#6B7B8A' : '#2D3748',
+                          cursor: isEditingSelf ? 'not-allowed' : 'pointer'
+                        }}
                       >
                         <option value="">No admin role</option>
                         <option value="staff">Staff (View only)</option>
@@ -612,7 +659,7 @@ const UserEditModal: React.FC<UserEditModalProps> = ({
                         <option value="super_admin">
                           Super Admin (Full access)
                         </option>
-                      </Select>
+                      </select>
                     </FormGroup>
 
                     {!isEditingSelf && (

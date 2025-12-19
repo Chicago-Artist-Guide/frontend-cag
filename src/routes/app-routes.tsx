@@ -72,15 +72,15 @@ const AppRoutes = () => {
 
         {/* Legacy route - redirect to new admin analytics */}
         <Route
-          path="/staff/analytics"
-          element={<Navigate to="/staff/admin/analytics" replace />}
+          path="/analytics"
+          element={<Navigate to="/admin/analytics" replace />}
         />
 
         <Route path="*" element={<NotFound />} />
       </Route>
 
       {/* Admin routes - separate layout */}
-      <Route path="/staff/admin" element={<AdminLayout />}>
+      <Route path="/admin" element={<AdminLayout />}>
         <Route index element={<AdminDashboard />} />
         <Route path="analytics" element={<AnalyticsDashboard />} />
 

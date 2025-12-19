@@ -198,7 +198,7 @@ const OpeningsManagement: React.FC = () => {
 
   // Permission check
   if (!hasPermission('openings', 'view')) {
-    return <Navigate to="/staff/admin" replace />;
+    return <Navigate to="/admin" replace />;
   }
 
   const [searchTerm, setSearchTerm] = useState('');

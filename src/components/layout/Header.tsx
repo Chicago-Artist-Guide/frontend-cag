@@ -124,7 +124,7 @@ const Header = () => {
             </>
           )}
           {isAdmin && (
-            <Nav.Link as={Link} to="/staff/admin" onClick={handleNavClick}>
+            <Nav.Link as={Link} to="/admin" onClick={handleNavClick}>
               ADMIN
             </Nav.Link>
           )}

@@ -36,12 +36,13 @@ Four role levels, from lowest to highest privilege:
 Once you have super_admin access:
 
 1. Log in to the application
-2. Navigate to `/staff/admin/users/roles`
+2. Navigate to `/admin/users/roles`
 3. Search for the user by email
 4. Assign appropriate role from dropdown
 5. Save changes
 
 The system will:
+
 - Log the action in `admin_actions` collection
 - Update the user's `admin_role` field
 - Update `admin_since` timestamp
@@ -68,7 +69,8 @@ const roleAssignments = {
 async function assignRoles() {
   for (const [email, role] of Object.entries(roleAssignments)) {
     // Find user account by email
-    const snapshot = await db.collection('accounts')
+    const snapshot = await db
+      .collection('accounts')
       .where('email', '==', email)
       .limit(1)
       .get();
@@ -99,6 +101,7 @@ assignRoles().then(() => console.log('Done'));
 Security rules have been updated with admin functions. Key points:
 
 ### Admin Helper Functions
+
 - `isAdmin()` - Has any admin_role
 - `hasAdminRole(role)` - Has specific role
 - `isSuperAdmin()` - Is super_admin
@@ -109,24 +112,28 @@ Security rules have been updated with admin functions. Key points:
 ### Collection Permissions
 
 **accounts:**
+
 - Read: All authenticated users (for matching) + admins
 - Create: Authenticated users (cannot set admin_role)
 - Update: Own account (cannot change admin_role) OR admins (cannot change admin_role) OR super_admin (can change admin_role)
 - Delete: Super admin only
 
 **profiles:**
+
 - Read: All authenticated users + admins
 - Create: Own profile only
 - Update: Own profile OR admins
 - Delete: Super admin only
 
 **admin_actions:**
+
 - Read: Admins only
 - Create: Admins only (must match auth.uid)
 - Update: Never (audit logs are immutable)
 - Delete: Super admin only (for retention policy)
 
 **theatre_requests:**
+
 - Read: Admins only
 - Create: Public (signup requests)
 - Update: Admins only (approval workflow)
@@ -163,7 +170,7 @@ All admin actions are automatically logged to `admin_actions` collection:
 1. Create test accounts with different roles
 2. Log in as each role
 3. Verify correct permissions:
-   - **staff**: Can only access `/staff/admin/analytics`
+   - **staff**: Can only access `/admin/analytics`
    - **moderator**: Can access analytics + openings management
    - **admin**: Can access all except role management
    - **super_admin**: Can access everything
@@ -201,6 +208,7 @@ All admin actions are automatically logged to `admin_actions` collection:
 ## Security Best Practices
 
 ### DO:
+
 ✅ Always use `super_admin` to grant admin roles
 ✅ Log all sensitive admin actions
 ✅ Validate permissions in Firestore rules
@@ -208,6 +216,7 @@ All admin actions are automatically logged to `admin_actions` collection:
 ✅ Test role permissions thoroughly
 
 ### DON'T:
+
 ❌ Trust client-side permission checks for security
 ❌ Allow users to set their own admin_role
 ❌ Skip audit logging for sensitive operations
@@ -219,11 +228,13 @@ All admin actions are automatically logged to `admin_actions` collection:
 ### "Permission Denied" Errors
 
 1. **Check user has admin_role set**:
+
    - Open Firestore Console
    - Check accounts/{uid} document
    - Verify admin_role field exists and is valid
 
 2. **Check Firestore rules are deployed**:
+
    ```bash
    firebase deploy --only firestore:rules
    ```
@@ -235,6 +246,7 @@ All admin actions are automatically logged to `admin_actions` collection:
 ### Admin Actions Not Logging
 
 1. **Check admin has permission to create logs**:
+
    - Verify `isAdmin()` returns true
    - Check `admin_role` field is set
 
@@ -248,10 +260,12 @@ All admin actions are automatically logged to `admin_actions` collection:
 ### Role Assignment Fails
 
 1. **Verify you are super_admin**:
+
    - Only super_admin can modify admin_role
    - Check your account's admin_role field
 
 2. **Check target user exists**:
+
    - Verify account document exists
    - Check UID is correct
 
@@ -279,11 +293,12 @@ const admin = require('firebase-admin');
 const db = admin.firestore();
 
 async function backupAdminRoles() {
-  const snapshot = await db.collection('accounts')
+  const snapshot = await db
+    .collection('accounts')
     .where('admin_role', '!=', null)
     .get();
 
-  const admins = snapshot.docs.map(doc => ({
+  const admins = snapshot.docs.map((doc) => ({
     uid: doc.id,
     email: doc.data().email,
     admin_role: doc.data().admin_role,
@@ -300,7 +315,9 @@ backupAdminRoles();
 
 ```javascript
 // Restore from backup
-const backupData = [/* paste backup JSON here */];
+const backupData = [
+  /* paste backup JSON here */
+];
 
 async function restoreAdminRoles() {
   for (const admin of backupData) {
@@ -318,6 +335,7 @@ restoreAdminRoles();
 ## Support
 
 For issues or questions:
+
 1. Check this guide
 2. Review Firestore rules
 3. Check Firebase Console logs
