@@ -208,8 +208,9 @@ export function useUsers(
           admin_role_assigned_by: account.admin_role_assigned_by,
           admin_role_notes: account.admin_role_notes,
           admin_active: account.admin_active,
-          first_name: profile?.first_name,
-          last_name: profile?.last_name,
+          // first_name/last_name are stored in accounts for individuals during signup
+          first_name: account.first_name || profile?.first_name,
+          last_name: account.last_name || profile?.last_name,
           preferred_name: profile?.preferred_name,
           pronouns: profile?.pronouns,
           profile_image_url: profile?.profile_image_url,
