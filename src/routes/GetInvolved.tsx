@@ -23,31 +23,8 @@ type RoleOpportunity = {
   roleType?: string;
   pay?: string;
   location?: string;
+  ongoing?: boolean;
 };
-
-type BoardPosition = {
-  id: string;
-  title: string;
-  description: string;
-  commitment: string;
-};
-
-const BOARD_POSITIONS: BoardPosition[] = [
-  {
-    id: 'board-1',
-    title: 'Artist Auxiliary Board Member',
-    description:
-      "Members of this Artist Auxiliary Board serve to cultivate collaborative relationships and visibility within the Chicago theater community, promote awareness of current work, advocate with the site's artist and company community, and support CAG projects. These Board members both understand and speak to the values and needs of Chicago artists",
-    commitment: 'Part Time - Location Chicago'
-  },
-  {
-    id: 'board-2',
-    title: 'Business Operations Board Member',
-    description:
-      'Members of the Business Operations Board support the day-to-day management and strategic planning. These Board members are available for strategic questions when needed, commit to quarterly meetings, help review strategic, fundraising, organizational policies, and serve as general support to leadership.',
-    commitment: 'Part Time - Location Chicago'
-  }
-];
 
 const contactFormSchema = Yup.object().shape({
   firstName: Yup.string().required('First name is required'),
@@ -103,6 +80,7 @@ const GetInvolved: React.FC = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const [searchParams] = useSearchParams();
   const [roles, setRoles] = useState<RoleOpportunity[]>([]);
+  const [ongoingRoles, setOngoingRoles] = useState<RoleOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const isDemoMode = searchParams.get('demo') === 'true';
@@ -114,13 +92,15 @@ const GetInvolved: React.FC = () => {
         // If demo mode is enabled, use demo roles
         if (isDemoMode) {
           setRoles(DEMO_ROLES);
+          setOngoingRoles([]);
           setLoading(false);
           return;
         }
 
-        const rolesList: RoleOpportunity[] = [];
+        const temporalRoles: RoleOpportunity[] = [];
+        const ongoingRolesList: RoleOpportunity[] = [];
 
-        // Fetch role opportunities from Firebase (similar to Events)
+        // Fetch role opportunities from Firebase
         try {
           const roleOpportunitiesRef = collection(
             firebaseFirestore,
@@ -133,7 +113,7 @@ const GetInvolved: React.FC = () => {
 
           roleOpportunitiesSnapshot.docs.forEach((doc) => {
             const data = doc.data();
-            rolesList.push({
+            const role: RoleOpportunity = {
               id: doc.id,
               roleName: data.roleName || data.role_name || '',
               productionName: data.productionName || data.production_name || '',
@@ -144,8 +124,16 @@ const GetInvolved: React.FC = () => {
               moreInfoUrl: data.moreInfoUrl || data.more_info_url || undefined,
               roleType: data.roleType || data.role_type || undefined,
               pay: data.pay || undefined,
-              location: data.location || 'Chicago'
-            });
+              location: data.location || 'Chicago',
+              ongoing: data.ongoing || false
+            };
+
+            // Separate ongoing and temporal roles
+            if (role.ongoing) {
+              ongoingRolesList.push(role);
+            } else {
+              temporalRoles.push(role);
+            }
           });
         } catch (error) {
           console.error(
@@ -154,7 +142,8 @@ const GetInvolved: React.FC = () => {
           );
         }
 
-        setRoles(rolesList.slice(0, 6)); // Limit to 6 roles for display
+        setRoles(temporalRoles.slice(0, 6)); // Limit to 6 temporal roles for display
+        setOngoingRoles(ongoingRolesList); // Show all ongoing roles
       } catch (error) {
         console.error('Error fetching roles:', error);
       }
@@ -309,38 +298,44 @@ ${values.message}
         )}
       </Section>
 
-      {/* Board Positions Section */}
-      <Section>
-        <SectionTitle>Ongoing open positions</SectionTitle>
-        <SectionDescription>
-          We are always looking for board members.
-        </SectionDescription>
+      {/* Ongoing Positions Section */}
+      {!loading && ongoingRoles.length > 0 && (
+        <Section>
+          <SectionTitle>Ongoing open positions</SectionTitle>
+          <SectionDescription>
+            We are always looking to fill these roles.
+          </SectionDescription>
 
-        <BoardList>
-          {BOARD_POSITIONS.map((position, index) => (
-            <BoardCard
-              key={position.id}
-              style={{ animationDelay: `${index * 0.15}s` }}
-            >
-              <BoardMetadata>
-                <BoardTitle>{position.title}</BoardTitle>
-                <BoardCommitment>{position.commitment}</BoardCommitment>
-              </BoardMetadata>
-              <BoardContent>
-                <BoardDescriptionLabel>Role Description</BoardDescriptionLabel>
-                <BoardDescription>{position.description}</BoardDescription>
-                <MoreInfoButton
-                  href="https://forms.google.com/your-board-application-form"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  More Info
-                </MoreInfoButton>
-              </BoardContent>
-            </BoardCard>
-          ))}
-        </BoardList>
-      </Section>
+          <BoardList>
+            {ongoingRoles.map((role, index) => (
+              <BoardCard
+                key={role.id}
+                style={{ animationDelay: `${index * 0.15}s` }}
+              >
+                <BoardMetadata>
+                  <BoardTitle>{role.roleName}</BoardTitle>
+                  {role.location && (
+                    <BoardCommitment>Location: {role.location}</BoardCommitment>
+                  )}
+                </BoardMetadata>
+                <BoardContent>
+                  <BoardDescriptionLabel>
+                    Role Description
+                  </BoardDescriptionLabel>
+                  <BoardDescription>{role.description}</BoardDescription>
+                  <MoreInfoButton
+                    href={role.googleFormUrl || role.moreInfoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    More Info
+                  </MoreInfoButton>
+                </BoardContent>
+              </BoardCard>
+            ))}
+          </BoardList>
+        </Section>
+      )}
 
       {/* Contact Form Section */}
       <Section>

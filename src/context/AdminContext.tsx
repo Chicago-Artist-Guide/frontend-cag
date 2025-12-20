@@ -136,15 +136,15 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    console.log('[AdminContext] useEffect triggered', {
-      hasCurrentUser: !!currentUser,
-      currentUserUid: currentUser?.uid,
-      hasFirestore: !!firestore
-    });
+    // console.log('[AdminContext] useEffect triggered', {
+    //   hasCurrentUser: !!currentUser,
+    //   currentUserUid: currentUser?.uid,
+    //   hasFirestore: !!firestore
+    // });
 
     // Reset state when user changes
     if (!currentUser || !firestore) {
-      console.log('[AdminContext] No user or firestore, resetting admin state');
+      // console.log('[AdminContext] No user or firestore, resetting admin state');
       setCurrentAdminRole(null);
       setPermissions(null);
       setLoading(false);
@@ -157,10 +157,10 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
      */
     const fetchAdminRole = async () => {
       try {
-        console.log(
-          '[AdminContext] Starting fetchAdminRole for UID:',
-          currentUser.uid
-        );
+        // console.log(
+        //   '[AdminContext] Starting fetchAdminRole for UID:',
+        //   currentUser.uid
+        // );
         setLoading(true);
 
         // Query the accounts collection by uid field (not document ID)
@@ -170,37 +170,37 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
           where('uid', '==', currentUser.uid),
           limit(1)
         );
-        console.log(
-          '[AdminContext] Querying accounts where uid ==',
-          currentUser.uid
-        );
+        // console.log(
+        //   '[AdminContext] Querying accounts where uid ==',
+        //   currentUser.uid
+        // );
 
         const querySnapshot = await getDocs(accountQuery);
-        console.log(
-          '[AdminContext] Query found documents:',
-          !querySnapshot.empty
-        );
+        // console.log(
+        //   '[AdminContext] Query found documents:',
+        //   !querySnapshot.empty
+        // );
 
         if (!querySnapshot.empty) {
           const accountDoc = querySnapshot.docs[0];
           const accountData = accountDoc.data();
-          console.log('[AdminContext] Account document ID:', accountDoc.id);
-          console.log('[AdminContext] Account data:', accountData);
+          // console.log('[AdminContext] Account document ID:', accountDoc.id);
+          // console.log('[AdminContext] Account data:', accountData);
 
           const adminRole = accountData?.admin_role as AdminRole | undefined;
-          console.log('[AdminContext] admin_role field value:', adminRole);
-          console.log(
-            '[AdminContext] Is valid admin role?',
-            isAdminRole(adminRole)
-          );
+          // console.log('[AdminContext] admin_role field value:', adminRole);
+          // console.log(
+          //   '[AdminContext] Is valid admin role?',
+          //   isAdminRole(adminRole)
+          // );
 
           // Validate that the role is a valid AdminRole using type guard
           if (adminRole && isAdminRole(adminRole)) {
             setCurrentAdminRole(adminRole);
             // Calculate permissions based on role
             const rolePermissions = getPermissionsForRole(adminRole);
-            console.log('[AdminContext] ✅ Admin role SET:', adminRole);
-            console.log('[AdminContext] Permissions:', rolePermissions);
+            // console.log('[AdminContext] ✅ Admin role SET:', adminRole);
+            // console.log('[AdminContext] Permissions:', rolePermissions);
             setPermissions(rolePermissions);
 
             // Sync admin_users collection for Firestore rules enforcement
@@ -215,9 +215,9 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
               const adminUserDoc = await getDoc(adminUserRef);
 
               if (!adminUserDoc.exists()) {
-                console.log(
-                  '[AdminContext] Creating admin_users document for rules enforcement'
-                );
+                // console.log(
+                //   '[AdminContext] Creating admin_users document for rules enforcement'
+                // );
                 await setDoc(adminUserRef, {
                   role: adminRole,
                   email: currentUser.email,
@@ -225,7 +225,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
                 });
               } else if (adminUserDoc.data()?.role !== adminRole) {
                 // Update if role changed
-                console.log('[AdminContext] Updating admin_users role');
+                // console.log('[AdminContext] Updating admin_users role');
                 await setDoc(
                   adminUserRef,
                   {
@@ -236,7 +236,7 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
                   { merge: true }
                 );
               }
-              console.log('[AdminContext] admin_users sync complete');
+              // console.log('[AdminContext] admin_users sync complete');
             } catch (syncError) {
               // Sync failure is non-fatal - admin role from accounts is still valid
               console.warn(
@@ -246,26 +246,26 @@ export const AdminProvider: React.FC<AdminProviderProps> = ({
             }
           } else {
             // No admin role or invalid role - user is not an admin
-            console.log('[AdminContext] ❌ No valid admin role found');
+            // console.log('[AdminContext] ❌ No valid admin role found');
             setCurrentAdminRole(null);
             setPermissions(null);
           }
         } else {
           // Account document doesn't exist - shouldn't happen, but handle gracefully
-          console.warn(
-            '[AdminContext] ⚠️ Account document not found for user',
-            currentUser.uid
-          );
+          // console.warn(
+          //   '[AdminContext] ⚠️ Account document not found for user',
+          //   currentUser.uid
+          // );
           setCurrentAdminRole(null);
           setPermissions(null);
         }
       } catch (error) {
-        console.error('[AdminContext] ❌ Error fetching admin role:', error);
+        // console.error('[AdminContext] ❌ Error fetching admin role:', error);
         // On error, assume no admin access for safety
         setCurrentAdminRole(null);
         setPermissions(null);
       } finally {
-        console.log('[AdminContext] fetchAdminRole complete, loading = false');
+        // console.log('[AdminContext] fetchAdminRole complete, loading = false');
         setLoading(false);
       }
     };
