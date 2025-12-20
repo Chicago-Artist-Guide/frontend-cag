@@ -227,6 +227,54 @@ export async function fetchTalentWithFilters(
           );
         }
 
+        // Filter Trans/Nonbinary artists by their role interests
+        if (
+          role.gender_identity &&
+          !role.gender_identity.includes('Open to all genders')
+        ) {
+          const roleGender = role.gender_identity[0]; // Now single selection
+
+          filteredMatches = filteredMatches.filter((profile) => {
+            // "I choose not to respond" only matches "Open to all genders"
+            if (profile.gender_identity === 'I choose not to respond') {
+              return false;
+            }
+
+            // Cis Woman/Man match directly
+            if (
+              profile.gender_identity === 'Cis Woman' &&
+              roleGender === 'Woman'
+            ) {
+              return true;
+            }
+            if (profile.gender_identity === 'Cis Man' && roleGender === 'Man') {
+              return true;
+            }
+
+            // Trans/Nonbinary needs to have matching role interest
+            if (profile.gender_identity === 'Trans/Nonbinary') {
+              const genderRoles = profile.gender_roles || [];
+
+              // Check if they want to play this role type
+              if (roleGender === 'Woman' && genderRoles.includes('Woman')) {
+                return true;
+              }
+              if (roleGender === 'Man' && genderRoles.includes('Man')) {
+                return true;
+              }
+
+              // Check if include_nonbinary is set and they want nonbinary roles
+              if (role.include_nonbinary && genderRoles.includes('Nonbinary')) {
+                return true;
+              }
+
+              return false;
+            }
+
+            return false;
+          });
+        }
+
         // Filter by singing/dancing requirements
         if (role.additional_requirements) {
           const requiresSinging =
@@ -311,18 +359,56 @@ export async function fetchRolesForTalent(
             }
           }
 
-          // gender
+          // gender matching with new model
           if (
             profile.gender_identity &&
             pR.gender_identity &&
             !pR.gender_identity?.includes('Open to all genders')
           ) {
-            const hasGenderMatch = pR.gender_identity?.includes(
-              profile.gender_identity
-            );
+            const roleGender = pR.gender_identity[0]; // Now single selection
 
-            if (!hasGenderMatch) {
+            // "I choose not to respond" only matches "Open to all genders"
+            if (profile.gender_identity === 'I choose not to respond') {
               return false;
+            }
+
+            // Cis Woman matches Woman roles
+            if (profile.gender_identity === 'Cis Woman') {
+              if (roleGender !== 'Woman') {
+                return false;
+              }
+            }
+
+            // Cis Man matches Man roles
+            if (profile.gender_identity === 'Cis Man') {
+              if (roleGender !== 'Man') {
+                return false;
+              }
+            }
+
+            // Trans/Nonbinary matches based on their role interests
+            if (profile.gender_identity === 'Trans/Nonbinary') {
+              const genderRoles = profile.gender_roles || [];
+              let hasMatch = false;
+
+              // Can play Woman roles if interested
+              if (roleGender === 'Woman' && genderRoles.includes('Woman')) {
+                hasMatch = true;
+              }
+
+              // Can play Man roles if interested
+              if (roleGender === 'Man' && genderRoles.includes('Man')) {
+                hasMatch = true;
+              }
+
+              // Can play roles with include_nonbinary if interested in nonbinary roles
+              if (pR.include_nonbinary && genderRoles.includes('Nonbinary')) {
+                hasMatch = true;
+              }
+
+              if (!hasMatch) {
+                return false;
+              }
             }
           }
 

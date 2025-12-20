@@ -50,11 +50,11 @@ export const getProfileWithUid = async (
   const queryProfileSnapshot = await getDocs(profileQuery);
 
   if (queryProfileSnapshot.empty) {
-    console.error('No profile found!');
     return false;
   }
 
-  return queryProfileSnapshot.docs[0].data();
+  const profileData = queryProfileSnapshot.docs[0].data();
+  return profileData;
 };
 
 export const getNameForAccount = async (

@@ -186,10 +186,9 @@ const ActorInfo: React.FC<{
                 </CAGLabel>
                 {!isOffStage && (
                   <p>
-                    First, choose your gender identity - additional options may
-                    be presented for casting purposes. If other, please select
-                    the option with which you most closely identify for casting
-                    purposes.
+                    Select your gender identity. If you select Trans/Nonbinary,
+                    you will be asked which types of roles you are interested in
+                    for casting purposes.
                   </p>
                 )}
                 <Form.Control
@@ -208,56 +207,56 @@ const ActorInfo: React.FC<{
               </Form.Group>
             </Col>
           </Row>
-          {actorInfo2Gender !== ('' as Gender) &&
-            !actorInfo2Gender.includes('Cis') &&
-            !isOffStage && (
-              <Row>
-                <Col lg="6">
-                  <Form.Group className="form-group">
-                    <CAGLabelSmaller>
-                      I would also be comfortable playing roles usually played
-                      by: <PrivateLabel />
-                    </CAGLabelSmaller>
-                    {genderRoles.map((g) => (
-                      <Checkbox
-                        checked={isGenderRoleInGenderRoles(g)}
-                        fieldType="checkbox"
-                        key={`gender-chk-${g}`}
-                        label={g}
-                        name="actorInfo2GenderRoles"
-                        onChange={(e: any) =>
-                          genderRoleChange(e.currentTarget.checked, g)
-                        }
-                      />
-                    ))}
-                  </Form.Group>
-                </Col>
-                <Col lg="6">
-                  <Form.Group className="form-group">
-                    <CAGLabelSmaller>
-                      I would be comfortable playing a character through all
-                      phases of their transition: <PrivateLabel />
-                    </CAGLabelSmaller>
+          {actorInfo2Gender === 'Trans/Nonbinary' && !isOffStage && (
+            <Row>
+              <Col lg="6">
+                <Form.Group className="form-group">
+                  <CAGLabelSmaller>
+                    Interested in the following roles: <PrivateLabel />
+                  </CAGLabelSmaller>
+                  <p style={{ fontSize: '14px', marginBottom: '10px' }}>
+                    Select all that apply
+                  </p>
+                  {genderRoles.map((g) => (
                     <Checkbox
-                      checked={actorInfo2GenderTransition === 'Yes'}
-                      fieldType="radio"
-                      label="Yes"
-                      name="actorInfo2GenderTransition"
-                      onChange={setForm}
-                      value="Yes"
+                      checked={isGenderRoleInGenderRoles(g)}
+                      fieldType="checkbox"
+                      key={`gender-chk-${g}`}
+                      label={g}
+                      name="actorInfo2GenderRoles"
+                      onChange={(e: any) =>
+                        genderRoleChange(e.currentTarget.checked, g)
+                      }
                     />
-                    <Checkbox
-                      checked={actorInfo2GenderTransition === 'No'}
-                      fieldType="radio"
-                      label="No"
-                      name="actorInfo2GenderTransition"
-                      onChange={setForm}
-                      value="No"
-                    />
-                  </Form.Group>
-                </Col>
-              </Row>
-            )}
+                  ))}
+                </Form.Group>
+              </Col>
+              <Col lg="6">
+                <Form.Group className="form-group">
+                  <CAGLabelSmaller>
+                    I would be comfortable playing a character through all
+                    phases of their transition: <PrivateLabel />
+                  </CAGLabelSmaller>
+                  <Checkbox
+                    checked={actorInfo2GenderTransition === 'Yes'}
+                    fieldType="radio"
+                    label="Yes"
+                    name="actorInfo2GenderTransition"
+                    onChange={setForm}
+                    value="Yes"
+                  />
+                  <Checkbox
+                    checked={actorInfo2GenderTransition === 'No'}
+                    fieldType="radio"
+                    label="No"
+                    name="actorInfo2GenderTransition"
+                    onChange={setForm}
+                    value="No"
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
           <Row>
             <Col lg="12">
               <Form.Group className="form-group">

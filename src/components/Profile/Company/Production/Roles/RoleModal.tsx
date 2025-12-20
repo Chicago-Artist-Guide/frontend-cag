@@ -486,41 +486,51 @@ const RoleModal: React.FC<{
                       className="form-group"
                       style={{ marginTop: 30 }}
                     >
-                      <CAGLabel>Gender Identity</CAGLabel>
+                      <CAGLabel>Character Gender</CAGLabel>
                       {roleGenders.map((gender) => {
-                        const isOpenToAll = gender === 'Open to all genders';
-                        const isDisabled =
-                          isOpenToAll &&
-                          hasSpecificSelections('gender_identity');
-                        const isChecked = isValueIncluded(
-                          'gender_identity',
-                          gender
-                        );
+                        const selectedGender =
+                          formValues.gender_identity?.[0] ||
+                          'Open to all genders';
+                        const isChecked = selectedGender === gender;
                         return (
                           <Checkbox
                             checked={isChecked}
-                            disabled={isDisabled}
-                            fieldType="checkbox"
+                            fieldType="radio"
                             key={`gender_identity_${gender}`}
                             label={gender}
-                            name={gender}
-                            onChange={(e: any) => {
-                              if (isOpenToAll) {
-                                handleOpenToAllChange(
-                                  'gender_identity',
-                                  e.target.checked
-                                );
-                              } else {
-                                handleSpecificOptionChange(
-                                  'gender_identity',
-                                  gender,
-                                  e.target.checked
-                                );
-                              }
+                            name="gender_identity_radio"
+                            value={gender}
+                            onChange={() => {
+                              setFormValues({
+                                ...formValues,
+                                gender_identity: [gender],
+                                include_nonbinary: false
+                              });
                             }}
                           />
                         );
                       })}
+                      {formValues.gender_identity?.[0] &&
+                        formValues.gender_identity[0] !==
+                          'Open to all genders' && (
+                          <div
+                            style={{ marginTop: '10px', paddingLeft: '20px' }}
+                          >
+                            <Checkbox
+                              checked={formValues.include_nonbinary || false}
+                              fieldType="checkbox"
+                              key="include_nonbinary"
+                              label="Include nonbinary actors"
+                              name="include_nonbinary"
+                              onChange={(e: any) => {
+                                setFormValues({
+                                  ...formValues,
+                                  include_nonbinary: e.target.checked
+                                });
+                              }}
+                            />
+                          </div>
+                        )}
                     </Form.Group>
                     <Form.Group
                       className="form-group"

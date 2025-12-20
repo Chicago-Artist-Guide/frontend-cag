@@ -105,9 +105,33 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
 
     if (findRole.gender_identity) {
       const genderCatchAll = 'Open to all genders';
-      newFilters['gender_identity'] = findRole.gender_identity.filter(
+      const roleGenders = findRole.gender_identity.filter(
         (g) => g !== genderCatchAll
-      ) as Gender[];
+      );
+
+      if (roleGenders.length > 0) {
+        // Map role genders to artist profile genders for initial query
+        // We'll include Trans/Nonbinary and do finer filtering post-fetch
+        const profileGenders: Gender[] = [];
+
+        if (roleGenders.includes('Woman')) {
+          profileGenders.push('Cis Woman');
+          profileGenders.push('Trans/Nonbinary');
+        }
+        if (roleGenders.includes('Man')) {
+          profileGenders.push('Cis Man');
+          profileGenders.push('Trans/Nonbinary');
+        }
+        // If include_nonbinary is set, Trans/Nonbinary with Nonbinary role interest also matches
+        if (findRole.include_nonbinary) {
+          if (!profileGenders.includes('Trans/Nonbinary')) {
+            profileGenders.push('Trans/Nonbinary');
+          }
+        }
+
+        // Remove duplicates
+        newFilters['gender_identity'] = [...new Set(profileGenders)];
+      }
     }
 
     if (findRole.ethnicity) {

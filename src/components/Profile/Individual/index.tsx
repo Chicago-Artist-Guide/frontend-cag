@@ -201,6 +201,12 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   }, [profile?.data, editMode]);
 
   useEffect(() => {
+    // Skip real-time listeners when viewing another user's profile
+    // The refs still point to current user's docs, so listening would overwrite viewed data
+    if (previewMode) {
+      return;
+    }
+
     if (profile.ref) {
       const unsubscribeProfile = onSnapshot(
         profile.ref,
@@ -217,9 +223,14 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
       // Clean up the subscription on unmount
       return () => unsubscribeProfile();
     }
-  }, []); // removing profile.ref to save calls to firebase
+  }, [previewMode]); // removing profile.ref to save calls to firebase
 
   useEffect(() => {
+    // Skip real-time listeners when viewing another user's profile
+    if (previewMode) {
+      return;
+    }
+
     if (account.ref) {
       const unsubscribeAccount = onSnapshot(
         account.ref,
@@ -236,7 +247,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
       // Clean up the subscription on unmount
       return () => unsubscribeAccount();
     }
-  }, []); // removing account.ref to save calls to firebase
+  }, [previewMode]); // removing account.ref to save calls to firebase
 
   const onEditModeClick = (
     e: React.MouseEvent<HTMLElement>,
@@ -780,7 +791,7 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
       )}
       <Row>
         <Col lg={12}>
-          <Title>YOUR PROFILE</Title>
+          <Title>{previewMode ? 'ARTIST PROFILE' : 'YOUR PROFILE'}</Title>
         </Col>
       </Row>
       <Row>
