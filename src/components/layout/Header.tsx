@@ -75,7 +75,7 @@ const Header = () => {
       onToggle={setExpanded}
     >
       <Navbar.Brand as={Link} to="/" onClick={handleNavClick}>
-        <img src={Logo} alt="CAG Logo" height="60" width="70" />
+        <LogoImage src={Logo} alt="CAG Logo" height="60" width="70" />
       </Navbar.Brand>
       <Navbar.Toggle
         aria-controls="basic-navbar-nav"
@@ -155,6 +155,11 @@ const WhiteBackNav = styled(Navbar)`
   @media (max-width: 575.98px) {
     padding: 0.75rem 1.25rem;
   }
+`;
+
+// Prevent Safari dark mode from inverting logo colors
+const LogoImage = styled.img`
+  color-scheme: light only;
 `;
 
 export default Header;

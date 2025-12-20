@@ -309,6 +309,7 @@ interface FormValues {
   googleFormUrl: string;
   moreInfoUrl: string;
   status: 'open' | 'closed';
+  ongoing: string; // 'true' or 'false' - HTML select returns strings
 }
 
 const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
@@ -345,7 +346,8 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
     location: opening?.location || 'Chicago',
     googleFormUrl: opening?.googleFormUrl || '',
     moreInfoUrl: opening?.moreInfoUrl || '',
-    status: opening?.status || 'open'
+    status: opening?.status || 'open',
+    ongoing: opening?.ongoing ? 'true' : 'false'
   };
 
   const handleSubmit = async (
@@ -381,6 +383,7 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
           googleFormUrl: values.googleFormUrl.trim() || null,
           moreInfoUrl: values.moreInfoUrl.trim() || null,
           status: values.status,
+          ongoing: values.ongoing === 'true',
           updatedAt: serverTimestamp(),
           moderated: true,
           moderatedBy: currentUser.uid,
@@ -422,6 +425,7 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
           googleFormUrl: values.googleFormUrl.trim() || null,
           moreInfoUrl: values.moreInfoUrl.trim() || null,
           status: values.status,
+          ongoing: values.ongoing === 'true',
           account_id: currentUser.uid,
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp(),
@@ -650,14 +654,24 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                   <ErrorMessage name="moreInfoUrl" component={ErrorText} />
                 </FormGroup>
 
-                <FormGroup>
-                  <Label htmlFor="status">Status</Label>
-                  <Field as={StyledSelect} name="status" id="status">
-                    <option value="open">Open</option>
-                    <option value="closed">Closed</option>
-                  </Field>
-                  <ErrorMessage name="status" component={ErrorText} />
-                </FormGroup>
+                <FormRow>
+                  <FormGroup>
+                    <Label htmlFor="status">Status</Label>
+                    <Field as={StyledSelect} name="status" id="status">
+                      <option value="open">Open</option>
+                      <option value="closed">Closed</option>
+                    </Field>
+                    <ErrorMessage name="status" component={ErrorText} />
+                  </FormGroup>
+
+                  <FormGroup>
+                    <Label htmlFor="ongoing">Position Type</Label>
+                    <Field as={StyledSelect} name="ongoing" id="ongoing">
+                      <option value="false">Temporal (Current Openings)</option>
+                      <option value="true">Ongoing (Always Open)</option>
+                    </Field>
+                  </FormGroup>
+                </FormRow>
 
                 <ButtonGroup>
                   <div>

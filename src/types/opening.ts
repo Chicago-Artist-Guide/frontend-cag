@@ -23,6 +23,7 @@ export interface RoleOpportunity {
   pay?: string; // Compensation (e.g., "$250", "Volunteer", "Stipend")
   location?: string; // Usually "Chicago" or "Remote"
   status?: 'open' | 'closed';
+  ongoing?: boolean; // If true, shows in "Ongoing open positions" section instead of "Current openings"
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
   account_id?: string; // Admin who posted
