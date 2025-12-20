@@ -140,9 +140,9 @@ const EditPersonalDetails = ({
       <Form.Group className="form-group">
         <CAGLabel>Gender Identity</CAGLabel>
         <p>
-          First, choose your gender identity - additional options may be
-          presented for casting purposes. If other, please select the option
-          with which you most closely identify for casting purposes.
+          Select your gender identity. If you select Trans/Nonbinary, you will
+          be asked which types of roles you are interested in for casting
+          purposes.
         </p>
         <Form.Control
           as="select"
@@ -160,6 +160,31 @@ const EditPersonalDetails = ({
           ))}
         </Form.Control>
       </Form.Group>
+      {editProfile?.gender_identity === 'Trans/Nonbinary' && (
+        <Form.Group className="form-group">
+          <CAGLabel>Interested in the following roles:</CAGLabel>
+          <p>Select all that apply</p>
+          {(['Man', 'Woman', 'Nonbinary'] as const).map((role) => (
+            <Checkbox
+              checked={editProfile?.gender_roles?.includes(role)}
+              fieldType="checkbox"
+              key={`gender-role-chk-${role}`}
+              label={role}
+              name={`genderRole-${role}`}
+              onChange={(e: any) => {
+                const currentRoles = editProfile?.gender_roles || [];
+                let newRoles: string[];
+                if (e.currentTarget.checked) {
+                  newRoles = [...currentRoles, role];
+                } else {
+                  newRoles = currentRoles.filter((r) => r !== role);
+                }
+                setProfileForm('gender_roles', newRoles);
+              }}
+            />
+          ))}
+        </Form.Group>
+      )}
       <Form.Group className="form-group">
         <CAGLabel>Ethnicity</CAGLabel>
         {ethnicityTypes.map((eth) => (
