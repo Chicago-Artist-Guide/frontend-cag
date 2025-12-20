@@ -136,20 +136,12 @@ export const ageRanges = [
 
 export const genders = [
   'Open to all genders',
-  'Cis Female',
-  'Cis Male',
-  'Trans Female',
-  'Trans Male',
-  'Non Binary/Agender'
+  'Cis Woman',
+  'Cis Man',
+  'Trans/Nonbinary',
+  'I choose not to respond'
 ] as const;
 
-export const roleGenders = [
-  'Open to all genders',
-  'Female',
-  'Male',
-  'Trans Female',
-  'Trans Man',
-  'Nonbinary'
-] as const;
+export const roleGenders = ['Open to all genders', 'Woman', 'Man'] as const;
 
 export const additionalRequirements = ['Requires singing', 'Requires dancing'];
