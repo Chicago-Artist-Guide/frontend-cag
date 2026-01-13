@@ -5,11 +5,6 @@ import PartnerSlider from '../components/Redesign/PartnerSlider';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import { zeffyUrl } from '../utils/marketing';
 
-// Additional sponsor images (for other sections)
-import SponsorCallForCulture from '../images/sponsors/callForCulture.png';
-import SponsorCliffLogo from '../images/sponsors/cliff.jpg';
-import SponsorLetsRoam from '../images/sponsors/lets_roam_logo_horizontal_v3.jpg';
-
 import { supporters as corporateSponsors } from '../utils/supporters';
 
 // Donate impact icons
