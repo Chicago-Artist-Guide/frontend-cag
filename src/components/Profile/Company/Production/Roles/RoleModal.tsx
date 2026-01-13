@@ -62,8 +62,7 @@ const RoleModal: React.FC<{
         union: []
       });
     }
-    console.log(formValues);
-  }, []);
+  }, [role, type, show]);
 
   const setFormState = (
     event:
