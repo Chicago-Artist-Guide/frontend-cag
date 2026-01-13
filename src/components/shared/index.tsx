@@ -3,6 +3,7 @@ import Card from './Card';
 import Checkbox from './Checkbox';
 import DividerBar from './DividerBar';
 import Dropdown from './Dropdown';
+import ErrorBoundary from './ErrorBoundary';
 import GenericAccordion from './GenericAccordion';
 import InputField from './Input';
 import Pagination from './Pagination';
@@ -21,6 +22,7 @@ export {
   Checkbox,
   DividerBar,
   Dropdown,
+  ErrorBoundary,
   GenericAccordion,
   InputField,
   Pagination,

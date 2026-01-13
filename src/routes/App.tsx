@@ -5,6 +5,7 @@ import { MarketingContext } from '../context/MarketingContext';
 import { PaginationProvider } from '../context/PaginationContext';
 import { UserContext } from '../context/UserContext';
 import { AdminProvider } from '../context/AdminContext';
+import { ErrorBoundary } from '../components/shared';
 import useAuthState from '../hooks/useAuthState';
 import useFirebase from '../hooks/useFirebase';
 import useProfileData from '../hooks/useProfileData';
@@ -65,7 +66,9 @@ const App = () => {
             value={{ lglApiKey: import.meta.env.VITE_APP_LGL_API_KEY || '' }}
           >
             <PaginationProvider>
-              <RouterProvider router={router} />
+              <ErrorBoundary>
+                <RouterProvider router={router} />
+              </ErrorBoundary>
             </PaginationProvider>
           </MarketingContext.Provider>
         </AdminProvider>
