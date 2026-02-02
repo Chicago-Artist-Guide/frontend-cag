@@ -237,7 +237,7 @@ export const TalentMatchCard = ({
           <h3 className="text-xl font-bold lg:text-2xl">{fullName}</h3>
           <button
             onClick={() => navigate(`/profile/view/${profile.account_id}`)}
-            className="rounded bg-yoda/50 px-3 py-1.5 text-sm font-semibold text-mint hover:bg-mint/50 hover:text-white"
+            className="cursor-pointer rounded bg-yoda/50 px-3 py-1.5 text-sm font-semibold text-mint hover:bg-mint/50 hover:text-white"
           >
             View Profile
           </button>
@@ -245,7 +245,9 @@ export const TalentMatchCard = ({
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
           <div>Union(s)</div>
           <div className="font-semibold">
-            {profile.union_status?.join(', ') || 'N/A'}
+            {Array.isArray(profile.union_status)
+              ? profile.union_status.join(', ')
+              : profile.union_status || 'N/A'}
           </div>
           <div>Special Skills</div>
           <div className="font-semibold">

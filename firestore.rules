@@ -121,7 +121,7 @@ service cloud.firestore {
     }
 
     // Profiles collection
-    // - Authenticated users can read
+    // - Authenticated users can read (required for theater talent match list and messaging)
     // - Owners can write (create/update/delete their own)
     // - Admins can create profiles for other users (for company management)
     // - Admins can update any profile (for user management)
@@ -192,6 +192,11 @@ service cloud.firestore {
 
     // Theater talent matches
     match /theater_talent_matches/{matchId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // Theater talent favorites (theater companies marking talent as favorites per role)
+    match /theater_talent_favorites/{favoriteId} {
       allow read, write: if isAuthenticated();
     }
 
