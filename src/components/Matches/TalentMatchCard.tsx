@@ -237,7 +237,7 @@ export const TalentMatchCard = ({
           <h3 className="text-xl font-bold lg:text-2xl">{fullName}</h3>
           <button
             onClick={() => navigate(`/profile/view/${profile.account_id}`)}
-            className="rounded bg-yoda/50 px-3 py-1.5 text-sm font-semibold text-mint hover:bg-mint/50 hover:text-white"
+            className="cursor-pointer rounded bg-yoda/50 px-3 py-1.5 text-sm font-semibold text-mint hover:bg-mint/50 hover:text-white"
           >
             View Profile
           </button>
