@@ -235,11 +235,6 @@ export async function fetchTalentWithFilters(
           const roleGender = role.gender_identity[0]; // Now single selection
 
           filteredMatches = filteredMatches.filter((profile) => {
-            // "I choose not to respond" only matches "Open to all genders"
-            if (profile.gender_identity === 'I choose not to respond') {
-              return false;
-            }
-
             // Cis Woman/Man match directly
             if (
               profile.gender_identity === 'Cis Woman' &&
@@ -366,11 +361,6 @@ export async function fetchRolesForTalent(
             !pR.gender_identity?.includes('Open to all genders')
           ) {
             const roleGender = pR.gender_identity[0]; // Now single selection
-
-            // "I choose not to respond" only matches "Open to all genders"
-            if (profile.gender_identity === 'I choose not to respond') {
-              return false;
-            }
 
             // Cis Woman matches Woman roles
             if (profile.gender_identity === 'Cis Woman') {

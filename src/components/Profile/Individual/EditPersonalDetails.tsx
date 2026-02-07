@@ -63,6 +63,18 @@ const EditPersonalDetails = ({
     }
     return editProfile.union_status.includes(option);
   };
+
+  // Disable height checkbox when height is entered
+  const hasHeightValue =
+    (editProfile?.height_ft && editProfile.height_ft > 0) ||
+    (editProfile?.height_in && editProfile.height_in > 0);
+  const isHeightCheckboxDisabled = hasHeightValue;
+
+  // Validate Trans/Nonbinary gender roles requirement
+  const requiresGenderRoles =
+    editProfile?.gender_identity === 'Trans/Nonbinary' &&
+    (!editProfile?.gender_roles || editProfile.gender_roles.length === 0);
+
   return (
     <div>
       <Form.Group className="form-group">
@@ -91,9 +103,17 @@ const EditPersonalDetails = ({
                 as="select"
                 value={editProfile?.height_ft}
                 name="actorInfo2HeightFt"
-                onChange={(e: any) =>
-                  setProfileForm('height_ft', e.target.value)
-                }
+                onChange={(e: any) => {
+                  const ftValue = parseInt(e.target.value, 10) || 0;
+                  setProfileForm('height_ft', ftValue);
+                  // If height is entered, disable and uncheck "no answer"
+                  if (
+                    ftValue > 0 ||
+                    (editProfile?.height_in && editProfile.height_in > 0)
+                  ) {
+                    setProfileForm('height_no_answer', false);
+                  }
+                }}
               >
                 <option value={undefined}>Feet</option>
                 {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
@@ -109,9 +129,17 @@ const EditPersonalDetails = ({
                 as="select"
                 value={editProfile?.height_in}
                 name="actorInfo2HeightIn"
-                onChange={(e: any) =>
-                  setProfileForm('height_in', e.target.value)
-                }
+                onChange={(e: any) => {
+                  const inValue = parseInt(e.target.value, 10) || 0;
+                  setProfileForm('height_in', inValue);
+                  // If height is entered, disable and uncheck "no answer"
+                  if (
+                    inValue > 0 ||
+                    (editProfile?.height_ft && editProfile.height_ft > 0)
+                  ) {
+                    setProfileForm('height_no_answer', false);
+                  }
+                }}
               >
                 <option value={undefined}>Inches</option>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((inches) => (
@@ -126,12 +154,21 @@ const EditPersonalDetails = ({
             <PaddedCol lg="12">
               <Checkbox
                 checked={editProfile?.height_no_answer}
+                disabled={isHeightCheckboxDisabled}
                 fieldType="checkbox"
                 label="I do not wish to answer"
                 name="actorInfo2HeightNoAnswer"
-                onChange={(e: any) =>
-                  setProfileForm('height_no_answer', e.currentTarget.checked)
-                }
+                onChange={(e: any) => {
+                  if (!isHeightCheckboxDisabled) {
+                    const checked = e.currentTarget.checked;
+                    setProfileForm('height_no_answer', checked);
+                    // If checking "no answer", clear height values
+                    if (checked) {
+                      setProfileForm('height_ft', 0);
+                      setProfileForm('height_in', 0);
+                    }
+                  }
+                }}
               />
             </PaddedCol>
           </Row>
@@ -162,7 +199,10 @@ const EditPersonalDetails = ({
       </Form.Group>
       {editProfile?.gender_identity === 'Trans/Nonbinary' && (
         <Form.Group className="form-group">
-          <CAGLabel>Interested in the following roles:</CAGLabel>
+          <CAGLabel>
+            Interested in the following roles:{' '}
+            <RequiredAsterisk>*</RequiredAsterisk>
+          </CAGLabel>
           <p>Select all that apply</p>
           {(['Man', 'Woman', 'Nonbinary'] as const).map((role) => (
             <Checkbox
@@ -183,39 +223,26 @@ const EditPersonalDetails = ({
               }}
             />
           ))}
+          {requiresGenderRoles && (
+            <ErrorText>
+              Please select at least one role you're interested in
+            </ErrorText>
+          )}
         </Form.Group>
       )}
       <Form.Group className="form-group">
         <CAGLabel>Ethnicity</CAGLabel>
         {ethnicityTypes.map((eth) => (
-          <React.Fragment key={`parent-frag-chk-${eth.name}`}>
-            <Checkbox
-              checked={editProfile?.ethnicities.includes(eth.name)}
-              fieldType="checkbox"
-              key={`first-level-chk-${eth.name}`}
-              label={eth.name}
-              name="actorInfo1Ethnicities"
-              onChange={(e: any) =>
-                ethnicityChange(e.currentTarget.checked, eth.name)
-              }
-            />
-            {eth.values.length > 0 && (
-              <Checkbox style={{ paddingLeft: '1.25rem' }}>
-                {eth.values.map((ethV) => (
-                  <Checkbox
-                    checked={editProfile?.ethnicities.includes(ethV)}
-                    fieldType="checkbox"
-                    key={`${eth.name}-child-chk-${ethV}`}
-                    label={ethV}
-                    name="actorInfoEthnicities"
-                    onChange={(e: any) =>
-                      ethnicityChange(e.currentTarget.checked, ethV)
-                    }
-                  />
-                ))}
-              </Checkbox>
-            )}
-          </React.Fragment>
+          <Checkbox
+            checked={editProfile?.ethnicities.includes(eth.name)}
+            fieldType="checkbox"
+            key={`ethnicity-chk-${eth.name}`}
+            label={eth.name}
+            name="actorInfo1Ethnicities"
+            onChange={(e: any) =>
+              ethnicityChange(e.currentTarget.checked, eth.name)
+            }
+          />
         ))}
       </Form.Group>
       <Form.Group>
@@ -407,6 +434,23 @@ const ButtonContainer = styled.div`
       width: 100%;
       min-height: 44px;
     }
+  }
+`;
+
+const RequiredAsterisk = styled.span`
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: 600;
+`;
+
+const ErrorText = styled.p`
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 8px;
+  margin-bottom: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 12px;
   }
 `;
 

@@ -65,6 +65,8 @@ const defaultData: IndividualData = {
   actorInfo2HeightFt: 0,
   actorInfo2HeightIn: 0,
   actorInfo2HeightNoAnswer: true,
+  actorInfoSinging: '',
+  actorInfoDancing: '',
   basics18Plus: false,
   basicsEmailAddress: '',
   basicsFirstName: '',
@@ -308,6 +310,8 @@ const IndividualSignUp: React.FC<{
       actorInfo2HeightFt,
       actorInfo2HeightIn,
       actorInfo2HeightNoAnswer,
+      actorInfoSinging,
+      actorInfoDancing,
       demographicsAgency,
       demographicsBioHeadline,
       demographicsBio,
@@ -355,6 +359,8 @@ const IndividualSignUp: React.FC<{
       gender_identity: actorInfo2Gender,
       gender_roles: actorInfo2GenderRoles,
       gender_transition: actorInfo2GenderTransition,
+      singing: actorInfoSinging,
+      dancing: actorInfoDancing,
 
       // off-stage
       offstage_roles_general: offstageRolesGeneral,

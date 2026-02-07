@@ -17,13 +17,20 @@ export type EthnicityTypeObj = {
 };
 export const ethnicityTypes: EthnicityTypeObj[] = [
   {
-    name: 'Asian',
-    values: [
-      'East Asian (ex. China, Korea, Japan)',
-      'Southeast Asian (ex. Cambodia, Thailand, Vietnam)',
-      'South Asian (ex. Bangladesh, India, Pakistan)',
-      'Central & West Asian (ex. Afghanistan, Iran, Uzbekistan)'
-    ]
+    name: 'East Asian (ex. China, Korea, Japan)',
+    values: []
+  },
+  {
+    name: 'Southeast Asian (ex. Cambodia, Thailand, Vietnam)',
+    values: []
+  },
+  {
+    name: 'South Asian (ex. Bangladesh, India, Pakistan)',
+    values: []
+  },
+  {
+    name: 'Central & West Asian (ex. Afghanistan, Iran, Uzbekistan)',
+    values: []
   },
   {
     name: 'Black or African American',
@@ -73,12 +80,7 @@ export const ageRanges = [
 ] as const;
 export type AgeRange = (typeof ageRanges)[number];
 
-export const genders = [
-  'Cis Woman',
-  'Cis Man',
-  'Trans/Nonbinary',
-  'I choose not to respond'
-] as const;
+export const genders = ['Cis Woman', 'Cis Man', 'Trans/Nonbinary'] as const;
 export type Gender = (typeof genders)[number];
 
 export const genderRoles = ['Man', 'Woman', 'Nonbinary'] as const;
@@ -117,6 +119,8 @@ export type IndividualData = {
   actorInfo2HeightFt: number;
   actorInfo2HeightIn: number;
   actorInfo2HeightNoAnswer: boolean;
+  actorInfoSinging: string;
+  actorInfoDancing: string;
   basics18Plus: boolean;
   basicsEmailAddress: string;
   basicsFirstName: string;
@@ -173,6 +177,8 @@ export type IndividualProfile = {
   gender_identity: Gender;
   gender_roles: GenderRole[];
   gender_transition: string;
+  singing: string;
+  dancing: string;
   offstage_roles_general: string[];
   offstage_roles_production: string[];
   offstage_roles_scenic_and_properties: string[];

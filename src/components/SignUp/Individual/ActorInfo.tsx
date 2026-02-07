@@ -10,7 +10,7 @@ import styled from 'styled-components';
 import Checkbox from '../../../components/shared/Checkbox';
 import PrivateLabel from '../../../components/shared/PrivateLabel';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
-import { colors, fonts } from '../../../theme/styleVars';
+import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { Title } from '../../layout/Titles';
 import {
   AgeRange,
@@ -36,7 +36,9 @@ const ActorInfo: React.FC<{
     actorInfo2Gender,
     actorInfo2GenderRoles,
     actorInfo2GenderTransition,
-    actorInfo1LGBTQ
+    actorInfo1LGBTQ,
+    actorInfoSinging,
+    actorInfoDancing
   } = formData;
 
   console.log('actorInfo1Ethnicities', actorInfo1Ethnicities);
@@ -68,6 +70,11 @@ const ActorInfo: React.FC<{
       }
     });
 
+    // Add validation for Trans/Nonbinary gender roles requirement
+    if (actorInfo2Gender === 'Trans/Nonbinary' && !isOffStage) {
+      formErrorsObj['actorInfo2GenderRoles'] = !actorInfo2GenderRoles.length;
+    }
+
     return formErrorsObj;
   };
 
@@ -92,7 +99,8 @@ const ActorInfo: React.FC<{
     actorInfo2AgeRanges,
     actorInfo1Ethnicities,
     actorInfo2Gender,
-    actorInfo1LGBTQ
+    actorInfo1LGBTQ,
+    actorInfo2GenderRoles
   ]);
 
   const isGenderRoleInGenderRoles = (genderRole: GenderRole) =>
@@ -209,50 +217,60 @@ const ActorInfo: React.FC<{
           </Row>
           {actorInfo2Gender === 'Trans/Nonbinary' && !isOffStage && (
             <Row>
-              <Col lg="6">
+              <Col lg="6" xs="12">
                 <Form.Group className="form-group">
                   <CAGLabelSmaller>
-                    Interested in the following roles: <PrivateLabel />
+                    Interested in the following roles: <PrivateLabel />{' '}
+                    <RequiredAsterisk>*</RequiredAsterisk>
                   </CAGLabelSmaller>
                   <p style={{ fontSize: '14px', marginBottom: '10px' }}>
                     Select all that apply
                   </p>
-                  {genderRoles.map((g) => (
-                    <Checkbox
-                      checked={isGenderRoleInGenderRoles(g)}
-                      fieldType="checkbox"
-                      key={`gender-chk-${g}`}
-                      label={g}
-                      name="actorInfo2GenderRoles"
-                      onChange={(e: any) =>
-                        genderRoleChange(e.currentTarget.checked, g)
-                      }
-                    />
-                  ))}
+                  <GenderRolesGroup>
+                    {genderRoles.map((g) => (
+                      <Checkbox
+                        checked={isGenderRoleInGenderRoles(g)}
+                        fieldType="checkbox"
+                        key={`gender-chk-${g}`}
+                        label={g}
+                        name="actorInfo2GenderRoles"
+                        onChange={(e: any) =>
+                          genderRoleChange(e.currentTarget.checked, g)
+                        }
+                      />
+                    ))}
+                  </GenderRolesGroup>
+                  {formErrors['actorInfo2GenderRoles'] && (
+                    <ErrorText>
+                      Please select at least one role you're interested in
+                    </ErrorText>
+                  )}
                 </Form.Group>
               </Col>
-              <Col lg="6">
+              <Col lg="6" xs="12">
                 <Form.Group className="form-group">
                   <CAGLabelSmaller>
                     I would be comfortable playing a character through all
                     phases of their transition: <PrivateLabel />
                   </CAGLabelSmaller>
-                  <Checkbox
-                    checked={actorInfo2GenderTransition === 'Yes'}
-                    fieldType="radio"
-                    label="Yes"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="Yes"
-                  />
-                  <Checkbox
-                    checked={actorInfo2GenderTransition === 'No'}
-                    fieldType="radio"
-                    label="No"
-                    name="actorInfo2GenderTransition"
-                    onChange={setForm}
-                    value="No"
-                  />
+                  <RadioGroup>
+                    <Checkbox
+                      checked={actorInfo2GenderTransition === 'Yes'}
+                      fieldType="radio"
+                      label="Yes"
+                      name="actorInfo2GenderTransition"
+                      onChange={setForm}
+                      value="Yes"
+                    />
+                    <Checkbox
+                      checked={actorInfo2GenderTransition === 'No'}
+                      fieldType="radio"
+                      label="No"
+                      name="actorInfo2GenderTransition"
+                      onChange={setForm}
+                      value="No"
+                    />
+                  </RadioGroup>
                 </Form.Group>
               </Col>
             </Row>
@@ -284,6 +302,54 @@ const ActorInfo: React.FC<{
               </Form.Group>
             </Col>
           </Row>
+          {!isOffStage && (
+            <Row>
+              <Col lg="12" xs="12">
+                <Form.Group className="form-group">
+                  <CAGLabel>Singing</CAGLabel>
+                  <RadioGroup>
+                    <Checkbox
+                      checked={actorInfoSinging === 'Yes'}
+                      fieldType="radio"
+                      label="Yes"
+                      name="actorInfoSinging"
+                      onChange={setForm}
+                      value="Yes"
+                    />
+                    <Checkbox
+                      checked={actorInfoSinging === 'No'}
+                      fieldType="radio"
+                      label="No"
+                      name="actorInfoSinging"
+                      onChange={setForm}
+                      value="No"
+                    />
+                  </RadioGroup>
+                </Form.Group>
+                <Form.Group className="form-group">
+                  <CAGLabel>Dancing</CAGLabel>
+                  <RadioGroup>
+                    <Checkbox
+                      checked={actorInfoDancing === 'Yes'}
+                      fieldType="radio"
+                      label="Yes"
+                      name="actorInfoDancing"
+                      onChange={setForm}
+                      value="Yes"
+                    />
+                    <Checkbox
+                      checked={actorInfoDancing === 'No'}
+                      fieldType="radio"
+                      label="No"
+                      name="actorInfoDancing"
+                      onChange={setForm}
+                      value="No"
+                    />
+                  </RadioGroup>
+                </Form.Group>
+              </Col>
+            </Row>
+          )}
         </Col>
         <ImageCol lg="4">
           <Image alt="" src={yellow_blob} />
@@ -307,10 +373,69 @@ const CAGLabel = styled(Form.Label)`
   color: ${colors.mainFont};
   font-family: ${fonts.mainFont};
   font-size: 20px;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 16px;
+  }
 `;
 
 const CAGLabelSmaller = styled(CAGLabel as any)`
   font-size: 16px;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 14px;
+  }
+`;
+
+const RequiredAsterisk = styled.span`
+  color: #dc3545;
+  margin-left: 4px;
+  font-weight: 600;
+`;
+
+const ErrorText = styled.p`
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 8px;
+  margin-bottom: 0;
+
+  @media (max-width: ${breakpoints.md}) {
+    font-size: 12px;
+  }
+`;
+
+const RadioGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+
+    @media (max-width: ${breakpoints.md}) {
+      font-size: 16px;
+    }
+  }
+`;
+
+const GenderRolesGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 8px 0;
+
+    @media (max-width: ${breakpoints.md}) {
+      font-size: 16px;
+    }
+  }
 `;
 
 export default ActorInfo;
