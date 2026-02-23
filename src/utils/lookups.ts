@@ -110,7 +110,10 @@ export const roleStatuses: RoleStatus[] = ['Open', 'Closed'];
 
 export const ethnicities = [
   'Open to all ethnicities',
-  'Asian',
+  'East Asian (ex. China, Korea, Japan)',
+  'Southeast Asian (ex. Cambodia, Thailand, Vietnam)',
+  'South Asian (ex. Bangladesh, India, Pakistan)',
+  'Central & West Asian (ex. Afghanistan, Iran, Uzbekistan)',
   'Black or African American',
   'Indigenous',
   'Latinx',
@@ -142,6 +145,14 @@ export const genders = [
   'I choose not to respond'
 ] as const;
 
-export const roleGenders = ['Open to all genders', 'Woman', 'Man'] as const;
+export const roleGenders = [
+  'Open to all genders',
+  'Woman',
+  'Man',
+  'Nonbinary'
+] as const;
+
+/** Specific character genders (multi-select when not Open to all) */
+export const roleSpecificGenders = ['Man', 'Woman', 'Nonbinary'] as const;
 
 export const additionalRequirements = ['Requires singing', 'Requires dancing'];

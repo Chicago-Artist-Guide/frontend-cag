@@ -10,9 +10,9 @@ import { getOptions } from '../../../../../utils/helpers';
 import {
   additionalRequirements,
   ageRanges,
-  roleGenders,
   productionEquities,
   roleStatuses,
+  roleSpecificGenders,
   unionOptions
 } from '../../../../../utils/lookups';
 import { ethnicityTypes } from '../../../../SignUp/Individual/types';
@@ -47,10 +47,22 @@ const RoleModal: React.FC<{
   useEffect(() => {
     if (role.role_id) {
       // Backward compatibility: convert legacy string union to array
-      const normalizedRole = {
+      let normalizedRole: Role = {
         ...role,
         union: typeof role.union === 'string' ? [role.union] : role.union || []
       };
+      // Fold legacy include_nonbinary into gender_identity
+      if (
+        normalizedRole.include_nonbinary &&
+        normalizedRole.gender_identity &&
+        !normalizedRole.gender_identity.includes('Open to all genders') &&
+        !normalizedRole.gender_identity.includes('Nonbinary')
+      ) {
+        normalizedRole = {
+          ...normalizedRole,
+          gender_identity: [...normalizedRole.gender_identity, 'Nonbinary']
+        };
+      }
       setFormValues(normalizedRole);
     } else {
       setFormValues({
@@ -88,6 +100,21 @@ const RoleModal: React.FC<{
     // Pay required and must be positive
     if (!formValues.role_rate || Number(formValues.role_rate) <= 0) {
       errors.push('Pay must be a positive number');
+    }
+
+    // When character gender is not "Open to all genders", at least one of Man, Woman, or Nonbinary required
+    if (isOnStage) {
+      const isOpenToAllGenders = isOpenToAllSelected('gender_identity');
+      if (!isOpenToAllGenders) {
+        const specificGenders = (formValues.gender_identity || []).filter(
+          (g) => g === 'Man' || g === 'Woman' || g === 'Nonbinary'
+        );
+        if (specificGenders.length === 0) {
+          errors.push(
+            'Select at least one character gender (Man, Woman, and/or Nonbinary)'
+          );
+        }
+      }
     }
 
     return { valid: errors.length === 0, errors };
@@ -234,14 +261,14 @@ const RoleModal: React.FC<{
       );
       const newEthnicities = [...filtered, subcategory];
 
-      // Check if all subcategories now selected
+      // Check if all subcategories now selected; add parent only for non-Asian (Asian is granular-only)
       const allSubcategoriesSelected = umbrellaObj.values.every((v) =>
         newEthnicities.includes(v)
       );
-
       if (
         allSubcategoriesSelected &&
-        !newEthnicities.includes(umbrellaObj.name)
+        !newEthnicities.includes(umbrellaObj.name) &&
+        umbrellaObj.name !== 'Asian'
       ) {
         newEthnicities.push(umbrellaObj.name);
       }
@@ -486,50 +513,45 @@ const RoleModal: React.FC<{
                       style={{ marginTop: 30 }}
                     >
                       <CAGLabel>Character Gender</CAGLabel>
-                      {roleGenders.map((gender) => {
-                        const selectedGender =
-                          formValues.gender_identity?.[0] ||
-                          'Open to all genders';
-                        const isChecked = selectedGender === gender;
+                      <Checkbox
+                        checked={isValueIncluded(
+                          'gender_identity',
+                          'Open to all genders'
+                        )}
+                        disabled={hasSpecificSelections('gender_identity')}
+                        fieldType="checkbox"
+                        key="gender_identity-open-to-all"
+                        label="Open to all genders"
+                        name="Open to all genders"
+                        onChange={(e: any) => {
+                          handleOpenToAllChange(
+                            'gender_identity',
+                            e.target.checked
+                          );
+                        }}
+                      />
+                      {roleSpecificGenders.map((gender) => {
+                        const isChecked = isValueIncluded(
+                          'gender_identity',
+                          gender
+                        );
                         return (
                           <Checkbox
                             checked={isChecked}
-                            fieldType="radio"
+                            fieldType="checkbox"
                             key={`gender_identity_${gender}`}
                             label={gender}
-                            name="gender_identity_radio"
-                            value={gender}
-                            onChange={() => {
-                              setFormValues({
-                                ...formValues,
-                                gender_identity: [gender],
-                                include_nonbinary: false
-                              });
+                            name={gender}
+                            onChange={(e: any) => {
+                              handleSpecificOptionChange(
+                                'gender_identity',
+                                gender,
+                                e.target.checked
+                              );
                             }}
                           />
                         );
                       })}
-                      {formValues.gender_identity?.[0] &&
-                        formValues.gender_identity[0] !==
-                          'Open to all genders' && (
-                          <div
-                            style={{ marginTop: '10px', paddingLeft: '20px' }}
-                          >
-                            <Checkbox
-                              checked={formValues.include_nonbinary || false}
-                              fieldType="checkbox"
-                              key="include_nonbinary"
-                              label="Include nonbinary actors"
-                              name="include_nonbinary"
-                              onChange={(e: any) => {
-                                setFormValues({
-                                  ...formValues,
-                                  include_nonbinary: e.target.checked
-                                });
-                              }}
-                            />
-                          </div>
-                        )}
                     </Form.Group>
                     <Form.Group
                       className="form-group"
@@ -590,6 +612,34 @@ const RoleModal: React.FC<{
                         }}
                       />
                       {ethnicityTypes.map((eth) => {
+                        // Asian: only show granular options (no parent checkbox)
+                        if (eth.name === 'Asian' && eth.values.length > 0) {
+                          return (
+                            <React.Fragment key={`parent-frag-chk-${eth.name}`}>
+                              {eth.values.map((ethV) => {
+                                const isSubChecked = isValueIncluded(
+                                  'ethnicity',
+                                  ethV
+                                );
+                                return (
+                                  <Checkbox
+                                    checked={isSubChecked}
+                                    fieldType="checkbox"
+                                    key={`${eth.name}-child-chk-${ethV}`}
+                                    label={ethV}
+                                    name={ethV}
+                                    onChange={(e: any) => {
+                                      handleSubcategoryEthnicityChange(
+                                        ethV,
+                                        e.target.checked
+                                      );
+                                    }}
+                                  />
+                                );
+                              })}
+                            </React.Fragment>
+                          );
+                        }
                         const isParentChecked = isValueIncluded(
                           'ethnicity',
                           eth.name
