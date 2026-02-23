@@ -110,8 +110,7 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
       );
 
       if (roleGenders.length > 0) {
-        // Map role genders to artist profile genders for initial query
-        // We'll include Trans/Nonbinary and do finer filtering post-fetch
+        // Map role genders (Man, Woman, Nonbinary) to artist profile genders for initial query
         const profileGenders: Gender[] = [];
 
         if (roleGenders.includes('Woman')) {
@@ -122,14 +121,19 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
           profileGenders.push('Cis Man');
           profileGenders.push('Trans/Nonbinary');
         }
-        // If include_nonbinary is set, Trans/Nonbinary with Nonbinary role interest also matches
-        if (findRole.include_nonbinary) {
+        if (roleGenders.includes('Nonbinary')) {
           if (!profileGenders.includes('Trans/Nonbinary')) {
             profileGenders.push('Trans/Nonbinary');
           }
         }
+        // Legacy: include_nonbinary also pulls in Trans/Nonbinary
+        if (
+          findRole.include_nonbinary &&
+          !profileGenders.includes('Trans/Nonbinary')
+        ) {
+          profileGenders.push('Trans/Nonbinary');
+        }
 
-        // Remove duplicates
         newFilters['gender_identity'] = [...new Set(profileGenders)];
       }
     }
