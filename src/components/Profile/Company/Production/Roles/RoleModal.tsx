@@ -10,7 +10,6 @@ import { getOptions } from '../../../../../utils/helpers';
 import {
   additionalRequirements,
   ageRanges,
-  productionEquities,
   roleStatuses,
   roleSpecificGenders,
   unionOptions
@@ -29,7 +28,6 @@ import { OffStageRoleCategory, StageRole } from '../../../shared/profile.types';
 import { Role } from '../../types';
 
 const statuses = getOptions(roleStatuses);
-const equities = getOptions(productionEquities);
 
 const RoleModal: React.FC<{
   show: boolean;
@@ -82,7 +80,7 @@ const RoleModal: React.FC<{
       | React.ChangeEvent<HTMLInputElement>
       | FormTarget
   ) => {
-    const eventTarget = event.target as any;
+    const eventTarget = event.target as HTMLInputElement;
     setFormValues((prev) => ({
       ...prev,
       [eventTarget?.name]: eventTarget?.value
@@ -148,14 +146,22 @@ const RoleModal: React.FC<{
     field: 'gender_identity' | 'ethnicity' | 'age_range',
     checked: boolean
   ) => {
+    const openToAllValue =
+      field === 'gender_identity'
+        ? 'Open to all genders'
+        : field === 'ethnicity'
+          ? 'Open to all ethnicities'
+          : 'Open to all ages';
+
+    const currentValues = (formValues[field] as string[]) || [];
+
     if (checked) {
-      const openToAllValue =
-        field === 'gender_identity'
-          ? 'Open to all genders'
-          : field === 'ethnicity'
-            ? 'Open to all ethnicities'
-            : 'Open to all ages';
+      // Selecting \"open to all\" clears specific selections and sets only the catch-all value
       setFormValues({ ...formValues, [field]: [openToAllValue] });
+    } else {
+      // Unchecking removes the catch-all value but preserves any specific selections (if any)
+      const filtered = currentValues.filter((v) => v !== openToAllValue);
+      setFormValues({ ...formValues, [field]: filtered });
     }
   };
 
@@ -436,7 +442,7 @@ const RoleModal: React.FC<{
                       key={`union_${option}`}
                       label={option}
                       name={option}
-                      onChange={(e: any) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         handleUnionChange(option, e.target.checked);
                       }}
                     />
@@ -459,7 +465,9 @@ const RoleModal: React.FC<{
                           key={`additional_requirements_${requirement}`}
                           label={requirement}
                           name={requirement}
-                          onChange={(e: any) => {
+                          onChange={(
+                            e: React.ChangeEvent<HTMLInputElement>
+                          ) => {
                             let additionalRequirements =
                               formValues.additional_requirements || [];
                             const selected = e.target.name;
@@ -523,7 +531,7 @@ const RoleModal: React.FC<{
                         key="gender_identity-open-to-all"
                         label="Open to all genders"
                         name="Open to all genders"
-                        onChange={(e: any) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           handleOpenToAllChange(
                             'gender_identity',
                             e.target.checked
@@ -542,7 +550,9 @@ const RoleModal: React.FC<{
                             key={`gender_identity_${gender}`}
                             label={gender}
                             name={gender}
-                            onChange={(e: any) => {
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
                               handleSpecificOptionChange(
                                 'gender_identity',
                                 gender,
@@ -574,7 +584,9 @@ const RoleModal: React.FC<{
                             key={`age_range_${ageRange}`}
                             label={ageRange}
                             name={ageRange}
-                            onChange={(e: any) => {
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                            ) => {
                               if (isOpenToAll) {
                                 handleOpenToAllChange(
                                   'age_range',
@@ -607,7 +619,7 @@ const RoleModal: React.FC<{
                         key="ethnicity-open-to-all"
                         label="Open to all ethnicities"
                         name="Open to all ethnicities"
-                        onChange={(e: any) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           handleOpenToAllChange('ethnicity', e.target.checked);
                         }}
                       />
@@ -628,7 +640,9 @@ const RoleModal: React.FC<{
                                     key={`${eth.name}-child-chk-${ethV}`}
                                     label={ethV}
                                     name={ethV}
-                                    onChange={(e: any) => {
+                                    onChange={(
+                                      e: React.ChangeEvent<HTMLInputElement>
+                                    ) => {
                                       handleSubcategoryEthnicityChange(
                                         ethV,
                                         e.target.checked
@@ -652,7 +666,9 @@ const RoleModal: React.FC<{
                               key={`first-level-chk-${eth.name}`}
                               label={eth.name}
                               name={eth.name}
-                              onChange={(e: any) => {
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
                                 handleUmbrellaEthnicityChange(
                                   eth.name,
                                   e.target.checked
@@ -673,7 +689,9 @@ const RoleModal: React.FC<{
                                       key={`${eth.name}-child-chk-${ethV}`}
                                       label={ethV}
                                       name={ethV}
-                                      onChange={(e: any) => {
+                                      onChange={(
+                                        e: React.ChangeEvent<HTMLInputElement>
+                                      ) => {
                                         handleSubcategoryEthnicityChange(
                                           ethV,
                                           e.target.checked
@@ -699,7 +717,7 @@ const RoleModal: React.FC<{
                         key="lgbtq_only"
                         label="LGBTQ+ only"
                         name="lgbtq_only"
-                        onChange={(e: any) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           setFormValues({
                             ...formValues,
                             lgbtq_only: e.target.checked
