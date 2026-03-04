@@ -261,9 +261,9 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     return `${rate}${unit}`;
   };
 
-  const getAuditionDates = () => {
-    const start = formatDate(production?.audition_start);
-    const end = formatDate(production?.audition_end);
+  const getProductionDates = () => {
+    const start = formatDate(production?.open_and_close_start);
+    const end = formatDate(production?.open_and_close_end);
     if (start && end) return `${start} - ${end}`;
     if (start) return start;
     if (end) return end;
@@ -290,7 +290,9 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         {production?.production_name && (
           <div className="mb-4">
             <button
-              onClick={() => navigate(`/shows/${production.production_id}`)}
+              onClick={() =>
+                navigate(`/shows/${production.production_id}?tab=basic`)
+              }
               className="text-left text-base font-semibold text-cornflower hover:underline"
             >
               {production.production_name}
@@ -311,10 +313,10 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
           </div>
         )}
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
-          {getAuditionDates() && (
+          {getProductionDates() && (
             <>
-              <div>Audition Dates</div>
-              <div className="font-semibold">{getAuditionDates()}</div>
+              <div>Production Dates</div>
+              <div className="font-semibold">{getProductionDates()}</div>
             </>
           )}
           {production?.location && (
@@ -330,6 +332,16 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             </>
           )}
         </div>
+        {role.type === 'On-Stage' && production && (
+          <button
+            onClick={() =>
+              navigate(`/shows/${production.production_id}?tab=audition`)
+            }
+            className="mt-3 w-fit rounded bg-cornflower/50 px-4 py-2 text-sm font-semibold text-cornflower hover:bg-cornflower hover:text-white"
+          >
+            Onstage Audition Info
+          </button>
+        )}
         {role.description && (
           <p className="mt-3 text-sm text-stone-600">{role.description}</p>
         )}
