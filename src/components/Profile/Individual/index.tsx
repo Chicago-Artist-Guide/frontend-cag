@@ -870,14 +870,15 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                       <br />
                     </>
                   )}
-                  {profile?.data?.gender_identity &&
+                  {!previewMode &&
+                    profile?.data?.gender_identity &&
                     profile?.data?.gender_identity !== '' && (
                       <>
                         Gender Identity: {profile?.data?.gender_identity}
                         <br />
                       </>
                     )}
-                  {profile?.data?.ethnicities?.length > 0 && (
+                  {!previewMode && profile?.data?.ethnicities?.length > 0 && (
                     <>
                       Ethnicity: {profile?.data?.ethnicities?.join(', ')}
                       <br />
