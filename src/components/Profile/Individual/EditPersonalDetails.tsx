@@ -170,7 +170,7 @@ const EditPersonalDetails = ({
       {editProfile?.gender_identity === 'Trans/Nonbinary' && (
         <Form.Group className="form-group">
           <CAGLabel>Interested in the following roles:</CAGLabel>
-          <p>Select all that apply</p>
+          <p>Select all that apply (at least one required)</p>
           {(['Man', 'Woman', 'Nonbinary'] as const).map((role) => (
             <Checkbox
               checked={editProfile?.gender_roles?.includes(role)}
@@ -190,6 +190,12 @@ const EditPersonalDetails = ({
               }}
             />
           ))}
+          {(!editProfile?.gender_roles ||
+            editProfile.gender_roles.length === 0) && (
+            <p style={{ color: '#E17B60', fontSize: '14px' }}>
+              Please select at least one role option.
+            </p>
+          )}
         </Form.Group>
       )}
       <Form.Group className="form-group">

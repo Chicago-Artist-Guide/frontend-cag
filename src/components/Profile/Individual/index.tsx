@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import {
   faCamera,
   faCheckCircle,
@@ -356,6 +357,19 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const updatePersonalDetails = async () => {
+    if (
+      editProfile.gender_identity === 'Trans/Nonbinary' &&
+      (!editProfile.gender_roles || editProfile.gender_roles.length === 0)
+    ) {
+      Swal.fire({
+        title: 'Required Field',
+        text: 'Please select at least one role option for Trans/Nonbinary gender identity.',
+        icon: 'warning',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+
     const {
       age_ranges,
       height_ft,

@@ -59,6 +59,11 @@ const ActorInfo: React.FC<{
     );
   }
 
+  // If Trans/Nonbinary, gender roles sub-selection is required
+  if (actorInfo2Gender === 'Trans/Nonbinary') {
+    requiredFields.push('actorInfo2GenderRoles');
+  }
+
   const createDefaultFormErrorsData = () => {
     const formErrorsObj: { [key: string]: boolean } = {};
 
@@ -96,6 +101,7 @@ const ActorInfo: React.FC<{
     actorInfo2AgeRanges,
     actorInfo1Ethnicities,
     actorInfo2Gender,
+    actorInfo2GenderRoles,
     actorInfo1LGBTQ,
     actorInfoSinging,
     actorInfoDancing
