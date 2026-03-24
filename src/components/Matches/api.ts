@@ -237,8 +237,10 @@ export async function fetchTalentWithFilters(
           );
 
           filteredMatches = filteredMatches.filter((profile) => {
-            // "I choose not to respond" only matches "Open to all genders"
-            if (profile.gender_identity === 'I choose not to respond') {
+            // Legacy: "I choose not to respond" only matches "Open to all genders"
+            if (
+              (profile.gender_identity as string) === 'I choose not to respond'
+            ) {
               return false;
             }
 
@@ -376,8 +378,10 @@ export async function fetchRolesForTalent(
               (g) => g === 'Man' || g === 'Woman' || g === 'Nonbinary'
             );
 
-            // "I choose not to respond" only matches "Open to all genders"
-            if (profile.gender_identity === 'I choose not to respond') {
+            // Legacy: "I choose not to respond" only matches "Open to all genders"
+            if (
+              (profile.gender_identity as string) === 'I choose not to respond'
+            ) {
               return false;
             }
 
