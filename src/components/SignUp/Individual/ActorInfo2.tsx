@@ -134,7 +134,15 @@ const ActorInfo2: React.FC<{
                         aria-label="height feet"
                         as="select"
                         name="actorInfo2HeightFt"
-                        onChange={setForm}
+                        onChange={(e: any) => {
+                          setForm(e);
+                          setForm({
+                            target: {
+                              name: 'actorInfo2HeightNoAnswer',
+                              value: false
+                            }
+                          });
+                        }}
                       >
                         <option value={undefined}>Feet</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
@@ -149,7 +157,15 @@ const ActorInfo2: React.FC<{
                         aria-label="height inches"
                         as="select"
                         name="actorInfo2HeightIn"
-                        onChange={setForm}
+                        onChange={(e: any) => {
+                          setForm(e);
+                          setForm({
+                            target: {
+                              name: 'actorInfo2HeightNoAnswer',
+                              value: false
+                            }
+                          });
+                        }}
                       >
                         <option value={undefined}>Inches</option>
                         {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map(
@@ -170,7 +186,23 @@ const ActorInfo2: React.FC<{
                         fieldType="checkbox"
                         label="I do not wish to answer"
                         name="actorInfo2HeightNoAnswer"
-                        onChange={setForm}
+                        onChange={(e: any) => {
+                          const checked = e.currentTarget.checked;
+                          setForm({
+                            target: {
+                              name: 'actorInfo2HeightNoAnswer',
+                              value: checked
+                            }
+                          });
+                          if (checked) {
+                            setForm({
+                              target: { name: 'actorInfo2HeightFt', value: 0 }
+                            });
+                            setForm({
+                              target: { name: 'actorInfo2HeightIn', value: 0 }
+                            });
+                          }
+                        }}
                       />
                     </PaddedCol>
                   </Row>

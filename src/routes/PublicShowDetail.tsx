@@ -9,6 +9,7 @@ import { useFirebaseContext } from '../context/FirebaseContext';
 import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
 import { Production, Role } from '../components/Profile/Company/types';
+import { getTheaterByAccountUid } from '../components/Profile/Company/api';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
@@ -103,45 +104,18 @@ const PublicShowDetail = () => {
 
           // Fetch theater name
           if (productionData.account_id) {
-            const accountRef = doc(
+            const theater = await getTheaterByAccountUid(
               firebaseFirestore,
-              'accounts',
               productionData.account_id
             );
-            const accountDoc = await getDoc(accountRef);
 
             if (!isMounted) return;
 
-            if (accountDoc.exists()) {
-              const accountData = accountDoc.data();
-
-              // Check if profile_id exists before trying to access it
-              if (accountData && accountData.profile_id) {
-                const profileRef = doc(
-                  firebaseFirestore,
-                  'profiles',
-                  accountData.profile_id
-                );
-                const profileDoc = await getDoc(profileRef);
-
-                if (!isMounted) return;
-
-                if (profileDoc.exists()) {
-                  const profileData = profileDoc.data();
-                  if (profileData && profileData.theatre_name) {
-                    setTheaterName(profileData.theatre_name);
-                  } else {
-                    setTheaterName('Unknown Theater');
-                  }
-                } else {
-                  setTheaterName('Unknown Theater');
-                }
-              } else {
-                setTheaterName('Unknown Theater');
-              }
-            } else {
-              setTheaterName('Unknown Theater');
-            }
+            setTheaterName(
+              theater && theater.theatre_name
+                ? theater.theatre_name
+                : 'Unknown Theater'
+            );
           }
         }
 

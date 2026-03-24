@@ -25,6 +25,7 @@ import type {
   IndividualProfileInit,
   IndividualRoles,
   Pronouns,
+  SkillCheckbox,
   WebsiteTypes
 } from './types';
 
@@ -344,7 +345,7 @@ const IndividualSignUp: React.FC<{
         break;
     }
 
-    const additionalSkillsCheckboxes: string[] = [];
+    const additionalSkillsCheckboxes: SkillCheckbox[] = [];
     if (actorInfoSinging === 'Yes') additionalSkillsCheckboxes.push('Singing');
     if (actorInfoDancing === 'Yes') additionalSkillsCheckboxes.push('Dancing');
 
@@ -387,7 +388,7 @@ const IndividualSignUp: React.FC<{
       profile_tagline: profileTagline,
 
       // additional skills
-      additional_skills_checkboxes: additionalSkillsCheckboxes as any,
+      additional_skills_checkboxes: additionalSkillsCheckboxes,
 
       // completed profile (new)
       completed_profile: true,

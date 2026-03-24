@@ -41,8 +41,6 @@ const ActorInfo: React.FC<{
     actorInfoDancing
   } = formData;
 
-  console.log('actorInfo1Ethnicities', actorInfo1Ethnicities);
-
   const optLabel = '(Optional)';
   const isOffStage = stageRole === 'off-stage';
   const requiredFields: string[] = [];
