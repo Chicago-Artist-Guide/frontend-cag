@@ -77,12 +77,7 @@ export const ageRanges = [
 ] as const;
 export type AgeRange = (typeof ageRanges)[number];
 
-export const genders = [
-  'Cis Woman',
-  'Cis Man',
-  'Trans/Nonbinary',
-  'I choose not to respond'
-] as const;
+export const genders = ['Cis Woman', 'Cis Man', 'Trans/Nonbinary'] as const;
 export type Gender = (typeof genders)[number];
 
 export const genderRoles = ['Man', 'Woman', 'Nonbinary'] as const;
