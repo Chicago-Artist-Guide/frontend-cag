@@ -56,7 +56,11 @@ export const ethnicityTypes: EthnicityTypeObj[] = [
 ];
 export const flattenedEthnicityTypes: string[] = ethnicityTypes.reduce<
   string[]
->((acc, item) => acc.concat(item.name, item.values), []);
+>(
+  (acc, item) =>
+    item.values.length > 0 ? acc.concat(item.values) : acc.concat(item.name),
+  []
+);
 export type EthnicityTypes = (typeof flattenedEthnicityTypes)[number];
 
 export const ageRanges = [

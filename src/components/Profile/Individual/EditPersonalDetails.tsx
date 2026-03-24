@@ -187,20 +187,11 @@ const EditPersonalDetails = ({
       )}
       <Form.Group className="form-group">
         <CAGLabel>Ethnicity</CAGLabel>
-        {ethnicityTypes.map((eth) => (
-          <React.Fragment key={`parent-frag-chk-${eth.name}`}>
-            <Checkbox
-              checked={editProfile?.ethnicities.includes(eth.name)}
-              fieldType="checkbox"
-              key={`first-level-chk-${eth.name}`}
-              label={eth.name}
-              name="actorInfo1Ethnicities"
-              onChange={(e: any) =>
-                ethnicityChange(e.currentTarget.checked, eth.name)
-              }
-            />
-            {eth.values.length > 0 && (
-              <Checkbox style={{ paddingLeft: '1.25rem' }}>
+        {ethnicityTypes.map((eth) => {
+          // Asian: only show granular sub-options, no parent checkbox
+          if (eth.name === 'Asian' && eth.values.length > 0) {
+            return (
+              <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                 {eth.values.map((ethV) => (
                   <Checkbox
                     checked={editProfile?.ethnicities.includes(ethV)}
@@ -213,10 +204,40 @@ const EditPersonalDetails = ({
                     }
                   />
                 ))}
-              </Checkbox>
-            )}
-          </React.Fragment>
-        ))}
+              </React.Fragment>
+            );
+          }
+          return (
+            <React.Fragment key={`parent-frag-chk-${eth.name}`}>
+              <Checkbox
+                checked={editProfile?.ethnicities.includes(eth.name)}
+                fieldType="checkbox"
+                key={`first-level-chk-${eth.name}`}
+                label={eth.name}
+                name="actorInfo1Ethnicities"
+                onChange={(e: any) =>
+                  ethnicityChange(e.currentTarget.checked, eth.name)
+                }
+              />
+              {eth.values.length > 0 && (
+                <Checkbox style={{ paddingLeft: '1.25rem' }}>
+                  {eth.values.map((ethV) => (
+                    <Checkbox
+                      checked={editProfile?.ethnicities.includes(ethV)}
+                      fieldType="checkbox"
+                      key={`${eth.name}-child-chk-${ethV}`}
+                      label={ethV}
+                      name="actorInfoEthnicities"
+                      onChange={(e: any) =>
+                        ethnicityChange(e.currentTarget.checked, ethV)
+                      }
+                    />
+                  ))}
+                </Checkbox>
+              )}
+            </React.Fragment>
+          );
+        })}
       </Form.Group>
       <Form.Group>
         <CAGLabel>Union</CAGLabel>
