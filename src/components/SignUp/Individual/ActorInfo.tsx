@@ -36,7 +36,9 @@ const ActorInfo: React.FC<{
     actorInfo2Gender,
     actorInfo2GenderRoles,
     actorInfo2GenderTransition,
-    actorInfo1LGBTQ
+    actorInfo1LGBTQ,
+    actorInfoSinging,
+    actorInfoDancing
   } = formData;
 
   console.log('actorInfo1Ethnicities', actorInfo1Ethnicities);
@@ -51,7 +53,9 @@ const ActorInfo: React.FC<{
       'actorInfo2AgeRanges',
       'actorInfo1Ethnicities',
       'actorInfo2Gender',
-      'actorInfo1LGBTQ'
+      'actorInfo1LGBTQ',
+      'actorInfoSinging',
+      'actorInfoDancing'
     );
   }
 
@@ -92,7 +96,9 @@ const ActorInfo: React.FC<{
     actorInfo2AgeRanges,
     actorInfo1Ethnicities,
     actorInfo2Gender,
-    actorInfo1LGBTQ
+    actorInfo1LGBTQ,
+    actorInfoSinging,
+    actorInfoDancing
   ]);
 
   const isGenderRoleInGenderRoles = (genderRole: GenderRole) =>
@@ -282,6 +288,52 @@ const ActorInfo: React.FC<{
                   value="No"
                 />
               </Form.Group>
+              {!isOffStage && (
+                <>
+                  <Form.Group className="form-group">
+                    <CAGLabel>
+                      Are you interested in roles that require singing?
+                    </CAGLabel>
+                    <Checkbox
+                      checked={actorInfoSinging === 'Yes'}
+                      fieldType="radio"
+                      label="Yes"
+                      name="actorInfoSinging"
+                      onChange={setForm}
+                      value="Yes"
+                    />
+                    <Checkbox
+                      checked={actorInfoSinging === 'No'}
+                      fieldType="radio"
+                      label="No"
+                      name="actorInfoSinging"
+                      onChange={setForm}
+                      value="No"
+                    />
+                  </Form.Group>
+                  <Form.Group className="form-group">
+                    <CAGLabel>
+                      Are you interested in roles that require dancing?
+                    </CAGLabel>
+                    <Checkbox
+                      checked={actorInfoDancing === 'Yes'}
+                      fieldType="radio"
+                      label="Yes"
+                      name="actorInfoDancing"
+                      onChange={setForm}
+                      value="Yes"
+                    />
+                    <Checkbox
+                      checked={actorInfoDancing === 'No'}
+                      fieldType="radio"
+                      label="No"
+                      name="actorInfoDancing"
+                      onChange={setForm}
+                      value="No"
+                    />
+                  </Form.Group>
+                </>
+              )}
             </Col>
           </Row>
         </Col>

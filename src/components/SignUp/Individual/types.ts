@@ -134,6 +134,8 @@ export type IndividualData = {
   demographicsUnionStatusOther: string;
   demographicsWebsites: IndividualWebsite[];
   emailListAgree: boolean;
+  actorInfoSinging: string; // 'Yes' | 'No' | ''
+  actorInfoDancing: string; // 'Yes' | 'No' | ''
   offstageRolesGeneral: string[];
   offstageRolesHairMakeupCostumes: string[];
   offstageRolesLighting: string[];
@@ -191,6 +193,7 @@ export type IndividualProfile = {
   headline: string;
   bio: string;
   profile_tagline: string;
+  additional_skills_checkboxes: SkillCheckbox[];
   completed_profile: boolean;
   completed_profile_1: boolean; // old
 };
