@@ -141,8 +141,7 @@ export const genders = [
   'Open to all genders',
   'Cis Woman',
   'Cis Man',
-  'Trans/Nonbinary',
-  'I choose not to respond'
+  'Trans/Nonbinary'
 ] as const;
 
 export const roleGenders = [

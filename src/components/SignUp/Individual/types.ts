@@ -56,7 +56,11 @@ export const ethnicityTypes: EthnicityTypeObj[] = [
 ];
 export const flattenedEthnicityTypes: string[] = ethnicityTypes.reduce<
   string[]
->((acc, item) => acc.concat(item.name, item.values), []);
+>(
+  (acc, item) =>
+    item.values.length > 0 ? acc.concat(item.values) : acc.concat(item.name),
+  []
+);
 export type EthnicityTypes = (typeof flattenedEthnicityTypes)[number];
 
 export const ageRanges = [
@@ -73,12 +77,7 @@ export const ageRanges = [
 ] as const;
 export type AgeRange = (typeof ageRanges)[number];
 
-export const genders = [
-  'Cis Woman',
-  'Cis Man',
-  'Trans/Nonbinary',
-  'I choose not to respond'
-] as const;
+export const genders = ['Cis Woman', 'Cis Man', 'Trans/Nonbinary'] as const;
 export type Gender = (typeof genders)[number];
 
 export const genderRoles = ['Man', 'Woman', 'Nonbinary'] as const;
@@ -130,6 +129,8 @@ export type IndividualData = {
   demographicsUnionStatusOther: string;
   demographicsWebsites: IndividualWebsite[];
   emailListAgree: boolean;
+  actorInfoSinging: string; // 'Yes' | 'No' | ''
+  actorInfoDancing: string; // 'Yes' | 'No' | ''
   offstageRolesGeneral: string[];
   offstageRolesHairMakeupCostumes: string[];
   offstageRolesLighting: string[];
@@ -187,6 +188,7 @@ export type IndividualProfile = {
   headline: string;
   bio: string;
   profile_tagline: string;
+  additional_skills_checkboxes: SkillCheckbox[];
   completed_profile: boolean;
   completed_profile_1: boolean; // old
 };

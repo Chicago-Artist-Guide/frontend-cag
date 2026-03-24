@@ -25,6 +25,7 @@ import type {
   IndividualProfileInit,
   IndividualRoles,
   Pronouns,
+  SkillCheckbox,
   WebsiteTypes
 } from './types';
 
@@ -78,6 +79,8 @@ const defaultData: IndividualData = {
   demographicsUnionStatusOther: '',
   demographicsWebsites: [{ id: 1, url: '', websiteType: '' as WebsiteTypes }],
   emailListAgree: true,
+  actorInfoSinging: '',
+  actorInfoDancing: '',
   offstageRolesGeneral: [],
   offstageRolesHairMakeupCostumes: [],
   offstageRolesLighting: [],
@@ -308,6 +311,8 @@ const IndividualSignUp: React.FC<{
       actorInfo2HeightFt,
       actorInfo2HeightIn,
       actorInfo2HeightNoAnswer,
+      actorInfoSinging,
+      actorInfoDancing,
       demographicsAgency,
       demographicsBioHeadline,
       demographicsBio,
@@ -339,6 +344,10 @@ const IndividualSignUp: React.FC<{
       default:
         break;
     }
+
+    const additionalSkillsCheckboxes: SkillCheckbox[] = [];
+    if (actorInfoSinging === 'Yes') additionalSkillsCheckboxes.push('Singing');
+    if (actorInfoDancing === 'Yes') additionalSkillsCheckboxes.push('Dancing');
 
     const finalProfileData: IndividualProfile = {
       // actor info 1
@@ -377,6 +386,9 @@ const IndividualSignUp: React.FC<{
 
       // profile tagline
       profile_tagline: profileTagline,
+
+      // additional skills
+      additional_skills_checkboxes: additionalSkillsCheckboxes,
 
       // completed profile (new)
       completed_profile: true,

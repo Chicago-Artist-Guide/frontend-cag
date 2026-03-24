@@ -1,3 +1,4 @@
+import Swal from 'sweetalert2';
 import {
   faCamera,
   faCheckCircle,
@@ -356,6 +357,19 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
   };
 
   const updatePersonalDetails = async () => {
+    if (
+      editProfile.gender_identity === 'Trans/Nonbinary' &&
+      (!editProfile.gender_roles || editProfile.gender_roles.length === 0)
+    ) {
+      Swal.fire({
+        title: 'Required Field',
+        text: 'Please select at least one role option for Trans/Nonbinary gender identity.',
+        icon: 'warning',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+
     const {
       age_ranges,
       height_ft,
@@ -1329,19 +1343,46 @@ const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
                 <Row>
                   <Col>
                     <CAGFormGroup>
-                      <BoldP>I am interested in roles that require:</BoldP>
-                      {skillCheckboxes.map((skill) => (
-                        <CAGCheckbox
-                          checked={isAdditionalSkillsCheckboxes(skill)}
-                          fieldType="checkbox"
-                          key={`skill-chk-${skill}`}
-                          label={skill}
-                          name="additionalSkillsCheckboxes"
-                          onChange={(e: any) =>
-                            skillOptionChange(e.currentTarget.checked, skill)
-                          }
-                        />
-                      ))}
+                      <BoldP>
+                        Are you interested in roles that require singing?
+                      </BoldP>
+                      <CAGCheckbox
+                        checked={isAdditionalSkillsCheckboxes('Singing')}
+                        fieldType="radio"
+                        label="Yes"
+                        name="skillSinging"
+                        onChange={() => skillOptionChange(true, 'Singing')}
+                        value="Yes"
+                      />
+                      <CAGCheckbox
+                        checked={!isAdditionalSkillsCheckboxes('Singing')}
+                        fieldType="radio"
+                        label="No"
+                        name="skillSinging"
+                        onChange={() => skillOptionChange(false, 'Singing')}
+                        value="No"
+                      />
+                    </CAGFormGroup>
+                    <CAGFormGroup>
+                      <BoldP>
+                        Are you interested in roles that require dancing?
+                      </BoldP>
+                      <CAGCheckbox
+                        checked={isAdditionalSkillsCheckboxes('Dancing')}
+                        fieldType="radio"
+                        label="Yes"
+                        name="skillDancing"
+                        onChange={() => skillOptionChange(true, 'Dancing')}
+                        value="Yes"
+                      />
+                      <CAGCheckbox
+                        checked={!isAdditionalSkillsCheckboxes('Dancing')}
+                        fieldType="radio"
+                        label="No"
+                        name="skillDancing"
+                        onChange={() => skillOptionChange(false, 'Dancing')}
+                        value="No"
+                      />
                     </CAGFormGroup>
                     <CAGFormGroup>
                       <BoldP>Additional Skills</BoldP>

@@ -91,9 +91,10 @@ const EditPersonalDetails = ({
                 as="select"
                 value={editProfile?.height_ft}
                 name="actorInfo2HeightFt"
-                onChange={(e: any) =>
-                  setProfileForm('height_ft', e.target.value)
-                }
+                onChange={(e: any) => {
+                  setProfileForm('height_ft', e.target.value);
+                  setProfileForm('height_no_answer', false);
+                }}
               >
                 <option value={undefined}>Feet</option>
                 {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
@@ -109,9 +110,10 @@ const EditPersonalDetails = ({
                 as="select"
                 value={editProfile?.height_in}
                 name="actorInfo2HeightIn"
-                onChange={(e: any) =>
-                  setProfileForm('height_in', e.target.value)
-                }
+                onChange={(e: any) => {
+                  setProfileForm('height_in', e.target.value);
+                  setProfileForm('height_no_answer', false);
+                }}
               >
                 <option value={undefined}>Inches</option>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((inches) => (
@@ -129,9 +131,14 @@ const EditPersonalDetails = ({
                 fieldType="checkbox"
                 label="I do not wish to answer"
                 name="actorInfo2HeightNoAnswer"
-                onChange={(e: any) =>
-                  setProfileForm('height_no_answer', e.currentTarget.checked)
-                }
+                onChange={(e: any) => {
+                  const checked = e.currentTarget.checked;
+                  setProfileForm('height_no_answer', checked);
+                  if (checked) {
+                    setProfileForm('height_ft', 0);
+                    setProfileForm('height_in', 0);
+                  }
+                }}
               />
             </PaddedCol>
           </Row>
@@ -163,7 +170,7 @@ const EditPersonalDetails = ({
       {editProfile?.gender_identity === 'Trans/Nonbinary' && (
         <Form.Group className="form-group">
           <CAGLabel>Interested in the following roles:</CAGLabel>
-          <p>Select all that apply</p>
+          <p>Select all that apply (at least one required)</p>
           {(['Man', 'Woman', 'Nonbinary'] as const).map((role) => (
             <Checkbox
               checked={editProfile?.gender_roles?.includes(role)}
@@ -183,24 +190,21 @@ const EditPersonalDetails = ({
               }}
             />
           ))}
+          {(!editProfile?.gender_roles ||
+            editProfile.gender_roles.length === 0) && (
+            <p style={{ color: '#E17B60', fontSize: '14px' }}>
+              Please select at least one role option.
+            </p>
+          )}
         </Form.Group>
       )}
       <Form.Group className="form-group">
         <CAGLabel>Ethnicity</CAGLabel>
-        {ethnicityTypes.map((eth) => (
-          <React.Fragment key={`parent-frag-chk-${eth.name}`}>
-            <Checkbox
-              checked={editProfile?.ethnicities.includes(eth.name)}
-              fieldType="checkbox"
-              key={`first-level-chk-${eth.name}`}
-              label={eth.name}
-              name="actorInfo1Ethnicities"
-              onChange={(e: any) =>
-                ethnicityChange(e.currentTarget.checked, eth.name)
-              }
-            />
-            {eth.values.length > 0 && (
-              <Checkbox style={{ paddingLeft: '1.25rem' }}>
+        {ethnicityTypes.map((eth) => {
+          // Asian: only show granular sub-options, no parent checkbox
+          if (eth.name === 'Asian' && eth.values.length > 0) {
+            return (
+              <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                 {eth.values.map((ethV) => (
                   <Checkbox
                     checked={editProfile?.ethnicities.includes(ethV)}
@@ -213,10 +217,40 @@ const EditPersonalDetails = ({
                     }
                   />
                 ))}
-              </Checkbox>
-            )}
-          </React.Fragment>
-        ))}
+              </React.Fragment>
+            );
+          }
+          return (
+            <React.Fragment key={`parent-frag-chk-${eth.name}`}>
+              <Checkbox
+                checked={editProfile?.ethnicities.includes(eth.name)}
+                fieldType="checkbox"
+                key={`first-level-chk-${eth.name}`}
+                label={eth.name}
+                name="actorInfo1Ethnicities"
+                onChange={(e: any) =>
+                  ethnicityChange(e.currentTarget.checked, eth.name)
+                }
+              />
+              {eth.values.length > 0 && (
+                <Checkbox style={{ paddingLeft: '1.25rem' }}>
+                  {eth.values.map((ethV) => (
+                    <Checkbox
+                      checked={editProfile?.ethnicities.includes(ethV)}
+                      fieldType="checkbox"
+                      key={`${eth.name}-child-chk-${ethV}`}
+                      label={ethV}
+                      name="actorInfoEthnicities"
+                      onChange={(e: any) =>
+                        ethnicityChange(e.currentTarget.checked, ethV)
+                      }
+                    />
+                  ))}
+                </Checkbox>
+              )}
+            </React.Fragment>
+          );
+        })}
       </Form.Group>
       <Form.Group>
         <CAGLabel>Union</CAGLabel>
