@@ -91,9 +91,10 @@ const EditPersonalDetails = ({
                 as="select"
                 value={editProfile?.height_ft}
                 name="actorInfo2HeightFt"
-                onChange={(e: any) =>
-                  setProfileForm('height_ft', e.target.value)
-                }
+                onChange={(e: any) => {
+                  setProfileForm('height_ft', e.target.value);
+                  setProfileForm('height_no_answer', false);
+                }}
               >
                 <option value={undefined}>Feet</option>
                 {[0, 1, 2, 3, 4, 5, 6, 7].map((ft) => (
@@ -109,9 +110,10 @@ const EditPersonalDetails = ({
                 as="select"
                 value={editProfile?.height_in}
                 name="actorInfo2HeightIn"
-                onChange={(e: any) =>
-                  setProfileForm('height_in', e.target.value)
-                }
+                onChange={(e: any) => {
+                  setProfileForm('height_in', e.target.value);
+                  setProfileForm('height_no_answer', false);
+                }}
               >
                 <option value={undefined}>Inches</option>
                 {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11].map((inches) => (
@@ -129,9 +131,14 @@ const EditPersonalDetails = ({
                 fieldType="checkbox"
                 label="I do not wish to answer"
                 name="actorInfo2HeightNoAnswer"
-                onChange={(e: any) =>
-                  setProfileForm('height_no_answer', e.currentTarget.checked)
-                }
+                onChange={(e: any) => {
+                  const checked = e.currentTarget.checked;
+                  setProfileForm('height_no_answer', checked);
+                  if (checked) {
+                    setProfileForm('height_ft', 0);
+                    setProfileForm('height_in', 0);
+                  }
+                }}
               />
             </PaddedCol>
           </Row>
