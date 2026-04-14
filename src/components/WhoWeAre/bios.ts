@@ -18,7 +18,7 @@ import Carter from '../../images/who-we-are/board/Board_Carter.jpg';
 import Johnson from '../../images/who-we-are/board/Board_Johnson.jpg';
 import Mason from '../../images/who-we-are/board/Board_Mason.jpg';
 import Russell from '../../images/who-we-are/board/Board_Russell.jpg';
-import Spielman from '../../images/who-we-are/board/Board_Spielman.jpg';
+import Spielman from '../../images/who-we-are/board/Board_Spielman.png';
 import Uyao from '../../images/who-we-are/board/Board_Uyao.jpg';
 import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 
@@ -26,10 +26,10 @@ import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
 import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
 import Adamy from '../../images/who-we-are/operations/Staff_Adamy.png';
 import Newsome from '../../images/who-we-are/operations/Staff_Newsome.png';
-import Walton from '../../images/who-we-are/operations/Staff_Walton.png';
+import Walton from '../../images/who-we-are/operations/Staff_Walton.jpg';
 import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.png';
 import Benda from '../../images/who-we-are/operations/Staff_Benda.jpg';
-import Ledesma from '../../images/who-we-are/operations/Staff_Ledesma.png';
+import Ledesma from '../../images/who-we-are/operations/Staff_Ledesma.jpg';
 import Meyers from '../../images/who-we-are/operations/Staff_Meyers.jpg';
 
 // Site Development
