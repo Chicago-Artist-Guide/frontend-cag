@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { Col, Row, Image } from 'react-bootstrap';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Col, Image, Row, Tab, Tabs } from 'react-bootstrap';
 import { doc, getDoc } from 'firebase/firestore';
 import { PageContainer } from '../components/layout';
 import { Title } from '../components/layout/Titles';
@@ -9,14 +9,17 @@ import { useFirebaseContext } from '../context/FirebaseContext';
 import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
 import { Production, Role } from '../components/Profile/Company/types';
+import { getTheaterByAccountUid } from '../components/Profile/Company/api';
 import styled from 'styled-components';
-import { colors, fonts } from '../theme/styleVars';
+import { breakpoints, colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
 import PublicShowDetailSkeleton from '../components/PublicShows/PublicShowDetailSkeleton';
 import PublicShowInterestForm from '../components/PublicShows/PublicShowInterestForm';
 
 const PublicShowDetail = () => {
   const { productionId } = useParams<{ productionId: string }>();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get('tab') || 'basic';
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const { getPaginationState } = usePagination();
@@ -101,45 +104,18 @@ const PublicShowDetail = () => {
 
           // Fetch theater name
           if (productionData.account_id) {
-            const accountRef = doc(
+            const theater = await getTheaterByAccountUid(
               firebaseFirestore,
-              'accounts',
               productionData.account_id
             );
-            const accountDoc = await getDoc(accountRef);
 
             if (!isMounted) return;
 
-            if (accountDoc.exists()) {
-              const accountData = accountDoc.data();
-
-              // Check if profile_id exists before trying to access it
-              if (accountData && accountData.profile_id) {
-                const profileRef = doc(
-                  firebaseFirestore,
-                  'profiles',
-                  accountData.profile_id
-                );
-                const profileDoc = await getDoc(profileRef);
-
-                if (!isMounted) return;
-
-                if (profileDoc.exists()) {
-                  const profileData = profileDoc.data();
-                  if (profileData && profileData.theatre_name) {
-                    setTheaterName(profileData.theatre_name);
-                  } else {
-                    setTheaterName('Unknown Theater');
-                  }
-                } else {
-                  setTheaterName('Unknown Theater');
-                }
-              } else {
-                setTheaterName('Unknown Theater');
-              }
-            } else {
-              setTheaterName('Unknown Theater');
-            }
+            setTheaterName(
+              theater && theater.theatre_name
+                ? theater.theatre_name
+                : 'Unknown Theater'
+            );
           }
         }
 
@@ -237,97 +213,191 @@ const PublicShowDetail = () => {
       </Row>
 
       <Row className="mt-4">
-        <Col lg={4}>
-          <ShowImage src={show.production_image_url || ''} fluid />
-          <ShowStatus>{show.status || 'Status Not Available'}</ShowStatus>
+        <Col lg={12}>
+          <ProductionTabs
+            activeKey={activeTab}
+            className="mb-3"
+            id="public-show-detail"
+            onSelect={(k) => setSearchParams({ tab: k || 'basic' })}
+          >
+            <Tab eventKey="basic" title="Basic Info">
+              <Row>
+                <Col lg={4}>
+                  <ShowImage src={show.production_image_url || ''} fluid />
+                  <ShowStatus>
+                    {show.status || 'Status Not Available'}
+                  </ShowStatus>
 
-          {show.writers && (
-            <InfoSection>
-              <InfoLabel>Written by:</InfoLabel>
-              <InfoValue>{show.writers}</InfoValue>
-            </InfoSection>
-          )}
+                  {show.writers && (
+                    <InfoSection>
+                      <InfoLabel>Written by:</InfoLabel>
+                      <InfoValue>{show.writers}</InfoValue>
+                    </InfoSection>
+                  )}
 
-          {show.director && (
-            <InfoSection>
-              <InfoLabel>Director:</InfoLabel>
-              <InfoValue>{show.director}</InfoValue>
-            </InfoSection>
-          )}
+                  {show.director && (
+                    <InfoSection>
+                      <InfoLabel>Director:</InfoLabel>
+                      <InfoValue>{show.director}</InfoValue>
+                    </InfoSection>
+                  )}
 
-          {show.location && (
-            <InfoSection>
-              <InfoLabel>Location:</InfoLabel>
-              <InfoValue>{show.location}</InfoValue>
-            </InfoSection>
-          )}
+                  {show.location && (
+                    <InfoSection>
+                      <InfoLabel>Location:</InfoLabel>
+                      <InfoValue>{show.location}</InfoValue>
+                    </InfoSection>
+                  )}
 
-          {(show.audition_start || show.audition_end) && (
-            <InfoSection>
-              <InfoLabel>Audition Dates:</InfoLabel>
-              <InfoValue>
-                {show.audition_start &&
-                  new Date(show.audition_start).toLocaleDateString()}
-                {show.audition_start && show.audition_end && ' - '}
-                {show.audition_end &&
-                  new Date(show.audition_end).toLocaleDateString()}
-              </InfoValue>
-            </InfoSection>
-          )}
+                  {(show.open_and_close_start || show.open_and_close_end) && (
+                    <InfoSection>
+                      <InfoLabel>Production Dates:</InfoLabel>
+                      <InfoValue>
+                        {show.open_and_close_start &&
+                          new Date(
+                            show.open_and_close_start
+                          ).toLocaleDateString()}
+                        {show.open_and_close_start &&
+                          show.open_and_close_end &&
+                          ' - '}
+                        {show.open_and_close_end &&
+                          new Date(
+                            show.open_and_close_end
+                          ).toLocaleDateString()}
+                      </InfoValue>
+                    </InfoSection>
+                  )}
 
-          <ShowButton
-            onClick={() => handleShowInterestClick(null)}
-            text="Express Interest in this Show"
-            type="button"
-            variant="primary"
-          />
+                  <ShowButton
+                    onClick={() => handleShowInterestClick(null)}
+                    text="Express Interest in this Show"
+                    type="button"
+                    variant="primary"
+                  />
 
-          {!currentUser && (
-            <SignUpPrompt>
-              <Link to="/sign-up">Sign up</Link> or{' '}
-              <Link to="/login">log in</Link> to apply directly to roles
-            </SignUpPrompt>
-          )}
-        </Col>
+                  {!currentUser && (
+                    <SignUpPrompt>
+                      <Link to="/sign-up">Sign up</Link> or{' '}
+                      <Link to="/login">log in</Link> to apply directly to roles
+                    </SignUpPrompt>
+                  )}
+                </Col>
 
-        <Col lg={8}>
-          <ShowDescription>
-            {show.description || 'No description available.'}
-          </ShowDescription>
+                <Col lg={8}>
+                  <ShowDescription>
+                    {show.description || 'No description available.'}
+                  </ShowDescription>
 
-          {onStageRoles.length > 0 && (
-            <RolesSection>
-              <SectionTitle>On-Stage Roles</SectionTitle>
-              {onStageRoles.map((role, index) => (
-                <PublicRoleCard
-                  key={`${role.role_id || 'unknown'}-onstage-${index}`}
-                  role={role}
-                  onShowInterest={() => handleShowInterestClick(role)}
-                  isLoggedIn={!!currentUser}
-                />
-              ))}
-            </RolesSection>
-          )}
+                  {onStageRoles.length > 0 && (
+                    <RolesSection>
+                      <SectionTitle>On-Stage Roles</SectionTitle>
+                      {onStageRoles.map((role, index) => (
+                        <PublicRoleCard
+                          key={`${role.role_id || 'unknown'}-onstage-${index}`}
+                          role={role}
+                          onShowInterest={() => handleShowInterestClick(role)}
+                          isLoggedIn={!!currentUser}
+                        />
+                      ))}
+                    </RolesSection>
+                  )}
 
-          {offStageRoles.length > 0 && (
-            <RolesSection>
-              <SectionTitle>Off-Stage Roles</SectionTitle>
-              {offStageRoles.map((role, index) => (
-                <PublicRoleCard
-                  key={`${role.role_id || 'unknown'}-offstage-${index}`}
-                  role={role}
-                  onShowInterest={() => handleShowInterestClick(role)}
-                  isLoggedIn={!!currentUser}
-                />
-              ))}
-            </RolesSection>
-          )}
+                  {offStageRoles.length > 0 && (
+                    <RolesSection>
+                      <SectionTitle>Off-Stage Roles</SectionTitle>
+                      {offStageRoles.map((role, index) => (
+                        <PublicRoleCard
+                          key={`${role.role_id || 'unknown'}-offstage-${index}`}
+                          role={role}
+                          onShowInterest={() => handleShowInterestClick(role)}
+                          isLoggedIn={!!currentUser}
+                        />
+                      ))}
+                    </RolesSection>
+                  )}
 
-          {onStageRoles.length === 0 && offStageRoles.length === 0 && (
-            <NoRoles>
-              No roles have been posted for this production yet.
-            </NoRoles>
-          )}
+                  {onStageRoles.length === 0 && offStageRoles.length === 0 && (
+                    <NoRoles>
+                      No roles have been posted for this production yet.
+                    </NoRoles>
+                  )}
+                </Col>
+              </Row>
+            </Tab>
+
+            <Tab eventKey="audition" title="Audition Info">
+              <Row>
+                <Col lg={12}>
+                  {(show.audition_start || show.audition_end) && (
+                    <InfoSection>
+                      <InfoLabel>Audition Dates:</InfoLabel>
+                      <InfoValue>
+                        {show.audition_start &&
+                          new Date(show.audition_start).toLocaleDateString()}
+                        {show.audition_start && show.audition_end && ' - '}
+                        {show.audition_end &&
+                          new Date(show.audition_end).toLocaleDateString()}
+                      </InfoValue>
+                    </InfoSection>
+                  )}
+
+                  {show.audition_location && (
+                    <InfoSection>
+                      <InfoLabel>Audition Location:</InfoLabel>
+                      <InfoValue>{show.audition_location}</InfoValue>
+                    </InfoSection>
+                  )}
+
+                  {show.contact_person_name_audition && (
+                    <InfoSection>
+                      <InfoLabel>Contact Person:</InfoLabel>
+                      <InfoValue>{show.contact_person_name_audition}</InfoValue>
+                    </InfoSection>
+                  )}
+
+                  {show.contact_person_email_audition && (
+                    <InfoSection>
+                      <InfoLabel>Contact Email:</InfoLabel>
+                      <InfoValue>
+                        {show.contact_person_email_audition}
+                      </InfoValue>
+                    </InfoSection>
+                  )}
+
+                  {show.materials_to_prepare_audition && (
+                    <InfoSection>
+                      <InfoLabel>Materials to Prepare:</InfoLabel>
+                      <InfoValue style={{ whiteSpace: 'pre-line' }}>
+                        {show.materials_to_prepare_audition}
+                      </InfoValue>
+                    </InfoSection>
+                  )}
+
+                  {show.additional_notes_audition && (
+                    <InfoSection>
+                      <InfoLabel>Additional Notes:</InfoLabel>
+                      <InfoValue style={{ whiteSpace: 'pre-line' }}>
+                        {show.additional_notes_audition}
+                      </InfoValue>
+                    </InfoSection>
+                  )}
+
+                  {!show.audition_start &&
+                    !show.audition_end &&
+                    !show.audition_location &&
+                    !show.contact_person_name_audition &&
+                    !show.contact_person_email_audition &&
+                    !show.materials_to_prepare_audition &&
+                    !show.additional_notes_audition && (
+                      <NoRoles>
+                        No audition information has been posted for this
+                        production yet.
+                      </NoRoles>
+                    )}
+                </Col>
+              </Row>
+            </Tab>
+          </ProductionTabs>
         </Col>
       </Row>
 
@@ -342,6 +412,28 @@ const PublicShowDetail = () => {
     </PageContainer>
   );
 };
+
+const ProductionTabs = styled(Tabs)`
+  border-bottom: 1px solid ${colors.paginationGray};
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: ${colors.paginationGray} transparent;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: ${colors.paginationGray};
+    border-radius: 3px;
+  }
+`;
 
 const BackLink = styled(Link)`
   display: inline-block;

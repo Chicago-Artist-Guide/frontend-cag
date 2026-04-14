@@ -17,6 +17,6 @@
     "types": ["vite/client", "jest"],
     "noFallthroughCasesInSwitch": true
   },
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.test.tsx"],
   "include": ["src", "src/svg.d.ts"]
 }

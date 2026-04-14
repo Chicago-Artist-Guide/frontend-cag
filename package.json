@@ -7,6 +7,8 @@
     "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint --fix --max-warnings=200",
     "audit": "better-npm-audit audit"
   },
@@ -75,7 +77,9 @@
     "react-router-dom": "^6.26.1",
     "tailwindcss": "^3.4.10",
     "typescript": "^5.5.4",
-    "vite-plugin-svgr": "^4.2.0"
+    "vite-plugin-svgr": "^4.2.0",
+    "jsdom": "^25.0.1",
+    "vitest": "^3.2.4"
   },
   "eslintConfig": {
     "rules": {
@@ -129,6 +133,5 @@
     "hooks": {
       "pre-commit": "lint-staged"
     }
-  },
-  "packageManager": "pnpm@9.15.4+sha512.b2dc20e2fc72b3e18848459b37359a32064663e5627a51e4c74b2c29dd8e8e0491483c3abb40789cfd578bf362fb6ba8261b05f0387d76792ed6e23ea3b1b6a0"
+  }
 }
