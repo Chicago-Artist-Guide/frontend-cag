@@ -562,13 +562,7 @@ const EventFormModal: React.FC<EventFormModalProps> = ({
                 <FormRow>
                   <FormGroup>
                     <Label htmlFor="date">Date *</Label>
-                    <Field
-                      as={StyledInput}
-                      type="text"
-                      name="date"
-                      id="date"
-                      placeholder="e.g., March 15, 2025"
-                    />
+                    <Field as={StyledInput} type="date" name="date" id="date" />
                     <ErrorMessage name="date" component={ErrorText} />
                   </FormGroup>
 
