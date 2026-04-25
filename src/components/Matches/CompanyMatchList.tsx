@@ -103,23 +103,22 @@ export const CompanyMatchList = () => {
 
   const selectedStatuses = filters.matchStatus || [];
 
-  const matchesAnySelected = (state: RoleState | undefined): boolean => {
-    if (!state) return selectedStatuses.includes('undecided');
-
+  const matchesAllSelected = (state: RoleState | undefined): boolean => {
     const buckets = new Set<TalentMatchStatus>();
-    if (state.matchStatus === true) buckets.add('applied');
-    if (state.matchStatus === false) buckets.add('hidden');
-    if (state.isFavorite) buckets.add('favorite');
-    if (state.matchStatus === null && !state.isFavorite)
+    if (state?.matchStatus === true) buckets.add('applied');
+    if (state?.matchStatus === false) buckets.add('hidden');
+    if (state?.isFavorite) buckets.add('favorite');
+    // "Undecided" = no Apply/Hide action taken (independent of favorite)
+    if (!state || state.matchStatus === null || state.matchStatus === undefined)
       buckets.add('undecided');
 
-    return selectedStatuses.some((s) => buckets.has(s));
+    return selectedStatuses.every((s) => buckets.has(s));
   };
 
   const filteredRoles =
     selectedStatuses.length === 0
       ? roles
-      : roles.filter((role) => matchesAnySelected(states[buildKey(role)]));
+      : roles.filter((role) => matchesAllSelected(states[buildKey(role)]));
 
   if (loadingStates) {
     return <p>Loading...</p>;

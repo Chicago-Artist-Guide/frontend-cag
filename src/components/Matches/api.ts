@@ -248,8 +248,8 @@ export async function fetchTalentWithFilters(
         );
 
         // Map current match record to the set of buckets it falls into.
-        // OR semantics across selected statuses (a profile is included if
-        // its match state matches any one of the selected filters).
+        // AND semantics across selected statuses — a profile is included
+        // only if its match state matches every one of the selected filters.
         const buckets = new Set<string>();
         if (!findMatch) {
           buckets.add('undecided');
@@ -265,7 +265,7 @@ export async function fetchTalentWithFilters(
           }
         }
 
-        if (matchStatus.some((s) => buckets.has(s))) {
+        if (matchStatus.every((s) => buckets.has(s))) {
           matches.push({ ...profileData });
         }
       } else {
