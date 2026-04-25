@@ -26,8 +26,17 @@ type EventType = {
  */
 const getEventDateTime = (event: EventType): Date => {
   try {
-    // Start with the date
-    const eventDate = new Date(event.date);
+    // Parse the date in local time. `new Date("2026-04-25")` is parsed as UTC
+    // midnight, which becomes the previous day in negative-offset timezones
+    // (e.g., Chicago) — moving events to "past" a day early.
+    const isoDateMatch = event.date.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const eventDate = isoDateMatch
+      ? new Date(
+          parseInt(isoDateMatch[1], 10),
+          parseInt(isoDateMatch[2], 10) - 1,
+          parseInt(isoDateMatch[3], 10)
+        )
+      : new Date(event.date);
 
     if (isNaN(eventDate.getTime())) {
       // Invalid date - return a past date as safe default
@@ -40,10 +49,10 @@ const getEventDateTime = (event: EventType): Date => {
       return new Date(0);
     }
 
-    // If no time provided, default to start of day (00:00:00)
-    // This ensures events move to "past" section after the event date has fully passed
+    // If no time provided, default to end of day (23:59:59) so all-day events
+    // remain "upcoming" through the event date and only flip to past at midnight.
     if (!event.time || event.time.trim() === '') {
-      eventDate.setHours(0, 0, 0, 0);
+      eventDate.setHours(23, 59, 59, 999);
       return eventDate;
     }
 
@@ -72,8 +81,8 @@ const getEventDateTime = (event: EventType): Date => {
       hours = parseInt(time24Match[1], 10);
       minutes = parseInt(time24Match[2], 10);
     } else {
-      // Couldn't parse time - default to start of day
-      eventDate.setHours(0, 0, 0, 0);
+      // Couldn't parse time - default to end of day
+      eventDate.setHours(23, 59, 59, 999);
       return eventDate;
     }
 
