@@ -8,13 +8,12 @@ import { Button } from '../components/shared';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
-import { Production, Role } from '../components/Profile/Company/types';
+import { Production } from '../components/Profile/Company/types';
 import { getTheaterByAccountUid } from '../components/Profile/Company/api';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
 import PublicShowDetailSkeleton from '../components/PublicShows/PublicShowDetailSkeleton';
-import PublicShowInterestForm from '../components/PublicShows/PublicShowInterestForm';
 
 const PublicShowDetail = () => {
   const { productionId } = useParams<{ productionId: string }>();
@@ -26,8 +25,6 @@ const PublicShowDetail = () => {
   const [show, setShow] = useState<Production | null>(null);
   const [theaterName, setTheaterName] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [showInterestForm, setShowInterestForm] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   // Get the saved pagination state
   const savedPaginationState = getPaginationState('/shows');
@@ -138,16 +135,6 @@ const PublicShowDetail = () => {
       isMounted = false;
     };
   }, [productionId, firebaseFirestore]);
-
-  const handleShowInterestClick = (role: Role | null) => {
-    setSelectedRole(role);
-    setShowInterestForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowInterestForm(false);
-    setSelectedRole(null);
-  };
 
   if (loading) {
     return (
@@ -268,13 +255,6 @@ const PublicShowDetail = () => {
                     </InfoSection>
                   )}
 
-                  <ShowButton
-                    onClick={() => handleShowInterestClick(null)}
-                    text="Express Interest in this Show"
-                    type="button"
-                    variant="primary"
-                  />
-
                   {!currentUser && (
                     <SignUpPrompt>
                       <Link to="/sign-up">Sign up</Link> or{' '}
@@ -295,8 +275,6 @@ const PublicShowDetail = () => {
                         <PublicRoleCard
                           key={`${role.role_id || 'unknown'}-onstage-${index}`}
                           role={role}
-                          onShowInterest={() => handleShowInterestClick(role)}
-                          isLoggedIn={!!currentUser}
                         />
                       ))}
                     </RolesSection>
@@ -309,8 +287,6 @@ const PublicShowDetail = () => {
                         <PublicRoleCard
                           key={`${role.role_id || 'unknown'}-offstage-${index}`}
                           role={role}
-                          onShowInterest={() => handleShowInterestClick(role)}
-                          isLoggedIn={!!currentUser}
                         />
                       ))}
                     </RolesSection>
@@ -400,15 +376,6 @@ const PublicShowDetail = () => {
           </ProductionTabs>
         </Col>
       </Row>
-
-      {showInterestForm && (
-        <PublicShowInterestForm
-          show={show}
-          role={selectedRole}
-          theaterName={theaterName}
-          onClose={handleCloseForm}
-        />
-      )}
     </PageContainer>
   );
 };

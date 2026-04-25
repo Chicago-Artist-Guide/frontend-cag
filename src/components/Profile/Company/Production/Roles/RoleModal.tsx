@@ -11,8 +11,7 @@ import {
   additionalRequirements,
   ageRanges,
   roleStatuses,
-  roleSpecificGenders,
-  unionOptions
+  roleSpecificGenders
 } from '../../../../../utils/lookups';
 import { ethnicityTypes } from '../../../../SignUp/Individual/types';
 import ConfirmDialog from '../../../../ConfirmDialog';
@@ -44,12 +43,8 @@ const RoleModal: React.FC<{
 
   useEffect(() => {
     if (role.role_id) {
-      // Backward compatibility: convert legacy string union to array
-      let normalizedRole: Role = {
-        ...role,
-        union: typeof role.union === 'string' ? [role.union] : role.union || []
-      };
       // Fold legacy include_nonbinary into gender_identity
+      let normalizedRole: Role = { ...role };
       if (
         normalizedRole.include_nonbinary &&
         normalizedRole.gender_identity &&
@@ -68,8 +63,7 @@ const RoleModal: React.FC<{
         role_status: 'Open',
         gender_identity: ['Open to all genders'],
         age_range: ['Open to all ages'],
-        ethnicity: ['Open to all ethnicities'],
-        union: []
+        ethnicity: ['Open to all ethnicities']
       });
     }
   }, [role, type, show]);
@@ -289,23 +283,6 @@ const RoleModal: React.FC<{
     }
   };
 
-  const handleUnionChange = (option: string, checked: boolean) => {
-    const currentUnions = (formValues.union as string[]) || [];
-
-    if (checked) {
-      setFormValues({ ...formValues, union: [...currentUnions, option] });
-    } else {
-      setFormValues({
-        ...formValues,
-        union: currentUnions.filter((u) => u !== option)
-      });
-    }
-  };
-
-  const isUnionSelected = (option: string): boolean => {
-    return ((formValues.union as string[]) || []).includes(option);
-  };
-
   const onDeleteConfirm = () => {
     onDelete(formValues);
   };
@@ -433,21 +410,6 @@ const RoleModal: React.FC<{
                   onChange={setFormState}
                   style={{ marginTop: 0 }}
                 />
-                <Form.Group className="form-group" style={{ marginTop: 30 }}>
-                  <CAGLabel>Union Status</CAGLabel>
-                  {unionOptions.map((option) => (
-                    <Checkbox
-                      checked={isUnionSelected(option)}
-                      fieldType="checkbox"
-                      key={`union_${option}`}
-                      label={option}
-                      name={option}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        handleUnionChange(option, e.target.checked);
-                      }}
-                    />
-                  ))}
-                </Form.Group>
                 {isOnStage && (
                   <>
                     <Form.Group

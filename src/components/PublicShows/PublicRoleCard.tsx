@@ -1,64 +1,33 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Row, Col } from 'react-bootstrap';
 import { Role } from '../Profile/Company/types';
-import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
 
 interface PublicRoleCardProps {
   role: Role;
-  onShowInterest: () => void;
-  isLoggedIn: boolean;
 }
 
-const PublicRoleCard: React.FC<PublicRoleCardProps> = ({
-  role,
-  onShowInterest,
-  isLoggedIn
-}) => {
+const PublicRoleCard: React.FC<PublicRoleCardProps> = ({ role }) => {
   return (
     <RoleCardContainer>
-      <Row>
-        <Col lg={8}>
-          <RoleName>{role.role_name}</RoleName>
-          <RoleStatus>{role.role_status}</RoleStatus>
+      <RoleName>{role.role_name}</RoleName>
+      <RoleStatus>{role.role_status}</RoleStatus>
 
-          {role.description && (
-            <RoleDescription>{role.description}</RoleDescription>
-          )}
+      {role.description && (
+        <RoleDescription>{role.description}</RoleDescription>
+      )}
 
-          <RoleDetails>
-            {role.union && (
-              <DetailItem>
-                <DetailLabel>Union:</DetailLabel>
-                <DetailValue>{role.union}</DetailValue>
-              </DetailItem>
-            )}
-
-            {role.role_rate && (
-              <DetailItem>
-                <DetailLabel>Rate:</DetailLabel>
-                <DetailValue>
-                  {role.role_rate}{' '}
-                  {role.role_rate_unit && `per ${role.role_rate_unit}`}
-                </DetailValue>
-              </DetailItem>
-            )}
-          </RoleDetails>
-        </Col>
-
-        <Col
-          lg={4}
-          className="d-flex align-items-center justify-content-center"
-        >
-          <RoleButton
-            onClick={onShowInterest}
-            text={isLoggedIn ? 'Apply for Role' : 'Express Interest'}
-            type="button"
-            variant="primary"
-          />
-        </Col>
-      </Row>
+      <RoleDetails>
+        {role.role_rate && (
+          <DetailItem>
+            <DetailLabel>Rate:</DetailLabel>
+            <DetailValue>
+              {role.role_rate}{' '}
+              {role.role_rate_unit && `per ${role.role_rate_unit}`}
+            </DetailValue>
+          </DetailItem>
+        )}
+      </RoleDetails>
     </RoleCardContainer>
   );
 };
@@ -114,10 +83,6 @@ const DetailLabel = styled.span`
 const DetailValue = styled.span`
   font-family: ${fonts.montserrat};
   font-size: 14px;
-`;
-
-const RoleButton = styled(Button)`
-  width: 100%;
 `;
 
 export default PublicRoleCard;
