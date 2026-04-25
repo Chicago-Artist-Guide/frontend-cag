@@ -13,11 +13,11 @@ import { Tagline, Title } from '../../layout/Titles';
 import { ImageUploadComponent } from '../../shared';
 import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
-import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import Privacy from './Privacy';
 import IndividualRole from './Role';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
+import UnionStatus from './UnionStatus';
 import type {
   Gender,
   IndividualAccountInit,
@@ -49,7 +49,7 @@ const defaultSteps: Step[] = [
   { id: 'privacy' },
   { id: 'offstageRoles' },
   { id: 'actorInfo' },
-  { id: 'demographics' },
+  { id: 'unionStatus' },
   { id: 'profilePhoto' }
 ];
 
@@ -452,9 +452,9 @@ const IndividualSignUp: React.FC<{
           <ActorInfo {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
-      case 'demographics':
+      case 'unionStatus':
         returnStep = (
-          <Demographics {...props} hasErrorCallback={setStepErrorsCallback} />
+          <UnionStatus {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
       case 'profilePhoto':
