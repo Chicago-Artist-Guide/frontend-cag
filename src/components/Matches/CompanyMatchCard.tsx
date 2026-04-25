@@ -23,7 +23,15 @@ import { MatchConfirmationModal } from './MatchConfirmationModal';
 import { ProductionRole } from './types';
 import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
 
-export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
+export const CompanyMatchCard = ({
+  role,
+  isFavorite = false,
+  onToggleFavorite
+}: {
+  role: ProductionRole;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+}) => {
   const navigate = useNavigate();
   const { account, currentUser } = useUserContext();
   const { findProduction } = useRoleMatches();
@@ -292,6 +300,33 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         </div>
       )}
       <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
+        {onToggleFavorite && (
+          <button
+            type="button"
+            onClick={onToggleFavorite}
+            aria-label={isFavorite ? 'Unfavorite role' : 'Favorite role'}
+            className={clsx(
+              'absolute right-3 top-3 rounded-full p-1 transition-colors',
+              {
+                'text-banana hover:text-banana/80': isFavorite,
+                'text-stone-300 hover:text-banana': !isFavorite
+              }
+            )}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="size-6"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
+        )}
         <h2 className="mb-2 text-xl font-bold lg:text-2xl">{role.role_name}</h2>
         {production?.production_name && (
           <div className="mb-4">
@@ -382,7 +417,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             />
           </svg>
           <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
-            Accept
+            Apply
           </span>
         </button>
         <button
@@ -409,7 +444,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             />
           </svg>
           <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
-            Decline
+            Hide
           </span>
         </button>
       </div>

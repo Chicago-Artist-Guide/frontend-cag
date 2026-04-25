@@ -13,6 +13,7 @@ import { Tagline, Title } from '../../layout/Titles';
 import { ImageUploadComponent } from '../../shared';
 import ActorInfo from './ActorInfo';
 import IndividualBasics from './Basics';
+import Demographics from './Demographics';
 import OffstageRoles from './OffstageRoles';
 import Privacy from './Privacy';
 import IndividualRole from './Role';
@@ -48,6 +49,7 @@ const defaultSteps: Step[] = [
   { id: 'privacy' },
   { id: 'offstageRoles' },
   { id: 'actorInfo' },
+  { id: 'demographics' },
   { id: 'profilePhoto' }
 ];
 
@@ -448,6 +450,11 @@ const IndividualSignUp: React.FC<{
       case 'actorInfo':
         returnStep = (
           <ActorInfo {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
+        break;
+      case 'demographics':
+        returnStep = (
+          <Demographics {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
       case 'profilePhoto':

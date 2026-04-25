@@ -104,6 +104,15 @@ export const unionOptions = [
 
 export type UnionOption = (typeof unionOptions)[number];
 
+// Display labels — keep stored values stable while correcting visible copy.
+export const unionOptionLabels: Record<UnionOption, string> = {
+  'Non-Union': 'Non-Union',
+  'AEA (actors, stage managers, directors)':
+    'AEA (actors, stage managers, directors)',
+  'IATSE (stage hands)': 'IATSE (stage hands)',
+  'Union Scenic Artist (designers)': 'United Scenic Artists (designers)'
+};
+
 export const productionTypes: ProductionType[] = ['Musical', 'Play', 'Other'];
 export const stageRoles: StageRole[] = ['On-Stage', 'Off-Stage'];
 export const roleStatuses: RoleStatus[] = ['Open', 'Closed'];

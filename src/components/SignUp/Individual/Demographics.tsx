@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
@@ -8,7 +8,7 @@ import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../../theme/styleVars';
-import { unionOptions } from '../../../utils/lookups';
+import { unionOptionLabels, unionOptions } from '../../../utils/lookups';
 import { Checkbox } from '../../shared';
 import { Tagline, Title, TitleThree } from '../../layout/Titles';
 import {
@@ -21,8 +21,9 @@ import {
 const Demographics: React.FC<{
   setForm: SetForm;
   formData: IndividualData;
+  hasErrorCallback: (step: string, hasErrors: boolean) => void;
 }> = (props) => {
-  const { formData, setForm } = props;
+  const { formData, setForm, hasErrorCallback } = props;
   const {
     demographicsUnionStatus, // array of union selections
     demographicsAgency,
@@ -31,6 +32,14 @@ const Demographics: React.FC<{
     demographicsBio
   } = formData;
   const [websiteId, setWebsiteId] = useState(1);
+
+  const hasUnionError = !(
+    Array.isArray(demographicsUnionStatus) && demographicsUnionStatus.length > 0
+  );
+
+  useEffect(() => {
+    hasErrorCallback('demographics', hasUnionError);
+  }, [hasUnionError]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleUnionChange = (option: string, checked: boolean) => {
     const currentUnions = Array.isArray(demographicsUnionStatus)
@@ -122,6 +131,7 @@ const Demographics: React.FC<{
           <Row>
             <Col lg="12">
               <TitleThree>Union</TitleThree>
+              <p>Select all that apply (at least one required).</p>
               <Container>
                 <Row>
                   <PaddedCol lg="10">
@@ -130,13 +140,18 @@ const Demographics: React.FC<{
                         <Checkbox
                           key={`union-option-${option}`}
                           checked={isUnionSelected(option)}
-                          label={option}
+                          label={unionOptionLabels[option]}
                           name={option}
                           onChange={(e: any) =>
                             handleUnionChange(option, e.currentTarget.checked)
                           }
                         />
                       ))}
+                      {hasUnionError && (
+                        <p style={{ color: '#E17B60', fontSize: '14px' }}>
+                          Please select at least one union status.
+                        </p>
+                      )}
                     </Form.Group>
                   </PaddedCol>
                 </Row>
