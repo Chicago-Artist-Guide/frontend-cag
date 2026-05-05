@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { type JSX } from 'react';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import BothStage from '../../../images/icons-signup/both-stage.svg';

@@ -242,7 +242,6 @@ const FormDatePicker: React.FC<
     <DatePickerInput
       name={name}
       onChange={handleChange}
-      value={defaultValue}
       selected={defaultValue ? new Date(defaultValue) : undefined}
       placeholderText="mm/dd/yyyy"
     />
@@ -341,7 +340,7 @@ const DateRange = styled.div`
   }
 `;
 
-const DatePickerInput = styled(DatePicker)`
+const DatePickerInput = styled(DatePicker as any)`
   height: 40px;
   width: 100%;
   max-width: 148px;
