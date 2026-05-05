@@ -312,11 +312,9 @@ interface FormValues {
   status: 'published' | 'draft' | 'cancelled';
 }
 
-const EventFormModal: React.FC<EventFormModalProps> = ({
-  event,
-  onClose,
-  onSuccess
-}) => {
+const EventFormModal: React.FC<
+  React.PropsWithChildren<EventFormModalProps>
+> = ({ event, onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const { logAction } = useAdminActions();

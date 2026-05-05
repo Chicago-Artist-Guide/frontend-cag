@@ -11,10 +11,12 @@ import { Tagline, Title } from '../../layout/Titles';
 import type { USStateSymbol } from '../types';
 import type { IndividualProfile2Data, TrainingInstitution } from './types';
 
-const Training: React.FC<{
-  setForm: SetForm;
-  formData: IndividualProfile2Data;
-}> = (props) => {
+const Training: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualProfile2Data;
+  }>
+> = (props) => {
   const { setForm, formData } = props;
   const { trainingInstitutions } = formData;
   const [trainingId, setTrainingId] = useState(1);

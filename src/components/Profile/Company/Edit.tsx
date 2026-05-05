@@ -29,10 +29,12 @@ import {
 } from './ProfileStyles';
 import { Award, Profile } from './types';
 
-const CompanyProfileEdit: React.FC<{
-  toggleEdit: () => void;
-  autoAddAward?: boolean;
-}> = ({ toggleEdit, autoAddAward = false }) => {
+const CompanyProfileEdit: React.FC<
+  React.PropsWithChildren<{
+    toggleEdit: () => void;
+    autoAddAward?: boolean;
+  }>
+> = ({ toggleEdit, autoAddAward = false }) => {
   const {
     profile: { ref, data },
     setProfileData

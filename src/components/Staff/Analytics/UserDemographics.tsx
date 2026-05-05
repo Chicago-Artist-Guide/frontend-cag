@@ -112,7 +112,9 @@ type DemographicsProps = {
   };
 };
 
-const UserDemographics: React.FC<DemographicsProps> = ({ data }) => {
+const UserDemographics: React.FC<
+  React.PropsWithChildren<DemographicsProps>
+> = ({ data }) => {
   // Transform data for charts
   const transformData = (obj: Record<string, number>) => {
     return Object.entries(obj)

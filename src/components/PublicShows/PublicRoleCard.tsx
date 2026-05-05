@@ -7,7 +7,9 @@ interface PublicRoleCardProps {
   role: Role;
 }
 
-const PublicRoleCard: React.FC<PublicRoleCardProps> = ({ role }) => {
+const PublicRoleCard: React.FC<
+  React.PropsWithChildren<PublicRoleCardProps>
+> = ({ role }) => {
   return (
     <RoleCardContainer>
       <RoleName>{role.role_name}</RoleName>

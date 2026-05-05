@@ -28,14 +28,16 @@ import { Role } from '../../types';
 
 const statuses = getOptions(roleStatuses);
 
-const RoleModal: React.FC<{
-  show: boolean;
-  type: StageRole;
-  role?: Role;
-  onDelete: (x: Role) => void;
-  onSubmit: (x: Role) => void;
-  onClose: () => void;
-}> = ({ show = false, type, role = {}, onSubmit, onClose, onDelete }) => {
+const RoleModal: React.FC<
+  React.PropsWithChildren<{
+    show: boolean;
+    type: StageRole;
+    role?: Role;
+    onDelete: (x: Role) => void;
+    onSubmit: (x: Role) => void;
+    onClose: () => void;
+  }>
+> = ({ show = false, type, role = {}, onSubmit, onClose, onDelete }) => {
   if (!show) return null;
   const [showConfirm, setShowConfirm] = useState(false);
   const [formValues, setFormValues] = useState<Role>({});

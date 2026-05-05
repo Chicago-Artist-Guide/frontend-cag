@@ -6,7 +6,10 @@ type Props = ColProps & {
   children: React.ReactNode;
 };
 
-const SignUpBody: React.FC<Props> = ({ children, ...rest }) => {
+const SignUpBody: React.FC<React.PropsWithChildren<Props>> = ({
+  children,
+  ...rest
+}) => {
   return <StyledCol {...rest}>{children}</StyledCol>;
 };
 

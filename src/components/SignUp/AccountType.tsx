@@ -77,7 +77,7 @@ type Props = {
   onCardClick?: () => void;
 };
 
-const AccountType: React.FC<Props> = ({
+const AccountType: React.FC<React.PropsWithChildren<Props>> = ({
   accountType,
   setAccountType,
   onCardClick

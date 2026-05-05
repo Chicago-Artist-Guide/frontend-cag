@@ -81,7 +81,9 @@ const getRoleDescription = (role: Exclude<AdminRole, null>): string => {
 /**
  * UserRoleBadge Component
  */
-const UserRoleBadge: React.FC<UserRoleBadgeProps> = ({ role }) => {
+const UserRoleBadge: React.FC<React.PropsWithChildren<UserRoleBadgeProps>> = ({
+  role
+}) => {
   return (
     <Badge $roleColor={getRoleColor(role)} title={getRoleDescription(role)}>
       {getRoleLabel(role)}

@@ -253,11 +253,9 @@ const MetaInfo = styled.div`
   }
 `;
 
-const OpeningDetailsModal: React.FC<OpeningDetailsModalProps> = ({
-  opening,
-  onClose,
-  onEdit
-}) => {
+const OpeningDetailsModal: React.FC<
+  React.PropsWithChildren<OpeningDetailsModalProps>
+> = ({ opening, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
 

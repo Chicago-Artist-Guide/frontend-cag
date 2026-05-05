@@ -33,7 +33,7 @@ const urlValidator = (url: string) => {
   return url;
 };
 
-const TheatreSignUpRequest: React.FC = () => {
+const TheatreSignUpRequest: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const [submitted, setSubmitted] = useState(false);
 

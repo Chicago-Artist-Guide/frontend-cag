@@ -6,10 +6,12 @@ import { Button } from '../../../../components/shared';
 import { breakpoints, colors, fonts } from '../../../../theme/styleVars';
 import { Production } from '../types';
 
-const ActiveProduction: React.FC<{
-  show: Production;
-  previewMode?: boolean;
-}> = ({ show, previewMode = false }) => {
+const ActiveProduction: React.FC<
+  React.PropsWithChildren<{
+    show: Production;
+    previewMode?: boolean;
+  }>
+> = ({ show, previewMode = false }) => {
   const navigate = useNavigate();
   const roles = show?.roles ?? [];
   const hasRoles = roles?.length > 0;

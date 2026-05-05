@@ -81,7 +81,9 @@ type QuickStatsProps = {
   data: AnalyticsData;
 };
 
-const QuickStats: React.FC<QuickStatsProps> = ({ data }) => {
+const QuickStats: React.FC<React.PropsWithChildren<QuickStatsProps>> = ({
+  data
+}) => {
   const { userMetrics } = data;
 
   const calculatePercentage = (value: number, total: number) => {

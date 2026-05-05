@@ -1,9 +1,8 @@
 import React from 'react';
 
-export const Title: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
-  children,
-  ...rest
-}) => {
+export const Title: React.FC<
+  React.PropsWithChildren<React.HTMLAttributes<HTMLHeadingElement>>
+> = ({ children, ...rest }) => {
   return (
     <h1 className="uppercase" {...rest}>
       {children}
@@ -11,10 +10,9 @@ export const Title: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   );
 };
 
-export const TitleTwo: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
-  children,
-  ...rest
-}) => {
+export const TitleTwo: React.FC<
+  React.PropsWithChildren<React.HTMLAttributes<HTMLHeadingElement>>
+> = ({ children, ...rest }) => {
   return (
     <h2
       className="font-lora text-2xl font-normal italic leading-7 tracking-wider text-cornflower"
@@ -25,10 +23,9 @@ export const TitleTwo: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   );
 };
 
-export const Tagline: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
-  children,
-  ...rest
-}) => {
+export const Tagline: React.FC<
+  React.PropsWithChildren<React.HTMLAttributes<HTMLHeadingElement>>
+> = ({ children, ...rest }) => {
   return (
     <h2
       className="mb-10 font-lora text-2xl font-normal italic leading-7 tracking-wider text-cornflower"
@@ -39,10 +36,9 @@ export const Tagline: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
   );
 };
 
-export const TitleThree: React.FC<React.HTMLAttributes<HTMLHeadingElement>> = ({
-  children,
-  ...rest
-}) => {
+export const TitleThree: React.FC<
+  React.PropsWithChildren<React.HTMLAttributes<HTMLHeadingElement>>
+> = ({ children, ...rest }) => {
   return (
     <h3 className="text-xl font-bold" {...rest}>
       {children}

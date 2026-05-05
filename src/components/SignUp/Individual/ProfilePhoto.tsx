@@ -11,10 +11,12 @@ import { Tagline, Title } from '../../layout/Titles';
 import { breakpoints } from '../../../theme/styleVars';
 import type { IndividualData } from './types';
 
-const ProfilePhoto: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-}> = ({ setForm, formData }) => {
+const ProfilePhoto: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+  }>
+> = ({ setForm, formData }) => {
   const handleImageSave = (imageUrl: string) => {
     setForm({
       target: {

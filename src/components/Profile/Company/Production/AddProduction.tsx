@@ -107,9 +107,9 @@ const MobileButtonCol = styled.div`
   }
 `;
 
-const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
-  toggleEdit
-}) => {
+const CompanyAddShow: React.FC<
+  React.PropsWithChildren<{ toggleEdit: () => void }>
+> = ({ toggleEdit }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     profile: { data: profileData },

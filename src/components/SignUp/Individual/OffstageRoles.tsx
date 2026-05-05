@@ -21,10 +21,12 @@ import type {
 } from '../../Profile/shared/profile.types';
 import type { IndividualData } from './types';
 
-const OffstageRoles: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-}> = (props) => {
+const OffstageRoles: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+  }>
+> = (props) => {
   const { formData, setForm } = props;
 
   const {

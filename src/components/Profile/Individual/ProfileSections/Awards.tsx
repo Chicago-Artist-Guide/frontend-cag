@@ -5,10 +5,12 @@ import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { breakpoints } from '../../../../theme/styleVars';
 
-const Awards: React.FC<{
-  awards: any;
-  editMode: boolean;
-}> = ({ awards, editMode }) => {
+const Awards: React.FC<
+  React.PropsWithChildren<{
+    awards: any;
+    editMode: boolean;
+  }>
+> = ({ awards, editMode }) => {
   const awardsIsEmpty = awards.length == 0 ? true : false;
 
   const EditVersion = () => {

@@ -16,13 +16,15 @@ import { checkForErrors } from './utils';
 
 const requiredFields = ['theatreName', 'emailAddress', 'password'];
 
-const CompanyBasics: React.FC<{
-  stepId: string;
-  errors: { [key: string]: string };
-  setForm: SetForm;
-  formValues: CompanyData;
-  setStepErrors: (step: string, hasErrors: boolean) => void;
-}> = ({ stepId, setForm, formValues, errors, setStepErrors }) => {
+const CompanyBasics: React.FC<
+  React.PropsWithChildren<{
+    stepId: string;
+    errors: { [key: string]: string };
+    setForm: SetForm;
+    formValues: CompanyData;
+    setStepErrors: (step: string, hasErrors: boolean) => void;
+  }>
+> = ({ stepId, setForm, formValues, errors, setStepErrors }) => {
   const { theatreName, emailAddress, password } = formValues;
 
   useEffect(() => {

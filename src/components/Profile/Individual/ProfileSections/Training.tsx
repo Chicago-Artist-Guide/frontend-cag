@@ -3,9 +3,11 @@ import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
-const Training: React.FC<{
-  training_institutions: any;
-}> = ({ training_institutions }) => {
+const Training: React.FC<
+  React.PropsWithChildren<{
+    training_institutions: any;
+  }>
+> = ({ training_institutions }) => {
   return (
     <>
       {hasNonEmptyValues(training_institutions) && (

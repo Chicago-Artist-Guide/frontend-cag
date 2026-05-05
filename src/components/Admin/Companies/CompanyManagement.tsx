@@ -159,7 +159,7 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
-const CompanyManagement: React.FC = () => {
+const CompanyManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { hasPermission, permissions } = useAdminAuth();
 
   // Permission check

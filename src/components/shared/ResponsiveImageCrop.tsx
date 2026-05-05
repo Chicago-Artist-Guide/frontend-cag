@@ -32,7 +32,9 @@ interface ResponsiveImageCropProps {
   maxZoom?: number;
 }
 
-const ResponsiveImageCrop: React.FC<ResponsiveImageCropProps> = ({
+const ResponsiveImageCrop: React.FC<
+  React.PropsWithChildren<ResponsiveImageCropProps>
+> = ({
   imageSrc,
   onCropComplete,
   onCancel,

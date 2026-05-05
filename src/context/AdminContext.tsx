@@ -124,11 +124,9 @@ interface AdminProviderProps {
  *   </UserContext.Provider>
  * </FirebaseContext.Provider>
  */
-export const AdminProvider: React.FC<AdminProviderProps> = ({
-  children,
-  currentUser,
-  firestore
-}) => {
+export const AdminProvider: React.FC<
+  React.PropsWithChildren<AdminProviderProps>
+> = ({ children, currentUser, firestore }) => {
   const [currentAdminRole, setCurrentAdminRole] = useState<AdminRole | null>(
     null
   );

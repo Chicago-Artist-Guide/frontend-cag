@@ -76,7 +76,7 @@ const DEMO_ROLES: RoleOpportunity[] = [
   }
 ];
 
-const GetInvolved: React.FC = () => {
+const GetInvolved: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const [searchParams] = useSearchParams();
   const [roles, setRoles] = useState<RoleOpportunity[]>([]);

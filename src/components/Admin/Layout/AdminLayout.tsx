@@ -116,7 +116,7 @@ const UnauthorizedContainer = styled.div`
  * Protects admin routes and provides consistent layout structure.
  * Only accessible to users with admin privileges.
  */
-const AdminLayout: React.FC = () => {
+const AdminLayout: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { isAdmin, loading, adminRole, permissions } = useAdminAuth();
 
   console.log('[AdminLayout] Render', {

@@ -12,13 +12,9 @@ interface ImageUploadModalProps {
   type: ImageUploadType;
 }
 
-const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
-  show,
-  onHide,
-  onSave,
-  currentImgUrl,
-  type
-}) => {
+const ImageUploadModal: React.FC<
+  React.PropsWithChildren<ImageUploadModalProps>
+> = ({ show, onHide, onSave, currentImgUrl, type }) => {
   // Convert legacy type to new image type format
   const imageType = type === 'User' ? 'user' : 'poster';
 

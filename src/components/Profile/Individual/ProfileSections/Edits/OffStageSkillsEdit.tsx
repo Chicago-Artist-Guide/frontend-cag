@@ -25,7 +25,7 @@ interface PropType {
   onCancel: () => void;
 }
 
-const OffStageSkillsEdit: React.FC<PropType> = ({
+const OffStageSkillsEdit: React.FC<React.PropsWithChildren<PropType>> = ({
   offstage_roles_general,
   offstage_roles_production,
   offstage_roles_scenic_and_properties,

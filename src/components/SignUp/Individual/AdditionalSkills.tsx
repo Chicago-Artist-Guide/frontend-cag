@@ -14,10 +14,12 @@ import {
   skillCheckboxes
 } from './types';
 
-const AdditionalSkills: React.FC<{
-  setForm: SetForm;
-  formData: IndividualProfile2Data;
-}> = (props) => {
+const AdditionalSkills: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualProfile2Data;
+  }>
+> = (props) => {
   const { formData, setForm } = props;
   const { additionalSkillsCheckboxes, additionalSkillsManual } = formData;
 

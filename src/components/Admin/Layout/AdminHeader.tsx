@@ -204,7 +204,7 @@ const generateBreadcrumbs = (pathname: string) => {
 /**
  * AdminHeader Component
  */
-const AdminHeader: React.FC = () => {
+const AdminHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   const location = useLocation();
   const { currentUser } = useUserContext();
 

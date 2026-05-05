@@ -7,9 +7,11 @@ import Ribbon from '../../../images/icons-profile/ribbon.svg';
 import { colors, fonts } from '../../../theme/styleVars';
 import { ProfileAwards } from '../../SignUp/Individual/types';
 
-const AwardCard: React.FC<{
-  award: ProfileAwards;
-}> = ({ award }) => {
+const AwardCard: React.FC<
+  React.PropsWithChildren<{
+    award: ProfileAwards;
+  }>
+> = ({ award }) => {
   return (
     <AwardCardFlex>
       <Row>

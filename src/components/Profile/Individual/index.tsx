@@ -53,9 +53,9 @@ import SpecialSkills from './ProfileSections/SpecialSkills';
 import Training from './ProfileSections/Training';
 import type { EditModeSections } from './types';
 
-const IndividualProfile: React.FC<{ previewMode?: boolean }> = ({
-  previewMode = false
-}) => {
+const IndividualProfile: React.FC<
+  React.PropsWithChildren<{ previewMode?: boolean }>
+> = ({ previewMode = false }) => {
   const { account, profile, setAccountData, setProfileData } = useUserContext();
   const [editMode, setEditMode] = useState<EditModeSections>({
     personalDetails: false,

@@ -3,7 +3,9 @@ import styled, { keyframes } from 'styled-components';
 import { Row, Col } from 'react-bootstrap';
 import { colors } from '../../theme/styleVars';
 
-const PublicRoleCardSkeleton: React.FC = () => {
+const PublicRoleCardSkeleton: React.FC<
+  React.PropsWithChildren<unknown>
+> = () => {
   return (
     <RoleCardContainer>
       <Row>

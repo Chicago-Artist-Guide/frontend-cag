@@ -40,11 +40,13 @@ const MessageContext = createContext<MessageContextType>({
 
 export const useMessages = () => useContext(MessageContext);
 
-export const MessageProvider: React.FC<{
-  children: React.ReactNode;
-  firestore: Firestore;
-  threadIdParam?: string;
-}> = ({ children, firestore, threadIdParam }) => {
+export const MessageProvider: React.FC<
+  React.PropsWithChildren<{
+    children: React.ReactNode;
+    firestore: Firestore;
+    threadIdParam?: string;
+  }>
+> = ({ children, firestore, threadIdParam }) => {
   const { account } = useUserContext();
   const [threads, setThreads] = useState<MessageThreadType[]>([]);
   const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
@@ -66,7 +68,11 @@ export const MessageProvider: React.FC<{
     );
     const threadSnapshot = await getDocs(threadQuery);
     const userThreads = threadSnapshot.docs.map(
-      (doc) => ({ id: doc.id, ...doc.data() }) as MessageThreadType
+      (doc) =>
+        ({
+          id: doc.id,
+          ...doc.data()
+        }) as MessageThreadType
     );
 
     setThreads(userThreads);
@@ -111,7 +117,11 @@ export const MessageProvider: React.FC<{
 
       const messagesSnapshot = await getDocs(messagesQuery);
       const messagesDocs = messagesSnapshot.docs.map(
-        (doc) => ({ id: doc.id, ...doc.data() }) as MessageType
+        (doc) =>
+          ({
+            id: doc.id,
+            ...doc.data()
+          }) as MessageType
       );
 
       setCurrentThreadMessages(messagesDocs);

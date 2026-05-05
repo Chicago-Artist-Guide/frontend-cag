@@ -4,11 +4,13 @@ import React from 'react';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../../../../../theme/styleVars';
 
-const RoleSection: React.FC<{
-  title: string;
-  onClick?: () => void;
-  children: React.ReactNode;
-}> = ({ title, onClick, children }) => {
+const RoleSection: React.FC<
+  React.PropsWithChildren<{
+    title: string;
+    onClick?: () => void;
+    children: React.ReactNode;
+  }>
+> = ({ title, onClick, children }) => {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (onClick) {

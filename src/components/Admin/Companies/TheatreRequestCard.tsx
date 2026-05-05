@@ -133,10 +133,9 @@ const formatDate = (timestamp: any): string => {
   }
 };
 
-const TheatreRequestCard: React.FC<TheatreRequestCardProps> = ({
-  request,
-  onClick
-}) => {
+const TheatreRequestCard: React.FC<
+  React.PropsWithChildren<TheatreRequestCardProps>
+> = ({ request, onClick }) => {
   const handleWebsiteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };

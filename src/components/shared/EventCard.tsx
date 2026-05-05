@@ -61,11 +61,13 @@ const getDateStringForEvent = (event: EventType) => {
   return dateObj.toLocaleDateString('en-US', options);
 };
 
-export const EventCard: React.FC<{
-  event: EventType;
-  status: 'upcoming' | 'past';
-  index?: number;
-}> = ({ event, status, index = 0 }) => {
+export const EventCard: React.FC<
+  React.PropsWithChildren<{
+    event: EventType;
+    status: 'upcoming' | 'past';
+    index?: number;
+  }>
+> = ({ event, status, index = 0 }) => {
   const dateString = getDateStringForEvent(event);
   const cardRef = useRef<HTMLAnchorElement>(null);
 

@@ -29,12 +29,14 @@ const locations = [
   }))
 ];
 
-const CompanyDetails: React.FC<{
-  stepId: string;
-  setForm: SetForm;
-  formValues: CompanyData;
-  setStepErrors: (step: string, hasErrors: boolean) => void;
-}> = ({ setForm, stepId, formValues, setStepErrors }) => {
+const CompanyDetails: React.FC<
+  React.PropsWithChildren<{
+    stepId: string;
+    setForm: SetForm;
+    formValues: CompanyData;
+    setStepErrors: (step: string, hasErrors: boolean) => void;
+  }>
+> = ({ setForm, stepId, formValues, setStepErrors }) => {
   useEffect(() => {
     if (requiredFields.length > 0) {
       const hasErrors = checkForErrors(requiredFields, formValues);

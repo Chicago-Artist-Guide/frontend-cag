@@ -32,9 +32,11 @@ type Edit = 'profile' | 'add-production' | 'add-award' | null;
 
 const MAX_ADDITIONAL_PHOTOS = 6;
 
-const CompanyProfile: React.FC<{
-  previewMode?: boolean;
-}> = ({ previewMode = false }) => {
+const CompanyProfile: React.FC<
+  React.PropsWithChildren<{
+    previewMode?: boolean;
+  }>
+> = ({ previewMode = false }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     profile,

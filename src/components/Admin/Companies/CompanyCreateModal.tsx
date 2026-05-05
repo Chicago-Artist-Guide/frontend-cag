@@ -232,10 +232,9 @@ const validationSchema = Yup.object({
   primary_contact_email: Yup.string().email('Invalid email address')
 });
 
-const CompanyCreateModal: React.FC<CompanyCreateModalProps> = ({
-  onClose,
-  onSuccess
-}) => {
+const CompanyCreateModal: React.FC<
+  React.PropsWithChildren<CompanyCreateModalProps>
+> = ({ onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { logAction } = useAdminActions();
   const [creating, setCreating] = useState(false);

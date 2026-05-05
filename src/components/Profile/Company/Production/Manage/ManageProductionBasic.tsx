@@ -17,10 +17,12 @@ import { Production } from '../../types';
 const types = ['Musical', 'Play', 'Other'];
 const equity = ['Union', 'Non-Union'];
 
-const ManageProductionBasic: React.FC<{
-  formValues: Production;
-  setFormValues: any;
-}> = ({ formValues, setFormValues }) => {
+const ManageProductionBasic: React.FC<
+  React.PropsWithChildren<{
+    formValues: Production;
+    setFormValues: any;
+  }>
+> = ({ formValues, setFormValues }) => {
   const [showOtherType, setShowOtherType] = useState(false);
 
   useEffect(() => {

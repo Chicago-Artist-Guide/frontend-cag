@@ -232,7 +232,7 @@ const OpeningCard = styled.div`
   }
 `;
 
-const OpeningsManagement: React.FC = () => {
+const OpeningsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { hasPermission } = useAdminAuth();
 
   // Permission check

@@ -122,7 +122,10 @@ const Stats = styled.div`
   }
 `;
 
-const CompanyCard: React.FC<CompanyCardProps> = ({ company, onClick }) => {
+const CompanyCard: React.FC<React.PropsWithChildren<CompanyCardProps>> = ({
+  company,
+  onClick
+}) => {
   // Get initials for avatar
   const getInitials = (): string => {
     if (company.theater_name) {

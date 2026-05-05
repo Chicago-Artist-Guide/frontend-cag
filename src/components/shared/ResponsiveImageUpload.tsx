@@ -17,7 +17,9 @@ interface ResponsiveImageUploadProps {
   helperText?: string;
 }
 
-const ResponsiveImageUpload: React.FC<ResponsiveImageUploadProps> = ({
+const ResponsiveImageUpload: React.FC<
+  React.PropsWithChildren<ResponsiveImageUploadProps>
+> = ({
   onFileSelect,
   onUpload,
   accept = 'image/*',
