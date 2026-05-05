@@ -305,7 +305,7 @@ const ImageUploadComponent: React.FC<
       disabled={disabled}
     >
       <input {...getInputProps()} />
-      <DropzoneContent>
+      <div className="flex flex-col items-center gap-[16px]">
         <UploadIcon>📁</UploadIcon>
         <DropzoneText>
           {isDragActive ? (
@@ -318,12 +318,12 @@ const ImageUploadComponent: React.FC<
             </>
           )}
         </DropzoneText>
-      </DropzoneContent>
+      </div>
     </DropzoneContainer>
   );
 
   const renderCroppingState = () => (
-    <CropContainer>
+    <div className="flex flex-col gap-[20px]">
       <CropperWrapper>
         <Cropper
           image={previewUrl!}
@@ -344,8 +344,8 @@ const ImageUploadComponent: React.FC<
         />
       </CropperWrapper>
 
-      <CropControls>
-        <ZoomControl>
+      <div className="flex flex-col gap-[16px]">
+        <div className="flex items-center gap-[12px]">
           <ZoomLabel>Zoom</ZoomLabel>
           <ZoomSlider
             type="range"
@@ -356,9 +356,9 @@ const ImageUploadComponent: React.FC<
             onChange={(e) => setZoom(Number(e.target.value))}
           />
           <ZoomValue>{Math.round(zoom * 100)}%</ZoomValue>
-        </ZoomControl>
+        </div>
 
-        <RotationControls>
+        <div className="flex justify-center gap-[8px]">
           <Button
             onClick={() => setRotation((prev) => prev - 90)}
             text="⟲"
@@ -380,10 +380,10 @@ const ImageUploadComponent: React.FC<
             text="Reset"
             variant="secondary"
           />
-        </RotationControls>
-      </CropControls>
+        </div>
+      </div>
 
-      <CropActions>
+      <div className="flex justify-between gap-[12px]">
         <Button onClick={handleCropCancel} text="Cancel" variant="secondary" />
         <Button
           onClick={handleCropSave}
@@ -391,12 +391,12 @@ const ImageUploadComponent: React.FC<
           variant="primary"
           disabled={!croppedAreaPixels}
         />
-      </CropActions>
-    </CropContainer>
+      </div>
+    </div>
   );
 
   const renderSelectedState = () => (
-    <SelectedContainer>
+    <div className="flex flex-col gap-[16px]">
       {(croppedPreviewUrl || previewUrl) && (
         <PreviewImageContainer>
           <PreviewImage
@@ -429,22 +429,22 @@ const ImageUploadComponent: React.FC<
           disabled={state === 'uploading'}
         />
       </ActionButtons>
-    </SelectedContainer>
+    </div>
   );
 
   const renderUploadingState = () => (
-    <UploadingContainer>
-      <ProgressContainer>
+    <div className="flex flex-col items-center gap-[16px] px-[20px] py-[40px]">
+      <div className="flex w-[100%] flex-col gap-[8px]">
         <ProgressBar progress={uploadProgress} />
         <ProgressText>Uploading... {uploadProgress}%</ProgressText>
-      </ProgressContainer>
-    </UploadingContainer>
+      </div>
+    </div>
   );
 
   const renderCompleteState = () => (
-    <CompleteContainer>
+    <div className="flex flex-col items-center gap-[16px]">
       {currentImageUrl && (
-        <CurrentImageContainer>
+        <div className="flex flex-col items-center gap-[16px]">
           <CurrentImage src={currentImageUrl} alt="Current image" />
           <Button
             onClick={resetComponent}
@@ -452,9 +452,9 @@ const ImageUploadComponent: React.FC<
             variant="primary"
             disabled={disabled}
           />
-        </CurrentImageContainer>
+        </div>
       )}
-    </CompleteContainer>
+    </div>
   );
 
   return (
@@ -507,14 +507,6 @@ const DropzoneContainer = styled.div<{
     padding: 20px 10px;
   }
 `;
-
-const DropzoneContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-`;
-
 const UploadIcon = styled.div`
   font-size: 48px;
   opacity: 0.6;
@@ -534,13 +526,6 @@ const DropzoneText = styled.div`
     font-size: 14px;
   }
 `;
-
-const CropContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
 const CropperWrapper = styled.div`
   position: relative;
   width: 100%;
@@ -552,19 +537,6 @@ const CropperWrapper = styled.div`
     height: 300px;
   }
 `;
-
-const CropControls = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-const ZoomControl = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
-
 const ZoomLabel = styled.span`
   font-family: ${fonts.lora};
   font-size: 14px;
@@ -596,25 +568,6 @@ const ZoomValue = styled.span`
   min-width: 40px;
   text-align: right;
 `;
-
-const RotationControls = styled.div`
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-`;
-
-const CropActions = styled.div`
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-`;
-
-const SelectedContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
 const PreviewImageContainer = styled.div`
   width: 100%;
   max-height: 300px;
@@ -662,22 +615,6 @@ const ActionButtons = styled.div`
     flex-direction: column;
   }
 `;
-
-const UploadingContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 40px 20px;
-`;
-
-const ProgressContainer = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
 const ProgressBar = styled.div<{ progress: number }>`
   width: 100%;
   height: 8px;
@@ -701,21 +638,6 @@ const ProgressText = styled.div`
   color: ${colors.darkGrey};
   text-align: center;
 `;
-
-const CompleteContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-`;
-
-const CurrentImageContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-`;
-
 const CurrentImage = styled.img`
   width: 200px;
   height: 200px;

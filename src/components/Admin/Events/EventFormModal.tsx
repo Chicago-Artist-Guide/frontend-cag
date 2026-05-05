@@ -37,20 +37,6 @@ interface EventFormModalProps {
   onSuccess: () => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  padding: 1rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -90,15 +76,6 @@ const Header = styled.div`
     }
   }
 `;
-
-const Content = styled.div`
-  padding: 2rem;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
 const FormRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -186,19 +163,6 @@ const FormError = styled.div`
   color: ${colors.salmon};
   font-size: 0.875rem;
 `;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  margin-top: 2rem;
-`;
-
-const ButtonRow = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
 const Button = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
   display: inline-flex;
   align-items: center;
@@ -498,7 +462,10 @@ const EventFormModal: React.FC<
   };
 
   return (
-    <Overlay onClick={onClose}>
+    <div
+      onClick={onClose}
+      className="z-1001 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[1rem]"
+    >
       <Modal onClick={(e) => e.stopPropagation()}>
         <Header>
           <h2>{isEditing ? 'Edit Event' : 'Add New Event'}</h2>
@@ -507,7 +474,7 @@ const EventFormModal: React.FC<
           </button>
         </Header>
 
-        <Content>
+        <div className="p-[2rem]">
           {showDeleteConfirm && event && (
             <DeleteConfirmation ref={deleteConfirmRef}>
               <p>
@@ -545,7 +512,7 @@ const EventFormModal: React.FC<
               <Form>
                 {formError && <FormError>{formError}</FormError>}
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="name">Event Name *</Label>
                   <Field
                     as={StyledInput}
@@ -555,16 +522,16 @@ const EventFormModal: React.FC<
                     placeholder="e.g., A Night at the CAG-Baret"
                   />
                   <ErrorMessage name="name" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 <FormRow>
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="date">Date *</Label>
                     <Field as={StyledInput} type="date" name="date" id="date" />
                     <ErrorMessage name="date" component={ErrorText} />
-                  </FormGroup>
+                  </div>
 
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="time">Time</Label>
                     <Field
                       as={StyledInput}
@@ -574,10 +541,10 @@ const EventFormModal: React.FC<
                       placeholder="e.g., 7:00 PM"
                     />
                     <ErrorMessage name="time" component={ErrorText} />
-                  </FormGroup>
+                  </div>
                 </FormRow>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="location">Location *</Label>
                   <Field
                     as={StyledInput}
@@ -587,9 +554,9 @@ const EventFormModal: React.FC<
                     placeholder="e.g., The Den Theatre, 1331 N Milwaukee Ave"
                   />
                   <ErrorMessage name="location" component={ErrorText} />
-                </FormGroup>
+                </div>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="details">Details</Label>
                   <Field
                     as={StyledTextarea}
@@ -598,10 +565,10 @@ const EventFormModal: React.FC<
                     placeholder="Describe the event, what attendees can expect..."
                   />
                   <ErrorMessage name="details" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 <FormRow>
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="price">Price</Label>
                     <Field
                       as={StyledInput}
@@ -611,9 +578,9 @@ const EventFormModal: React.FC<
                       placeholder="e.g., $25, Free, $15-$50"
                     />
                     <ErrorMessage name="price" component={ErrorText} />
-                  </FormGroup>
+                  </div>
 
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="status">Status</Label>
                     <Field as={StyledSelect} name="status" id="status">
                       <option value="published">Published</option>
@@ -621,10 +588,10 @@ const EventFormModal: React.FC<
                       <option value="cancelled">Cancelled</option>
                     </Field>
                     <ErrorMessage name="status" component={ErrorText} />
-                  </FormGroup>
+                  </div>
                 </FormRow>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="image">Image URL</Label>
                   <Field
                     as={StyledInput}
@@ -634,9 +601,9 @@ const EventFormModal: React.FC<
                     placeholder="https://..."
                   />
                   <ErrorMessage name="image" component={ErrorText} />
-                </FormGroup>
+                </div>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="externalUrl">Event Page / Tickets URL</Label>
                   <Field
                     as={StyledInput}
@@ -646,9 +613,9 @@ const EventFormModal: React.FC<
                     placeholder="https://..."
                   />
                   <ErrorMessage name="externalUrl" component={ErrorText} />
-                </FormGroup>
+                </div>
 
-                <ButtonGroup>
+                <div className="mt-[2rem] flex justify-between gap-[1rem]">
                   <div>
                     {isEditing && (
                       <Button
@@ -662,7 +629,7 @@ const EventFormModal: React.FC<
                       </Button>
                     )}
                   </div>
-                  <ButtonRow>
+                  <div className="flex gap-[1rem]">
                     <Button
                       type="button"
                       variant="secondary"
@@ -679,14 +646,14 @@ const EventFormModal: React.FC<
                           ? 'Save Changes'
                           : 'Create Event'}
                     </Button>
-                  </ButtonRow>
-                </ButtonGroup>
+                  </div>
+                </div>
               </Form>
             )}
           </Formik>
-        </Content>
+        </div>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

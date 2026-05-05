@@ -66,13 +66,6 @@ const InfoRow = styled.div`
     }
   }
 `;
-
-const BadgeRow = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
-`;
-
 const Badge = styled.span<{ $variant?: 'equity' | 'business' }>`
   display: inline-block;
   padding: 0.25rem 0.5rem;
@@ -87,14 +80,6 @@ const Badge = styled.span<{ $variant?: 'equity' | 'business' }>`
     return `background: ${colors.bodyBg}; color: ${colors.grayishBlue};`;
   }}
 `;
-
-const ActionArea = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.5rem;
-`;
-
 const DateLabel = styled.span`
   font-size: 0.75rem;
   color: ${colors.grayishBlue};
@@ -158,19 +143,19 @@ const TheatreRequestCard: React.FC<
             </a>
           )}
         </InfoRow>
-        <BadgeRow>
+        <div className="mt-[0.75rem] flex gap-[0.5rem]">
           <Badge $variant="equity">{request.companyType}</Badge>
           <Badge>{request.businessType}</Badge>
-        </BadgeRow>
+        </div>
       </MainInfo>
 
-      <ActionArea>
+      <div className="flex flex-col items-end gap-[0.5rem]">
         <DateLabel>
           <FontAwesomeIcon icon={faClock} />
           {formatDate(request.createdAt)}
         </DateLabel>
         <ViewButton onClick={onClick}>Review</ViewButton>
-      </ActionArea>
+      </div>
     </Card>
   );
 };

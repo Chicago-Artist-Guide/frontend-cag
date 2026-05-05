@@ -38,23 +38,6 @@ interface UserEditModalProps {
 }
 
 /**
- * Modal overlay
- */
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  padding: 2rem;
-`;
-
-/**
  * Modal container
  */
 const Modal = styled.div`
@@ -110,25 +93,6 @@ const CloseButton = styled.button`
     font-size: 1.25rem;
   }
 `;
-
-/**
- * Modal body
- */
-const Body = styled.div`
-  padding: 2rem;
-`;
-
-/**
- * Form group
- */
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
 /**
  * Label
  */
@@ -520,7 +484,10 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
   };
 
   return (
-    <Overlay onClick={handleOverlayClick}>
+    <div
+      onClick={handleOverlayClick}
+      className="z-1001 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[2rem]"
+    >
       <Modal>
         <Header>
           <h2>Edit User</h2>
@@ -536,9 +503,9 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
         >
           {({ errors, touched, isSubmitting, setFieldValue, values }) => (
             <Form>
-              <Body>
+              <div className="p-[2rem]">
                 {/* Basic Information */}
-                <FormGroup>
+                <div className="mb-[1.5rem] last:mb-0">
                   <Label htmlFor="email">Email Address</Label>
                   <Input
                     type="email"
@@ -549,12 +516,12 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                   {errors.email && touched.email && (
                     <ErrorMessage>{errors.email}</ErrorMessage>
                   )}
-                </FormGroup>
+                </div>
 
                 {/* Individual fields */}
                 {user.type === 'individual' && (
                   <>
-                    <FormGroup>
+                    <div className="mb-[1.5rem] last:mb-0">
                       <Label htmlFor="first_name">First Name</Label>
                       <Input
                         type="text"
@@ -565,9 +532,9 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                       {errors.first_name && touched.first_name && (
                         <ErrorMessage>{errors.first_name}</ErrorMessage>
                       )}
-                    </FormGroup>
+                    </div>
 
-                    <FormGroup>
+                    <div className="mb-[1.5rem] last:mb-0">
                       <Label htmlFor="last_name">Last Name</Label>
                       <Input
                         type="text"
@@ -578,9 +545,9 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                       {errors.last_name && touched.last_name && (
                         <ErrorMessage>{errors.last_name}</ErrorMessage>
                       )}
-                    </FormGroup>
+                    </div>
 
-                    <FormGroup>
+                    <div className="mb-[1.5rem] last:mb-0">
                       <Label htmlFor="preferred_name">
                         Preferred Name (Optional)
                       </Label>
@@ -590,13 +557,13 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                         id="preferred_name"
                         placeholder="Preferred name"
                       />
-                    </FormGroup>
+                    </div>
                   </>
                 )}
 
                 {/* Company fields */}
                 {user.type === 'company' && (
-                  <FormGroup>
+                  <div className="mb-[1.5rem] last:mb-0">
                     <Label htmlFor="theater_name">Theater Name</Label>
                     <Input
                       type="text"
@@ -607,7 +574,7 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                     {errors.theater_name && touched.theater_name && (
                       <ErrorMessage>{errors.theater_name}</ErrorMessage>
                     )}
-                  </FormGroup>
+                  </div>
                 )}
 
                 {/* Admin Role (super_admin only) */}
@@ -623,7 +590,7 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                       </WarningMessage>
                     )}
 
-                    <FormGroup>
+                    <div className="mb-[1.5rem] last:mb-0">
                       <Label htmlFor="admin_role">Admin Role</Label>
                       <select
                         name="admin_role"
@@ -660,10 +627,10 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                           Super Admin (Full access)
                         </option>
                       </select>
-                    </FormGroup>
+                    </div>
 
                     {!isEditingSelf && (
-                      <FormGroup>
+                      <div className="mb-[1.5rem] last:mb-0">
                         <Label htmlFor="admin_role_notes">
                           Role Assignment Notes (Optional)
                         </Label>
@@ -673,11 +640,11 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
                           id="admin_role_notes"
                           placeholder="Why is this user being assigned this role?"
                         />
-                      </FormGroup>
+                      </div>
                     )}
                   </SectionDivider>
                 )}
-              </Body>
+              </div>
 
               <Footer>
                 <div>
@@ -713,7 +680,7 @@ const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
           )}
         </Formik>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

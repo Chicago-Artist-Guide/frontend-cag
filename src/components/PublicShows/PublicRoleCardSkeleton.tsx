@@ -14,12 +14,12 @@ const PublicRoleCardSkeleton: React.FC<
           <RoleStatusSkeleton />
           <RoleDescriptionSkeleton />
 
-          <RoleDetailsSkeleton>
+          <div className="mt-[15px] flex flex-wrap gap-[10px]">
             <DetailItemSkeleton />
             <DetailItemSkeleton />
             <DetailItemSkeleton />
             <DetailItemSkeleton />
-          </RoleDetailsSkeleton>
+          </div>
         </Col>
 
         <Col
@@ -89,14 +89,6 @@ const RoleDescriptionSkeleton = styled(SkeletonBase as any)`
     margin-bottom: 15px;
   }
 `;
-
-const RoleDetailsSkeleton = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 15px;
-`;
-
 const DetailItemSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 120px;

@@ -216,28 +216,28 @@ const PublicShowDetail = () => {
                   </ShowStatus>
 
                   {show.writers && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Written by:</InfoLabel>
                       <InfoValue>{show.writers}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.director && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Director:</InfoLabel>
                       <InfoValue>{show.director}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.location && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Location:</InfoLabel>
                       <InfoValue>{show.location}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {(show.open_and_close_start || show.open_and_close_end) && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Production Dates:</InfoLabel>
                       <InfoValue>
                         {show.open_and_close_start &&
@@ -252,7 +252,7 @@ const PublicShowDetail = () => {
                             show.open_and_close_end
                           ).toLocaleDateString()}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {!currentUser && (
@@ -269,7 +269,7 @@ const PublicShowDetail = () => {
                   </ShowDescription>
 
                   {onStageRoles.length > 0 && (
-                    <RolesSection>
+                    <div className="mb-[30px]">
                       <SectionTitle>On-Stage Roles</SectionTitle>
                       {onStageRoles.map((role, index) => (
                         <PublicRoleCard
@@ -277,11 +277,11 @@ const PublicShowDetail = () => {
                           role={role}
                         />
                       ))}
-                    </RolesSection>
+                    </div>
                   )}
 
                   {offStageRoles.length > 0 && (
-                    <RolesSection>
+                    <div className="mb-[30px]">
                       <SectionTitle>Off-Stage Roles</SectionTitle>
                       {offStageRoles.map((role, index) => (
                         <PublicRoleCard
@@ -289,7 +289,7 @@ const PublicShowDetail = () => {
                           role={role}
                         />
                       ))}
-                    </RolesSection>
+                    </div>
                   )}
 
                   {onStageRoles.length === 0 && offStageRoles.length === 0 && (
@@ -305,7 +305,7 @@ const PublicShowDetail = () => {
               <Row>
                 <Col lg={12}>
                   {(show.audition_start || show.audition_end) && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Audition Dates:</InfoLabel>
                       <InfoValue>
                         {show.audition_start &&
@@ -314,48 +314,48 @@ const PublicShowDetail = () => {
                         {show.audition_end &&
                           new Date(show.audition_end).toLocaleDateString()}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.audition_location && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Audition Location:</InfoLabel>
                       <InfoValue>{show.audition_location}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.contact_person_name_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Contact Person:</InfoLabel>
                       <InfoValue>{show.contact_person_name_audition}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.contact_person_email_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Contact Email:</InfoLabel>
                       <InfoValue>
                         {show.contact_person_email_audition}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.materials_to_prepare_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Materials to Prepare:</InfoLabel>
                       <InfoValue style={{ whiteSpace: 'pre-line' }}>
                         {show.materials_to_prepare_audition}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.additional_notes_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Additional Notes:</InfoLabel>
                       <InfoValue style={{ whiteSpace: 'pre-line' }}>
                         {show.additional_notes_audition}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {!show.audition_start &&
@@ -443,11 +443,6 @@ const ShowStatus = styled.div`
   color: ${colors.mint};
   margin-bottom: 20px;
 `;
-
-const InfoSection = styled.div`
-  margin-bottom: 15px;
-`;
-
 const InfoLabel = styled.div`
   font-family: ${fonts.montserrat};
   font-weight: 600;
@@ -489,11 +484,6 @@ const ShowDescription = styled.div`
   margin-bottom: 30px;
   white-space: pre-line;
 `;
-
-const RolesSection = styled.div`
-  margin-bottom: 30px;
-`;
-
 const SectionTitle = styled.h3`
   font-family: ${fonts.montserrat};
   font-weight: 600;

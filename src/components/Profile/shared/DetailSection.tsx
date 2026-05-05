@@ -6,17 +6,12 @@ const DetailSection: React.FC<
   React.PropsWithChildren<{ title: string; children: React.ReactNode }>
 > = ({ title, children }) => {
   return (
-    <DetailsSection>
+    <div className="mt-[39px]">
       <DetailSectionTitle>{title}</DetailSectionTitle>
       {children}
-    </DetailsSection>
+    </div>
   );
 };
-
-const DetailsSection = styled.div`
-  margin-top: 39px;
-`;
-
 const DetailSectionTitle = styled.h3`
   font-family: ${fonts.montserrat};
   font-style: normal;

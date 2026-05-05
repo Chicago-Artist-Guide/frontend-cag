@@ -36,20 +36,6 @@ interface TheatreRequestModalProps {
   onSuccess: () => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 2rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -97,19 +83,6 @@ const CloseButton = styled.button`
     font-size: 1.25rem;
   }
 `;
-
-const Body = styled.div`
-  padding: 2rem;
-`;
-
-const Section = styled.div`
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
 const SectionTitle = styled.h3`
   font-family: 'Montserrat', sans-serif;
   font-size: 0.875rem;
@@ -177,12 +150,6 @@ const Footer = styled.div`
   padding: 1.5rem 2rem;
   border-top: 1px solid ${colors.lightGrey};
 `;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 0.75rem;
-`;
-
 const SuccessBox = styled.div`
   background: ${colors.mint}10;
   border: 2px solid ${colors.mint};
@@ -443,7 +410,10 @@ We recommend changing your password after your first login.`;
   };
 
   return (
-    <Overlay onClick={handleOverlayClick}>
+    <div
+      onClick={handleOverlayClick}
+      className="z-1000 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[2rem]"
+    >
       <Modal>
         <Header>
           <h2>{approved ? 'Request Approved!' : 'Review Request'}</h2>
@@ -455,7 +425,7 @@ We recommend changing your password after your first login.`;
           </CloseButton>
         </Header>
 
-        <Body>
+        <div className="p-[2rem]">
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
           {approved && credentials ? (
@@ -488,7 +458,7 @@ We recommend changing your password after your first login.`;
             </SuccessBox>
           ) : (
             <>
-              <Section>
+              <div className="mb-[1.5rem] last:mb-0">
                 <SectionTitle>Company Information</SectionTitle>
                 <InfoGrid>
                   <Label>Company Name:</Label>
@@ -516,9 +486,9 @@ We recommend changing your password after your first login.`;
                     <Badge>{request.businessType}</Badge>
                   </Value>
                 </InfoGrid>
-              </Section>
+              </div>
 
-              <Section>
+              <div className="mb-[1.5rem] last:mb-0">
                 <SectionTitle>Contact Information</SectionTitle>
                 <InfoGrid>
                   <Label>Contact Person:</Label>
@@ -527,17 +497,17 @@ We recommend changing your password after your first login.`;
                   <Label>Email:</Label>
                   <Value>{request.contactEmail}</Value>
                 </InfoGrid>
-              </Section>
+              </div>
 
               {request.additionalInfo && (
-                <Section>
+                <div className="mb-[1.5rem] last:mb-0">
                   <SectionTitle>Additional Information</SectionTitle>
                   <AdditionalInfo>{request.additionalInfo}</AdditionalInfo>
-                </Section>
+                </div>
               )}
             </>
           )}
-        </Body>
+        </div>
 
         <Footer>
           {approved ? (
@@ -554,7 +524,7 @@ We recommend changing your password after your first login.`;
               >
                 Reject
               </AdminButton>
-              <ButtonGroup>
+              <div className="flex gap-[0.75rem]">
                 <AdminButton
                   variant="secondary"
                   onClick={onClose}
@@ -571,12 +541,12 @@ We recommend changing your password after your first login.`;
                 >
                   Approve
                 </AdminButton>
-              </ButtonGroup>
+              </div>
             </>
           )}
         </Footer>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

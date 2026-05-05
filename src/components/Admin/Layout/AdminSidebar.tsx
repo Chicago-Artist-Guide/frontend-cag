@@ -64,18 +64,6 @@ const NavMenu = styled.nav`
   padding: 1rem 0;
   overflow-y: auto;
 `;
-
-/**
- * Navigation section (group of related links)
- */
-const NavSection = styled.div`
-  margin-bottom: 1.5rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
 /**
  * Section title
  */
@@ -183,66 +171,66 @@ const AdminSidebar: React.FC<React.PropsWithChildren<unknown>> = () => {
 
       <NavMenu>
         {/* Dashboard - always visible to all admins */}
-        <NavSection>
+        <div className="mb-[1.5rem] last:mb-0">
           <StyledNavLink to="/admin" end>
             <FontAwesomeIcon icon={faChartLine} />
             <span>Dashboard</span>
           </StyledNavLink>
-        </NavSection>
+        </div>
 
         {/* Analytics - visible to all staff */}
         {permissions?.analytics.view && (
-          <NavSection>
+          <div className="mb-[1.5rem] last:mb-0">
             <SectionTitle>Analytics</SectionTitle>
             <StyledNavLink to="/admin/analytics">
               <FontAwesomeIcon icon={faChartBar} />
               <span>Analytics</span>
             </StyledNavLink>
-          </NavSection>
+          </div>
         )}
 
         {/* User Management - visible to those who can manage users */}
         {hasAnyPermissionOn(adminRole, 'users') && (
-          <NavSection>
+          <div className="mb-[1.5rem] last:mb-0">
             <SectionTitle>User Management</SectionTitle>
             <StyledNavLink to="/admin/users">
               <FontAwesomeIcon icon={faUsers} />
               <span>All Users</span>
             </StyledNavLink>
-          </NavSection>
+          </div>
         )}
 
         {/* Theatre Companies - visible to those who can manage companies */}
         {hasAnyPermissionOn(adminRole, 'companies') && (
-          <NavSection>
+          <div className="mb-[1.5rem] last:mb-0">
             <SectionTitle>Theatre Companies</SectionTitle>
             <StyledNavLink to="/admin/companies">
               <FontAwesomeIcon icon={faBuilding} />
               <span>All Companies</span>
             </StyledNavLink>
-          </NavSection>
+          </div>
         )}
 
         {/* Openings Management - visible to those with openings permissions */}
         {hasAnyPermissionOn(adminRole, 'openings') && (
-          <NavSection>
+          <div className="mb-[1.5rem] last:mb-0">
             <SectionTitle>Current Openings</SectionTitle>
             <StyledNavLink to="/admin/openings">
               <FontAwesomeIcon icon={faBriefcase} />
               <span>All Openings</span>
             </StyledNavLink>
-          </NavSection>
+          </div>
         )}
 
         {/* Events Management - visible to those with events permissions */}
         {hasAnyPermissionOn(adminRole, 'events') && (
-          <NavSection>
+          <div className="mb-[1.5rem] last:mb-0">
             <SectionTitle>Events</SectionTitle>
             <StyledNavLink to="/admin/events">
               <FontAwesomeIcon icon={faCalendarAlt} />
               <span>All Events</span>
             </StyledNavLink>
-          </NavSection>
+          </div>
         )}
       </NavMenu>
 

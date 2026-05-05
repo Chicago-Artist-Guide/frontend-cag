@@ -31,18 +31,6 @@ const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
 `;
-
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const HeaderContent = styled.div``;
-
 const AddButton = styled.button`
   display: inline-flex;
   align-items: center;
@@ -305,20 +293,20 @@ const OpeningsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
 
   return (
     <Container>
-      <HeaderRow>
-        <HeaderContent>
+      <div className="mb-[2rem] flex flex-wrap items-start justify-between gap-[1rem]">
+        <div className="">
           <PageTitle>CAG Job Openings</PageTitle>
           <PageSubtitle>
             Manage staff, volunteer, and board positions for /get-involved page
           </PageSubtitle>
-        </HeaderContent>
+        </div>
         {hasPermission('openings', 'edit') && (
           <AddButton onClick={handleAddClick}>
             <FontAwesomeIcon icon={faPlus} />
             Add Opening
           </AddButton>
         )}
-      </HeaderRow>
+      </div>
 
       <SearchBar
         type="text"

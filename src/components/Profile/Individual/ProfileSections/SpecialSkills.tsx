@@ -12,11 +12,11 @@ const SpecialSkills: React.FC<
   const skills = checkboxes.concat(manual);
   return (
     <Container>
-      <Flex>
+      <div className="mx-0 mb-[20px] mt-[20px] flex">
         {skills.map((skill: string) => (
           <SkillBadge key={`skills-primary-${skill}`}>{skill}</SkillBadge>
         ))}
-      </Flex>
+      </div>
     </Container>
   );
 };
@@ -29,10 +29,4 @@ const SkillBadge = styled.div`
   border-radius: 20px;
   margin-right: 10px;
 `;
-
-const Flex = styled.div`
-  display: flex;
-  margin: 20px 0px 20px;
-`;
-
 export default SpecialSkills;

@@ -11,7 +11,7 @@ const WhoSquare = (props: any) => {
       <SvgHolder>
         <SVGLayer blob={blob} dancer={dancer} />
       </SvgHolder>
-      <ShadowTitle>{title}</ShadowTitle>
+      <h3 className="m-0 p-0">{title}</h3>
       <ul>
         {whoWeArray.map((who: any) => (
           <li key={who.id}>
@@ -40,10 +40,4 @@ const SvgHolder = styled.div`
     width: calc(100% - 80px);
   }
 `;
-
-const ShadowTitle = styled.h3`
-  margin: 0;
-  padding: 0;
-`;
-
 export default WhoSquare;
