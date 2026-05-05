@@ -16,12 +16,14 @@ import { Title } from '../../layout/Titles';
 import { SubmitBasicsResp } from './SignUpFooter';
 import type { IndividualData } from './types';
 
-const IndividualBasics: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-  submitBasicsErr: SubmitBasicsResp | undefined;
-}> = (props) => {
+const IndividualBasics: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+    hasErrorCallback: (step: string, hasErrors: boolean) => void;
+    submitBasicsErr: SubmitBasicsResp | undefined;
+  }>
+> = (props) => {
   const { setForm, formData, hasErrorCallback, submitBasicsErr } = props;
   const {
     basicsFirstName,

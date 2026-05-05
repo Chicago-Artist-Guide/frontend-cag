@@ -81,7 +81,7 @@ const ActionContainer = styled.div`
 /**
  * EmptyState Component
  */
-const EmptyState: React.FC<EmptyStateProps> = ({
+const EmptyState: React.FC<React.PropsWithChildren<EmptyStateProps>> = ({
   icon = faInbox,
   title,
   description,

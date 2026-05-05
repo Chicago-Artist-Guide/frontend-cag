@@ -2,10 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import { colors, fonts } from '../../../theme/styleVars';
 
-const DetailSection: React.FC<{ title: string; children: React.ReactNode }> = ({
-  title,
-  children
-}) => {
+const DetailSection: React.FC<
+  React.PropsWithChildren<{ title: string; children: React.ReactNode }>
+> = ({ title, children }) => {
   return (
     <DetailsSection>
       <DetailSectionTitle>{title}</DetailSectionTitle>

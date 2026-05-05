@@ -55,12 +55,9 @@ const MatchContext = createContext<MatchContextValue>(defaultContextValue);
 
 export const useMatches = (): MatchContextValue => useContext(MatchContext);
 
-export const MatchProvider: React.FC<MatchProviderProps> = ({
-  firestore,
-  productionId,
-  roleIdParam,
-  children
-}) => {
+export const MatchProvider: React.FC<
+  React.PropsWithChildren<MatchProviderProps>
+> = ({ firestore, productionId, roleIdParam, children }) => {
   const navigate = useNavigate();
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);

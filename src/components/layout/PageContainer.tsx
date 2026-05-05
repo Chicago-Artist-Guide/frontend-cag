@@ -1,10 +1,9 @@
 import clsx from 'clsx';
 import React from 'react';
 
-const PageContainer: React.FC<{ className?: string }> = ({
-  children,
-  className
-}) => (
+const PageContainer: React.FC<
+  React.PropsWithChildren<{ className?: string }>
+> = ({ children, className }) => (
   <div
     className={clsx(
       'container mx-auto px-4 py-8',

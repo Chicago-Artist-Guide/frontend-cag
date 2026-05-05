@@ -9,10 +9,12 @@ import { colors, fonts } from '../../../theme/styleVars';
 import { Tagline, Title } from '../../layout/Titles';
 import type { IndividualProfile2Data, ProfileAwards } from './types';
 
-const Awards: React.FC<{
-  setForm: SetForm;
-  formData: IndividualProfile2Data;
-}> = (props) => {
+const Awards: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualProfile2Data;
+  }>
+> = (props) => {
   const { setForm, formData } = props;
   const { awards } = formData;
   const [awardId, setAwardId] = useState(1);

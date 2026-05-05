@@ -8,11 +8,13 @@ import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 import { CompanyData } from './types';
 
-const CompanyPhoto: React.FC<{
-  setForm: SetForm;
-  formValues: CompanyData;
-  setStepErrors: (step: string, hasErrors: boolean) => void;
-}> = ({ setForm, formValues }) => {
+const CompanyPhoto: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formValues: CompanyData;
+    setStepErrors: (step: string, hasErrors: boolean) => void;
+  }>
+> = ({ setForm, formValues }) => {
   const handleImageSave = (imageUrl: string) => {
     setForm({
       target: {

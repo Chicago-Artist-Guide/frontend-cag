@@ -225,11 +225,9 @@ const validationSchema = Yup.object({
   moderationNotes: Yup.string().max(500, 'Notes must be 500 characters or less')
 });
 
-const OpeningEditModal: React.FC<OpeningEditModalProps> = ({
-  opening,
-  onClose,
-  onSuccess
-}) => {
+const OpeningEditModal: React.FC<
+  React.PropsWithChildren<OpeningEditModalProps>
+> = ({ opening, onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const { logAction } = useAdminActions();

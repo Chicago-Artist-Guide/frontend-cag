@@ -3,7 +3,9 @@ import { Col, Row } from 'react-bootstrap';
 import styled, { keyframes } from 'styled-components';
 import { colors } from '../../theme/styleVars';
 
-const PublicShowCardSkeleton: React.FC = () => {
+const PublicShowCardSkeleton: React.FC<
+  React.PropsWithChildren<unknown>
+> = () => {
   return (
     <ShowCard>
       <Row>

@@ -302,7 +302,7 @@ const getValidationSchema = (accountType: string) => {
 /**
  * UserEditModal Component
  */
-const UserEditModal: React.FC<UserEditModalProps> = ({
+const UserEditModal: React.FC<React.PropsWithChildren<UserEditModalProps>> = ({
   user,
   onClose,
   onSuccess

@@ -155,7 +155,7 @@ const SidebarFooter = styled.div`
 /**
  * AdminSidebar Component
  */
-const AdminSidebar: React.FC = () => {
+const AdminSidebar: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { adminRole, permissions } = useAdminAuth();
 
   // Get role display name

@@ -27,7 +27,9 @@ type StaffRouteProps = {
   children: React.ReactNode;
 };
 
-const StaffRoute: React.FC<StaffRouteProps> = ({ children }) => {
+const StaffRoute: React.FC<React.PropsWithChildren<StaffRouteProps>> = ({
+  children
+}) => {
   const { isStaff } = useStaffAuth();
 
   if (!isStaff) {

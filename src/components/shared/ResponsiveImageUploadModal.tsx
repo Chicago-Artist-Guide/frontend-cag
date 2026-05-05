@@ -26,7 +26,9 @@ interface ResponsiveImageUploadModalProps {
 
 type ModalStep = 'upload' | 'crop' | 'uploading';
 
-const ResponsiveImageUploadModal: React.FC<ResponsiveImageUploadModalProps> = ({
+const ResponsiveImageUploadModal: React.FC<
+  React.PropsWithChildren<ResponsiveImageUploadModalProps>
+> = ({
   show,
   onHide,
   onSave,

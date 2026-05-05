@@ -2,10 +2,12 @@ import React from 'react';
 import { Container } from 'react-bootstrap';
 import styled from 'styled-components';
 
-const Features: React.FC<{
-  features: any;
-  emptyPlaceholder: string;
-}> = ({ features }) => {
+const Features: React.FC<
+  React.PropsWithChildren<{
+    features: any;
+    emptyPlaceholder: string;
+  }>
+> = ({ features }) => {
   return (
     <Container>
       {features.map((feature: any) => (

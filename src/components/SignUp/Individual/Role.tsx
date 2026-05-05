@@ -79,10 +79,12 @@ const cards: Card[] = [
   }
 ];
 
-const IndividualRole: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-}> = ({ setForm, formData }) => {
+const IndividualRole: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+  }>
+> = ({ setForm, formData }) => {
   const { stageRole } = formData;
   return (
     <Container>

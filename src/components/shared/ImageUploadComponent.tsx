@@ -28,7 +28,9 @@ interface ImageUploadComponentProps {
 
 type UploadState = 'idle' | 'selected' | 'cropping' | 'uploading' | 'complete';
 
-const ImageUploadComponent: React.FC<ImageUploadComponentProps> = ({
+const ImageUploadComponent: React.FC<
+  React.PropsWithChildren<ImageUploadComponentProps>
+> = ({
   onSave,
   currentImageUrl,
   imageType,

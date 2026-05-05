@@ -4,7 +4,9 @@ import { Row, Col } from 'react-bootstrap';
 import { colors } from '../../theme/styleVars';
 import PublicRoleCardSkeleton from './PublicRoleCardSkeleton';
 
-const PublicShowDetailSkeleton: React.FC = () => {
+const PublicShowDetailSkeleton: React.FC<
+  React.PropsWithChildren<unknown>
+> = () => {
   return (
     <>
       <Row>

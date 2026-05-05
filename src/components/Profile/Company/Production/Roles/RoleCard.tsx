@@ -7,11 +7,13 @@ import { breakpoints, colors, fonts } from '../../../../../theme/styleVars';
 import { LeftCol, RightCol } from '../../ProfileStyles';
 import { Role } from '../../types';
 
-const RoleCard: React.FC<{
-  role: Role;
-  onEdit: () => void;
-  onViewMatches: () => void;
-}> = ({ role, onEdit, onViewMatches }) => {
+const RoleCard: React.FC<
+  React.PropsWithChildren<{
+    role: Role;
+    onEdit: () => void;
+    onViewMatches: () => void;
+  }>
+> = ({ role, onEdit, onViewMatches }) => {
   return (
     <RolesCard>
       <Row>

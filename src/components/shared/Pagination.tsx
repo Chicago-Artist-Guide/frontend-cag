@@ -11,7 +11,7 @@ interface PaginationProps {
   showItemCount?: boolean;
 }
 
-const Pagination: React.FC<PaginationProps> = ({
+const Pagination: React.FC<React.PropsWithChildren<PaginationProps>> = ({
   currentPage,
   totalPages,
   totalItems,

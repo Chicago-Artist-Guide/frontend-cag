@@ -39,10 +39,9 @@ interface MessageThreadProps {
   onBack?: () => void;
 }
 
-export const MessageThread: React.FC<MessageThreadProps> = ({
-  thread,
-  onBack
-}) => {
+export const MessageThread: React.FC<
+  React.PropsWithChildren<MessageThreadProps>
+> = ({ thread, onBack }) => {
   const navigate = useNavigate();
   const { threadId } = useParams();
   const { account, currentUser, profile } = useUserContext();

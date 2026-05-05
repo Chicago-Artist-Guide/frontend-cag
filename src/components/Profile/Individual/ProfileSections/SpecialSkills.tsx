@@ -3,10 +3,12 @@ import { Container } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
 import { colors } from '../../../../theme/styleVars';
 
-const SpecialSkills: React.FC<{
-  checkboxes: string[];
-  manual: string[];
-}> = ({ checkboxes, manual }) => {
+const SpecialSkills: React.FC<
+  React.PropsWithChildren<{
+    checkboxes: string[];
+    manual: string[];
+  }>
+> = ({ checkboxes, manual }) => {
   const skills = checkboxes.concat(manual);
   return (
     <Container>

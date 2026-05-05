@@ -191,11 +191,9 @@ const formatDate = (timestamp: any): string => {
 /**
  * UserDetailsModal Component
  */
-const UserDetailsModal: React.FC<UserDetailsModalProps> = ({
-  user,
-  onClose,
-  onEdit
-}) => {
+const UserDetailsModal: React.FC<
+  React.PropsWithChildren<UserDetailsModalProps>
+> = ({ user, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
 

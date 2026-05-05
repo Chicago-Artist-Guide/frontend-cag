@@ -307,11 +307,9 @@ function isUpcoming(event: Event): boolean {
   }
 }
 
-const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
-  event,
-  onClose,
-  onEdit
-}) => {
+const EventDetailsModal: React.FC<
+  React.PropsWithChildren<EventDetailsModalProps>
+> = ({ event, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
 

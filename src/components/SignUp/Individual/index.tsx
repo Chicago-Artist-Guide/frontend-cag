@@ -92,10 +92,12 @@ const defaultData: IndividualData = {
   stageRole: '' as IndividualRoles
 };
 
-const IndividualSignUp: React.FC<{
-  currentStep: number;
-  setCurrentStep: (x: number) => void;
-}> = ({ currentStep, setCurrentStep }) => {
+const IndividualSignUp: React.FC<
+  React.PropsWithChildren<{
+    currentStep: number;
+    setCurrentStep: (x: number) => void;
+  }>
+> = ({ currentStep, setCurrentStep }) => {
   const navigate = useNavigate();
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useUserContext();

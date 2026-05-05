@@ -9,7 +9,11 @@ type Props = {
   subtitle?: string;
 };
 
-const SignUpHeader: React.FC<Props> = ({ pre, title, subtitle }) => {
+const SignUpHeader: React.FC<React.PropsWithChildren<Props>> = ({
+  pre,
+  title,
+  subtitle
+}) => {
   return (
     <PaddingHeader className="header">
       {pre && <TitleThree>{pre}</TitleThree>}

@@ -18,10 +18,12 @@ import {
   WebsiteTypes
 } from './types';
 
-const Demographics: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-}> = (props) => {
+const Demographics: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+  }>
+> = (props) => {
   const { formData, setForm } = props;
   const {
     demographicsUnionStatus, // array of union selections

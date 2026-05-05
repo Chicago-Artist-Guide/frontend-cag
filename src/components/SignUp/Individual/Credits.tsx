@@ -11,10 +11,12 @@ import { colors } from '../../../theme/styleVars';
 import { Tagline, Title } from '../../layout/Titles';
 import type { IndividualProfile2Data, PastPerformances } from './types';
 
-const Credits: React.FC<{
-  setForm: SetForm;
-  formData: IndividualProfile2Data;
-}> = (props) => {
+const Credits: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualProfile2Data;
+  }>
+> = (props) => {
   const { setForm, formData } = props;
   const { pastPerformances } = formData;
   const [showId, setShowId] = useState(1);

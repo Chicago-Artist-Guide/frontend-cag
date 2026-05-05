@@ -93,11 +93,9 @@ const LoadingText = styled.p`
 /**
  * LoadingSpinner Component
  */
-const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
-  message = 'Loading...',
-  size = 'medium',
-  centered = true
-}) => {
+const LoadingSpinner: React.FC<
+  React.PropsWithChildren<LoadingSpinnerProps>
+> = ({ message = 'Loading...', size = 'medium', centered = true }) => {
   return (
     <Container $centered={centered}>
       <Spinner $size={size} />

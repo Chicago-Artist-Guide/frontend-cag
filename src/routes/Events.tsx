@@ -99,7 +99,7 @@ const getEventDateTime = (event: EventType): Date => {
   }
 };
 
-const Events: React.FC = () => {
+const Events: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const [events, setEvents] = useState<EventType[]>([]);
   const [loading, setLoading] = useState(true);

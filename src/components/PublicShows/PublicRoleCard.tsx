@@ -11,11 +11,9 @@ interface PublicRoleCardProps {
   isLoggedIn: boolean;
 }
 
-const PublicRoleCard: React.FC<PublicRoleCardProps> = ({
-  role,
-  onShowInterest,
-  isLoggedIn
-}) => {
+const PublicRoleCard: React.FC<
+  React.PropsWithChildren<PublicRoleCardProps>
+> = ({ role, onShowInterest, isLoggedIn }) => {
   return (
     <RoleCardContainer>
       <Row>

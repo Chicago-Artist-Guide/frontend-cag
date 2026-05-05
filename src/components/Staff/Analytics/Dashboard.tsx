@@ -61,7 +61,7 @@ const LastUpdated = styled.div`
   margin-top: 1rem;
 `;
 
-const AnalyticsDashboard: React.FC = () => {
+const AnalyticsDashboard: React.FC<React.PropsWithChildren<unknown>> = () => {
   const analyticsData = useAnalyticsData();
   const { loading, error } = analyticsData;
 

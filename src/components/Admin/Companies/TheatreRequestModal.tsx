@@ -268,11 +268,9 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_APP_FIREBASE_APP_ID
 };
 
-const TheatreRequestModal: React.FC<TheatreRequestModalProps> = ({
-  request,
-  onClose,
-  onSuccess
-}) => {
+const TheatreRequestModal: React.FC<
+  React.PropsWithChildren<TheatreRequestModalProps>
+> = ({ request, onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { logAction } = useAdminActions();
   const [processing, setProcessing] = useState(false);

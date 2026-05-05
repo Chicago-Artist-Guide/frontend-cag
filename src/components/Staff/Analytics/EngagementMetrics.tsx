@@ -104,7 +104,9 @@ type EngagementProps = {
   };
 };
 
-const EngagementMetrics: React.FC<EngagementProps> = ({ data }) => {
+const EngagementMetrics: React.FC<React.PropsWithChildren<EngagementProps>> = ({
+  data
+}) => {
   const metrics = [
     {
       title: 'Profile Completion Rate',

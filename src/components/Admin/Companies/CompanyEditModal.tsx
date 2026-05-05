@@ -222,11 +222,9 @@ const validationSchema = Yup.object({
   description: Yup.string()
 });
 
-const CompanyEditModal: React.FC<CompanyEditModalProps> = ({
-  company,
-  onClose,
-  onSuccess
-}) => {
+const CompanyEditModal: React.FC<
+  React.PropsWithChildren<CompanyEditModalProps>
+> = ({ company, onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { logAction } = useAdminActions();
   const { hasPermission } = useAdminAuth();

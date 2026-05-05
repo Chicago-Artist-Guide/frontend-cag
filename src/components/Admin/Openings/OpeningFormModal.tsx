@@ -312,11 +312,9 @@ interface FormValues {
   ongoing: string; // 'true' or 'false' - HTML select returns strings
 }
 
-const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
-  opening,
-  onClose,
-  onSuccess
-}) => {
+const OpeningFormModal: React.FC<
+  React.PropsWithChildren<OpeningFormModalProps>
+> = ({ opening, onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const { logAction } = useAdminActions();

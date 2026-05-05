@@ -288,7 +288,7 @@ function isUpcoming(event: Event): boolean {
   }
 }
 
-const EventsManagement: React.FC = () => {
+const EventsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { hasPermission } = useAdminAuth();
 
   // Permission check

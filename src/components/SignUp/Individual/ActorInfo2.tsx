@@ -20,11 +20,13 @@ import {
   IndividualData
 } from './types';
 
-const ActorInfo2: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = (props) => {
+const ActorInfo2: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+    hasErrorCallback: (step: string, hasErrors: boolean) => void;
+  }>
+> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
   const {
     actorInfo2AgeRanges,

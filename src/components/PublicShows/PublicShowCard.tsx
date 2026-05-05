@@ -12,7 +12,9 @@ interface PublicShowCardProps {
   show: Production;
 }
 
-const PublicShowCard: React.FC<PublicShowCardProps> = ({ show }) => {
+const PublicShowCard: React.FC<
+  React.PropsWithChildren<PublicShowCardProps>
+> = ({ show }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const [theaterName, setTheaterName] = useState<string>('');
 

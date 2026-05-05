@@ -11,10 +11,12 @@ import { colors, fonts } from '../../../theme/styleVars';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';
 
-const Privacy: React.FC<{
-  setForm: SetForm;
-  formData: any;
-}> = (props) => {
+const Privacy: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: any;
+  }>
+> = (props) => {
   const { formData } = props;
 
   return (

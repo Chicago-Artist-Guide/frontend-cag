@@ -15,12 +15,9 @@ interface PublicShowInterestFormProps {
   onClose: () => void;
 }
 
-const PublicShowInterestForm: React.FC<PublicShowInterestFormProps> = ({
-  show,
-  role,
-  theaterName,
-  onClose
-}) => {
+const PublicShowInterestForm: React.FC<
+  React.PropsWithChildren<PublicShowInterestFormProps>
+> = ({ show, role, theaterName, onClose }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const [formData, setFormData] = useState({

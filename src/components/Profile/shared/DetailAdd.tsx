@@ -4,10 +4,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 
-const DetailAdd: React.FC<{
-  text: string;
-  onClick?: () => void;
-}> = ({ text, onClick }) => {
+const DetailAdd: React.FC<
+  React.PropsWithChildren<{
+    text: string;
+    onClick?: () => void;
+  }>
+> = ({ text, onClick }) => {
   const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if (onClick) {

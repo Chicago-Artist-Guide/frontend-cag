@@ -14,7 +14,7 @@ interface PartnerSliderProps {
   showCards?: boolean;
 }
 
-const PartnerSlider: React.FC<PartnerSliderProps> = ({
+const PartnerSlider: React.FC<React.PropsWithChildren<PartnerSliderProps>> = ({
   partners,
   autoSlideInterval = 5000,
   itemsPerSlide = 3,

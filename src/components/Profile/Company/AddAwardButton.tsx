@@ -6,9 +6,11 @@ import styled from 'styled-components';
 import Ribbon from '../../../images/icons-profile/ribbon.svg';
 import { colors, fonts } from '../../../theme/styleVars';
 
-const AddAwardButton: React.FC<{
-  onClick?: () => void;
-}> = ({ onClick }) => {
+const AddAwardButton: React.FC<
+  React.PropsWithChildren<{
+    onClick?: () => void;
+  }>
+> = ({ onClick }) => {
   return (
     <Button
       className="d-flex flex-column justify-content-center align-items-center ml-1 mt-2"

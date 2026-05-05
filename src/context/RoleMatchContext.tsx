@@ -37,10 +37,9 @@ const RoleMatchContext =
 export const useRoleMatches = (): RoleMatchContextValue =>
   useContext(RoleMatchContext);
 
-export const RoleMatchProvider: React.FC<RoleMatchProviderProps> = ({
-  firestore,
-  children
-}) => {
+export const RoleMatchProvider: React.FC<
+  React.PropsWithChildren<RoleMatchProviderProps>
+> = ({ firestore, children }) => {
   const { profile } = useUserContext();
   const [productions, setProductions] = useState<{ [key: string]: Production }>(
     {}

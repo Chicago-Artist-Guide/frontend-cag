@@ -136,7 +136,7 @@ const UserCard = styled.div`
   }
 `;
 
-const UserManagement: React.FC = () => {
+const UserManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { hasPermission } = useAdminAuth();
 
   // Permission check

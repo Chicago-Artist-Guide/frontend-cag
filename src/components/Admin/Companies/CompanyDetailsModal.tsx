@@ -179,11 +179,9 @@ const formatDate = (timestamp: any): string => {
   }
 };
 
-const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
-  company,
-  onClose,
-  onEdit
-}) => {
+const CompanyDetailsModal: React.FC<
+  React.PropsWithChildren<CompanyDetailsModalProps>
+> = ({ company, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
   const hasLoggedViewRef = useRef(false);

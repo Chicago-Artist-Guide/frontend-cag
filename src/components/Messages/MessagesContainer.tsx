@@ -5,7 +5,7 @@ import { MessageThread } from './MessageThread';
 import MessageThreads from './MessageThreads';
 import { MessageThreadType } from './types';
 
-const MessagesContainer: React.FC = () => {
+const MessagesContainer: React.FC<React.PropsWithChildren<unknown>> = () => {
   const navigate = useNavigate();
   const { threadId } = useParams();
   const { currentThread: currThreadFromContext } = useMessages();

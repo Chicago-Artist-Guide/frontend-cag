@@ -4,14 +4,16 @@ import styled from 'styled-components';
 import { colors } from '../../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
-const OffStageSkills: React.FC<{
-  offstage_roles_general?: Array<string>;
-  offstage_roles_production?: Array<string>;
-  offstage_roles_scenic_and_properties?: Array<string>;
-  offstage_roles_lighting?: Array<string>;
-  offstage_roles_sound?: Array<string>;
-  offstage_roles_hair_makeup_costumes?: Array<string>;
-}> = ({
+const OffStageSkills: React.FC<
+  React.PropsWithChildren<{
+    offstage_roles_general?: Array<string>;
+    offstage_roles_production?: Array<string>;
+    offstage_roles_scenic_and_properties?: Array<string>;
+    offstage_roles_lighting?: Array<string>;
+    offstage_roles_sound?: Array<string>;
+    offstage_roles_hair_makeup_costumes?: Array<string>;
+  }>
+> = ({
   offstage_roles_general,
   offstage_roles_production,
   offstage_roles_scenic_and_properties,
