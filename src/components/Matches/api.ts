@@ -9,6 +9,7 @@ import {
   Query,
   QueryDocumentSnapshot,
   QuerySnapshot,
+  setDoc,
   where,
   updateDoc,
   limit
@@ -64,6 +65,50 @@ export const getTheaterTalentMatch = async (
   }
 
   return false;
+};
+
+export const getTalentRoleFavoriteDocId = (
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+) => `talent_${talentAccountId}_${productionId}_${roleId}`;
+
+export const getTalentRoleFavorite = async (
+  firebaseStore: Firestore,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+): Promise<boolean> => {
+  if (!talentAccountId || !productionId || !roleId) return false;
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTalentRoleFavoriteDocId(talentAccountId, productionId, roleId)
+  );
+  const snap = await getDoc(ref);
+  return snap.exists() ? !!snap.data()?.status : false;
+};
+
+export const setTalentRoleFavorite = async (
+  firebaseStore: Firestore,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string,
+  status: boolean
+): Promise<void> => {
+  if (!talentAccountId || !productionId || !roleId) return;
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTalentRoleFavoriteDocId(talentAccountId, productionId, roleId)
+  );
+  await setDoc(ref, {
+    initiated_by: 'talent',
+    production_id: doc(firebaseStore, 'productions', productionId),
+    role_id: roleId,
+    status,
+    talent_account_id: doc(firebaseStore, 'accounts', talentAccountId)
+  });
 };
 
 export const createTheaterTalentMatch = async (
@@ -194,16 +239,33 @@ export async function fetchTalentWithFilters(
     if (docSnap.exists()) {
       const profileData = docSnap.data() as IndividualProfileDataFullInit;
 
-      if (matchStatus !== null && matchStatus !== undefined) {
+      if (Array.isArray(matchStatus) && matchStatus.length > 0) {
         const findMatch = await getTheaterTalentMatch(
           firebaseStore,
           productionId,
           roleId,
           profileData.account_id
         );
-        const foundMatchStatus = findMatch ? findMatch.status : null;
 
-        if (foundMatchStatus === matchStatus) {
+        // Map current match record to the set of buckets it falls into.
+        // AND semantics across selected statuses — a profile is included
+        // only if its match state matches every one of the selected filters.
+        const buckets = new Set<string>();
+        if (!findMatch) {
+          buckets.add('undecided');
+        } else {
+          if (findMatch.status === true) {
+            buckets.add('accepted');
+          }
+          if (findMatch.status === false) {
+            buckets.add('declined');
+          }
+          if (findMatch.initiated_by === 'talent') {
+            buckets.add('interested');
+          }
+        }
+
+        if (matchStatus.every((s) => buckets.has(s))) {
           matches.push({ ...profileData });
         }
       } else {
@@ -446,20 +508,6 @@ export async function fetchRolesForTalent(
               return false;
             }
             if (requiresDancing && !skills.includes('Dancing')) {
-              return false;
-            }
-          }
-
-          // Union matching - role union requirements vs profile union status
-          if (pR.union && Array.isArray(pR.union) && pR.union.length > 0) {
-            const profileUnionStatus = profile.union_status || [];
-
-            // Check if at least one union status matches
-            const hasUnionMatch = pR.union.some((roleUnion) =>
-              profileUnionStatus.includes(roleUnion)
-            );
-
-            if (!hasUnionMatch) {
               return false;
             }
           }

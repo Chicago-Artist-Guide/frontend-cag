@@ -17,6 +17,7 @@ import OffstageRoles from './OffstageRoles';
 import Privacy from './Privacy';
 import IndividualRole from './Role';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
+import UnionStatus from './UnionStatus';
 import type {
   Gender,
   IndividualAccountInit,
@@ -48,6 +49,7 @@ const defaultSteps: Step[] = [
   { id: 'privacy' },
   { id: 'offstageRoles' },
   { id: 'actorInfo' },
+  { id: 'unionStatus' },
   { id: 'profilePhoto' }
 ];
 
@@ -450,6 +452,11 @@ const IndividualSignUp: React.FC<
       case 'actorInfo':
         returnStep = (
           <ActorInfo {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
+        break;
+      case 'unionStatus':
+        returnStep = (
+          <UnionStatus {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
       case 'profilePhoto':

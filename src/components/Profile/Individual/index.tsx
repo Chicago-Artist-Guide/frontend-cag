@@ -370,12 +370,23 @@ const IndividualProfile: React.FC<
       return;
     }
 
+    if (!editProfile.union_status || editProfile.union_status.length === 0) {
+      Swal.fire({
+        title: 'Required Field',
+        text: 'Please select at least one union status (Non-Union counts).',
+        icon: 'warning',
+        confirmButtonText: 'Ok'
+      });
+      return;
+    }
+
     const {
       age_ranges,
       height_ft,
       height_in,
       height_no_answer,
       gender_identity,
+      gender_roles,
       ethnicities,
       union_status,
       union_other,
@@ -389,6 +400,7 @@ const IndividualProfile: React.FC<
       height_in,
       height_no_answer,
       gender_identity,
+      gender_roles,
       ethnicities,
       union_status,
       union_other,

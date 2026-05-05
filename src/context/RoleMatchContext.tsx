@@ -10,13 +10,15 @@ import { useUserContext } from './UserContext';
 import { Production } from '../components/Profile/Company/types';
 import { getProduction } from '../components/Profile/Company/api';
 import { fetchRolesForTalent } from '../components/Matches/api';
-import { ProductionRole } from '../components/Matches/types';
+import { ProductionRole, RoleMatchFilters } from '../components/Matches/types';
 
 interface RoleMatchContextValue {
   productions: { [key: string]: Production };
   roles: ProductionRole[];
   loading: boolean;
   findProduction: (productionId: string) => Promise<Production | null>;
+  filters: RoleMatchFilters;
+  updateFilters: (newFilters: RoleMatchFilters) => void;
 }
 
 interface RoleMatchProviderProps {
@@ -28,7 +30,9 @@ const defaultContextValue: RoleMatchContextValue = {
   productions: {},
   roles: [],
   loading: true,
-  findProduction: async () => null
+  findProduction: async () => null,
+  filters: {},
+  updateFilters: () => null
 };
 
 const RoleMatchContext =
@@ -46,6 +50,11 @@ export const RoleMatchProvider: React.FC<
   );
   const [roles, setRoles] = useState<ProductionRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<RoleMatchFilters>({});
+
+  const updateFilters = (newFilters: RoleMatchFilters) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
 
   useEffect(() => {
     const profileData = profile.data;
@@ -87,7 +96,9 @@ export const RoleMatchProvider: React.FC<
     productions,
     roles,
     loading,
-    findProduction
+    findProduction,
+    filters,
+    updateFilters
   };
 
   return (

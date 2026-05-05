@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import { Button, Checkbox } from '../../../components/shared';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
-import { unionOptions } from '../../../utils/lookups';
+import { unionOptionLabels, unionOptions } from '../../../utils/lookups';
 import {
   AgeRange,
   ageRanges,
@@ -262,7 +262,7 @@ const EditPersonalDetails = ({
                   <Checkbox
                     key={`union-option-${option}`}
                     checked={isUnionSelected(option)}
-                    label={option}
+                    label={unionOptionLabels[option]}
                     name={option}
                     onChange={(e: any) =>
                       handleUnionChange(option, e.currentTarget.checked)
