@@ -115,7 +115,9 @@ async function captureEntry(
       const url = `${BASE_URL}${entry.path}`;
       console.log(`[capture] ${entry.name} ${viewport.name} → ${url}`);
 
-      await page.goto(url, { waitUntil: 'networkidle', timeout: 30_000 });
+      // 'load' instead of 'networkidle' — the app uses Firebase realtime
+      // listeners that keep sockets busy, so 'networkidle' never resolves.
+      await page.goto(url, { waitUntil: 'load', timeout: 30_000 });
       if (entry.waitFor) {
         await page
           .waitForSelector(entry.waitFor, { timeout: 15_000 })
@@ -125,8 +127,8 @@ async function captureEntry(
             );
           });
       }
-      // Settle for animations / lazy images.
-      await page.waitForTimeout(500);
+      // Settle for animations, lazy images, and Firebase data fetches.
+      await page.waitForTimeout(1500);
 
       const outDir = path.join(SNAP_DIR, bucket, entry.name);
       await fs.mkdir(outDir, { recursive: true });
