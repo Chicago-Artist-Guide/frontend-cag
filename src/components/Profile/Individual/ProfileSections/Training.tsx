@@ -14,11 +14,11 @@ const Training: React.FC<
         <Container>
           {training_institutions.map((training: any) => (
             <div key={training.id}>
-              <DegreeInformation>
+              <div className="mt-[25px] flex justify-between font-bold">
                 <Bold>{training.trainingInstitution}</Bold>
                 <Bold>{training.trainingYear}</Bold>
-              </DegreeInformation>
-              <Degree>{training.trainingDegree}</Degree>
+              </div>
+              <p className="text-[20px]">{training.trainingDegree}</p>
             </div>
           ))}
         </Container>
@@ -26,20 +26,7 @@ const Training: React.FC<
     </>
   );
 };
-
-const DegreeInformation = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin-top: 25px;
-`;
-
 const Bold = styled.p`
   font-weight: bolder;
 `;
-
-const Degree = styled.p`
-  font-size: 20px;
-`;
-
 export default Training;

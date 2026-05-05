@@ -327,12 +327,12 @@ const RoleModal: React.FC<
                 <Title>{title}</Title>
               </Col>
               <div className="d-flex flex-shrink-1 flex-row flex-row-reverse">
-                <CloseButton
-                  className="d-flex align-items-center"
+                <div
+                  className="d-flex align-items-center cursor-pointer text-[24px]"
                   onClick={onClose}
                 >
                   <Icon icon={faClose} />
-                </CloseButton>
+                </div>
               </div>
             </Row>
             <Row className="mt-5">
@@ -368,9 +368,12 @@ const RoleModal: React.FC<
                 />
                 <Form.Group className="form-group" style={{ marginTop: 30 }}>
                   <CAGLabel>
-                    Pay<RequiredAsterisk>*</RequiredAsterisk>
+                    Pay
+                    <span className="ml-[4px] font-semibold text-[#dc3545]">
+                      *
+                    </span>
                   </CAGLabel>
-                  <RoleRate>
+                  <div className="mt-[-30px] flex items-center gap-[0.75em]">
                     <FormInput
                       name="role_rate"
                       label="Rate"
@@ -402,7 +405,7 @@ const RoleModal: React.FC<
                       value={formValues?.role_rate_unit}
                       onChange={setFormState}
                     />
-                  </RoleRate>
+                  </div>
                 </Form.Group>
                 <Dropdown
                   name="role_status"
@@ -694,11 +697,11 @@ const RoleModal: React.FC<
               </Col>
             </Row>
             {validationErrors.length > 0 && (
-              <ValidationErrorContainer>
+              <div className="mb-[10px] mt-[20px] rounded-[4px] border border-solid border-[#f5c6cb] bg-[#f8d7da] px-[16px] py-[12px]">
                 {validationErrors.map((error, index) => (
                   <ValidationError key={index}>{error}</ValidationError>
                 ))}
-              </ValidationErrorContainer>
+              </div>
             )}
             <ModalButtonContainer className="d-flex flex-column-reverse flex-md-row flex-md-row-reverse mt-3">
               <Button
@@ -721,12 +724,6 @@ const RoleModal: React.FC<
     </>
   );
 };
-
-const CloseButton = styled.div`
-  font-size: 24px;
-  cursor: pointer;
-`;
-
 const Icon = styled(FontAwesomeIcon)`
   margin-right: 5px;
   color: ${colors.lighterGrey};
@@ -741,14 +738,6 @@ const Title = styled.h2`
   letter-spacing: 0.1em;
   text-transform: uppercase;
 `;
-
-const RoleRate = styled.div`
-  margin-top: -30px;
-  display: flex;
-  gap: 0.75em;
-  align-items: center;
-`;
-
 const ModalButtonContainer = styled.div`
   gap: 0;
 
@@ -762,27 +751,10 @@ const ModalButtonContainer = styled.div`
     }
   }
 `;
-
-const ValidationErrorContainer = styled.div`
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 12px 16px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-`;
-
 const ValidationError = styled.div`
   color: #721c24;
   font-size: 14px;
   margin: 4px 0;
   font-family: ${fonts.montserrat};
 `;
-
-const RequiredAsterisk = styled.span`
-  color: #dc3545;
-  margin-left: 4px;
-  font-weight: 600;
-`;
-
 export default RoleModal;

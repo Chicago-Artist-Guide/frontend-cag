@@ -12,50 +12,31 @@ const Features: React.FC<
     <Container>
       {features.map((feature: any) => (
         <div key={feature.id || feature.title}>
-          <FeatureTitle>
+          <div className="mt-[25px] flex justify-between font-bold">
             <Bold>
-              {feature.title} <Group> - {feature.group}</Group>
+              {feature.title}{' '}
+              <span className="text-[18px] font-normal italic">
+                {' '}
+                - {feature.group}
+              </span>
             </Bold>
             <Bold>{feature.year}</Bold>
-          </FeatureTitle>
-          <FeatureInformation>
-            <Role>{feature.role}</Role>
+          </div>
+          <div className="px-[25px] pb-0 pt-0 leading-[1.5]">
+            <p className="font-semibold">{feature.role}</p>
             {feature.director && <p>Director: {feature.director}</p>}
             {feature.musicalDirector && (
               <p>Musical Director: {feature.musicalDirector}</p>
             )}
-          </FeatureInformation>
+          </div>
           <hr />
         </div>
       ))}
     </Container>
   );
 };
-
-const FeatureTitle = styled.div`
-  display: flex;
-  justify-content: space-between;
-  font-weight: bold;
-  margin-top: 25px;
-`;
-
-const FeatureInformation = styled.div`
-  padding: 0px 25px 0px;
-  line-height: 1.5;
-`;
-
 const Bold = styled.p`
   font-weight: bolder;
   font-size: 20px;
 `;
-const Group = styled.span`
-  font-style: italic;
-  font-weight: normal;
-  font-size: 18px;
-`;
-
-const Role = styled.p`
-  font-weight: 600;
-`;
-
 export default Features;

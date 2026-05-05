@@ -8,9 +8,9 @@ const Card = (props: any) => {
   return (
     <CAGCard>
       <CardBody>
-        <SVGHolder>
+        <div className="mt-[40px]">
           <img alt="" src={src} />
-        </SVGHolder>
+        </div>
         <DividerBar
           style={{
             backgroundColor: '#000000'
@@ -48,9 +48,4 @@ const CAGCard = styled(BSCard)`
   backdrop-filter: blur(15px);
   box-shadow: 0px 0px 12px 3px rgba(0, 0, 0, 0.1);
 `;
-
-const SVGHolder = styled.div`
-  margin-top: 40px;
-`;
-
 export default Card;

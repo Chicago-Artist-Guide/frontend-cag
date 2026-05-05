@@ -6,7 +6,6 @@ import {
   CAGError,
   CAGFormControl,
   CAGFormGroup,
-  CAGHelperText,
   CAGLabel
 } from '../SignUp/SignUpStyles';
 
@@ -75,7 +74,9 @@ const TextArea = (props: Props) => {
         />
       </CAGFormGroup>
       {hasError && <CAGError>{errorMessage || ErrorMessage.Default}</CAGError>}
-      {helperText && <CAGHelperText>{helperText}</CAGHelperText>}
+      {helperText && (
+        <div className="ml-[5px] mt-[8px] text-[11px] italic">{helperText}</div>
+      )}
     </>
   );
 };

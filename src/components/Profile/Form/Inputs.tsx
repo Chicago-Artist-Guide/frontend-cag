@@ -43,7 +43,9 @@ export const FormTextArea: React.FC<
     <FormGroup controlId={name} {...rest}>
       <Label>
         {label}
-        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        {required && (
+          <span className="ml-[4px] font-semibold text-[#dc3545]">*</span>
+        )}
       </Label>
       <TextArea
         as="textarea"
@@ -82,7 +84,9 @@ export const FormInput: React.FC<
     <FormGroup controlId={name} {...rest}>
       <Label>
         {label}
-        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        {required && (
+          <span className="ml-[4px] font-semibold text-[#dc3545]">*</span>
+        )}
       </Label>
       <Input
         aria-label={name}
@@ -119,7 +123,9 @@ export const FormSelect: React.FC<
     <FormGroup controlId={name}>
       <Label>
         {label}
-        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        {required && (
+          <span className="ml-[4px] font-semibold text-[#dc3545]">*</span>
+        )}
       </Label>
       <Select
         aria-label={name}
@@ -375,10 +381,4 @@ const Thru = styled.h6`
     align-self: center;
     margin: 0.25em 0;
   }
-`;
-
-const RequiredAsterisk = styled.span`
-  color: #dc3545;
-  margin-left: 4px;
-  font-weight: 600;
 `;

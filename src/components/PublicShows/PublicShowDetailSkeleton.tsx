@@ -21,20 +21,20 @@ const PublicShowDetailSkeleton: React.FC<
         <Col lg={4}>
           <ImageSkeleton />
 
-          <InfoSectionSkeleton>
+          <div className="mb-[15px]">
             <InfoLabelSkeleton />
             <InfoValueSkeleton />
-          </InfoSectionSkeleton>
+          </div>
 
-          <InfoSectionSkeleton>
+          <div className="mb-[15px]">
             <InfoLabelSkeleton />
             <InfoValueSkeleton />
-          </InfoSectionSkeleton>
+          </div>
 
-          <InfoSectionSkeleton>
+          <div className="mb-[15px]">
             <InfoLabelSkeleton />
             <InfoValueSkeleton />
-          </InfoSectionSkeleton>
+          </div>
 
           <ButtonSkeleton />
         </Col>
@@ -105,11 +105,6 @@ const ImageSkeleton = styled(SkeletonBase as any)`
   border-radius: 8px;
   margin-bottom: 20px;
 `;
-
-const InfoSectionSkeleton = styled.div`
-  margin-bottom: 15px;
-`;
-
 const InfoLabelSkeleton = styled(SkeletonBase as any)`
   height: 16px;
   width: 30%;

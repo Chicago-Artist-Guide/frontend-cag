@@ -119,15 +119,16 @@ const Training: React.FC<
       ))}
       <Row>
         <Col lg="10">
-          <SaveAndAddLink
+          <a
             href="#"
             onClick={(e: any) => {
               e.preventDefault();
               addTrainingBlock();
             }}
+            className="mt-[1em] block"
           >
             + Save and add another institution
-          </SaveAndAddLink>
+          </a>
         </Col>
       </Row>
     </Container>
@@ -152,10 +153,4 @@ const DeleteRowLink = styled.a`
     color: ${colors.salmon};
   }
 `;
-
-const SaveAndAddLink = styled.a`
-  display: block;
-  margin-top: 1em;
-`;
-
 export default Training;

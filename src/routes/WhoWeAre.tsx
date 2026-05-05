@@ -16,7 +16,7 @@ const WhoWeAre = () => {
 
   return (
     <PageContainer>
-      <ContentWrapper>
+      <div className="max-w-full">
         <HeaderSection>
           <PageTitle>ABOUT US</PageTitle>
           <DividerBar />
@@ -37,7 +37,13 @@ const WhoWeAre = () => {
               </AboutText>
               <AboutText>
                 Learn more about us on our{' '}
-                <AboutLink href="/faq">FAQ page</AboutLink>.
+                <a
+                  href="/faq"
+                  className="font-semibold text-[#82b29a] no-underline hover:text-[#6fa086] hover:underline"
+                >
+                  FAQ page
+                </a>
+                .
               </AboutText>
             </AboutCard>
           </VisionMissionWrapper>
@@ -45,26 +51,21 @@ const WhoWeAre = () => {
 
         <TeamSection>
           <MeetOurTeamTitle>Meet Our Team</MeetOurTeamTitle>
-          <CollapsibleWrapper>
+          <div className="w-[100%]">
             <Collapsible
               sectionTitles={sectionTitles}
               subSections={bios}
               subContainer={Team}
               grid={true}
             />
-          </CollapsibleWrapper>
+          </div>
         </TeamSection>
-      </ContentWrapper>
+      </div>
     </PageContainer>
   );
 };
 
 export default WhoWeAre;
-
-const ContentWrapper = styled.div`
-  max-width: 100%;
-`;
-
 const HeaderSection = styled.div`
   margin-bottom: 32px;
   text-align: center;
@@ -184,18 +185,6 @@ const AboutText = styled.p`
     font-size: 1.125rem;
   }
 `;
-
-const AboutLink = styled.a`
-  color: #82b29a;
-  text-decoration: none;
-  font-weight: 600;
-
-  &:hover {
-    color: #6fa086;
-    text-decoration: underline;
-  }
-`;
-
 const TeamSection = styled.div`
   margin-top: 48px;
 
@@ -221,8 +210,4 @@ const MeetOurTeamTitle = styled.h2`
     margin-bottom: 48px;
     text-align: left;
   }
-`;
-
-const CollapsibleWrapper = styled.div`
-  width: 100%;
 `;

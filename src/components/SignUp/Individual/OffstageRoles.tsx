@@ -136,7 +136,10 @@ const OffstageRoles: React.FC<
               } = currObjKey;
 
               return (
-                <StyledDiv key={`div-accordion-item-${textHeader}`}>
+                <div
+                  key={`div-accordion-item-${textHeader}`}
+                  className="pb-[2em]"
+                >
                   <GenericAccordion
                     eventKey={objI}
                     key={`accordion-item-${textHeader}`}
@@ -174,7 +177,7 @@ const OffstageRoles: React.FC<
                       </ImageCol>
                     </Row>
                   </GenericAccordion>
-                </StyledDiv>
+                </div>
               );
             })}
           </StyledAccordion>
@@ -204,9 +207,4 @@ const StyledAccordion = styled(Accordion)`
   border-radius: 8px;
   opacity: 1;
 `;
-
-const StyledDiv = styled.div`
-  padding-bottom: 2em;
-`;
-
 export default OffstageRoles;

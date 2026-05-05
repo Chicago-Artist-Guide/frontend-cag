@@ -25,7 +25,7 @@ const TOS = () => (
       at any time you can do so by closing your account and no longer accessing
       or using our Services.
     </p>
-    <BoldP>Services</BoldP>
+    <p className="font-bold">Services</p>
     <p>
       This Contract applies to Chicagoartistguide.org, Chicago Artist
       Guide-branded apps, and other CAG-related sites, apps, communications and
@@ -35,12 +35,12 @@ const TOS = () => (
       CAG" plugins. Registered users of our Services are "Members" and
       unregistered users are "Visitors".
     </p>
-    <BoldP>Chicago Artist Guide</BoldP>
+    <p className="font-bold">Chicago Artist Guide</p>
     <p>
       You are entering into this Contract with Chicago Artist Guide (also
       referred to as "we", "us", and "CAG").
     </p>
-    <BoldP>This Contract applies to Members and Visitors.</BoldP>
+    <p className="font-bold">This Contract applies to Members and Visitors.</p>
     <p>
       As a Visitor or Member of our Services, the collection, use and sharing of
       your personal data is subject to this Privacy Policy (which includes our
@@ -54,7 +54,7 @@ const TOS = () => (
       features as a "Visitor."
     </p>
     <TitleThree>1.3 Change</TitleThree>
-    <BoldP>We may make changes to the Contract.</BoldP>
+    <p className="font-bold">We may make changes to the Contract.</p>
     <p>
       We may modify this Contract, our Privacy Policy and our Cookies Policy
       from time to time. If we make material changes to it, we will provide you
@@ -67,11 +67,13 @@ const TOS = () => (
     </p>
     <h3>2. Obligations</h3>
     <TitleThree>2.1 Service Eligibility</TitleThree>
-    <BoldP>Here are some promises that you make to us in this Contract:</BoldP>
-    <BoldP>
+    <p className="font-bold">
+      Here are some promises that you make to us in this Contract:
+    </p>
+    <p className="font-bold">
       You're eligible to enter into this Contract and you are at least our
       "Minimum Age."
-    </BoldP>
+    </p>
     <p>The Services are not for use by anyone under the age of 18.</p>
     <p>
       To use the Services, you agree that: (1) you must be the "Minimum Age"
@@ -88,11 +90,11 @@ const TOS = () => (
       Age is such older age.
     </p>
     <TitleThree>2.2 Your Account</TitleThree>
-    <BoldP>You will keep your password a secret.</BoldP>
-    <BoldP>
+    <p className="font-bold">You will keep your password a secret.</p>
+    <p className="font-bold">
       You will not share an account with anyone else and will follow our rules
       and the law.
-    </BoldP>
+    </p>
     <p>
       Members are account holders. You agree to: (1) use a strong password and
       keep it confidential; (2) not transfer any part of your account (e.g.,
@@ -309,9 +311,9 @@ const TOS = () => (
       conditions that apply to such events.
     </p>
     <TitleThree>3.4 Limits</TitleThree>
-    <BoldP>
+    <p className="font-bold">
       We have the right to limit how you connect and interact on our Services.
-    </BoldP>
+    </p>
     <p>
       CAG reserves the right to limit your use of the Services, including the
       number of your connections and your ability to contact other Members. CAG
@@ -320,9 +322,9 @@ const TOS = () => (
       violating any of the Dos and Don'ts or Professional Community Policies).
     </p>
     <TitleThree>3.5 Intellectual Property Rights</TitleThree>
-    <BoldP>
+    <p className="font-bold">
       We're providing you notice about our intellectual property rights.
-    </BoldP>
+    </p>
     <p>
       CAG reserves all of its intellectual property rights in the Services.
       Trademarks and logos used in connection with the Services are the
@@ -332,10 +334,10 @@ const TOS = () => (
     </p>
     <h3>4. Disclaimer and Limit of Liability</h3>
     <TitleThree>4.1 No Warranty</TitleThree>
-    <BoldP>
+    <p className="font-bold">
       This is our disclaimer of legal liability for the quality, safety, or
       reliability of our Services.
-    </BoldP>
+    </p>
     <p>
       CHICAGO ARTIST GUIDE AND ITS AFFILIATES MAKE NO REPRESENTATION OR WARRANTY
       ABOUT THE SERVICES, INCLUDING ANY REPRESENTATION THAT THE SERVICES WILL BE
@@ -347,7 +349,9 @@ const TOS = () => (
       MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
     </p>
     <TitleThree>4.2 Exclusion of Liability</TitleThree>
-    <BoldP>These are the limits of legal liability we may have to you.</BoldP>
+    <p className="font-bold">
+      These are the limits of legal liability we may have to you.
+    </p>
     <p>
       TO THE FULLEST EXTENT PERMITTED BY LAW (AND UNLESS CHICAGO ARTIST GUIDE
       HAS ENTERED INTO A SEPARATE WRITTEN AGREEMENT THAT OVERRIDES THIS
@@ -384,9 +388,9 @@ const TOS = () => (
       in the context of this Contract.
     </p>
     <h3>5. Termination</h3>
-    <BoldP>
+    <p className="font-bold">
       We can each end this Contract, but some rights and obligations survive.
-    </BoldP>
+    </p>
     <p>
       Both you and CAG may terminate this Contract at any time with notice to
       the other. On termination, you lose the right to access or use the
@@ -394,14 +398,16 @@ const TOS = () => (
     </p>
     <ul>
       <li>
-        <BoldP>Our rights to use and disclose your feedback</BoldP>
+        <p className="font-bold">
+          Our rights to use and disclose your feedback
+        </p>
         <p>
           Members and/or Visitors' rights to further re-share content and
           information you shared through the Services.
         </p>
       </li>
       <li>
-        <BoldP>Sections 4, 6, 7, and 8.2 of this Contract</BoldP>
+        <p className="font-bold">Sections 4, 6, 7, and 8.2 of this Contract</p>
         <p>
           Any amounts owed by either party prior to termination remain owed
           after termination. You can visit our Help Center to close your
@@ -415,7 +421,9 @@ const TOS = () => (
       Guide agree to resolve it in Illinois courts using Illinois law.
     </p>
     <h3>7. General Terms</h3>
-    <BoldP>Here are some important details about the Contract.</BoldP>
+    <p className="font-bold">
+      Here are some important details about the Contract.
+    </p>
     <p>
       If a court with authority over this Contract finds any part of it
       unenforceable, you and we agree that the court should modify the terms to
@@ -581,9 +589,4 @@ const TOSContainer = styled(PageContainer)`
     font-size: 20px;
   }
 `;
-
-const BoldP = styled.p`
-  font-weight: bold;
-`;
-
 export default TOS;

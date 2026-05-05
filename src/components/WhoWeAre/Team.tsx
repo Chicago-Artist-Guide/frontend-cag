@@ -14,7 +14,7 @@ const Team = (props: any) => {
   const { affiliation, bio, id, image, linkedin, name, pronouns, role } = props;
 
   return (
-    <MarginTeam key={id}>
+    <div key={id} className="mb-[10px] mt-[10px]">
       <Accordion>
         <PersonCard>
           <TopRow className="align-items-center justify-content-center">
@@ -57,7 +57,7 @@ const Team = (props: any) => {
           </Accordion.Body>
         </PersonCard>
       </Accordion>
-    </MarginTeam>
+    </div>
   );
 };
 
@@ -101,12 +101,6 @@ const PersonImg = styled(Image)`
   height: 7.5rem;
   width: 7.5rem;
 `;
-
-const MarginTeam = styled.div`
-  margin-bottom: 10px;
-  margin-top: 10px;
-`;
-
 const PersonName = styled.h5`
   font-size: 14px;
   font-weight: 700;

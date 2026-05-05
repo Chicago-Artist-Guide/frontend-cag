@@ -60,7 +60,9 @@ const UnionStatus: React.FC<{
               />
             ))}
             {hasError && (
-              <ErrorText>Please select at least one union status.</ErrorText>
+              <p className="mt-[0.5rem] text-[14px] text-salmon">
+                Please select at least one union status.
+              </p>
             )}
           </Form.Group>
         </Col>
@@ -77,11 +79,4 @@ const ImageCol = styled(Col)`
   max-height: 100%;
   max-width: 100%;
 `;
-
-const ErrorText = styled.p`
-  color: #e17b60;
-  font-size: 14px;
-  margin-top: 0.5rem;
-`;
-
 export default UnionStatus;

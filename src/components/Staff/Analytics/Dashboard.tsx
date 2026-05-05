@@ -26,16 +26,6 @@ const LoadingState = styled.div`
   font-size: 1.2rem;
   color: ${colors.grayishBlue};
 `;
-
-const ErrorState = styled.div`
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin: 2rem 0;
-  color: #856404;
-`;
-
 const RefreshButton = styled.button`
   background: ${colors.mint};
   color: white;
@@ -106,14 +96,14 @@ const AnalyticsDashboard: React.FC<React.PropsWithChildren<unknown>> = () => {
       {loading && <LoadingState>Loading analytics data...</LoadingState>}
 
       {error && (
-        <ErrorState>
+        <div className="mx-0 my-[2rem] rounded-[8px] border border-solid border-[#ffc107] bg-[#fff3cd] p-[1.5rem] text-[#856404]">
           <strong>Note:</strong> {error}
           <br />
           <small>
             This typically means you need to be logged in with proper
             permissions to view analytics data.
           </small>
-        </ErrorState>
+        </div>
       )}
 
       {!loading && !error && (

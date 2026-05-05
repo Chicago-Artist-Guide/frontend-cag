@@ -142,15 +142,16 @@ const Credits: React.FC<
       ))}
       <Row>
         <Col lg="10">
-          <SaveAndAddLink
+          <a
             href="#"
             onClick={(e: any) => {
               e.preventDefault();
               addCreditBlock();
             }}
+            className="mt-[1em] block"
           >
             + Save and add another previous production
-          </SaveAndAddLink>
+          </a>
         </Col>
       </Row>
     </Container>
@@ -165,12 +166,6 @@ const PerfRow = styled(Row)`
     border-top: 1px solid ${colors.lightGrey};
   }
 `;
-
-const SaveAndAddLink = styled.a`
-  display: block;
-  margin-top: 1em;
-`;
-
 const DeleteRowLink = styled.a`
   color: ${colors.salmon};
   display: block;

@@ -42,81 +42,70 @@ function normalizeColor(v: string): string {
   return v.toLowerCase().replace(/\s+/g, '');
 }
 
+// Bootstrap 4 reserves these color names for its theme palette. If the
+// project's tailwind.config.js maps a hex to one of these names, emitting
+// `text-primary` etc. would collide with BS (which still loads). Emit the
+// raw hex as arbitrary value instead.
+const BOOTSTRAP_RESERVED_COLOR_NAMES = new Set([
+  'primary',
+  'secondary',
+  'success',
+  'danger',
+  'warning',
+  'info',
+  'light',
+  'dark',
+  'body',
+  'muted',
+  'white',
+  'black'
+]);
+
 function tailwindColor(value: string): string | null {
   const norm = normalizeColor(value);
   // Direct hit on a named color in config.
   const hit = COLOR_LOOKUP?.get(norm);
-  if (hit) return hit;
-  // Hex passthrough as arbitrary value.
+  if (hit && !BOOTSTRAP_RESERVED_COLOR_NAMES.has(hit)) return hit;
+  // Hex passthrough as arbitrary value (also handles BS-name collisions).
   if (/^#[0-9a-f]{3,8}$/i.test(value.trim())) {
+    return `[${value.trim()}]`;
+  }
+  // If we hit a BS-reserved name but the original wasn't a literal hex, fall
+  // through to emit the resolved hex from config so we still avoid collision.
+  if (hit && BOOTSTRAP_RESERVED_COLOR_NAMES.has(hit)) {
     return `[${value.trim()}]`;
   }
   // rgb/rgba arbitrary value (Tailwind requires underscores instead of spaces).
   if (/^rgba?\(/i.test(value.trim())) {
     return `[${value.trim().replace(/\s+/g, '_')}]`;
   }
-  // Common bare keywords
-  if (['white', 'black', 'transparent', 'currentcolor'].includes(norm)) {
-    return norm === 'currentcolor' ? 'current' : norm;
+  // Common bare keywords — these collide with BS too, so use arbitrary.
+  if (norm === 'white' || norm === 'black') {
+    return `[${norm}]`;
   }
+  if (norm === 'transparent') return 'transparent';
+  if (norm === 'currentcolor') return 'current';
   return null;
 }
 
-const SPACING_REM: Record<string, string> = {
-  '0': '0',
-  '0.125rem': '0.5',
-  '0.25rem': '1',
-  '0.375rem': '1.5',
-  '0.5rem': '2',
-  '0.625rem': '2.5',
-  '0.75rem': '3',
-  '0.875rem': '3.5',
-  '1rem': '4',
-  '1.25rem': '5',
-  '1.5rem': '6',
-  '1.75rem': '7',
-  '2rem': '8',
-  '2.25rem': '9',
-  '2.5rem': '10',
-  '2.75rem': '11',
-  '3rem': '12',
-  '3.5rem': '14',
-  '4rem': '16',
-  '5rem': '20',
-  '6rem': '24',
-  '8rem': '32'
-};
-const SPACING_PX: Record<string, string> = {
-  '0': '0',
-  '1px': 'px',
-  '2px': '0.5',
-  '4px': '1',
-  '6px': '1.5',
-  '8px': '2',
-  '10px': '2.5',
-  '12px': '3',
-  '14px': '3.5',
-  '16px': '4',
-  '20px': '5',
-  '24px': '6',
-  '28px': '7',
-  '32px': '8',
-  '36px': '9',
-  '40px': '10',
-  '44px': '11',
-  '48px': '12',
-  '56px': '14',
-  '64px': '16',
-  '80px': '20',
-  '96px': '24',
-  '128px': '32'
-};
-
+/**
+ * Bootstrap 4 ships its own spacing utilities (`m-{0..5}`, `mt-{0..5}`,
+ * `p-{0..5}`, `mx-auto`, etc.) with `!important`. These collide with
+ * Tailwind's same-named classes but use a DIFFERENT scale (BS m-4 = 1.5rem,
+ * Tailwind m-4 = 1rem). Until Bootstrap is removed, the codemod must avoid
+ * emitting Tailwind class names that BS also defines.
+ *
+ * `spacingScale` therefore always returns the *arbitrary value* form
+ * (`[1rem]`, `[15px]`) rather than a named scale step. Bootstrap doesn't
+ * define `.mt-\[1rem\]`, so no collision.
+ *
+ * Special-case `0` → `0` (Tailwind class `mt-0`). This DOES collide with
+ * Bootstrap's `mt-0` but both resolve to the same value (0), so the visual
+ * outcome is identical either way.
+ */
 function spacingScale(value: string): string | null {
   const v = value.trim().toLowerCase();
-  if (SPACING_REM[v]) return SPACING_REM[v];
-  if (SPACING_PX[v]) return SPACING_PX[v];
-  // Allow arbitrary `[13px]` style for unmapped values.
+  if (v === '0' || v === '0px' || v === '0rem' || v === '0em') return '0';
   if (/^-?\d+(?:\.\d+)?(px|rem|em|%|vw|vh)$/.test(v)) return `[${v}]`;
   return null;
 }

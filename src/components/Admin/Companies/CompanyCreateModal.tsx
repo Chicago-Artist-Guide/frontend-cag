@@ -25,20 +25,6 @@ interface CompanyCreateModalProps {
   onSuccess: () => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 2rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -86,15 +72,6 @@ const CloseButton = styled.button`
     font-size: 1.25rem;
   }
 `;
-
-const Body = styled.div`
-  padding: 2rem;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
 const Label = styled.label`
   display: block;
   font-family: 'Open Sans', sans-serif;
@@ -383,7 +360,10 @@ We recommend changing your password after your first login.`;
   };
 
   return (
-    <Overlay onClick={handleOverlayClick}>
+    <div
+      onClick={handleOverlayClick}
+      className="z-1000 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[2rem]"
+    >
       <Modal>
         <Header>
           <h2>{success ? 'Company Created!' : 'Add New Company'}</h2>
@@ -395,7 +375,7 @@ We recommend changing your password after your first login.`;
           </CloseButton>
         </Header>
 
-        <Body>
+        <div className="p-[2rem]">
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
           {success && credentials ? (
@@ -427,7 +407,7 @@ We recommend changing your password after your first login.`;
             </SuccessBox>
           ) : (
             <form onSubmit={formik.handleSubmit}>
-              <FormGroup>
+              <div className="mb-[1.5rem]">
                 <Label htmlFor="theater_name">Company Name *</Label>
                 <Input
                   id="theater_name"
@@ -444,9 +424,9 @@ We recommend changing your password after your first login.`;
                 {formik.touched.theater_name && formik.errors.theater_name && (
                   <ErrorText>{formik.errors.theater_name}</ErrorText>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
+              <div className="mb-[1.5rem]">
                 <Label htmlFor="email">Login Email *</Label>
                 <Input
                   id="email"
@@ -461,9 +441,9 @@ We recommend changing your password after your first login.`;
                 {formik.touched.email && formik.errors.email && (
                   <ErrorText>{formik.errors.email}</ErrorText>
                 )}
-              </FormGroup>
+              </div>
 
-              <FormGroup>
+              <div className="mb-[1.5rem]">
                 <Label htmlFor="primary_contact">Primary Contact Name</Label>
                 <Input
                   id="primary_contact"
@@ -474,9 +454,9 @@ We recommend changing your password after your first login.`;
                   onBlur={formik.handleBlur}
                   disabled={creating}
                 />
-              </FormGroup>
+              </div>
 
-              <FormGroup>
+              <div className="mb-[1.5rem]">
                 <Label htmlFor="primary_contact_email">
                   Primary Contact Email
                 </Label>
@@ -497,7 +477,7 @@ We recommend changing your password after your first login.`;
                   formik.errors.primary_contact_email && (
                     <ErrorText>{formik.errors.primary_contact_email}</ErrorText>
                   )}
-              </FormGroup>
+              </div>
 
               <Note>
                 A temporary password will be generated automatically. You'll be
@@ -505,7 +485,7 @@ We recommend changing your password after your first login.`;
               </Note>
             </form>
           )}
-        </Body>
+        </div>
 
         <Footer>
           {success ? (
@@ -533,7 +513,7 @@ We recommend changing your password after your first login.`;
           )}
         </Footer>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

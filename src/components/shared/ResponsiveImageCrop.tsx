@@ -79,7 +79,7 @@ const ResponsiveImageCrop: React.FC<
   };
 
   return (
-    <Container>
+    <div className="flex w-[100%] flex-col gap-[20px]">
       <CropperContainer>
         <Cropper
           image={imageSrc}
@@ -162,17 +162,9 @@ const ResponsiveImageCrop: React.FC<
           )}
         </ActionButtons>
       </Controls>
-    </Container>
+    </div>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
 const CropperContainer = styled.div`
   position: relative;
   width: 100%;

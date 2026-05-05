@@ -32,18 +32,6 @@ const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
 `;
-
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const HeaderContent = styled.div``;
-
 const AddButton = styled.button`
   display: inline-flex;
   align-items: center;
@@ -85,14 +73,6 @@ const SearchBar = styled.input`
     outline-offset: 2px;
   }
 `;
-
-const FiltersRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-`;
-
 const FilterSelect = styled.select`
   padding: 0.5rem 1rem;
   border: 1px solid ${colors.lightGrey};
@@ -362,20 +342,20 @@ const EventsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
 
   return (
     <Container>
-      <HeaderRow>
-        <HeaderContent>
+      <div className="mb-[2rem] flex flex-wrap items-start justify-between gap-[1rem]">
+        <div className="">
           <PageTitle>Events</PageTitle>
           <PageSubtitle>
             Manage events that appear on the /events page
           </PageSubtitle>
-        </HeaderContent>
+        </div>
         {hasPermission('events', 'edit') && (
           <AddButton onClick={handleAddClick}>
             <FontAwesomeIcon icon={faPlus} />
             Add Event
           </AddButton>
         )}
-      </HeaderRow>
+      </div>
 
       <SearchBar
         type="text"
@@ -384,7 +364,7 @@ const EventsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
         onChange={(e) => handleSearch(e.target.value)}
       />
 
-      <FiltersRow>
+      <div className="mb-[2rem] flex flex-wrap gap-[1rem]">
         <FilterSelect
           value={filters.status}
           onChange={(e) =>
@@ -440,7 +420,7 @@ const EventsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
           <option value="desc">Descending</option>
           <option value="asc">Ascending</option>
         </FilterSelect>
-      </FiltersRow>
+      </div>
 
       <StatsGrid>
         <StatCard>

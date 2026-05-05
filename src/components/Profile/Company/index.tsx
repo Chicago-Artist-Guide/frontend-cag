@@ -170,9 +170,9 @@ const CompanyProfile: React.FC<
               <DetailsColTitle>
                 <div>Menu</div>
               </DetailsColTitle>
-              <MenuLinkContainer>
+              <div className="flex flex-col gap-[8px]">
                 <MenuLink to="/profile/messages">Messages</MenuLink>
-              </MenuLinkContainer>
+              </div>
             </DetailsCard>
           )}
         </LeftCol>
@@ -320,13 +320,6 @@ const TheatreInfoCard = styled.div`
     padding: 20px 16px;
   }
 `;
-
-const MenuLinkContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-`;
-
 const MenuLink = styled(Link)`
   font-family: ${fonts.montserrat};
   font-size: 16px;

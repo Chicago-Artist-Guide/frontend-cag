@@ -137,10 +137,3 @@ export const CAGError = styled.span`
   display: block;
   line-height: 1.4;
 `;
-
-export const CAGHelperText = styled.div`
-  font-size: 11px;
-  font-style: italic;
-  margin-left: 5px;
-  margin-top: 8px;
-`;

@@ -76,14 +76,6 @@ const Email = styled.div`
   overflow: hidden;
   text-overflow: ellipsis;
 `;
-
-const BadgeRow = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-`;
-
 const Badge = styled.span<{
   $variant?: 'success' | 'warning' | 'error' | 'default';
 }>`
@@ -150,7 +142,7 @@ const CompanyCard: React.FC<React.PropsWithChildren<CompanyCardProps>> = ({
       <Name title={company.theater_name}>{company.theater_name}</Name>
       <Email title={company.email}>{company.email || 'No email'}</Email>
 
-      <BadgeRow>
+      <div className="mb-[0.75rem] flex flex-wrap gap-[0.5rem]">
         {company.disabled ? (
           <Badge $variant="error">
             <FontAwesomeIcon icon={faBan} /> Disabled
@@ -165,7 +157,7 @@ const CompanyCard: React.FC<React.PropsWithChildren<CompanyCardProps>> = ({
         ) : (
           <Badge $variant="warning">Incomplete</Badge>
         )}
-      </BadgeRow>
+      </div>
 
       <Stats>
         <span>{company.productions_count || 0} productions</span>

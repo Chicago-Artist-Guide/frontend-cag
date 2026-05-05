@@ -19,17 +19,17 @@ const PublicRoleCard: React.FC<
         <RoleDescription>{role.description}</RoleDescription>
       )}
 
-      <RoleDetails>
+      <div className="flex flex-wrap gap-[10px]">
         {role.role_rate && (
-          <DetailItem>
+          <div className="mb-[5px] mr-[15px] flex">
             <DetailLabel>Rate:</DetailLabel>
             <DetailValue>
               {role.role_rate}{' '}
               {role.role_rate_unit && `per ${role.role_rate_unit}`}
             </DetailValue>
-          </DetailItem>
+          </div>
         )}
-      </RoleDetails>
+      </div>
     </RoleCardContainer>
   );
 };
@@ -62,19 +62,6 @@ const RoleDescription = styled.p`
   font-size: 14px;
   margin-bottom: 15px;
 `;
-
-const RoleDetails = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  margin-right: 15px;
-  margin-bottom: 5px;
-`;
-
 const DetailLabel = styled.span`
   font-family: ${fonts.montserrat};
   font-weight: 600;

@@ -68,7 +68,7 @@ const Pagination: React.FC<React.PropsWithChildren<PaginationProps>> = ({
   const visiblePages = getVisiblePageNumbers();
 
   return (
-    <PaginationContainer>
+    <div className="mb-[20px] mt-[30px] flex flex-col items-center">
       <PaginationWrapper>
         <PaginationButton
           onClick={() => handlePageChange(currentPage - 1)}
@@ -104,18 +104,9 @@ const Pagination: React.FC<React.PropsWithChildren<PaginationProps>> = ({
           Showing {firstItem}-{lastItem} of {totalItems} items
         </ItemCount>
       )}
-    </PaginationContainer>
+    </div>
   );
 };
-
-const PaginationContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 30px;
-  margin-bottom: 20px;
-`;
-
 const PaginationWrapper = styled.div`
   display: flex;
   border-radius: 8px;

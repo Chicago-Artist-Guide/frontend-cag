@@ -23,20 +23,6 @@ interface OpeningEditModalProps {
   onSuccess: () => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  padding: 1rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -76,15 +62,6 @@ const Header = styled.div`
     }
   }
 `;
-
-const Content = styled.div`
-  padding: 2rem;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
 const Label = styled.label`
   display: block;
   font-family: 'Montserrat', sans-serif;
@@ -162,14 +139,6 @@ const FormError = styled.div`
   color: ${colors.salmon};
   font-size: 0.875rem;
 `;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 2rem;
-`;
-
 const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   display: inline-flex;
   align-items: center;
@@ -300,7 +269,10 @@ const OpeningEditModal: React.FC<
   };
 
   return (
-    <Overlay onClick={onClose}>
+    <div
+      onClick={onClose}
+      className="z-1001 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[1rem]"
+    >
       <Modal onClick={(e) => e.stopPropagation()}>
         <Header>
           <h2>Edit Opening</h2>
@@ -309,7 +281,7 @@ const OpeningEditModal: React.FC<
           </button>
         </Header>
 
-        <Content>
+        <div className="p-[2rem]">
           <Formik
             initialValues={initialValues}
             validationSchema={validationSchema}
@@ -320,7 +292,7 @@ const OpeningEditModal: React.FC<
                 {formError && <FormError>{formError}</FormError>}
 
                 {/* Opening Info (Read-only) */}
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label>Role</Label>
                   <div
                     style={{
@@ -332,9 +304,9 @@ const OpeningEditModal: React.FC<
                   >
                     {opening.roleName}
                   </div>
-                </FormGroup>
+                </div>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label>Production</Label>
                   <div
                     style={{
@@ -345,20 +317,20 @@ const OpeningEditModal: React.FC<
                   >
                     {opening.productionName}
                   </div>
-                </FormGroup>
+                </div>
 
                 {/* Status (Editable) */}
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="status">Status</Label>
                   <Select as="select" name="status" id="status">
                     <option value="open">Open</option>
                     <option value="closed">Closed</option>
                   </Select>
                   <ErrorMessage name="status" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 {/* Moderation Notes (Editable) */}
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="moderationNotes">
                     Moderation Notes (Optional)
                   </Label>
@@ -369,10 +341,10 @@ const OpeningEditModal: React.FC<
                     placeholder="Add any notes about this opening or moderation action..."
                   />
                   <ErrorMessage name="moderationNotes" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 {/* Buttons */}
-                <ButtonGroup>
+                <div className="mt-[2rem] flex justify-end gap-[1rem]">
                   <Button
                     type="button"
                     variant="secondary"
@@ -385,13 +357,13 @@ const OpeningEditModal: React.FC<
                     <FontAwesomeIcon icon={faSave} />
                     {isSubmitting ? 'Saving...' : 'Save Changes'}
                   </Button>
-                </ButtonGroup>
+                </div>
               </Form>
             )}
           </Formik>
-        </Content>
+        </div>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 
