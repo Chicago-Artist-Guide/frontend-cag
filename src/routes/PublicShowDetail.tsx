@@ -160,12 +160,6 @@ const PublicShowDetail = () => {
   }
 
   if (!show) {
-    // Keep the console logs for debugging
-    console.log(
-      'Show is null or undefined, displaying "Show not found" message'
-    );
-    console.log('Current productionId:', productionId);
-
     return (
       <PageContainer>
         <BackLink to="/shows">

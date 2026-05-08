@@ -140,7 +140,13 @@ const RoleModal: React.FC<
 
     // Clear any previous errors
     setValidationErrors([]);
-    onSubmit(role);
+    // Drop the legacy include_nonbinary flag on save: the new
+    // gender_identity + trans_nonbinary_roles fields are the source of truth
+    // and the load-time normalization already folded any legacy value into
+    // gender_identity. Leaving include_nonbinary set in Firestore would let
+    // it drift away from the new fields on subsequent edits.
+    const { include_nonbinary: _drop, ...sanitized } = role;
+    onSubmit(sanitized as Role);
     setFormValues({});
   };
 

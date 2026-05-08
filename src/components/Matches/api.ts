@@ -321,25 +321,22 @@ export async function fetchTalentWithFilters(
               return true;
             }
 
-            // Trans/Nonbinary matches if their role interests overlap role's genders
+            // Trans/Nonbinary artists match if their gender_roles overlap with
+            // the role's open-to set. When the role explicitly invites trans
+            // actors (gender_identity includes 'Trans/Nonbinary'), the
+            // company-specified trans_nonbinary_roles is authoritative; fall
+            // back to roleGenders for legacy roles created before that field
+            // existed.
             if (profile.gender_identity === 'Trans/Nonbinary') {
               const genderRoles = profile.gender_roles || [];
-              if (
-                roleGenders.includes('Woman') &&
-                genderRoles.includes('Woman')
-              ) {
-                return true;
-              }
-              if (roleGenders.includes('Man') && genderRoles.includes('Man')) {
-                return true;
-              }
-              if (
-                roleGenders.includes('Nonbinary') &&
-                genderRoles.includes('Nonbinary')
-              ) {
-                return true;
-              }
-              return false;
+              const transAccepted =
+                role.gender_identity?.includes('Trans/Nonbinary') ?? false;
+              const acceptedSet =
+                transAccepted &&
+                (role.trans_nonbinary_roles?.length ?? 0) > 0
+                  ? role.trans_nonbinary_roles!
+                  : roleGenders;
+              return genderRoles.some((g) => acceptedSet.includes(g));
             }
 
             return false;
@@ -461,15 +458,22 @@ export async function fetchRolesForTalent(
               }
             }
 
-            // Trans/Nonbinary matches if their role interests overlap role's genders
+            // Trans/Nonbinary artists match if their gender_roles overlap with
+            // the role's open-to set. Prefer pR.trans_nonbinary_roles when the
+            // role explicitly invites trans actors; fall back to roleGenders
+            // for legacy roles. (Mirrors fetchTalentWithFilters.)
             if (profile.gender_identity === 'Trans/Nonbinary') {
               const genderRoles = profile.gender_roles || [];
-              const hasMatch =
-                (roleGenders.includes('Woman') &&
-                  genderRoles.includes('Woman')) ||
-                (roleGenders.includes('Man') && genderRoles.includes('Man')) ||
-                (roleGenders.includes('Nonbinary') &&
-                  genderRoles.includes('Nonbinary'));
+              const transAccepted =
+                pR.gender_identity?.includes('Trans/Nonbinary') ?? false;
+              const acceptedSet =
+                transAccepted &&
+                (pR.trans_nonbinary_roles?.length ?? 0) > 0
+                  ? pR.trans_nonbinary_roles!
+                  : roleGenders;
+              const hasMatch = genderRoles.some((g) =>
+                acceptedSet.includes(g)
+              );
               if (!hasMatch) {
                 return false;
               }

@@ -76,17 +76,3 @@ export const getTheaterByAccountId = async (
 
   return queryProfileSnapshot.docs[0].data() as Profile;
 };
-
-export const getTheaterByAccountUid = async (
-  firebaseStore: Firestore,
-  uid: string
-) => {
-  const theaterAccount = await getTheaterAccountByUid(firebaseStore, uid);
-
-  if (!theaterAccount) {
-    console.error('Could not find company account while getting profile');
-    return false;
-  }
-
-  return await getTheaterByAccountId(firebaseStore, theaterAccount.id);
-};

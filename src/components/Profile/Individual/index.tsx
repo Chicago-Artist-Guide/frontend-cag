@@ -912,6 +912,12 @@ const IndividualProfile: React.FC<
                       <br />
                     </>
                   )}
+                  {!previewMode && profile?.data?.lgbtqia && (
+                    <>
+                      LGBTQIA+: {profile?.data?.lgbtqia}
+                      <br />
+                    </>
+                  )}
                   {((profile?.data?.union_status &&
                     profile?.data?.union_status !== '') ||
                     (profile?.data?.union_other &&
