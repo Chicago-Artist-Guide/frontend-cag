@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { Event, EventSearchFilters, EventPagination } from '../types/event';
+import { parseEventDateTime } from '../utils/dates';
 
 /**
  * Cache for event data (5 minute TTL)
@@ -21,44 +22,11 @@ let eventCache: CacheEntry | null = null;
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 /**
- * Parse event date and time into a Date object
+ * Parse event date and time into a sortable Date. All-day events fall back
+ * to start-of-day so they sort before timed events on the same date.
  */
 function getEventDateTime(event: Event): Date {
-  try {
-    const eventDate = new Date(event.date);
-
-    if (isNaN(eventDate.getTime())) {
-      return new Date(0);
-    }
-
-    if (!event.time || event.time.trim() === '') {
-      eventDate.setHours(0, 0, 0, 0);
-      return eventDate;
-    }
-
-    const timeStr = event.time.trim().toUpperCase();
-    let hours = 0;
-    let minutes = 0;
-
-    // Parse time formats like "7:00 PM", "7 PM", "19:00"
-    const timeMatch = timeStr.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)?$/i);
-    if (timeMatch) {
-      hours = parseInt(timeMatch[1], 10);
-      minutes = timeMatch[2] ? parseInt(timeMatch[2], 10) : 0;
-      const period = timeMatch[3]?.toUpperCase();
-
-      if (period === 'PM' && hours !== 12) {
-        hours += 12;
-      } else if (period === 'AM' && hours === 12) {
-        hours = 0;
-      }
-    }
-
-    eventDate.setHours(hours, minutes, 0, 0);
-    return eventDate;
-  } catch {
-    return new Date(0);
-  }
+  return parseEventDateTime(event.date, event.time, 'startOfDay') ?? new Date(0);
 }
 
 /**

@@ -8,6 +8,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { isUpcomingEventDate } from '../../../utils/dates';
 import {
   faTimes,
   faMapMarkerAlt,
@@ -269,16 +270,12 @@ const MetaInfo = styled.div`
 `;
 
 /**
- * Check if event is upcoming
+ * Check if event is upcoming. Delegates to the shared dates util so the
+ * local-time fix and "today is still upcoming" semantics stay consistent
+ * with the public /events page and EventsManagement.
  */
 function isUpcoming(event: Event): boolean {
-  try {
-    const eventDate = new Date(event.date);
-    if (isNaN(eventDate.getTime())) return false;
-    return eventDate >= new Date();
-  } catch {
-    return false;
-  }
+  return isUpcomingEventDate(event.date);
 }
 
 const EventDetailsModal: React.FC<

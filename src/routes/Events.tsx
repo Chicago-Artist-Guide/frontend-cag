@@ -5,6 +5,7 @@ import { Title, Tagline } from '../components/layout/Titles';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { EventCard } from '../components/shared';
 import styled from 'styled-components';
+import { parseEventDateTime } from '../utils/dates';
 
 type EventType = {
   id: string;
@@ -20,83 +21,22 @@ type EventType = {
 };
 
 /**
- * Combines event date and time into a complete Date object for accurate comparison.
- * Handles various time formats (e.g., "7:00 PM", "19:00", "7 PM").
- * Defaults to end-of-day (23:59:59) if time is missing or invalid.
+ * Combines event date and time into a sortable Date. Falls back to
+ * end-of-day so all-day events stay upcoming through the entire date.
+ * Returns the epoch (a safely-past sentinel) for unparseable input.
  */
 const getEventDateTime = (event: EventType): Date => {
-  try {
-    // Parse the date in local time. `new Date("2026-04-25")` is parsed as UTC
-    // midnight, which becomes the previous day in negative-offset timezones
-    // (e.g., Chicago) — moving events to "past" a day early.
-    const isoDateMatch = event.date.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    const eventDate = isoDateMatch
-      ? new Date(
-          parseInt(isoDateMatch[1], 10),
-          parseInt(isoDateMatch[2], 10) - 1,
-          parseInt(isoDateMatch[3], 10)
-        )
-      : new Date(event.date);
-
-    if (isNaN(eventDate.getTime())) {
-      // Invalid date - return a past date as safe default
-      console.error(
-        'Invalid event date:',
-        event.date,
-        'for event:',
-        event.name
-      );
-      return new Date(0);
-    }
-
-    // If no time provided, default to end of day (23:59:59) so all-day events
-    // remain "upcoming" through the event date and only flip to past at midnight.
-    if (!event.time || event.time.trim() === '') {
-      eventDate.setHours(23, 59, 59, 999);
-      return eventDate;
-    }
-
-    // Parse the time string
-    const timeStr = event.time.trim().toUpperCase();
-    let hours = 0;
-    let minutes = 0;
-
-    // Try to match various time formats
-    // Format: "7:00 PM", "7:00PM", "7 PM", "7PM"
-    const time12Match = timeStr.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/);
-    // Format: "19:00", "7:00"
-    const time24Match = timeStr.match(/^(\d{1,2}):(\d{2})$/);
-
-    if (time12Match) {
-      hours = parseInt(time12Match[1], 10);
-      minutes = time12Match[2] ? parseInt(time12Match[2], 10) : 0;
-      const isPM = time12Match[3] === 'PM';
-
-      if (isPM && hours !== 12) {
-        hours += 12;
-      } else if (!isPM && hours === 12) {
-        hours = 0;
-      }
-    } else if (time24Match) {
-      hours = parseInt(time24Match[1], 10);
-      minutes = parseInt(time24Match[2], 10);
-    } else {
-      // Couldn't parse time - default to end of day
-      eventDate.setHours(23, 59, 59, 999);
-      return eventDate;
-    }
-
-    eventDate.setHours(hours, minutes, 0, 0);
-    return eventDate;
-  } catch (error) {
+  const dt = parseEventDateTime(event.date, event.time, 'endOfDay');
+  if (!dt) {
     console.error(
-      'Error parsing event datetime:',
-      error,
+      'Invalid event date:',
+      event.date,
       'for event:',
       event.name
     );
-    return new Date(0); // Return past date as safe default
+    return new Date(0);
   }
+  return dt;
 };
 
 const Events: React.FC<React.PropsWithChildren<unknown>> = () => {
