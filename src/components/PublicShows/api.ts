@@ -1,16 +1,19 @@
 import {
   collection,
-  doc,
   Firestore,
-  getDoc,
   getDocs,
   query,
   where
 } from 'firebase/firestore';
 import { Production, Role } from '../Profile/Company/types';
+import { ACTIVE_PRODUCTION_STATUSES } from '../../utils/lookups';
 
 // A role flattened with its parent production context, suitable for
-// rendering in a list outside the show-detail page.
+// rendering in a list outside the show-detail page. theatre_name is
+// intentionally absent for the unauth /roles surface — the accounts
+// collection requires auth (it carries email), and we don't yet have a
+// public-safe theatre directory. Follow-up: a `company_public_profiles`
+// collection or denormalize theater_name onto the production document.
 export type PublicRoleListItem = Role & {
   production_id: string;
   production_name: string;
@@ -18,63 +21,15 @@ export type PublicRoleListItem = Role & {
   audition_start?: string;
   audition_end?: string;
   account_id: string;
-  theatre_name?: string;
-};
-
-// Productions are considered "active" (i.e. publicly browsable) when they
-// match one of these statuses. Mirrors the gating used in PublicShows.tsx
-// and Matches/api.ts so the public role list stays consistent with the
-// rest of the marketing surface.
-export const ACTIVE_PRODUCTION_STATUSES = [
-  'Casting',
-  'Hiring',
-  'Pre-Production'
-];
-
-// Theatre name resolution for the public/unauth surface reads only the
-// company's account record. Profiles stay auth-gated (firestore.rules)
-// because individual artist profiles contain sensitive personal data,
-// and Firestore rules can't cheaply distinguish company profiles from
-// individual ones at read-time. account.theater_name is set at company
-// signup (see SignUp/Company/index.tsx) so this is sufficient for the
-// marketing browse. We cache per call to avoid N duplicate reads.
-const resolveTheatreName = async (
-  firebaseStore: Firestore,
-  accountId: string,
-  cache: Map<string, string | undefined>
-): Promise<string | undefined> => {
-  if (!accountId) {
-    return undefined;
-  }
-
-  if (cache.has(accountId)) {
-    return cache.get(accountId);
-  }
-
-  try {
-    const accountRef = doc(firebaseStore, 'accounts', accountId);
-    const accountSnap = await getDoc(accountRef);
-
-    if (!accountSnap.exists()) {
-      cache.set(accountId, undefined);
-      return undefined;
-    }
-
-    const theatreName =
-      (accountSnap.data()?.theater_name as string | undefined) || undefined;
-    cache.set(accountId, theatreName);
-    return theatreName;
-  } catch (err) {
-    console.error('Error resolving theatre name', err);
-    cache.set(accountId, undefined);
-    return undefined;
-  }
 };
 
 // Fetch all open roles across all active productions, flattened into a
 // single list. The list is shaped for the unauthenticated /roles page —
-// each item carries enough context (production name, theatre, dates) to
-// render a self-contained role card without further reads.
+// each item carries enough context (production name, dates) to render a
+// self-contained role card. Reads only the productions collection; no
+// account/profile lookups happen on this path so unauth visitors don't
+// trigger rule denials and we don't leak email addresses (which live on
+// company account docs).
 export const fetchPublicOpenRoles = async (
   firebaseStore: Firestore
 ): Promise<PublicRoleListItem[]> => {
@@ -100,7 +55,6 @@ export const fetchPublicOpenRoles = async (
         p.account_id.length > 0
     );
 
-  const theatreNameCache = new Map<string, string | undefined>();
   const items: PublicRoleListItem[] = [];
 
   for (const production of productions) {
@@ -117,12 +71,6 @@ export const fetchPublicOpenRoles = async (
       continue;
     }
 
-    const theatreName = await resolveTheatreName(
-      firebaseStore,
-      production.account_id,
-      theatreNameCache
-    );
-
     for (const role of openRoles) {
       items.push({
         ...role,
@@ -131,8 +79,7 @@ export const fetchPublicOpenRoles = async (
         production_image_url: production.production_image_url,
         audition_start: production.audition_start,
         audition_end: production.audition_end,
-        account_id: production.account_id,
-        theatre_name: theatreName
+        account_id: production.account_id
       });
     }
   }

@@ -1,18 +1,15 @@
-import { getDoc, getDocs } from 'firebase/firestore';
+import { getDocs } from 'firebase/firestore';
 import type { Production, Role } from '../components/Profile/Company/types';
 import { fetchPublicOpenRoles } from '../components/PublicShows/api';
 
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn(),
-  doc: vi.fn((_store, path, id) => ({ path, id })),
-  getDoc: vi.fn(),
   getDocs: vi.fn(),
   query: vi.fn(),
   where: vi.fn()
 }));
 
 const mockGetDocs = vi.mocked(getDocs);
-const mockGetDoc = vi.mocked(getDoc);
 
 const buildProduction = (
   overrides: Partial<Production> = {},
@@ -29,28 +26,12 @@ const buildProduction = (
   ...overrides
 });
 
-// Theatre name comes from accounts.theater_name (set at company signup).
-// The unauth /roles surface deliberately does not read profiles — see
-// firestore.rules: profile reads stay auth-gated to protect individual
-// artist data, while company accounts are publicly readable.
-const setUpTheatreLookup = (accountId: string, theatreName: string) => {
-  mockGetDoc.mockImplementation(async (ref: any) => {
-    if (ref.path === 'accounts' && ref.id === accountId) {
-      return {
-        exists: () => true,
-        data: () => ({ theater_name: theatreName, type: 'company' })
-      } as never;
-    }
-    return { exists: () => false, data: () => null } as never;
-  });
-};
-
 describe('fetchPublicOpenRoles', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('flattens open roles across active productions with theatre context', async () => {
+  it('flattens open roles across active productions with production context', async () => {
     const production = buildProduction({}, [
       {
         role_id: 'role-1',
@@ -70,7 +51,6 @@ describe('fetchPublicOpenRoles', () => {
     mockGetDocs.mockResolvedValue({
       docs: [{ id: 'prod-1', data: () => production }]
     } as never);
-    setUpTheatreLookup('acct-1', 'Demo Theatre');
 
     const items = await fetchPublicOpenRoles({} as never);
 
@@ -80,7 +60,6 @@ describe('fetchPublicOpenRoles', () => {
       role_name: 'Lead Actor',
       production_id: 'prod-1',
       production_name: 'Demo Production',
-      theatre_name: 'Demo Theatre',
       audition_start: '2026-06-01',
       audition_end: '2026-06-15',
       account_id: 'acct-1'
@@ -90,6 +69,25 @@ describe('fetchPublicOpenRoles', () => {
       role_name: 'Stage Manager',
       production_id: 'prod-1'
     });
+    // Theatre attribution is intentionally absent on the unauth surface;
+    // see the comment in PublicShows/api.ts about the email leak.
+    expect(items[0]).not.toHaveProperty('theatre_name');
+  });
+
+  it('does not read accounts or profiles (rule-deny safety)', async () => {
+    // The unauth /roles page must not trigger any account/profile reads —
+    // those are auth-gated and would surface as console errors. Only the
+    // productions query should be issued.
+    const production = buildProduction({}, [
+      { role_id: 'r1', role_name: 'A', role_status: 'Open' }
+    ]);
+    mockGetDocs.mockResolvedValue({
+      docs: [{ id: 'prod-1', data: () => production }]
+    } as never);
+
+    await fetchPublicOpenRoles({} as never);
+
+    expect(mockGetDocs).toHaveBeenCalledTimes(1);
   });
 
   it('excludes roles with role_status of Closed', async () => {
@@ -101,7 +99,6 @@ describe('fetchPublicOpenRoles', () => {
     mockGetDocs.mockResolvedValue({
       docs: [{ id: 'prod-1', data: () => production }]
     } as never);
-    setUpTheatreLookup('acct-1', 'Demo Theatre');
 
     const items = await fetchPublicOpenRoles({} as never);
 
@@ -117,7 +114,6 @@ describe('fetchPublicOpenRoles', () => {
     mockGetDocs.mockResolvedValue({
       docs: [{ id: 'prod-1', data: () => production }]
     } as never);
-    setUpTheatreLookup('acct-1', 'Demo Theatre');
 
     const items = await fetchPublicOpenRoles({} as never);
 
@@ -144,29 +140,6 @@ describe('fetchPublicOpenRoles', () => {
     expect(items).toEqual([]);
   });
 
-  it('dedupes account reads via the per-call cache (perf contract)', async () => {
-    // Two productions sharing the same account_id should produce a single
-    // accounts/getDoc — that's the only reason the cache exists.
-    const a = buildProduction({ production_id: 'p-a' }, [
-      { role_id: 'role-a', role_name: 'A', role_status: 'Open' }
-    ]);
-    const b = buildProduction({ production_id: 'p-b' }, [
-      { role_id: 'role-b', role_name: 'B', role_status: 'Open' }
-    ]);
-
-    mockGetDocs.mockResolvedValue({
-      docs: [
-        { id: 'p-a', data: () => a },
-        { id: 'p-b', data: () => b }
-      ]
-    } as never);
-    setUpTheatreLookup('acct-1', 'Shared Theatre');
-
-    await fetchPublicOpenRoles({} as never);
-
-    expect(mockGetDoc).toHaveBeenCalledTimes(1);
-  });
-
   it('filters out productions missing required identity fields', async () => {
     const valid = buildProduction({}, [
       { role_id: 'r-valid', role_name: 'Valid', role_status: 'Open' }
@@ -182,7 +155,6 @@ describe('fetchPublicOpenRoles', () => {
         { id: 'prod-2', data: () => invalid }
       ]
     } as never);
-    setUpTheatreLookup('acct-1', 'Demo Theatre');
 
     const items = await fetchPublicOpenRoles({} as never);
 

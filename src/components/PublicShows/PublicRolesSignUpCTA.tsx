@@ -28,7 +28,7 @@ const PublicRolesSignUpCTA: React.FC<PublicRolesSignUpCTAProps> = ({
       </div>
       <div className="mt-4 flex flex-shrink-0 gap-3 md:mt-0">
         <Link
-          className="inline-flex items-center justify-center rounded-full bg-primary px-5 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white shadow-sm hover:bg-darkPrimary"
+          className="inline-flex items-center justify-center rounded-full bg-[#82B29A] px-5 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white shadow-sm hover:bg-[#425B4E]"
           to="/sign-up"
         >
           Sign Up

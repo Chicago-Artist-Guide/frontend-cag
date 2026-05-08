@@ -18,6 +18,7 @@ import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import { Production, Role } from '../Profile/Company/types';
 import { getProduction } from '../Profile/Company/api';
 import { expandEthnicityForMatching } from '../../utils/helpers';
+import { ACTIVE_PRODUCTION_STATUSES } from '../../utils/lookups';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
   MatchingFilters,
@@ -381,10 +382,9 @@ export async function fetchRolesForTalent(
   profile: IndividualProfileDataFullInit
 ): Promise<ProductionRole[]> {
   const roles: ProductionRole[] = [];
-  const activeProductionStatuses = ['Casting', 'Hiring', 'Pre-Production'];
   const productionsRef = query(
     collection(firebaseStore, 'productions'),
-    where('status', 'in', activeProductionStatuses)
+    where('status', 'in', ACTIVE_PRODUCTION_STATUSES)
   );
 
   try {

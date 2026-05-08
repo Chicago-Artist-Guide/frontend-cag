@@ -45,8 +45,7 @@ const sampleRoles = [
     description: 'A leading role',
     production_id: 'p1',
     production_name: 'Hamlet',
-    account_id: 'a1',
-    theatre_name: 'Steppenwolf'
+    account_id: 'a1'
   },
   {
     role_id: 'r2',
@@ -55,8 +54,7 @@ const sampleRoles = [
     role_status: 'Open' as const,
     production_id: 'p2',
     production_name: 'Macbeth',
-    account_id: 'a2',
-    theatre_name: 'Goodman'
+    account_id: 'a2'
   }
 ];
 
@@ -74,8 +72,10 @@ describe('PublicRoles route', () => {
     expect(screen.getByText('Stage Manager')).toBeInTheDocument();
     expect(screen.getByText('Hamlet')).toBeInTheDocument();
     expect(screen.getByText('Macbeth')).toBeInTheDocument();
-    expect(screen.getByText('Steppenwolf')).toBeInTheDocument();
-    expect(screen.getByText('Goodman')).toBeInTheDocument();
+    // Theatre attribution is intentionally absent on the unauth surface;
+    // see the comment in PublicShows/api.ts about the email leak.
+    expect(screen.queryByText('Steppenwolf')).not.toBeInTheDocument();
+    expect(screen.queryByText('Goodman')).not.toBeInTheDocument();
     expect(screen.getByTestId('public-roles-list')).toBeInTheDocument();
   });
 
@@ -122,9 +122,7 @@ describe('PublicRoles route', () => {
     // Wait for initial render of the list before filtering.
     await screen.findByText('Lead Actor');
 
-    const search = screen.getByLabelText(
-      /Search roles by name, production, or theatre/i
-    );
+    const search = screen.getByLabelText(/Search roles by name or production/i);
     fireEvent.change(search, { target: { value: 'zzznoresults' } });
 
     expect(

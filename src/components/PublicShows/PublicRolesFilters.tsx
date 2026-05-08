@@ -31,11 +31,11 @@ const PublicRolesFilters: React.FC<PublicRolesFiltersProps> = ({
             Search
           </label>
           <input
-            aria-label="Search roles by name, production, or theatre"
+            aria-label="Search roles by name or production"
             className="w-full rounded-md border border-lightGrey bg-bodyBg px-3 py-2 font-montserrat text-sm text-darkGrey focus:border-mint focus:outline-none focus:ring-1 focus:ring-mint"
             id="public-roles-search"
             onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search by role, production, or theatre"
+            placeholder="Search by role or production"
             type="text"
             value={searchTerm}
           />

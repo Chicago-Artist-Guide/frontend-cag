@@ -66,8 +66,7 @@ const PublicRoles = () => {
         const haystack = [
           r.role_name,
           r.offstage_role,
-          r.production_name,
-          r.theatre_name
+          r.production_name
         ]
           .filter(Boolean)
           .join(' ')
@@ -93,7 +92,7 @@ const PublicRoles = () => {
   const renderBody = () => {
     if (loading) {
       return (
-        <div className="mt-4">
+        <div className="mt-[1rem]">
           <PublicRoleCardSkeleton />
           <PublicRoleCardSkeleton />
           <PublicRoleCardSkeleton />
@@ -145,7 +144,6 @@ const PublicRoles = () => {
               productionId={role.production_id}
               productionName={role.production_name}
               role={role}
-              theatreName={role.theatre_name}
             />
           ))}
         </div>

@@ -3,15 +3,17 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Role } from '../Profile/Company/types';
 import { colors, fonts } from '../../theme/styleVars';
+import { parseLocalDate } from '../../utils/dates';
 
 interface PublicRoleCardProps {
   role: Role;
   // Optional list-mode props for the /roles browse page (DEV-496/497).
-  // When productionId is set, the card renders production/theatre context
-  // at the top and a "View Role" link to the show detail page.
+  // When productionId is set, the card renders production context at the
+  // top and links to the production detail page. Theatre attribution is
+  // intentionally omitted on the unauth surface — see comment in
+  // PublicShows/api.ts about the email leak from the accounts collection.
   productionId?: string;
   productionName?: string;
-  theatreName?: string;
   auditionStart?: string;
   auditionEnd?: string;
 }
@@ -20,8 +22,8 @@ const formatDate = (value?: string) => {
   if (!value) {
     return '';
   }
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
+  const parsed = parseLocalDate(value);
+  if (!parsed) {
     return '';
   }
   return parsed.toLocaleDateString();
@@ -38,14 +40,7 @@ const formatAuditionWindow = (start?: string, end?: string) => {
 
 const PublicRoleCard: React.FC<
   React.PropsWithChildren<PublicRoleCardProps>
-> = ({
-  role,
-  productionId,
-  productionName,
-  theatreName,
-  auditionStart,
-  auditionEnd
-}) => {
+> = ({ role, productionId, productionName, auditionStart, auditionEnd }) => {
   const isListMode = !!productionId;
   const auditionWindow = formatAuditionWindow(auditionStart, auditionEnd);
   const displayRoleName =
@@ -58,12 +53,6 @@ const PublicRoleCard: React.FC<
           <ProductionLink to={`/shows/${productionId}`}>
             {productionName}
           </ProductionLink>
-          {theatreName && (
-            <>
-              <Separator>·</Separator>
-              <TheatreName>{theatreName}</TheatreName>
-            </>
-          )}
         </ProductionLine>
       )}
 
@@ -105,7 +94,9 @@ const PublicRoleCard: React.FC<
       </div>
 
       {isListMode && (
-        <ViewRoleLink to={`/shows/${productionId}`}>View Role →</ViewRoleLink>
+        <ViewProductionLink to={`/shows/${productionId}`}>
+          View Production →
+        </ViewProductionLink>
       )}
     </RoleCardContainer>
   );
@@ -138,14 +129,6 @@ const ProductionLink = styled(Link)`
     color: ${colors.mint};
     text-decoration: underline;
   }
-`;
-
-const Separator = styled.span`
-  margin: 0 6px;
-`;
-
-const TheatreName = styled.span`
-  font-weight: 500;
 `;
 
 const RoleName = styled.h4`
@@ -181,7 +164,7 @@ const DetailValue = styled.span`
   font-size: 14px;
 `;
 
-const ViewRoleLink = styled(Link)`
+const ViewProductionLink = styled(Link)`
   display: inline-block;
   margin-top: 12px;
   font-family: ${fonts.montserrat};

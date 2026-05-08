@@ -23,7 +23,7 @@ const PublicRolesNoResults: React.FC<PublicRolesNoResultsProps> = ({
         are added regularly.
       </p>
       <button
-        className="mt-6 inline-flex items-center justify-center rounded-full bg-primary px-6 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white shadow-sm hover:bg-darkPrimary"
+        className="mt-6 inline-flex items-center justify-center rounded-full bg-[#82B29A] px-6 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white shadow-sm hover:bg-[#425B4E]"
         onClick={onClearFilters}
         type="button"
       >

@@ -62,16 +62,21 @@ const asUser = (uid: string) =>
   testEnv.authenticatedContext(uid).firestore();
 
 describe('accounts collection', () => {
-  it('unauthenticated user CAN read a company account (DEV-496)', async () => {
+  // DEV-496 originally opened company accounts to public read so the unauth
+  // /roles page could resolve theatre names. That leaked the `email` field
+  // (set during company signup). The page now omits theatre attribution
+  // entirely; both individual and company accounts stay auth-gated.
+  it('unauthenticated user CANNOT read a company account (no email leak)', async () => {
     await seed(async (db) => {
       await setDoc(doc(db, 'accounts', 'company-1'), {
         uid: 'company-1',
         type: 'company',
+        email: 'company@example.com',
         theater_name: 'Acme Theatre'
       });
     });
 
-    await assertSucceeds(getDoc(doc(unauth(), 'accounts', 'company-1')));
+    await assertFails(getDoc(doc(unauth(), 'accounts', 'company-1')));
   });
 
   it('unauthenticated user CANNOT read an individual account (privacy)', async () => {
@@ -84,14 +89,6 @@ describe('accounts collection', () => {
     });
 
     await assertFails(getDoc(doc(unauth(), 'accounts', 'individual-1')));
-  });
-
-  it('unauthenticated user CANNOT read an account without an explicit type', async () => {
-    await seed(async (db) => {
-      await setDoc(doc(db, 'accounts', 'no-type'), { uid: 'no-type' });
-    });
-
-    await assertFails(getDoc(doc(unauth(), 'accounts', 'no-type')));
   });
 
   it('authenticated user CAN read any account (regression)', async () => {
@@ -123,41 +120,6 @@ describe('accounts collection', () => {
     await assertSucceeds(
       updateDoc(doc(asUser('owner-1'), 'accounts', 'owner-1'), {
         first_name: 'New'
-      })
-    );
-  });
-
-  it('owner CANNOT change their account type (prevents privacy escalation)', async () => {
-    await seed(async (db) => {
-      await setDoc(doc(db, 'accounts', 'owner-1'), {
-        uid: 'owner-1',
-        type: 'individual',
-        email: 'private@example.com'
-      });
-    });
-
-    // The whole point of the type-spoof check: an individual account turning
-    // itself into a 'company' would become world-readable, leaking email and
-    // any other personal fields.
-    await assertFails(
-      updateDoc(doc(asUser('owner-1'), 'accounts', 'owner-1'), {
-        type: 'company'
-      })
-    );
-  });
-
-  it('admin CANNOT change account type either', async () => {
-    await seed(async (db) => {
-      await setDoc(doc(db, 'accounts', 'owner-1'), {
-        uid: 'owner-1',
-        type: 'individual'
-      });
-      await setDoc(doc(db, 'admin_users', 'admin-1'), { role: 'admin' });
-    });
-
-    await assertFails(
-      updateDoc(doc(asUser('admin-1'), 'accounts', 'owner-1'), {
-        type: 'company'
       })
     );
   });
