@@ -96,16 +96,31 @@ const RoleModal: React.FC<
       errors.push('Pay must be a positive number');
     }
 
-    // When character gender is not "Open to all genders", at least one of Man, Woman, or Nonbinary required
+    // When character gender is not "Open to all genders", at least one of
+    // Man, Woman, Nonbinary, or Trans/Nonbinary required
     if (isOnStage) {
       const isOpenToAllGenders = isOpenToAllSelected('gender_identity');
       if (!isOpenToAllGenders) {
         const specificGenders = (formValues.gender_identity || []).filter(
-          (g) => g === 'Man' || g === 'Woman' || g === 'Nonbinary'
+          (g) =>
+            g === 'Man' ||
+            g === 'Woman' ||
+            g === 'Nonbinary' ||
+            g === 'Trans/Nonbinary'
         );
         if (specificGenders.length === 0) {
           errors.push(
-            'Select at least one character gender (Man, Woman, and/or Nonbinary)'
+            'Select at least one character gender (Man, Woman, Nonbinary, and/or Trans/Nonbinary)'
+          );
+        }
+      }
+
+      // If Trans/Nonbinary is selected, require at least one sub-selection
+      if (isTransNonbinaryEnabled) {
+        const subSelections = formValues.trans_nonbinary_roles || [];
+        if (subSelections.length === 0) {
+          errors.push(
+            'Select which roles you are open to trans/nonbinary actors playing (Man, Woman, and/or Nonbinary)'
           );
         }
       }
@@ -283,6 +298,61 @@ const RoleModal: React.FC<
       );
       setFormValues({ ...formValues, ethnicity: newEthnicities });
     }
+  };
+
+  // "Trans/Nonbinary" parent option (item 9): toggling on opens a sub-select
+  // of which trans/nonbinary roles (Man/Woman/Nonbinary) the company is open
+  // to. Stored separately so we keep the existing gender_identity matching
+  // contract intact while still capturing the additional context.
+  const isTransNonbinaryEnabled =
+    isValueIncluded('gender_identity', 'Trans/Nonbinary') ||
+    (formValues.trans_nonbinary_roles?.length ?? 0) > 0;
+
+  const handleTransNonbinaryToggle = (checked: boolean) => {
+    if (checked) {
+      const currentValues = (formValues.gender_identity as string[]) || [];
+      const filtered = currentValues.filter(
+        (v) => v !== 'Open to all genders'
+      );
+      const next = filtered.includes('Trans/Nonbinary')
+        ? filtered
+        : [...filtered, 'Trans/Nonbinary'];
+      setFormValues({ ...formValues, gender_identity: next });
+    } else {
+      const currentValues = (formValues.gender_identity as string[]) || [];
+      setFormValues({
+        ...formValues,
+        gender_identity: currentValues.filter((v) => v !== 'Trans/Nonbinary'),
+        trans_nonbinary_roles: []
+      });
+    }
+  };
+
+  const handleTransNonbinaryRoleChange = (role: string, checked: boolean) => {
+    const current = formValues.trans_nonbinary_roles || [];
+    const next = checked
+      ? current.includes(role)
+        ? current
+        : [...current, role]
+      : current.filter((r) => r !== role);
+    setFormValues({ ...formValues, trans_nonbinary_roles: next });
+  };
+
+  const handleUnionChange = (option: string, checked: boolean) => {
+    const currentUnions = (formValues.union as string[]) || [];
+
+    if (checked) {
+      setFormValues({ ...formValues, union: [...currentUnions, option] });
+    } else {
+      setFormValues({
+        ...formValues,
+        union: currentUnions.filter((u) => u !== option)
+      });
+    }
+  };
+
+  const isUnionSelected = (option: string): boolean => {
+    return ((formValues.union as string[]) || []).includes(option);
   };
 
   const onDeleteConfirm = () => {
@@ -529,6 +599,52 @@ const RoleModal: React.FC<
                           />
                         );
                       })}
+                      <Checkbox
+                        checked={isTransNonbinaryEnabled}
+                        fieldType="checkbox"
+                        key="gender_identity_trans_nonbinary"
+                        label="Trans/Nonbinary"
+                        name="trans_nonbinary"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          handleTransNonbinaryToggle(e.target.checked);
+                        }}
+                      />
+                      {isTransNonbinaryEnabled && (
+                        <div style={{ paddingLeft: '1.25rem' }}>
+                          <p
+                            style={{
+                              fontSize: '14px',
+                              marginBottom: '8px',
+                              marginTop: '4px'
+                            }}
+                          >
+                            Open to trans/nonbinary actors playing (select all
+                            that apply):
+                          </p>
+                          {roleSpecificGenders.map((gender) => {
+                            const isChecked = (
+                              formValues.trans_nonbinary_roles || []
+                            ).includes(gender);
+                            return (
+                              <Checkbox
+                                checked={isChecked}
+                                fieldType="checkbox"
+                                key={`trans_nonbinary_role_${gender}`}
+                                label={gender}
+                                name={`trans_nonbinary_${gender}`}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => {
+                                  handleTransNonbinaryRoleChange(
+                                    gender,
+                                    e.target.checked
+                                  );
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
                     </Form.Group>
                     <Form.Group
                       className="form-group"

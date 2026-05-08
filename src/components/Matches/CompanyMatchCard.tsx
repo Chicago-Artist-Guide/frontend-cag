@@ -6,8 +6,9 @@ import { useUserContext } from '../../context/UserContext';
 import { useRoleMatches } from '../../context/RoleMatchContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import {
-  getTheaterByAccountUid,
-  getTheaterAccountByAccountId
+  getTheaterAccountByAccountId,
+  getTheaterAccountByUid,
+  getTheaterByAccountId
 } from '../Profile/Company/api';
 import { Profile, Production } from '../Profile/Company/types';
 import { createMessageThread, createEmail } from '../Messages/api';
@@ -75,24 +76,41 @@ export const CompanyMatchCard = ({
       return false;
     }
 
-    const theaterAccountId = production?.account_id || '';
+    const theaterAccountUid = production?.account_id || '';
 
-    if (!theaterAccountId || theaterAccountId == '') {
+    if (!theaterAccountUid || theaterAccountUid == '') {
       console.error('Could not find theater account id');
       return false;
     }
 
-    const getTheater = await getTheaterByAccountUid(
+    // production.account_id is the company auth uid. Resolve account first so
+    // we can fall back from profile.theatre_name to account.theater_name when
+    // the company hasn't completed their detailed profile yet.
+    const theaterAccount = await getTheaterAccountByUid(
       firebaseFirestore,
-      theaterAccountId
+      theaterAccountUid
     );
 
-    if (!getTheater) {
+    if (!theaterAccount) {
+      console.error('Could not find theater account by uid');
+      return false;
+    }
+
+    const theaterProfile = await getTheaterByAccountId(
+      firebaseFirestore,
+      theaterAccount.id
+    );
+
+    if (!theaterProfile) {
       console.error('Could not find theater profile');
       return false;
     }
 
-    setTheater(getTheater);
+    if (!theaterProfile.theatre_name && (theaterAccount as any).theater_name) {
+      theaterProfile.theatre_name = (theaterAccount as any).theater_name;
+    }
+
+    setTheater(theaterProfile);
   };
 
   const sendEmailToTheater = async () => {
