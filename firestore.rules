@@ -92,10 +92,16 @@ service cloud.firestore {
     // - Authenticated users can read any account
     // - Unauthenticated users can read company accounts only (theatre directory is public;
     //   used by /roles unauth marketing browse — DEV-496). Individual accounts contain
-    //   personal data and remain auth-gated.
-    // - Owners can write (create/update/delete their own)
+    //   personal data and remain auth-gated. The whole company-account document is
+    //   exposed when type=='company', so do NOT add sensitive fields (e.g.
+    //   internal_notes, contact_email, EIN) to company accounts. If the team needs
+    //   to store sensitive company data, add a separate 'company_private' collection
+    //   and gate its reads to authenticated owners.
+    // - Owners can write (create/update/delete their own) but cannot change `type`
+    //   (prevents type-spoofing an individual account into public-readable status)
     // - Admins can create accounts for other users (for company management)
-    // - Admins can update any account (for user management)
+    // - Admins can update any account (for user management) but also cannot change
+    //   admin_role except via super_admin
     // - Only super_admin can modify admin_role field (prevents privilege escalation)
     // - Cannot modify your own admin_role (prevents self-escalation/accidental self-demotion)
     match /accounts/{accountId} {
@@ -109,12 +115,12 @@ service cloud.firestore {
          !request.resource.data.keys().hasAny(['admin_role']))
       );
       allow update: if isAuthenticated() && (
-        // Owner can update their own account (but not admin_role)
+        // Owner can update their own account (but not admin_role or type)
         (request.auth.uid == resource.data.uid &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_role'])) ||
-        // Admins can update any account (but not admin_role)
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_role', 'type'])) ||
+        // Admins can update any account (but not admin_role or type)
         (isAdminOrHigher() &&
-         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_role'])) ||
+         !request.resource.data.diff(resource.data).affectedKeys().hasAny(['admin_role', 'type'])) ||
         // Only super_admin can modify admin_role, but not their own
         (isSuperAdmin() &&
          resource.data.uid != request.auth.uid)

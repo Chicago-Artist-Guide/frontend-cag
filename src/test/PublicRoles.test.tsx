@@ -79,6 +79,26 @@ describe('PublicRoles route', () => {
     expect(screen.getByTestId('public-roles-list')).toBeInTheDocument();
   });
 
+  it('shows a distinct error state when the fetch rejects (not the empty state)', async () => {
+    // Suppress the expected console.error from the load() catch so the
+    // test output stays clean.
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockFetch.mockRejectedValueOnce(new Error('firestore unavailable'));
+
+    renderRoute();
+
+    expect(
+      await screen.findByTestId('public-roles-error')
+    ).toBeInTheDocument();
+    // Empty-state copy must NOT show — that would be misleading on a real
+    // network/rules failure.
+    expect(
+      screen.queryByTestId('public-roles-empty-state')
+    ).not.toBeInTheDocument();
+
+    errSpy.mockRestore();
+  });
+
   it('shows the empty-system null state when no roles are returned', async () => {
     mockFetch.mockResolvedValueOnce([]);
 

@@ -41,7 +41,7 @@ export const ACTIVE_PRODUCTION_STATUSES = [
 const resolveTheatreName = async (
   firebaseStore: Firestore,
   accountId: string,
-  cache: Map<string, string>
+  cache: Map<string, string | undefined>
 ): Promise<string | undefined> => {
   if (!accountId) {
     return undefined;
@@ -56,17 +56,17 @@ const resolveTheatreName = async (
     const accountSnap = await getDoc(accountRef);
 
     if (!accountSnap.exists()) {
-      cache.set(accountId, '');
+      cache.set(accountId, undefined);
       return undefined;
     }
 
     const theatreName =
-      (accountSnap.data()?.theater_name as string | undefined) || '';
+      (accountSnap.data()?.theater_name as string | undefined) || undefined;
     cache.set(accountId, theatreName);
-    return theatreName || undefined;
+    return theatreName;
   } catch (err) {
     console.error('Error resolving theatre name', err);
-    cache.set(accountId, '');
+    cache.set(accountId, undefined);
     return undefined;
   }
 };
@@ -100,7 +100,7 @@ export const fetchPublicOpenRoles = async (
         p.account_id.length > 0
     );
 
-  const theatreNameCache = new Map<string, string>();
+  const theatreNameCache = new Map<string, string | undefined>();
   const items: PublicRoleListItem[] = [];
 
   for (const production of productions) {

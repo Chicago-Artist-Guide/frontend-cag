@@ -144,6 +144,29 @@ describe('fetchPublicOpenRoles', () => {
     expect(items).toEqual([]);
   });
 
+  it('dedupes account reads via the per-call cache (perf contract)', async () => {
+    // Two productions sharing the same account_id should produce a single
+    // accounts/getDoc — that's the only reason the cache exists.
+    const a = buildProduction({ production_id: 'p-a' }, [
+      { role_id: 'role-a', role_name: 'A', role_status: 'Open' }
+    ]);
+    const b = buildProduction({ production_id: 'p-b' }, [
+      { role_id: 'role-b', role_name: 'B', role_status: 'Open' }
+    ]);
+
+    mockGetDocs.mockResolvedValue({
+      docs: [
+        { id: 'p-a', data: () => a },
+        { id: 'p-b', data: () => b }
+      ]
+    } as never);
+    setUpTheatreLookup('acct-1', 'Shared Theatre');
+
+    await fetchPublicOpenRoles({} as never);
+
+    expect(mockGetDoc).toHaveBeenCalledTimes(1);
+  });
+
   it('filters out productions missing required identity fields', async () => {
     const valid = buildProduction({}, [
       { role_id: 'r-valid', role_name: 'Valid', role_status: 'Open' }

@@ -20,6 +20,7 @@ const PublicRoles = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const [roles, setRoles] = useState<PublicRoleListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [stageFilter, setStageFilter] = useState<StageFilter>('All');
 
@@ -29,16 +30,15 @@ const PublicRoles = () => {
     const load = async () => {
       try {
         setLoading(true);
+        setHasError(false);
         const items = await fetchPublicOpenRoles(firebaseFirestore);
         if (!isMounted) return;
         setRoles(items);
       } catch (err) {
         if (isMounted) {
-          // Surface the error in console; the page falls back to the
-          // empty-system null state which is the most charitable thing
-          // we can show without auth.
           console.error('Failed to load public roles', err);
           setRoles([]);
+          setHasError(true);
         }
       } finally {
         if (isMounted) {
@@ -97,6 +97,24 @@ const PublicRoles = () => {
           <PublicRoleCardSkeleton />
           <PublicRoleCardSkeleton />
           <PublicRoleCardSkeleton />
+        </div>
+      );
+    }
+
+    // Distinguish a real load failure from "system is empty" — the empty
+    // copy ("check back soon") is misleading when the issue is actually a
+    // network or rules error.
+    if (hasError) {
+      return (
+        <div
+          className="mt-6 rounded border border-salmon/30 bg-salmon/5 p-6 text-center font-montserrat text-sm text-grayishBlue"
+          data-testid="public-roles-error"
+          role="alert"
+        >
+          <p className="mb-2 font-semibold text-salmon">
+            Couldn&apos;t load roles right now.
+          </p>
+          <p>Please refresh the page or try again in a moment.</p>
         </div>
       );
     }

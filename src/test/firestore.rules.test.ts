@@ -127,6 +127,41 @@ describe('accounts collection', () => {
     );
   });
 
+  it('owner CANNOT change their account type (prevents privacy escalation)', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'owner-1'), {
+        uid: 'owner-1',
+        type: 'individual',
+        email: 'private@example.com'
+      });
+    });
+
+    // The whole point of the type-spoof check: an individual account turning
+    // itself into a 'company' would become world-readable, leaking email and
+    // any other personal fields.
+    await assertFails(
+      updateDoc(doc(asUser('owner-1'), 'accounts', 'owner-1'), {
+        type: 'company'
+      })
+    );
+  });
+
+  it('admin CANNOT change account type either', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'owner-1'), {
+        uid: 'owner-1',
+        type: 'individual'
+      });
+      await setDoc(doc(db, 'admin_users', 'admin-1'), { role: 'admin' });
+    });
+
+    await assertFails(
+      updateDoc(doc(asUser('admin-1'), 'accounts', 'owner-1'), {
+        type: 'company'
+      })
+    );
+  });
+
   it('non-owner CANNOT update someone else\'s account', async () => {
     await seed(async (db) => {
       await setDoc(doc(db, 'accounts', 'owner-1'), {
