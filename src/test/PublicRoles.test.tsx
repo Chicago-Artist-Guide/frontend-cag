@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, wait, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { FirebaseContext } from '../context/FirebaseContext';
 import PublicRoles from '../routes/PublicRoles';
@@ -137,7 +137,7 @@ describe('PublicRoles route', () => {
     // Clearing filters should restore the list.
     fireEvent.click(screen.getByRole('button', { name: /clear filters/i }));
 
-    await wait(() => {
+    await waitFor(() => {
       expect(screen.getByText('Lead Actor')).toBeInTheDocument();
     });
   });
@@ -169,7 +169,7 @@ describe('PublicRoles route', () => {
     const stageSelect = screen.getByLabelText(/Filter by stage type/i);
     fireEvent.change(stageSelect, { target: { value: 'Off-Stage' } });
 
-    await wait(() => {
+    await waitFor(() => {
       expect(screen.queryByText('Lead Actor')).not.toBeInTheDocument();
     });
     expect(screen.getByText('Stage Manager')).toBeInTheDocument();
