@@ -1,6 +1,6 @@
 import { getDoc, getDocs } from 'firebase/firestore';
-import type { Production, Role } from '../Profile/Company/types';
-import { fetchPublicOpenRoles } from './api';
+import type { Production, Role } from '../components/Profile/Company/types';
+import { fetchPublicOpenRoles } from '../components/PublicShows/api';
 
 vi.mock('firebase/firestore', () => ({
   collection: vi.fn(),
