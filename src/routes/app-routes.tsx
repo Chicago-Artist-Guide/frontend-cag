@@ -10,6 +10,7 @@ import TOS from './TOS';
 import PrivacyPolicy from './PrivacyPolicy';
 import WhoWeAre from './WhoWeAre';
 import TheaterResources from './TheaterResources';
+import PublicRoles from './PublicRoles';
 import PublicShows from './PublicShows';
 import PublicShowDetail from './PublicShowDetail';
 import Events from './Events';
@@ -55,6 +56,7 @@ const AppRoutes = () => {
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/about-us" element={<WhoWeAre />} />
         <Route path="/theatre-resources" element={<TheaterResources />} />
+        <Route path="/roles" element={<PublicRoles />} />
         <Route path="/shows" element={<PublicShows />} />
         <Route path="/shows/:productionId" element={<PublicShowDetail />} />
         <Route path="/events" element={<Events />} />

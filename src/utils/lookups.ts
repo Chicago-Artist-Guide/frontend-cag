@@ -6,6 +6,18 @@ import {
   StageRole
 } from '../components/Profile/shared/profile.types';
 
+// Productions are considered "active" (i.e. publicly browsable + open for
+// applications) when status falls in this set. Single source of truth —
+// imported by PublicRoles/api.ts, PublicShows.tsx, and Matches/api.ts.
+// 'Casting' and 'Pre-Production' are real Firestore values even though they
+// were missing from the original ProductionStatus union; the union has been
+// widened to match (see profile.types.ts).
+export const ACTIVE_PRODUCTION_STATUSES: ProductionStatus[] = [
+  'Casting',
+  'Hiring',
+  'Pre-Production'
+];
+
 export const neighborhoods = [
   '(The) Loop[11]',
   'Albany Park',

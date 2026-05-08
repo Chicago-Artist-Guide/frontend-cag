@@ -918,17 +918,20 @@ const IndividualProfile: React.FC<
                       <br />
                     </>
                   )}
-                  {((profile?.data?.union_status &&
-                    profile?.data?.union_status !== '') ||
-                    (profile?.data?.union_other &&
-                      profile?.data?.union_other !== '')) && (
-                    <>
-                      Union:{' '}
-                      {profile?.data?.union_status ||
-                        profile?.data?.union_other}
-                      <br />
-                    </>
-                  )}
+                  {(() => {
+                    const us = profile?.data?.union_status;
+                    const usDisplay = Array.isArray(us)
+                      ? us.join(', ')
+                      : us || '';
+                    const otherDisplay = profile?.data?.union_other || '';
+                    if (!usDisplay && !otherDisplay) return null;
+                    return (
+                      <>
+                        Union: {usDisplay || otherDisplay}
+                        <br />
+                      </>
+                    );
+                  })()}
                   {profile?.data?.agency && profile?.data?.agency !== '' && (
                     <>Agency: {profile?.data?.agency}</>
                   )}

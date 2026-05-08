@@ -18,6 +18,7 @@ import { Production } from '../components/Profile/Company/types';
 import PublicShowCard from '../components/PublicShows/PublicShowCard';
 import PublicShowCardSkeleton from '../components/PublicShows/PublicShowCardSkeleton';
 import { Pagination } from '../components/shared';
+import { ACTIVE_PRODUCTION_STATUSES } from '../utils/lookups';
 
 const PublicShows = () => {
   const { firebaseFirestore } = useFirebaseContext();
@@ -61,17 +62,10 @@ const PublicShows = () => {
       try {
         setLoading(true);
 
-        // Get active productions
-        const activeProductionStatuses = [
-          'Casting',
-          'Hiring',
-          'Pre-Production'
-        ];
-
         // First, get the total count for pagination
         const countQuery = query(
           collection(firebaseFirestore, 'productions'),
-          where('status', 'in', activeProductionStatuses)
+          where('status', 'in', ACTIVE_PRODUCTION_STATUSES)
         );
 
         const countSnapshot = await getDocs(countQuery);
@@ -100,7 +94,7 @@ const PublicShows = () => {
           // First page query
           productionsRef = query(
             collection(firebaseFirestore, 'productions'),
-            where('status', 'in', activeProductionStatuses),
+            where('status', 'in', ACTIVE_PRODUCTION_STATUSES),
             orderBy('production_name'),
             limit(SHOWS_PER_PAGE)
           );
@@ -112,7 +106,7 @@ const PublicShows = () => {
             // Use the last document from the previous page as a cursor
             productionsRef = query(
               collection(firebaseFirestore, 'productions'),
-              where('status', 'in', activeProductionStatuses),
+              where('status', 'in', ACTIVE_PRODUCTION_STATUSES),
               orderBy('production_name'),
               startAfter(prevPageDoc),
               limit(SHOWS_PER_PAGE)
@@ -124,7 +118,7 @@ const PublicShows = () => {
             );
             productionsRef = query(
               collection(firebaseFirestore, 'productions'),
-              where('status', 'in', activeProductionStatuses),
+              where('status', 'in', ACTIVE_PRODUCTION_STATUSES),
               orderBy('production_name'),
               limit(SHOWS_PER_PAGE)
             );
