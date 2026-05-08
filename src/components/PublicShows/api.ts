@@ -31,9 +31,13 @@ export const ACTIVE_PRODUCTION_STATUSES = [
   'Pre-Production'
 ];
 
-// Theatre name resolution requires reading the company's profile via the
-// account record. We cache lookups per call to avoid N duplicate reads
-// when many productions share a theatre.
+// Theatre name resolution for the public/unauth surface reads only the
+// company's account record. Profiles stay auth-gated (firestore.rules)
+// because individual artist profiles contain sensitive personal data,
+// and Firestore rules can't cheaply distinguish company profiles from
+// individual ones at read-time. account.theater_name is set at company
+// signup (see SignUp/Company/index.tsx) so this is sufficient for the
+// marketing browse. We cache per call to avoid N duplicate reads.
 const resolveTheatreName = async (
   firebaseStore: Firestore,
   accountId: string,
@@ -56,24 +60,8 @@ const resolveTheatreName = async (
       return undefined;
     }
 
-    const accountData = accountSnap.data();
-    const profileId = accountData?.profile_id;
-
-    if (!profileId) {
-      cache.set(accountId, '');
-      return undefined;
-    }
-
-    const profileRef = doc(firebaseStore, 'profiles', profileId);
-    const profileSnap = await getDoc(profileRef);
-
-    if (!profileSnap.exists()) {
-      cache.set(accountId, '');
-      return undefined;
-    }
-
     const theatreName =
-      (profileSnap.data()?.theatre_name as string | undefined) || '';
+      (accountSnap.data()?.theater_name as string | undefined) || '';
     cache.set(accountId, theatreName);
     return theatreName || undefined;
   } catch (err) {

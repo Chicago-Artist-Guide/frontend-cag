@@ -29,25 +29,16 @@ const buildProduction = (
   ...overrides
 });
 
-// Resolve theatre name lookups via accounts/profiles. The implementation
-// reads accounts first, then profiles. We model that with sequential
-// getDoc returns keyed off the path.
-const setUpTheatreLookup = (
-  accountId: string,
-  theatreName: string,
-  profileId = 'profile-1'
-) => {
+// Theatre name comes from accounts.theater_name (set at company signup).
+// The unauth /roles surface deliberately does not read profiles — see
+// firestore.rules: profile reads stay auth-gated to protect individual
+// artist data, while company accounts are publicly readable.
+const setUpTheatreLookup = (accountId: string, theatreName: string) => {
   mockGetDoc.mockImplementation(async (ref: any) => {
     if (ref.path === 'accounts' && ref.id === accountId) {
       return {
         exists: () => true,
-        data: () => ({ profile_id: profileId })
-      } as never;
-    }
-    if (ref.path === 'profiles' && ref.id === profileId) {
-      return {
-        exists: () => true,
-        data: () => ({ theatre_name: theatreName })
+        data: () => ({ theater_name: theatreName, type: 'company' })
       } as never;
     }
     return { exists: () => false, data: () => null } as never;
