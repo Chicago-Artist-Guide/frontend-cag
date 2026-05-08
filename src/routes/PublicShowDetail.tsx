@@ -9,7 +9,10 @@ import { useFirebaseContext } from '../context/FirebaseContext';
 import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
 import { Production } from '../components/Profile/Company/types';
-import { getTheaterByAccountUid } from '../components/Profile/Company/api';
+import {
+  getTheaterAccountByUid,
+  getTheaterByAccountId
+} from '../components/Profile/Company/api';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
@@ -99,20 +102,32 @@ const PublicShowDetail = () => {
           // Set the show data
           setShow(productionData);
 
-          // Fetch theater name
+          // Fetch theater name. account_id is the auth uid; pull both account
+          // and profile so we can fall back from theatre_name to theater_name.
           if (productionData.account_id) {
-            const theater = await getTheaterByAccountUid(
+            const theaterAccount = await getTheaterAccountByUid(
               firebaseFirestore,
               productionData.account_id
             );
 
             if (!isMounted) return;
 
-            setTheaterName(
-              theater && theater.theatre_name
-                ? theater.theatre_name
-                : 'Unknown Theater'
-            );
+            if (theaterAccount) {
+              const theaterProfile = await getTheaterByAccountId(
+                firebaseFirestore,
+                theaterAccount.id
+              );
+
+              if (!isMounted) return;
+
+              const resolvedName =
+                (theaterProfile && theaterProfile.theatre_name) ||
+                (theaterAccount as any).theater_name ||
+                '';
+              setTheaterName(resolvedName || 'Unknown Theater');
+            } else {
+              setTheaterName('Unknown Theater');
+            }
           }
         }
 
@@ -145,12 +160,6 @@ const PublicShowDetail = () => {
   }
 
   if (!show) {
-    // Keep the console logs for debugging
-    console.log(
-      'Show is null or undefined, displaying "Show not found" message'
-    );
-    console.log('Current productionId:', productionId);
-
     return (
       <PageContainer>
         <BackLink to="/shows">

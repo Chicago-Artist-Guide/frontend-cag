@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { colors, fonts, breakpoints } from '../../theme/styleVars';
+import { parseLocalDate } from '../../utils/dates';
 
 // Calendar icon that matches the screenshots
 const CalendarIcon = () => (
@@ -45,8 +46,8 @@ type EventType = {
 };
 
 const getDateStringForEvent = (event: EventType) => {
-  const dateObj = new Date(event.date + 'T00:00:00'); //server is in UTC
-  if (isNaN(dateObj.getTime())) {
+  const dateObj = parseLocalDate(event.date);
+  if (!dateObj) {
     console.error(`Invalid date for event ${event.id}: ${event.date}`);
     return null;
   }
@@ -56,7 +57,6 @@ const getDateStringForEvent = (event: EventType) => {
     month: 'long' as const,
     day: 'numeric' as const
   };
-  // dateObj is correct here, loses a day when the 'timezone' adjustment is applied. so remove it.
 
   return dateObj.toLocaleDateString('en-US', options);
 };

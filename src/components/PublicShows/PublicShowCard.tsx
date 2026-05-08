@@ -5,7 +5,10 @@ import styled from 'styled-components';
 import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
 import { Production } from '../Profile/Company/types';
-import { doc, getDoc } from 'firebase/firestore';
+import {
+  getTheaterAccountByUid,
+  getTheaterByAccountId
+} from '../Profile/Company/api';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 
 interface PublicShowCardProps {
@@ -22,6 +25,9 @@ const PublicShowCard: React.FC<
     // Flag to track if the component is mounted
     let isMounted = true;
 
+    // production.account_id is the company's auth uid (see AddProduction.tsx),
+    // not a Firestore doc id. Look up the account by uid, then prefer the
+    // profile's theatre_name, falling back to the account's theater_name.
     const fetchTheaterName = async () => {
       if (!show || !show.account_id) {
         if (isMounted) setTheaterName('Unknown Theater');
@@ -29,41 +35,30 @@ const PublicShowCard: React.FC<
       }
 
       try {
-        const accountRef = doc(firebaseFirestore, 'accounts', show.account_id);
-        const accountDoc = await getDoc(accountRef);
+        const account = await getTheaterAccountByUid(
+          firebaseFirestore,
+          show.account_id
+        );
 
         if (!isMounted) return;
 
-        if (accountDoc.exists()) {
-          const accountData = accountDoc.data();
-
-          // Check if profile_id exists before trying to access it
-          if (accountData && accountData.profile_id) {
-            const profileRef = doc(
-              firebaseFirestore,
-              'profiles',
-              accountData.profile_id
-            );
-            const profileDoc = await getDoc(profileRef);
-
-            if (!isMounted) return;
-
-            if (profileDoc.exists()) {
-              const profileData = profileDoc.data();
-              if (profileData && profileData.theatre_name) {
-                setTheaterName(profileData.theatre_name);
-              } else {
-                setTheaterName('Unknown Theater');
-              }
-            } else {
-              setTheaterName('Unknown Theater');
-            }
-          } else {
-            setTheaterName('Unknown Theater');
-          }
-        } else {
+        if (!account) {
           setTheaterName('Unknown Theater');
+          return;
         }
+
+        const profile = await getTheaterByAccountId(
+          firebaseFirestore,
+          account.id
+        );
+
+        if (!isMounted) return;
+
+        const resolvedName =
+          (profile && profile.theatre_name) ||
+          (account as any).theater_name ||
+          '';
+        setTheaterName(resolvedName || 'Unknown Theater');
       } catch (error) {
         if (isMounted) {
           console.error('Error fetching theater name:', error);

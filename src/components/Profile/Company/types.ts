@@ -89,6 +89,7 @@ export type Role = {
   role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour' | 'Per Show';
   gender_identity?: string[];
   include_nonbinary?: boolean;
+  trans_nonbinary_roles?: string[];
   ethnicity?: string[];
   role_status?: RoleStatus;
   age_range?: string[];

@@ -167,6 +167,25 @@ const EditPersonalDetails = ({
           ))}
         </Form.Control>
       </Form.Group>
+      <Form.Group className="form-group">
+        <CAGLabel>Do you identify as part of the LGBTQIA+ community?</CAGLabel>
+        <Checkbox
+          checked={editProfile?.lgbtqia === 'Yes'}
+          fieldType="radio"
+          label="Yes"
+          name="actorInfo1LGBTQ"
+          onChange={() => setProfileForm('lgbtqia', 'Yes')}
+          value="Yes"
+        />
+        <Checkbox
+          checked={editProfile?.lgbtqia === 'No'}
+          fieldType="radio"
+          label="No"
+          name="actorInfo1LGBTQ"
+          onChange={() => setProfileForm('lgbtqia', 'No')}
+          value="No"
+        />
+      </Form.Group>
       {editProfile?.gender_identity === 'Trans/Nonbinary' && (
         <Form.Group className="form-group">
           <CAGLabel>Interested in the following roles:</CAGLabel>

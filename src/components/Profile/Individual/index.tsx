@@ -388,6 +388,7 @@ const IndividualProfile: React.FC<
       gender_identity,
       gender_roles,
       ethnicities,
+      lgbtqia,
       union_status,
       union_other,
       agency,
@@ -400,8 +401,9 @@ const IndividualProfile: React.FC<
       height_in,
       height_no_answer,
       gender_identity,
-      gender_roles,
+      gender_roles: gender_roles || [],
       ethnicities,
+      lgbtqia: lgbtqia || '',
       union_status,
       union_other,
       agency,
@@ -907,6 +909,12 @@ const IndividualProfile: React.FC<
                   {!previewMode && profile?.data?.ethnicities?.length > 0 && (
                     <>
                       Ethnicity: {profile?.data?.ethnicities?.join(', ')}
+                      <br />
+                    </>
+                  )}
+                  {!previewMode && profile?.data?.lgbtqia && (
+                    <>
+                      LGBTQIA+: {profile?.data?.lgbtqia}
                       <br />
                     </>
                   )}
