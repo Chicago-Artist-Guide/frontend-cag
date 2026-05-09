@@ -129,16 +129,27 @@ const PublicShowDetail = () => {
         setTheaterName(productionData.theater_name);
       } else if (currentUser && productionData.account_id) {
         try {
-          const theater = await getTheaterByAccountUid(
+          const theaterAccount = await getTheaterAccountByUid(
             firebaseFirestore,
             productionData.account_id
           );
 
           if (!isMounted) return;
 
-          setTheaterName(
-            theater && theater.theatre_name ? theater.theatre_name : ''
-          );
+          if (theaterAccount) {
+            const theaterProfile = await getTheaterByAccountId(
+              firebaseFirestore,
+              theaterAccount.id
+            );
+
+            if (!isMounted) return;
+
+            const resolvedName =
+              (theaterProfile && theaterProfile.theatre_name) ||
+              (theaterAccount as any).theater_name ||
+              '';
+            setTheaterName(resolvedName);
+          }
         } catch {
           // Silently ignore — theater name is non-critical display data.
         }
