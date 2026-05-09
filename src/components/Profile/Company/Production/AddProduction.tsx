@@ -160,10 +160,15 @@ const CompanyAddShow: React.FC<
   const handleSubmit = async () => {
     const productionId = uuidv4();
     try {
+      const resolvedTheaterName: string =
+        (profileData as any)?.theatre_name ||
+        (accountData as any)?.theater_name ||
+        '';
       const payload = sanitizeDataForFirestore({
         ...formValues,
         production_id: productionId,
-        account_id: formValues.account_id || ownerAccountId
+        account_id: formValues.account_id || ownerAccountId,
+        theater_name: resolvedTheaterName
       });
 
       await setDoc(doc(db, 'productions', productionId), payload);

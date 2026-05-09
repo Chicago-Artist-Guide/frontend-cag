@@ -10,6 +10,7 @@ import {
   getTheaterByAccountId
 } from '../Profile/Company/api';
 import { useFirebaseContext } from '../../context/FirebaseContext';
+import { useUserContext } from '../../context/UserContext';
 
 interface PublicShowCardProps {
   show: Production;
@@ -19,21 +20,36 @@ const PublicShowCard: React.FC<
   React.PropsWithChildren<PublicShowCardProps>
 > = ({ show }) => {
   const { firebaseFirestore } = useFirebaseContext();
-  const [theaterName, setTheaterName] = useState<string>('');
+  const { currentUser } = useUserContext();
+  const [theaterName, setTheaterName] = useState<string>(
+    show.theater_name || ''
+  );
 
   useEffect(() => {
-    // Flag to track if the component is mounted
+    // If the production already has a denormalized theater_name, use it directly.
+    if (show.theater_name) {
+      setTheaterName(show.theater_name);
+      return;
+    }
+
+    // For anonymous users, never call the auth-gated accounts query.
+    if (!currentUser) {
+      setTheaterName('');
+      return;
+    }
+
+    // Authenticated users: best-effort fallback for un-backfilled legacy productions.
+    if (!show.account_id) {
+      setTheaterName('');
+      return;
+    }
+
     let isMounted = true;
 
     // production.account_id is the company's auth uid (see AddProduction.tsx),
     // not a Firestore doc id. Look up the account by uid, then prefer the
     // profile's theatre_name, falling back to the account's theater_name.
     const fetchTheaterName = async () => {
-      if (!show || !show.account_id) {
-        if (isMounted) setTheaterName('Unknown Theater');
-        return;
-      }
-
       try {
         const account = await getTheaterAccountByUid(
           firebaseFirestore,
@@ -43,7 +59,7 @@ const PublicShowCard: React.FC<
         if (!isMounted) return;
 
         if (!account) {
-          setTheaterName('Unknown Theater');
+          setTheaterName('');
           return;
         }
 
@@ -58,22 +74,18 @@ const PublicShowCard: React.FC<
           (profile && profile.theatre_name) ||
           (account as any).theater_name ||
           '';
-        setTheaterName(resolvedName || 'Unknown Theater');
-      } catch (error) {
-        if (isMounted) {
-          console.error('Error fetching theater name:', error);
-          setTheaterName('Unknown Theater');
-        }
+        setTheaterName(resolvedName);
+      } catch {
+        // Silently ignore — theater name is non-critical display data.
       }
     };
 
     fetchTheaterName();
 
-    // Cleanup function to prevent state updates on unmounted component
     return () => {
       isMounted = false;
     };
-  }, [show?.account_id, firebaseFirestore]);
+  }, [show.theater_name, show.account_id, currentUser, firebaseFirestore]);
 
   return (
     <ShowCard>
@@ -85,9 +97,11 @@ const PublicShowCard: React.FC<
           <div className="d-flex flex-column" style={{ height: '100%' }}>
             <div className="flex-grow-1">
               <ShowName>{show?.production_name}</ShowName>
-              <TheaterNameLink to={`/profile/view/${show?.account_id}`}>
-                {theaterName}
-              </TheaterNameLink>
+              {theaterName ? (
+                <TheaterNameLink to={`/profile/view/${show?.account_id}`}>
+                  {theaterName}
+                </TheaterNameLink>
+              ) : null}
               <ShowStatus>{show?.status}</ShowStatus>
               <ShowDescription>{show?.description}</ShowDescription>
             </div>
