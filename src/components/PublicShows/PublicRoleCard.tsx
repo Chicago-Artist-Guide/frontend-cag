@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Role } from '../Profile/Company/types';
+import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
 import { parseLocalDate } from '../../utils/dates';
 
@@ -38,6 +39,20 @@ const formatAuditionWindow = (start?: string, end?: string) => {
   return s || e || '';
 };
 
+// Format pay rate as "$NNN Unit" matching the CompanyMatchCard pattern.
+// role_rate_unit values already include "Per" (e.g. "Per Week", "Per Hour",
+// "Per Show", "Total"), so no "per" prefix is added here.
+const formatRate = (
+  rate?: number,
+  unit?: 'Total' | 'Per Week' | 'Per Hour' | 'Per Show'
+): string => {
+  if (rate == null) {
+    return '';
+  }
+  const rateStr = `$${rate}`;
+  return unit ? `${rateStr} ${unit}` : rateStr;
+};
+
 const PublicRoleCard: React.FC<
   React.PropsWithChildren<PublicRoleCardProps>
 > = ({ role, productionId, productionName, auditionStart, auditionEnd }) => {
@@ -45,6 +60,7 @@ const PublicRoleCard: React.FC<
   const auditionWindow = formatAuditionWindow(auditionStart, auditionEnd);
   const displayRoleName =
     role.role_name || role.offstage_role || 'Untitled Role';
+  const rateDisplay = formatRate(role.role_rate, role.role_rate_unit);
 
   return (
     <RoleCardContainer>
@@ -57,10 +73,11 @@ const PublicRoleCard: React.FC<
       )}
 
       <RoleName>{displayRoleName}</RoleName>
-      {role.role_status && <RoleStatus>{role.role_status}</RoleStatus>}
 
       {role.description && (
-        <RoleDescription>{role.description}</RoleDescription>
+        <p className="mb-[15px] line-clamp-3 font-montserrat text-sm">
+          {role.description}
+        </p>
       )}
 
       <div className="flex flex-wrap gap-[10px]">
@@ -76,13 +93,10 @@ const PublicRoleCard: React.FC<
             <DetailValue>{role.union.join(', ')}</DetailValue>
           </div>
         )}
-        {role.role_rate && (
+        {rateDisplay && (
           <div className="mb-[5px] mr-[15px] flex">
             <DetailLabel>Rate:</DetailLabel>
-            <DetailValue>
-              {role.role_rate}
-              {role.role_rate_unit && ` per ${role.role_rate_unit}`}
-            </DetailValue>
+            <DetailValue>{rateDisplay}</DetailValue>
           </div>
         )}
         {auditionWindow && (
@@ -93,10 +107,16 @@ const PublicRoleCard: React.FC<
         )}
       </div>
 
-      {isListMode && (
-        <ViewProductionLink to={`/shows/${productionId}`}>
-          View Production →
-        </ViewProductionLink>
+      {isListMode && productionId && (
+        <div className="mt-[12px]">
+          <Link to={`/shows/${productionId}`}>
+            <ViewButton
+              text="View Production"
+              type="button"
+              variant="primary"
+            />
+          </Link>
+        </div>
       )}
     </RoleCardContainer>
   );
@@ -138,20 +158,6 @@ const RoleName = styled.h4`
   margin-bottom: 5px;
 `;
 
-const RoleStatus = styled.div`
-  font-family: ${fonts.montserrat};
-  font-weight: 500;
-  font-size: 14px;
-  color: ${colors.mint};
-  margin-bottom: 10px;
-`;
-
-const RoleDescription = styled.p`
-  font-family: ${fonts.montserrat};
-  font-size: 14px;
-  margin-bottom: 15px;
-`;
-
 const DetailLabel = styled.span`
   font-family: ${fonts.montserrat};
   font-weight: 600;
@@ -164,19 +170,9 @@ const DetailValue = styled.span`
   font-size: 14px;
 `;
 
-const ViewProductionLink = styled(Link)`
-  display: inline-block;
-  margin-top: 12px;
+const ViewButton = styled(Button)`
   font-family: ${fonts.montserrat};
   font-weight: 600;
-  font-size: 14px;
-  color: ${colors.cornflower};
-  text-decoration: none;
-
-  &:hover {
-    color: ${colors.mint};
-    text-decoration: underline;
-  }
 `;
 
 export default PublicRoleCard;
