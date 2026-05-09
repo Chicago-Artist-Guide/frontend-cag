@@ -63,11 +63,7 @@ const PublicRoles = () => {
       }
 
       if (needle.length > 0) {
-        const haystack = [
-          r.role_name,
-          r.offstage_role,
-          r.production_name
-        ]
+        const haystack = [r.role_name, r.offstage_role, r.production_name]
           .filter(Boolean)
           .join(' ')
           .toLowerCase();
@@ -132,8 +128,8 @@ const PublicRoles = () => {
       <>
         <p className="mb-4 font-montserrat text-sm text-grayishBlue">
           Showing {filteredRoles.length}
-          {hasActiveFilters ? ` of ${roles.length}` : ''}{' '}
-          open {filteredRoles.length === 1 ? 'role' : 'roles'}
+          {hasActiveFilters ? ` of ${roles.length}` : ''} open{' '}
+          {filteredRoles.length === 1 ? 'role' : 'roles'}
         </p>
         <div data-testid="public-roles-list">
           {filteredRoles.map((role, index) => (
@@ -147,6 +143,15 @@ const PublicRoles = () => {
             />
           ))}
         </div>
+        {/* Bottom CTA — reinforces sign-up after the visitor has scanned
+            the full list. Uses the lighter 'inline' variant so it reads as
+            a natural end-of-list nudge rather than a competing banner. */}
+        <PublicRolesSignUpCTA
+          body="Create a free profile so theatres can find you when they're casting."
+          className="mt-6"
+          heading="See a role that excites you?"
+          variant="inline"
+        />
       </>
     );
   };
@@ -162,8 +167,11 @@ const PublicRoles = () => {
 
           {/* Sign-up CTA appears above the list whenever we have roles to
               show. The empty-system null state has its own embedded CTA so
-              we don't double up. */}
-          {!loading && roles.length > 0 && <PublicRolesSignUpCTA />}
+              we don't double up. The 'banner' variant uses the cornflower
+              brand block so it's clearly distinct from role cards below. */}
+          {!loading && roles.length > 0 && (
+            <PublicRolesSignUpCTA variant="banner" />
+          )}
 
           {/* Filters are shown whenever there's at least one role in the
               system, otherwise filtering is meaningless. */}

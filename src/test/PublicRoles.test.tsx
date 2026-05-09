@@ -82,14 +82,14 @@ describe('PublicRoles route', () => {
   it('shows a distinct error state when the fetch rejects (not the empty state)', async () => {
     // Suppress the expected console.error from the load() catch so the
     // test output stays clean.
-    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errSpy = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
     mockFetch.mockRejectedValueOnce(new Error('firestore unavailable'));
 
     renderRoute();
 
-    expect(
-      await screen.findByTestId('public-roles-error')
-    ).toBeInTheDocument();
+    expect(await screen.findByTestId('public-roles-error')).toBeInTheDocument();
     // Empty-state copy must NOT show — that would be misleading on a real
     // network/rules failure.
     expect(
@@ -108,10 +108,12 @@ describe('PublicRoles route', () => {
       await screen.findByTestId('public-roles-empty-state')
     ).toBeInTheDocument();
     expect(screen.getByText(/No open roles right now/i)).toBeInTheDocument();
-    // Sign-up CTA is embedded in the empty state.
-    const signUpLinks = screen.getAllByRole('link', { name: /sign up/i });
-    expect(signUpLinks.length).toBeGreaterThan(0);
-    expect(signUpLinks[0]).toHaveAttribute('href', '/sign-up');
+    // Sign-up CTA is embedded in the empty state — primary link goes to /sign-up.
+    const joinLinks = screen.getAllByRole('link', {
+      name: /create a free artist account/i
+    });
+    expect(joinLinks.length).toBeGreaterThan(0);
+    expect(joinLinks[0]).toHaveAttribute('href', '/sign-up');
   });
 
   it('shows the no-results null state when filters match nothing', async () => {
@@ -129,32 +131,41 @@ describe('PublicRoles route', () => {
       await screen.findByTestId('public-roles-no-results')
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/No matches for these filters/i)
+      screen.getByText(/No roles match your filters/i)
     ).toBeInTheDocument();
 
-    // Clearing filters should restore the list.
-    fireEvent.click(screen.getByRole('button', { name: /clear filters/i }));
+    // Clearing filters should restore the list. The button's accessible name
+    // comes from its aria-label ("Clear all active filters and show all roles").
+    fireEvent.click(
+      screen.getByRole('button', { name: /clear all active filters/i })
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Lead Actor')).toBeInTheDocument();
     });
   });
 
-  it('top sign-up CTA links to /sign-up and /login when roles exist', async () => {
+  it('top sign-up CTA links to /sign-up and /get-involved when roles exist', async () => {
     mockFetch.mockResolvedValueOnce(sampleRoles as never);
 
     renderRoute();
 
     await screen.findByText('Lead Actor');
 
-    const cta = screen.getByTestId('public-roles-signup-cta');
-    expect(cta).toBeInTheDocument();
+    // There are two sign-up CTAs (top banner + bottom inline); at least one
+    // of the primary links should point to /sign-up.
+    const allCtas = screen.getAllByTestId('public-roles-signup-cta');
+    expect(allCtas.length).toBeGreaterThanOrEqual(1);
 
-    const signUpLink = screen.getAllByRole('link', { name: /sign up/i })[0];
-    expect(signUpLink).toHaveAttribute('href', '/sign-up');
+    const joinLinks = screen.getAllByRole('link', {
+      name: /create a free artist account/i
+    });
+    expect(joinLinks[0]).toHaveAttribute('href', '/sign-up');
 
-    const loginLink = screen.getAllByRole('link', { name: /log in/i })[0];
-    expect(loginLink).toHaveAttribute('href', '/login');
+    const howItWorksLinks = screen.getAllByRole('link', {
+      name: /learn how chicago artist guide works/i
+    });
+    expect(howItWorksLinks[0]).toHaveAttribute('href', '/get-involved');
   });
 
   it('filters by stage type', async () => {
