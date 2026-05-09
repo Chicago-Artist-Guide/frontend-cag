@@ -75,7 +75,9 @@ const PublicRoleCard: React.FC<
       <RoleName>{displayRoleName}</RoleName>
 
       {role.description && (
-        <RoleDescription>{role.description}</RoleDescription>
+        <p className="mb-[15px] line-clamp-3 font-montserrat text-sm">
+          {role.description}
+        </p>
       )}
 
       <div className="flex flex-wrap gap-[10px]">
@@ -154,17 +156,6 @@ const RoleName = styled.h4`
   font-weight: 600;
   font-size: 18px;
   margin-bottom: 5px;
-`;
-
-const RoleDescription = styled.p`
-  font-family: ${fonts.montserrat};
-  font-size: 14px;
-  margin-bottom: 15px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
 `;
 
 const DetailLabel = styled.span`
