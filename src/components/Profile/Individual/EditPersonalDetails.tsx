@@ -226,7 +226,7 @@ const EditPersonalDetails = ({
               <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                 {eth.values.map((ethV) => (
                   <Checkbox
-                    checked={editProfile?.ethnicities.includes(ethV)}
+                    checked={(editProfile?.ethnicities || []).includes(ethV)}
                     fieldType="checkbox"
                     key={`${eth.name}-child-chk-${ethV}`}
                     label={ethV}
@@ -242,7 +242,7 @@ const EditPersonalDetails = ({
           return (
             <React.Fragment key={`parent-frag-chk-${eth.name}`}>
               <Checkbox
-                checked={editProfile?.ethnicities.includes(eth.name)}
+                checked={(editProfile?.ethnicities || []).includes(eth.name)}
                 fieldType="checkbox"
                 key={`first-level-chk-${eth.name}`}
                 label={eth.name}
@@ -255,7 +255,7 @@ const EditPersonalDetails = ({
                 <Checkbox style={{ paddingLeft: '1.25rem' }}>
                   {eth.values.map((ethV) => (
                     <Checkbox
-                      checked={editProfile?.ethnicities.includes(ethV)}
+                      checked={(editProfile?.ethnicities || []).includes(ethV)}
                       fieldType="checkbox"
                       key={`${eth.name}-child-chk-${ethV}`}
                       label={ethV}

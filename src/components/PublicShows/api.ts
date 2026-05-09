@@ -64,7 +64,11 @@ export const fetchPublicOpenRoles = async (
     // are treated as open by convention (matches PublicShowDetail behaviour
     // where the role still appears for unauth viewers).
     const openRoles = roles.filter(
-      (r) => r && (r.role_status === undefined || r.role_status === 'Open')
+      (r) =>
+        r &&
+        typeof r === 'object' &&
+        !Array.isArray(r) &&
+        (r.role_status === undefined || r.role_status === 'Open')
     );
 
     if (openRoles.length === 0) {

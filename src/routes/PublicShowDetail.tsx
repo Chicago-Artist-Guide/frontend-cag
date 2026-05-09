@@ -41,6 +41,9 @@ const PublicShowDetail = () => {
         return;
       }
 
+      // Outer try/catch wraps ONLY the production fetch.
+      // If this fails, show is set to null and loading stops.
+      let productionData: Production | null = null;
       try {
         const productionRef = doc(
           firebaseFirestore,
@@ -56,12 +59,13 @@ const PublicShowDetail = () => {
           const rawData = productionDoc.data();
 
           // Create a valid Production object with required fields
-          const productionData: Production = {
+          productionData = {
             // Required fields with fallbacks
             production_id: rawData.production_id || productionDoc.id,
             production_name: rawData.production_name || 'Untitled Production',
             account_id: rawData.account_id || '',
             location: rawData.location || '',
+            theater_name: rawData.theater_name || '',
 
             // Optional fields
             production_image_url: rawData.production_image_url,
@@ -101,34 +105,9 @@ const PublicShowDetail = () => {
 
           // Set the show data
           setShow(productionData);
-
-          // Fetch theater name. account_id is the auth uid; pull both account
-          // and profile so we can fall back from theatre_name to theater_name.
-          if (productionData.account_id) {
-            const theaterAccount = await getTheaterAccountByUid(
-              firebaseFirestore,
-              productionData.account_id
-            );
-
-            if (!isMounted) return;
-
-            if (theaterAccount) {
-              const theaterProfile = await getTheaterByAccountId(
-                firebaseFirestore,
-                theaterAccount.id
-              );
-
-              if (!isMounted) return;
-
-              const resolvedName =
-                (theaterProfile && theaterProfile.theatre_name) ||
-                (theaterAccount as any).theater_name ||
-                '';
-              setTheaterName(resolvedName || 'Unknown Theater');
-            } else {
-              setTheaterName('Unknown Theater');
-            }
-          }
+        } else if (isMounted) {
+          // Production no longer exists — clear any stale state from a prior render.
+          setShow(null);
         }
 
         if (isMounted) {
@@ -140,6 +119,43 @@ const PublicShowDetail = () => {
           setShow(null);
           setLoading(false);
         }
+        return;
+      }
+
+      if (!productionData || !isMounted) return;
+
+      // Theater-name lookup: best-effort, in its own catch so it never
+      // wipes out a successfully-fetched production.
+      // Use the denormalized field first; only call the auth-gated query
+      // when the user is authenticated and the field is missing (legacy data).
+      if (productionData.theater_name) {
+        setTheaterName(productionData.theater_name);
+      } else if (currentUser && productionData.account_id) {
+        try {
+          const theaterAccount = await getTheaterAccountByUid(
+            firebaseFirestore,
+            productionData.account_id
+          );
+
+          if (!isMounted) return;
+
+          if (theaterAccount) {
+            const theaterProfile = await getTheaterByAccountId(
+              firebaseFirestore,
+              theaterAccount.id
+            );
+
+            if (!isMounted) return;
+
+            const resolvedName =
+              (theaterProfile && theaterProfile.theatre_name) ||
+              (theaterAccount as any).theater_name ||
+              '';
+            setTheaterName(resolvedName);
+          }
+        } catch {
+          // Silently ignore — theater name is non-critical display data.
+        }
       }
     };
 
@@ -149,7 +165,7 @@ const PublicShowDetail = () => {
     return () => {
       isMounted = false;
     };
-  }, [productionId, firebaseFirestore]);
+  }, [productionId, firebaseFirestore, currentUser]);
 
   if (loading) {
     return (
@@ -202,9 +218,11 @@ const PublicShowDetail = () => {
             ← Back to shows (page {savedPaginationState.currentPage || 1})
           </BackLink>
           <Title>{show.production_name}</Title>
-          <TheaterNameLink to={`/profile/view/${show.account_id}`}>
-            {theaterName}
-          </TheaterNameLink>
+          {theaterName ? (
+            <TheaterNameLink to={`/profile/view/${show.account_id}`}>
+              {theaterName}
+            </TheaterNameLink>
+          ) : null}
         </Col>
       </Row>
 

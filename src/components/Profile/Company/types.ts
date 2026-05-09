@@ -44,6 +44,7 @@ export type Production = {
   account_id: string;
   production_id: string;
   production_name: string;
+  theater_name?: string;
   production_image_url?: string;
   type?: ProductionType;
   type_other?: string;
