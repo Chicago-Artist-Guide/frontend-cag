@@ -105,6 +105,9 @@ const PublicShowDetail = () => {
 
           // Set the show data
           setShow(productionData);
+        } else if (isMounted) {
+          // Production no longer exists — clear any stale state from a prior render.
+          setShow(null);
         }
 
         if (isMounted) {
@@ -215,9 +218,11 @@ const PublicShowDetail = () => {
             ← Back to shows (page {savedPaginationState.currentPage || 1})
           </BackLink>
           <Title>{show.production_name}</Title>
-          <TheaterNameLink to={`/profile/view/${show.account_id}`}>
-            {theaterName}
-          </TheaterNameLink>
+          {theaterName ? (
+            <TheaterNameLink to={`/profile/view/${show.account_id}`}>
+              {theaterName}
+            </TheaterNameLink>
+          ) : null}
         </Col>
       </Row>
 

@@ -150,8 +150,6 @@ const CompanyAddShow: React.FC<
     setShowOtherType(formValues.type === 'Other');
   }, [formValues.type]);
 
-  console.log(profileData);
-
   const setProfilePicture = (url: string) => {
     const target = { name: 'production_image_url', value: url };
     setFormValues({ target });
@@ -173,7 +171,6 @@ const CompanyAddShow: React.FC<
 
       await setDoc(doc(db, 'productions', productionId), payload);
       toggleEdit();
-      console.log(productionId);
     } catch (error) {
       console.error('Error creating production:', error);
     }
