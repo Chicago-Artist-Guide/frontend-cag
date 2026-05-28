@@ -5,9 +5,13 @@ import { getNameForAccount } from '../../components/Profile/shared/api';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMatches } from '../../context/MatchContext';
 import { useUserContext } from '../../context/UserContext';
-import { getTheaterTalentMatch } from './api';
+import {
+  getTheaterTalentFavorite,
+  getTheaterTalentMatch,
+  setTheaterTalentFavorite
+} from './api';
+import { getTheaterCardMatchStatus } from './matchStatus';
 import { ProfileAndName, TalentMatchCard } from './TalentMatchCard';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { FilterFavoritesType } from './types';
 
 export const TalentMatchList = () => {
@@ -19,32 +23,25 @@ export const TalentMatchList = () => {
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
   const [filter, setFilter] = useState<FilterFavoritesType>('all');
 
-  const getFavoriteDocRef = (talentAccountId: string) => {
-    if (!account?.ref?.id || !talentAccountId) return null;
-    return doc(
-      firebaseFirestore,
-      'theater_talent_favorites',
-      `${account.ref.id}_${talentAccountId}_${production?.production_id}_${currentRoleId}`
-    );
-  };
+  const theaterAccountId = account?.ref?.id || '';
+  const productionId = production?.production_id || '';
+  const roleId = currentRoleId || '';
 
   const fetchFavoriteStatus = async (talentAccountId: string) => {
-    const docRef = getFavoriteDocRef(talentAccountId);
-    if (!docRef) return;
+    if (!theaterAccountId || !productionId || !roleId) return;
 
     try {
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setFavorites((prev) => ({
-          ...prev,
-          [talentAccountId]: docSnap.data().status
-        }));
-      } else {
-        setFavorites((prev) => ({
-          ...prev,
-          [talentAccountId]: false
-        }));
-      }
+      const isFavorite = await getTheaterTalentFavorite(
+        firebaseFirestore,
+        theaterAccountId,
+        talentAccountId,
+        productionId,
+        roleId
+      );
+      setFavorites((prev) => ({
+        ...prev,
+        [talentAccountId]: isFavorite
+      }));
     } catch (error) {
       console.error('Error fetching favorite status:', error);
       setFavorites((prev) => ({
@@ -55,22 +52,18 @@ export const TalentMatchList = () => {
   };
 
   const toggleFavorite = async (talentAccountId: string) => {
-    const docRef = getFavoriteDocRef(talentAccountId);
-    if (!docRef) return;
+    if (!theaterAccountId || !productionId || !roleId) return;
 
     try {
       const newStatus = !favorites[talentAccountId];
-      await setDoc(docRef, {
-        initiated_by: 'theatre',
-        production_id: doc(
-          firebaseFirestore,
-          'productions',
-          production?.production_id || ''
-        ),
-        role_id: currentRoleId,
-        status: newStatus,
-        talent_account_id: doc(firebaseFirestore, 'accounts', talentAccountId)
-      });
+      await setTheaterTalentFavorite(
+        firebaseFirestore,
+        theaterAccountId,
+        talentAccountId,
+        productionId,
+        roleId,
+        newStatus
+      );
       setFavorites((prev) => ({
         ...prev,
         [talentAccountId]: newStatus
@@ -97,8 +90,7 @@ export const TalentMatchList = () => {
           firebaseFirestore,
           production?.production_id || '',
           currentRoleId || '',
-          m.account_id,
-          'theater' // initiated by theater
+          m.account_id
         );
 
         // Fetch favorite status for each profile
@@ -109,7 +101,7 @@ export const TalentMatchList = () => {
         return {
           ...m,
           fullName,
-          matchStatus: findMatch ? findMatch.status : null
+          matchStatus: getTheaterCardMatchStatus(findMatch)
         };
       })
     );

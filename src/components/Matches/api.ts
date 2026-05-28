@@ -26,6 +26,7 @@ import {
   TheaterOrTalent,
   TheaterTalentMatch
 } from './types';
+import { profileMatchesTheaterStatusFilters } from './matchStatus';
 
 export const getTheaterTalentMatch = async (
   firebaseStore: Firestore,
@@ -74,6 +75,13 @@ export const getTalentRoleFavoriteDocId = (
   roleId: string
 ) => `talent_${talentAccountId}_${productionId}_${roleId}`;
 
+export const getTheaterTalentFavoriteDocId = (
+  theaterAccountId: string,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+) => `${theaterAccountId}_${talentAccountId}_${productionId}_${roleId}`;
+
 export const getTalentRoleFavorite = async (
   firebaseStore: Firestore,
   talentAccountId: string,
@@ -88,6 +96,60 @@ export const getTalentRoleFavorite = async (
   );
   const snap = await getDoc(ref);
   return snap.exists() ? !!snap.data()?.status : false;
+};
+
+export const getTheaterTalentFavorite = async (
+  firebaseStore: Firestore,
+  theaterAccountId: string,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+): Promise<boolean> => {
+  if (!theaterAccountId || !talentAccountId || !productionId || !roleId) {
+    return false;
+  }
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTheaterTalentFavoriteDocId(
+      theaterAccountId,
+      talentAccountId,
+      productionId,
+      roleId
+    )
+  );
+  const snap = await getDoc(ref);
+  return snap.exists() ? !!snap.data()?.status : false;
+};
+
+export const setTheaterTalentFavorite = async (
+  firebaseStore: Firestore,
+  theaterAccountId: string,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string,
+  status: boolean
+): Promise<void> => {
+  if (!theaterAccountId || !talentAccountId || !productionId || !roleId) {
+    return;
+  }
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTheaterTalentFavoriteDocId(
+      theaterAccountId,
+      talentAccountId,
+      productionId,
+      roleId
+    )
+  );
+  await setDoc(ref, {
+    initiated_by: 'theater',
+    production_id: doc(firebaseStore, 'productions', productionId),
+    role_id: roleId,
+    status,
+    talent_account_id: doc(firebaseStore, 'accounts', talentAccountId)
+  });
 };
 
 export const setTalentRoleFavorite = async (
@@ -249,25 +311,7 @@ export async function fetchTalentWithFilters(
           profileData.account_id
         );
 
-        // Map current match record to the set of buckets it falls into.
-        // AND semantics across selected statuses — a profile is included
-        // only if its match state matches every one of the selected filters.
-        const buckets = new Set<string>();
-        if (!findMatch) {
-          buckets.add('undecided');
-        } else {
-          if (findMatch.status === true) {
-            buckets.add('accepted');
-          }
-          if (findMatch.status === false) {
-            buckets.add('declined');
-          }
-          if (findMatch.initiated_by === 'talent') {
-            buckets.add('interested');
-          }
-        }
-
-        if (matchStatus.every((s) => buckets.has(s))) {
+        if (profileMatchesTheaterStatusFilters(findMatch, matchStatus)) {
           matches.push({ ...profileData });
         }
       } else {

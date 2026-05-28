@@ -198,9 +198,11 @@ export const TalentMatchCard = ({
           backgroundImage: `url(${profile.profile_image_url})`
         }}
       >
-        <div
+        <button
+          type="button"
           className="absolute left-2 top-2 cursor-pointer transition-transform hover:scale-110 sm:left-4 sm:top-4"
           onClick={onToggleFavorite}
+          aria-label={isFavorited ? 'Unfavorite artist' : 'Favorite artist'}
         >
           {isFavorited ? (
             <svg
@@ -231,7 +233,7 @@ export const TalentMatchCard = ({
               />
             </svg>
           )}
-        </div>
+        </button>
       </div>
       <div className="relative flex flex-1 flex-col px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
         <div className="mb-4 flex items-center justify-between">
