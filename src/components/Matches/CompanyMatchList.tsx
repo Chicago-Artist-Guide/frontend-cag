@@ -8,7 +8,8 @@ import {
   getTheaterTalentMatch,
   setTalentRoleFavorite
 } from './api';
-import { ProductionRole, TalentMatchStatus } from './types';
+import { ProductionRole } from './types';
+import { roleMatchesTalentStatusFilters } from './talentMatchStatus';
 
 type RoleState = {
   isFavorite: boolean;
@@ -103,22 +104,9 @@ export const CompanyMatchList = () => {
 
   const selectedStatuses = filters.matchStatus || [];
 
-  const matchesAllSelected = (state: RoleState | undefined): boolean => {
-    const buckets = new Set<TalentMatchStatus>();
-    if (state?.matchStatus === true) buckets.add('applied');
-    if (state?.matchStatus === false) buckets.add('hidden');
-    if (state?.isFavorite) buckets.add('favorite');
-    // "Undecided" = no Apply/Hide action taken (independent of favorite)
-    if (!state || state.matchStatus === null || state.matchStatus === undefined)
-      buckets.add('undecided');
-
-    return selectedStatuses.every((s) => buckets.has(s));
-  };
-
-  const filteredRoles =
-    selectedStatuses.length === 0
-      ? roles
-      : roles.filter((role) => matchesAllSelected(states[buildKey(role)]));
+  const filteredRoles = roles.filter((role) =>
+    roleMatchesTalentStatusFilters(states[buildKey(role)], selectedStatuses)
+  );
 
   if (loadingStates) {
     return <p>Loading...</p>;

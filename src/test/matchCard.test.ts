@@ -50,4 +50,54 @@ describe('DEV-488: artist-side match card (CompanyMatchCard)', () => {
       expect(matchCardSource).toMatch(/\?tab=audition/);
     });
   });
+
+  describe('Artist matching: Apply, Hide, and favorites', () => {
+    it('labels the green action Apply and the red action Hide', () => {
+      expect(matchCardSource).toMatch(/>\s*Apply\s*</);
+      expect(matchCardSource).toMatch(/>\s*Hide\s*</);
+      expect(matchCardSource).not.toMatch(/>\s*Approve(d)?\s*</i);
+    });
+
+    it('renders a favorite star control', () => {
+      expect(matchCardSource).toMatch(/Favorite role/);
+      expect(matchCardSource).toMatch(/onToggleFavorite/);
+    });
+
+    it('confirm modal copy refers to applying, not expressing interest', () => {
+      expect(matchCardSource).toMatch(/apply for the following role/i);
+      expect(matchCardSource).not.toMatch(
+        /express interest in the following role/i
+      );
+    });
+  });
+});
+
+describe('Artist show overview from match card', () => {
+  const showDetailSource = fs.readFileSync(
+    path.resolve(__dirname, '../routes/PublicShowDetail.tsx'),
+    'utf8'
+  );
+  const filterBarSource = fs.readFileSync(
+    path.resolve(__dirname, '../components/Matches/RoleMatchesFilterBar.tsx'),
+    'utf8'
+  );
+
+  it('does not offer show-level Apply for Role or Express Interest CTAs', () => {
+    expect(showDetailSource).not.toMatch(/Apply for Role/i);
+    expect(showDetailSource).not.toMatch(/Express Interest In This Show/i);
+  });
+
+  it('exposes Basic Info and Audition Info tabs for full show context', () => {
+    expect(showDetailSource).toMatch(/eventKey="basic"/);
+    expect(showDetailSource).toMatch(/eventKey="audition"/);
+    expect(showDetailSource).toMatch(/ShowDescription/);
+  });
+
+  it('offers multi-select role status filters for artists', () => {
+    expect(filterBarSource).toMatch(/Applied/);
+    expect(filterBarSource).toMatch(/Hidden/);
+    expect(filterBarSource).toMatch(/Favorite/);
+    expect(filterBarSource).toMatch(/Undecided/);
+    expect(filterBarSource).toMatch(/type="checkbox"/);
+  });
 });
