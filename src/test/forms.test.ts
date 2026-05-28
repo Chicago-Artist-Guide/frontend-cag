@@ -50,7 +50,9 @@ describe('DEV-488: Signup + edit form contracts', () => {
       expect(src).toMatch(/'actorInfoSinging'/);
       expect(src).toMatch(/'actorInfoDancing'/);
       // Both fields are pushed inside the !isOffStage block
-      expect(src).toMatch(/if\s*\(!isOffStage\)\s*{[\s\S]*?actorInfoSinging[\s\S]*?actorInfoDancing[\s\S]*?\)/m);
+      expect(src).toMatch(
+        /if\s*\(!isOffStage\)\s*{[\s\S]*?actorInfoSinging[\s\S]*?actorInfoDancing[\s\S]*?\)/m
+      );
     });
 
     it('renders Singing/Dancing radios on the signup ActorInfo step', () => {
@@ -88,7 +90,9 @@ describe('DEV-488: Signup + edit form contracts', () => {
     it('persists lgbtqia when saving personal details', () => {
       const src = readSource('components/Profile/Individual/index.tsx');
       // The personal details payload must include the lgbtqia field
-      expect(src).toMatch(/personalDetailsData\s*=\s*\{[\s\S]*?lgbtqia[\s\S]*?\}/m);
+      expect(src).toMatch(
+        /personalDetailsData\s*=\s*\{[\s\S]*?lgbtqia[\s\S]*?\}/m
+      );
     });
   });
 
@@ -99,7 +103,9 @@ describe('DEV-488: Signup + edit form contracts', () => {
       const genderBlock = src.match(/Gender Identity[\s\S]*?<\/Form\.Group>/);
       expect(genderBlock).not.toBeNull();
       expect(genderBlock?.[0] ?? '').not.toMatch(/chose\s+not\s+to\s+respond/i);
-      expect(genderBlock?.[0] ?? '').not.toMatch(/do\s+not\s+wish\s+to\s+respond/i);
+      expect(genderBlock?.[0] ?? '').not.toMatch(
+        /do\s+not\s+wish\s+to\s+respond/i
+      );
     });
   });
 
@@ -115,6 +121,21 @@ describe('DEV-488: Signup + edit form contracts', () => {
       const src = readSource('components/Profile/Individual/index.tsx');
       expect(src).toMatch(
         /gender_identity\s*===\s*'Trans\/Nonbinary'[\s\S]*?gender_roles[\s\S]*?length\s*===\s*0/m
+      );
+    });
+
+    it('lets Trans/Nonbinary users edit on-stage gender role preferences post-signup', () => {
+      const editSrc = readSource(
+        'components/Profile/Individual/EditPersonalDetails.tsx'
+      );
+      const profileSrc = readSource('components/Profile/Individual/index.tsx');
+
+      expect(editSrc).toMatch(
+        /gender_identity\s*===\s*'Trans\/Nonbinary'[\s\S]*?genderRoleChange/m
+      );
+      expect(profileSrc).toMatch(/genderRoleChange/);
+      expect(profileSrc).toMatch(
+        /gender_roles:[\s\S]*?gender_identity\s*===\s*'Trans\/Nonbinary'/m
       );
     });
   });

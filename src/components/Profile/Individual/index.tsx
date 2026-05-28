@@ -27,6 +27,8 @@ import { forceHttp } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
 import {
   AgeRange,
+  Gender,
+  GenderRole,
   IndividualAccountInit,
   IndividualProfileDataFullInit,
   IndividualWebsite,
@@ -306,6 +308,31 @@ const IndividualProfile: React.FC<
     setProfileForm('ethnicities', newEthnicities);
   };
 
+  const genderIdentityChange = (gender: Gender) => {
+    setEditProfile((prevState: IndividualProfileDataFullInit) => ({
+      ...prevState,
+      gender_identity: gender,
+      gender_roles:
+        gender === 'Trans/Nonbinary' ? prevState?.gender_roles || [] : []
+    }));
+  };
+
+  const genderRoleChange = (checkValue: boolean, role: GenderRole) => {
+    setEditProfile((prevState: IndividualProfileDataFullInit) => {
+      const currentRoles = prevState?.gender_roles || [];
+      const newRoles = checkValue
+        ? currentRoles.includes(role)
+          ? currentRoles
+          : [...currentRoles, role]
+        : currentRoles.filter((r) => r !== role);
+
+      return {
+        ...prevState,
+        gender_roles: newRoles
+      };
+    });
+  };
+
   const onWebsiteInputChange = <T extends keyof IndividualWebsite>(
     fieldValue: IndividualWebsite[T],
     fieldName: T,
@@ -401,7 +428,8 @@ const IndividualProfile: React.FC<
       height_in,
       height_no_answer,
       gender_identity,
-      gender_roles: gender_roles || [],
+      gender_roles:
+        gender_identity === 'Trans/Nonbinary' ? gender_roles || [] : [],
       ethnicities,
       lgbtqia: lgbtqia || '',
       union_status,
@@ -864,6 +892,8 @@ const IndividualProfile: React.FC<
                 {...{
                   ageRangeChange,
                   editProfile,
+                  genderIdentityChange,
+                  genderRoleChange,
                   onWebsiteInputChange,
                   removeWebsiteInput,
                   addWebsiteInput,
