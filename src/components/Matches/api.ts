@@ -190,7 +190,8 @@ export async function fetchTalentWithFilters(
           if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
             profileQuery = query(profileQuery, where(field, 'in', value));
           } else {
-            // we know the comparison is array to array
+            // Array profile fields (e.g. union_status, ethnicities): multiple
+            // selected filter values use OR — match profiles containing any one.
             profileQuery = query(
               profileQuery,
               where(field, 'array-contains-any', value)
@@ -333,8 +334,7 @@ export async function fetchTalentWithFilters(
               const transAccepted =
                 role.gender_identity?.includes('Trans/Nonbinary') ?? false;
               const acceptedSet =
-                transAccepted &&
-                (role.trans_nonbinary_roles?.length ?? 0) > 0
+                transAccepted && (role.trans_nonbinary_roles?.length ?? 0) > 0
                   ? role.trans_nonbinary_roles!
                   : roleGenders;
               return genderRoles.some((g) => acceptedSet.includes(g));
@@ -467,13 +467,10 @@ export async function fetchRolesForTalent(
               const transAccepted =
                 pR.gender_identity?.includes('Trans/Nonbinary') ?? false;
               const acceptedSet =
-                transAccepted &&
-                (pR.trans_nonbinary_roles?.length ?? 0) > 0
+                transAccepted && (pR.trans_nonbinary_roles?.length ?? 0) > 0
                   ? pR.trans_nonbinary_roles!
                   : roleGenders;
-              const hasMatch = genderRoles.some((g) =>
-                acceptedSet.includes(g)
-              );
+              const hasMatch = genderRoles.some((g) => acceptedSet.includes(g));
               if (!hasMatch) {
                 return false;
               }

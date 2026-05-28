@@ -23,6 +23,7 @@ import { Button, Checkbox, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
+import { formatUnionStatusDisplay } from '../../../utils/lookups';
 import { forceHttp } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
 import {
@@ -949,10 +950,9 @@ const IndividualProfile: React.FC<
                     </>
                   )}
                   {(() => {
-                    const us = profile?.data?.union_status;
-                    const usDisplay = Array.isArray(us)
-                      ? us.join(', ')
-                      : us || '';
+                    const usDisplay = formatUnionStatusDisplay(
+                      profile?.data?.union_status
+                    );
                     const otherDisplay = profile?.data?.union_other || '';
                     if (!usDisplay && !otherDisplay) return null;
                     return (

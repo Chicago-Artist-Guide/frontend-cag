@@ -2,6 +2,8 @@ import {
   ethnicities,
   roleGenders,
   roleSpecificGenders,
+  formatUnionStatusDisplay,
+  unionOptionLabels,
   unionOptions,
   UnionOption
 } from './lookups';
@@ -35,6 +37,25 @@ describe('Union Options Type Definitions', () => {
 
     it('should contain Union Scenic Artist option', () => {
       expect(unionOptions).toContain('Union Scenic Artist (designers)');
+    });
+  });
+
+  describe('unionOptionLabels', () => {
+    it('displays United Scenic Artists for the USA designers option', () => {
+      expect(unionOptionLabels['Union Scenic Artist (designers)']).toBe(
+        'United Scenic Artists (designers)'
+      );
+    });
+  });
+
+  describe('formatUnionStatusDisplay', () => {
+    it('maps stored values to display labels', () => {
+      expect(
+        formatUnionStatusDisplay([
+          'Non-Union',
+          'Union Scenic Artist (designers)'
+        ])
+      ).toBe('Non-Union, United Scenic Artists (designers)');
     });
   });
 

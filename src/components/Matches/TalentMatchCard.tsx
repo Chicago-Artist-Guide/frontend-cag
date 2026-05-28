@@ -14,6 +14,7 @@ import {
   theaterToArtistEmailText,
   theaterToArtistEmailHtml
 } from '../Messages/messages';
+import { formatUnionStatusDisplay } from '../../utils/lookups';
 import { createTheaterTalentMatch } from './api';
 import { MatchConfirmationModal } from './MatchConfirmationModal';
 
@@ -245,9 +246,7 @@ export const TalentMatchCard = ({
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
           <div>Union(s)</div>
           <div className="font-semibold">
-            {Array.isArray(profile.union_status)
-              ? profile.union_status.join(', ')
-              : profile.union_status || 'N/A'}
+            {formatUnionStatusDisplay(profile.union_status) || 'N/A'}
           </div>
           <div>Special Skills</div>
           <div className="font-semibold">
