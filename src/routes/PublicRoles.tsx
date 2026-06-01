@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { PageContainer } from '../components/layout';
 import { Tagline, Title } from '../components/layout/Titles';
@@ -9,9 +15,16 @@ import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
 import PublicRoleCardSkeleton from '../components/PublicShows/PublicRoleCardSkeleton';
 import PublicRolesEmptyState from '../components/PublicShows/PublicRolesEmptyState';
 import PublicRolesFilters from '../components/PublicShows/PublicRolesFilters';
-import type { StageFilter } from '../components/PublicShows/PublicRolesFilters';
 import PublicRolesNoResults from '../components/PublicShows/PublicRolesNoResults';
 import PublicRolesSignUpCTA from '../components/PublicShows/PublicRolesSignUpCTA';
+import RolesFilterDrawer from '../components/PublicShows/RolesFilterDrawer';
+import {
+  applyRoleFilters,
+  cloneRoleFilters,
+  countAppliedFilters,
+  createEmptyRoleFilters
+} from '../components/PublicShows/roleFilters';
+import type { RoleFilters } from '../components/PublicShows/roleFilters';
 
 // Roles list page (DEV-496/494/495/497/498). Renders every Open role
 // across active productions, lets unauth visitors filter, and offers a
@@ -21,8 +34,12 @@ const PublicRoles = () => {
   const [roles, setRoles] = useState<PublicRoleListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [stageFilter, setStageFilter] = useState<StageFilter>('All');
+  const [appliedFilters, setAppliedFilters] =
+    useState<RoleFilters>(createEmptyRoleFilters);
+  const [draftFilters, setDraftFilters] =
+    useState<RoleFilters>(createEmptyRoleFilters);
+  const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
+  const filterTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -54,36 +71,45 @@ const PublicRoles = () => {
     };
   }, [firebaseFirestore]);
 
-  const filteredRoles = useMemo(() => {
-    const needle = searchTerm.trim().toLowerCase();
+  const filteredRoles = useMemo(
+    () => applyRoleFilters(roles, appliedFilters),
+    [appliedFilters, roles]
+  );
 
-    return roles.filter((r) => {
-      if (stageFilter !== 'All' && r.type !== stageFilter) {
-        return false;
-      }
+  const appliedFilterCount = useMemo(
+    () => countAppliedFilters(appliedFilters),
+    [appliedFilters]
+  );
 
-      if (needle.length > 0) {
-        const haystack = [r.role_name, r.offstage_role, r.production_name]
-          .filter(Boolean)
-          .join(' ')
-          .toLowerCase();
+  const filteredProductionCount = useMemo(
+    () => new Set(filteredRoles.map((role) => role.production_id)).size,
+    [filteredRoles]
+  );
 
-        if (!haystack.includes(needle)) {
-          return false;
-        }
-      }
+  const clearFilters = useCallback(() => {
+    setAppliedFilters(createEmptyRoleFilters());
+    setDraftFilters(createEmptyRoleFilters());
+  }, []);
 
-      return true;
-    });
-  }, [roles, searchTerm, stageFilter]);
+  const closeFilterDrawer = useCallback(() => {
+    setFilterDrawerOpen(false);
+  }, []);
 
-  const clearFilters = () => {
-    setSearchTerm('');
-    setStageFilter('All');
-  };
+  const openFilterDrawer = useCallback(() => {
+    setDraftFilters(cloneRoleFilters(appliedFilters));
+    setFilterDrawerOpen(true);
+  }, [appliedFilters]);
 
-  const hasActiveFilters =
-    searchTerm.trim().length > 0 || stageFilter !== 'All';
+  const applyDraftFilters = useCallback(() => {
+    setAppliedFilters(cloneRoleFilters(draftFilters));
+    setFilterDrawerOpen(false);
+  }, [draftFilters]);
+
+  const clearDraftFilters = useCallback(() => {
+    setDraftFilters(createEmptyRoleFilters());
+  }, []);
+
+  const hasActiveFilters = appliedFilterCount > 0;
 
   const renderBody = () => {
     if (loading) {
@@ -127,9 +153,11 @@ const PublicRoles = () => {
     return (
       <>
         <p className="mb-4 font-montserrat text-sm text-grayishBlue">
-          Showing {filteredRoles.length}
-          {hasActiveFilters ? ` of ${roles.length}` : ''} open{' '}
-          {filteredRoles.length === 1 ? 'role' : 'roles'}
+          Showing {filteredRoles.length}{' '}
+          {filteredRoles.length === 1 ? 'opportunity' : 'opportunities'} across{' '}
+          {filteredProductionCount}{' '}
+          {filteredProductionCount === 1 ? 'production' : 'productions'} in
+          Chicago, IL
         </p>
         <div data-testid="public-roles-list">
           {filteredRoles.map((role, index) => (
@@ -177,10 +205,20 @@ const PublicRoles = () => {
               system, otherwise filtering is meaningless. */}
           {!loading && roles.length > 0 && (
             <PublicRolesFilters
-              onSearchChange={setSearchTerm}
-              onStageFilterChange={setStageFilter}
-              searchTerm={searchTerm}
-              stageFilter={stageFilter}
+              appliedCount={appliedFilterCount}
+              onOpen={openFilterDrawer}
+              triggerRef={filterTriggerRef}
+            />
+          )}
+
+          {!loading && roles.length > 0 && (
+            <RolesFilterDrawer
+              draft={draftFilters}
+              onApply={applyDraftFilters}
+              onChange={setDraftFilters}
+              onClear={clearDraftFilters}
+              onClose={closeFilterDrawer}
+              open={filterDrawerOpen}
             />
           )}
 
