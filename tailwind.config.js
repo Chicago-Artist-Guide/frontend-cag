@@ -51,6 +51,7 @@ export default {
         yellow: '#EFC93D',
         yoda: '#B8D8C7',
         evergreen: '#4A725D',
+        filterCream: '#FBF6EC',
         gold: '#D3991C'
       },
       keyframes: {
