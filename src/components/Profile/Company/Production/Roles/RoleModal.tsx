@@ -145,7 +145,7 @@ const RoleModal: React.FC<
     // and the load-time normalization already folded any legacy value into
     // gender_identity. Leaving include_nonbinary set in Firestore would let
     // it drift away from the new fields on subsequent edits.
-    const { include_nonbinary: _drop, ...sanitized } = role;
+    const { include_nonbinary: _drop, union: _union, ...sanitized } = role;
     onSubmit(sanitized as Role);
     setFormValues({});
   };
@@ -317,9 +317,7 @@ const RoleModal: React.FC<
   const handleTransNonbinaryToggle = (checked: boolean) => {
     if (checked) {
       const currentValues = (formValues.gender_identity as string[]) || [];
-      const filtered = currentValues.filter(
-        (v) => v !== 'Open to all genders'
-      );
+      const filtered = currentValues.filter((v) => v !== 'Open to all genders');
       const next = filtered.includes('Trans/Nonbinary')
         ? filtered
         : [...filtered, 'Trans/Nonbinary'];
@@ -342,23 +340,6 @@ const RoleModal: React.FC<
         : [...current, role]
       : current.filter((r) => r !== role);
     setFormValues({ ...formValues, trans_nonbinary_roles: next });
-  };
-
-  const handleUnionChange = (option: string, checked: boolean) => {
-    const currentUnions = (formValues.union as string[]) || [];
-
-    if (checked) {
-      setFormValues({ ...formValues, union: [...currentUnions, option] });
-    } else {
-      setFormValues({
-        ...formValues,
-        union: currentUnions.filter((u) => u !== option)
-      });
-    }
-  };
-
-  const isUnionSelected = (option: string): boolean => {
-    return ((formValues.union as string[]) || []).includes(option);
   };
 
   const onDeleteConfirm = () => {

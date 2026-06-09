@@ -5,6 +5,7 @@ import { Role } from '../Profile/Company/types';
 import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
 import { parseLocalDate } from '../../utils/dates';
+import { formatUnionStatusDisplay } from '../../utils/lookups';
 
 interface PublicRoleCardProps {
   role: Role;
@@ -90,7 +91,7 @@ const PublicRoleCard: React.FC<
         {Array.isArray(role.union) && role.union.length > 0 && (
           <div className="mb-[5px] mr-[15px] flex">
             <DetailLabel>Union:</DetailLabel>
-            <DetailValue>{role.union.join(', ')}</DetailValue>
+            <DetailValue>{formatUnionStatusDisplay(role.union)}</DetailValue>
           </div>
         )}
         {rateDisplay && (

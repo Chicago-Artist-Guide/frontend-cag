@@ -23,10 +23,13 @@ import { Button, Checkbox, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
+import { formatUnionStatusDisplay } from '../../../utils/lookups';
 import { forceHttp } from '../../../utils/validation';
 import PageContainer from '../../layout/PageContainer';
 import {
   AgeRange,
+  Gender,
+  GenderRole,
   IndividualAccountInit,
   IndividualProfileDataFullInit,
   IndividualWebsite,
@@ -306,6 +309,31 @@ const IndividualProfile: React.FC<
     setProfileForm('ethnicities', newEthnicities);
   };
 
+  const genderIdentityChange = (gender: Gender) => {
+    setEditProfile((prevState: IndividualProfileDataFullInit) => ({
+      ...prevState,
+      gender_identity: gender,
+      gender_roles:
+        gender === 'Trans/Nonbinary' ? prevState?.gender_roles || [] : []
+    }));
+  };
+
+  const genderRoleChange = (checkValue: boolean, role: GenderRole) => {
+    setEditProfile((prevState: IndividualProfileDataFullInit) => {
+      const currentRoles = prevState?.gender_roles || [];
+      const newRoles = checkValue
+        ? currentRoles.includes(role)
+          ? currentRoles
+          : [...currentRoles, role]
+        : currentRoles.filter((r) => r !== role);
+
+      return {
+        ...prevState,
+        gender_roles: newRoles
+      };
+    });
+  };
+
   const onWebsiteInputChange = <T extends keyof IndividualWebsite>(
     fieldValue: IndividualWebsite[T],
     fieldName: T,
@@ -401,7 +429,8 @@ const IndividualProfile: React.FC<
       height_in,
       height_no_answer,
       gender_identity,
-      gender_roles: gender_roles || [],
+      gender_roles:
+        gender_identity === 'Trans/Nonbinary' ? gender_roles || [] : [],
       ethnicities,
       lgbtqia: lgbtqia || '',
       union_status,
@@ -864,6 +893,8 @@ const IndividualProfile: React.FC<
                 {...{
                   ageRangeChange,
                   editProfile,
+                  genderIdentityChange,
+                  genderRoleChange,
                   onWebsiteInputChange,
                   removeWebsiteInput,
                   addWebsiteInput,
@@ -919,10 +950,9 @@ const IndividualProfile: React.FC<
                     </>
                   )}
                   {(() => {
-                    const us = profile?.data?.union_status;
-                    const usDisplay = Array.isArray(us)
-                      ? us.join(', ')
-                      : us || '';
+                    const usDisplay = formatUnionStatusDisplay(
+                      profile?.data?.union_status
+                    );
                     const otherDisplay = profile?.data?.union_other || '';
                     if (!usDisplay && !otherDisplay) return null;
                     return (

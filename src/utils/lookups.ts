@@ -125,6 +125,19 @@ export const unionOptionLabels: Record<UnionOption, string> = {
   'Union Scenic Artist (designers)': 'United Scenic Artists (designers)'
 };
 
+export const getUnionOptionLabel = (option: string): string =>
+  unionOptionLabels[option as UnionOption] ?? option;
+
+export const formatUnionStatusDisplay = (
+  unionStatus: string | string[] | undefined | null
+): string => {
+  if (!unionStatus) {
+    return '';
+  }
+  const values = Array.isArray(unionStatus) ? unionStatus : [unionStatus];
+  return values.map(getUnionOptionLabel).join(', ');
+};
+
 export const productionTypes: ProductionType[] = ['Musical', 'Play', 'Other'];
 export const stageRoles: StageRole[] = ['On-Stage', 'Off-Stage'];
 export const roleStatuses: RoleStatus[] = ['Open', 'Closed'];

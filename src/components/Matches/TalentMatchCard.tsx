@@ -14,6 +14,7 @@ import {
   theaterToArtistEmailText,
   theaterToArtistEmailHtml
 } from '../Messages/messages';
+import { formatUnionStatusDisplay } from '../../utils/lookups';
 import { createTheaterTalentMatch } from './api';
 import { MatchConfirmationModal } from './MatchConfirmationModal';
 
@@ -197,9 +198,11 @@ export const TalentMatchCard = ({
           backgroundImage: `url(${profile.profile_image_url})`
         }}
       >
-        <div
+        <button
+          type="button"
           className="absolute left-2 top-2 cursor-pointer transition-transform hover:scale-110 sm:left-4 sm:top-4"
           onClick={onToggleFavorite}
+          aria-label={isFavorited ? 'Unfavorite artist' : 'Favorite artist'}
         >
           {isFavorited ? (
             <svg
@@ -230,7 +233,7 @@ export const TalentMatchCard = ({
               />
             </svg>
           )}
-        </div>
+        </button>
       </div>
       <div className="relative flex flex-1 flex-col px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
         <div className="mb-4 flex items-center justify-between">
@@ -245,9 +248,7 @@ export const TalentMatchCard = ({
         <div className="text-sm sm:text-base lg:grid lg:grid-cols-2 lg:gap-2">
           <div>Union(s)</div>
           <div className="font-semibold">
-            {Array.isArray(profile.union_status)
-              ? profile.union_status.join(', ')
-              : profile.union_status || 'N/A'}
+            {formatUnionStatusDisplay(profile.union_status) || 'N/A'}
           </div>
           <div>Special Skills</div>
           <div className="font-semibold">

@@ -13,6 +13,7 @@ const matchStatusOptions: {
   { value: 'accepted', label: 'Accepted' },
   { value: 'declined', label: 'Declined' },
   { value: 'interested', label: 'Interested' },
+  { value: 'favorite', label: 'Favorite' },
   { value: 'undecided', label: 'Undecided' }
 ];
 

@@ -21,6 +21,7 @@ export type TheaterMatchStatus =
   | 'accepted'
   | 'declined'
   | 'interested'
+  | 'favorite'
   | 'undecided';
 
 export type TalentMatchStatus = 'applied' | 'hidden' | 'favorite' | 'undecided';
@@ -68,5 +69,3 @@ export type TheaterTalentMatch = {
   confirmed_by?: TheaterOrTalent;
   rejected_by?: TheaterOrTalent;
 };
-
-export type FilterFavoritesType = 'all' | 'favorites';
