@@ -27,11 +27,15 @@ import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
 export const CompanyMatchCard = ({
   role,
   isFavorite = false,
-  onToggleFavorite
+  onToggleFavorite,
+  matchStatus: matchStatusProp,
+  onMatchStatusChange
 }: {
   role: ProductionRole;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  matchStatus?: boolean | null;
+  onMatchStatusChange?: (status: boolean) => void;
 }) => {
   const navigate = useNavigate();
   const { account, currentUser } = useUserContext();
@@ -40,7 +44,11 @@ export const CompanyMatchCard = ({
   const [production, setProduction] = useState<Production | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
-  const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
+  const [localMatchStatus, setLocalMatchStatus] = useState<boolean | null>(
+    null
+  );
+  const matchStatus =
+    matchStatusProp !== undefined ? matchStatusProp : localMatchStatus;
   const [theater, setTheater] = useState<Profile | null>(null);
   const productionName = production?.production_name || '(Unknown Production)';
   const roleName = role.role_name;
@@ -65,7 +73,7 @@ export const CompanyMatchCard = ({
       'talent'
     );
 
-    setMatchStatus(foundMatch ? foundMatch.status : null);
+    setLocalMatchStatus(foundMatch ? foundMatch.status : null);
   };
 
   const findTheater = async () => {
@@ -177,8 +185,10 @@ export const CompanyMatchCard = ({
         'talent'
       );
 
-      // update match state in this card
-      await findMatch();
+      onMatchStatusChange?.(status);
+      if (matchStatusProp === undefined) {
+        await findMatch();
+      }
 
       // only create messages and emails if accepted
       if (status) {
@@ -232,12 +242,14 @@ export const CompanyMatchCard = ({
     }
 
     const productionChangeOrder = async () => {
-      await findMatch();
+      if (matchStatusProp === undefined) {
+        await findMatch();
+      }
       await findTheater();
     };
 
     productionChangeOrder();
-  }, [production]);
+  }, [production, matchStatusProp]);
 
   const handleConfirm = async () => {
     setIsModalVisible(false);

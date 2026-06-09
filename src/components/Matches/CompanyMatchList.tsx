@@ -102,6 +102,17 @@ export const CompanyMatchList = () => {
     }));
   };
 
+  const onMatchStatusChange = (role: ProductionRole, status: boolean) => {
+    const key = buildKey(role);
+    setStates((prev) => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || { matchStatus: null, isFavorite: false }),
+        matchStatus: status
+      }
+    }));
+  };
+
   const selectedStatuses = filters.matchStatus || [];
 
   const filteredRoles = roles.filter((role) =>
@@ -125,7 +136,9 @@ export const CompanyMatchList = () => {
             key={`${role.role_id}-CompanyMatchCard`}
             role={role}
             isFavorite={!!state?.isFavorite}
+            matchStatus={state?.matchStatus ?? null}
             onToggleFavorite={() => onToggleFavorite(role)}
+            onMatchStatusChange={(status) => onMatchStatusChange(role, status)}
           />
         );
       })}
