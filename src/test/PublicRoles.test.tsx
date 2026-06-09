@@ -72,6 +72,20 @@ describe('PublicRoles route', () => {
     expect(screen.getByText('Stage Manager')).toBeInTheDocument();
     expect(screen.getByText('Hamlet')).toBeInTheDocument();
     expect(screen.getByText('Macbeth')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Showing 2 opportunities across 2 productions in Chicago, IL'
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /filter roles, 0 applied/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/Search roles by name or production/i)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText(/Filter by stage type/i)
+    ).not.toBeInTheDocument();
     // Theatre attribution is intentionally absent on the unauth surface;
     // see the comment in PublicShows/api.ts about the email leak.
     expect(screen.queryByText('Steppenwolf')).not.toBeInTheDocument();
@@ -124,8 +138,15 @@ describe('PublicRoles route', () => {
     // Wait for initial render of the list before filtering.
     await screen.findByText('Lead Actor');
 
-    const search = screen.getByLabelText(/Search roles by name or production/i);
-    fireEvent.change(search, { target: { value: 'zzznoresults' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /filter roles, 0 applied/i })
+    );
+
+    await screen.findByRole('dialog', { name: /filter roles/i });
+    fireEvent.change(screen.getByLabelText(/Minimum/i), {
+      target: { value: '9999' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: /apply filters/i }));
 
     expect(
       await screen.findByTestId('public-roles-no-results')
@@ -143,6 +164,9 @@ describe('PublicRoles route', () => {
     await waitFor(() => {
       expect(screen.getByText('Lead Actor')).toBeInTheDocument();
     });
+    expect(
+      screen.getByRole('button', { name: /filter roles, 0 applied/i })
+    ).toBeInTheDocument();
   });
 
   it('top sign-up CTA links to /sign-up and /get-involved when roles exist', async () => {
@@ -168,19 +192,34 @@ describe('PublicRoles route', () => {
     expect(howItWorksLinks[0]).toHaveAttribute('href', '/get-involved');
   });
 
-  it('filters by stage type', async () => {
+  it('filters by role type from the drawer', async () => {
     mockFetch.mockResolvedValueOnce(sampleRoles as never);
 
     renderRoute();
 
     await screen.findByText('Lead Actor');
 
-    const stageSelect = screen.getByLabelText(/Filter by stage type/i);
-    fireEvent.change(stageSelect, { target: { value: 'Off-Stage' } });
+    fireEvent.click(
+      screen.getByRole('button', { name: /filter roles, 0 applied/i })
+    );
+
+    await screen.findByRole('dialog', { name: /filter roles/i });
+    fireEvent.change(screen.getByLabelText(/Filter by role type/i), {
+      target: { value: 'Off-Stage' }
+    });
+    fireEvent.click(screen.getByRole('button', { name: /apply filters/i }));
 
     await waitFor(() => {
       expect(screen.queryByText('Lead Actor')).not.toBeInTheDocument();
     });
     expect(screen.getByText('Stage Manager')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Showing 1 opportunity across 1 production in Chicago, IL'
+      )
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /filter roles, 1 applied/i })
+    ).toBeInTheDocument();
   });
 });

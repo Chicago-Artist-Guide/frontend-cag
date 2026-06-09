@@ -20,9 +20,9 @@ const PublicRolesNoResults: React.FC<PublicRolesNoResultsProps> = ({
         No roles match your filters
       </h2>
       <p className="mx-auto mt-3 max-w-md font-montserrat text-base text-grayishBlue">
-        There are open roles in the system, but none match your current search
-        or stage-type filter. Try broadening your search or clearing all filters
-        to see every available opportunity.
+        There are open roles in the system, but none match your current
+        filters. Try broadening your selections or clearing all filters to see
+        every available opportunity.
       </p>
       <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <button
