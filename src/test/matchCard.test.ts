@@ -101,3 +101,19 @@ describe('Artist show overview from match card', () => {
     expect(filterBarSource).toMatch(/type="checkbox"/);
   });
 });
+
+describe('Theatre talent match filters', () => {
+  const filterBarSource = fs.readFileSync(
+    path.resolve(__dirname, '../components/Matches/TalentMatchesFilterBar.tsx'),
+    'utf8'
+  );
+
+  it('offers multi-select match status filters including Favorite', () => {
+    expect(filterBarSource).toMatch(/Accepted/);
+    expect(filterBarSource).toMatch(/Declined/);
+    expect(filterBarSource).toMatch(/Interested/);
+    expect(filterBarSource).toMatch(/Favorite/);
+    expect(filterBarSource).toMatch(/Undecided/);
+    expect(filterBarSource).toMatch(/type="checkbox"/);
+  });
+});

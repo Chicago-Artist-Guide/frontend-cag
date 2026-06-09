@@ -20,14 +20,22 @@ export const isTheaterDeclined = (match: TheaterTalentMatch): boolean =>
 export const isTalentInterested = (match: TheaterTalentMatch): boolean =>
   match.initiated_by === 'talent' && match.status === true;
 
+export type TheaterMatchFilterContext = {
+  isFavorite?: boolean;
+};
+
 /**
  * Status buckets for theatre-side match filters. A profile may belong to
  * multiple buckets (e.g. Interested + Undecided before the theatre acts).
+ * Favorite is independent of Accept/Decline/Interested.
  */
 export const getTheaterMatchStatusBuckets = (
-  match: TheaterTalentMatchRecord
+  match: TheaterTalentMatchRecord,
+  { isFavorite = false }: TheaterMatchFilterContext = {}
 ): Set<TheaterMatchStatus> => {
   const buckets = new Set<TheaterMatchStatus>();
+
+  if (isFavorite) buckets.add('favorite');
 
   if (!match) {
     buckets.add('undecided');
@@ -56,9 +64,10 @@ export const getTheaterCardMatchStatus = (
 
 export const profileMatchesTheaterStatusFilters = (
   match: TheaterTalentMatchRecord,
-  selected: TheaterMatchStatus[]
+  selected: TheaterMatchStatus[],
+  context: TheaterMatchFilterContext = {}
 ): boolean => {
   if (selected.length === 0) return true;
-  const buckets = getTheaterMatchStatusBuckets(match);
+  const buckets = getTheaterMatchStatusBuckets(match, context);
   return selected.every((s) => buckets.has(s));
 };

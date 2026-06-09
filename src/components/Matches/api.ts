@@ -226,7 +226,8 @@ export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
   filters: MatchingFilters,
   productionId: string,
-  roleId: string
+  roleId: string,
+  theaterAccountId?: string
 ): Promise<IndividualProfileDataFullInit[]> {
   // NOTE: do not remove "accountType" from the destructuring below
   // it's necessary that it's removed for filters to work
@@ -311,7 +312,22 @@ export async function fetchTalentWithFilters(
           profileData.account_id
         );
 
-        if (profileMatchesTheaterStatusFilters(findMatch, matchStatus)) {
+        const isFavorite =
+          theaterAccountId && profileData.account_id
+            ? await getTheaterTalentFavorite(
+                firebaseStore,
+                theaterAccountId,
+                profileData.account_id,
+                productionId,
+                roleId
+              )
+            : false;
+
+        if (
+          profileMatchesTheaterStatusFilters(findMatch, matchStatus, {
+            isFavorite
+          })
+        ) {
           matches.push({ ...profileData });
         }
       } else {

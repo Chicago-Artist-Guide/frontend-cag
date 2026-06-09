@@ -60,6 +60,22 @@ describe('theatre match status buckets', () => {
     );
   });
 
+  it('treats theatre favorites as a separate favorite bucket', () => {
+    expect(getTheaterMatchStatusBuckets(false, { isFavorite: true })).toEqual(
+      new Set(['favorite', 'undecided'])
+    );
+    expect(
+      profileMatchesTheaterStatusFilters(false, ['favorite'], {
+        isFavorite: true
+      })
+    ).toBe(true);
+    expect(
+      profileMatchesTheaterStatusFilters(false, ['favorite'], {
+        isFavorite: false
+      })
+    ).toBe(false);
+  });
+
   it('uses AND semantics across selected filter statuses', () => {
     const interestedUndecided = baseMatch({
       initiated_by: 'talent',

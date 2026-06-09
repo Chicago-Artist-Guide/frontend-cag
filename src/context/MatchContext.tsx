@@ -9,6 +9,7 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { fetchTalentWithFilters } from '../components/Matches/api';
 import { getProduction } from '../components/Profile/Company/api';
+import { useUserContext } from './UserContext';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 import { Production, Role } from '../components/Profile/Company/types';
@@ -59,6 +60,8 @@ export const MatchProvider: React.FC<
   React.PropsWithChildren<MatchProviderProps>
 > = ({ firestore, productionId, roleIdParam, children }) => {
   const navigate = useNavigate();
+  const { account } = useUserContext();
+  const theaterAccountId = account?.ref?.id;
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
   const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
@@ -219,12 +222,20 @@ export const MatchProvider: React.FC<
       firestore,
       filters,
       production.production_id,
-      currentRoleId
+      currentRoleId,
+      theaterAccountId
     ).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
     });
-  }, [filters]);
+  }, [
+    filters,
+    theaterAccountId,
+    production,
+    currentRoleId,
+    foundRole,
+    firestore
+  ]);
 
   const updateFilters = (newFilters: MatchingFilters) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));
