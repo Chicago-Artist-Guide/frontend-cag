@@ -26,20 +26,6 @@ interface OpeningDetailsModalProps {
   onEdit?: (opening: RoleOpportunity) => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -88,11 +74,6 @@ const Header = styled.div`
     }
   }
 `;
-
-const Content = styled.div`
-  padding: 2rem;
-`;
-
 const Section = styled.div`
   margin-bottom: 2rem;
 
@@ -127,13 +108,6 @@ const Section = styled.div`
     }
   }
 `;
-
-const BadgeGroup = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-`;
-
 const Badge = styled.span<{ variant?: string }>`
   display: inline-block;
   padding: 0.375rem 0.75rem;
@@ -253,11 +227,9 @@ const MetaInfo = styled.div`
   }
 `;
 
-const OpeningDetailsModal: React.FC<OpeningDetailsModalProps> = ({
-  opening,
-  onClose,
-  onEdit
-}) => {
+const OpeningDetailsModal: React.FC<
+  React.PropsWithChildren<OpeningDetailsModalProps>
+> = ({ opening, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
 
@@ -281,7 +253,10 @@ const OpeningDetailsModal: React.FC<OpeningDetailsModalProps> = ({
   };
 
   return (
-    <Overlay onClick={onClose}>
+    <div
+      onClick={onClose}
+      className="z-1000 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[1rem]"
+    >
       <Modal onClick={(e) => e.stopPropagation()}>
         <Header>
           <div className="title-section">
@@ -293,17 +268,17 @@ const OpeningDetailsModal: React.FC<OpeningDetailsModalProps> = ({
           </button>
         </Header>
 
-        <Content>
+        <div className="p-[2rem]">
           {/* Status and Type Badges */}
           <Section>
-            <BadgeGroup>
+            <div className="flex flex-wrap gap-[0.5rem]">
               {opening.roleType && (
                 <Badge variant="type">{opening.roleType}</Badge>
               )}
               <Badge variant={opening.status || 'open'}>
                 {opening.status || 'open'}
               </Badge>
-            </BadgeGroup>
+            </div>
           </Section>
 
           {/* Description */}
@@ -425,9 +400,9 @@ const OpeningDetailsModal: React.FC<OpeningDetailsModalProps> = ({
               </EditButton>
             </Section>
           )}
-        </Content>
+        </div>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

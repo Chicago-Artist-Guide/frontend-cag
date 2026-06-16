@@ -14,9 +14,11 @@ import {
 } from '../components/Profile/shared/api';
 import { colors, fonts } from '../theme/styleVars';
 
-const Profile: React.FC<{
-  previewMode?: boolean;
-}> = ({ previewMode = false }) => {
+const Profile: React.FC<
+  React.PropsWithChildren<{
+    previewMode?: boolean;
+  }>
+> = ({ previewMode = false }) => {
   const navigate = useNavigate();
   const { accountId } = useParams<{ accountId?: string }>();
   const auth = getAuth();
@@ -112,7 +114,12 @@ const Profile: React.FC<{
 
   // Handle viewing other profiles - MUST be before conditional returns (Rules of Hooks)
   useEffect(() => {
-    if (viewingOtherProfile && viewedAccount && viewedProfile && !contextSwappedRef.current) {
+    if (
+      viewingOtherProfile &&
+      viewedAccount &&
+      viewedProfile &&
+      !contextSwappedRef.current
+    ) {
       // Save original data before swapping
       if (!originalAccountRef.current && account) {
         originalAccountRef.current = account;
@@ -122,7 +129,11 @@ const Profile: React.FC<{
       setAccountData(viewedAccount);
       setProfileData(viewedProfile);
       contextSwappedRef.current = true;
-    } else if (!viewingOtherProfile && contextSwappedRef.current && originalAccountRef.current) {
+    } else if (
+      !viewingOtherProfile &&
+      contextSwappedRef.current &&
+      originalAccountRef.current
+    ) {
       // Restore original data
       setAccountData(originalAccountRef.current);
       originalAccountRef.current = null;
@@ -130,7 +141,13 @@ const Profile: React.FC<{
     }
     // Note: 'account' not in deps to avoid loops (we save it in ref before it changes)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewingOtherProfile, viewedAccount, viewedProfile, setAccountData, setProfileData]);
+  }, [
+    viewingOtherProfile,
+    viewedAccount,
+    viewedProfile,
+    setAccountData,
+    setProfileData
+  ]);
 
   if (loading) {
     return (

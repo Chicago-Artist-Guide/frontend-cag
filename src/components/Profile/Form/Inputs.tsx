@@ -20,15 +20,17 @@ export type OptGroupSelectValue = {
   };
 };
 
-export const FormTextArea: React.FC<{
-  name: string;
-  label: string;
-  defaultValue: string | number | readonly string[] | undefined;
-  onChange: SetForm;
-  style?: CSSProperties;
-  rows?: number;
-  required?: boolean;
-}> = ({
+export const FormTextArea: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    label: string;
+    defaultValue: string | number | readonly string[] | undefined;
+    onChange: SetForm;
+    style?: CSSProperties;
+    rows?: number;
+    required?: boolean;
+  }>
+> = ({
   name,
   label,
   defaultValue,
@@ -41,7 +43,9 @@ export const FormTextArea: React.FC<{
     <FormGroup controlId={name} {...rest}>
       <Label>
         {label}
-        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        {required && (
+          <span className="ml-[4px] font-semibold text-[#dc3545]">*</span>
+        )}
       </Label>
       <TextArea
         as="textarea"
@@ -55,16 +59,18 @@ export const FormTextArea: React.FC<{
   );
 };
 
-export const FormInput: React.FC<{
-  name: string;
-  label: string;
-  defaultValue: string | number | readonly string[] | undefined;
-  onChange: SetForm;
-  style?: CSSProperties;
-  type?: 'text' | 'number';
-  placeholder?: string;
-  required?: boolean;
-}> = ({
+export const FormInput: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    label: string;
+    defaultValue: string | number | readonly string[] | undefined;
+    onChange: SetForm;
+    style?: CSSProperties;
+    type?: 'text' | 'number';
+    placeholder?: string;
+    required?: boolean;
+  }>
+> = ({
   name,
   label,
   defaultValue,
@@ -78,7 +84,9 @@ export const FormInput: React.FC<{
     <FormGroup controlId={name} {...rest}>
       <Label>
         {label}
-        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        {required && (
+          <span className="ml-[4px] font-semibold text-[#dc3545]">*</span>
+        )}
       </Label>
       <Input
         aria-label={name}
@@ -92,15 +100,17 @@ export const FormInput: React.FC<{
   );
 };
 
-export const FormSelect: React.FC<{
-  name: string;
-  label: string;
-  defaultValue: string | number | readonly string[] | undefined;
-  onChange: SetForm;
-  options: SelectValue[] | OptGroupSelectValue;
-  hasOptGroups?: boolean;
-  required?: boolean;
-}> = ({
+export const FormSelect: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    label: string;
+    defaultValue: string | number | readonly string[] | undefined;
+    onChange: SetForm;
+    options: SelectValue[] | OptGroupSelectValue;
+    hasOptGroups?: boolean;
+    required?: boolean;
+  }>
+> = ({
   name,
   label,
   defaultValue,
@@ -113,7 +123,9 @@ export const FormSelect: React.FC<{
     <FormGroup controlId={name}>
       <Label>
         {label}
-        {required && <RequiredAsterisk>*</RequiredAsterisk>}
+        {required && (
+          <span className="ml-[4px] font-semibold text-[#dc3545]">*</span>
+        )}
       </Label>
       <Select
         aria-label={name}
@@ -147,13 +159,15 @@ export const FormSelect: React.FC<{
   );
 };
 
-export const FormRadio: React.FC<{
-  name: string;
-  label: string;
-  checked?: string;
-  onChange: SetForm;
-  options: SelectValue[];
-}> = ({ name, label, checked, onChange, options }) => {
+export const FormRadio: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    label: string;
+    checked?: string;
+    onChange: SetForm;
+    options: SelectValue[];
+  }>
+> = ({ name, label, checked, onChange, options }) => {
   const handleChange = (e: any) => {
     e.persist();
     onChange({
@@ -183,13 +197,15 @@ export const FormRadio: React.FC<{
   );
 };
 
-export const FormDateRange: React.FC<{
-  name: string;
-  label: string;
-  startValue?: string;
-  endValue?: string;
-  onChange: SetForm;
-}> = ({ name, label, startValue, endValue, onChange }) => {
+export const FormDateRange: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    label: string;
+    startValue?: string;
+    endValue?: string;
+    onChange: SetForm;
+  }>
+> = ({ name, label, startValue, endValue, onChange }) => {
   return (
     <FormGroup controlId={name}>
       <Label>{label}</Label>
@@ -210,11 +226,13 @@ export const FormDateRange: React.FC<{
   );
 };
 
-const FormDatePicker: React.FC<{
-  name: string;
-  defaultValue?: string;
-  onChange: SetForm;
-}> = ({ name, defaultValue, onChange }) => {
+const FormDatePicker: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    defaultValue?: string;
+    onChange: SetForm;
+  }>
+> = ({ name, defaultValue, onChange }) => {
   const handleChange = (date: any) => {
     const dateString = new Date(date).toLocaleDateString();
 
@@ -230,7 +248,6 @@ const FormDatePicker: React.FC<{
     <DatePickerInput
       name={name}
       onChange={handleChange}
-      value={defaultValue}
       selected={defaultValue ? new Date(defaultValue) : undefined}
       placeholderText="mm/dd/yyyy"
     />
@@ -329,7 +346,7 @@ const DateRange = styled.div`
   }
 `;
 
-const DatePickerInput = styled(DatePicker)`
+const DatePickerInput = styled(DatePicker as any)`
   height: 40px;
   width: 100%;
   max-width: 148px;
@@ -364,10 +381,4 @@ const Thru = styled.h6`
     align-self: center;
     margin: 0.25em 0;
   }
-`;
-
-const RequiredAsterisk = styled.span`
-  color: #dc3545;
-  margin-left: 4px;
-  font-weight: 600;
 `;

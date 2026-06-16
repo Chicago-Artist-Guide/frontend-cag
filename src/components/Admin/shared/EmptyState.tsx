@@ -70,18 +70,10 @@ const Description = styled.p`
   max-width: 400px;
   line-height: 1.6;
 `;
-
-/**
- * Action button container
- */
-const ActionContainer = styled.div`
-  margin-top: 0.5rem;
-`;
-
 /**
  * EmptyState Component
  */
-const EmptyState: React.FC<EmptyStateProps> = ({
+const EmptyState: React.FC<React.PropsWithChildren<EmptyStateProps>> = ({
   icon = faInbox,
   title,
   description,
@@ -94,7 +86,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({
       </IconContainer>
       <Title>{title}</Title>
       {description && <Description>{description}</Description>}
-      {action && <ActionContainer>{action}</ActionContainer>}
+      {action && <div className="mt-[0.5rem]">{action}</div>}
     </Container>
   );
 };

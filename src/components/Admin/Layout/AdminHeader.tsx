@@ -59,16 +59,6 @@ const Breadcrumbs = styled.div`
     font-weight: 600;
   }
 `;
-
-/**
- * Right side actions
- */
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-`;
-
 /**
  * User info display
  */
@@ -204,7 +194,7 @@ const generateBreadcrumbs = (pathname: string) => {
 /**
  * AdminHeader Component
  */
-const AdminHeader: React.FC = () => {
+const AdminHeader: React.FC<React.PropsWithChildren<unknown>> = () => {
   const location = useLocation();
   const { currentUser } = useUserContext();
 
@@ -231,7 +221,7 @@ const AdminHeader: React.FC = () => {
         ))}
       </Breadcrumbs>
 
-      <HeaderActions>
+      <div className="flex items-center gap-[1rem]">
         <LinkButton to="/home">View Site</LinkButton>
         {currentUser && (
           <UserInfo>
@@ -246,7 +236,7 @@ const AdminHeader: React.FC = () => {
             </div>
           </UserInfo>
         )}
-      </HeaderActions>
+      </div>
     </HeaderContainer>
   );
 };

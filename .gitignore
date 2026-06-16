@@ -42,3 +42,15 @@ CLAUDE.md
 .vscode
 
 docs/
+
+# Visual regression — auth state and run outputs (baselines are committed per-PR)
+scripts/visual-regression/.auth/
+scripts/visual-regression/snapshots/current/
+scripts/visual-regression/snapshots/diff/
+
+# Codemod per-run report
+scripts/migrate-styles/last-run.json
+
+# One-off shot folders from the React 19 migration
+master-shots/
+r19-shots/

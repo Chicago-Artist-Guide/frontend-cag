@@ -11,8 +11,7 @@ import {
   additionalRequirements,
   ageRanges,
   roleStatuses,
-  roleSpecificGenders,
-  unionOptions
+  roleSpecificGenders
 } from '../../../../../utils/lookups';
 import { ethnicityTypes } from '../../../../SignUp/Individual/types';
 import ConfirmDialog from '../../../../ConfirmDialog';
@@ -29,14 +28,16 @@ import { Role } from '../../types';
 
 const statuses = getOptions(roleStatuses);
 
-const RoleModal: React.FC<{
-  show: boolean;
-  type: StageRole;
-  role?: Role;
-  onDelete: (x: Role) => void;
-  onSubmit: (x: Role) => void;
-  onClose: () => void;
-}> = ({ show = false, type, role = {}, onSubmit, onClose, onDelete }) => {
+const RoleModal: React.FC<
+  React.PropsWithChildren<{
+    show: boolean;
+    type: StageRole;
+    role?: Role;
+    onDelete: (x: Role) => void;
+    onSubmit: (x: Role) => void;
+    onClose: () => void;
+  }>
+> = ({ show = false, type, role = {}, onSubmit, onClose, onDelete }) => {
   if (!show) return null;
   const [showConfirm, setShowConfirm] = useState(false);
   const [formValues, setFormValues] = useState<Role>({});
@@ -44,12 +45,8 @@ const RoleModal: React.FC<{
 
   useEffect(() => {
     if (role.role_id) {
-      // Backward compatibility: convert legacy string union to array
-      let normalizedRole: Role = {
-        ...role,
-        union: typeof role.union === 'string' ? [role.union] : role.union || []
-      };
       // Fold legacy include_nonbinary into gender_identity
+      let normalizedRole: Role = { ...role };
       if (
         normalizedRole.include_nonbinary &&
         normalizedRole.gender_identity &&
@@ -68,8 +65,7 @@ const RoleModal: React.FC<{
         role_status: 'Open',
         gender_identity: ['Open to all genders'],
         age_range: ['Open to all ages'],
-        ethnicity: ['Open to all ethnicities'],
-        union: []
+        ethnicity: ['Open to all ethnicities']
       });
     }
   }, [role, type, show]);
@@ -100,16 +96,31 @@ const RoleModal: React.FC<{
       errors.push('Pay must be a positive number');
     }
 
-    // When character gender is not "Open to all genders", at least one of Man, Woman, or Nonbinary required
+    // When character gender is not "Open to all genders", at least one of
+    // Man, Woman, Nonbinary, or Trans/Nonbinary required
     if (isOnStage) {
       const isOpenToAllGenders = isOpenToAllSelected('gender_identity');
       if (!isOpenToAllGenders) {
         const specificGenders = (formValues.gender_identity || []).filter(
-          (g) => g === 'Man' || g === 'Woman' || g === 'Nonbinary'
+          (g) =>
+            g === 'Man' ||
+            g === 'Woman' ||
+            g === 'Nonbinary' ||
+            g === 'Trans/Nonbinary'
         );
         if (specificGenders.length === 0) {
           errors.push(
-            'Select at least one character gender (Man, Woman, and/or Nonbinary)'
+            'Select at least one character gender (Man, Woman, Nonbinary, and/or Trans/Nonbinary)'
+          );
+        }
+      }
+
+      // If Trans/Nonbinary is selected, require at least one sub-selection
+      if (isTransNonbinaryEnabled) {
+        const subSelections = formValues.trans_nonbinary_roles || [];
+        if (subSelections.length === 0) {
+          errors.push(
+            'Select which roles you are open to trans/nonbinary actors playing (Man, Woman, and/or Nonbinary)'
           );
         }
       }
@@ -129,7 +140,13 @@ const RoleModal: React.FC<{
 
     // Clear any previous errors
     setValidationErrors([]);
-    onSubmit(role);
+    // Drop the legacy include_nonbinary flag on save: the new
+    // gender_identity + trans_nonbinary_roles fields are the source of truth
+    // and the load-time normalization already folded any legacy value into
+    // gender_identity. Leaving include_nonbinary set in Firestore would let
+    // it drift away from the new fields on subsequent edits.
+    const { include_nonbinary: _drop, union: _union, ...sanitized } = role;
+    onSubmit(sanitized as Role);
     setFormValues({});
   };
 
@@ -289,21 +306,40 @@ const RoleModal: React.FC<{
     }
   };
 
-  const handleUnionChange = (option: string, checked: boolean) => {
-    const currentUnions = (formValues.union as string[]) || [];
+  // "Trans/Nonbinary" parent option (item 9): toggling on opens a sub-select
+  // of which trans/nonbinary roles (Man/Woman/Nonbinary) the company is open
+  // to. Stored separately so we keep the existing gender_identity matching
+  // contract intact while still capturing the additional context.
+  const isTransNonbinaryEnabled =
+    isValueIncluded('gender_identity', 'Trans/Nonbinary') ||
+    (formValues.trans_nonbinary_roles?.length ?? 0) > 0;
 
+  const handleTransNonbinaryToggle = (checked: boolean) => {
     if (checked) {
-      setFormValues({ ...formValues, union: [...currentUnions, option] });
+      const currentValues = (formValues.gender_identity as string[]) || [];
+      const filtered = currentValues.filter((v) => v !== 'Open to all genders');
+      const next = filtered.includes('Trans/Nonbinary')
+        ? filtered
+        : [...filtered, 'Trans/Nonbinary'];
+      setFormValues({ ...formValues, gender_identity: next });
     } else {
+      const currentValues = (formValues.gender_identity as string[]) || [];
       setFormValues({
         ...formValues,
-        union: currentUnions.filter((u) => u !== option)
+        gender_identity: currentValues.filter((v) => v !== 'Trans/Nonbinary'),
+        trans_nonbinary_roles: []
       });
     }
   };
 
-  const isUnionSelected = (option: string): boolean => {
-    return ((formValues.union as string[]) || []).includes(option);
+  const handleTransNonbinaryRoleChange = (role: string, checked: boolean) => {
+    const current = formValues.trans_nonbinary_roles || [];
+    const next = checked
+      ? current.includes(role)
+        ? current
+        : [...current, role]
+      : current.filter((r) => r !== role);
+    setFormValues({ ...formValues, trans_nonbinary_roles: next });
   };
 
   const onDeleteConfirm = () => {
@@ -348,12 +384,12 @@ const RoleModal: React.FC<{
                 <Title>{title}</Title>
               </Col>
               <div className="d-flex flex-shrink-1 flex-row flex-row-reverse">
-                <CloseButton
-                  className="d-flex align-items-center"
+                <div
+                  className="d-flex align-items-center cursor-pointer text-[24px]"
                   onClick={onClose}
                 >
                   <Icon icon={faClose} />
-                </CloseButton>
+                </div>
               </div>
             </Row>
             <Row className="mt-5">
@@ -389,9 +425,12 @@ const RoleModal: React.FC<{
                 />
                 <Form.Group className="form-group" style={{ marginTop: 30 }}>
                   <CAGLabel>
-                    Pay<RequiredAsterisk>*</RequiredAsterisk>
+                    Pay
+                    <span className="ml-[4px] font-semibold text-[#dc3545]">
+                      *
+                    </span>
                   </CAGLabel>
-                  <RoleRate>
+                  <div className="mt-[-30px] flex items-center gap-[0.75em]">
                     <FormInput
                       name="role_rate"
                       label="Rate"
@@ -423,7 +462,7 @@ const RoleModal: React.FC<{
                       value={formValues?.role_rate_unit}
                       onChange={setFormState}
                     />
-                  </RoleRate>
+                  </div>
                 </Form.Group>
                 <Dropdown
                   name="role_status"
@@ -433,21 +472,6 @@ const RoleModal: React.FC<{
                   onChange={setFormState}
                   style={{ marginTop: 0 }}
                 />
-                <Form.Group className="form-group" style={{ marginTop: 30 }}>
-                  <CAGLabel>Union Status</CAGLabel>
-                  {unionOptions.map((option) => (
-                    <Checkbox
-                      checked={isUnionSelected(option)}
-                      fieldType="checkbox"
-                      key={`union_${option}`}
-                      label={option}
-                      name={option}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        handleUnionChange(option, e.target.checked);
-                      }}
-                    />
-                  ))}
-                </Form.Group>
                 {isOnStage && (
                   <>
                     <Form.Group
@@ -562,6 +586,52 @@ const RoleModal: React.FC<{
                           />
                         );
                       })}
+                      <Checkbox
+                        checked={isTransNonbinaryEnabled}
+                        fieldType="checkbox"
+                        key="gender_identity_trans_nonbinary"
+                        label="Trans/Nonbinary"
+                        name="trans_nonbinary"
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                          handleTransNonbinaryToggle(e.target.checked);
+                        }}
+                      />
+                      {isTransNonbinaryEnabled && (
+                        <div style={{ paddingLeft: '1.25rem' }}>
+                          <p
+                            style={{
+                              fontSize: '14px',
+                              marginBottom: '8px',
+                              marginTop: '4px'
+                            }}
+                          >
+                            Open to trans/nonbinary actors playing (select all
+                            that apply):
+                          </p>
+                          {roleSpecificGenders.map((gender) => {
+                            const isChecked = (
+                              formValues.trans_nonbinary_roles || []
+                            ).includes(gender);
+                            return (
+                              <Checkbox
+                                checked={isChecked}
+                                fieldType="checkbox"
+                                key={`trans_nonbinary_role_${gender}`}
+                                label={gender}
+                                name={`trans_nonbinary_${gender}`}
+                                onChange={(
+                                  e: React.ChangeEvent<HTMLInputElement>
+                                ) => {
+                                  handleTransNonbinaryRoleChange(
+                                    gender,
+                                    e.target.checked
+                                  );
+                                }}
+                              />
+                            );
+                          })}
+                        </div>
+                      )}
                     </Form.Group>
                     <Form.Group
                       className="form-group"
@@ -730,11 +800,11 @@ const RoleModal: React.FC<{
               </Col>
             </Row>
             {validationErrors.length > 0 && (
-              <ValidationErrorContainer>
+              <div className="mb-[10px] mt-[20px] rounded-[4px] border border-solid border-[#f5c6cb] bg-[#f8d7da] px-[16px] py-[12px]">
                 {validationErrors.map((error, index) => (
                   <ValidationError key={index}>{error}</ValidationError>
                 ))}
-              </ValidationErrorContainer>
+              </div>
             )}
             <ModalButtonContainer className="d-flex flex-column-reverse flex-md-row flex-md-row-reverse mt-3">
               <Button
@@ -757,12 +827,6 @@ const RoleModal: React.FC<{
     </>
   );
 };
-
-const CloseButton = styled.div`
-  font-size: 24px;
-  cursor: pointer;
-`;
-
 const Icon = styled(FontAwesomeIcon)`
   margin-right: 5px;
   color: ${colors.lighterGrey};
@@ -777,14 +841,6 @@ const Title = styled.h2`
   letter-spacing: 0.1em;
   text-transform: uppercase;
 `;
-
-const RoleRate = styled.div`
-  margin-top: -30px;
-  display: flex;
-  gap: 0.75em;
-  align-items: center;
-`;
-
 const ModalButtonContainer = styled.div`
   gap: 0;
 
@@ -798,27 +854,10 @@ const ModalButtonContainer = styled.div`
     }
   }
 `;
-
-const ValidationErrorContainer = styled.div`
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 12px 16px;
-  margin-top: 20px;
-  margin-bottom: 10px;
-`;
-
 const ValidationError = styled.div`
   color: #721c24;
   font-size: 14px;
   margin: 4px 0;
   font-family: ${fonts.montserrat};
 `;
-
-const RequiredAsterisk = styled.span`
-  color: #dc3545;
-  margin-left: 4px;
-  font-weight: 600;
-`;
-
 export default RoleModal;

@@ -44,6 +44,7 @@ export type Production = {
   account_id: string;
   production_id: string;
   production_name: string;
+  theater_name?: string;
   production_image_url?: string;
   type?: ProductionType;
   type_other?: string;
@@ -89,6 +90,7 @@ export type Role = {
   role_rate_unit?: 'Total' | 'Per Week' | 'Per Hour' | 'Per Show';
   gender_identity?: string[];
   include_nonbinary?: boolean;
+  trans_nonbinary_roles?: string[];
   ethnicity?: string[];
   role_status?: RoleStatus;
   age_range?: string[];

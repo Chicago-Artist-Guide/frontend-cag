@@ -1,64 +1,124 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Row, Col } from 'react-bootstrap';
 import { Role } from '../Profile/Company/types';
 import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
+import { parseLocalDate } from '../../utils/dates';
+import { formatUnionStatusDisplay } from '../../utils/lookups';
 
 interface PublicRoleCardProps {
   role: Role;
-  onShowInterest: () => void;
-  isLoggedIn: boolean;
+  // Optional list-mode props for the /roles browse page (DEV-496/497).
+  // When productionId is set, the card renders production context at the
+  // top and links to the production detail page. Theatre attribution is
+  // intentionally omitted on the unauth surface — see comment in
+  // PublicShows/api.ts about the email leak from the accounts collection.
+  productionId?: string;
+  productionName?: string;
+  auditionStart?: string;
+  auditionEnd?: string;
 }
 
-const PublicRoleCard: React.FC<PublicRoleCardProps> = ({
-  role,
-  onShowInterest,
-  isLoggedIn
-}) => {
+const formatDate = (value?: string) => {
+  if (!value) {
+    return '';
+  }
+  const parsed = parseLocalDate(value);
+  if (!parsed) {
+    return '';
+  }
+  return parsed.toLocaleDateString();
+};
+
+const formatAuditionWindow = (start?: string, end?: string) => {
+  const s = formatDate(start);
+  const e = formatDate(end);
+  if (s && e) {
+    return `${s} – ${e}`;
+  }
+  return s || e || '';
+};
+
+// Format pay rate as "$NNN Unit" matching the CompanyMatchCard pattern.
+// role_rate_unit values already include "Per" (e.g. "Per Week", "Per Hour",
+// "Per Show", "Total"), so no "per" prefix is added here.
+const formatRate = (
+  rate?: number,
+  unit?: 'Total' | 'Per Week' | 'Per Hour' | 'Per Show'
+): string => {
+  if (rate == null) {
+    return '';
+  }
+  const rateStr = `$${rate}`;
+  return unit ? `${rateStr} ${unit}` : rateStr;
+};
+
+const PublicRoleCard: React.FC<
+  React.PropsWithChildren<PublicRoleCardProps>
+> = ({ role, productionId, productionName, auditionStart, auditionEnd }) => {
+  const isListMode = !!productionId;
+  const auditionWindow = formatAuditionWindow(auditionStart, auditionEnd);
+  const displayRoleName =
+    role.role_name || role.offstage_role || 'Untitled Role';
+  const rateDisplay = formatRate(role.role_rate, role.role_rate_unit);
+
   return (
     <RoleCardContainer>
-      <Row>
-        <Col lg={8}>
-          <RoleName>{role.role_name}</RoleName>
-          <RoleStatus>{role.role_status}</RoleStatus>
+      {isListMode && productionName && (
+        <ProductionLine>
+          <ProductionLink to={`/shows/${productionId}`}>
+            {productionName}
+          </ProductionLink>
+        </ProductionLine>
+      )}
 
-          {role.description && (
-            <RoleDescription>{role.description}</RoleDescription>
-          )}
+      <RoleName>{displayRoleName}</RoleName>
 
-          <RoleDetails>
-            {role.union && (
-              <DetailItem>
-                <DetailLabel>Union:</DetailLabel>
-                <DetailValue>{role.union}</DetailValue>
-              </DetailItem>
-            )}
+      {role.description && (
+        <p className="mb-[15px] line-clamp-3 font-montserrat text-sm">
+          {role.description}
+        </p>
+      )}
 
-            {role.role_rate && (
-              <DetailItem>
-                <DetailLabel>Rate:</DetailLabel>
-                <DetailValue>
-                  {role.role_rate}{' '}
-                  {role.role_rate_unit && `per ${role.role_rate_unit}`}
-                </DetailValue>
-              </DetailItem>
-            )}
-          </RoleDetails>
-        </Col>
+      <div className="flex flex-wrap gap-[10px]">
+        {role.type && (
+          <div className="mb-[5px] mr-[15px] flex">
+            <DetailLabel>Stage:</DetailLabel>
+            <DetailValue>{role.type}</DetailValue>
+          </div>
+        )}
+        {Array.isArray(role.union) && role.union.length > 0 && (
+          <div className="mb-[5px] mr-[15px] flex">
+            <DetailLabel>Union:</DetailLabel>
+            <DetailValue>{formatUnionStatusDisplay(role.union)}</DetailValue>
+          </div>
+        )}
+        {rateDisplay && (
+          <div className="mb-[5px] mr-[15px] flex">
+            <DetailLabel>Rate:</DetailLabel>
+            <DetailValue>{rateDisplay}</DetailValue>
+          </div>
+        )}
+        {auditionWindow && (
+          <div className="mb-[5px] mr-[15px] flex">
+            <DetailLabel>Auditions:</DetailLabel>
+            <DetailValue>{auditionWindow}</DetailValue>
+          </div>
+        )}
+      </div>
 
-        <Col
-          lg={4}
-          className="d-flex align-items-center justify-content-center"
-        >
-          <RoleButton
-            onClick={onShowInterest}
-            text={isLoggedIn ? 'Apply for Role' : 'Express Interest'}
-            type="button"
-            variant="primary"
-          />
-        </Col>
-      </Row>
+      {isListMode && productionId && (
+        <div className="mt-[12px]">
+          <Link to={`/shows/${productionId}`}>
+            <ViewButton
+              text="View Production"
+              type="button"
+              variant="primary"
+            />
+          </Link>
+        </div>
+      )}
     </RoleCardContainer>
   );
 };
@@ -71,36 +131,31 @@ const RoleCardContainer = styled.div`
   margin-bottom: 20px;
 `;
 
+const ProductionLine = styled.div`
+  font-family: ${fonts.montserrat};
+  font-size: 13px;
+  color: ${colors.grayishBlue};
+  margin-bottom: 6px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+`;
+
+const ProductionLink = styled(Link)`
+  color: ${colors.cornflower};
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    color: ${colors.mint};
+    text-decoration: underline;
+  }
+`;
+
 const RoleName = styled.h4`
   font-family: ${fonts.montserrat};
   font-weight: 600;
   font-size: 18px;
-  margin-bottom: 5px;
-`;
-
-const RoleStatus = styled.div`
-  font-family: ${fonts.montserrat};
-  font-weight: 500;
-  font-size: 14px;
-  color: ${colors.mint};
-  margin-bottom: 10px;
-`;
-
-const RoleDescription = styled.p`
-  font-family: ${fonts.montserrat};
-  font-size: 14px;
-  margin-bottom: 15px;
-`;
-
-const RoleDetails = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  margin-right: 15px;
   margin-bottom: 5px;
 `;
 
@@ -116,8 +171,9 @@ const DetailValue = styled.span`
   font-size: 14px;
 `;
 
-const RoleButton = styled(Button)`
-  width: 100%;
+const ViewButton = styled(Button)`
+  font-family: ${fonts.montserrat};
+  font-weight: 600;
 `;
 
 export default PublicRoleCard;

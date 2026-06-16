@@ -14,16 +14,18 @@ import { FormStep, SubmitResponse } from './types';
 
 const FORM_VALIDATION_ON = true;
 
-const SignUpFooter: React.FC<{
-  navigation: NavigationProps;
-  setLandingStep: (x: number) => void;
-  formStep: FormStep;
-  steps: Step[];
-  setErrors: (step: string, hasErrors: boolean) => void;
-  submitBasics: () => Promise<SubmitResponse>;
-  completeSignUp: () => Promise<void>;
-  stepErrors: { [key: string]: boolean };
-}> = ({
+const SignUpFooter: React.FC<
+  React.PropsWithChildren<{
+    navigation: NavigationProps;
+    setLandingStep: (x: number) => void;
+    formStep: FormStep;
+    steps: Step[];
+    setErrors: (step: string, hasErrors: boolean) => void;
+    submitBasics: () => Promise<SubmitResponse>;
+    completeSignUp: () => Promise<void>;
+    stepErrors: { [key: string]: boolean };
+  }>
+> = ({
   navigation,
   setLandingStep,
   formStep,

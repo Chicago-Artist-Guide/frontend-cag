@@ -32,7 +32,9 @@ interface ResponsiveImageCropProps {
   maxZoom?: number;
 }
 
-const ResponsiveImageCrop: React.FC<ResponsiveImageCropProps> = ({
+const ResponsiveImageCrop: React.FC<
+  React.PropsWithChildren<ResponsiveImageCropProps>
+> = ({
   imageSrc,
   onCropComplete,
   onCancel,
@@ -77,7 +79,7 @@ const ResponsiveImageCrop: React.FC<ResponsiveImageCropProps> = ({
   };
 
   return (
-    <Container>
+    <div className="flex w-[100%] flex-col gap-[20px]">
       <CropperContainer>
         <Cropper
           image={imageSrc}
@@ -160,17 +162,9 @@ const ResponsiveImageCrop: React.FC<ResponsiveImageCropProps> = ({
           )}
         </ActionButtons>
       </Controls>
-    </Container>
+    </div>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
-
 const CropperContainer = styled.div`
   position: relative;
   width: 100%;

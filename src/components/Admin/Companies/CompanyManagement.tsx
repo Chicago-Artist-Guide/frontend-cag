@@ -34,18 +34,6 @@ const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
 `;
-
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-  gap: 1rem;
-`;
-
-const TitleSection = styled.div``;
-
 const SearchBar = styled.input`
   width: 100%;
   padding: 0.75rem 1rem;
@@ -128,13 +116,6 @@ const CompanyGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
 `;
-
-const RequestsList = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
 const EmptyState = styled.div`
   text-align: center;
   padding: 4rem;
@@ -159,7 +140,7 @@ const ErrorMessage = styled.div`
   text-align: center;
 `;
 
-const CompanyManagement: React.FC = () => {
+const CompanyManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { hasPermission, permissions } = useAdminAuth();
 
   // Permission check
@@ -282,13 +263,13 @@ const CompanyManagement: React.FC = () => {
 
   return (
     <Container>
-      <HeaderRow>
-        <TitleSection>
+      <div className="mb-[2rem] flex flex-wrap items-start justify-between gap-[1rem]">
+        <div className="">
           <PageTitle>Theatre Companies</PageTitle>
           <PageSubtitle>
             Manage theatre company accounts and sign-up requests
           </PageSubtitle>
-        </TitleSection>
+        </div>
         {canCreate && (
           <AdminButton
             variant="primary"
@@ -298,7 +279,7 @@ const CompanyManagement: React.FC = () => {
             Add Company
           </AdminButton>
         )}
-      </HeaderRow>
+      </div>
 
       <TabRow>
         <Tab
@@ -384,7 +365,7 @@ const CompanyManagement: React.FC = () => {
           {requestsLoading && <LoadingSpinner message="Loading requests..." />}
 
           {!requestsLoading && requests.length > 0 && (
-            <RequestsList>
+            <div className="flex flex-col gap-[1rem]">
               {requests.map((request) => (
                 <TheatreRequestCard
                   key={request.id}
@@ -392,7 +373,7 @@ const CompanyManagement: React.FC = () => {
                   onClick={() => handleRequestClick(request)}
                 />
               ))}
-            </RequestsList>
+            </div>
           )}
 
           {!requestsLoading && requests.length === 0 && (

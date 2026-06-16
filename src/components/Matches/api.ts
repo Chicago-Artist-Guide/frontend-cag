@@ -9,6 +9,7 @@ import {
   Query,
   QueryDocumentSnapshot,
   QuerySnapshot,
+  setDoc,
   where,
   updateDoc,
   limit
@@ -17,6 +18,7 @@ import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
 import { Production, Role } from '../Profile/Company/types';
 import { getProduction } from '../Profile/Company/api';
 import { expandEthnicityForMatching } from '../../utils/helpers';
+import { ACTIVE_PRODUCTION_STATUSES } from '../../utils/lookups';
 import {
   FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING,
   MatchingFilters,
@@ -24,6 +26,7 @@ import {
   TheaterOrTalent,
   TheaterTalentMatch
 } from './types';
+import { profileMatchesTheaterStatusFilters } from './matchStatus';
 
 export const getTheaterTalentMatch = async (
   firebaseStore: Firestore,
@@ -64,6 +67,111 @@ export const getTheaterTalentMatch = async (
   }
 
   return false;
+};
+
+export const getTalentRoleFavoriteDocId = (
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+) => `talent_${talentAccountId}_${productionId}_${roleId}`;
+
+export const getTheaterTalentFavoriteDocId = (
+  theaterAccountId: string,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+) => `${theaterAccountId}_${talentAccountId}_${productionId}_${roleId}`;
+
+export const getTalentRoleFavorite = async (
+  firebaseStore: Firestore,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+): Promise<boolean> => {
+  if (!talentAccountId || !productionId || !roleId) return false;
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTalentRoleFavoriteDocId(talentAccountId, productionId, roleId)
+  );
+  const snap = await getDoc(ref);
+  return snap.exists() ? !!snap.data()?.status : false;
+};
+
+export const getTheaterTalentFavorite = async (
+  firebaseStore: Firestore,
+  theaterAccountId: string,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string
+): Promise<boolean> => {
+  if (!theaterAccountId || !talentAccountId || !productionId || !roleId) {
+    return false;
+  }
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTheaterTalentFavoriteDocId(
+      theaterAccountId,
+      talentAccountId,
+      productionId,
+      roleId
+    )
+  );
+  const snap = await getDoc(ref);
+  return snap.exists() ? !!snap.data()?.status : false;
+};
+
+export const setTheaterTalentFavorite = async (
+  firebaseStore: Firestore,
+  theaterAccountId: string,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string,
+  status: boolean
+): Promise<void> => {
+  if (!theaterAccountId || !talentAccountId || !productionId || !roleId) {
+    return;
+  }
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTheaterTalentFavoriteDocId(
+      theaterAccountId,
+      talentAccountId,
+      productionId,
+      roleId
+    )
+  );
+  await setDoc(ref, {
+    initiated_by: 'theater',
+    production_id: doc(firebaseStore, 'productions', productionId),
+    role_id: roleId,
+    status,
+    talent_account_id: doc(firebaseStore, 'accounts', talentAccountId)
+  });
+};
+
+export const setTalentRoleFavorite = async (
+  firebaseStore: Firestore,
+  talentAccountId: string,
+  productionId: string,
+  roleId: string,
+  status: boolean
+): Promise<void> => {
+  if (!talentAccountId || !productionId || !roleId) return;
+  const ref = doc(
+    firebaseStore,
+    'theater_talent_favorites',
+    getTalentRoleFavoriteDocId(talentAccountId, productionId, roleId)
+  );
+  await setDoc(ref, {
+    initiated_by: 'talent',
+    production_id: doc(firebaseStore, 'productions', productionId),
+    role_id: roleId,
+    status,
+    talent_account_id: doc(firebaseStore, 'accounts', talentAccountId)
+  });
 };
 
 export const createTheaterTalentMatch = async (
@@ -118,7 +226,8 @@ export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
   filters: MatchingFilters,
   productionId: string,
-  roleId: string
+  roleId: string,
+  theaterAccountId?: string
 ): Promise<IndividualProfileDataFullInit[]> {
   // NOTE: do not remove "accountType" from the destructuring below
   // it's necessary that it's removed for filters to work
@@ -144,7 +253,8 @@ export async function fetchTalentWithFilters(
           if (FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING.includes(field)) {
             profileQuery = query(profileQuery, where(field, 'in', value));
           } else {
-            // we know the comparison is array to array
+            // Array profile fields (e.g. union_status, ethnicities): multiple
+            // selected filter values use OR — match profiles containing any one.
             profileQuery = query(
               profileQuery,
               where(field, 'array-contains-any', value)
@@ -194,16 +304,30 @@ export async function fetchTalentWithFilters(
     if (docSnap.exists()) {
       const profileData = docSnap.data() as IndividualProfileDataFullInit;
 
-      if (matchStatus !== null && matchStatus !== undefined) {
+      if (Array.isArray(matchStatus) && matchStatus.length > 0) {
         const findMatch = await getTheaterTalentMatch(
           firebaseStore,
           productionId,
           roleId,
           profileData.account_id
         );
-        const foundMatchStatus = findMatch ? findMatch.status : null;
 
-        if (foundMatchStatus === matchStatus) {
+        const isFavorite =
+          theaterAccountId && profileData.account_id
+            ? await getTheaterTalentFavorite(
+                firebaseStore,
+                theaterAccountId,
+                profileData.account_id,
+                productionId,
+                roleId
+              )
+            : false;
+
+        if (
+          profileMatchesTheaterStatusFilters(findMatch, matchStatus, {
+            isFavorite
+          })
+        ) {
           matches.push({ ...profileData });
         }
       } else {
@@ -259,25 +383,21 @@ export async function fetchTalentWithFilters(
               return true;
             }
 
-            // Trans/Nonbinary matches if their role interests overlap role's genders
+            // Trans/Nonbinary artists match if their gender_roles overlap with
+            // the role's open-to set. When the role explicitly invites trans
+            // actors (gender_identity includes 'Trans/Nonbinary'), the
+            // company-specified trans_nonbinary_roles is authoritative; fall
+            // back to roleGenders for legacy roles created before that field
+            // existed.
             if (profile.gender_identity === 'Trans/Nonbinary') {
               const genderRoles = profile.gender_roles || [];
-              if (
-                roleGenders.includes('Woman') &&
-                genderRoles.includes('Woman')
-              ) {
-                return true;
-              }
-              if (roleGenders.includes('Man') && genderRoles.includes('Man')) {
-                return true;
-              }
-              if (
-                roleGenders.includes('Nonbinary') &&
-                genderRoles.includes('Nonbinary')
-              ) {
-                return true;
-              }
-              return false;
+              const transAccepted =
+                role.gender_identity?.includes('Trans/Nonbinary') ?? false;
+              const acceptedSet =
+                transAccepted && (role.trans_nonbinary_roles?.length ?? 0) > 0
+                  ? role.trans_nonbinary_roles!
+                  : roleGenders;
+              return genderRoles.some((g) => acceptedSet.includes(g));
             }
 
             return false;
@@ -322,10 +442,9 @@ export async function fetchRolesForTalent(
   profile: IndividualProfileDataFullInit
 ): Promise<ProductionRole[]> {
   const roles: ProductionRole[] = [];
-  const activeProductionStatuses = ['Casting', 'Hiring', 'Pre-Production'];
   const productionsRef = query(
     collection(firebaseStore, 'productions'),
-    where('status', 'in', activeProductionStatuses)
+    where('status', 'in', ACTIVE_PRODUCTION_STATUSES)
   );
 
   try {
@@ -399,15 +518,19 @@ export async function fetchRolesForTalent(
               }
             }
 
-            // Trans/Nonbinary matches if their role interests overlap role's genders
+            // Trans/Nonbinary artists match if their gender_roles overlap with
+            // the role's open-to set. Prefer pR.trans_nonbinary_roles when the
+            // role explicitly invites trans actors; fall back to roleGenders
+            // for legacy roles. (Mirrors fetchTalentWithFilters.)
             if (profile.gender_identity === 'Trans/Nonbinary') {
               const genderRoles = profile.gender_roles || [];
-              const hasMatch =
-                (roleGenders.includes('Woman') &&
-                  genderRoles.includes('Woman')) ||
-                (roleGenders.includes('Man') && genderRoles.includes('Man')) ||
-                (roleGenders.includes('Nonbinary') &&
-                  genderRoles.includes('Nonbinary'));
+              const transAccepted =
+                pR.gender_identity?.includes('Trans/Nonbinary') ?? false;
+              const acceptedSet =
+                transAccepted && (pR.trans_nonbinary_roles?.length ?? 0) > 0
+                  ? pR.trans_nonbinary_roles!
+                  : roleGenders;
+              const hasMatch = genderRoles.some((g) => acceptedSet.includes(g));
               if (!hasMatch) {
                 return false;
               }
@@ -446,20 +569,6 @@ export async function fetchRolesForTalent(
               return false;
             }
             if (requiresDancing && !skills.includes('Dancing')) {
-              return false;
-            }
-          }
-
-          // Union matching - role union requirements vs profile union status
-          if (pR.union && Array.isArray(pR.union) && pR.union.length > 0) {
-            const profileUnionStatus = profile.union_status || [];
-
-            // Check if at least one union status matches
-            const hasUnionMatch = pR.union.some((roleUnion) =>
-              profileUnionStatus.includes(roleUnion)
-            );
-
-            if (!hasUnionMatch) {
               return false;
             }
           }

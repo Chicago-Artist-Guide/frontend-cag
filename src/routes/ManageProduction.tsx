@@ -27,7 +27,8 @@ const ManageProduction = () => {
   const navigate = useNavigate();
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
-    account: { data: accountData }
+    account: { data: accountData },
+    profile: { data: profileData }
   } = useUserContext();
   const ownerAccountId = accountData?.uid || accountData?.account_id || '';
   const [showConfirm, setShowConfirm] = useState(false);
@@ -111,10 +112,24 @@ const ManageProduction = () => {
 
   const handleUpdateDocument = async (values: Production) => {
     const docRef = doc(db, 'productions', productionId);
+    // Preserve existing theater_name (incl. empty string) on update —
+    // only auto-resolve when the field is genuinely missing AND the saver
+    // owns this production. Prevents an admin/collaborator editing
+    // another company's production from overwriting it with their own
+    // theatre name. Mirrors AddProduction's profile-first priority.
+    const isOwner = !!ownerAccountId && values.account_id === ownerAccountId;
+    const resolvedTheaterName: string =
+      values.theater_name ??
+      (isOwner
+        ? (profileData as any)?.theatre_name ||
+          (accountData as any)?.theater_name ||
+          ''
+        : '');
     const payload = sanitizeDataForFirestore({
       ...values,
       production_id: values.production_id || productionId,
-      account_id: values.account_id || ownerAccountId
+      account_id: values.account_id || ownerAccountId,
+      theater_name: resolvedTheaterName
     });
 
     await updateDoc(docRef, payload);

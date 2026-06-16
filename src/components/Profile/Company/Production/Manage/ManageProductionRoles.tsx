@@ -8,11 +8,13 @@ import RoleCard from '../Roles/RoleCard';
 import RoleModal from '../Roles/RoleModal';
 import RoleSection from '../Roles/RoleSection';
 
-const ManageProductionRoles: React.FC<{
-  formValues: Production;
-  setFormValues: SetForm;
-  handleUpdate: (x: Production) => void;
-}> = ({ formValues, setFormValues, handleUpdate }) => {
+const ManageProductionRoles: React.FC<
+  React.PropsWithChildren<{
+    formValues: Production;
+    setFormValues: SetForm;
+    handleUpdate: (x: Production) => void;
+  }>
+> = ({ formValues, setFormValues, handleUpdate }) => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [roleType, setRoleType] = useState<StageRole>('On-Stage');

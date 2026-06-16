@@ -14,11 +14,13 @@ import { colors, fonts } from '../../../theme/styleVars';
 import { Title } from '../../layout/Titles';
 import { ethnicityTypes, IndividualData, pronouns } from './types';
 
-const ActorInfo1: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-  hasErrorCallback: (step: string, hasErrors: boolean) => void;
-}> = (props) => {
+const ActorInfo1: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+    hasErrorCallback: (step: string, hasErrors: boolean) => void;
+  }>
+> = (props) => {
   const { formData, setForm, hasErrorCallback } = props;
   const { actorInfo1Pronouns, actorInfo1LGBTQ, actorInfo1Ethnicities } =
     formData;

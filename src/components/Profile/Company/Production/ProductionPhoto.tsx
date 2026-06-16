@@ -10,11 +10,13 @@ import { useFirebaseContext } from '../../../../context/FirebaseContext';
 import { useUserContext } from '../../../../context/UserContext';
 import { colors, fonts } from '../../../../theme/styleVars';
 
-const ProductionPhoto: React.FC<{
-  name: string;
-  src?: string;
-  onChange: SetForm;
-}> = ({ name, src, onChange }) => {
+const ProductionPhoto: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    src?: string;
+    onChange: SetForm;
+  }>
+> = ({ name, src, onChange }) => {
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }

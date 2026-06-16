@@ -3,10 +3,12 @@ import { FormInput, FormTextArea } from '../../../Form/Inputs';
 import { Production } from '../../types';
 import { Col } from 'react-bootstrap';
 
-const ManageOffStageInfo: React.FC<{
-  formValues: Production;
-  setFormValues: any;
-}> = ({ formValues, setFormValues }) => {
+const ManageOffStageInfo: React.FC<
+  React.PropsWithChildren<{
+    formValues: Production;
+    setFormValues: any;
+  }>
+> = ({ formValues, setFormValues }) => {
   return (
     <Col>
       <FormInput

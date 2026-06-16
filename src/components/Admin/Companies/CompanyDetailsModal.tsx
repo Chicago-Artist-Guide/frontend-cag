@@ -26,20 +26,6 @@ interface CompanyDetailsModalProps {
   onEdit?: () => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 2rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -87,19 +73,6 @@ const CloseButton = styled.button`
     font-size: 1.25rem;
   }
 `;
-
-const Body = styled.div`
-  padding: 2rem;
-`;
-
-const Section = styled.div`
-  margin-bottom: 2rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
-
 const SectionTitle = styled.h3`
   font-family: 'Montserrat', sans-serif;
   font-size: 1rem;
@@ -179,11 +152,9 @@ const formatDate = (timestamp: any): string => {
   }
 };
 
-const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
-  company,
-  onClose,
-  onEdit
-}) => {
+const CompanyDetailsModal: React.FC<
+  React.PropsWithChildren<CompanyDetailsModalProps>
+> = ({ company, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
   const hasLoggedViewRef = useRef(false);
@@ -222,7 +193,10 @@ const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
   const canEdit = hasPermission('companies', 'edit');
 
   return (
-    <Overlay onClick={handleOverlayClick}>
+    <div
+      onClick={handleOverlayClick}
+      className="z-1000 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[2rem]"
+    >
       <Modal>
         <Header>
           <h2>Company Details</h2>
@@ -231,9 +205,9 @@ const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
           </CloseButton>
         </Header>
 
-        <Body>
+        <div className="p-[2rem]">
           {/* Account Information */}
-          <Section>
+          <div className="mb-[2rem] last:mb-0">
             <SectionTitle>Account Information</SectionTitle>
             <InfoGrid>
               <Label>Account ID:</Label>
@@ -260,10 +234,10 @@ const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
                 {company.complete_profile ? '✓ Complete' : '○ Incomplete'}
               </Value>
             </InfoGrid>
-          </Section>
+          </div>
 
           {/* Company Information */}
-          <Section>
+          <div className="mb-[2rem] last:mb-0">
             <SectionTitle>Company Information</SectionTitle>
             <InfoGrid>
               <Label>Company Name:</Label>
@@ -305,10 +279,10 @@ const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
                 </>
               )}
             </InfoGrid>
-          </Section>
+          </div>
 
           {/* Contact Information */}
-          <Section>
+          <div className="mb-[2rem] last:mb-0">
             <SectionTitle>Contact Information</SectionTitle>
             <InfoGrid>
               <Label>Primary Contact:</Label>
@@ -317,27 +291,27 @@ const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
               <Label>Contact Email:</Label>
               <Value>{company.primary_contact_email || 'Not set'}</Value>
             </InfoGrid>
-          </Section>
+          </div>
 
           {/* Statistics */}
-          <Section>
+          <div className="mb-[2rem] last:mb-0">
             <SectionTitle>Activity</SectionTitle>
             <InfoGrid>
               <Label>Productions:</Label>
               <Value>{company.productions_count || 0} productions</Value>
             </InfoGrid>
-          </Section>
+          </div>
 
           {/* Description */}
           {company.description && (
-            <Section>
+            <div className="mb-[2rem] last:mb-0">
               <SectionTitle>Description</SectionTitle>
               <Value style={{ whiteSpace: 'pre-wrap' }}>
                 {company.description}
               </Value>
-            </Section>
+            </div>
           )}
-        </Body>
+        </div>
 
         <Footer>
           <AdminButton variant="secondary" onClick={onClose}>
@@ -354,7 +328,7 @@ const CompanyDetailsModal: React.FC<CompanyDetailsModalProps> = ({
           )}
         </Footer>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

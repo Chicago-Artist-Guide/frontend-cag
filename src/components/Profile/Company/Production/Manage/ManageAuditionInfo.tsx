@@ -10,10 +10,12 @@ import { Production } from '../../types';
 import { neighborhoods } from '../../../../../utils/lookups';
 import { Col } from 'styled-bootstrap-grid';
 
-const ManageAuditionInfo: React.FC<{
-  formValues: Production;
-  setFormValues: any;
-}> = ({ formValues, setFormValues }) => {
+const ManageAuditionInfo: React.FC<
+  React.PropsWithChildren<{
+    formValues: Production;
+    setFormValues: any;
+  }>
+> = ({ formValues, setFormValues }) => {
   const [showOtherType, setShowOtherType] = useState(false);
 
   useEffect(() => {

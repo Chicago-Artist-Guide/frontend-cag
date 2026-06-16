@@ -11,10 +11,12 @@ import { Tagline, Title } from '../../layout/Titles';
 import type { USStateSymbol } from '../types';
 import type { IndividualProfile2Data, TrainingInstitution } from './types';
 
-const Training: React.FC<{
-  setForm: SetForm;
-  formData: IndividualProfile2Data;
-}> = (props) => {
+const Training: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualProfile2Data;
+  }>
+> = (props) => {
   const { setForm, formData } = props;
   const { trainingInstitutions } = formData;
   const [trainingId, setTrainingId] = useState(1);
@@ -117,15 +119,16 @@ const Training: React.FC<{
       ))}
       <Row>
         <Col lg="10">
-          <SaveAndAddLink
+          <a
             href="#"
             onClick={(e: any) => {
               e.preventDefault();
               addTrainingBlock();
             }}
+            className="mt-[1em] block"
           >
             + Save and add another institution
-          </SaveAndAddLink>
+          </a>
         </Col>
       </Row>
     </Container>
@@ -150,10 +153,4 @@ const DeleteRowLink = styled.a`
     color: ${colors.salmon};
   }
 `;
-
-const SaveAndAddLink = styled.a`
-  display: block;
-  margin-top: 1em;
-`;
-
 export default Training;

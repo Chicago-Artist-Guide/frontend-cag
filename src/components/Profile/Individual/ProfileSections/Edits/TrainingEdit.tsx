@@ -7,15 +7,13 @@ import styled from 'styled-components';
 import { InputField } from '../../../../../components/shared';
 import { colors, breakpoints } from '../../../../../theme/styleVars';
 
-const TrainingEdit: React.FC<{
-  training_institutions: any;
-  onTrainingFieldChange: any;
-  removeTrainingBlock: (e: any, id: number) => void;
-}> = ({
-  training_institutions,
-  onTrainingFieldChange,
-  removeTrainingBlock
-}) => {
+const TrainingEdit: React.FC<
+  React.PropsWithChildren<{
+    training_institutions: any;
+    onTrainingFieldChange: any;
+    removeTrainingBlock: (e: any, id: number) => void;
+  }>
+> = ({ training_institutions, onTrainingFieldChange, removeTrainingBlock }) => {
   return (
     <Container>
       {training_institutions.map((training: any) => (

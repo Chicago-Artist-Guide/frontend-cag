@@ -17,7 +17,9 @@ interface ResponsiveImageUploadProps {
   helperText?: string;
 }
 
-const ResponsiveImageUpload: React.FC<ResponsiveImageUploadProps> = ({
+const ResponsiveImageUpload: React.FC<
+  React.PropsWithChildren<ResponsiveImageUploadProps>
+> = ({
   onFileSelect,
   onUpload,
   accept = 'image/*',
@@ -85,7 +87,7 @@ const ResponsiveImageUpload: React.FC<ResponsiveImageUploadProps> = ({
   const displayImageUrl = previewUrl || currentImageUrl;
 
   return (
-    <Container>
+    <div className="w-[100%] max-w-[400px]">
       <DropzoneContainer
         {...getRootProps()}
         isDragActive={isDragActive}
@@ -97,7 +99,7 @@ const ResponsiveImageUpload: React.FC<ResponsiveImageUploadProps> = ({
         {displayImageUrl ? (
           <PreviewImage src={displayImageUrl} alt="Preview" />
         ) : (
-          <DropzoneContent>
+          <div className="flex flex-col items-center gap-[10px]">
             <UploadIcon>📁</UploadIcon>
             <DropzoneText>
               {isDragActive ? (
@@ -110,18 +112,18 @@ const ResponsiveImageUpload: React.FC<ResponsiveImageUploadProps> = ({
                 </>
               )}
             </DropzoneText>
-          </DropzoneContent>
+          </div>
         )}
 
         {isUploading && (
-          <ProgressOverlay>
+          <div className="absolute bottom-0 left-0 right-0 top-0 flex flex-col items-center justify-center rounded-[6px] bg-[rgba(0,_0,_0,_0.7)]">
             <ProgressBar progress={uploadProgress} />
             <ProgressText>{uploadProgress}% uploaded</ProgressText>
-          </ProgressOverlay>
+          </div>
         )}
       </DropzoneContainer>
 
-      <Controls>
+      <div className="mt-[15px] flex flex-col gap-[10px]">
         {error && <ErrorText>{error}</ErrorText>}
 
         {helperText && !error && <HelperText>{helperText}</HelperText>}
@@ -141,16 +143,10 @@ const ResponsiveImageUpload: React.FC<ResponsiveImageUploadProps> = ({
             variant="success"
           />
         )}
-      </Controls>
-    </Container>
+      </div>
+    </div>
   );
 };
-
-const Container = styled.div`
-  width: 100%;
-  max-width: 400px;
-`;
-
 const DropzoneContainer = styled.div<{
   isDragActive: boolean;
   disabled: boolean;
@@ -193,14 +189,6 @@ const DropzoneContainer = styled.div<{
     padding: ${(props) => (props.hasImage ? '0' : '15px')};
   }
 `;
-
-const DropzoneContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-`;
-
 const UploadIcon = styled.div`
   font-size: 48px;
   opacity: 0.6;
@@ -228,21 +216,6 @@ const PreviewImage = styled.img`
   object-fit: cover;
   border-radius: 6px;
 `;
-
-const ProgressOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-`;
-
 const ProgressBar = styled.div<{ progress: number }>`
   width: 80%;
   height: 8px;
@@ -267,14 +240,6 @@ const ProgressText = styled.span`
   font-size: 14px;
   font-weight: 600;
 `;
-
-const Controls = styled.div`
-  margin-top: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-`;
-
 const ErrorText = styled.p`
   margin: 0;
   color: ${colors.salmon};

@@ -77,6 +77,13 @@ export const getTheaterByAccountId = async (
   return queryProfileSnapshot.docs[0].data() as Profile;
 };
 
+// Convenience wrapper: account uid → company profile. Kept exported because
+// staging consumers (e.g. CompanyMatchCard prior to DEV-488's three-site
+// rewrite) still import it. The newer call sites prefer the explicit
+// getTheaterAccountByUid + getTheaterByAccountId pair so the
+// account.theater_name fallback can be applied when the profile is missing
+// theatre_name. Don't delete without grepping `getTheaterByAccountUid`
+// across master AND staging.
 export const getTheaterByAccountUid = async (
   firebaseStore: Firestore,
   uid: string

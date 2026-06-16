@@ -1,32 +1,28 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
-import { Row, Col } from 'react-bootstrap';
 import { colors } from '../../theme/styleVars';
 
-const PublicRoleCardSkeleton: React.FC = () => {
+const PublicRoleCardSkeleton: React.FC<
+  React.PropsWithChildren<unknown>
+> = () => {
   return (
     <RoleCardContainer>
-      <Row>
-        <Col lg={8}>
-          <RoleNameSkeleton />
-          <RoleStatusSkeleton />
-          <RoleDescriptionSkeleton />
+      {/* Production name line */}
+      <ProductionLineSkeleton />
 
-          <RoleDetailsSkeleton>
-            <DetailItemSkeleton />
-            <DetailItemSkeleton />
-            <DetailItemSkeleton />
-            <DetailItemSkeleton />
-          </RoleDetailsSkeleton>
-        </Col>
+      <RoleNameSkeleton />
+      <RoleDescriptionSkeleton />
+      <RoleDescriptionSkeleton />
 
-        <Col
-          lg={4}
-          className="d-flex align-items-center justify-content-center"
-        >
-          <RoleButtonSkeleton />
-        </Col>
-      </Row>
+      <div className="mt-[15px] flex flex-wrap gap-[10px]">
+        <DetailItemSkeleton />
+        <DetailItemSkeleton />
+        <DetailItemSkeleton />
+        <DetailItemSkeleton />
+      </div>
+
+      {/* View Production button */}
+      <RoleButtonSkeleton />
     </RoleCardContainer>
   );
 };
@@ -61,38 +57,30 @@ const RoleCardContainer = styled.div`
 `;
 
 // TODO: understand why we need to use as any to resolve the TS error for circular propTypes
+const ProductionLineSkeleton = styled(SkeletonBase as any)`
+  height: 14px;
+  width: 30%;
+  margin-bottom: 10px;
+`;
+
 const RoleNameSkeleton = styled(SkeletonBase as any)`
   height: 22px;
   width: 40%;
   margin-bottom: 10px;
 `;
 
-const RoleStatusSkeleton = styled(SkeletonBase as any)`
-  height: 16px;
-  width: 25%;
-  margin-bottom: 15px;
-`;
-
 const RoleDescriptionSkeleton = styled(SkeletonBase as any)`
-  height: 16px;
+  height: 14px;
   width: 90%;
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 
-  &:nth-child(3) {
-    width: 85%;
-  }
-
+  /* Second of the two description lines (position 4 within RoleCardContainer:
+     ProductionLine, RoleName, Description, Description, ChipsRow, Button).
+     Shorter width + larger margin gives the chip row breathing room. */
   &:nth-child(4) {
-    width: 70%;
+    width: 75%;
     margin-bottom: 15px;
   }
-`;
-
-const RoleDetailsSkeleton = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 15px;
 `;
 
 const DetailItemSkeleton = styled(SkeletonBase as any)`
@@ -120,7 +108,8 @@ const DetailItemSkeleton = styled(SkeletonBase as any)`
 
 const RoleButtonSkeleton = styled(SkeletonBase as any)`
   height: 40px;
-  width: 100%;
+  width: 180px;
+  margin-top: 12px;
 `;
 
 export default PublicRoleCardSkeleton;

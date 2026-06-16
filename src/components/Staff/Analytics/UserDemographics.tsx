@@ -13,6 +13,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 import { colors, fonts } from '../../../theme/styleVars';
+import { getUnionOptionLabel } from '../../../utils/lookups';
 
 // Type assertions for React 16 compatibility
 const ResponsiveContainerFixed = ResponsiveContainer as any;
@@ -112,7 +113,9 @@ type DemographicsProps = {
   };
 };
 
-const UserDemographics: React.FC<DemographicsProps> = ({ data }) => {
+const UserDemographics: React.FC<
+  React.PropsWithChildren<DemographicsProps>
+> = ({ data }) => {
   // Transform data for charts
   const transformData = (obj: Record<string, number>) => {
     return Object.entries(obj)
@@ -122,7 +125,10 @@ const UserDemographics: React.FC<DemographicsProps> = ({ data }) => {
 
   const genderData = transformData(data.genderIdentity);
   const ageData = transformData(data.ageRanges);
-  const unionData = transformData(data.unionStatus);
+  const unionData = transformData(data.unionStatus).map((item) => ({
+    ...item,
+    name: getUnionOptionLabel(item.name)
+  }));
   const topSkills = transformData(data.skills).slice(0, 15); // Top 15 skills
 
   const CustomTooltip = ({ active, payload, label }: any) => {

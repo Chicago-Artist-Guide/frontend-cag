@@ -17,6 +17,7 @@ import OffstageRoles from './OffstageRoles';
 import Privacy from './Privacy';
 import IndividualRole from './Role';
 import SignUpFooter, { SubmitBasicsResp } from './SignUpFooter';
+import UnionStatus from './UnionStatus';
 import type {
   Gender,
   IndividualAccountInit,
@@ -48,6 +49,7 @@ const defaultSteps: Step[] = [
   { id: 'privacy' },
   { id: 'offstageRoles' },
   { id: 'actorInfo' },
+  { id: 'unionStatus' },
   { id: 'profilePhoto' }
 ];
 
@@ -92,10 +94,12 @@ const defaultData: IndividualData = {
   stageRole: '' as IndividualRoles
 };
 
-const IndividualSignUp: React.FC<{
-  currentStep: number;
-  setCurrentStep: (x: number) => void;
-}> = ({ currentStep, setCurrentStep }) => {
+const IndividualSignUp: React.FC<
+  React.PropsWithChildren<{
+    currentStep: number;
+    setCurrentStep: (x: number) => void;
+  }>
+> = ({ currentStep, setCurrentStep }) => {
   const navigate = useNavigate();
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useUserContext();
@@ -448,6 +452,11 @@ const IndividualSignUp: React.FC<{
       case 'actorInfo':
         returnStep = (
           <ActorInfo {...props} hasErrorCallback={setStepErrorsCallback} />
+        );
+        break;
+      case 'unionStatus':
+        returnStep = (
+          <UnionStatus {...props} hasErrorCallback={setStepErrorsCallback} />
         );
         break;
       case 'profilePhoto':

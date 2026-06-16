@@ -8,6 +8,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { isUpcomingEventDate } from '../../../utils/dates';
 import {
   faTimes,
   faMapMarkerAlt,
@@ -28,20 +29,6 @@ interface EventDetailsModalProps {
   onClose: () => void;
   onEdit?: (event: Event) => void;
 }
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 1rem;
-`;
 
 const Modal = styled.div`
   background: white;
@@ -119,11 +106,6 @@ const Header = styled.div`
     }
   }
 `;
-
-const Content = styled.div`
-  padding: 2rem;
-`;
-
 const Section = styled.div`
   margin-bottom: 2rem;
 
@@ -158,13 +140,6 @@ const Section = styled.div`
     }
   }
 `;
-
-const BadgeGroup = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-`;
-
 const Badge = styled.span<{ variant?: string }>`
   display: inline-block;
   padding: 0.375rem 0.75rem;
@@ -295,23 +270,17 @@ const MetaInfo = styled.div`
 `;
 
 /**
- * Check if event is upcoming
+ * Check if event is upcoming. Delegates to the shared dates util so the
+ * local-time fix and "today is still upcoming" semantics stay consistent
+ * with the public /events page and EventsManagement.
  */
 function isUpcoming(event: Event): boolean {
-  try {
-    const eventDate = new Date(event.date);
-    if (isNaN(eventDate.getTime())) return false;
-    return eventDate >= new Date();
-  } catch {
-    return false;
-  }
+  return isUpcomingEventDate(event.date);
 }
 
-const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
-  event,
-  onClose,
-  onEdit
-}) => {
+const EventDetailsModal: React.FC<
+  React.PropsWithChildren<EventDetailsModalProps>
+> = ({ event, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
 
@@ -337,7 +306,10 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
   const upcoming = isUpcoming(event);
 
   return (
-    <Overlay onClick={onClose}>
+    <div
+      onClick={onClose}
+      className="z-1000 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[1rem]"
+    >
       <Modal onClick={(e) => e.stopPropagation()}>
         {/* Event Image */}
         <EventImage>
@@ -379,17 +351,17 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
           </button>
         </Header>
 
-        <Content>
+        <div className="p-[2rem]">
           {/* Status Badges */}
           <Section>
-            <BadgeGroup>
+            <div className="flex flex-wrap gap-[0.5rem]">
               <Badge variant={event.status || 'published'}>
                 {event.status || 'published'}
               </Badge>
               <Badge variant={upcoming ? 'upcoming' : 'past'}>
                 {upcoming ? 'upcoming' : 'past'}
               </Badge>
-            </BadgeGroup>
+            </div>
           </Section>
 
           {/* Details */}
@@ -510,9 +482,9 @@ const EventDetailsModal: React.FC<EventDetailsModalProps> = ({
               </EditButton>
             </Section>
           )}
-        </Content>
+        </div>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

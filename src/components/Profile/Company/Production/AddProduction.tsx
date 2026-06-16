@@ -107,9 +107,9 @@ const MobileButtonCol = styled.div`
   }
 `;
 
-const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
-  toggleEdit
-}) => {
+const CompanyAddShow: React.FC<
+  React.PropsWithChildren<{ toggleEdit: () => void }>
+> = ({ toggleEdit }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
   const {
     profile: { data: profileData },
@@ -150,8 +150,6 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
     setShowOtherType(formValues.type === 'Other');
   }, [formValues.type]);
 
-  console.log(profileData);
-
   const setProfilePicture = (url: string) => {
     const target = { name: 'production_image_url', value: url };
     setFormValues({ target });
@@ -160,15 +158,19 @@ const CompanyAddShow: React.FC<{ toggleEdit: () => void }> = ({
   const handleSubmit = async () => {
     const productionId = uuidv4();
     try {
+      const resolvedTheaterName: string =
+        (profileData as any)?.theatre_name ||
+        (accountData as any)?.theater_name ||
+        '';
       const payload = sanitizeDataForFirestore({
         ...formValues,
         production_id: productionId,
-        account_id: formValues.account_id || ownerAccountId
+        account_id: formValues.account_id || ownerAccountId,
+        theater_name: resolvedTheaterName
       });
 
       await setDoc(doc(db, 'productions', productionId), payload);
       toggleEdit();
-      console.log(productionId);
     } catch (error) {
       console.error('Error creating production:', error);
     }

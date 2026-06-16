@@ -55,67 +55,46 @@ class ErrorBoundary extends Component<Props, State> {
     window.location.reload();
   };
 
-  handleDismiss = () => {
-    this.setState({
-      hasError: false,
-      error: null,
-      errorInfo: null
-    });
-  };
-
   render() {
     if (this.state.hasError) {
       return (
-        <>
-          {this.props.children}
-          <Modal
-            backdrop="static"
-            show={this.state.hasError}
-            onHide={this.handleDismiss}
-            className="z-3"
-            centered
-          >
-            <Modal.Header>
-              <Modal.Title>
-                <Title>Something Went Wrong</Title>
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <ErrorMessage>
-                An unexpected error occurred. Please refresh the page to
-                continue.
-              </ErrorMessage>
-              {import.meta.env.DEV && this.state.error && (
-                <DevErrorDetails>
-                  <DevErrorTitle>Development Error Details:</DevErrorTitle>
-                  <DevErrorText>
-                    <strong>Error:</strong> {this.state.error.toString()}
-                  </DevErrorText>
-                  {this.state.error.stack && (
-                    <DevErrorStack>
-                      <strong>Stack:</strong>
-                      <pre>{this.state.error.stack}</pre>
-                    </DevErrorStack>
-                  )}
-                  {this.state.errorInfo?.componentStack && (
-                    <DevErrorStack>
-                      <strong>Component Stack:</strong>
-                      <pre>{this.state.errorInfo.componentStack}</pre>
-                    </DevErrorStack>
-                  )}
-                </DevErrorDetails>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="primary" onClick={this.handleRefresh}>
-                Refresh Page
-              </Button>
-              <Button variant="secondary" onClick={this.handleDismiss}>
-                Dismiss
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+        <Modal backdrop="static" show centered className="z-3">
+          <Modal.Header>
+            <Modal.Title>
+              <Title>Something Went Wrong</Title>
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <ErrorMessage>
+              An unexpected error occurred. Please refresh the page to continue.
+            </ErrorMessage>
+            {import.meta.env.DEV && this.state.error && (
+              <DevErrorDetails>
+                <DevErrorTitle>Development Error Details:</DevErrorTitle>
+                <DevErrorText>
+                  <strong>Error:</strong> {this.state.error.toString()}
+                </DevErrorText>
+                {this.state.error.stack && (
+                  <DevErrorStack>
+                    <strong>Stack:</strong>
+                    <pre>{this.state.error.stack}</pre>
+                  </DevErrorStack>
+                )}
+                {this.state.errorInfo?.componentStack && (
+                  <DevErrorStack>
+                    <strong>Component Stack:</strong>
+                    <pre>{this.state.errorInfo.componentStack}</pre>
+                  </DevErrorStack>
+                )}
+              </DevErrorDetails>
+            )}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={this.handleRefresh}>
+              Refresh Page
+            </Button>
+          </Modal.Footer>
+        </Modal>
       );
     }
 

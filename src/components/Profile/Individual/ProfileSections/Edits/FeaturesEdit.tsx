@@ -5,12 +5,14 @@ import styled from 'styled-components';
 import { InputField } from '../../../../../components/shared';
 import { colors, breakpoints } from '../../../../../theme/styleVars';
 
-const FeaturesEdit: React.FC<{
-  features: any;
-  emptyPlaceholder: string;
-  onCreditFieldChange: any;
-  removeCreditBlock: (e: any, i: number) => void;
-}> = ({ features, onCreditFieldChange, removeCreditBlock }) => {
+const FeaturesEdit: React.FC<
+  React.PropsWithChildren<{
+    features: any;
+    emptyPlaceholder: string;
+    onCreditFieldChange: any;
+    removeCreditBlock: (e: any, i: number) => void;
+  }>
+> = ({ features, onCreditFieldChange, removeCreditBlock }) => {
   return (
     <Container>
       {features?.map((credit: any) => (

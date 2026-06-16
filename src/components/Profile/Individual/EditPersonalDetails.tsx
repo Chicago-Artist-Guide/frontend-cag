@@ -6,11 +6,14 @@ import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import { Button, Checkbox } from '../../../components/shared';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
-import { unionOptions } from '../../../utils/lookups';
+import { unionOptionLabels, unionOptions } from '../../../utils/lookups';
 import {
   AgeRange,
   ageRanges,
   ethnicityTypes,
+  Gender,
+  GenderRole,
+  genderRoles,
   genders,
   IndividualProfileDataFull,
   IndividualWebsite,
@@ -20,6 +23,8 @@ import {
 interface EditPersonalDetailsProps<T extends keyof IndividualWebsite> {
   ageRangeChange: (checkValue: boolean, range: AgeRange) => void;
   editProfile: IndividualProfileDataFull;
+  genderIdentityChange: (gender: Gender) => void;
+  genderRoleChange: (checkValue: boolean, role: GenderRole) => void;
   onWebsiteInputChange: (
     fieldValue: IndividualWebsite[T],
     fieldName: T,
@@ -35,6 +40,8 @@ interface EditPersonalDetailsProps<T extends keyof IndividualWebsite> {
 const EditPersonalDetails = ({
   ageRangeChange,
   editProfile,
+  genderIdentityChange,
+  genderRoleChange,
   onWebsiteInputChange,
   removeWebsiteInput,
   addWebsiteInput,
@@ -155,9 +162,7 @@ const EditPersonalDetails = ({
           as="select"
           value={editProfile?.gender_identity}
           name="actorInfo2Gender"
-          onChange={(e: any) =>
-            setProfileForm('gender_identity', e.target.value)
-          }
+          onChange={(e: any) => genderIdentityChange(e.target.value as Gender)}
         >
           <option value={undefined}>Select</option>
           {genders.map((g) => (
@@ -167,27 +172,41 @@ const EditPersonalDetails = ({
           ))}
         </Form.Control>
       </Form.Group>
+      <Form.Group className="form-group">
+        <CAGLabel>Do you identify as part of the LGBTQIA+ community?</CAGLabel>
+        <Checkbox
+          checked={editProfile?.lgbtqia === 'Yes'}
+          fieldType="radio"
+          label="Yes"
+          name="actorInfo1LGBTQ"
+          onChange={() => setProfileForm('lgbtqia', 'Yes')}
+          value="Yes"
+        />
+        <Checkbox
+          checked={editProfile?.lgbtqia === 'No'}
+          fieldType="radio"
+          label="No"
+          name="actorInfo1LGBTQ"
+          onChange={() => setProfileForm('lgbtqia', 'No')}
+          value="No"
+        />
+      </Form.Group>
       {editProfile?.gender_identity === 'Trans/Nonbinary' && (
         <Form.Group className="form-group">
-          <CAGLabel>Interested in the following roles:</CAGLabel>
+          <CAGLabel>
+            Which on-stage role genders do you want to be matched with?
+          </CAGLabel>
           <p>Select all that apply (at least one required)</p>
-          {(['Man', 'Woman', 'Nonbinary'] as const).map((role) => (
+          {genderRoles.map((role) => (
             <Checkbox
               checked={editProfile?.gender_roles?.includes(role)}
               fieldType="checkbox"
               key={`gender-role-chk-${role}`}
               label={role}
               name={`genderRole-${role}`}
-              onChange={(e: any) => {
-                const currentRoles = editProfile?.gender_roles || [];
-                let newRoles: string[];
-                if (e.currentTarget.checked) {
-                  newRoles = [...currentRoles, role];
-                } else {
-                  newRoles = currentRoles.filter((r) => r !== role);
-                }
-                setProfileForm('gender_roles', newRoles);
-              }}
+              onChange={(e: any) =>
+                genderRoleChange(e.currentTarget.checked, role)
+              }
             />
           ))}
           {(!editProfile?.gender_roles ||
@@ -207,7 +226,7 @@ const EditPersonalDetails = ({
               <React.Fragment key={`parent-frag-chk-${eth.name}`}>
                 {eth.values.map((ethV) => (
                   <Checkbox
-                    checked={editProfile?.ethnicities.includes(ethV)}
+                    checked={(editProfile?.ethnicities || []).includes(ethV)}
                     fieldType="checkbox"
                     key={`${eth.name}-child-chk-${ethV}`}
                     label={ethV}
@@ -223,7 +242,7 @@ const EditPersonalDetails = ({
           return (
             <React.Fragment key={`parent-frag-chk-${eth.name}`}>
               <Checkbox
-                checked={editProfile?.ethnicities.includes(eth.name)}
+                checked={(editProfile?.ethnicities || []).includes(eth.name)}
                 fieldType="checkbox"
                 key={`first-level-chk-${eth.name}`}
                 label={eth.name}
@@ -236,7 +255,7 @@ const EditPersonalDetails = ({
                 <Checkbox style={{ paddingLeft: '1.25rem' }}>
                   {eth.values.map((ethV) => (
                     <Checkbox
-                      checked={editProfile?.ethnicities.includes(ethV)}
+                      checked={(editProfile?.ethnicities || []).includes(ethV)}
                       fieldType="checkbox"
                       key={`${eth.name}-child-chk-${ethV}`}
                       label={ethV}
@@ -262,7 +281,7 @@ const EditPersonalDetails = ({
                   <Checkbox
                     key={`union-option-${option}`}
                     checked={isUnionSelected(option)}
-                    label={option}
+                    label={unionOptionLabels[option]}
                     name={option}
                     onChange={(e: any) =>
                       handleUnionChange(option, e.currentTarget.checked)

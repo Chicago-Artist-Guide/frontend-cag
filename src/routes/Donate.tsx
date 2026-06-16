@@ -18,7 +18,7 @@ import StageLightIcon from '../images/donate/stage_light.png';
 const Donate = () => {
   return (
     <PageContainer className="!px-0 !py-0">
-      <ContentWrapper>
+      <div className="max-w-full">
         {/* Hero Section */}
         <HeroSectionWrapper>
           <HeroSection>
@@ -52,7 +52,7 @@ const Donate = () => {
                 rel="noopener noreferrer"
               >
                 Donate Securely Now
-                <ArrowIcon>↗</ArrowIcon>
+                <span className="text-[18px] leading-[1]">↗</span>
               </DonateButton>
               <TaxDeductibleText>
                 Chicago Artist Guide NFP is a 501(c)(3) and donations are tax
@@ -69,7 +69,7 @@ const Donate = () => {
           rel="noopener noreferrer"
         >
           Donate Securely Now
-          <ArrowIcon>↗</ArrowIcon>
+          <span className="text-[18px] leading-[1]">↗</span>
         </StickyDonateCTA>
 
         {/* Where Your Donation Goes Section */}
@@ -154,7 +154,7 @@ const Donate = () => {
           <SectionContentWrapper>
             <SectionTitle>Corporate Sponsorship Opportunities</SectionTitle>
             <SponsorshipGrid>
-              <SponsorshipColumn>
+              <div className="flex flex-col">
                 <SponsorshipText>
                   Is your company looking to support Diversity, Equity, and
                   Inclusion, the arts, and Chicago economic growth? We want to
@@ -163,8 +163,8 @@ const Donate = () => {
                   marketing, and promotion at our annual "A Night at the
                   CAG-Baret" gala.
                 </SponsorshipText>
-              </SponsorshipColumn>
-              <SponsorshipColumn>
+              </div>
+              <div className="flex flex-col">
                 <WaysToHelpTitle>Other ways you can help:</WaysToHelpTitle>
                 <WaysToHelpList>
                   <li>
@@ -177,7 +177,7 @@ const Donate = () => {
                     matching benefits
                   </li>
                 </WaysToHelpList>
-              </SponsorshipColumn>
+              </div>
             </SponsorshipGrid>
             <ContactInfo>
               For more information please contact our Executive Director,{' '}
@@ -190,12 +190,12 @@ const Donate = () => {
         <SponsorsSection>
           <SectionContentWrapper>
             <SectionTitle>Chicago Artist Guide is Supported By</SectionTitle>
-            <CarouselWrapper>
+            <div className="w-[100%]">
               <PartnerSlider partners={corporateSponsors} staticMode={true} />
-            </CarouselWrapper>
+            </div>
           </SectionContentWrapper>
         </SponsorsSection>
-      </ContentWrapper>
+      </div>
     </PageContainer>
   );
 };
@@ -203,10 +203,6 @@ const Donate = () => {
 export default Donate;
 
 // Styled Components
-const ContentWrapper = styled.div`
-  max-width: 100%;
-`;
-
 const HeroSectionWrapper = styled.div`
   background: ${colors.white};
   padding: 48px 24px;
@@ -396,12 +392,6 @@ const StickyDonateCTA = styled.a`
     display: none;
   }
 `;
-
-const ArrowIcon = styled.span`
-  font-size: 18px;
-  line-height: 1;
-`;
-
 const SectionContentWrapper = styled.div`
   max-width: 1400px;
   margin: 0 auto;
@@ -601,12 +591,6 @@ const SponsorshipGrid = styled.div`
     gap: 64px;
   }
 `;
-
-const SponsorshipColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
 const SponsorshipText = styled.p`
   font-family: ${fonts.mainFont};
   font-size: 1rem;
@@ -689,8 +673,4 @@ const SponsorsSection = styled.section`
   @media (min-width: ${breakpoints.lg}) {
     padding: 96px 0;
   }
-`;
-
-const CarouselWrapper = styled.div`
-  width: 100%;
 `;

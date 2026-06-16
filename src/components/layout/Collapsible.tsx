@@ -14,7 +14,7 @@ interface Props {
   grid: boolean;
 }
 
-const Collapsible: React.FC<Props> = ({
+const Collapsible: React.FC<React.PropsWithChildren<Props>> = ({
   sectionTitles,
   subSections,
   subContainer,

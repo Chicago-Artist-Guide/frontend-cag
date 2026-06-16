@@ -8,7 +8,7 @@ import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import yellow_blob from '../../../images/yellow_blob_2.svg';
 import { colors, fonts } from '../../../theme/styleVars';
-import { unionOptions } from '../../../utils/lookups';
+import { unionOptionLabels, unionOptions } from '../../../utils/lookups';
 import { Checkbox } from '../../shared';
 import { Tagline, Title, TitleThree } from '../../layout/Titles';
 import {
@@ -18,10 +18,12 @@ import {
   WebsiteTypes
 } from './types';
 
-const Demographics: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-}> = (props) => {
+const Demographics: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+  }>
+> = (props) => {
   const { formData, setForm } = props;
   const {
     demographicsUnionStatus, // array of union selections
@@ -130,7 +132,7 @@ const Demographics: React.FC<{
                         <Checkbox
                           key={`union-option-${option}`}
                           checked={isUnionSelected(option)}
-                          label={option}
+                          label={unionOptionLabels[option]}
                           name={option}
                           onChange={(e: any) =>
                             handleUnionChange(option, e.currentTarget.checked)

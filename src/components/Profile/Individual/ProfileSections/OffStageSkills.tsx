@@ -4,14 +4,16 @@ import styled from 'styled-components';
 import { colors } from '../../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../../utils/hasNonEmptyValues';
 
-const OffStageSkills: React.FC<{
-  offstage_roles_general?: Array<string>;
-  offstage_roles_production?: Array<string>;
-  offstage_roles_scenic_and_properties?: Array<string>;
-  offstage_roles_lighting?: Array<string>;
-  offstage_roles_sound?: Array<string>;
-  offstage_roles_hair_makeup_costumes?: Array<string>;
-}> = ({
+const OffStageSkills: React.FC<
+  React.PropsWithChildren<{
+    offstage_roles_general?: Array<string>;
+    offstage_roles_production?: Array<string>;
+    offstage_roles_scenic_and_properties?: Array<string>;
+    offstage_roles_lighting?: Array<string>;
+    offstage_roles_sound?: Array<string>;
+    offstage_roles_hair_makeup_costumes?: Array<string>;
+  }>
+> = ({
   offstage_roles_general,
   offstage_roles_production,
   offstage_roles_scenic_and_properties,
@@ -25,24 +27,24 @@ const OffStageSkills: React.FC<{
         offstage_roles_general?.map((role) => ({ value: role })) || []
       ) && (
         <>
-          <Bold>General</Bold>
-          <Flex>
+          <p className="mt-[25px] text-[20px] font-medium">General</p>
+          <div className="mx-0 mb-[20px] mt-[20px] flex">
             {offstage_roles_general?.map((skill: string) => (
               <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
-          </Flex>
+          </div>
         </>
       )}
       {hasNonEmptyValues(
         offstage_roles_production?.map((role) => ({ value: role })) || []
       ) && (
         <>
-          <Bold>Production</Bold>
-          <Flex>
+          <p className="mt-[25px] text-[20px] font-medium">Production</p>
+          <div className="mx-0 mb-[20px] mt-[20px] flex">
             {offstage_roles_production?.map((skill: string) => (
               <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
-          </Flex>
+          </div>
         </>
       )}
       {hasNonEmptyValues(
@@ -51,36 +53,36 @@ const OffStageSkills: React.FC<{
         })) || []
       ) && (
         <>
-          <Bold>Scenic</Bold>
-          <Flex>
+          <p className="mt-[25px] text-[20px] font-medium">Scenic</p>
+          <div className="mx-0 mb-[20px] mt-[20px] flex">
             {offstage_roles_scenic_and_properties?.map((skill: string) => (
               <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
-          </Flex>
+          </div>
         </>
       )}
       {hasNonEmptyValues(
         offstage_roles_lighting?.map((role) => ({ value: role })) || []
       ) && (
         <>
-          <Bold>Lighting</Bold>
-          <Flex>
+          <p className="mt-[25px] text-[20px] font-medium">Lighting</p>
+          <div className="mx-0 mb-[20px] mt-[20px] flex">
             {offstage_roles_lighting?.map((skill: string) => (
               <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
-          </Flex>
+          </div>
         </>
       )}
       {hasNonEmptyValues(
         offstage_roles_sound?.map((role) => ({ value: role })) || []
       ) && (
         <>
-          <Bold>Sound</Bold>
-          <Flex>
+          <p className="mt-[25px] text-[20px] font-medium">Sound</p>
+          <div className="mx-0 mb-[20px] mt-[20px] flex">
             {offstage_roles_sound?.map((skill: string) => (
               <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
-          </Flex>
+          </div>
         </>
       )}
       {hasNonEmptyValues(
@@ -88,24 +90,19 @@ const OffStageSkills: React.FC<{
           []
       ) && (
         <>
-          <Bold>Hair, Makeup and Costumes</Bold>
-          <Flex>
+          <p className="mt-[25px] text-[20px] font-medium">
+            Hair, Makeup and Costumes
+          </p>
+          <div className="mx-0 mb-[20px] mt-[20px] flex">
             {offstage_roles_hair_makeup_costumes?.map((skill: string) => (
               <SkillBadge key={skill}>{skill}</SkillBadge>
             ))}
-          </Flex>
+          </div>
         </>
       )}
     </Container>
   );
 };
-
-const Bold = styled.p`
-  font-weight: 500;
-  font-size: 20px;
-  margin-top: 25px;
-`;
-
 const SkillBadge = styled.div`
   color: ${colors.white};
   background-color: ${colors.mint};
@@ -115,10 +112,4 @@ const SkillBadge = styled.div`
   margin-right: 10px;
   margin-left: 10px;
 `;
-
-const Flex = styled.div`
-  display: flex;
-  margin: 20px 0px 20px;
-`;
-
 export default OffStageSkills;

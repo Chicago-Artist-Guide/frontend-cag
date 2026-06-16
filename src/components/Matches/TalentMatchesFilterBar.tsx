@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { MatchingFilters } from './types';
+import clsx from 'clsx';
+import { MatchingFilters, TheaterMatchStatus } from './types';
 import { Role } from '../Profile/Company/types';
 import Dropdown from '../shared/Dropdown';
 import { useMatches } from '../../context/MatchContext';
-import { unionOptions } from '../../utils/lookups';
+import { unionOptionLabels, unionOptions } from '../../utils/lookups';
+
+const matchStatusOptions: {
+  value: TheaterMatchStatus;
+  label: string;
+}[] = [
+  { value: 'accepted', label: 'Accepted' },
+  { value: 'declined', label: 'Declined' },
+  { value: 'interested', label: 'Interested' },
+  { value: 'favorite', label: 'Favorite' },
+  { value: 'undecided', label: 'Undecided' }
+];
 
 export const TalentMatchesFilterBar = () => {
   const { currentRoleId, filters, updateFilters, roles, setCurrentRoleId } =
@@ -23,46 +35,25 @@ export const TalentMatchesFilterBar = () => {
     value: r.role_id || ''
   }));
 
-  const unionStatusOptions = [
-    {
-      name: 'All Options',
-      value: ''
-    },
-    ...unionOptions.map((option) => ({
-      name: option,
-      value: option
-    }))
-  ];
+  const selectedUnions = filters.union_status || [];
+  const selectedMatchStatuses = filters.matchStatus || [];
 
-  const existingMatchOptions = [
-    {
-      name: 'All Matches',
-      value: ''
-    },
-    {
-      name: 'Approved',
-      value: 'true'
-    },
-    {
-      name: 'Declined',
-      value: 'false'
-    }
-  ];
-
-  const updateUnionStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const unionStatusValue =
-      e.target.value === '' ? undefined : [e.target.value];
-    updateFilters({ union_status: unionStatusValue } as MatchingFilters);
+  const toggleUnion = (option: string, checked: boolean) => {
+    const next = checked
+      ? [...selectedUnions, option]
+      : selectedUnions.filter((u) => u !== option);
+    updateFilters({
+      union_status: next.length > 0 ? next : undefined
+    } as MatchingFilters);
   };
 
-  const updateMatchStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const matchStatusValue =
-      e.target.value === ''
-        ? undefined
-        : e.target.value === 'true'
-          ? true
-          : false;
-    updateFilters({ matchStatus: matchStatusValue } as MatchingFilters);
+  const toggleMatchStatus = (status: TheaterMatchStatus, checked: boolean) => {
+    const next = checked
+      ? [...selectedMatchStatuses, status]
+      : selectedMatchStatuses.filter((s) => s !== status);
+    updateFilters({
+      matchStatus: next.length > 0 ? next : undefined
+    } as MatchingFilters);
   };
 
   return (
@@ -110,20 +101,67 @@ export const TalentMatchesFilterBar = () => {
             </div>
           )}
 
-          <Dropdown
-            name="unionStatus"
-            label="Union Status"
-            options={unionStatusOptions}
-            value={''}
-            onChange={updateUnionStatus}
-          />
-          <Dropdown
-            name="existingMatches"
-            label="Match Status"
-            options={existingMatchOptions}
-            value={''}
-            onChange={updateMatchStatus}
-          />
+          <div className="mt-6 border-t border-stone-200 pt-6">
+            <div className="mb-3 font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+              Union Status
+            </div>
+            <div className="flex flex-col gap-2">
+              {unionOptions.map((option) => {
+                const checked = selectedUnions.includes(option);
+                return (
+                  <label
+                    key={`filter-union-${option}`}
+                    className={clsx(
+                      'flex cursor-pointer items-center gap-2 font-open-sans text-sm tracking-[0.5px]',
+                      {
+                        'text-dark': checked,
+                        'text-stone-700': !checked
+                      }
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => toggleUnion(option, e.target.checked)}
+                    />
+                    {unionOptionLabels[option]}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="mt-6 border-t border-stone-200 pt-6">
+            <div className="mb-3 font-open-sans text-sm font-semibold tracking-[0.5px] text-dark">
+              Match Status
+            </div>
+            <div className="flex flex-col gap-2">
+              {matchStatusOptions.map(({ value, label }) => {
+                const checked = selectedMatchStatuses.includes(value);
+                return (
+                  <label
+                    key={`filter-match-status-${value}`}
+                    className={clsx(
+                      'flex cursor-pointer items-center gap-2 font-open-sans text-sm tracking-[0.5px]',
+                      {
+                        'text-dark': checked,
+                        'text-stone-700': !checked
+                      }
+                    )}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) =>
+                        toggleMatchStatus(value, e.target.checked)
+                      }
+                    />
+                    {label}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
         </>
       )}
     </div>

@@ -17,10 +17,19 @@ export const FILTER_ARRAYS_TO_SINGLE_VALUES_MATCHING = [
 // add more filter options to this as we work on the filter bar functionality
 // we split out some as arrays because single values in the profile
 // need to have multiple options for search
+export type TheaterMatchStatus =
+  | 'accepted'
+  | 'declined'
+  | 'interested'
+  | 'favorite'
+  | 'undecided';
+
+export type TalentMatchStatus = 'applied' | 'hidden' | 'favorite' | 'undecided';
+
 export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
   stage_role?: IndividualRoles[];
   gender_identity?: Gender[];
-  matchStatus?: boolean | null;
+  matchStatus?: TheaterMatchStatus[];
 } & Partial<
     Pick<
       IndividualProfileDataFullInit,
@@ -44,6 +53,10 @@ export type MatchingFilters = Pick<IndividualAccountInit, 'type'> & {
 
 export type ProductionRole = Role & { productionId: string };
 
+export type RoleMatchFilters = {
+  matchStatus?: TalentMatchStatus[];
+};
+
 export type TheaterOrTalent = 'theater' | 'talent';
 
 export type TheaterTalentMatch = {
@@ -56,5 +69,3 @@ export type TheaterTalentMatch = {
   confirmed_by?: TheaterOrTalent;
   rejected_by?: TheaterOrTalent;
 };
-
-export type FilterFavoritesType = 'all' | 'favorites';

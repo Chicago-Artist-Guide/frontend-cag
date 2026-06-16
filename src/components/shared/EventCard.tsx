@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { colors, fonts, breakpoints } from '../../theme/styleVars';
+import { parseLocalDate } from '../../utils/dates';
 
 // Calendar icon that matches the screenshots
 const CalendarIcon = () => (
@@ -45,8 +46,8 @@ type EventType = {
 };
 
 const getDateStringForEvent = (event: EventType) => {
-  const dateObj = new Date(event.date + 'T00:00:00'); //server is in UTC
-  if (isNaN(dateObj.getTime())) {
+  const dateObj = parseLocalDate(event.date);
+  if (!dateObj) {
     console.error(`Invalid date for event ${event.id}: ${event.date}`);
     return null;
   }
@@ -56,16 +57,17 @@ const getDateStringForEvent = (event: EventType) => {
     month: 'long' as const,
     day: 'numeric' as const
   };
-  // dateObj is correct here, loses a day when the 'timezone' adjustment is applied. so remove it.
 
   return dateObj.toLocaleDateString('en-US', options);
 };
 
-export const EventCard: React.FC<{
-  event: EventType;
-  status: 'upcoming' | 'past';
-  index?: number;
-}> = ({ event, status, index = 0 }) => {
+export const EventCard: React.FC<
+  React.PropsWithChildren<{
+    event: EventType;
+    status: 'upcoming' | 'past';
+    index?: number;
+  }>
+> = ({ event, status, index = 0 }) => {
   const dateString = getDateStringForEvent(event);
   const cardRef = useRef<HTMLAnchorElement>(null);
 
@@ -104,17 +106,17 @@ export const EventCard: React.FC<{
     >
       <CardContainer className={status}>
         <MobileView className={status}>
-          <IconRow>
+          <div className="mb-0 flex items-start gap-[16px]">
             <CalendarIcon />
             <div>
               <DateText>{dateString}</DateText>
               <TimeText>{event.time}</TimeText>
             </div>
-          </IconRow>
-          <IconRow>
+          </div>
+          <div className="mb-0 flex items-start gap-[16px]">
             <LocationIcon />
             <LocationText>{event.location}</LocationText>
-          </IconRow>
+          </div>
           <Content>
             <EventTitle>{event.name}</EventTitle>
             <EventDescription>{event.details}</EventDescription>
@@ -126,20 +128,20 @@ export const EventCard: React.FC<{
 
         <TabletView className={status}>
           <CardHeader className={status}>
-            <IconRow>
+            <div className="mb-0 flex items-start gap-[16px]">
               <CalendarIcon />
               <div>
                 <DateText>{dateString}</DateText>
                 <TimeText>{event.time}</TimeText>
               </div>
-            </IconRow>
-            <IconRow>
+            </div>
+            <div className="mb-0 flex items-start gap-[16px]">
               <LocationIcon />
               <LocationText>{event.location}</LocationText>
-            </IconRow>
+            </div>
           </CardHeader>
 
-          <CardContent>
+          <div className="flex flex-row bg-[white]">
             <CardLeftSide>
               <EventTitle>{event.name}</EventTitle>
               <EventDescription>{event.details}</EventDescription>
@@ -152,22 +154,22 @@ export const EventCard: React.FC<{
                 <EventImageTablet src={event.image} alt={event.name} />
               </CardRightSide>
             )}
-          </CardContent>
+          </div>
         </TabletView>
 
         <DesktopView>
           <LeftCol className={status}>
-            <IconRow>
+            <div className="mb-0 flex items-start gap-[16px]">
               <CalendarIcon />
               <div>
                 <DateText>{dateString}</DateText>
                 <TimeText>{event.time}</TimeText>
               </div>
-            </IconRow>
-            <IconRow>
+            </div>
+            <div className="mb-0 flex items-start gap-[16px]">
               <LocationIcon />
               <LocationText>{event.location}</LocationText>
-            </IconRow>
+            </div>
           </LeftCol>
           <RightCol>
             <Content>
@@ -267,13 +269,6 @@ const CardHeader = styled.div`
     background: #cad2e6;
   }
 `;
-
-const CardContent = styled.div`
-  display: flex;
-  flex-direction: row;
-  background: white;
-`;
-
 const CardLeftSide = styled.div`
   flex: 2;
   padding: 24px;
@@ -313,14 +308,6 @@ const LeftCol = styled.div`
     background: #cad2e6;
   }
 `;
-
-const IconRow = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 0;
-`;
-
 const DateText = styled.div`
   font-family: ${fonts.montserrat};
   font-weight: 700;

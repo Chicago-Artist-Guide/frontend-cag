@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { isUpcomingEventDate } from '../../../utils/dates';
 import {
   faMapMarkerAlt,
   faCalendarAlt,
@@ -32,18 +33,6 @@ const Container = styled.div`
   max-width: 1400px;
   margin: 0 auto;
 `;
-
-const HeaderRow = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-bottom: 2rem;
-`;
-
-const HeaderContent = styled.div``;
-
 const AddButton = styled.button`
   display: inline-flex;
   align-items: center;
@@ -85,14 +74,6 @@ const SearchBar = styled.input`
     outline-offset: 2px;
   }
 `;
-
-const FiltersRow = styled.div`
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-`;
-
 const FilterSelect = styled.select`
   padding: 0.5rem 1rem;
   border: 1px solid ${colors.lightGrey};
@@ -276,19 +257,15 @@ const EmptyState = styled.div`
 `;
 
 /**
- * Check if event is upcoming
+ * Check if event is upcoming. Delegates to the shared dates util so the
+ * local-time fix and "today is still upcoming" semantics stay consistent
+ * with the public /events page and EventDetailsModal.
  */
 function isUpcoming(event: Event): boolean {
-  try {
-    const eventDate = new Date(event.date);
-    if (isNaN(eventDate.getTime())) return false;
-    return eventDate >= new Date();
-  } catch {
-    return false;
-  }
+  return isUpcomingEventDate(event.date);
 }
 
-const EventsManagement: React.FC = () => {
+const EventsManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { hasPermission } = useAdminAuth();
 
   // Permission check
@@ -362,20 +339,20 @@ const EventsManagement: React.FC = () => {
 
   return (
     <Container>
-      <HeaderRow>
-        <HeaderContent>
+      <div className="mb-[2rem] flex flex-wrap items-start justify-between gap-[1rem]">
+        <div className="">
           <PageTitle>Events</PageTitle>
           <PageSubtitle>
             Manage events that appear on the /events page
           </PageSubtitle>
-        </HeaderContent>
+        </div>
         {hasPermission('events', 'edit') && (
           <AddButton onClick={handleAddClick}>
             <FontAwesomeIcon icon={faPlus} />
             Add Event
           </AddButton>
         )}
-      </HeaderRow>
+      </div>
 
       <SearchBar
         type="text"
@@ -384,7 +361,7 @@ const EventsManagement: React.FC = () => {
         onChange={(e) => handleSearch(e.target.value)}
       />
 
-      <FiltersRow>
+      <div className="mb-[2rem] flex flex-wrap gap-[1rem]">
         <FilterSelect
           value={filters.status}
           onChange={(e) =>
@@ -440,7 +417,7 @@ const EventsManagement: React.FC = () => {
           <option value="desc">Descending</option>
           <option value="asc">Ascending</option>
         </FilterSelect>
-      </FiltersRow>
+      </div>
 
       <StatsGrid>
         <StatCard>

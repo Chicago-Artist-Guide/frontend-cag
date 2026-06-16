@@ -22,7 +22,9 @@ type MessageThreadTypeExtended = MessageThreadType & {
   statusNew: boolean;
 };
 
-const MessageThreads: React.FC<MessageThreadsProps> = ({ onThreadSelect }) => {
+const MessageThreads: React.FC<
+  React.PropsWithChildren<MessageThreadsProps>
+> = ({ onThreadSelect }) => {
   const { threadId } = useParams();
   const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();

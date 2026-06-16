@@ -37,20 +37,6 @@ interface OpeningFormModalProps {
   onSuccess: () => void;
 }
 
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-  padding: 1rem;
-`;
-
 const Modal = styled.div`
   background: white;
   border-radius: 16px;
@@ -90,15 +76,6 @@ const Header = styled.div`
     }
   }
 `;
-
-const Content = styled.div`
-  padding: 2rem;
-`;
-
-const FormGroup = styled.div`
-  margin-bottom: 1.5rem;
-`;
-
 const FormRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -186,19 +163,6 @@ const FormError = styled.div`
   color: ${colors.salmon};
   font-size: 0.875rem;
 `;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 1rem;
-  justify-content: space-between;
-  margin-top: 2rem;
-`;
-
-const ButtonRow = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
 const Button = styled.button<{ variant?: 'primary' | 'secondary' | 'danger' }>`
   display: inline-flex;
   align-items: center;
@@ -312,11 +276,9 @@ interface FormValues {
   ongoing: string; // 'true' or 'false' - HTML select returns strings
 }
 
-const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
-  opening,
-  onClose,
-  onSuccess
-}) => {
+const OpeningFormModal: React.FC<
+  React.PropsWithChildren<OpeningFormModalProps>
+> = ({ opening, onClose, onSuccess }) => {
   const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const { logAction } = useAdminActions();
@@ -514,7 +476,10 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
   };
 
   return (
-    <Overlay onClick={onClose}>
+    <div
+      onClick={onClose}
+      className="z-1001 fixed bottom-0 left-0 right-0 top-0 flex items-center justify-center bg-[rgba(0,_0,_0,_0.5)] p-[1rem]"
+    >
       <Modal onClick={(e) => e.stopPropagation()}>
         <Header>
           <h2>{isEditing ? 'Edit Opening' : 'Add New Opening'}</h2>
@@ -523,7 +488,7 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
           </button>
         </Header>
 
-        <Content>
+        <div className="p-[2rem]">
           {showDeleteConfirm && opening && (
             <DeleteConfirmation ref={deleteConfirmRef}>
               <p>
@@ -561,7 +526,7 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
               <Form>
                 {formError && <FormError>{formError}</FormError>}
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="roleName">Position Title *</Label>
                   <Input
                     type="text"
@@ -570,10 +535,10 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                     placeholder="e.g., Project Manager, Grant Writer"
                   />
                   <ErrorMessage name="roleName" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 <FormRow>
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="productionName">Department/Team *</Label>
                     <Input
                       type="text"
@@ -582,9 +547,9 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                       placeholder="e.g., Chicago Artist Guide"
                     />
                     <ErrorMessage name="productionName" component={ErrorText} />
-                  </FormGroup>
+                  </div>
 
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="roleType">Position Type *</Label>
                     <Field as={StyledSelect} name="roleType" id="roleType">
                       <option value="Staff">Staff</option>
@@ -594,10 +559,10 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                       <option value="Contract">Contract</option>
                     </Field>
                     <ErrorMessage name="roleType" component={ErrorText} />
-                  </FormGroup>
+                  </div>
                 </FormRow>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="description">Description *</Label>
                   <Field
                     as={StyledTextarea}
@@ -606,10 +571,10 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                     placeholder="Describe the position, responsibilities, and requirements..."
                   />
                   <ErrorMessage name="description" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 <FormRow>
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="pay">Compensation</Label>
                     <Input
                       type="text"
@@ -618,9 +583,9 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                       placeholder="e.g., $250, Volunteer, Stipend"
                     />
                     <ErrorMessage name="pay" component={ErrorText} />
-                  </FormGroup>
+                  </div>
 
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="location">Location</Label>
                     <Input
                       type="text"
@@ -629,10 +594,10 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                       placeholder="e.g., Chicago, Remote"
                     />
                     <ErrorMessage name="location" component={ErrorText} />
-                  </FormGroup>
+                  </div>
                 </FormRow>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="googleFormUrl">Application Form URL</Label>
                   <Input
                     type="url"
@@ -641,9 +606,9 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                     placeholder="https://forms.google.com/..."
                   />
                   <ErrorMessage name="googleFormUrl" component={ErrorText} />
-                </FormGroup>
+                </div>
 
-                <FormGroup>
+                <div className="mb-[1.5rem]">
                   <Label htmlFor="moreInfoUrl">More Info URL</Label>
                   <Input
                     type="url"
@@ -652,28 +617,28 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                     placeholder="https://..."
                   />
                   <ErrorMessage name="moreInfoUrl" component={ErrorText} />
-                </FormGroup>
+                </div>
 
                 <FormRow>
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="status">Status</Label>
                     <Field as={StyledSelect} name="status" id="status">
                       <option value="open">Open</option>
                       <option value="closed">Closed</option>
                     </Field>
                     <ErrorMessage name="status" component={ErrorText} />
-                  </FormGroup>
+                  </div>
 
-                  <FormGroup>
+                  <div className="mb-[1.5rem]">
                     <Label htmlFor="ongoing">Position Type</Label>
                     <Field as={StyledSelect} name="ongoing" id="ongoing">
                       <option value="false">Temporal (Current Openings)</option>
                       <option value="true">Ongoing (Always Open)</option>
                     </Field>
-                  </FormGroup>
+                  </div>
                 </FormRow>
 
-                <ButtonGroup>
+                <div className="mt-[2rem] flex justify-between gap-[1rem]">
                   <div>
                     {isEditing && (
                       <Button
@@ -687,7 +652,7 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                       </Button>
                     )}
                   </div>
-                  <ButtonRow>
+                  <div className="flex gap-[1rem]">
                     <Button
                       type="button"
                       variant="secondary"
@@ -704,14 +669,14 @@ const OpeningFormModal: React.FC<OpeningFormModalProps> = ({
                           ? 'Save Changes'
                           : 'Create Opening'}
                     </Button>
-                  </ButtonRow>
-                </ButtonGroup>
+                  </div>
+                </div>
               </Form>
             )}
           </Formik>
-        </Content>
+        </div>
       </Modal>
-    </Overlay>
+    </div>
   );
 };
 

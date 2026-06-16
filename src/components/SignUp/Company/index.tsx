@@ -21,10 +21,12 @@ const stepComponents = {
   details: CompanyDetails
 };
 
-const CompanySignUp: React.FC<{
-  currentStep: number;
-  setCurrentStep: (x: number) => void;
-}> = ({ currentStep, setCurrentStep }) => {
+const CompanySignUp: React.FC<
+  React.PropsWithChildren<{
+    currentStep: number;
+    setCurrentStep: (x: number) => void;
+  }>
+> = ({ currentStep, setCurrentStep }) => {
   const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
   const { profile, setAccountRef, setProfileRef } = useUserContext();
   const { lglApiKey } = useMarketingContext();

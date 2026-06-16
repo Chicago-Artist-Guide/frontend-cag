@@ -40,7 +40,7 @@ const DebugContainer = styled.div`
   }
 `;
 
-const DebugAuth: React.FC = () => {
+const DebugAuth: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { currentUser, account, profile } = useUserContext();
   const { isStaff, staffEmail } = useStaffAuth();
   const simpleData = useSimpleAnalytics();

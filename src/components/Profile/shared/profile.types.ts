@@ -4,7 +4,16 @@ export type ProductionEquity = 'Union' | 'Non-Union';
 
 export type ProductionType = 'Musical' | 'Play' | 'Other';
 
-export type ProductionStatus = 'Hiring' | 'In Production' | 'Show Complete';
+// Includes the values used in production data even though the type was
+// originally narrower. PublicShows.tsx, Matches/api.ts, and PublicRoles
+// all filter on 'Casting' / 'Pre-Production' alongside 'Hiring'; if those
+// strings disappear from this union the casts in api.ts start lying.
+export type ProductionStatus =
+  | 'Casting'
+  | 'Hiring'
+  | 'Pre-Production'
+  | 'In Production'
+  | 'Show Complete';
 
 export type RoleStatus = 'Open' | 'Closed';
 

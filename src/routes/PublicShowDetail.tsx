@@ -8,13 +8,15 @@ import { Button } from '../components/shared';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
-import { Production, Role } from '../components/Profile/Company/types';
-import { getTheaterByAccountUid } from '../components/Profile/Company/api';
+import { Production } from '../components/Profile/Company/types';
+import {
+  getTheaterAccountByUid,
+  getTheaterByAccountId
+} from '../components/Profile/Company/api';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
 import PublicShowDetailSkeleton from '../components/PublicShows/PublicShowDetailSkeleton';
-import PublicShowInterestForm from '../components/PublicShows/PublicShowInterestForm';
 
 const PublicShowDetail = () => {
   const { productionId } = useParams<{ productionId: string }>();
@@ -26,8 +28,6 @@ const PublicShowDetail = () => {
   const [show, setShow] = useState<Production | null>(null);
   const [theaterName, setTheaterName] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [showInterestForm, setShowInterestForm] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   // Get the saved pagination state
   const savedPaginationState = getPaginationState('/shows');
@@ -41,6 +41,9 @@ const PublicShowDetail = () => {
         return;
       }
 
+      // Outer try/catch wraps ONLY the production fetch.
+      // If this fails, show is set to null and loading stops.
+      let productionData: Production | null = null;
       try {
         const productionRef = doc(
           firebaseFirestore,
@@ -56,12 +59,13 @@ const PublicShowDetail = () => {
           const rawData = productionDoc.data();
 
           // Create a valid Production object with required fields
-          const productionData: Production = {
+          productionData = {
             // Required fields with fallbacks
             production_id: rawData.production_id || productionDoc.id,
             production_name: rawData.production_name || 'Untitled Production',
             account_id: rawData.account_id || '',
             location: rawData.location || '',
+            theater_name: rawData.theater_name || '',
 
             // Optional fields
             production_image_url: rawData.production_image_url,
@@ -101,22 +105,9 @@ const PublicShowDetail = () => {
 
           // Set the show data
           setShow(productionData);
-
-          // Fetch theater name
-          if (productionData.account_id) {
-            const theater = await getTheaterByAccountUid(
-              firebaseFirestore,
-              productionData.account_id
-            );
-
-            if (!isMounted) return;
-
-            setTheaterName(
-              theater && theater.theatre_name
-                ? theater.theatre_name
-                : 'Unknown Theater'
-            );
-          }
+        } else if (isMounted) {
+          // Production no longer exists — clear any stale state from a prior render.
+          setShow(null);
         }
 
         if (isMounted) {
@@ -128,6 +119,43 @@ const PublicShowDetail = () => {
           setShow(null);
           setLoading(false);
         }
+        return;
+      }
+
+      if (!productionData || !isMounted) return;
+
+      // Theater-name lookup: best-effort, in its own catch so it never
+      // wipes out a successfully-fetched production.
+      // Use the denormalized field first; only call the auth-gated query
+      // when the user is authenticated and the field is missing (legacy data).
+      if (productionData.theater_name) {
+        setTheaterName(productionData.theater_name);
+      } else if (currentUser && productionData.account_id) {
+        try {
+          const theaterAccount = await getTheaterAccountByUid(
+            firebaseFirestore,
+            productionData.account_id
+          );
+
+          if (!isMounted) return;
+
+          if (theaterAccount) {
+            const theaterProfile = await getTheaterByAccountId(
+              firebaseFirestore,
+              theaterAccount.id
+            );
+
+            if (!isMounted) return;
+
+            const resolvedName =
+              (theaterProfile && theaterProfile.theatre_name) ||
+              (theaterAccount as any).theater_name ||
+              '';
+            setTheaterName(resolvedName);
+          }
+        } catch {
+          // Silently ignore — theater name is non-critical display data.
+        }
       }
     };
 
@@ -137,17 +165,7 @@ const PublicShowDetail = () => {
     return () => {
       isMounted = false;
     };
-  }, [productionId, firebaseFirestore]);
-
-  const handleShowInterestClick = (role: Role | null) => {
-    setSelectedRole(role);
-    setShowInterestForm(true);
-  };
-
-  const handleCloseForm = () => {
-    setShowInterestForm(false);
-    setSelectedRole(null);
-  };
+  }, [productionId, firebaseFirestore, currentUser]);
 
   if (loading) {
     return (
@@ -158,12 +176,6 @@ const PublicShowDetail = () => {
   }
 
   if (!show) {
-    // Keep the console logs for debugging
-    console.log(
-      'Show is null or undefined, displaying "Show not found" message'
-    );
-    console.log('Current productionId:', productionId);
-
     return (
       <PageContainer>
         <BackLink to="/shows">
@@ -206,9 +218,11 @@ const PublicShowDetail = () => {
             ← Back to shows (page {savedPaginationState.currentPage || 1})
           </BackLink>
           <Title>{show.production_name}</Title>
-          <TheaterNameLink to={`/profile/view/${show.account_id}`}>
-            {theaterName}
-          </TheaterNameLink>
+          {theaterName ? (
+            <TheaterNameLink to={`/profile/view/${show.account_id}`}>
+              {theaterName}
+            </TheaterNameLink>
+          ) : null}
         </Col>
       </Row>
 
@@ -229,28 +243,28 @@ const PublicShowDetail = () => {
                   </ShowStatus>
 
                   {show.writers && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Written by:</InfoLabel>
                       <InfoValue>{show.writers}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.director && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Director:</InfoLabel>
                       <InfoValue>{show.director}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.location && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Location:</InfoLabel>
                       <InfoValue>{show.location}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {(show.open_and_close_start || show.open_and_close_end) && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Production Dates:</InfoLabel>
                       <InfoValue>
                         {show.open_and_close_start &&
@@ -265,15 +279,8 @@ const PublicShowDetail = () => {
                             show.open_and_close_end
                           ).toLocaleDateString()}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
-
-                  <ShowButton
-                    onClick={() => handleShowInterestClick(null)}
-                    text="Express Interest in this Show"
-                    type="button"
-                    variant="primary"
-                  />
 
                   {!currentUser && (
                     <SignUpPrompt>
@@ -289,31 +296,27 @@ const PublicShowDetail = () => {
                   </ShowDescription>
 
                   {onStageRoles.length > 0 && (
-                    <RolesSection>
+                    <div className="mb-[30px]">
                       <SectionTitle>On-Stage Roles</SectionTitle>
                       {onStageRoles.map((role, index) => (
                         <PublicRoleCard
                           key={`${role.role_id || 'unknown'}-onstage-${index}`}
                           role={role}
-                          onShowInterest={() => handleShowInterestClick(role)}
-                          isLoggedIn={!!currentUser}
                         />
                       ))}
-                    </RolesSection>
+                    </div>
                   )}
 
                   {offStageRoles.length > 0 && (
-                    <RolesSection>
+                    <div className="mb-[30px]">
                       <SectionTitle>Off-Stage Roles</SectionTitle>
                       {offStageRoles.map((role, index) => (
                         <PublicRoleCard
                           key={`${role.role_id || 'unknown'}-offstage-${index}`}
                           role={role}
-                          onShowInterest={() => handleShowInterestClick(role)}
-                          isLoggedIn={!!currentUser}
                         />
                       ))}
-                    </RolesSection>
+                    </div>
                   )}
 
                   {onStageRoles.length === 0 && offStageRoles.length === 0 && (
@@ -329,7 +332,7 @@ const PublicShowDetail = () => {
               <Row>
                 <Col lg={12}>
                   {(show.audition_start || show.audition_end) && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Audition Dates:</InfoLabel>
                       <InfoValue>
                         {show.audition_start &&
@@ -338,48 +341,48 @@ const PublicShowDetail = () => {
                         {show.audition_end &&
                           new Date(show.audition_end).toLocaleDateString()}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.audition_location && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Audition Location:</InfoLabel>
                       <InfoValue>{show.audition_location}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.contact_person_name_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Contact Person:</InfoLabel>
                       <InfoValue>{show.contact_person_name_audition}</InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.contact_person_email_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Contact Email:</InfoLabel>
                       <InfoValue>
                         {show.contact_person_email_audition}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.materials_to_prepare_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Materials to Prepare:</InfoLabel>
                       <InfoValue style={{ whiteSpace: 'pre-line' }}>
                         {show.materials_to_prepare_audition}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {show.additional_notes_audition && (
-                    <InfoSection>
+                    <div className="mb-[15px]">
                       <InfoLabel>Additional Notes:</InfoLabel>
                       <InfoValue style={{ whiteSpace: 'pre-line' }}>
                         {show.additional_notes_audition}
                       </InfoValue>
-                    </InfoSection>
+                    </div>
                   )}
 
                   {!show.audition_start &&
@@ -400,15 +403,6 @@ const PublicShowDetail = () => {
           </ProductionTabs>
         </Col>
       </Row>
-
-      {showInterestForm && (
-        <PublicShowInterestForm
-          show={show}
-          role={selectedRole}
-          theaterName={theaterName}
-          onClose={handleCloseForm}
-        />
-      )}
     </PageContainer>
   );
 };
@@ -476,11 +470,6 @@ const ShowStatus = styled.div`
   color: ${colors.mint};
   margin-bottom: 20px;
 `;
-
-const InfoSection = styled.div`
-  margin-bottom: 15px;
-`;
-
 const InfoLabel = styled.div`
   font-family: ${fonts.montserrat};
   font-weight: 600;
@@ -522,11 +511,6 @@ const ShowDescription = styled.div`
   margin-bottom: 30px;
   white-space: pre-line;
 `;
-
-const RolesSection = styled.div`
-  margin-bottom: 30px;
-`;
-
 const SectionTitle = styled.h3`
   font-family: ${fonts.montserrat};
   font-weight: 600;

@@ -26,7 +26,9 @@ interface ResponsiveImageUploadModalProps {
 
 type ModalStep = 'upload' | 'crop' | 'uploading';
 
-const ResponsiveImageUploadModal: React.FC<ResponsiveImageUploadModalProps> = ({
+const ResponsiveImageUploadModal: React.FC<
+  React.PropsWithChildren<ResponsiveImageUploadModalProps>
+> = ({
   show,
   onHide,
   onSave,
@@ -147,12 +149,12 @@ const ResponsiveImageUploadModal: React.FC<ResponsiveImageUploadModalProps> = ({
 
       case 'uploading':
         return (
-          <UploadingContainer>
+          <div className="flex flex-col items-center px-[20px] py-[40px] text-center">
             <UploadingIcon>⏳</UploadingIcon>
             <UploadingText>Processing your image...</UploadingText>
             <ProgressBar progress={uploadProgress} />
             <ProgressText>{uploadProgress}% complete</ProgressText>
-          </UploadingContainer>
+          </div>
         );
 
       default:
@@ -266,15 +268,6 @@ const ErrorAlert = styled.div`
   font-family: ${fonts.mainFont};
   font-size: 14px;
 `;
-
-const UploadingContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 20px;
-  text-align: center;
-`;
-
 const UploadingIcon = styled.div`
   font-size: 48px;
   margin-bottom: 16px;

@@ -10,7 +10,7 @@ import IndividualSignUp from '../components/SignUp/Individual';
 import { AccountTypeOptions } from '../components/SignUp/types';
 import { useUserContext } from '../context/UserContext';
 
-const SignUp: React.FC = () => {
+const SignUp: React.FC<React.PropsWithChildren<unknown>> = () => {
   const navigate = useNavigate();
   const { flag } = queryString.parse(location.search);
   const { currentUser } = useUserContext();

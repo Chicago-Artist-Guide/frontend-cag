@@ -21,10 +21,12 @@ import type {
 } from '../../Profile/shared/profile.types';
 import type { IndividualData } from './types';
 
-const OffstageRoles: React.FC<{
-  setForm: SetForm;
-  formData: IndividualData;
-}> = (props) => {
+const OffstageRoles: React.FC<
+  React.PropsWithChildren<{
+    setForm: SetForm;
+    formData: IndividualData;
+  }>
+> = (props) => {
   const { formData, setForm } = props;
 
   const {
@@ -134,7 +136,10 @@ const OffstageRoles: React.FC<{
               } = currObjKey;
 
               return (
-                <StyledDiv key={`div-accordion-item-${textHeader}`}>
+                <div
+                  key={`div-accordion-item-${textHeader}`}
+                  className="pb-[2em]"
+                >
                   <GenericAccordion
                     eventKey={objI}
                     key={`accordion-item-${textHeader}`}
@@ -172,7 +177,7 @@ const OffstageRoles: React.FC<{
                       </ImageCol>
                     </Row>
                   </GenericAccordion>
-                </StyledDiv>
+                </div>
               );
             })}
           </StyledAccordion>
@@ -202,9 +207,4 @@ const StyledAccordion = styled(Accordion)`
   border-radius: 8px;
   opacity: 1;
 `;
-
-const StyledDiv = styled.div`
-  padding-bottom: 2em;
-`;
-
 export default OffstageRoles;

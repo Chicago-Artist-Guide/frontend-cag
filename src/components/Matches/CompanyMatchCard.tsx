@@ -6,8 +6,9 @@ import { useUserContext } from '../../context/UserContext';
 import { useRoleMatches } from '../../context/RoleMatchContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import {
-  getTheaterByAccountUid,
-  getTheaterAccountByAccountId
+  getTheaterAccountByAccountId,
+  getTheaterAccountByUid,
+  getTheaterByAccountId
 } from '../Profile/Company/api';
 import { Profile, Production } from '../Profile/Company/types';
 import { createMessageThread, createEmail } from '../Messages/api';
@@ -23,7 +24,19 @@ import { MatchConfirmationModal } from './MatchConfirmationModal';
 import { ProductionRole } from './types';
 import { createTheaterTalentMatch, getTheaterTalentMatch } from './api';
 
-export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
+export const CompanyMatchCard = ({
+  role,
+  isFavorite = false,
+  onToggleFavorite,
+  matchStatus: matchStatusProp,
+  onMatchStatusChange
+}: {
+  role: ProductionRole;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  matchStatus?: boolean | null;
+  onMatchStatusChange?: (status: boolean) => void;
+}) => {
   const navigate = useNavigate();
   const { account, currentUser } = useUserContext();
   const { findProduction } = useRoleMatches();
@@ -31,7 +44,11 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
   const [production, setProduction] = useState<Production | null>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [matchType, setMatchType] = useState<boolean | null>(null);
-  const [matchStatus, setMatchStatus] = useState<boolean | null>(null);
+  const [localMatchStatus, setLocalMatchStatus] = useState<boolean | null>(
+    null
+  );
+  const matchStatus =
+    matchStatusProp !== undefined ? matchStatusProp : localMatchStatus;
   const [theater, setTheater] = useState<Profile | null>(null);
   const productionName = production?.production_name || '(Unknown Production)';
   const roleName = role.role_name;
@@ -56,10 +73,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       'talent'
     );
 
-    if (foundMatch) {
-      const matchStatus = foundMatch.status;
-      setMatchStatus(matchStatus);
-    }
+    setLocalMatchStatus(foundMatch ? foundMatch.status : null);
   };
 
   const findTheater = async () => {
@@ -67,24 +81,41 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
       return false;
     }
 
-    const theaterAccountId = production?.account_id || '';
+    const theaterAccountUid = production?.account_id || '';
 
-    if (!theaterAccountId || theaterAccountId == '') {
+    if (!theaterAccountUid || theaterAccountUid == '') {
       console.error('Could not find theater account id');
       return false;
     }
 
-    const getTheater = await getTheaterByAccountUid(
+    // production.account_id is the company auth uid. Resolve account first so
+    // we can fall back from profile.theatre_name to account.theater_name when
+    // the company hasn't completed their detailed profile yet.
+    const theaterAccount = await getTheaterAccountByUid(
       firebaseFirestore,
-      theaterAccountId
+      theaterAccountUid
     );
 
-    if (!getTheater) {
+    if (!theaterAccount) {
+      console.error('Could not find theater account by uid');
+      return false;
+    }
+
+    const theaterProfile = await getTheaterByAccountId(
+      firebaseFirestore,
+      theaterAccount.id
+    );
+
+    if (!theaterProfile) {
       console.error('Could not find theater profile');
       return false;
     }
 
-    setTheater(getTheater);
+    if (!theaterProfile.theatre_name && (theaterAccount as any).theater_name) {
+      theaterProfile.theatre_name = (theaterAccount as any).theater_name;
+    }
+
+    setTheater(theaterProfile);
   };
 
   const sendEmailToTheater = async () => {
@@ -154,8 +185,10 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         'talent'
       );
 
-      // update match state in this card
-      await findMatch();
+      onMatchStatusChange?.(status);
+      if (matchStatusProp === undefined) {
+        await findMatch();
+      }
 
       // only create messages and emails if accepted
       if (status) {
@@ -209,12 +242,14 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
     }
 
     const productionChangeOrder = async () => {
-      await findMatch();
+      if (matchStatusProp === undefined) {
+        await findMatch();
+      }
       await findTheater();
     };
 
     productionChangeOrder();
-  }, [production]);
+  }, [production, matchStatusProp]);
 
   const handleConfirm = async () => {
     setIsModalVisible(false);
@@ -232,7 +267,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
 
   const returnModalMessage = () => (
     <>
-      Please confirm you would like to express interest in the following role:
+      Please confirm you would like to apply for the following role:
       <span className="mx-2 my-8 block rounded-xl bg-stone-200 px-4 py-2">
         <strong>{roleName}</strong> in <em>{productionName}</em>
       </span>
@@ -292,6 +327,50 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
         </div>
       )}
       <div className="relative flex flex-1 flex-col overflow-hidden px-4 py-4 font-montserrat -tracking-tighter sm:px-8">
+        {onToggleFavorite && (
+          <button
+            type="button"
+            onClick={onToggleFavorite}
+            aria-label={isFavorite ? 'Unfavorite role' : 'Favorite role'}
+            className={clsx(
+              'absolute right-3 top-3 rounded-full p-1 transition-colors',
+              {
+                'text-banana hover:text-banana/80': isFavorite,
+                'text-stone-300 hover:text-banana': !isFavorite
+              }
+            )}
+          >
+            {isFavorite ? (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="size-6"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            ) : (
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+                />
+              </svg>
+            )}
+          </button>
+        )}
         <h2 className="mb-2 text-xl font-bold lg:text-2xl">{role.role_name}</h2>
         {production?.production_name && (
           <div className="mb-4">
@@ -382,7 +461,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             />
           </svg>
           <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
-            Accept
+            Apply
           </span>
         </button>
         <button
@@ -409,7 +488,7 @@ export const CompanyMatchCard = ({ role }: { role: ProductionRole }) => {
             />
           </svg>
           <span className="font-montserrat text-sm font-bold uppercase -tracking-tighter lg:text-base">
-            Decline
+            Hide
           </span>
         </button>
       </div>

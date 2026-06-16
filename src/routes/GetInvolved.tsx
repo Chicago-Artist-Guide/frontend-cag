@@ -76,7 +76,7 @@ const DEMO_ROLES: RoleOpportunity[] = [
   }
 ];
 
-const GetInvolved: React.FC = () => {
+const GetInvolved: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const [searchParams] = useSearchParams();
   const [roles, setRoles] = useState<RoleOpportunity[]>([]);
@@ -405,7 +405,7 @@ ${values.message}
                       : null
                   }
                 />
-                <TextAreaWrapper>
+                <div className="mt-[25px] w-[100%]">
                   <TextAreaLabel htmlFor="message">Message</TextAreaLabel>
                   <TextAreaField
                     id="message"
@@ -424,7 +424,7 @@ ${values.message}
                   {!formSubmitted && touched.message && errors.message && (
                     <TextAreaError>{errors.message}</TextAreaError>
                   )}
-                </TextAreaWrapper>
+                </div>
 
                 {formSubmitted && (
                   <SuccessMessage>
@@ -967,12 +967,6 @@ const NameFieldsRow = styled.div`
     min-width: 0;
   }
 `;
-
-const TextAreaWrapper = styled.div`
-  margin-top: 25px;
-  width: 100%;
-`;
-
 const TextAreaLabel = styled.label`
   display: block;
   font-family: ${fonts.montserrat};

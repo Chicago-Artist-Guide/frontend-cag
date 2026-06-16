@@ -5,7 +5,7 @@ import { Title, TitleThree, TitleTwo } from '../components/layout/Titles';
 
 const NotFound = () => (
   <FullSceenContainer>
-    <CenterDiv>
+    <div className="text-center">
       <Title>THIS PAGE IS NOT AVAILABLE</Title>
       <TitleTwo>
         Return to <a href="/">Chicago Artist Guide</a>
@@ -18,7 +18,7 @@ const NotFound = () => (
         </TitleThree>
         <TitleThree>Cats</TitleThree>
       </div>
-    </CenterDiv>
+    </div>
   </FullSceenContainer>
 );
 
@@ -26,9 +26,4 @@ const FullSceenContainer = styled(PageContainer)`
   margin-top: 20rem;
   margin-bottom: 20rem;
 `;
-
-const CenterDiv = styled.div`
-  text-align: center;
-`;
-
 export default NotFound;

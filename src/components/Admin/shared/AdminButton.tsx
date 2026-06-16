@@ -196,7 +196,7 @@ const Spinner = styled.div`
 /**
  * AdminButton Component
  */
-const AdminButton: React.FC<AdminButtonProps> = ({
+const AdminButton: React.FC<React.PropsWithChildren<AdminButtonProps>> = ({
   text,
   variant = 'primary',
   size = 'medium',

@@ -8,11 +8,13 @@ import { useUserContext } from '../../../context/UserContext';
 import { breakpoints } from '../../../theme/styleVars';
 import { Profile } from '../Company/types';
 
-const FormPhoto: React.FC<{
-  name: string;
-  src?: string;
-  onChange: SetForm;
-}> = ({ src, name, onChange }) => {
+const FormPhoto: React.FC<
+  React.PropsWithChildren<{
+    name: string;
+    src?: string;
+    onChange: SetForm;
+  }>
+> = ({ src, name, onChange }) => {
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }

@@ -9,6 +9,7 @@ import React, {
 import { useNavigate } from 'react-router-dom';
 import { fetchTalentWithFilters } from '../components/Matches/api';
 import { getProduction } from '../components/Profile/Company/api';
+import { useUserContext } from './UserContext';
 import { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 import { MatchingFilters } from '../components/Matches/types';
 import { Production, Role } from '../components/Profile/Company/types';
@@ -55,13 +56,12 @@ const MatchContext = createContext<MatchContextValue>(defaultContextValue);
 
 export const useMatches = (): MatchContextValue => useContext(MatchContext);
 
-export const MatchProvider: React.FC<MatchProviderProps> = ({
-  firestore,
-  productionId,
-  roleIdParam,
-  children
-}) => {
+export const MatchProvider: React.FC<
+  React.PropsWithChildren<MatchProviderProps>
+> = ({ firestore, productionId, roleIdParam, children }) => {
   const navigate = useNavigate();
+  const { account } = useUserContext();
+  const theaterAccountId = account?.ref?.id;
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
   const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(
@@ -166,15 +166,6 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
       }
     }
 
-    // Union status - filter talent by role's union requirements
-    if (
-      findRole.union &&
-      Array.isArray(findRole.union) &&
-      findRole.union.length > 0
-    ) {
-      newFilters['union_status'] = findRole.union;
-    }
-
     setFilters(newFilters);
     return newFilters;
   };
@@ -231,12 +222,20 @@ export const MatchProvider: React.FC<MatchProviderProps> = ({
       firestore,
       filters,
       production.production_id,
-      currentRoleId
+      currentRoleId,
+      theaterAccountId
     ).then((filteredMatches) => {
       setMatches(filteredMatches);
       setLoading(false);
     });
-  }, [filters]);
+  }, [
+    filters,
+    theaterAccountId,
+    production,
+    currentRoleId,
+    foundRole,
+    firestore
+  ]);
 
   const updateFilters = (newFilters: MatchingFilters) => {
     setFilters((prevFilters) => ({ ...prevFilters, ...newFilters }));

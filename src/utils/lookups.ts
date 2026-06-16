@@ -6,6 +6,18 @@ import {
   StageRole
 } from '../components/Profile/shared/profile.types';
 
+// Productions are considered "active" (i.e. publicly browsable + open for
+// applications) when status falls in this set. Single source of truth —
+// imported by PublicRoles/api.ts, PublicShows.tsx, and Matches/api.ts.
+// 'Casting' and 'Pre-Production' are real Firestore values even though they
+// were missing from the original ProductionStatus union; the union has been
+// widened to match (see profile.types.ts).
+export const ACTIVE_PRODUCTION_STATUSES: ProductionStatus[] = [
+  'Casting',
+  'Hiring',
+  'Pre-Production'
+];
+
 export const neighborhoods = [
   '(The) Loop[11]',
   'Albany Park',
@@ -103,6 +115,28 @@ export const unionOptions = [
 ] as const;
 
 export type UnionOption = (typeof unionOptions)[number];
+
+// Display labels — keep stored values stable while correcting visible copy.
+export const unionOptionLabels: Record<UnionOption, string> = {
+  'Non-Union': 'Non-Union',
+  'AEA (actors, stage managers, directors)':
+    'AEA (actors, stage managers, directors)',
+  'IATSE (stage hands)': 'IATSE (stage hands)',
+  'Union Scenic Artist (designers)': 'United Scenic Artists (designers)'
+};
+
+export const getUnionOptionLabel = (option: string): string =>
+  unionOptionLabels[option as UnionOption] ?? option;
+
+export const formatUnionStatusDisplay = (
+  unionStatus: string | string[] | undefined | null
+): string => {
+  if (!unionStatus) {
+    return '';
+  }
+  const values = Array.isArray(unionStatus) ? unionStatus : [unionStatus];
+  return values.map(getUnionOptionLabel).join(', ');
+};
 
 export const productionTypes: ProductionType[] = ['Musical', 'Play', 'Other'];
 export const stageRoles: StageRole[] = ['On-Stage', 'Off-Stage'];

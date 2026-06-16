@@ -95,6 +95,14 @@ service cloud.firestore {
     // - Admins can update any account (for user management)
     // - Only super_admin can modify admin_role field (prevents privilege escalation)
     // - Cannot modify your own admin_role (prevents self-escalation/accidental self-demotion)
+    //
+    // Note: company accounts contain `email` (set during SignUp/Company),
+    // so opening read access to type=='company' would leak email addresses.
+    // The unauth /roles page deliberately does NOT resolve theatre names —
+    // a follow-up should add a `company_public_profiles` collection (or
+    // denormalize theater_name onto the production doc at create time) so
+    // public surfaces can show theatre attribution without exposing
+    // company account data.
     match /accounts/{accountId} {
       allow read: if isAuthenticated();
       allow create: if isAuthenticated() && (
@@ -142,10 +150,11 @@ service cloud.firestore {
     }
 
     // Productions collection
-    // - Authenticated users can read
+    // - Public read access (productions are publicly-advertised auditions; powers the
+    //   /roles unauth marketing browse — DEV-496)
     // - Companies can create/update/delete their own productions
     match /productions/{productionId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow create: if isAuthenticated() &&
         request.resource.data.account_id == request.auth.uid;
       allow update, delete: if isAuthenticated() &&

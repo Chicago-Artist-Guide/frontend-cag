@@ -6,7 +6,9 @@ import { Button } from '../../../../components/shared';
 import { breakpoints, colors, fonts } from '../../../../theme/styleVars';
 import { Production } from '../types';
 
-const InactiveShow: React.FC<{ show: Production }> = ({ show }) => {
+const InactiveShow: React.FC<React.PropsWithChildren<{ show: Production }>> = ({
+  show
+}) => {
   const navigate = useNavigate();
   const manageProduction = () => {
     navigate(`/production/${show.production_id}/manage`);

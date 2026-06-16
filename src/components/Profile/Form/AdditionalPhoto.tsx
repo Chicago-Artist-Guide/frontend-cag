@@ -7,12 +7,14 @@ import { useUserContext } from '../../../context/UserContext';
 import { colors } from '../../../theme/styleVars';
 import { Profile } from '../Company/types';
 
-const AdditionalPhoto: React.FC<{
-  index: number;
-  name: string;
-  src?: string;
-  onChange: SetForm;
-}> = ({ index, src, name, onChange }) => {
+const AdditionalPhoto: React.FC<
+  React.PropsWithChildren<{
+    index: number;
+    name: string;
+    src?: string;
+    onChange: SetForm;
+  }>
+> = ({ index, src, name, onChange }) => {
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }

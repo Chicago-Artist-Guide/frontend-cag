@@ -5,19 +5,13 @@ import { colors } from '../../theme/styleVars';
 const QandA = (props: any) => {
   return (
     <div className="" key={props.id}>
-      <Section>
+      <div className="mb-[2rem] mt-[1rem]">
         <Question>{props.question}</Question>
         <p>{props.answer}</p>
-      </Section>
+      </div>
     </div>
   );
 };
-
-const Section = styled.div`
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-`;
-
 const Question = styled.div`
   font-weight: 700;
   font-color: ${colors.dark};

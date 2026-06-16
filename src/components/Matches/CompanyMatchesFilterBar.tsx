@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUserContext } from '../../context/UserContext';
 import { IndividualProfileDataFullInit } from '../SignUp/Individual/types';
+import { formatUnionStatusDisplay } from '../../utils/lookups';
 
 export const CompanyMatchesFilterBar = () => {
   const { profile } = useUserContext();
@@ -27,7 +28,7 @@ export const CompanyMatchesFilterBar = () => {
         <div className="sm:col-span-1">Union Status</div>
         <span className="col-span-1 font-bold sm:col-span-2">
           {profileData?.union_status && profileData.union_status.length > 0
-            ? profileData.union_status.join(', ')
+            ? formatUnionStatusDisplay(profileData.union_status)
             : 'All Options'}
         </span>
       </div>

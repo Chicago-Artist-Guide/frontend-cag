@@ -18,17 +18,19 @@ export type SubmitBasicsResp = {
   code?: string | number;
 };
 
-const SignUpFooter: React.FC<{
-  landingStep: number;
-  navigation: NavigationProps;
-  setLandingStep: (x: number) => void;
-  currentStep: string;
-  steps: Step[];
-  submitBasics: () => Promise<SubmitBasicsResp>;
-  submitSignUpProfile: () => Promise<void>;
-  stepErrors: { [key: string]: boolean };
-  goToProfile: () => void;
-}> = ({
+const SignUpFooter: React.FC<
+  React.PropsWithChildren<{
+    landingStep: number;
+    navigation: NavigationProps;
+    setLandingStep: (x: number) => void;
+    currentStep: string;
+    steps: Step[];
+    submitBasics: () => Promise<SubmitBasicsResp>;
+    submitSignUpProfile: () => Promise<void>;
+    stepErrors: { [key: string]: boolean };
+    goToProfile: () => void;
+  }>
+> = ({
   landingStep,
   navigation,
   setLandingStep,
