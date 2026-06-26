@@ -72,4 +72,28 @@ describe('sendDeferredDeclineNotifications', () => {
     expect(createMessageThread).toHaveBeenCalledTimes(1);
     expect(markMatchDeclineNotified).toHaveBeenCalledTimes(1);
   });
+
+  it('email contains decline role, production, and theatre details', async () => {
+    vi.mocked(getDeclinedMatchesForProduction).mockResolvedValue([
+      { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
+    ] as any);
+    vi.mocked(getAccountWithAccountId).mockResolvedValue({
+      email: 'x@y.com'
+    } as any);
+
+    await sendDeferredDeclineNotifications(
+      store,
+      production,
+      'theater1',
+      'My Theater'
+    );
+
+    expect(createEmail).toHaveBeenCalledWith(
+      store,
+      'x@y.com',
+      expect.stringContaining('Lead'),
+      expect.stringContaining('Show'),
+      expect.stringContaining('My Theater')
+    );
+  });
 });
