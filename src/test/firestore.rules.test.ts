@@ -289,6 +289,166 @@ describe('events collection (regression — was already public)', () => {
   });
 });
 
+describe('threads collection', () => {
+  // Thread docs store theater_account_id / talent_account_id as
+  // DocumentReferences into `accounts` (see Messages/api.ts
+  // createMessageThread) — account doc IDs are auto-generated and
+  // distinct from the owning user's auth uid, so these seeds mirror that
+  // by giving the account doc a different ID than its `uid` field.
+  const seedAccountsAndThread = () =>
+    seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'theater-acct-doc'), {
+        uid: 'theater-auth-uid',
+        type: 'company'
+      });
+      await setDoc(doc(db, 'accounts', 'talent-acct-doc'), {
+        uid: 'talent-auth-uid',
+        type: 'individual'
+      });
+      await setDoc(doc(db, 'threads', 'thread-1'), {
+        theater_account_id: doc(db, 'accounts', 'theater-acct-doc'),
+        talent_account_id: doc(db, 'accounts', 'talent-acct-doc'),
+        theater_status: 'new',
+        talent_status: 'new',
+        last_message: { content: 'hello' }
+      });
+    });
+
+  it('theater participant CAN update an existing thread (regression for the participants/created_by bug)', async () => {
+    await seedAccountsAndThread();
+
+    await assertSucceeds(
+      updateDoc(doc(asUser('theater-auth-uid'), 'threads', 'thread-1'), {
+        last_message: { content: 'updated' }
+      })
+    );
+  });
+
+  it('talent participant CAN update an existing thread', async () => {
+    await seedAccountsAndThread();
+
+    await assertSucceeds(
+      updateDoc(doc(asUser('talent-auth-uid'), 'threads', 'thread-1'), {
+        talent_status: 'read'
+      })
+    );
+  });
+
+  it('non-participant CANNOT read or update a thread', async () => {
+    await seedAccountsAndThread();
+
+    await assertFails(getDoc(doc(asUser('attacker'), 'threads', 'thread-1')));
+    await assertFails(
+      updateDoc(doc(asUser('attacker'), 'threads', 'thread-1'), {
+        last_message: { content: 'hacked' }
+      })
+    );
+  });
+
+  it('a participant CAN create a new thread referencing both accounts', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'theater-acct-doc'), {
+        uid: 'theater-auth-uid',
+        type: 'company'
+      });
+      await setDoc(doc(db, 'accounts', 'talent-acct-doc'), {
+        uid: 'talent-auth-uid',
+        type: 'individual'
+      });
+    });
+
+    const db = asUser('theater-auth-uid');
+    await assertSucceeds(
+      setDoc(doc(db, 'threads', 'thread-new'), {
+        theater_account_id: doc(db, 'accounts', 'theater-acct-doc'),
+        talent_account_id: doc(db, 'accounts', 'talent-acct-doc'),
+        theater_status: 'new',
+        talent_status: 'new'
+      })
+    );
+  });
+
+  it('a non-participant CANNOT create a thread for two other accounts', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'theater-acct-doc'), {
+        uid: 'theater-auth-uid',
+        type: 'company'
+      });
+      await setDoc(doc(db, 'accounts', 'talent-acct-doc'), {
+        uid: 'talent-auth-uid',
+        type: 'individual'
+      });
+    });
+
+    const db = asUser('attacker');
+    await assertFails(
+      setDoc(doc(db, 'threads', 'thread-evil'), {
+        theater_account_id: doc(db, 'accounts', 'theater-acct-doc'),
+        talent_account_id: doc(db, 'accounts', 'talent-acct-doc')
+      })
+    );
+  });
+});
+
+describe('messages collection', () => {
+  // Message docs store sender_id / recipient_id as DocumentReferences
+  // into `accounts` (see Messages/api.ts createMessageThread), same
+  // account-doc-id-vs-auth-uid distinction as threads above.
+  const seedAccountsAndMessage = () =>
+    seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'sender-acct-doc'), {
+        uid: 'sender-auth-uid',
+        type: 'company'
+      });
+      await setDoc(doc(db, 'accounts', 'recipient-acct-doc'), {
+        uid: 'recipient-auth-uid',
+        type: 'individual'
+      });
+      await setDoc(doc(db, 'messages', 'message-1'), {
+        sender_id: doc(db, 'accounts', 'sender-acct-doc'),
+        recipient_id: doc(db, 'accounts', 'recipient-acct-doc'),
+        content: 'hi',
+        status: 'new'
+      });
+    });
+
+  it('sender CAN update an existing message (e.g. backfilling thread_id — regression for the sender_id/recipients bug)', async () => {
+    await seedAccountsAndMessage();
+
+    await assertSucceeds(
+      updateDoc(doc(asUser('sender-auth-uid'), 'messages', 'message-1'), {
+        thread_id: 'thread-1'
+      })
+    );
+  });
+
+  it('recipient CAN read and update an existing message', async () => {
+    await seedAccountsAndMessage();
+
+    await assertSucceeds(
+      getDoc(doc(asUser('recipient-auth-uid'), 'messages', 'message-1'))
+    );
+    await assertSucceeds(
+      updateDoc(doc(asUser('recipient-auth-uid'), 'messages', 'message-1'), {
+        status: 'read'
+      })
+    );
+  });
+
+  it('non-participant CANNOT read or update a message', async () => {
+    await seedAccountsAndMessage();
+
+    await assertFails(
+      getDoc(doc(asUser('attacker'), 'messages', 'message-1'))
+    );
+    await assertFails(
+      updateDoc(doc(asUser('attacker'), 'messages', 'message-1'), {
+        status: 'read'
+      })
+    );
+  });
+});
+
 describe('default deny', () => {
   it('unauthenticated user CANNOT read an unmapped collection', async () => {
     await seed(async (db) => {
