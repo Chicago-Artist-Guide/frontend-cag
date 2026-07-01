@@ -9,6 +9,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import ConfirmDialog from '../components/ConfirmDialog';
 import PageContainer from '../components/layout/PageContainer';
+import { sendDeferredDeclineNotifications } from '../components/Matches/declineNotifications';
 import ManageProductionBasic from '../components/Profile/Company/Production/Manage/ManageProductionBasic';
 import ManageProductionMatches from '../components/Profile/Company/Production/Manage/ManageProductionMatches';
 import ManageProductionRoles from '../components/Profile/Company/Production/Manage/ManageProductionRoles';
@@ -32,6 +33,10 @@ const ManageProduction = () => {
   } = useUserContext();
   const ownerAccountId = accountData?.uid || accountData?.account_id || '';
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showDeclineNoticeConfirm, setShowDeclineNoticeConfirm] =
+    useState(false);
+  const [originalStatus, setOriginalStatus] =
+    useState<Production['status']>();
   const [productionExists, setProductionExists] = useState(false);
   const [formValues, setFormValues] = useForm<Production>({
     account_id: ownerAccountId,
@@ -77,6 +82,7 @@ const ManageProduction = () => {
     if (docSnap.exists()) {
       setProductionExists(true);
       const data = docSnap.data() as Production;
+      setOriginalStatus(data.status);
       Object.entries(data).forEach(([key, value]) =>
         setFormValues({
           target: {
@@ -137,10 +143,38 @@ const ManageProduction = () => {
 
   const handleSave = async () => {
     try {
+      if (
+        originalStatus === 'Hiring' &&
+        formValues.status === 'In Production'
+      ) {
+        setShowDeclineNoticeConfirm(true);
+        return;
+      }
+
       await handleUpdateDocument(formValues);
       goToProfile();
     } catch (error) {
       console.error('Error saving production:', error);
+    }
+  };
+
+  const handleDeclineNoticeCancel = () => {
+    setShowDeclineNoticeConfirm(false);
+  };
+
+  const handleDeclineNoticeConfirm = async () => {
+    try {
+      setShowDeclineNoticeConfirm(false);
+      await handleUpdateDocument(formValues);
+      await sendDeferredDeclineNotifications(
+        db,
+        formValues,
+        ownerAccountId,
+        profileData?.theatre_name || accountData?.theater_name || ''
+      );
+      goToProfile();
+    } catch (error) {
+      console.error('Error saving production and sending decline notices:', error);
     }
   };
 
@@ -170,6 +204,13 @@ const ManageProduction = () => {
         onCancel={onDeleteCancel}
         onConfirm={onDeleteConfirm}
         show={showConfirm}
+      />
+      <ConfirmDialog
+        title="Send decline notices?"
+        content="Decline emails and in-app messages will now be sent to all declined applicants for this show."
+        onCancel={handleDeclineNoticeCancel}
+        onConfirm={handleDeclineNoticeConfirm}
+        show={showDeclineNoticeConfirm}
       />
       <Form>
         <Row>

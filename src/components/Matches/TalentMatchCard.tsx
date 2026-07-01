@@ -173,6 +173,16 @@ export const TalentMatchCard = ({
     setMatchType(null);
   };
 
+  const handleDecline = async () => {
+    await createMatch(false);
+    Swal.fire({
+      title: 'Artist declined',
+      text: 'This artist has been declined. They will not be notified until you change the show status from "Hiring" to "In Production".',
+      icon: 'info',
+      confirmButtonText: 'Got it'
+    });
+  };
+
   const returnModalMessage = () => (
     <>
       Please confirm you would like to express interest in{' '}
@@ -303,7 +313,7 @@ export const TalentMatchCard = ({
           </span>
         </button>
         <button
-          onClick={() => createMatch(false)}
+          onClick={handleDecline}
           disabled={isDeclined}
           className={clsx(
             'flex min-h-[60px] flex-1 flex-col items-center justify-center bg-blush/50 px-4 py-3 text-salmon lg:h-full lg:min-h-0 lg:flex-initial',

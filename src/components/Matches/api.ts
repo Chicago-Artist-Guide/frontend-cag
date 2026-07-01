@@ -222,6 +222,37 @@ export const createTheaterTalentMatch = async (
   return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
 };
 
+export const getDeclinedMatchesForProduction = async (
+  firebaseStore: Firestore,
+  productionId: string
+): Promise<TheaterTalentMatch[]> => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const matchesRef = collection(firebaseStore, 'theater_talent_matches');
+  const matchesQuery = query(
+    matchesRef,
+    where('production_id', '==', productionRef),
+    where('status', '==', false)
+  );
+
+  const querySnapshot = await getDocs(matchesQuery);
+  const matches = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data()
+  })) as TheaterTalentMatch[];
+
+  return matches.filter((match) => !match.decline_notified);
+};
+
+export const markMatchDeclineNotified = async (
+  firebaseStore: Firestore,
+  matchId: string
+): Promise<void> => {
+  const matchRef = doc(firebaseStore, 'theater_talent_matches', matchId);
+  await updateDoc(matchRef, {
+    decline_notified: true
+  });
+};
+
 export async function fetchTalentWithFilters(
   firebaseStore: Firestore,
   filters: MatchingFilters,

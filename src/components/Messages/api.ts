@@ -99,6 +99,34 @@ export const createMessageThread = async (
   }
 };
 
+// DEV-382: number of threads still marked "new" for this account, used to
+// surface a global unread indicator (e.g. when a theatre accepts an artist).
+export const getUnreadThreadCount = async (
+  firebaseStore: Firestore,
+  accountId: string,
+  accountType: 'company' | 'individual'
+): Promise<number> => {
+  if (!accountId) {
+    return 0;
+  }
+
+  const accountRef = doc(firebaseStore, 'accounts', accountId);
+  const threadsRef = collection(firebaseStore, 'threads');
+  const isCompany = accountType === 'company';
+  const threadsQuery = query(
+    threadsRef,
+    where(
+      isCompany ? 'theater_account_id' : 'talent_account_id',
+      '==',
+      accountRef
+    ),
+    where(isCompany ? 'theater_status' : 'talent_status', '==', 'new')
+  );
+
+  const snapshot = await getDocs(threadsQuery);
+  return snapshot.size;
+};
+
 export const createEmail = async (
   firebaseStore: Firestore,
   to: string,

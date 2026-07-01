@@ -68,4 +68,5 @@ export type TheaterTalentMatch = {
   initiated_by: TheaterOrTalent;
   confirmed_by?: TheaterOrTalent;
   rejected_by?: TheaterOrTalent;
+  decline_notified?: boolean;
 };

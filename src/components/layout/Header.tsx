@@ -4,19 +4,23 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
+import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 import Logo from '../../images/cagLogo1.svg';
 import { colors } from '../../theme/styleVars';
+import { getUnreadThreadCount } from '../Messages/api';
 
 const Header = () => {
-  const { currentUser } = useUserContext();
+  const { currentUser, account } = useUserContext();
   const {
     profile: { ref: profileRef }
   } = useUserContext();
   const { isAdmin, adminRole } = useAdminAuth();
+  const { firebaseFirestore } = useFirebaseContext();
   const location = useLocation();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
 
   // Handle sign-up link click to reset to initial screen when already on sign-up page
@@ -59,6 +63,31 @@ const Header = () => {
   useEffect(() => {
     setExpanded(false);
   }, [location.pathname]);
+
+  // DEV-382: keep the artist's unread-interest badge fresh on login and on
+  // every navigation (e.g. after visiting Messages and marking a thread
+  // seen). Scoped to individual/artist accounts only — theatre-side
+  // notifications are a separate, unticketed requirement.
+  useEffect(() => {
+    const loadUnreadCount = async () => {
+      const accountId = account?.ref?.id;
+      const accountType = account?.data?.type;
+
+      if (!accountId || accountType !== 'individual') {
+        setUnreadCount(0);
+        return;
+      }
+
+      const count = await getUnreadThreadCount(
+        firebaseFirestore,
+        accountId,
+        accountType
+      );
+      setUnreadCount(count);
+    };
+
+    loadUnreadCount();
+  }, [account, location.pathname]);
 
   // Handle nav link clicks - close menu
   const handleNavClick = () => {
@@ -105,6 +134,11 @@ const Header = () => {
           {profileRef !== null ? (
             <Nav.Link as={Link} to="/profile" onClick={handleNavClick}>
               PROFILE
+              {unreadCount > 0 && (
+                <NotificationBadge aria-label={`${unreadCount} unread messages`}>
+                  {unreadCount}
+                </NotificationBadge>
+              )}
             </Nav.Link>
           ) : (
             <>
@@ -160,6 +194,23 @@ const WhiteBackNav = styled(Navbar)`
 // Prevent Safari dark mode from inverting logo colors
 const LogoImage = styled.img`
   color-scheme: light only;
+`;
+
+const NotificationBadge = styled.span`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  margin-left: 6px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background-color: ${colors.salmon};
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
 `;
 
 export default Header;
