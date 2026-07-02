@@ -36,9 +36,17 @@ export const getProductionsForAccount = async (
 
   return snapshot.docs.map((productionDoc) => {
     const data = productionDoc.data() as Production;
+    // Always use the real Firestore document ID, never the production_id
+    // *field*. Found live in dev: 32 of 59 productions under one account
+    // have a production_id field that's stale/wrong (some empty, some
+    // duplicated across many unrelated docs, none pointing to any real
+    // document) -- using it as a write target silently hit updateDoc() on
+    // a nonexistent document, which Firestore's rules evaluate against a
+    // null resource and report back as "Missing or insufficient
+    // permissions" rather than "not found".
     return {
       ...data,
-      production_id: data.production_id || productionDoc.id
+      production_id: productionDoc.id
     };
   });
 };
