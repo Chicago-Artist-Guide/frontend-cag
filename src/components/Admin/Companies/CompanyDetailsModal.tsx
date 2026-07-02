@@ -4,7 +4,7 @@
  * Shows full company account and profile data with option to edit.
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -12,12 +12,20 @@ import {
   faEdit,
   faExternalLinkAlt,
   faBan,
-  faCheckCircle
+  faCheckCircle,
+  faEye,
+  faEyeSlash
 } from '@fortawesome/free-solid-svg-icons';
 import { colors } from '../../../theme/styleVars';
-import { CompanyData } from '../../../hooks/useCompanies';
+import { CompanyData, isProductionLive } from '../../../hooks/useCompanies';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 import { useAdminActions } from '../../../hooks/useAdminActions';
+import { useFirebaseContext } from '../../../context/FirebaseContext';
+import { Production } from '../../Profile/Company/types';
+import {
+  getProductionsForAccount,
+  setProductionAdminHidden
+} from './api';
 import AdminButton from '../shared/AdminButton';
 
 interface CompanyDetailsModalProps {
@@ -129,6 +137,53 @@ const StatusBadge = styled.span<{ $status: 'active' | 'disabled' }>`
       : `background: ${colors.salmon}20; color: ${colors.salmon};`}
 `;
 
+const ProductionRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid ${colors.bodyBg};
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
+const ProductionName = styled.div`
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: ${colors.slate};
+`;
+
+const ProductionMeta = styled.div`
+  font-family: 'Open Sans', sans-serif;
+  font-size: 0.75rem;
+  color: ${colors.grayishBlue};
+`;
+
+const VisibilityToggle = styled.button<{ $hidden: boolean }>`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid ${(props) => (props.$hidden ? colors.salmon : colors.mint)};
+  background: ${(props) =>
+    props.$hidden ? `${colors.salmon}10` : `${colors.mint}10`};
+  color: ${(props) => (props.$hidden ? colors.salmon : colors.mint)};
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
 const Footer = styled.div`
   display: flex;
   align-items: center;
@@ -157,7 +212,74 @@ const CompanyDetailsModal: React.FC<
 > = ({ company, onClose, onEdit }) => {
   const { hasPermission } = useAdminAuth();
   const { logAction } = useAdminActions();
+  const { firebaseFirestore } = useFirebaseContext();
   const hasLoggedViewRef = useRef(false);
+  const [productions, setProductions] = useState<Production[]>([]);
+  const [productionsLoading, setProductionsLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
+
+  // Load this company's shows so an admin can see/toggle public visibility
+  // per-show, not just the aggregate count.
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProductions = async () => {
+      setProductionsLoading(true);
+      const results = await getProductionsForAccount(
+        firebaseFirestore,
+        company.accountId
+      );
+      if (isMounted) {
+        setProductions(
+          [...results].sort((a, b) =>
+            (a.production_name || '').localeCompare(b.production_name || '')
+          )
+        );
+        setProductionsLoading(false);
+      }
+    };
+
+    loadProductions();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [firebaseFirestore, company.accountId]);
+
+  const handleToggleVisibility = async (production: Production) => {
+    const nextHidden = !production.admin_hidden;
+    setTogglingId(production.production_id);
+
+    try {
+      await setProductionAdminHidden(
+        firebaseFirestore,
+        production.production_id,
+        nextHidden
+      );
+
+      setProductions((prev) =>
+        prev.map((p) =>
+          p.production_id === production.production_id
+            ? { ...p, admin_hidden: nextHidden }
+            : p
+        )
+      );
+
+      logAction({
+        action_type: 'production_visibility_change',
+        target_type: 'production',
+        target_id: production.production_id,
+        target_name: production.production_name,
+        changes: {
+          before: { admin_hidden: !!production.admin_hidden },
+          after: { admin_hidden: nextHidden },
+          fields_changed: ['admin_hidden']
+        }
+      });
+    } finally {
+      setTogglingId(null);
+    }
+  };
 
   // Log view action - only once per modal open
   useEffect(() => {
@@ -324,6 +446,52 @@ const CompanyDetailsModal: React.FC<
               </Value>
             </InfoGrid>
           </div>
+
+          {/* Shows */}
+          {productions.length > 0 && (
+            <div className="mb-[2rem] last:mb-0">
+              <SectionTitle>Shows</SectionTitle>
+              {productionsLoading ? (
+                <Value>Loading…</Value>
+              ) : (
+                productions.map((production) => {
+                  const live = isProductionLive(production);
+                  return (
+                    <ProductionRow key={production.production_id}>
+                      <div>
+                        <ProductionName>
+                          {production.production_name || '(Untitled)'}
+                        </ProductionName>
+                        <ProductionMeta>
+                          Status: {production.status || 'Not set'} ·{' '}
+                          {live ? 'Visible to the public' : 'Not visible'}
+                        </ProductionMeta>
+                      </div>
+                      {canEdit && (
+                        <VisibilityToggle
+                          $hidden={!!production.admin_hidden}
+                          disabled={togglingId === production.production_id}
+                          onClick={() => handleToggleVisibility(production)}
+                          title={
+                            production.admin_hidden
+                              ? 'Hidden by an admin — click to unhide'
+                              : 'Click to hide this show from /roles and /shows, regardless of its status'
+                          }
+                        >
+                          <FontAwesomeIcon
+                            icon={production.admin_hidden ? faEyeSlash : faEye}
+                          />
+                          {production.admin_hidden
+                            ? 'Hidden by admin'
+                            : 'Hide from public'}
+                        </VisibilityToggle>
+                      )}
+                    </ProductionRow>
+                  );
+                })
+              )}
+            </div>
+          )}
 
           {/* Description */}
           {company.description && (

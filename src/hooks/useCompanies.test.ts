@@ -56,4 +56,24 @@ describe('isProductionLive', () => {
       );
     }
   });
+
+  it('is false when admin_hidden is true, even with active status and an open role', () => {
+    expect(
+      isProductionLive({
+        status: 'Hiring',
+        roles: [{ role_status: 'Open' }],
+        admin_hidden: true
+      })
+    ).toBe(false);
+  });
+
+  it('is true when admin_hidden is explicitly false', () => {
+    expect(
+      isProductionLive({
+        status: 'Hiring',
+        roles: [{ role_status: 'Open' }],
+        admin_hidden: false
+      })
+    ).toBe(true);
+  });
 });

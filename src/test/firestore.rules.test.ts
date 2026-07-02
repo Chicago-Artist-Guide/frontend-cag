@@ -209,6 +209,116 @@ describe('productions collection', () => {
       })
     );
   });
+
+  // Admin-only visibility toggle (production_visibility_change)
+  const seedAdmin = (uid: string, role = 'admin') =>
+    seed(async (db) => {
+      await setDoc(doc(db, 'admin_users', uid), { role });
+    });
+
+  it('admin CAN toggle admin_hidden on a production they do not own', async () => {
+    await seedAdmin('admin-1');
+    await seed(async (db) => {
+      await setDoc(doc(db, 'productions', 'prod-1'), {
+        production_id: 'prod-1',
+        account_id: 'company-1',
+        production_name: 'Hamlet'
+      });
+    });
+
+    await assertSucceeds(
+      updateDoc(doc(asUser('admin-1'), 'productions', 'prod-1'), {
+        admin_hidden: true
+      })
+    );
+  });
+
+  it('admin CANNOT change any other field on a production they do not own', async () => {
+    await seedAdmin('admin-1');
+    await seed(async (db) => {
+      await setDoc(doc(db, 'productions', 'prod-1'), {
+        production_id: 'prod-1',
+        account_id: 'company-1',
+        production_name: 'Hamlet'
+      });
+    });
+
+    await assertFails(
+      updateDoc(doc(asUser('admin-1'), 'productions', 'prod-1'), {
+        production_name: 'Hacked by admin'
+      })
+    );
+  });
+
+  it('admin CANNOT bundle admin_hidden with another field change in one update', async () => {
+    await seedAdmin('admin-1');
+    await seed(async (db) => {
+      await setDoc(doc(db, 'productions', 'prod-1'), {
+        production_id: 'prod-1',
+        account_id: 'company-1',
+        production_name: 'Hamlet'
+      });
+    });
+
+    await assertFails(
+      updateDoc(doc(asUser('admin-1'), 'productions', 'prod-1'), {
+        admin_hidden: true,
+        production_name: 'Hacked by admin'
+      })
+    );
+  });
+
+  it('non-admin CANNOT toggle admin_hidden on a production they do not own', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'productions', 'prod-1'), {
+        production_id: 'prod-1',
+        account_id: 'company-1',
+        production_name: 'Hamlet'
+      });
+    });
+
+    await assertFails(
+      updateDoc(doc(asUser('attacker'), 'productions', 'prod-1'), {
+        admin_hidden: true
+      })
+    );
+  });
+
+  it('owner CAN still update their own production normally (regression)', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'productions', 'prod-1'), {
+        production_id: 'prod-1',
+        account_id: 'company-1',
+        production_name: 'Hamlet'
+      });
+    });
+
+    await assertSucceeds(
+      updateDoc(doc(asUser('company-1'), 'productions', 'prod-1'), {
+        production_name: 'Hamlet (Revised)',
+        status: 'Hiring'
+      })
+    );
+  });
+});
+
+describe('admin_actions collection — production_visibility_change', () => {
+  it('admin CAN log a production_visibility_change action', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'admin_users', 'admin-1'), { role: 'admin' });
+    });
+
+    await assertSucceeds(
+      setDoc(doc(asUser('admin-1'), 'admin_actions', 'action-1'), {
+        admin_uid: 'admin-1',
+        admin_email: 'admin@example.com',
+        action_type: 'production_visibility_change',
+        target_type: 'production',
+        target_id: 'prod-1',
+        timestamp: new Date()
+      })
+    );
+  });
 });
 
 describe('profiles collection (must stay auth-gated)', () => {

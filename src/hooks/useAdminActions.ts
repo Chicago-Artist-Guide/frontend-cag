@@ -33,7 +33,8 @@ export type AdminActionType =
   | 'event_create'
   | 'event_edit'
   | 'event_delete'
-  | 'event_publish';
+  | 'event_publish'
+  | 'production_visibility_change';
 
 /**
  * Admin action target types
@@ -44,6 +45,7 @@ export type AdminActionTargetType =
   | 'theatre_request'
   | 'opening'
   | 'event'
+  | 'production'
   | 'system';
 
 /**
