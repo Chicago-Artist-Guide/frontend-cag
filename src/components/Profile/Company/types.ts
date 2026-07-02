@@ -78,6 +78,11 @@ export type Production = {
   contact_person_email_audition?: string;
   materials_to_prepare_audition?: string;
   additional_notes_audition?: string;
+  // Admin-only visibility override (see firestore.rules) — hides the
+  // production from the public /roles and /shows pages regardless of
+  // status. Not editable by the owning company; toggled from the Admin
+  // Companies panel.
+  admin_hidden?: boolean;
 };
 
 export type Role = {

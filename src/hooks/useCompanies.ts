@@ -182,11 +182,15 @@ function applySorting(
 
 /**
  * Whether a production is currently visible on the public /roles or /shows
- * pages: active status AND at least one role explicitly Open (or with no
- * role_status set, which the public pages treat as open by convention).
- * Mirrors fetchPublicOpenRoles in src/components/PublicShows/api.ts.
+ * pages: not admin-hidden, active status, AND at least one role explicitly
+ * Open (or with no role_status set, which the public pages treat as open by
+ * convention). Mirrors fetchPublicOpenRoles in src/components/PublicShows/api.ts.
  */
 export function isProductionLive(production: any): boolean {
+  if (production.admin_hidden) {
+    return false;
+  }
+
   if (!ACTIVE_PRODUCTION_STATUSES.includes(production.status)) {
     return false;
   }

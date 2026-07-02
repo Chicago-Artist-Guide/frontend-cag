@@ -52,7 +52,8 @@ export const fetchPublicOpenRoles = async (
         typeof p.production_name === 'string' &&
         p.production_name.length > 0 &&
         typeof p.account_id === 'string' &&
-        p.account_id.length > 0
+        p.account_id.length > 0 &&
+        !p.admin_hidden
     );
 
   const items: PublicRoleListItem[] = [];

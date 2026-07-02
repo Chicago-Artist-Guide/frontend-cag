@@ -72,14 +72,15 @@ const PublicShows = () => {
 
         if (!isMounted) return;
 
-        // Filter out invalid productions from the count
+        // Filter out invalid or admin-hidden productions from the count
         const validProductions = countSnapshot.docs.filter((doc) => {
           const data = doc.data();
           return (
             data.production_name &&
             data.account_id &&
             typeof data.production_name === 'string' &&
-            typeof data.account_id === 'string'
+            typeof data.account_id === 'string' &&
+            !data.admin_hidden
           );
         });
 
@@ -150,12 +151,13 @@ const PublicShows = () => {
             };
           })
           .filter((production) => {
-            // Filter out productions without required fields
+            // Filter out productions without required fields, or hidden by an admin
             return (
               production.production_name &&
               production.account_id &&
               typeof production.production_name === 'string' &&
-              typeof production.account_id === 'string'
+              typeof production.account_id === 'string' &&
+              !production.admin_hidden
             );
           });
 

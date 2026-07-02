@@ -153,11 +153,19 @@ service cloud.firestore {
     // - Public read access (productions are publicly-advertised auditions; powers the
     //   /roles unauth marketing browse — DEV-496)
     // - Companies can create/update/delete their own productions
+    // - Admins can flip admin_hidden only (public-visibility toggle) on any
+    //   production, without gaining general edit rights over another
+    //   company's show content
     match /productions/{productionId} {
       allow read: if true;
       allow create: if isAuthenticated() &&
         request.resource.data.account_id == request.auth.uid;
-      allow update, delete: if isAuthenticated() &&
+      allow update: if isAuthenticated() && (
+        resource.data.account_id == request.auth.uid ||
+        (isAdminOrHigher() &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['admin_hidden']))
+      );
+      allow delete: if isAuthenticated() &&
         resource.data.account_id == request.auth.uid;
     }
 
@@ -306,7 +314,8 @@ service cloud.firestore {
           'company_view', 'company_edit', 'company_create', 'company_approve', 'company_reject',
           'opening_view', 'opening_edit', 'opening_moderate', 'opening_create', 'opening_delete',
           'event_view', 'event_create', 'event_edit', 'event_delete', 'event_publish',
-          'role_change', 'delete', 'export', 'profile_view', 'account_create'
+          'role_change', 'delete', 'export', 'profile_view', 'account_create',
+          'production_visibility_change'
         ] &&
         request.resource.data.target_type in ['user', 'company', 'production', 'role', 'opening', 'event', 'match', 'theatre_request', 'account', 'profile', 'system'];
       allow update: if false;
