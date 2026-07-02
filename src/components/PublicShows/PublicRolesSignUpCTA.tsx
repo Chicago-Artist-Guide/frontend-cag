@@ -70,7 +70,7 @@ const PublicRolesSignUpCTA: React.FC<PublicRolesSignUpCTAProps> = ({
               ? 'inline-flex items-center justify-center rounded-full border border-white/70 px-6 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white hover:border-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-cornflower'
               : 'inline-flex items-center justify-center rounded-full border border-cornflower px-5 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-cornflower hover:bg-cornflower hover:text-white focus:outline-none focus:ring-2 focus:ring-cornflower focus:ring-offset-2'
           }
-          to="/get-involved"
+          to="/faq"
         >
           How it Works
         </Link>
