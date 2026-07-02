@@ -299,6 +299,29 @@ const CompanyDetailsModal: React.FC<
             <InfoGrid>
               <Label>Productions:</Label>
               <Value>{company.productions_count || 0} productions</Value>
+
+              <Label>Live to the public:</Label>
+              <Value
+                style={{
+                  color:
+                    (company.productions_count || 0) > 0 &&
+                    !(company.live_productions_count || 0)
+                      ? colors.salmon
+                      : undefined,
+                  fontWeight:
+                    (company.productions_count || 0) > 0 &&
+                    !(company.live_productions_count || 0)
+                      ? 700
+                      : undefined
+                }}
+              >
+                {company.live_productions_count || 0} of{' '}
+                {company.productions_count || 0} shows visible on /roles or
+                /shows right now
+                {(company.productions_count || 0) > 0 &&
+                  !(company.live_productions_count || 0) &&
+                  ' — nothing is public. Check each show’s Status field (must be Hiring, Casting, or Pre-Production) and that at least one role is added and marked Open.'}
+              </Value>
             </InfoGrid>
           </div>
 

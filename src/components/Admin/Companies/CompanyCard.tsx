@@ -157,10 +157,20 @@ const CompanyCard: React.FC<React.PropsWithChildren<CompanyCardProps>> = ({
         ) : (
           <Badge $variant="warning">Incomplete</Badge>
         )}
+        {(company.productions_count || 0) > 0 &&
+          !(company.live_productions_count || 0) && (
+            <Badge $variant="warning" title="No shows visible on the public site right now">
+              Nothing public
+            </Badge>
+          )}
       </div>
 
       <Stats>
-        <span>{company.productions_count || 0} productions</span>
+        <span>
+          {company.productions_count
+            ? `${company.live_productions_count || 0} of ${company.productions_count} live`
+            : '0 productions'}
+        </span>
         {company.primary_contact && (
           <span>Contact: {company.primary_contact}</span>
         )}
