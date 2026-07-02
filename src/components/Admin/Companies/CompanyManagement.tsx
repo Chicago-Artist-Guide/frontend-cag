@@ -40,7 +40,28 @@ const SearchBar = styled.input`
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
   font-size: 1rem;
+
+  &:focus {
+    outline: 2px solid ${colors.mint};
+    outline-offset: 2px;
+  }
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
   margin-bottom: 1.5rem;
+`;
+
+const FilterSelect = styled.select`
+  padding: 0.5rem 0.75rem;
+  border: 1px solid ${colors.lightGrey};
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: ${colors.slate};
+  background: white;
 
   &:focus {
     outline: 2px solid ${colors.mint};
@@ -159,6 +180,7 @@ const CompanyManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
     searchTerm: '',
     status: 'all',
     profileComplete: 'all',
+    productions: 'all',
     sortBy: 'created',
     sortOrder: 'desc'
   });
@@ -307,6 +329,27 @@ const CompanyManagement: React.FC<React.PropsWithChildren<unknown>> = () => {
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
           />
+
+          <FilterRow>
+            <FilterSelect
+              aria-label="Filter by productions"
+              value={filters.productions}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  productions: e.target
+                    .value as CompanySearchFilters['productions']
+                }))
+              }
+            >
+              <option value="all">All companies</option>
+              <option value="has_productions">Has at least one show</option>
+              <option value="no_productions">No shows yet</option>
+              <option value="nothing_live">
+                Has shows, but nothing live
+              </option>
+            </FilterSelect>
+          </FilterRow>
 
           <StatsGrid>
             <StatCard>
