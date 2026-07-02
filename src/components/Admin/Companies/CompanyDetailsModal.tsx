@@ -217,6 +217,7 @@ const CompanyDetailsModal: React.FC<
   const [productions, setProductions] = useState<Production[]>([]);
   const [productionsLoading, setProductionsLoading] = useState(true);
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [toggleError, setToggleError] = useState<string | null>(null);
 
   // Load this company's shows so an admin can see/toggle public visibility
   // per-show, not just the aggregate count.
@@ -249,6 +250,7 @@ const CompanyDetailsModal: React.FC<
   const handleToggleVisibility = async (production: Production) => {
     const nextHidden = !production.admin_hidden;
     setTogglingId(production.production_id);
+    setToggleError(null);
 
     try {
       await setProductionAdminHidden(
@@ -276,6 +278,11 @@ const CompanyDetailsModal: React.FC<
           fields_changed: ['admin_hidden']
         }
       });
+    } catch (error) {
+      console.error('[CompanyDetailsModal] Failed to toggle visibility', error);
+      setToggleError(
+        `Couldn't update "${production.production_name || 'this show'}" — try again.`
+      );
     } finally {
       setTogglingId(null);
     }
@@ -451,6 +458,11 @@ const CompanyDetailsModal: React.FC<
           {productions.length > 0 && (
             <div className="mb-[2rem] last:mb-0">
               <SectionTitle>Shows</SectionTitle>
+              {toggleError && (
+                <Value style={{ color: colors.salmon, marginBottom: '0.75rem' }}>
+                  {toggleError}
+                </Value>
+              )}
               {productionsLoading ? (
                 <Value>Loading…</Value>
               ) : (
