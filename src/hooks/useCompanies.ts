@@ -67,6 +67,10 @@ export interface CompanySearchFilters {
   searchTerm: string;
   status: 'all' | 'active' | 'disabled';
   profileComplete: 'all' | boolean;
+  // 'has_productions': at least one show. 'no_productions': zero shows.
+  // 'nothing_live': has shows, but none are visible on /roles or /shows
+  // right now — the exact bucket that needs admin attention.
+  productions: 'all' | 'has_productions' | 'no_productions' | 'nothing_live';
   sortBy: 'name' | 'created' | 'email';
   sortOrder: 'asc' | 'desc';
 }
@@ -105,7 +109,7 @@ export function clearCompanyCache(): void {
 /**
  * Apply filters to company array
  */
-function applyFilters(
+export function applyFilters(
   companies: CompanyData[],
   filters: CompanySearchFilters
 ): CompanyData[] {
@@ -138,6 +142,25 @@ function applyFilters(
     filtered = filtered.filter(
       (company) => company.complete_profile === filters.profileComplete
     );
+  }
+
+  // Productions filter
+  if (filters.productions && filters.productions !== 'all') {
+    filtered = filtered.filter((company) => {
+      const count = company.productions_count || 0;
+      const liveCount = company.live_productions_count || 0;
+
+      switch (filters.productions) {
+        case 'has_productions':
+          return count > 0;
+        case 'no_productions':
+          return count === 0;
+        case 'nothing_live':
+          return count > 0 && liveCount === 0;
+        default:
+          return true;
+      }
+    });
   }
 
   return filtered;
