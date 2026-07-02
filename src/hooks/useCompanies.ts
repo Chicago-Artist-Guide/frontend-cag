@@ -8,6 +8,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { useFirebaseContext } from '../context/FirebaseContext';
+import { ACTIVE_PRODUCTION_STATUSES } from '../utils/lookups';
 
 /**
  * Company data structure combining account + profile
@@ -37,6 +38,11 @@ export interface CompanyData {
 
   // Counts
   productions_count?: number;
+  // Productions that are actually visible on the public /roles or /shows
+  // pages right now: active status (Hiring/Casting/Pre-Production) AND at
+  // least one role marked Open. Mirrors fetchPublicOpenRoles in
+  // src/components/PublicShows/api.ts -- keep these in sync.
+  live_productions_count?: number;
 }
 
 /**
@@ -175,6 +181,27 @@ function applySorting(
 }
 
 /**
+ * Whether a production is currently visible on the public /roles or /shows
+ * pages: active status AND at least one role explicitly Open (or with no
+ * role_status set, which the public pages treat as open by convention).
+ * Mirrors fetchPublicOpenRoles in src/components/PublicShows/api.ts.
+ */
+export function isProductionLive(production: any): boolean {
+  if (!ACTIVE_PRODUCTION_STATUSES.includes(production.status)) {
+    return false;
+  }
+
+  const roles = Array.isArray(production.roles) ? production.roles : [];
+  return roles.some(
+    (role: any) =>
+      role &&
+      typeof role === 'object' &&
+      !Array.isArray(role) &&
+      (role.role_status === undefined || role.role_status === 'Open')
+  );
+}
+
+/**
  * useCompanies Hook
  */
 export function useCompanies(
@@ -256,13 +283,20 @@ export function useCompanies(
       const productionsRef = collection(firebaseFirestore, 'productions');
       const productionsSnapshot = await getDocs(productionsRef);
 
-      // Count productions per account
+      // Count productions per account, and how many of those are actually
+      // live to the public right now.
       const productionsCount = new Map<string, number>();
+      const liveProductionsCount = new Map<string, number>();
       productionsSnapshot.forEach((doc) => {
         const prod = doc.data();
         if (prod.account_id) {
           const count = productionsCount.get(prod.account_id) || 0;
           productionsCount.set(prod.account_id, count + 1);
+
+          if (isProductionLive(prod)) {
+            const liveCount = liveProductionsCount.get(prod.account_id) || 0;
+            liveProductionsCount.set(prod.account_id, liveCount + 1);
+          }
         }
       });
 
@@ -296,7 +330,8 @@ export function useCompanies(
           profile_exists: !!profile,
 
           // Counts
-          productions_count: productionsCount.get(doc.id) || 0
+          productions_count: productionsCount.get(doc.id) || 0,
+          live_productions_count: liveProductionsCount.get(doc.id) || 0
         });
       });
 
