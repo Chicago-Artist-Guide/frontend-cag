@@ -26,12 +26,12 @@ describe('PublicRolesSignUpCTA', () => {
     expect(primaryLink).toHaveAttribute('href', '/sign-up');
   });
 
-  it('secondary action href points to /get-involved', () => {
+  it('secondary action href points to /faq', () => {
     renderCTA();
     const secondaryLink = screen.getByRole('link', {
       name: /learn how chicago artist guide works/i
     });
-    expect(secondaryLink).toHaveAttribute('href', '/get-involved');
+    expect(secondaryLink).toHaveAttribute('href', '/faq');
   });
 
   it('renders default heading and body copy', () => {

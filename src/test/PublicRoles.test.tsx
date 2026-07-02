@@ -169,7 +169,7 @@ describe('PublicRoles route', () => {
     ).toBeInTheDocument();
   });
 
-  it('top sign-up CTA links to /sign-up and /get-involved when roles exist', async () => {
+  it('top sign-up CTA links to /sign-up and /faq when roles exist', async () => {
     mockFetch.mockResolvedValueOnce(sampleRoles as never);
 
     renderRoute();
@@ -189,7 +189,7 @@ describe('PublicRoles route', () => {
     const howItWorksLinks = screen.getAllByRole('link', {
       name: /learn how chicago artist guide works/i
     });
-    expect(howItWorksLinks[0]).toHaveAttribute('href', '/get-involved');
+    expect(howItWorksLinks[0]).toHaveAttribute('href', '/faq');
   });
 
   it('filters by role type from the drawer', async () => {
