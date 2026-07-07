@@ -1,6 +1,7 @@
 import {
   getTheaterCardMatchStatus,
   getTheaterMatchStatusBuckets,
+  isAppliedAndDeclinedByTheater,
   profileMatchesTheaterStatusFilters
 } from './matchStatus';
 import { TheaterTalentMatch } from './types';
@@ -93,5 +94,28 @@ describe('theatre match status buckets', () => {
         'interested'
       ])
     ).toBe(false);
+  });
+
+  it('identifies talent who applied and were declined by the theatre', () => {
+    const appliedAndDeclined = baseMatch({
+      initiated_by: 'talent',
+      status: false,
+      rejected_by: 'theater'
+    });
+    expect(isAppliedAndDeclinedByTheater(appliedAndDeclined)).toBe(true);
+
+    const appliedOnly = baseMatch({
+      initiated_by: 'talent',
+      status: true
+    });
+    expect(isAppliedAndDeclinedByTheater(appliedOnly)).toBe(false);
+
+    const theatreDeclinedWithoutApply = baseMatch({
+      initiated_by: 'theater',
+      status: false
+    });
+    expect(isAppliedAndDeclinedByTheater(theatreDeclinedWithoutApply)).toBe(
+      false
+    );
   });
 });

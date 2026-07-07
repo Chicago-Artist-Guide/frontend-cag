@@ -9,6 +9,8 @@ type Props = {
   onConfirm: () => void;
   onCancel: () => void;
   show: boolean;
+  confirmLabel?: string;
+  cancelLabel?: string;
 };
 
 const ConfirmDialog = ({
@@ -16,7 +18,9 @@ const ConfirmDialog = ({
   content,
   onConfirm,
   onCancel,
-  show = false
+  show = false,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel'
 }: Props) => (
   <Modal backdrop="static" show={show} onHide={onCancel} className="z-3">
     <Modal.Header>
@@ -27,10 +31,10 @@ const ConfirmDialog = ({
     <Modal.Body>{content}</Modal.Body>
     <Modal.Footer>
       <Button variant="primary" onClick={onConfirm}>
-        Confirm
+        {confirmLabel}
       </Button>
       <Button variant="secondary" onClick={onCancel}>
-        Cancel
+        {cancelLabel}
       </Button>
     </Modal.Footer>
   </Modal>

@@ -8,8 +8,12 @@ import { TalentMatchCard } from '../components/Matches/TalentMatchCard';
 import { createTheaterTalentMatch } from '../components/Matches/api';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { useUserContext } from '../context/UserContext';
-import { createMessageThread, createEmail } from '../components/Messages/api';
+import { sendMessageThreadWithEmail } from '../components/Messages/api';
 import { getAccountWithAccountId } from '../components/Profile/shared/api';
+import {
+  theaterToArtistMessage,
+  theaterToArtistEmailText
+} from '../components/Messages/messages';
 
 vi.mock('sweetalert2', () => ({
   default: {
@@ -30,18 +34,15 @@ vi.mock('../components/Matches/api', () => ({
 }));
 
 vi.mock('../components/Messages/api', () => ({
-  createEmail: vi.fn(),
-  createMessageThread: vi.fn()
+  sendMessageThreadWithEmail: vi.fn()
 }));
 
 vi.mock('../components/Profile/shared/api', () => ({
   getAccountWithAccountId: vi.fn()
 }));
 
-const mockCreateMessageThread = vi.mocked(createMessageThread);
-const mockCreateEmail = vi.mocked(createEmail);
+const mockSendMessageThreadWithEmail = vi.mocked(sendMessageThreadWithEmail);
 const mockGetAccountWithAccountId = vi.mocked(getAccountWithAccountId);
-
 const mockUseFirebaseContext = vi.mocked(useFirebaseContext);
 const mockUseUserContext = vi.mocked(useUserContext);
 const mockCreateTheaterTalentMatch = vi.mocked(createTheaterTalentMatch);
@@ -107,6 +108,7 @@ describe('TalentMatchCard decline action', () => {
       mockGetAccountWithAccountId.mockResolvedValue({
         email: 'talent@example.com'
       } as any);
+      mockSendMessageThreadWithEmail.mockResolvedValue('thread-1');
       mockUseFirebaseContext.mockReturnValue({
         firebaseFirestore: store
       } as any);
@@ -122,12 +124,14 @@ describe('TalentMatchCard decline action', () => {
       } as any);
     });
 
-    it('creates match thread and sends email when theater accepts artist', async () => {
+    it('sends a short in-app message and a separate email copy when theater accepts artist', async () => {
       renderTalentMatchCard();
 
       await userEvent.click(screen.getByRole('button', { name: /accept/i }));
       await waitFor(() =>
-        expect(screen.getByRole('button', { name: /^confirm$/i })).toBeInTheDocument()
+        expect(
+          screen.getByRole('button', { name: /^confirm$/i })
+        ).toBeInTheDocument()
       );
       await userEvent.click(screen.getByRole('button', { name: /^confirm$/i }));
 
@@ -142,23 +146,34 @@ describe('TalentMatchCard decline action', () => {
         );
       });
 
-      expect(mockCreateMessageThread).toHaveBeenCalledWith(
-        store,
-        'theater-1',
-        'talent-1',
-        expect.stringContaining('Lead'),
-        'theater',
-        'production-1',
-        'role-1'
+      const shortMessage = theaterToArtistMessage(
+        'Lead',
+        'Demo Show',
+        'contact@example.com'
+      );
+      const emailText = theaterToArtistEmailText(
+        'Demo Theatre',
+        'Lead',
+        'Demo Show',
+        'contact@example.com'
       );
 
-      expect(mockCreateEmail).toHaveBeenCalledWith(
-        store,
-        'talent@example.com',
-        expect.stringContaining('Lead'),
-        expect.stringContaining('Demo Show'),
-        expect.any(String)
+      expect(mockSendMessageThreadWithEmail).toHaveBeenCalledWith(
+        expect.objectContaining({
+          firebaseStore: store,
+          theaterAccountId: 'theater-1',
+          talentAccountId: 'talent-1',
+          theaterOrTalent: 'theater',
+          shortMessage,
+          productionId: 'production-1',
+          roleId: 'role-1',
+          email: expect.objectContaining({
+            to: 'talent@example.com',
+            text: emailText
+          })
+        })
       );
+      expect(shortMessage).not.toBe(emailText);
     });
   });
 

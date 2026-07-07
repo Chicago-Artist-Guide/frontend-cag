@@ -6,9 +6,11 @@ import {
   query,
   where,
   collection,
-  limit
+  limit,
+  updateDoc
 } from 'firebase/firestore';
-import { Profile, Production, TheaterAccount } from './types';
+import { Profile, Production, Role, TheaterAccount } from './types';
+import { RoleStatus } from '../shared/profile.types';
 
 export const getProduction = async (
   firebaseStore: Firestore,
@@ -75,6 +77,21 @@ export const getTheaterByAccountId = async (
   }
 
   return queryProfileSnapshot.docs[0].data() as Profile;
+};
+
+export const updateRoleStatus = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string,
+  roleStatus: RoleStatus,
+  roles: Role[]
+): Promise<Role[]> => {
+  const updatedRoles = roles.map((role) =>
+    role.role_id === roleId ? { ...role, role_status: roleStatus } : role
+  );
+  const docRef = doc(firebaseStore, 'productions', productionId);
+  await updateDoc(docRef, { roles: updatedRoles });
+  return updatedRoles;
 };
 
 // Convenience wrapper: account uid → company profile. Kept exported because

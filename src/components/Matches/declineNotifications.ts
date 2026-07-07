@@ -1,10 +1,14 @@
 import { Firestore } from 'firebase/firestore';
 import { Production } from '../Profile/Company/types';
 import {
+  getDeclinedAppliedMatchesForRole,
   getDeclinedMatchesForProduction,
   markMatchDeclineNotified
 } from './api';
-import { createEmail, createMessageThread } from '../Messages/api';
+import {
+  createMessageThread,
+  sendMessageThreadWithEmail
+} from '../Messages/api';
 import { getAccountWithAccountId } from '../Profile/shared/api';
 import {
   UNKNOWN_ROLE,
@@ -13,17 +17,15 @@ import {
   theaterDeclineArtistEmailText,
   theaterDeclineArtistEmailHtml
 } from '../Messages/messages';
+import { TheaterTalentMatch } from './types';
 
-export const sendDeferredDeclineNotifications = async (
+const notifyDeclinedMatches = async (
   firebaseStore: Firestore,
+  matches: TheaterTalentMatch[],
   production: Production,
   theaterAccountId: string,
   theaterName: string
 ): Promise<number> => {
-  const matches = await getDeclinedMatchesForProduction(
-    firebaseStore,
-    production.production_id
-  );
   let notified = 0;
 
   for (const match of matches) {
@@ -39,37 +41,39 @@ export const sendDeferredDeclineNotifications = async (
         firebaseStore,
         talentAccountId
       );
+      const shortMessage = theaterDeclineArtistMessage(roleName, theaterName);
+      const emailText = theaterDeclineArtistEmailText(theaterName, roleName);
 
-      if (account && account.email) {
-        await createEmail(
+      if (account?.email) {
+        await sendMessageThreadWithEmail({
           firebaseStore,
-          account.email,
-          theaterDeclineArtistEmailSubject(
-            roleName,
-            production.production_name
-          ),
-          theaterDeclineArtistEmailText(
-            theaterName,
-            roleName,
-            production.production_name
-          ),
-          theaterDeclineArtistEmailHtml(
-            theaterName,
-            roleName,
-            production.production_name
-          )
+          theaterAccountId,
+          talentAccountId,
+          theaterOrTalent: 'theater',
+          shortMessage,
+          productionId: production.production_id,
+          roleId: match.role_id,
+          email: {
+            to: account.email,
+            subject: theaterDeclineArtistEmailSubject(
+              roleName,
+              production.production_name
+            ),
+            text: emailText,
+            html: theaterDeclineArtistEmailHtml(theaterName, roleName)
+          }
+        });
+      } else {
+        await createMessageThread(
+          firebaseStore,
+          theaterAccountId,
+          talentAccountId,
+          shortMessage,
+          'theater',
+          production.production_id,
+          match.role_id
         );
       }
-
-      await createMessageThread(
-        firebaseStore,
-        theaterAccountId,
-        talentAccountId,
-        theaterDeclineArtistMessage(roleName, production.production_name),
-        'theater',
-        production.production_id,
-        match.role_id
-      );
 
       await markMatchDeclineNotified(firebaseStore, match.id);
       notified++;
@@ -80,4 +84,46 @@ export const sendDeferredDeclineNotifications = async (
   }
 
   return notified;
+};
+
+export const sendDeferredDeclineNotifications = async (
+  firebaseStore: Firestore,
+  production: Production,
+  theaterAccountId: string,
+  theaterName: string
+): Promise<number> => {
+  const matches = await getDeclinedMatchesForProduction(
+    firebaseStore,
+    production.production_id
+  );
+
+  return notifyDeclinedMatches(
+    firebaseStore,
+    matches,
+    production,
+    theaterAccountId,
+    theaterName
+  );
+};
+
+export const sendRoleCloseDeclineNotifications = async (
+  firebaseStore: Firestore,
+  production: Production,
+  roleId: string,
+  theaterAccountId: string,
+  theaterName: string
+): Promise<number> => {
+  const matches = await getDeclinedAppliedMatchesForRole(
+    firebaseStore,
+    production.production_id,
+    roleId
+  );
+
+  return notifyDeclinedMatches(
+    firebaseStore,
+    matches,
+    production,
+    theaterAccountId,
+    theaterName
+  );
 };

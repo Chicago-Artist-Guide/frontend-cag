@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../components/Matches/api', () => ({
+  getDeclinedAppliedMatchesForRole: vi.fn(),
   getDeclinedMatchesForProduction: vi.fn(),
   markMatchDeclineNotified: vi.fn()
 }));
@@ -12,9 +13,9 @@ vi.mock('../components/Profile/shared/api', () => ({
   getAccountWithAccountId: vi.fn()
 }));
 
-import { sendDeferredDeclineNotifications } from '../components/Matches/declineNotifications';
+import { sendRoleCloseDeclineNotifications } from '../components/Matches/declineNotifications';
 import {
-  getDeclinedMatchesForProduction,
+  getDeclinedAppliedMatchesForRole,
   markMatchDeclineNotified
 } from '../components/Matches/api';
 import {
@@ -28,7 +29,7 @@ import {
   theaterDeclineArtistEmailHtml
 } from '../components/Messages/messages';
 
-describe('sendDeferredDeclineNotifications', () => {
+describe('sendRoleCloseDeclineNotifications', () => {
   const store = {} as any;
   const production = {
     production_id: 'p1',
@@ -40,72 +41,24 @@ describe('sendDeferredDeclineNotifications', () => {
     vi.clearAllMocks();
   });
 
-  it('sends email + short message + marks notified for each declined match with email', async () => {
-    vi.mocked(getDeclinedMatchesForProduction).mockResolvedValue([
-      { id: 'm1', role_id: 'r1', talent_account_id: 'a1' },
-      { id: 'm2', role_id: 'r1', talent_account_id: 'a2' }
+  it('sends a short in-app message and a separate email copy for declined applicants', async () => {
+    vi.mocked(getDeclinedAppliedMatchesForRole).mockResolvedValue([
+      { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
     ] as any);
     vi.mocked(getAccountWithAccountId).mockResolvedValue({
       email: 'x@y.com'
     } as any);
     vi.mocked(sendMessageThreadWithEmail).mockResolvedValue('thread-1');
 
-    const n = await sendDeferredDeclineNotifications(
+    const n = await sendRoleCloseDeclineNotifications(
       store,
       production,
-      'theater1',
-      'My Theater'
-    );
-
-    expect(n).toBe(2);
-    expect(sendMessageThreadWithEmail).toHaveBeenCalledTimes(2);
-    expect(markMatchDeclineNotified).toHaveBeenCalledTimes(2);
-  });
-
-  it('stores only the short in-app message when talent has no email', async () => {
-    vi.mocked(getDeclinedMatchesForProduction).mockResolvedValue([
-      { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
-    ] as any);
-    vi.mocked(getAccountWithAccountId).mockResolvedValue({} as any);
-    vi.mocked(createMessageThread).mockResolvedValue('thread-1');
-
-    const n = await sendDeferredDeclineNotifications(
-      store,
-      production,
+      'r1',
       'theater1',
       'My Theater'
     );
 
     expect(n).toBe(1);
-    expect(createMessageThread).toHaveBeenCalledWith(
-      store,
-      'theater1',
-      'a1',
-      theaterDeclineArtistMessage('Lead', 'My Theater'),
-      'theater',
-      'p1',
-      'r1'
-    );
-    expect(sendMessageThreadWithEmail).not.toHaveBeenCalled();
-    expect(markMatchDeclineNotified).toHaveBeenCalledTimes(1);
-  });
-
-  it('uses the short message and full email body for decline notifications', async () => {
-    vi.mocked(getDeclinedMatchesForProduction).mockResolvedValue([
-      { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
-    ] as any);
-    vi.mocked(getAccountWithAccountId).mockResolvedValue({
-      email: 'x@y.com'
-    } as any);
-    vi.mocked(sendMessageThreadWithEmail).mockResolvedValue('thread-1');
-
-    await sendDeferredDeclineNotifications(
-      store,
-      production,
-      'theater1',
-      'My Theater'
-    );
-
     expect(sendMessageThreadWithEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         shortMessage: theaterDeclineArtistMessage('Lead', 'My Theater'),
@@ -116,5 +69,34 @@ describe('sendDeferredDeclineNotifications', () => {
         })
       })
     );
+    expect(createMessageThread).not.toHaveBeenCalled();
+    expect(markMatchDeclineNotified).toHaveBeenCalledWith(store, 'm1');
+  });
+
+  it('stores only the short in-app message when talent has no email', async () => {
+    vi.mocked(getDeclinedAppliedMatchesForRole).mockResolvedValue([
+      { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
+    ] as any);
+    vi.mocked(getAccountWithAccountId).mockResolvedValue({} as any);
+    vi.mocked(createMessageThread).mockResolvedValue('thread-1');
+
+    await sendRoleCloseDeclineNotifications(
+      store,
+      production,
+      'r1',
+      'theater1',
+      'My Theater'
+    );
+
+    expect(createMessageThread).toHaveBeenCalledWith(
+      store,
+      'theater1',
+      'a1',
+      theaterDeclineArtistMessage('Lead', 'My Theater'),
+      'theater',
+      'p1',
+      'r1'
+    );
+    expect(sendMessageThreadWithEmail).not.toHaveBeenCalled();
   });
 });

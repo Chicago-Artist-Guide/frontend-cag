@@ -11,7 +11,7 @@ import {
   getTheaterByAccountId
 } from '../Profile/Company/api';
 import { Profile, Production } from '../Profile/Company/types';
-import { createMessageThread, createEmail } from '../Messages/api';
+import { sendMessageThreadWithEmail } from '../Messages/api';
 import {
   UNKNOWN_ROLE,
   NO_EMAIL,
@@ -118,50 +118,63 @@ export const CompanyMatchCard = ({
     setTheater(theaterProfile);
   };
 
-  const sendEmailToTheater = async () => {
-    if (!theater || theater === null) {
-      console.error('Could not find theater to send email');
-      return false;
-    }
+  const sendApplyNotifications = async (
+    theaterAccountId: string,
+    talentAccountId: string
+  ) => {
+    const contactEmail = currentUser?.email || NO_EMAIL;
+    const talentFullName = `${account?.data.first_name} ${account?.data.last_name}`;
+    const shortMessage = artistToTheaterMessage(
+      roleName || UNKNOWN_ROLE,
+      productionName,
+      contactEmail
+    );
+    const emailText = artistToTheaterEmailText(
+      talentFullName,
+      roleName || UNKNOWN_ROLE,
+      productionName,
+      contactEmail
+    );
+    const emailHtml = artistToTheaterEmailHtml(
+      talentFullName,
+      roleName || UNKNOWN_ROLE,
+      productionName,
+      contactEmail
+    );
 
-    const subject = artistToTheaterEmailSubject(
-      roleName || UNKNOWN_ROLE,
-      productionName
-    );
-    const messageContent = artistToTheaterEmailText(
-      `${account?.data.first_name} ${account?.data.last_name}`,
-      roleName || UNKNOWN_ROLE,
-      productionName,
-      currentUser?.email || NO_EMAIL
-    );
-    const messageContentHtml = artistToTheaterEmailHtml(
-      `${account?.data.first_name} ${account?.data.last_name}`,
-      roleName || UNKNOWN_ROLE,
-      productionName,
-      currentUser?.email || NO_EMAIL
-    );
     let toEmail = theater?.primary_contact_email;
 
-    // if there isn't a primary contact email, we need to find the account email
     if (!toEmail) {
       const theaterAccount = await getTheaterAccountByAccountId(
         firebaseFirestore,
         theater.account_id
       );
 
-      if (theaterAccount && theaterAccount.email) {
+      if (theaterAccount?.email) {
         toEmail = theaterAccount.email;
       }
     }
 
-    toEmail &&
-      (await createEmail(
-        firebaseFirestore,
-        toEmail,
-        subject,
-        messageContent,
-        messageContentHtml
-      ));
+    return sendMessageThreadWithEmail({
+      firebaseStore: firebaseFirestore,
+      theaterAccountId,
+      talentAccountId,
+      theaterOrTalent: 'talent',
+      shortMessage,
+      productionId: production?.production_id,
+      roleId: role.role_id,
+      email: toEmail
+        ? {
+            to: toEmail,
+            subject: artistToTheaterEmailSubject(
+              roleName || UNKNOWN_ROLE,
+              productionName
+            ),
+            text: emailText,
+            html: emailHtml
+          }
+        : undefined
+    });
   };
 
   const createMatch = async (status: boolean) => {
@@ -192,23 +205,15 @@ export const CompanyMatchCard = ({
 
       // only create messages and emails if accepted
       if (status) {
-        const messageContent = artistToTheaterMessage(
-          roleName || UNKNOWN_ROLE,
-          productionName,
-          currentUser?.email || NO_EMAIL
-        );
-        const messageThreadId = await createMessageThread(
-          firebaseFirestore,
-          theaterAccountId,
-          talentAccountId,
-          messageContent,
-          'talent',
-          productionId,
-          roleId
-        );
+        if (!theater) {
+          console.error('Could not find theater to send notifications');
+          return false;
+        }
 
-        // send email
-        await sendEmailToTheater();
+        const messageThreadId = await sendApplyNotifications(
+          theaterAccountId,
+          talentAccountId
+        );
 
         return messageThreadId;
       }

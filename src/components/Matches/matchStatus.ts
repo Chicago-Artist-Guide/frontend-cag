@@ -20,6 +20,11 @@ export const isTheaterDeclined = (match: TheaterTalentMatch): boolean =>
 export const isTalentInterested = (match: TheaterTalentMatch): boolean =>
   match.initiated_by === 'talent' && match.status === true;
 
+/** Artist applied and the theatre subsequently declined them. */
+export const isAppliedAndDeclinedByTheater = (
+  match: TheaterTalentMatch
+): boolean => match.initiated_by === 'talent' && isTheaterDeclined(match);
+
 export type TheaterMatchFilterContext = {
   isFavorite?: boolean;
 };

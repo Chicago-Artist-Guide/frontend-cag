@@ -11,6 +11,7 @@ export interface MessageType {
   recipient_id: DocumentReference<DocumentData> | string;
   content: string;
   action?: string;
+  message_type?: 'message' | 'email_sent';
   timestamp: Date;
   status: string;
 }
