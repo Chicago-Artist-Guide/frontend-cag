@@ -3,7 +3,10 @@ import {
   theaterDeclineArtistMessage,
   theaterDeclineArtistEmailSubject,
   theaterDeclineArtistEmailText,
-  theaterDeclineArtistEmailHtml
+  theaterDeclineArtistEmailHtml,
+  theaterToArtistMessage,
+  theaterToArtistEmailText,
+  stripEmailCtas
 } from '../components/Messages/messages';
 
 describe('declineNotifications', () => {
@@ -12,7 +15,7 @@ describe('declineNotifications', () => {
   const theaterName = 'Chicago Theater';
 
   describe('theaterDeclineArtistMessage', () => {
-    it('interpolates role and theatre names with close-role copy', () => {
+    it('provides the short in-app decline copy', () => {
       const result = theaterDeclineArtistMessage(roleName, theaterName);
       expect(result).toBe(
         `Thank you for your interest in ${roleName} with ${theaterName}. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.`
@@ -53,6 +56,24 @@ describe('declineNotifications', () => {
     it('contains strong tags', () => {
       const result = theaterDeclineArtistEmailHtml(theaterName, roleName);
       expect(result).includes('<strong>');
+    });
+  });
+
+  describe('theaterToArtistMessage', () => {
+    it('is shorter than the email body sent to talent', () => {
+      const email = 'contact@example.com';
+
+      expect(
+        theaterToArtistEmailText(theaterName, roleName, productionName, email)
+      ).toContain('login to CAG and go to your Messages to respond');
+      expect(
+        theaterToArtistMessage(roleName, productionName, email)
+      ).not.toContain('login to CAG');
+      expect(
+        stripEmailCtas(
+          theaterToArtistEmailText(theaterName, roleName, productionName, email)
+        )
+      ).not.toContain('login to CAG');
     });
   });
 });

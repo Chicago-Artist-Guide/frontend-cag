@@ -6,7 +6,7 @@ import { IndividualProfileDataFullInit } from '../../components/SignUp/Individua
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { getAccountWithAccountId } from '../Profile/shared/api';
-import { createMessageThread, createEmail } from '../Messages/api';
+import { sendMessageThreadWithEmail } from '../Messages/api';
 import {
   NO_EMAIL,
   theaterToArtistMessage,
@@ -53,45 +53,52 @@ export const TalentMatchCard = ({
   const isDeclined = matchStatus === false;
   const isAccepted = matchStatus === true;
 
-  const sendEmailToTalent = async () => {
-    if (!profile.account_id) {
-      console.error('Could not find account id for profile');
-      return false;
-    }
+  const sendAcceptNotifications = async (
+    theaterAccountId: string,
+    talentAccountId: string
+  ) => {
+    const contactEmail =
+      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL;
+    const shortMessage = theaterToArtistMessage(
+      roleName,
+      productionName,
+      contactEmail
+    );
+    const emailText = theaterToArtistEmailText(
+      userProfile?.data.theatre_name,
+      roleName,
+      productionName,
+      contactEmail
+    );
+    const emailHtml = theaterToArtistEmailHtml(
+      userProfile?.data.theatre_name,
+      roleName,
+      productionName,
+      contactEmail
+    );
 
     const talentAccount = await getAccountWithAccountId(
       firebaseFirestore,
-      profile.account_id
-    );
-    const subject = theaterToArtistEmailSubject(roleName, productionName);
-    const messageContent = theaterToArtistEmailText(
-      userProfile?.data.theatre_name,
-      roleName,
-      productionName,
-      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
-    );
-    const messageContentHtml = theaterToArtistEmailHtml(
-      userProfile?.data.theatre_name,
-      roleName,
-      productionName,
-      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+      talentAccountId
     );
 
-    if (!talentAccount || !talentAccount?.email) {
-      console.error(
-        'Could not find account or account email address for talent.'
-      );
-      return false;
-    }
-
-    const toEmail = talentAccount?.email;
-    await createEmail(
-      firebaseFirestore,
-      toEmail,
-      subject,
-      messageContent,
-      messageContentHtml
-    );
+    return sendMessageThreadWithEmail({
+      firebaseStore: firebaseFirestore,
+      theaterAccountId,
+      talentAccountId,
+      theaterOrTalent: 'theater',
+      shortMessage,
+      productionId,
+      roleId,
+      email: talentAccount?.email
+        ? {
+            to: talentAccount.email,
+            subject: theaterToArtistEmailSubject(roleName, productionName),
+            text: emailText,
+            html: emailHtml
+          }
+        : undefined
+    });
   };
 
   const createMatch = async (status: boolean) => {
@@ -117,25 +124,10 @@ export const TalentMatchCard = ({
 
       // only send message and email if accepted
       if (status) {
-        const messageContent = theaterToArtistMessage(
-          roleName,
-          productionName,
-          userProfile.data.primary_contact_email ||
-            currentUser?.email ||
-            NO_EMAIL
-        );
-        const messageThreadId = await createMessageThread(
-          firebaseFirestore,
+        const messageThreadId = await sendAcceptNotifications(
           currUserAccountId,
-          talentAccountId,
-          messageContent,
-          'theater',
-          productionId,
-          roleId
+          talentAccountId
         );
-
-        // send email
-        await sendEmailToTalent();
 
         return messageThreadId;
       }

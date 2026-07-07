@@ -5,7 +5,10 @@ import {
   getDeclinedMatchesForProduction,
   markMatchDeclineNotified
 } from './api';
-import { createEmail, createMessageThread } from '../Messages/api';
+import {
+  createMessageThread,
+  sendMessageThreadWithEmail
+} from '../Messages/api';
 import { getAccountWithAccountId } from '../Profile/shared/api';
 import {
   UNKNOWN_ROLE,
@@ -38,29 +41,39 @@ const notifyDeclinedMatches = async (
         firebaseStore,
         talentAccountId
       );
+      const shortMessage = theaterDeclineArtistMessage(roleName, theaterName);
+      const emailText = theaterDeclineArtistEmailText(theaterName, roleName);
 
-      if (account && account.email) {
-        await createEmail(
+      if (account?.email) {
+        await sendMessageThreadWithEmail({
           firebaseStore,
-          account.email,
-          theaterDeclineArtistEmailSubject(
-            roleName,
-            production.production_name
-          ),
-          theaterDeclineArtistEmailText(theaterName, roleName),
-          theaterDeclineArtistEmailHtml(theaterName, roleName)
+          theaterAccountId,
+          talentAccountId,
+          theaterOrTalent: 'theater',
+          shortMessage,
+          productionId: production.production_id,
+          roleId: match.role_id,
+          email: {
+            to: account.email,
+            subject: theaterDeclineArtistEmailSubject(
+              roleName,
+              production.production_name
+            ),
+            text: emailText,
+            html: theaterDeclineArtistEmailHtml(theaterName, roleName)
+          }
+        });
+      } else {
+        await createMessageThread(
+          firebaseStore,
+          theaterAccountId,
+          talentAccountId,
+          shortMessage,
+          'theater',
+          production.production_id,
+          match.role_id
         );
       }
-
-      await createMessageThread(
-        firebaseStore,
-        theaterAccountId,
-        talentAccountId,
-        theaterDeclineArtistMessage(roleName, theaterName),
-        'theater',
-        production.production_id,
-        match.role_id
-      );
 
       await markMatchDeclineNotified(firebaseStore, match.id);
       notified++;

@@ -10,6 +10,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { TheaterOrTalent } from '../Matches/types';
+import { stripEmailCtas, IN_APP_EMAIL_SENT_LABEL } from './messages';
 
 export const createMessageThread = async (
   firebaseStore: Firestore,
@@ -97,6 +98,105 @@ export const createMessageThread = async (
     console.error('Error creating or updating message thread:', error);
     return false;
   }
+};
+
+export const appendEmailSentMessage = async (
+  firebaseStore: Firestore,
+  threadId: string,
+  theaterAccountId: string,
+  talentAccountId: string,
+  theaterOrTalent: TheaterOrTalent,
+  emailText: string
+) => {
+  const threadRef = doc(firebaseStore, 'threads', threadId);
+  const messagesRef = collection(firebaseStore, 'messages');
+  const theaterAccountRef = doc(firebaseStore, 'accounts', theaterAccountId);
+  const talentAccountRef = doc(firebaseStore, 'accounts', talentAccountId);
+  const recipient_id =
+    theaterOrTalent === 'theater' ? talentAccountRef : theaterAccountRef;
+  const sender_id =
+    theaterOrTalent === 'theater' ? theaterAccountRef : talentAccountRef;
+  const content = stripEmailCtas(emailText);
+
+  const messageDocRef = await addDoc(messagesRef, {
+    content,
+    recipient_id,
+    sender_id,
+    status: 'new',
+    timestamp: Timestamp.now(),
+    thread_id: threadRef,
+    message_type: 'email_sent'
+  });
+
+  await updateDoc(threadRef, {
+    last_message: {
+      content: `${IN_APP_EMAIL_SENT_LABEL}: ${content}`,
+      message_id: messageDocRef,
+      timestamp: Timestamp.now()
+    },
+    updated_at: Timestamp.now()
+  });
+
+  return messageDocRef.id;
+};
+
+export type SendMessageThreadWithEmailParams = {
+  firebaseStore: Firestore;
+  theaterAccountId: string;
+  talentAccountId: string;
+  theaterOrTalent: TheaterOrTalent;
+  shortMessage: string;
+  productionId?: string;
+  roleId?: string;
+  email?: {
+    to: string;
+    subject: string;
+    text: string;
+    html: string;
+  };
+};
+
+export const sendMessageThreadWithEmail = async ({
+  firebaseStore,
+  theaterAccountId,
+  talentAccountId,
+  theaterOrTalent,
+  shortMessage,
+  productionId,
+  roleId,
+  email
+}: SendMessageThreadWithEmailParams): Promise<string | false> => {
+  const threadId = await createMessageThread(
+    firebaseStore,
+    theaterAccountId,
+    talentAccountId,
+    shortMessage,
+    theaterOrTalent,
+    productionId,
+    roleId
+  );
+
+  if (!threadId || !email?.to) {
+    return threadId;
+  }
+
+  await createEmail(
+    firebaseStore,
+    email.to,
+    email.subject,
+    email.text,
+    email.html
+  );
+  await appendEmailSentMessage(
+    firebaseStore,
+    threadId,
+    theaterAccountId,
+    talentAccountId,
+    theaterOrTalent,
+    email.text
+  );
+
+  return threadId;
 };
 
 // DEV-382: number of threads still marked "new" for this account, used to

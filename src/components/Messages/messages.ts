@@ -75,3 +75,18 @@ export const theaterDeclineArtistEmailHtml = (
   roleName: string
 ) =>
   `<p>Thank you for your interest in <strong>${roleName}</strong> with <strong>${theaterName}</strong>. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.</p>`;
+
+const EMAIL_CTA_PATTERNS = [
+  /\s*You may also login to CAG and go to your Messages to respond\.?/gi,
+  /\s*We encourage you to apply to other roles on Chicago Artist Guide\.?/gi
+];
+
+export const stripEmailCtas = (text: string): string => {
+  let result = text;
+  for (const pattern of EMAIL_CTA_PATTERNS) {
+    result = result.replace(pattern, '');
+  }
+  return result.trim();
+};
+
+export const IN_APP_EMAIL_SENT_LABEL = 'Email Sent';
