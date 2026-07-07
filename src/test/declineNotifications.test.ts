@@ -12,10 +12,11 @@ describe('declineNotifications', () => {
   const theaterName = 'Chicago Theater';
 
   describe('theaterDeclineArtistMessage', () => {
-    it('interpolates role and production names', () => {
-      const result = theaterDeclineArtistMessage(roleName, productionName);
-      expect(result).includes(roleName);
-      expect(result).includes(productionName);
+    it('interpolates role and theatre names with close-role copy', () => {
+      const result = theaterDeclineArtistMessage(roleName, theaterName);
+      expect(result).toBe(
+        `Thank you for your interest in ${roleName} with ${theaterName}. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.`
+      );
     });
   });
 
@@ -33,36 +34,24 @@ describe('declineNotifications', () => {
   });
 
   describe('theaterDeclineArtistEmailText', () => {
-    it('interpolates theater, role, and production names', () => {
-      const result = theaterDeclineArtistEmailText(
-        theaterName,
-        roleName,
-        productionName
+    it('interpolates theatre and role names with close-role copy', () => {
+      const result = theaterDeclineArtistEmailText(theaterName, roleName);
+      expect(result).toBe(
+        `Thank you for your interest in ${roleName} with ${theaterName}. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.`
       );
-      expect(result).includes(theaterName);
-      expect(result).includes(roleName);
-      expect(result).includes(productionName);
     });
   });
 
   describe('theaterDeclineArtistEmailHtml', () => {
-    it('interpolates theater, role, and production names', () => {
-      const result = theaterDeclineArtistEmailHtml(
-        theaterName,
-        roleName,
-        productionName
-      );
+    it('interpolates theatre and role names with close-role copy', () => {
+      const result = theaterDeclineArtistEmailHtml(theaterName, roleName);
       expect(result).includes(theaterName);
       expect(result).includes(roleName);
-      expect(result).includes(productionName);
+      expect(result).toMatch(/move forward with other candidates/);
     });
 
     it('contains strong tags', () => {
-      const result = theaterDeclineArtistEmailHtml(
-        theaterName,
-        roleName,
-        productionName
-      );
+      const result = theaterDeclineArtistEmailHtml(theaterName, roleName);
       expect(result).includes('<strong>');
     });
   });

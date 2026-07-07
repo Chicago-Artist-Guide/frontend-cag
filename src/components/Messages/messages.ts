@@ -58,22 +58,20 @@ export const theaterToArtistEmailHtml = (
 // theater decline artist
 export const theaterDeclineArtistMessage = (
   roleName: string,
-  productionName: string
+  theaterName: string
 ) =>
-  `Thank you for applying for ${roleName} in ${productionName}. We moved forward with other performers.`;
+  `Thank you for your interest in ${roleName} with ${theaterName}. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.`;
 export const theaterDeclineArtistEmailSubject = (
   roleName: string,
   productionName: string
 ) => `CAG: Application Update for ${roleName} in ${productionName}`;
 export const theaterDeclineArtistEmailText = (
   theaterName: string,
-  roleName: string,
-  productionName: string
+  roleName: string
 ) =>
-  `We are ${theaterName}. Thank you for applying for ${roleName} in ${productionName}. We moved forward with other performers. We encourage you to apply to other roles on Chicago Artist Guide.`;
+  `Thank you for your interest in ${roleName} with ${theaterName}. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.`;
 export const theaterDeclineArtistEmailHtml = (
   theaterName: string,
-  roleName: string,
-  productionName: string
+  roleName: string
 ) =>
-  `<p>We are <strong>${theaterName}</strong>. Thank you for applying for <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>We moved forward with other performers. We encourage you to apply to other roles on Chicago Artist Guide.</p>`;
+  `<p>Thank you for your interest in <strong>${roleName}</strong> with <strong>${theaterName}</strong>. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.</p>`;

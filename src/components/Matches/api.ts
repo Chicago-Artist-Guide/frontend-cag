@@ -26,7 +26,10 @@ import {
   TheaterOrTalent,
   TheaterTalentMatch
 } from './types';
-import { profileMatchesTheaterStatusFilters } from './matchStatus';
+import {
+  isAppliedAndDeclinedByTheater,
+  profileMatchesTheaterStatusFilters
+} from './matchStatus';
 
 export const getTheaterTalentMatch = async (
   firebaseStore: Firestore,
@@ -220,6 +223,31 @@ export const createTheaterTalentMatch = async (
   };
 
   return addDoc(collection(firebaseStore, 'theater_talent_matches'), data);
+};
+
+export const getDeclinedAppliedMatchesForRole = async (
+  firebaseStore: Firestore,
+  productionId: string,
+  roleId: string
+): Promise<TheaterTalentMatch[]> => {
+  const productionRef = doc(firebaseStore, 'productions', productionId);
+  const matchesRef = collection(firebaseStore, 'theater_talent_matches');
+  const matchesQuery = query(
+    matchesRef,
+    where('production_id', '==', productionRef),
+    where('role_id', '==', roleId),
+    where('status', '==', false)
+  );
+
+  const querySnapshot = await getDocs(matchesQuery);
+  const matches = querySnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data()
+  })) as TheaterTalentMatch[];
+
+  return matches.filter(
+    (match) => !match.decline_notified && isAppliedAndDeclinedByTheater(match)
+  );
 };
 
 export const getDeclinedMatchesForProduction = async (

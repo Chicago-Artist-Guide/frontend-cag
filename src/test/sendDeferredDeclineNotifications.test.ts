@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('../components/Matches/api', () => ({
   getDeclinedMatchesForProduction: vi.fn(),
+  getDeclinedAppliedMatchesForRole: vi.fn(),
   markMatchDeclineNotified: vi.fn()
 }));
 vi.mock('../components/Messages/api', () => ({
@@ -19,6 +20,10 @@ import {
 } from '../components/Matches/api';
 import { createEmail, createMessageThread } from '../components/Messages/api';
 import { getAccountWithAccountId } from '../components/Profile/shared/api';
+import {
+  theaterDeclineArtistEmailText,
+  theaterDeclineArtistEmailHtml
+} from '../components/Messages/messages';
 
 describe('sendDeferredDeclineNotifications', () => {
   const store = {} as any;
@@ -92,8 +97,8 @@ describe('sendDeferredDeclineNotifications', () => {
       store,
       'x@y.com',
       expect.stringContaining('Lead'),
-      expect.stringContaining('Show'),
-      expect.stringContaining('My Theater')
+      theaterDeclineArtistEmailText('My Theater', 'Lead'),
+      theaterDeclineArtistEmailHtml('My Theater', 'Lead')
     );
   });
 });

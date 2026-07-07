@@ -116,4 +116,11 @@ describe('Theatre talent match filters', () => {
     expect(filterBarSource).toMatch(/Undecided/);
     expect(filterBarSource).toMatch(/type="checkbox"/);
   });
+
+  it('allows editing role status from the filter bar', () => {
+    expect(filterBarSource).toMatch(/label="Role Status"/);
+    expect(filterBarSource).toMatch(
+      /By closing this role, you will automatically send a decline message/
+    );
+  });
 });
