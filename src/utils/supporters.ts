@@ -2,6 +2,7 @@
 import Driehaus from '../images/supporters/driehaus.svg';
 import Gios from '../images/supporters/gios.png';
 import PFM from '../images/supporters/pfm.png';
+import YoungLeadersFund from '../images/supporters/young-leaders-fund.png';
 import WestLoopSoul from '../images/sponsors/west-loop-soul.png';
 
 export interface Supporter {
@@ -19,6 +20,11 @@ export const supporters: Supporter[] = [
     src: Driehaus,
     alt: 'Driehaus Foundation',
     url: 'https://www.driehausfoundation.org/'
+  },
+  {
+    src: YoungLeadersFund,
+    alt: 'Young Leaders Fund, an initiative of The Chicago Community Trust',
+    url: 'https://www.cct.org/young-leaders-fund/'
   },
   {
     src: WestLoopSoul,
