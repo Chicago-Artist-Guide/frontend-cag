@@ -2,7 +2,11 @@
 import defaultTheme from 'tailwindcss/defaultTheme';
 
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    './app/**/*.{js,ts,jsx,tsx}',
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}'
+  ],
   theme: {
     extend: {
       fontFamily: {
@@ -57,33 +61,33 @@ export default {
       keyframes: {
         slideRight: {
           '0%': { transform: 'translateX(-200%)' },
-          '100%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(0)' }
         },
         slideLeft: {
           '0%': { transform: 'translateX(200%)' },
-          '100%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(0)' }
         },
         slideUp: {
           '0%': { transform: 'translateY(100%)' },
-          '100%': { transform: 'translateY(0)' },
+          '100%': { transform: 'translateY(0)' }
         },
         slideDown: {
           '0%': { transform: 'translateY(-100%)' },
-          '100%': { transform: 'translateY(0)' },
-        },
+          '100%': { transform: 'translateY(0)' }
+        }
       },
       animation: {
         'slide-right': 'slideRight 1s ease-in-out',
         'slide-left': 'slideLeft 1s ease-in-out',
         'slide-up': 'slideUp 1s ease-in-out',
-        'slide-down': 'slideDown 1s ease-in-out',
+        'slide-down': 'slideDown 1s ease-in-out'
       },
       fontSize: {
-        '36': ['36px', '1'],
-        '50': ['50px', '1'],
-        '60': ['60px', '1'],
-        '80': ['80px', '1'],
-      },
+        36: ['36px', '1'],
+        50: ['50px', '1'],
+        60: ['60px', '1'],
+        80: ['80px', '1']
+      }
     }
   },
   plugins: []

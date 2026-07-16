@@ -12,8 +12,6 @@ import useFirebase from '../hooks/useFirebase';
 import useProfileData from '../hooks/useProfileData';
 import AppRoutes from './app-routes';
 
-import '../styles/App.scss';
-
 const router = createBrowserRouter([{ path: '*', element: <AppRoutes /> }]);
 
 const App = () => {
