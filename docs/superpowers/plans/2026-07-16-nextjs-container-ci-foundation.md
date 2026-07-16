@@ -26,7 +26,8 @@
 Run:
 
 ```bash
-env PATH=/Users/chrisknuteson/.nvm/versions/node/v22.22.0/bin:/usr/local/bin:/usr/bin:/bin npm test
+nvm use
+npm test
 ```
 
 Expected: 159 tests pass; the App Firebase configuration test and two checkbox label tests fail.
@@ -44,7 +45,8 @@ Only call `getAnalytics(app)` when the browser is present and a measurement ID i
 Run:
 
 ```bash
-env PATH=/Users/chrisknuteson/.nvm/versions/node/v22.22.0/bin:/usr/local/bin:/usr/bin:/bin npm test
+nvm use
+npm test
 ```
 
 Expected: 20 test files and 162 tests pass.

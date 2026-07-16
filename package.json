@@ -2,11 +2,13 @@
   "name": "frontend_cag",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "npm@10.9.4",
   "type": "module",
   "engines": {
     "node": ">=22 <23"
   },
   "scripts": {
+    "setup": "npm ci && npm --prefix infra ci",
     "dev": "next dev --webpack",
     "start": "next start",
     "build": "next build --webpack",
@@ -14,6 +16,7 @@
     "start:legacy": "vite",
     "preview:legacy": "vite preview",
     "smoke:server": "node scripts/smoke-server.mjs",
+    "infra:verify": "npm --prefix infra run verify",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:rules": "firebase emulators:exec --only firestore --project cag-rules-tests \"vitest run --config vitest.rules.config.ts\"",
@@ -26,7 +29,8 @@
     "vr:diff": "tsx scripts/visual-regression/diff.ts",
     "vr:report": "tsx scripts/visual-regression/report.ts",
     "migrate:codemod": "tsx scripts/migrate-styles/codemod.ts",
-    "migrate:cycle": "tsx --env-file=.env.local scripts/migrate-cycle.ts"
+    "migrate:cycle": "tsx --env-file=.env.local scripts/migrate-cycle.ts",
+    "verify": "npm run lint:check && npm test && npm run build && npm run infra:verify"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.2.0",

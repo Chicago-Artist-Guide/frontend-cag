@@ -83,7 +83,12 @@ export default defineConfig(({ mode }) => {
       environment: 'jsdom',
       setupFiles: ['./src/test/setupTests.ts'],
       // firestore.rules.test.ts runs in node + emulator via `npm run test:rules`
-      exclude: ['**/node_modules/**', '**/dist/**', '**/*.rules.test.ts']
+      exclude: [
+        '**/node_modules/**',
+        '**/dist/**',
+        '**/*.rules.test.ts',
+        'infra/**'
+      ]
     }
   };
 });
