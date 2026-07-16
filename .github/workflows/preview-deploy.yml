@@ -104,15 +104,6 @@ jobs:
             }
           '
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
-        with:
-          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
-          aws-region: ${{ vars.AWS_REGION }}
-          mask-aws-account-id: true
-          role-session-name: cag-preview-plan-${{ github.run_id }}
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-
       - name: Install application and infrastructure dependencies
         run: |
           npm ci
@@ -128,6 +119,15 @@ jobs:
         run: |
           npm --prefix infra run build
           npm --prefix infra test
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
+        with:
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: true
+          role-session-name: cag-preview-plan-${{ github.run_id }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Diff exact CDK stack
         working-directory: infra
@@ -208,6 +208,9 @@ jobs:
             }
           '
 
+      - name: Install infrastructure dependencies
+        run: npm --prefix infra ci
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
         with:
@@ -216,9 +219,6 @@ jobs:
           mask-aws-account-id: true
           role-session-name: cag-preview-deploy-${{ github.run_id }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-
-      - name: Install infrastructure dependencies
-        run: npm --prefix infra ci
 
       - name: Deploy exact CDK stack
         working-directory: infra

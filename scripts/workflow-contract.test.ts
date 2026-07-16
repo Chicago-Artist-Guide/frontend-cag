@@ -127,6 +127,25 @@ describe('GitHub workflow contracts', () => {
     }
   });
 
+  it('installs dependencies before exposing OIDC credentials to a job', () => {
+    for (const name of deploymentWorkflowNames) {
+      const workflow = readWorkflow(name);
+      const authMarker = '- name: Configure AWS credentials';
+      let previousAuthIndex = -1;
+      let authIndex = workflow.indexOf(authMarker);
+
+      while (authIndex !== -1) {
+        const sectionBeforeAuth = workflow.slice(previousAuthIndex + 1, authIndex);
+
+        expect(sectionBeforeAuth).toMatch(/- name: Install .*dependencies/);
+        previousAuthIndex = authIndex;
+        authIndex = workflow.indexOf(authMarker, authIndex + authMarker.length);
+      }
+
+      expect(previousAuthIndex).toBeGreaterThan(-1);
+    }
+  });
+
   it('uses immutable external actions and contains no machine or credential material', () => {
     const workflows = ['pull-request.yml', ...deploymentWorkflowNames].map(
       readWorkflow

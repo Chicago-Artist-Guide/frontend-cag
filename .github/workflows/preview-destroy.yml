@@ -105,6 +105,9 @@ jobs:
             }
           '
 
+      - name: Install infrastructure dependencies
+        run: npm --prefix infra ci
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
         with:
@@ -113,9 +116,6 @@ jobs:
           mask-aws-account-id: true
           role-session-name: cag-preview-destroy-${{ github.run_id }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-
-      - name: Install infrastructure dependencies
-        run: npm --prefix infra ci
 
       - name: Destroy exact preview stack
         working-directory: infra
