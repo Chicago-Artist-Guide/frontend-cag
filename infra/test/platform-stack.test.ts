@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
@@ -107,6 +107,17 @@ describe('PlatformStack', () => {
     ).not.toContain('latest');
   });
 
+  it('keeps nested install and synthesis artifacts out of the Docker asset', () => {
+    const { app } = createStack('staging');
+    const assembly = app.synth();
+    const source = getDockerImageSource(assembly);
+    expect(source.directory).toBeDefined();
+    const assetDirectory = join(assembly.directory, String(source.directory));
+
+    expect(existsSync(join(assetDirectory, 'node_modules'))).toBe(false);
+    expect(existsSync(join(assetDirectory, 'infra'))).toBe(false);
+  });
+
   it('creates public application and isolated data subnets in two AZs without isolated routes', () => {
     const { template } = createStack('staging');
 
@@ -202,6 +213,19 @@ describe('PlatformStack', () => {
     });
   });
 
+  it('disables paid Container Insights for the zero-traffic baseline', () => {
+    const { template } = createStack('staging');
+    const clusters = template.findResources('AWS::ECS::Cluster');
+    const [cluster] = Object.values(clusters) as Array<{
+      Properties?: { ClusterSettings?: unknown };
+    }>;
+
+    expect(Object.values(clusters)).toHaveLength(1);
+    expect(cluster.Properties?.ClusterSettings).toEqual([
+      { Name: 'containerInsights', Value: 'disabled' }
+    ]);
+  });
+
   it('uses readiness for ALB routing and rollback for failed deployments', () => {
     const { template } = createStack('production');
 
@@ -265,17 +289,23 @@ describe('PlatformStack', () => {
     );
   });
 
-  it.each(['staging', 'production'] as const)(
-    'retains durable %s logs',
-    (stage) => {
-      const { template } = createStack(stage);
+  it('keeps staging teardown and recreation self-contained', () => {
+    const { template } = createStack('staging');
 
-      template.hasResource('AWS::Logs::LogGroup', {
-        DeletionPolicy: 'Retain',
-        UpdateReplacePolicy: 'Retain'
-      });
-    }
-  );
+    template.hasResource('AWS::Logs::LogGroup', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete'
+    });
+  });
+
+  it('retains production logs', () => {
+    const { template } = createStack('production');
+
+    template.hasResource('AWS::Logs::LogGroup', {
+      DeletionPolicy: 'Retain',
+      UpdateReplacePolicy: 'Retain'
+    });
+  });
 
   it('protects the production stack and load balancer', () => {
     const { stack, template } = createStack('production');

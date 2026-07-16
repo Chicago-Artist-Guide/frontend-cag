@@ -83,15 +83,15 @@ export class PlatformStack extends Stack {
     );
 
     const cluster = new ecs.Cluster(this, 'Cluster', {
-      containerInsightsV2: ecs.ContainerInsights.ENABLED,
+      containerInsightsV2: ecs.ContainerInsights.DISABLED,
       vpc
     });
 
     const logGroup = new logs.LogGroup(this, 'ApplicationLogs', {
       logGroupName: `/cag/${target.deploymentId}/frontend`,
-      removalPolicy: target.isEphemeral
-        ? RemovalPolicy.DESTROY
-        : RemovalPolicy.RETAIN,
+      removalPolicy: target.isProduction
+        ? RemovalPolicy.RETAIN
+        : RemovalPolicy.DESTROY,
       retention: target.isProduction
         ? logs.RetentionDays.ONE_MONTH
         : logs.RetentionDays.ONE_WEEK

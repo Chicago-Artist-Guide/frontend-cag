@@ -47,9 +47,12 @@ future-data security group ID are outputs so a later relational-data change can
 attach to the existing boundary.
 
 The ALB checks `/api/health/ready`; ECS checks `/api/health/live`. Failed ECS
-deployments roll back. Preview logs and resources are destroyable. Staging and
-production logs are retained, and production also enables CloudFormation
-termination protection and ALB deletion protection.
+deployments roll back. Preview and staging logs are stack-owned so either target
+can be torn down and recreated without a retained-name collision. Production
+logs are retained, and production also enables CloudFormation termination
+protection and ALB deletion protection. Paid ECS Container Insights is
+explicitly disabled for the zero-traffic baseline; application logs and native
+ECS/ALB metrics remain available.
 
 ## Application image configuration
 

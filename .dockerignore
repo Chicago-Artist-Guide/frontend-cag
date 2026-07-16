@@ -5,7 +5,11 @@
 coverage
 dist
 docs
+infra
 node_modules
+**/.next
+**/cdk.out
+**/node_modules
 *.tsbuildinfo
 .env
 .env.*
