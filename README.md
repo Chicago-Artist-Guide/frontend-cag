@@ -1,27 +1,66 @@
 # Chicago Artist Guide
+
 ## Frontend App
 
-This is a React application using TypeScript, Bootstrap, and Styled-Components.
+This is a React and TypeScript application hosted by Next.js. The existing
+React Router application is mounted as a client-rendered compatibility shell;
+route-by-route server rendering is tracked separately in DEV-492.
 
-### Instructions
+### Local development
 
-Before you run this app, make sure you're using Node Version Manager (NVM) and are using at least Node v18.13.0 (`nvm install 18.13.0` and `nvm use 18.13.0`)
+Use the pinned Node 22 release:
 
-**Running this app:**
-1. `npm install`
-2. `npm run start`
-3. Now access the app at http://localhost:3000 (should open automatically). Editing files should automatically build and hot-reload the page
+```bash
+nvm install
+nvm use
+npm ci
+npm run dev
+```
 
-**Environment Variables:**
+The app is available at <http://localhost:3000>. Production commands are
+`npm run build` and `npm start`. The previous Vite host remains available
+during migration through `npm run start:legacy`, `npm run build:legacy`, and
+`npm run preview:legacy`.
+
+### Public environment variables
 
 ```
-VITE_APP_FIREBASE_API_KEY
-VITE_APP_FIREBASE_PROJECT_ID
-VITE_APP_FIREBASE_SENDER_ID
-VITE_APP_FIREBASE_APP_ID
-VITE_APP_FIREBASE_MID
-VITE_APP_LGL_API_KEY
+NEXT_PUBLIC_FIREBASE_API_KEY
+NEXT_PUBLIC_FIREBASE_PROJECT_ID
+NEXT_PUBLIC_FIREBASE_SENDER_ID
+NEXT_PUBLIC_FIREBASE_APP_ID
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+NEXT_PUBLIC_LGL_API_KEY
 ```
+
+These values configure browser clients and are not secrets. Next.js embeds
+`NEXT_PUBLIC_*` values into the client bundle at build time, so staging and
+production images must be built with their environment's values. The legacy
+Vite build also accepts the old `VITE_APP_*` names and maps them to this public
+configuration boundary.
+
+Firebase remains the backend and authentication provider during this phase.
+No database or authentication migration is performed by the compatibility
+host.
+
+### Health and container contracts
+
+- `GET /api/health/live` returns `{ "status": "ok" }`.
+- `GET /api/health/ready` returns `{ "status": "ready" }`.
+- Neither endpoint depends on Firebase or another external provider.
+
+Build and exercise the production container with:
+
+```bash
+docker build --tag cag-frontend:local .
+docker run --rm --publish 3000:3000 cag-frontend:local
+BASE_URL=http://127.0.0.1:3000 npm run smoke:server
+```
+
+The image runs as a non-root user. Pull requests targeting `staging` or
+`master` run lint, tests, the standalone build, the live smoke check, and a
+credential-free Docker build. The workflow does not deploy or request AWS
+credentials.
 
 ### Pull Requests (PRs)
 
