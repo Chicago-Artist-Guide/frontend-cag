@@ -1,14 +1,17 @@
-import React from 'react';
+import React, { useId } from 'react';
 import { Form } from 'react-bootstrap';
 import styled from 'styled-components';
 import { colors, fonts } from '../../theme/styleVars';
 
 const Checkbox = (props: any) => {
-  const { fieldType, label, ...rest } = props;
+  const { fieldType, id, label, ...rest } = props;
+  const generatedId = useId();
+  const controlId = id || generatedId;
 
   return (
     <CAGCheckbox>
       <Form.Check
+        id={controlId}
         label={label}
         type={fieldType}
         {...rest}

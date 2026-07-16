@@ -17,7 +17,13 @@ const firebaseConfig = {
 
 const useFirebase = () => {
   const app = useMemo(() => initializeApp(firebaseConfig), []);
-  const analytics = useMemo(() => getAnalytics(app), [app]);
+  const analytics = useMemo(() => {
+    if (typeof window === 'undefined' || !firebaseConfig.measurementId) {
+      return null;
+    }
+
+    return getAnalytics(app);
+  }, [app]);
   const auth = useMemo(() => getAuth(app), [app]);
   const firestore = useMemo(() => getFirestore(app), [app]);
   const storage = useMemo(() => getStorage(app), [app]);
