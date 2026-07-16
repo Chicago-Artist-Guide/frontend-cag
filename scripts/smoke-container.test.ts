@@ -1,7 +1,11 @@
+import { EventEmitter } from 'node:events';
+import { readFileSync } from 'node:fs';
+
 import {
   createDockerCommands,
   executeDocker,
   parsePublishedPort,
+  runSmokeContainerCli,
   smokeContainer
 } from './smoke-container.mjs';
 import { PUBLIC_ENV_NAMES } from './public-env.mjs';
@@ -11,6 +15,19 @@ const configuredEnvironment = Object.fromEntries(
 );
 
 describe('container smoke verification', () => {
+  it('refreshes the development dependency volume from the lockfile', () => {
+    const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+    const compose = readFileSync('compose.yaml', 'utf8');
+
+    expect(packageJson.scripts['dev:container:start']).toContain(
+      'npm ci --prefer-offline'
+    );
+    expect(compose).toContain(
+      "command: ['npm', 'run', 'dev:container:start']"
+    );
+    expect(compose).toContain('app-npm-cache:/root/.npm');
+  });
+
   it('constructs an amd64 build and loopback-only container commands', () => {
     const commands = createDockerCommands({
       buildArgs: configuredEnvironment,
@@ -285,5 +302,68 @@ describe('container smoke verification', () => {
       '--force',
       'cag-local-smoke-identity-failure'
     ]);
+  });
+
+  it('fails a successful smoke when its created resources cannot be removed', async () => {
+    const runDocker = vi.fn(async (arguments_: string[]) => {
+      if (arguments_[0] === 'image' && arguments_[1] === 'inspect') {
+        return { failed: false, stderr: '', stdout: 'linux/amd64\n' };
+      }
+      if (arguments_[0] === 'exec') {
+        return { failed: false, stderr: '', stdout: '1001:1001' };
+      }
+      if (arguments_[0] === 'port') {
+        return { failed: false, stderr: '', stdout: '127.0.0.1:49155\n' };
+      }
+      if (arguments_[0] === 'image' && arguments_[1] === 'rm') {
+        return { failed: true, stderr: 'image is still in use', stdout: '' };
+      }
+
+      return { failed: false, stderr: '', stdout: '' };
+    });
+
+    await expect(
+      smokeContainer({
+        environment: configuredEnvironment,
+        idFactory: () => 'cleanup-failure',
+        runDocker,
+        smokeServerImpl: vi.fn()
+      })
+    ).rejects.toThrow('cleanup');
+  });
+
+  it('turns SIGINT into an abort, waits for cleanup, and restores listeners', async () => {
+    const processObject = Object.assign(new EventEmitter(), {
+      exitCode: undefined as number | undefined
+    });
+    let releaseStart: (() => void) | undefined;
+    const started = new Promise<void>((resolve) => {
+      releaseStart = resolve;
+    });
+    const smokeContainerImpl = vi.fn(
+      ({ signal }: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          releaseStart?.();
+          signal.addEventListener('abort', () => reject(signal.reason), {
+            once: true
+          });
+        })
+    );
+    const errors: string[] = [];
+
+    const cli = runSmokeContainerCli({
+      processObject,
+      smokeContainerImpl,
+      writeError: (message: string) => errors.push(message),
+      writeOutput: vi.fn()
+    });
+    await started;
+    processObject.emit('SIGINT');
+    await cli;
+
+    expect(processObject.exitCode).toBe(130);
+    expect(errors.join('\n')).toContain('SIGINT');
+    expect(processObject.listenerCount('SIGINT')).toBe(0);
+    expect(processObject.listenerCount('SIGTERM')).toBe(0);
   });
 });

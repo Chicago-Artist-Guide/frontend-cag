@@ -75,7 +75,8 @@ export const executeDocker = async (
     allowFailure = false,
     execFileImpl = execFileAsync,
     label = 'Docker command',
-    sensitiveValues = []
+    sensitiveValues = [],
+    signal
   } = {}
 ) => {
   try {
@@ -84,14 +85,16 @@ export const executeDocker = async (
       arguments_,
       {
         encoding: 'utf8',
-        maxBuffer: 10 * 1024 * 1024
+        maxBuffer: 10 * 1024 * 1024,
+        ...(signal ? { signal } : {})
       }
     );
 
-    return { stderr, stdout };
+    return { failed: false, stderr, stdout };
   } catch (error) {
     if (allowFailure) {
       return {
+        failed: true,
         stderr: failureOutput(error, 'stderr'),
         stdout: failureOutput(error, 'stdout')
       };
@@ -198,11 +201,82 @@ const normalizeSmokeId = (value) => {
   return normalized;
 };
 
-const ignoreCleanupFailure = async (operation) => {
+const cleanupDockerResources = async ({
+  commands,
+  containerExpected,
+  imageExpected,
+  runDocker
+}) => {
+  const failures = [];
+  const operations = [
+    {
+      arguments_: commands.remove,
+      expected: containerExpected,
+      label: 'container'
+    },
+    {
+      arguments_: commands.imageRemove,
+      expected: imageExpected,
+      label: 'image'
+    }
+  ];
+
+  for (const { arguments_, expected, label } of operations) {
+    try {
+      const result = await runDocker(arguments_, {
+        allowFailure: true,
+        label: `Docker ${label} cleanup`
+      });
+
+      if (expected && result?.failed) {
+        failures.push(label);
+      }
+    } catch {
+      if (expected) {
+        failures.push(label);
+      }
+    }
+  }
+
+  if (failures.length === 0) {
+    return undefined;
+  }
+
+  return new Error(
+    `Container smoke cleanup failed for: ${failures.join(', ')}. Remove ${commands.remove.at(-1)} and ${commands.imageRemove.at(-1)} manually.`
+  );
+};
+
+const throwIfAborted = (signal) => {
+  if (signal?.aborted) {
+    throw signal.reason instanceof Error
+      ? signal.reason
+      : new Error('Container smoke was aborted.');
+  }
+};
+
+const waitWithAbort = async (operation, signal) => {
+  if (!signal) {
+    return operation;
+  }
+
+  throwIfAborted(signal);
+  let abortHandler;
+  const aborted = new Promise((_resolve, reject) => {
+    abortHandler = () => {
+      reject(
+        signal.reason instanceof Error
+          ? signal.reason
+          : new Error('Container smoke was aborted.')
+      );
+    };
+    signal.addEventListener('abort', abortHandler, { once: true });
+  });
+
   try {
-    await operation();
-  } catch {
-    // Cleanup is best-effort and must not hide the verification failure.
+    return await Promise.race([operation, aborted]);
+  } finally {
+    signal.removeEventListener('abort', abortHandler);
   }
 };
 
@@ -210,6 +284,7 @@ export const smokeContainer = async ({
   environment = process.env,
   idFactory = randomUUID,
   runDocker = executeDocker,
+  signal,
   smokeServerImpl = smokeServer,
   writeError = console.error
 } = {}) => {
@@ -223,15 +298,23 @@ export const smokeContainer = async ({
     imageName
   });
   let containerStarted = false;
+  let imageBuilt = false;
+  let result;
+  let verificationError;
 
   try {
+    throwIfAborted(signal);
     await runDocker(commands.build, {
       label: 'Docker image build',
-      sensitiveValues: Object.values(buildArgs)
+      sensitiveValues: Object.values(buildArgs),
+      signal
     });
+    imageBuilt = true;
+    throwIfAborted(signal);
 
     const imageInspection = await runDocker(commands.imageInspect, {
-      label: 'Docker image platform inspection'
+      label: 'Docker image platform inspection',
+      signal
     });
     if (imageInspection.stdout.trim() !== 'linux/amd64') {
       throw new Error(
@@ -239,11 +322,17 @@ export const smokeContainer = async ({
       );
     }
 
-    await runDocker(commands.run, { label: 'Docker container start' });
+    throwIfAborted(signal);
+    await runDocker(commands.run, {
+      label: 'Docker container start',
+      signal
+    });
     containerStarted = true;
+    throwIfAborted(signal);
 
     const runtimeIdentity = await runDocker(commands.runtimeIdentity, {
-      label: 'Docker runtime identity inspection'
+      label: 'Docker runtime identity inspection',
+      signal
     });
     if (runtimeIdentity.stdout.trim() !== '1001:1001') {
       throw new Error(
@@ -252,44 +341,100 @@ export const smokeContainer = async ({
     }
 
     const publishedPort = await runDocker(commands.port, {
-      label: 'Docker published port inspection'
+      label: 'Docker published port inspection',
+      signal
     });
     const { baseUrl, port } = parsePublishedPort(publishedPort.stdout);
 
-    await smokeServerImpl({ baseUrl });
+    await waitWithAbort(smokeServerImpl({ baseUrl, signal }), signal);
+    throwIfAborted(signal);
 
-    return { baseUrl, port };
+    result = { baseUrl, port };
   } catch (error) {
+    verificationError = error;
     if (containerStarted) {
-      const logs = await runDocker(commands.logs, {
-        allowFailure: true,
-        label: 'Docker container logs'
-      });
-      const combinedLogs = [logs.stdout, logs.stderr]
-        .filter(Boolean)
-        .join('\n');
+      try {
+        const logs = await runDocker(commands.logs, {
+          allowFailure: true,
+          label: 'Docker container logs'
+        });
+        const combinedLogs = [logs.stdout, logs.stderr]
+          .filter(Boolean)
+          .join('\n');
 
-      if (combinedLogs.trim()) {
-        writeError(
-          `Container logs:\n${redactValues(combinedLogs.trim(), Object.values(buildArgs))}`
-        );
+        if (combinedLogs.trim()) {
+          writeError(
+            `Container logs:\n${redactValues(combinedLogs.trim(), Object.values(buildArgs))}`
+          );
+        }
+      } catch {
+        writeError('Container logs could not be collected before cleanup.');
       }
     }
+  }
 
-    throw error;
+  const cleanupError = await cleanupDockerResources({
+    commands,
+    containerExpected: containerStarted,
+    imageExpected: imageBuilt,
+    runDocker
+  });
+
+  if (verificationError) {
+    if (cleanupError) {
+      writeError(cleanupError.message);
+    }
+    throw verificationError;
+  }
+
+  if (cleanupError) {
+    throw cleanupError;
+  }
+
+  throwIfAborted(signal);
+  return result;
+};
+
+export const runSmokeContainerCli = async ({
+  processObject = process,
+  smokeContainerImpl = smokeContainer,
+  writeError = console.error,
+  writeOutput = console.log
+} = {}) => {
+  const abortController = new AbortController();
+  let receivedSignal;
+  const signalHandlers = new Map(
+    ['SIGINT', 'SIGTERM'].map((signalName) => [
+      signalName,
+      () => {
+        receivedSignal = signalName;
+        abortController.abort(
+          new Error(`Container smoke interrupted by ${signalName}.`)
+        );
+      }
+    ])
+  );
+
+  for (const [signalName, handler] of signalHandlers) {
+    processObject.once(signalName, handler);
+  }
+
+  try {
+    const { baseUrl } = await smokeContainerImpl({
+      signal: abortController.signal,
+      writeError
+    });
+    writeOutput(`Container smoke test passed at ${baseUrl}.`);
+    return 0;
+  } catch (error) {
+    writeError(`Container smoke test failed: ${errorMessage(error)}`);
+    const exitCode = receivedSignal === 'SIGINT' ? 130 : receivedSignal ? 143 : 1;
+    processObject.exitCode = exitCode;
+    return exitCode;
   } finally {
-    await ignoreCleanupFailure(() =>
-      runDocker(commands.remove, {
-        allowFailure: true,
-        label: 'Docker container cleanup'
-      })
-    );
-    await ignoreCleanupFailure(() =>
-      runDocker(commands.imageRemove, {
-        allowFailure: true,
-        label: 'Docker image cleanup'
-      })
-    );
+    for (const [signalName, handler] of signalHandlers) {
+      processObject.off(signalName, handler);
+    }
   }
 };
 
@@ -297,12 +442,5 @@ const isMainModule =
   process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
 
 if (isMainModule) {
-  smokeContainer()
-    .then(({ baseUrl }) => {
-      console.log(`Container smoke test passed at ${baseUrl}.`);
-    })
-    .catch((error) => {
-      console.error(`Container smoke test failed: ${errorMessage(error)}`);
-      process.exitCode = 1;
-    });
+  void runSmokeContainerCli();
 }

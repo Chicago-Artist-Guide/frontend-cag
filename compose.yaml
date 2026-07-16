@@ -3,7 +3,7 @@ services:
     build:
       context: .
       target: development
-    command: ['npm', 'run', 'dev', '--', '--hostname', '0.0.0.0']
+    command: ['npm', 'run', 'dev:container:start']
     environment:
       NEXT_TELEMETRY_DISABLED: '1'
       WATCHPACK_POLLING: 'true'
@@ -13,6 +13,7 @@ services:
       - .:/app
       - app-next:/app/.next
       - app-node-modules:/app/node_modules
+      - app-npm-cache:/root/.npm
 
   production:
     profiles: ['production']
@@ -45,3 +46,4 @@ services:
 volumes:
   app-next:
   app-node-modules:
+  app-npm-cache:

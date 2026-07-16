@@ -94,6 +94,39 @@ describe('smokeServer', () => {
     expect(timeout).toHaveBeenCalledWith(1234);
   });
 
+  it('stops retries when an external verification signal is aborted', async () => {
+    const controller = new AbortController();
+    let requestStarted: (() => void) | undefined;
+    const started = new Promise<void>((resolve) => {
+      requestStarted = resolve;
+    });
+    const fetchImpl = vi.fn<typeof fetch>(
+      async (_input, init) =>
+        new Promise<Response>((_resolve, reject) => {
+          requestStarted?.();
+          init?.signal?.addEventListener(
+            'abort',
+            () => reject(init.signal?.reason),
+            { once: true }
+          );
+        })
+    );
+
+    const verification = smokeServer({
+      attempts: 20,
+      baseUrl: 'http://example.test',
+      delayMs: 0,
+      fetchImpl,
+      requestTimeoutMs: 1,
+      signal: controller.signal
+    });
+    await started;
+    controller.abort(new Error('verification interrupted'));
+
+    await expect(verification).rejects.toThrow('verification interrupted');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it('retries bounded connection failures', async () => {
     const fetchImpl = vi
       .fn<typeof fetch>()

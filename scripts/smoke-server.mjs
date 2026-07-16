@@ -3,11 +3,59 @@
 
 import { pathToFileURL } from 'node:url';
 
-const wait = (milliseconds) =>
-  new Promise((resolve) => setTimeout(resolve, milliseconds));
-
 const errorMessage = (error) =>
   error instanceof Error ? error.message : String(error);
+
+const abortError = (signal) =>
+  signal.reason instanceof Error
+    ? signal.reason
+    : new Error('Server smoke verification was aborted.');
+
+const wait = (milliseconds, signal) => {
+  if (!signal) {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+  if (signal.aborted) {
+    return Promise.reject(abortError(signal));
+  }
+
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      signal.removeEventListener('abort', handleAbort);
+      resolve();
+    }, milliseconds);
+    const handleAbort = () => {
+      clearTimeout(timer);
+      reject(abortError(signal));
+    };
+    signal.addEventListener('abort', handleAbort, { once: true });
+  });
+};
+
+const combineSignals = (signals) => {
+  const controller = new AbortController();
+  const listeners = new Map();
+
+  for (const signal of signals) {
+    if (signal.aborted) {
+      controller.abort(signal.reason);
+      break;
+    }
+
+    const handleAbort = () => controller.abort(signal.reason);
+    listeners.set(signal, handleAbort);
+    signal.addEventListener('abort', handleAbort, { once: true });
+  }
+
+  return {
+    dispose: () => {
+      for (const [signal, handleAbort] of listeners) {
+        signal.removeEventListener('abort', handleAbort);
+      }
+    },
+    signal: controller.signal
+  };
+};
 
 const requestWithRetry = async ({
   attempts,
@@ -15,21 +63,36 @@ const requestWithRetry = async ({
   delayMs,
   fetchImpl,
   path,
-  requestTimeoutMs
+  requestTimeoutMs,
+  signal
 }) => {
   let lastError;
 
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    if (signal?.aborted) {
+      throw abortError(signal);
+    }
+
+    const timeoutSignal = AbortSignal.timeout(requestTimeoutMs);
+    const requestSignal = signal
+      ? combineSignals([signal, timeoutSignal])
+      : { dispose: () => undefined, signal: timeoutSignal };
+
     try {
       return await fetchImpl(new URL(path, `${baseUrl}/`), {
-        signal: AbortSignal.timeout(requestTimeoutMs)
+        signal: requestSignal.signal
       });
     } catch (error) {
+      if (signal?.aborted) {
+        throw abortError(signal);
+      }
       lastError = error;
 
       if (attempt < attempts) {
-        await wait(delayMs);
+        await wait(delayMs, signal);
       }
+    } finally {
+      requestSignal.dispose();
     }
   }
 
@@ -88,14 +151,16 @@ export const smokeServer = async ({
   baseUrl = process.env.BASE_URL || 'http://127.0.0.1:3000',
   delayMs = 500,
   fetchImpl = globalThis.fetch,
-  requestTimeoutMs = 5000
+  requestTimeoutMs = 5000,
+  signal
 } = {}) => {
   const options = {
     attempts,
     baseUrl: baseUrl.replace(/\/$/, ''),
     delayMs,
     fetchImpl,
-    requestTimeoutMs
+    requestTimeoutMs,
+    signal
   };
 
   await checkHealth(options, '/api/health/live', 'ok');

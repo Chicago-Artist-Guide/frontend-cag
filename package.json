@@ -11,6 +11,7 @@
     "setup": "npm ci && npm --prefix infra ci",
     "dev": "next dev --webpack",
     "dev:container": "docker compose --env-file .env.local up --build app",
+    "dev:container:start": "npm ci --prefer-offline && npm run dev -- --hostname 0.0.0.0",
     "start": "next start",
     "build": "next build --webpack",
     "build:legacy": "tsc && vite build",
