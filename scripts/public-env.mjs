@@ -1,3 +1,7 @@
+/* eslint-env node */
+
+import { pathToFileURL } from 'node:url';
+
 export const PUBLIC_ENV_NAMES = Object.freeze([
   'NEXT_PUBLIC_FIREBASE_API_KEY',
   'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
@@ -26,3 +30,27 @@ export const requirePublicBuildArgs = (environment) => {
 
   return buildArgs;
 };
+
+export const runPublicEnvCli = ({
+  environment = process.env,
+  writeError = console.error,
+  writeOutput = console.log
+} = {}) => {
+  try {
+    requirePublicBuildArgs(environment);
+    writeOutput(
+      `Public build environment verified: ${PUBLIC_ENV_NAMES.join(', ')}`
+    );
+    return 0;
+  } catch (error) {
+    writeError(error instanceof Error ? error.message : String(error));
+    return 1;
+  }
+};
+
+const isMainModule =
+  process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+
+if (isMainModule) {
+  process.exitCode = runPublicEnvCli();
+}

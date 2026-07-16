@@ -1,0 +1,47 @@
+services:
+  app:
+    build:
+      context: .
+      target: development
+    command: ['npm', 'run', 'dev', '--', '--hostname', '0.0.0.0']
+    environment:
+      NEXT_TELEMETRY_DISABLED: '1'
+      WATCHPACK_POLLING: 'true'
+    ports:
+      - '127.0.0.1:3000:3000'
+    volumes:
+      - .:/app
+      - app-next:/app/.next
+      - app-node-modules:/app/node_modules
+
+  production:
+    profiles: ['production']
+    platform: linux/amd64
+    build:
+      context: .
+      target: runner
+      args:
+        NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY:-}
+        NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID:-}
+        NEXT_PUBLIC_FIREBASE_SENDER_ID: ${NEXT_PUBLIC_FIREBASE_SENDER_ID:-}
+        NEXT_PUBLIC_FIREBASE_APP_ID: ${NEXT_PUBLIC_FIREBASE_APP_ID:-}
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID:-}
+        NEXT_PUBLIC_LGL_API_KEY: ${NEXT_PUBLIC_LGL_API_KEY:-}
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:3000/api/health/live').then((response) => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    ports:
+      - '127.0.0.1:3001:3000'
+
+volumes:
+  app-next:
+  app-node-modules:
