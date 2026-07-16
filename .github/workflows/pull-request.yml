@@ -13,35 +13,49 @@ concurrency:
   cancel-in-progress: true
   group: pull-request-${{ github.event.pull_request.number }}
 
+env:
+  NEXT_PUBLIC_FIREBASE_API_KEY: ci-firebase-api-key
+  NEXT_PUBLIC_FIREBASE_APP_ID: ci-firebase-app-id
+  NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ci-firebase-measurement-id
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: ci-firebase-project-id
+  NEXT_PUBLIC_FIREBASE_SENDER_ID: ci-firebase-sender-id
+  NEXT_PUBLIC_LGL_API_KEY: ci-lgl-api-key
+
 jobs:
-  verify:
-    name: Verify application and container
+  application:
+    name: Verify application
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
     steps:
       - name: Check out source
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           persist-credentials: false
 
       - name: Use project Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
           cache: npm
           node-version-file: .nvmrc
 
-      - name: Install dependencies
+      - name: Install application dependencies
         run: npm ci
 
       - name: Check lint baseline
         run: npm run lint:check
 
-      - name: Run tests
+      - name: Run application tests
         run: npm test
 
       - name: Build standalone application
         run: npm run build
+
+      - name: Assemble standalone application
+        run: |
+          mkdir -p .next/standalone/.next
+          cp -R .next/static .next/standalone/.next/static
+          cp -R public .next/standalone/public
 
       - name: Smoke standalone application
         env:
@@ -49,10 +63,99 @@ jobs:
           HOSTNAME: 127.0.0.1
           PORT: 3000
         run: |
-          node .next/standalone/server.js > "$RUNNER_TEMP/next-server.log" 2>&1 &
+          log_file="$RUNNER_TEMP/next-server.log"
+          node .next/standalone/server.js > "$log_file" 2>&1 &
           server_pid=$!
-          trap 'kill "$server_pid"' EXIT
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              cat "$log_file"
+            fi
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+            exit "$status"
+          }
+          trap cleanup EXIT
           npm run smoke:server
 
-      - name: Build production image
-        run: docker build --tag cag-frontend:pr .
+  infrastructure:
+    name: Verify CDK infrastructure
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
+          node-version-file: .nvmrc
+
+      - name: Install infrastructure dependencies
+        run: npm --prefix infra ci
+
+      - name: Build, test, and synthesize CDK
+        run: npm --prefix infra run verify
+
+  container:
+    name: Verify production container
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build linux/amd64 production image
+        run: |
+          docker buildx build \
+            --build-arg NEXT_PUBLIC_FIREBASE_API_KEY="$NEXT_PUBLIC_FIREBASE_API_KEY" \
+            --build-arg NEXT_PUBLIC_FIREBASE_APP_ID="$NEXT_PUBLIC_FIREBASE_APP_ID" \
+            --build-arg NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID="$NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID" \
+            --build-arg NEXT_PUBLIC_FIREBASE_PROJECT_ID="$NEXT_PUBLIC_FIREBASE_PROJECT_ID" \
+            --build-arg NEXT_PUBLIC_FIREBASE_SENDER_ID="$NEXT_PUBLIC_FIREBASE_SENDER_ID" \
+            --build-arg NEXT_PUBLIC_LGL_API_KEY="$NEXT_PUBLIC_LGL_API_KEY" \
+            --load \
+            --platform linux/amd64 \
+            --tag cag-frontend:pr \
+            --target runner \
+            .
+
+      - name: Run and smoke production image
+        run: |
+          image_metadata="$(docker image inspect cag-frontend:pr --format '{{.Architecture}} {{.Config.User}}')"
+          test "$image_metadata" = "amd64 1001:1001"
+
+          container_name="cag-pr-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          docker run \
+            --detach \
+            --name "$container_name" \
+            --publish 127.0.0.1::3000 \
+            cag-frontend:pr
+
+          cleanup() {
+            status=$?
+            if [ "$status" -ne 0 ]; then
+              docker logs "$container_name" || true
+            fi
+            docker rm --force "$container_name" >/dev/null 2>&1 || true
+            exit "$status"
+          }
+          trap cleanup EXIT
+
+          test "$(docker exec "$container_name" uname -m)" = "x86_64"
+          published_address="$(docker port "$container_name" 3000/tcp)"
+          published_port="${published_address##*:}"
+          BASE_URL="http://127.0.0.1:${published_port}" npm run smoke:server

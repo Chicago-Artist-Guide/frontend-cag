@@ -1,0 +1,253 @@
+name: Deploy preview environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview_id:
+        description: Lowercase preview slug (3-20 characters, for example dev-511)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  cancel-in-progress: false
+  group: cag-preview-${{ inputs.preview_id }}
+
+jobs:
+  validate:
+    name: Validate preview target
+    runs-on: ubuntu-latest
+    outputs:
+      stack_name: ${{ steps.target.outputs.stack_name }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+
+      - name: Validate deployment target
+        id: target
+        env:
+          PREVIEW_ID: ${{ inputs.preview_id }}
+          TARGET_REF: ${{ github.ref_name }}
+        run: |
+          node scripts/deployment-target.mjs \
+            --stage preview \
+            --preview-id "$PREVIEW_ID" \
+            --ref "$TARGET_REF" >> "$GITHUB_OUTPUT"
+
+  plan:
+    name: Plan preview ${{ inputs.preview_id }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: preview-plan
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+      NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
+      NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+      PREVIEW_ID: ${{ inputs.preview_id }}
+      STACK_NAME: ${{ needs.validate.outputs.stack_name }}
+      TARGET_REF: ${{ github.ref_name }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            infra/package-lock.json
+          node-version-file: .nvmrc
+
+      - name: Validate deployment target again
+        run: |
+          node scripts/deployment-target.mjs \
+            --stage preview \
+            --preview-id "$PREVIEW_ID" \
+            --ref "$TARGET_REF"
+
+      - name: Validate environment configuration
+        run: |
+          node scripts/public-env.mjs
+          node --input-type=module -e '
+            const names = [
+              "AWS_ACCOUNT_ID",
+              "AWS_REGION",
+              "AWS_ROLE_ARN"
+            ];
+            const missing = names.filter((name) => !(process.env[name] || "").trim());
+            if (missing.length) {
+              console.error("Missing required GitHub Environment variables: " + missing.join(", "));
+              process.exit(1);
+            }
+          '
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
+        with:
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: true
+          role-session-name: cag-preview-plan-${{ github.run_id }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Install application and infrastructure dependencies
+        run: |
+          npm ci
+          npm --prefix infra ci
+
+      - name: Verify application
+        run: |
+          npm run lint:check
+          npm test
+          npm run build
+
+      - name: Verify infrastructure
+        run: |
+          npm --prefix infra run build
+          npm --prefix infra test
+
+      - name: Diff exact CDK stack
+        working-directory: infra
+        run: |
+          diff_file="$RUNNER_TEMP/cdk-diff.txt"
+          if ! npm exec cdk -- diff "$STACK_NAME" \
+            --context stage=preview \
+            --context "previewId=$PREVIEW_ID" > "$diff_file" 2>&1; then
+            cat "$diff_file"
+            exit 1
+          fi
+          cat "$diff_file"
+          {
+            echo "## CDK diff: $STACK_NAME"
+            echo '```text'
+            cat "$diff_file"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: Deploy preview ${{ inputs.preview_id }}
+    needs:
+      - validate
+      - plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: preview
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+      NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
+      NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+      PREVIEW_ID: ${{ inputs.preview_id }}
+      STACK_NAME: ${{ needs.validate.outputs.stack_name }}
+      TARGET_REF: ${{ github.ref_name }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
+          node-version-file: .nvmrc
+
+      - name: Validate deployment target again
+        run: |
+          node scripts/deployment-target.mjs \
+            --stage preview \
+            --preview-id "$PREVIEW_ID" \
+            --ref "$TARGET_REF"
+
+      - name: Validate environment configuration
+        run: |
+          node scripts/public-env.mjs
+          node --input-type=module -e '
+            const names = [
+              "AWS_ACCOUNT_ID",
+              "AWS_REGION",
+              "AWS_ROLE_ARN"
+            ];
+            const missing = names.filter((name) => !(process.env[name] || "").trim());
+            if (missing.length) {
+              console.error("Missing required GitHub Environment variables: " + missing.join(", "));
+              process.exit(1);
+            }
+          '
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
+        with:
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: true
+          role-session-name: cag-preview-deploy-${{ github.run_id }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Install infrastructure dependencies
+        run: npm --prefix infra ci
+
+      - name: Deploy exact CDK stack
+        working-directory: infra
+        run: |
+          npm exec cdk -- deploy "$STACK_NAME" \
+            --context stage=preview \
+            --context "previewId=$PREVIEW_ID" \
+            --outputs-file "$RUNNER_TEMP/cdk-outputs.json" \
+            --require-approval never
+
+      - name: Read validated load balancer output
+        id: deployment
+        run: |
+          node scripts/read-cdk-output.mjs \
+            --file "$RUNNER_TEMP/cdk-outputs.json" \
+            --stack "$STACK_NAME" >> "$GITHUB_OUTPUT"
+
+      - name: Smoke deployed load balancer
+        env:
+          BASE_URL: ${{ steps.deployment.outputs.base_url }}
+        run: npm run smoke:server
+
+      - name: Publish preview URL and cleanup reminder
+        env:
+          BASE_URL: ${{ steps.deployment.outputs.base_url }}
+        run: |
+          {
+            echo "## Preview deployment complete"
+            echo "Validated ALB URL: $BASE_URL"
+            echo "No DNS records were changed."
+            echo "Destroy this preview with the Preview destroy workflow when testing ends."
+          } >> "$GITHUB_STEP_SUMMARY"
