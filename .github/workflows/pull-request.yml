@@ -1,0 +1,58 @@
+name: Pull request checks
+
+on:
+  pull_request:
+    branches:
+      - master
+      - staging
+
+permissions:
+  contents: read
+
+concurrency:
+  cancel-in-progress: true
+  group: pull-request-${{ github.event.pull_request.number }}
+
+jobs:
+  verify:
+    name: Verify application and container
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Check lint baseline
+        run: npm run lint:check
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build standalone application
+        run: npm run build
+
+      - name: Smoke standalone application
+        env:
+          BASE_URL: http://127.0.0.1:3000
+          HOSTNAME: 127.0.0.1
+          PORT: 3000
+        run: |
+          node .next/standalone/server.js > "$RUNNER_TEMP/next-server.log" 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          npm run smoke:server
+
+      - name: Build production image
+        run: docker build --tag cag-frontend:pr .
