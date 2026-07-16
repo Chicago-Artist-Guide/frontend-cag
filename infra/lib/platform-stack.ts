@@ -1,3 +1,5 @@
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   CfnOutput,
   Duration,
@@ -7,25 +9,48 @@ import {
   Tags
 } from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import * as ecr from 'aws-cdk-lib/aws-ecr';
+import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import type { Construct } from 'constructs';
+import type { DeploymentTarget } from './deployment-target.js';
+
+export const PUBLIC_BUILD_ARGUMENT_NAMES = [
+  'NEXT_PUBLIC_FIREBASE_API_KEY',
+  'NEXT_PUBLIC_FIREBASE_PROJECT_ID',
+  'NEXT_PUBLIC_FIREBASE_SENDER_ID',
+  'NEXT_PUBLIC_FIREBASE_APP_ID',
+  'NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID',
+  'NEXT_PUBLIC_LGL_API_KEY'
+] as const;
+
+export type PublicBuildArguments = Record<
+  (typeof PUBLIC_BUILD_ARGUMENT_NAMES)[number],
+  string
+>;
 
 export interface PlatformStackProps extends StackProps {
-  stageName: 'production' | 'staging';
+  buildArguments: PublicBuildArguments;
+  target: DeploymentTarget;
 }
+
+const repositoryRoot = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../..'
+);
 
 export class PlatformStack extends Stack {
   constructor(scope: Construct, id: string, props: PlatformStackProps) {
-    super(scope, id, props);
-
-    const { stageName } = props;
-    const isProduction = stageName === 'production';
+    const { buildArguments, target, ...stackProps } = props;
+    super(scope, id, {
+      ...stackProps,
+      terminationProtection: target.isProduction
+    });
 
     Tags.of(this).add('Application', 'chicago-artist-guide');
-    Tags.of(this).add('Environment', stageName);
+    Tags.of(this).add('DeploymentId', target.deploymentId);
+    Tags.of(this).add('Environment', target.stageName);
     Tags.of(this).add('ManagedBy', 'aws-cdk');
 
     const vpc = new ec2.Vpc(this, 'Vpc', {
@@ -36,16 +61,26 @@ export class PlatformStack extends Stack {
           cidrMask: 24,
           name: 'PublicApplication',
           subnetType: ec2.SubnetType.PUBLIC
+        },
+        {
+          cidrMask: 24,
+          name: 'Data',
+          subnetType: ec2.SubnetType.PRIVATE_ISOLATED
         }
       ]
     });
 
-    const repository = new ecr.Repository(this, 'Repository', {
-      imageScanOnPush: true,
-      lifecycleRules: [{ maxImageCount: isProduction ? 25 : 10 }],
-      repositoryName: `cag-frontend-${stageName}`
-    });
-    repository.applyRemovalPolicy(RemovalPolicy.RETAIN);
+    const applicationImage = new ecrAssets.DockerImageAsset(
+      this,
+      'ApplicationImage',
+      {
+        buildArgs: buildArguments,
+        directory: repositoryRoot,
+        exclude: ['infra/cdk.out'],
+        platform: ecrAssets.Platform.LINUX_AMD64,
+        target: 'runner'
+      }
+    );
 
     const cluster = new ecs.Cluster(this, 'Cluster', {
       containerInsightsV2: ecs.ContainerInsights.ENABLED,
@@ -53,11 +88,11 @@ export class PlatformStack extends Stack {
     });
 
     const logGroup = new logs.LogGroup(this, 'ApplicationLogs', {
-      logGroupName: `/cag/${stageName}/frontend`,
-      removalPolicy: isProduction
-        ? RemovalPolicy.RETAIN
-        : RemovalPolicy.DESTROY,
-      retention: isProduction
+      logGroupName: `/cag/${target.deploymentId}/frontend`,
+      removalPolicy: target.isEphemeral
+        ? RemovalPolicy.DESTROY
+        : RemovalPolicy.RETAIN,
+      retention: target.isProduction
         ? logs.RetentionDays.ONE_MONTH
         : logs.RetentionDays.ONE_WEEK
     });
@@ -79,7 +114,7 @@ export class PlatformStack extends Stack {
       environment: {
         NODE_ENV: 'production',
         PORT: '3000',
-        STAGE_NAME: stageName
+        STAGE_NAME: target.stageName
       },
       healthCheck: {
         command: [
@@ -91,7 +126,7 @@ export class PlatformStack extends Stack {
         startPeriod: Duration.seconds(10),
         timeout: Duration.seconds(5)
       },
-      image: ecs.ContainerImage.fromEcrRepository(repository, 'latest'),
+      image: ecs.ContainerImage.fromDockerImageAsset(applicationImage),
       logging: ecs.LogDrivers.awsLogs({
         logGroup,
         streamPrefix: 'application'
@@ -116,11 +151,27 @@ export class PlatformStack extends Stack {
       vpcSubnets: { subnetType: ec2.SubnetType.PUBLIC }
     });
 
+    const futureDataSecurityGroup = new ec2.SecurityGroup(
+      this,
+      'FutureDataSecurityGroup',
+      {
+        allowAllOutbound: false,
+        description:
+          'Reserved PostgreSQL boundary for a future relational data service',
+        vpc
+      }
+    );
+    futureDataSecurityGroup.addIngressRule(
+      service.connections.securityGroups[0],
+      ec2.Port.tcp(5432),
+      'Allow PostgreSQL from the application service'
+    );
+
     const loadBalancer = new elbv2.ApplicationLoadBalancer(
       this,
       'LoadBalancer',
       {
-        deletionProtection: isProduction,
+        deletionProtection: target.isProduction,
         internetFacing: true,
         vpc
       }
@@ -149,7 +200,7 @@ export class PlatformStack extends Stack {
     );
 
     const scaling = service.autoScaleTaskCount({
-      maxCapacity: isProduction ? 4 : 2,
+      maxCapacity: target.isProduction ? 4 : 2,
       minCapacity: 1
     });
     scaling.scaleOnCpuUtilization('CpuScaling', {
@@ -158,13 +209,28 @@ export class PlatformStack extends Stack {
       targetUtilizationPercent: 60
     });
 
+    const dataSubnetIds = vpc.selectSubnets({
+      subnetType: ec2.SubnetType.PRIVATE_ISOLATED
+    }).subnetIds;
+
+    new CfnOutput(this, 'VpcId', {
+      value: vpc.vpcId
+    });
+    new CfnOutput(this, 'DataSubnetIds', {
+      value: dataSubnetIds.join(',')
+    });
+    new CfnOutput(this, 'FutureDataSecurityGroupId', {
+      value: futureDataSecurityGroup.securityGroupId
+    });
+    new CfnOutput(this, 'DeploymentId', {
+      value: target.deploymentId
+    });
     new CfnOutput(this, 'LoadBalancerDnsName', {
       description: 'Use this hostname for validation before a DNS cutover.',
       value: loadBalancer.loadBalancerDnsName
     });
-    new CfnOutput(this, 'RepositoryUri', {
-      description: 'Push the application image to this repository.',
-      value: repository.repositoryUri
+    new CfnOutput(this, 'LoadBalancerUrl', {
+      value: `http://${loadBalancer.loadBalancerDnsName}`
     });
   }
 }

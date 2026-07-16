@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "tsc --noEmit",
+    "list": "cdk list",
     "synth": "cdk synth --quiet",
     "test": "vitest run",
     "verify": "npm run build && npm test && npm run synth"
