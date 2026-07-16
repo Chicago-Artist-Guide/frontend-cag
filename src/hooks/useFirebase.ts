@@ -4,21 +4,12 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { useMemo } from 'react';
-
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_APP_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_APP_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: import.meta.env.VITE_APP_FIREBASE_SENDER_ID,
-  appId: import.meta.env.VITE_APP_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_APP_FIREBASE_MID
-};
+import { firebaseClientConfig } from '../config/publicEnv';
 
 const useFirebase = () => {
-  const app = useMemo(() => initializeApp(firebaseConfig), []);
+  const app = useMemo(() => initializeApp(firebaseClientConfig), []);
   const analytics = useMemo(() => {
-    if (typeof window === 'undefined' || !firebaseConfig.measurementId) {
+    if (typeof window === 'undefined' || !firebaseClientConfig.measurementId) {
       return null;
     }
 

@@ -11,6 +11,7 @@ import InputField from '../components/shared/Input';
 import Button from '../components/shared/Button';
 import { colors, fonts, breakpoints } from '../theme/styleVars';
 import { createEmail } from '../components/Messages/api';
+import { isDevelopment } from '../config/publicEnv';
 
 type RoleOpportunity = {
   id: string;
@@ -164,8 +165,7 @@ const GetInvolved: React.FC<React.PropsWithChildren<unknown>> = () => {
   ) => {
     try {
       // Determine recipient based on environment
-      const isDev = import.meta.env.DEV;
-      const recipientEmail = isDev
+      const recipientEmail = isDevelopment
         ? 'chris@ctkadvisors.net'
         : 'anna@chicagoartistguide.org';
 
