@@ -5,8 +5,6 @@ import { SetForm } from 'react-hooks-helper';
 import styled, { CSSProperties } from 'styled-components';
 import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 
-import 'react-datepicker/dist/react-datepicker.css';
-
 export interface SelectValue {
   name: string;
   value: string;

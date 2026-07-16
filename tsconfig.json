@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -9,14 +13,35 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "module": "esnext",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react",
-    "types": ["vite/client", "jest", "node"],
-    "noFallthroughCasesInSwitch": true
+    "jsx": "react-jsx",
+    "types": [
+      "vite/client",
+      "jest",
+      "node"
+    ],
+    "noFallthroughCasesInSwitch": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "incremental": true
   },
-  "exclude": ["node_modules", "src/**/*.test.ts", "src/**/*.test.tsx"],
-  "include": ["src", "src/svg.d.ts"]
+  "exclude": [
+    "node_modules",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx"
+  ],
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "app",
+    "src",
+    "src/svg.d.ts",
+    ".next/dev/types/**/*.ts"
+  ]
 }

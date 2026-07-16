@@ -1,7 +1,5 @@
 import React from 'react';
-import Hero from '/hero.png';
 import Collapsible from '../components/layout/Collapsible';
-import Donate from '/donate.png';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
@@ -19,6 +17,9 @@ import Jackalope from '../images/partners/jackalope-1.png';
 import Pegasus from '../images/partners/pegasus-logo-1.jpg';
 
 import { supporters } from '../utils/supporters';
+
+const Donate = '/donate.png';
+const Hero = '/hero.png';
 
 const Home = () => {
   const sectionTitles = {
