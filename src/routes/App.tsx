@@ -6,6 +6,7 @@ import { PaginationProvider } from '../context/PaginationContext';
 import { UserContext } from '../context/UserContext';
 import { AdminProvider } from '../context/AdminContext';
 import { ErrorBoundary } from '../components/shared';
+import { publicConfig } from '../config/publicEnv';
 import useAuthState from '../hooks/useAuthState';
 import useFirebase from '../hooks/useFirebase';
 import useProfileData from '../hooks/useProfileData';
@@ -63,7 +64,7 @@ const App = () => {
       <UserContext.Provider value={userContextValue}>
         <AdminProvider currentUser={currentUser} firestore={firestore}>
           <MarketingContext.Provider
-            value={{ lglApiKey: import.meta.env.VITE_APP_LGL_API_KEY || '' }}
+            value={{ lglApiKey: publicConfig.lglApiKey }}
           >
             <PaginationProvider>
               <ErrorBoundary>

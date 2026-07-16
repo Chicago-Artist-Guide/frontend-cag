@@ -23,6 +23,7 @@ import {
   deleteDoc,
   serverTimestamp
 } from 'firebase/firestore';
+import { firebaseClientConfig } from '../../../config/publicEnv';
 import { colors } from '../../../theme/styleVars';
 import { TheatreRequest } from '../../../hooks/useCompanies';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
@@ -225,16 +226,6 @@ const ErrorMessage = styled.div`
   font-weight: 500;
 `;
 
-// Firebase config from environment
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_APP_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_APP_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: import.meta.env.VITE_APP_FIREBASE_SENDER_ID,
-  appId: import.meta.env.VITE_APP_FIREBASE_APP_ID
-};
-
 const TheatreRequestModal: React.FC<
   React.PropsWithChildren<TheatreRequestModalProps>
 > = ({ request, onClose, onSuccess }) => {
@@ -263,7 +254,7 @@ const TheatreRequestModal: React.FC<
       // Create a secondary Firebase app instance
       // Use unique name to prevent collision if modal is reopened quickly
       secondaryApp = initializeApp(
-        firebaseConfig,
+        firebaseClientConfig,
         `SecondaryApp_${Date.now()}`
       );
       const secondaryAuth = getAuth(secondaryApp);

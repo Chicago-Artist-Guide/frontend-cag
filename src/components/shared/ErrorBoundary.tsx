@@ -1,6 +1,7 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import styled from 'styled-components';
+import { isDevelopment } from '../../config/publicEnv';
 import { colors, fonts } from '../../theme/styleVars';
 
 interface Props {
@@ -33,7 +34,7 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details in development mode only
-    if (import.meta.env.DEV) {
+    if (isDevelopment) {
       console.error('ErrorBoundary caught an error:', error);
       console.error('Error details:', {
         message: error.message,
@@ -68,7 +69,7 @@ class ErrorBoundary extends Component<Props, State> {
             <ErrorMessage>
               An unexpected error occurred. Please refresh the page to continue.
             </ErrorMessage>
-            {import.meta.env.DEV && this.state.error && (
+            {isDevelopment && this.state.error && (
               <DevErrorDetails>
                 <DevErrorTitle>Development Error Details:</DevErrorTitle>
                 <DevErrorText>

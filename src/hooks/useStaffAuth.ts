@@ -16,8 +16,9 @@
  * This hook remains for backward compatibility but should not be used in new code.
  */
 
-import { useUserContext } from '../context/UserContext';
+import { isDevelopment } from '../config/publicEnv';
 import { STAFF_CONFIG } from '../config/staffAccess';
+import { useUserContext } from '../context/UserContext';
 
 export const useStaffAuth = () => {
   const { currentUser } = useUserContext();
@@ -28,7 +29,7 @@ export const useStaffAuth = () => {
   );
 
   // Log deprecation warning in development
-  if (import.meta.env.DEV && isStaff) {
+  if (isDevelopment && isStaff) {
     console.warn(
       '[DEPRECATED] useStaffAuth is deprecated. Please migrate to useAdminAuth for role-based permissions.'
     );
