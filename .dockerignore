@@ -1,0 +1,16 @@
+.git
+.github
+.next
+.vercel
+coverage
+dist
+docs
+node_modules
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+npm-debug.log*
+scripts/visual-regression/.auth
+scripts/visual-regression/snapshots/current
+scripts/visual-regression/snapshots/diff
