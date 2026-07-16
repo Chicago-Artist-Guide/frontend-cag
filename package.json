@@ -24,7 +24,7 @@
     "test:watch": "vitest",
     "test:rules": "firebase emulators:exec --only firestore --project cag-rules-tests \"vitest run --config vitest.rules.config.ts\"",
     "lint": "eslint --fix --max-warnings=250",
-    "lint:check": "eslint app scripts/public-env.mjs scripts/public-env.test.ts scripts/smoke-container.mjs scripts/smoke-container.test.ts scripts/smoke-server.mjs scripts/smoke-server.test.ts src --max-warnings=371",
+    "lint:check": "eslint app scripts/*.mjs scripts/*.test.ts src --max-warnings=371",
     "audit": "better-npm-audit audit",
     "vr:auth": "tsx --env-file=.env.local scripts/visual-regression/auth-setup.ts",
     "vr:baseline": "tsx --env-file=.env.local scripts/visual-regression/capture.ts --bucket=baseline",

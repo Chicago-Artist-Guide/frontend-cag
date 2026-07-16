@@ -34,6 +34,8 @@ jobs:
       - name: Use project Node version
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
         with:
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
           node-version-file: .nvmrc
 
       - name: Validate deployment target
@@ -50,6 +52,12 @@ jobs:
             --operation destroy \
             --confirmation "$DESTROY_CONFIRMATION" >> "$GITHUB_OUTPUT"
 
+      - name: Install dependencies without OIDC permission
+        run: npm --prefix infra ci
+
+      - name: Verify infrastructure without OIDC permission
+        run: npm --prefix infra run verify
+
   destroy:
     name: Destroy preview ${{ inputs.preview_id }}
     needs: validate
@@ -60,13 +68,8 @@ jobs:
       contents: read
       id-token: write
     env:
-      AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
-      DESTROY_CONFIRMATION: ${{ inputs.confirmation }}
       PREVIEW_ID: ${{ inputs.preview_id }}
       STACK_NAME: ${{ needs.validate.outputs.stack_name }}
-      TARGET_REF: ${{ github.ref_name }}
 
     steps:
       - name: Check out source
@@ -81,32 +84,8 @@ jobs:
           cache-dependency-path: infra/package-lock.json
           node-version-file: .nvmrc
 
-      - name: Validate deployment target again
-        run: |
-          node scripts/deployment-target.mjs \
-            --stage preview \
-            --preview-id "$PREVIEW_ID" \
-            --ref "$TARGET_REF" \
-            --operation destroy \
-            --confirmation "$DESTROY_CONFIRMATION"
-
-      - name: Validate environment configuration
-        run: |
-          node --input-type=module -e '
-            const names = [
-              "AWS_ACCOUNT_ID",
-              "AWS_REGION",
-              "AWS_ROLE_ARN"
-            ];
-            const missing = names.filter((name) => !(process.env[name] || "").trim());
-            if (missing.length) {
-              console.error("Missing required GitHub Environment variables: " + missing.join(", "));
-              process.exit(1);
-            }
-          '
-
-      - name: Install infrastructure dependencies
-        run: npm --prefix infra ci
+      - name: Install infrastructure without lifecycle scripts
+        run: npm --prefix infra ci --ignore-scripts
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885

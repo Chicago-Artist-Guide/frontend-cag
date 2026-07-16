@@ -19,53 +19,15 @@ jobs:
   validate:
     name: Validate preview target
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: validation-firebase-api-key
+      NEXT_PUBLIC_FIREBASE_APP_ID: validation-firebase-app-id
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: validation-firebase-measurement-id
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: validation-firebase-project-id
+      NEXT_PUBLIC_FIREBASE_SENDER_ID: validation-firebase-sender-id
+      NEXT_PUBLIC_LGL_API_KEY: validation-lgl-api-key
     outputs:
       stack_name: ${{ steps.target.outputs.stack_name }}
-    steps:
-      - name: Check out source
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          persist-credentials: false
-
-      - name: Use project Node version
-        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
-        with:
-          node-version-file: .nvmrc
-
-      - name: Validate deployment target
-        id: target
-        env:
-          PREVIEW_ID: ${{ inputs.preview_id }}
-          TARGET_REF: ${{ github.ref_name }}
-        run: |
-          node scripts/deployment-target.mjs \
-            --stage preview \
-            --preview-id "$PREVIEW_ID" \
-            --ref "$TARGET_REF" >> "$GITHUB_OUTPUT"
-
-  plan:
-    name: Plan preview ${{ inputs.preview_id }}
-    needs: validate
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    environment: preview-plan
-    permissions:
-      contents: read
-      id-token: write
-    env:
-      AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
-      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
-      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
-      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-      NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
-      NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
-      PREVIEW_ID: ${{ inputs.preview_id }}
-      STACK_NAME: ${{ needs.validate.outputs.stack_name }}
-      TARGET_REF: ${{ github.ref_name }}
-
     steps:
       - name: Check out source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -81,44 +43,68 @@ jobs:
             infra/package-lock.json
           node-version-file: .nvmrc
 
-      - name: Validate deployment target again
+      - name: Validate deployment target
+        id: target
+        env:
+          PREVIEW_ID: ${{ inputs.preview_id }}
+          TARGET_REF: ${{ github.ref_name }}
         run: |
           node scripts/deployment-target.mjs \
             --stage preview \
             --preview-id "$PREVIEW_ID" \
-            --ref "$TARGET_REF"
+            --ref "$TARGET_REF" >> "$GITHUB_OUTPUT"
 
-      - name: Validate environment configuration
-        run: |
-          node scripts/public-env.mjs
-          node --input-type=module -e '
-            const names = [
-              "AWS_ACCOUNT_ID",
-              "AWS_REGION",
-              "AWS_ROLE_ARN"
-            ];
-            const missing = names.filter((name) => !(process.env[name] || "").trim());
-            if (missing.length) {
-              console.error("Missing required GitHub Environment variables: " + missing.join(", "));
-              process.exit(1);
-            }
-          '
-
-      - name: Install application and infrastructure dependencies
+      - name: Install dependencies without OIDC permission
         run: |
           npm ci
           npm --prefix infra ci
 
-      - name: Verify application
-        run: |
-          npm run lint:check
-          npm test
-          npm run build
+      - name: Verify application and infrastructure without OIDC permission
+        run: npm run verify
 
-      - name: Verify infrastructure
-        run: |
-          npm --prefix infra run build
-          npm --prefix infra test
+  plan:
+    name: Plan preview ${{ inputs.preview_id }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: preview-plan
+    outputs:
+      configuration_fingerprint: ${{ steps.configuration.outputs.configuration_fingerprint }}
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PREVIEW_ID: ${{ inputs.preview_id }}
+      STACK_NAME: ${{ needs.validate.outputs.stack_name }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
+          node-version-file: .nvmrc
+
+      - name: Install infrastructure without lifecycle scripts
+        run: npm --prefix infra ci --ignore-scripts
+
+      - name: Fingerprint planned deployment configuration
+        id: configuration
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
+          NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+        run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
@@ -130,6 +116,13 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Diff exact CDK stack
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
+          NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
         working-directory: infra
         run: |
           diff_file="$RUNNER_TEMP/cdk-diff.txt"
@@ -159,18 +152,8 @@ jobs:
       contents: read
       id-token: write
     env:
-      AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
-      AWS_REGION: ${{ vars.AWS_REGION }}
-      AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}
-      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
-      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
-      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
-      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
-      NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
-      NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
       PREVIEW_ID: ${{ inputs.preview_id }}
       STACK_NAME: ${{ needs.validate.outputs.stack_name }}
-      TARGET_REF: ${{ github.ref_name }}
 
     steps:
       - name: Check out source
@@ -185,31 +168,31 @@ jobs:
           cache-dependency-path: infra/package-lock.json
           node-version-file: .nvmrc
 
-      - name: Validate deployment target again
-        run: |
-          node scripts/deployment-target.mjs \
-            --stage preview \
-            --preview-id "$PREVIEW_ID" \
-            --ref "$TARGET_REF"
+      - name: Install infrastructure without lifecycle scripts
+        run: npm --prefix infra ci --ignore-scripts
 
-      - name: Validate environment configuration
-        run: |
-          node scripts/public-env.mjs
-          node --input-type=module -e '
-            const names = [
-              "AWS_ACCOUNT_ID",
-              "AWS_REGION",
-              "AWS_ROLE_ARN"
-            ];
-            const missing = names.filter((name) => !(process.env[name] || "").trim());
-            if (missing.length) {
-              console.error("Missing required GitHub Environment variables: " + missing.join(", "));
-              process.exit(1);
-            }
-          '
+      - name: Fingerprint deploy configuration
+        id: configuration
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
+          NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+        run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
 
-      - name: Install infrastructure dependencies
-        run: npm --prefix infra ci
+      - name: Require the approved plan configuration
+        env:
+          DEPLOY_CONFIGURATION_FINGERPRINT: ${{ steps.configuration.outputs.configuration_fingerprint }}
+          PLAN_CONFIGURATION_FINGERPRINT: ${{ needs.plan.outputs.configuration_fingerprint }}
+        run: |
+          if [ "$DEPLOY_CONFIGURATION_FINGERPRINT" != "$PLAN_CONFIGURATION_FINGERPRINT" ]; then
+            echo "Deployment configuration differs from the approved plan." >&2
+            exit 1
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
@@ -221,6 +204,13 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Deploy exact CDK stack
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
+          NEXT_PUBLIC_FIREBASE_APP_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_APP_ID }}
+          NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+          NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
+          NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
         working-directory: infra
         run: |
           npm exec cdk -- deploy "$STACK_NAME" \

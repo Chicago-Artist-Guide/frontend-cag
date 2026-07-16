@@ -100,7 +100,7 @@ describe('GitHub workflow contracts', () => {
         expect(workflow).toContain(`${variable}: \${{ vars.${variable} }}`);
       }
 
-      expect(workflow).toContain('node scripts/public-env.mjs');
+      expect(workflow).toContain('node scripts/deployment-config.mjs');
     }
   });
 
@@ -108,9 +108,9 @@ describe('GitHub workflow contracts', () => {
     const destroy = readWorkflow('preview-destroy.yml');
 
     expect(destroy).not.toContain('NEXT_PUBLIC_');
-    expect(destroy).toContain('AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}');
-    expect(destroy).toContain('AWS_REGION: ${{ vars.AWS_REGION }}');
-    expect(destroy).toContain('AWS_ROLE_ARN: ${{ vars.AWS_ROLE_ARN }}');
+    expect(destroy).toContain('allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}');
+    expect(destroy).toContain('aws-region: ${{ vars.AWS_REGION }}');
+    expect(destroy).toContain('role-to-assume: ${{ vars.AWS_ROLE_ARN }}');
   });
 
   it('runs every CDK command from the infrastructure package', () => {
@@ -127,22 +127,57 @@ describe('GitHub workflow contracts', () => {
     }
   });
 
-  it('installs dependencies before exposing OIDC credentials to a job', () => {
+  it('keeps dependency lifecycle and role identifiers out of OIDC preparation', () => {
     for (const name of deploymentWorkflowNames) {
       const workflow = readWorkflow(name);
-      const authMarker = '- name: Configure AWS credentials';
-      let previousAuthIndex = -1;
-      let authIndex = workflow.indexOf(authMarker);
+      const oidcJobs = workflow.slice(workflow.indexOf('id-token: write'));
 
-      while (authIndex !== -1) {
-        const sectionBeforeAuth = workflow.slice(previousAuthIndex + 1, authIndex);
+      expect(workflow).toContain('npm --prefix infra ci --ignore-scripts');
+      expect(workflow).not.toMatch(/^ {6}AWS_ROLE_ARN:/m);
+      expect(oidcJobs).not.toMatch(/run: npm --prefix infra ci\s*$/m);
+    }
+  });
 
-        expect(sectionBeforeAuth).toMatch(/- name: Install .*dependencies/);
-        previousAuthIndex = authIndex;
-        authIndex = workflow.indexOf(authMarker, authIndex + authMarker.length);
-      }
+  it('performs full dependency verification in jobs without OIDC permission', () => {
+    for (const name of deploymentWorkflowNames) {
+      const workflow = readWorkflow(name);
+      const oidcIndex = workflow.indexOf('id-token: write');
+      const verificationIndex = workflow.indexOf(
+        name === 'preview-destroy.yml'
+          ? 'run: npm --prefix infra run verify'
+          : 'run: npm run verify'
+      );
 
-      expect(previousAuthIndex).toBeGreaterThan(-1);
+      expect(verificationIndex).toBeGreaterThan(-1);
+      expect(verificationIndex).toBeLessThan(oidcIndex);
+    }
+  });
+
+  it('requires deploy configuration to exactly match the approved plan', () => {
+    for (const name of ['deploy-environment.yml', 'preview-deploy.yml']) {
+      const workflow = readWorkflow(name);
+
+      expect(workflow).toContain(
+        'configuration_fingerprint: ${{ steps.configuration.outputs.configuration_fingerprint }}'
+      );
+      expect(workflow).toContain(
+        'PLAN_CONFIGURATION_FINGERPRINT: ${{ needs.plan.outputs.configuration_fingerprint }}'
+      );
+      expect(workflow).toContain('node scripts/deployment-config.mjs');
+      expect(workflow).toContain(
+        'Deployment configuration differs from the approved plan.'
+      );
+
+      const comparisonIndex = workflow.indexOf(
+        'Deployment configuration differs from the approved plan.'
+      );
+      const deployJobIndex = workflow.indexOf('\n  deploy:');
+      const deployAuthIndex = workflow.indexOf(
+        '- name: Configure AWS credentials',
+        deployJobIndex
+      );
+      expect(comparisonIndex).toBeGreaterThan(deployJobIndex);
+      expect(comparisonIndex).toBeLessThan(deployAuthIndex);
     }
   });
 
