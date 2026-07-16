@@ -406,7 +406,7 @@ passing unit/build/synth evidence; do not claim the container ran.
 Provide reviewers the design, plan, `origin/master` base SHA, and final head
 SHA. Fix all critical and important findings, then rerun affected verification.
 
-- [ ] **Step 4: Commit and push only**
+- [x] **Step 4: Commit and push only**
 
 Commit the scoped changes on `dev-512`, push to `origin/dev-512`, confirm PR
 #335 remains open and draft against `master`, and do not merge, close, or change
@@ -426,5 +426,5 @@ The production Docker smoke was invoked and stopped at its explicit external
 precondition because Docker Desktop's daemon is not running on this machine;
 the command emitted the actionable daemon diagnostic. No AWS deployment, DNS
 change, Amplify mutation, database, GitHub Environment, credential write, or
-PR merge was performed. Task 7 step 4 is intentionally completed only after
-this record is committed and the branch is pushed.
+PR merge was performed. Task 7 step 4 was completed by pushing only `dev-512`
+and confirming PR #335 remained open and draft against `master`.
