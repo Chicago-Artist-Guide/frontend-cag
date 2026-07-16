@@ -127,6 +127,43 @@ describe('smokeServer', () => {
     expect(fetchImpl).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps cancellation active while a response body is being read', async () => {
+    const controller = new AbortController();
+    let headersReturned: (() => void) | undefined;
+    const returned = new Promise<void>((resolve) => {
+      headersReturned = resolve;
+    });
+    const fetchImpl = vi.fn<typeof fetch>(async (_input, init) => {
+      const requestSignal = init?.signal;
+      const body = new ReadableStream({
+        start(streamController) {
+          requestSignal?.addEventListener(
+            'abort',
+            () => streamController.error(requestSignal.reason),
+            { once: true }
+          );
+        }
+      });
+      headersReturned?.();
+      return new Response(body, {
+        headers: { 'Content-Type': 'application/json' }
+      });
+    });
+
+    const verification = smokeServer({
+      attempts: 1,
+      baseUrl: 'http://example.test',
+      fetchImpl,
+      requestTimeoutMs: 5000,
+      signal: controller.signal
+    });
+    await returned;
+    controller.abort(new Error('body read interrupted'));
+
+    await expect(verification).rejects.toThrow('body read interrupted');
+    expect(fetchImpl).toHaveBeenCalledTimes(1);
+  });
+
   it('retries bounded connection failures', async () => {
     const fetchImpl = vi
       .fn<typeof fetch>()

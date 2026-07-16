@@ -255,12 +255,13 @@ const throwIfAborted = (signal) => {
   }
 };
 
-const waitWithAbort = async (operation, signal) => {
+const waitWithAbort = async (operationFactory, signal) => {
   if (!signal) {
-    return operation;
+    return operationFactory();
   }
 
   throwIfAborted(signal);
+  const operation = operationFactory();
   let abortHandler;
   const aborted = new Promise((_resolve, reject) => {
     abortHandler = () => {
@@ -346,7 +347,7 @@ export const smokeContainer = async ({
     });
     const { baseUrl, port } = parsePublishedPort(publishedPort.stdout);
 
-    await waitWithAbort(smokeServerImpl({ baseUrl, signal }), signal);
+    await waitWithAbort(() => smokeServerImpl({ baseUrl, signal }), signal);
     throwIfAborted(signal);
 
     result = { baseUrl, port };

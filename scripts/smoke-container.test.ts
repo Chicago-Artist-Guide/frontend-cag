@@ -366,4 +366,34 @@ describe('container smoke verification', () => {
     expect(processObject.listenerCount('SIGINT')).toBe(0);
     expect(processObject.listenerCount('SIGTERM')).toBe(0);
   });
+
+  it('does not start HTTP verification after cancellation wins the port race', async () => {
+    const controller = new AbortController();
+    const smokeServerImpl = vi.fn().mockResolvedValue(undefined);
+    const runDocker = vi.fn(async (arguments_: string[]) => {
+      if (arguments_[0] === 'image' && arguments_[1] === 'inspect') {
+        return { failed: false, stderr: '', stdout: 'linux/amd64\n' };
+      }
+      if (arguments_[0] === 'exec') {
+        return { failed: false, stderr: '', stdout: '1001:1001' };
+      }
+      if (arguments_[0] === 'port') {
+        controller.abort(new Error('cancelled before HTTP verification'));
+        return { failed: false, stderr: '', stdout: '127.0.0.1:49155\n' };
+      }
+
+      return { failed: false, stderr: '', stdout: '' };
+    });
+
+    await expect(
+      smokeContainer({
+        environment: configuredEnvironment,
+        idFactory: () => 'port-race',
+        runDocker,
+        signal: controller.signal,
+        smokeServerImpl
+      })
+    ).rejects.toThrow('cancelled before HTTP verification');
+    expect(smokeServerImpl).not.toHaveBeenCalled();
+  });
 });

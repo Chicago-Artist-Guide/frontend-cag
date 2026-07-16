@@ -79,10 +79,12 @@ const requestWithRetry = async ({
       : { dispose: () => undefined, signal: timeoutSignal };
 
     try {
-      return await fetchImpl(new URL(path, `${baseUrl}/`), {
+      const response = await fetchImpl(new URL(path, `${baseUrl}/`), {
         signal: requestSignal.signal
       });
+      return { dispose: requestSignal.dispose, response };
     } catch (error) {
+      requestSignal.dispose();
       if (signal?.aborted) {
         throw abortError(signal);
       }
@@ -91,8 +93,6 @@ const requestWithRetry = async ({
       if (attempt < attempts) {
         await wait(delayMs, signal);
       }
-    } finally {
-      requestSignal.dispose();
     }
   }
 
@@ -110,28 +110,36 @@ const requireSuccess = (path, response) => {
 };
 
 const checkHealth = async (options, path, expectedStatus) => {
-  const response = await requestWithRetry({ ...options, path });
-  requireSuccess(path, response);
+  const { dispose, response } = await requestWithRetry({ ...options, path });
+  try {
+    requireSuccess(path, response);
 
-  const body = await response.json();
-  if (body.status !== expectedStatus) {
-    throw new Error(
-      `${path} returned status ${JSON.stringify(body.status)}; expected ${JSON.stringify(expectedStatus)}`
-    );
+    const body = await response.json();
+    if (body.status !== expectedStatus) {
+      throw new Error(
+        `${path} returned status ${JSON.stringify(body.status)}; expected ${JSON.stringify(expectedStatus)}`
+      );
+    }
+  } finally {
+    dispose();
   }
 };
 
 const checkHtml = async (options, path) => {
-  const response = await requestWithRetry({ ...options, path });
-  requireSuccess(path, response);
+  const { dispose, response } = await requestWithRetry({ ...options, path });
+  try {
+    requireSuccess(path, response);
 
-  const contentType = response.headers.get('content-type') || '';
-  const body = await response.text();
-  if (!contentType.includes('text/html') || !/<html[\s>]/i.test(body)) {
-    throw new Error(`${path} did not return an HTML application shell`);
+    const contentType = response.headers.get('content-type') || '';
+    const body = await response.text();
+    if (!contentType.includes('text/html') || !/<html[\s>]/i.test(body)) {
+      throw new Error(`${path} did not return an HTML application shell`);
+    }
+
+    return body;
+  } finally {
+    dispose();
   }
-
-  return body;
 };
 
 const findStaticPath = (html) => {
@@ -177,11 +185,15 @@ export const smokeServer = async ({
     );
   }
 
-  const staticResponse = await requestWithRetry({
+  const { dispose, response: staticResponse } = await requestWithRetry({
     ...options,
     path: staticPath
   });
-  requireSuccess(staticPath, staticResponse);
+  try {
+    requireSuccess(staticPath, staticResponse);
+  } finally {
+    dispose();
+  }
 };
 
 const isMainModule =
