@@ -23,6 +23,7 @@ const Profile: React.FC<
 > = ({ previewMode = false }) => {
   const navigate = useNavigate();
   const { accountId } = useParams<{ accountId?: string }>();
+  const isPublicView = Boolean(accountId);
   const auth = getAuth();
   const { account, setAccountData, profile, setProfileData } = useUserContext();
   const [loading, setLoading] = useState(true);
@@ -163,12 +164,18 @@ const Profile: React.FC<
     viewingOtherProfile && viewedAccount ? viewedAccount : account.data;
 
   if (displayAccount?.type === 'company') {
-    return <CompanyProfile previewMode={previewMode || viewingOtherProfile} />;
+    return (
+      <CompanyProfile
+        previewMode={previewMode || isPublicView || viewingOtherProfile}
+      />
+    );
   }
 
   if (displayAccount?.type === 'individual') {
     return (
-      <IndividualProfile previewMode={previewMode || viewingOtherProfile} />
+      <IndividualProfile
+        previewMode={previewMode || isPublicView || viewingOtherProfile}
+      />
     );
   }
 
