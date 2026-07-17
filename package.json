@@ -33,6 +33,7 @@
     "vr:typecheck": "tsc -p scripts/visual-regression/tsconfig.json --noEmit",
     "vr:auth": "tsx scripts/visual-regression/auth-setup.ts",
     "vr:baseline": "tsx scripts/visual-regression/capture.ts baseline",
+    "vr:calibrate": "tsx scripts/visual-regression/calibrate.ts",
     "vr:capture": "tsx scripts/visual-regression/capture.ts capture",
     "vr:diff": "tsx scripts/visual-regression/diff.ts",
     "vr:report": "tsx scripts/visual-regression/report.ts",
