@@ -168,6 +168,19 @@ export function parseVisualArgs(
   const outputBucket = outputBucketFor(command, values.get('bucket'));
   if (outputBucket !== undefined) args.outputBucket = outputBucket;
 
+  const commandFlags: Record<VisualCommand, ReadonlySet<string>> = {
+    baseline: new Set(['bucket', 'cluster', 'only', 'target', 'viewport']),
+    capture: new Set(['bucket', 'cluster', 'only', 'target', 'viewport']),
+    diff: new Set(['threshold']),
+    report: new Set(),
+    verify: new Set(['cluster', 'only', 'target', 'threshold', 'viewport'])
+  };
+  for (const flag of values.keys()) {
+    if (!commandFlags[command].has(flag)) {
+      throw new Error(`${command} does not accept --${flag}`);
+    }
+  }
+
   const clusterValue = values.get('cluster');
   if (clusterValue !== undefined) {
     args.clusters = assertAllowedValues(

@@ -1,0 +1,1083 @@
+import {
+  lstat,
+  mkdir,
+  readFile,
+  realpath,
+  rename,
+  rm,
+  writeFile
+} from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import pixelmatch from 'pixelmatch';
+import { PNG } from 'pngjs';
+import type {
+  CaptureCaseSummaryV1,
+  CaptureErrorV1,
+  CaptureSummaryV1
+} from './capture-core';
+import {
+  selectVisualCases,
+  type BaselinePolicy,
+  type RouteEntry,
+  type VisualCase
+} from './manifest';
+
+export type EvidenceState = 'invalid' | 'missing' | 'read-error' | 'valid';
+export type ComparisonState = 'changed' | 'identical' | 'not-run';
+export type GateVerdict = 'fail' | 'not-enforced' | 'pass';
+
+export type PngEvidenceInput =
+  | { bytes: Buffer; kind: 'bytes' }
+  | { kind: 'missing' }
+  | { kind: 'read-error'; message: string };
+
+export interface DiffIssue {
+  code: string;
+  message: string;
+  scope: 'baseline' | 'capture' | 'comparison' | 'current' | 'policy' | 'run';
+}
+
+export interface ImageDimensions {
+  height: number;
+  width: number;
+}
+
+export interface DiffResult {
+  auth: CaptureCaseSummaryV1['auth'];
+  baselineAsset?: string;
+  baselineDimensions: ImageDimensions | null;
+  baselineEvidence: EvidenceState;
+  baselinePolicy: BaselinePolicy;
+  comparison: ComparisonState;
+  currentAsset?: string;
+  currentDimensions: ImageDimensions | null;
+  currentEvidence: EvidenceState;
+  diffAsset?: string;
+  diffPixels: number;
+  dimensionsMatch: boolean | null;
+  gateVerdict: GateVerdict;
+  id: string;
+  issues: DiffIssue[];
+  path: string;
+  ratio: number | null;
+  totalPixels: number;
+  verdict: 'fail' | 'pass';
+  viewport: CaptureCaseSummaryV1['viewport'];
+}
+
+export interface ComparePngCaseOptions {
+  baselineBytes: PngEvidenceInput;
+  captureResult: CaptureCaseSummaryV1;
+  currentBytes: PngEvidenceInput;
+  maxDiffRatio: number;
+  pixelSensitivity: number;
+  visualCase: VisualCase;
+}
+
+export interface ComparePngCaseResult {
+  diffPng?: Buffer;
+  result: DiffResult;
+}
+
+interface DecodedEvidence {
+  dimensions: ImageDimensions | null;
+  image?: PNG;
+  issue?: DiffIssue;
+  state: EvidenceState;
+}
+
+const evidenceIssue = (
+  code: string,
+  message: string,
+  scope: DiffIssue['scope']
+): DiffIssue => ({ code, message, scope });
+
+const decodeEvidence = (
+  input: PngEvidenceInput,
+  side: 'baseline' | 'current'
+): DecodedEvidence => {
+  if (input.kind === 'missing') {
+    return {
+      dimensions: null,
+      issue: evidenceIssue(`missing-${side}`, `${side} PNG is missing`, side),
+      state: 'missing'
+    };
+  }
+  if (input.kind === 'read-error') {
+    return {
+      dimensions: null,
+      issue: evidenceIssue(
+        `${side}-read-error`,
+        `${side} PNG could not be read: ${input.message}`,
+        side
+      ),
+      state: 'read-error'
+    };
+  }
+  try {
+    const image = PNG.sync.read(input.bytes);
+    if (image.width <= 0 || image.height <= 0) {
+      throw new Error('PNG dimensions must be positive');
+    }
+    return {
+      dimensions: { height: image.height, width: image.width },
+      image,
+      state: 'valid'
+    };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return {
+      dimensions: null,
+      issue: evidenceIssue(
+        `invalid-${side}`,
+        `${side} PNG is invalid: ${message}`,
+        side
+      ),
+      state: 'invalid'
+    };
+  }
+};
+
+const padTo = (source: PNG, width: number, height: number): PNG => {
+  if (source.width === width && source.height === height) return source;
+  const output = new PNG({ height, width });
+  output.data.fill(0);
+  for (let row = 0; row < source.height; row += 1) {
+    const sourceStart = row * source.width * 4;
+    source.data.copy(
+      output.data,
+      row * width * 4,
+      sourceStart,
+      sourceStart + source.width * 4
+    );
+  }
+  return output;
+};
+
+const policyGateVerdict = (
+  policy: BaselinePolicy,
+  evidenceFault: boolean,
+  factualFailure: boolean
+): GateVerdict => {
+  if (policy.kind === 'missing' || evidenceFault) return 'fail';
+  if (!factualFailure) return 'pass';
+  return policy.kind === 'reference-only' ? 'not-enforced' : 'fail';
+};
+
+export function comparePngCase(
+  options: ComparePngCaseOptions
+): ComparePngCaseResult {
+  const baseline = decodeEvidence(options.baselineBytes, 'baseline');
+  const captureFailed = options.captureResult.status === 'failed';
+  const current = captureFailed
+    ? { dimensions: null, state: 'missing' as const }
+    : decodeEvidence(options.currentBytes, 'current');
+  const issues: DiffIssue[] = [];
+  if (baseline.issue) issues.push(baseline.issue);
+  if (!captureFailed && current.issue) issues.push(current.issue);
+  if (captureFailed) {
+    issues.push(
+      evidenceIssue(
+        'capture-failed',
+        options.captureResult.error?.message ?? 'capture failed',
+        'capture'
+      )
+    );
+  }
+
+  if (options.visualCase.entry.baselinePolicy.kind === 'missing') {
+    if (baseline.state === 'missing') {
+      issues.push(
+        evidenceIssue(
+          'missing-baseline-policy',
+          options.visualCase.entry.baselinePolicy.reason,
+          'policy'
+        )
+      );
+    } else {
+      issues.push(
+        evidenceIssue(
+          'unexpected-baseline',
+          'baseline exists but its policy has not been promoted',
+          'policy'
+        )
+      );
+    }
+  }
+
+  let comparison: ComparisonState = 'not-run';
+  let diffPixels = 0;
+  let dimensionsMatch: boolean | null = null;
+  let ratio: number | null = null;
+  let totalPixels = 0;
+  let diffPng: Buffer | undefined;
+  if (baseline.image && current.image && !captureFailed) {
+    const width = Math.max(baseline.image.width, current.image.width);
+    const height = Math.max(baseline.image.height, current.image.height);
+    totalPixels = width * height;
+    dimensionsMatch =
+      baseline.image.width === current.image.width &&
+      baseline.image.height === current.image.height;
+    const output = new PNG({ height, width });
+    diffPixels = pixelmatch(
+      padTo(baseline.image, width, height).data,
+      padTo(current.image, width, height).data,
+      output.data,
+      width,
+      height,
+      {
+        includeAA: false,
+        threshold: options.pixelSensitivity
+      }
+    );
+    ratio = diffPixels / totalPixels;
+    comparison = diffPixels === 0 && dimensionsMatch ? 'identical' : 'changed';
+    if (!dimensionsMatch) {
+      issues.push(
+        evidenceIssue(
+          'dimension-mismatch',
+          'baseline and current dimensions differ',
+          'comparison'
+        )
+      );
+    }
+    if (diffPixels > 0) {
+      issues.push(
+        evidenceIssue(
+          'pixel-change',
+          `${diffPixels} of ${totalPixels} pixels differ`,
+          'comparison'
+        )
+      );
+    }
+    if (comparison === 'changed') diffPng = PNG.sync.write(output);
+  }
+
+  const comparisonFailure =
+    dimensionsMatch === false ||
+    (ratio !== null && ratio > options.maxDiffRatio);
+  const evidenceFault =
+    captureFailed || baseline.state !== 'valid' || current.state !== 'valid';
+  const policyFailure =
+    options.visualCase.entry.baselinePolicy.kind === 'missing';
+  const factualFailure = evidenceFault || policyFailure || comparisonFailure;
+  const gateVerdict = policyGateVerdict(
+    options.visualCase.entry.baselinePolicy,
+    evidenceFault,
+    factualFailure
+  );
+
+  return {
+    ...(diffPng ? { diffPng } : {}),
+    result: {
+      auth: options.visualCase.entry.auth,
+      baselineDimensions: baseline.dimensions,
+      baselineEvidence: baseline.state,
+      baselinePolicy: options.visualCase.entry.baselinePolicy,
+      comparison,
+      currentDimensions: current.dimensions,
+      currentEvidence: current.state,
+      diffPixels,
+      dimensionsMatch,
+      gateVerdict,
+      id: options.visualCase.entry.id,
+      issues,
+      path: options.visualCase.entry.path,
+      ratio,
+      totalPixels,
+      verdict: factualFailure ? 'fail' : 'pass',
+      viewport: options.visualCase.viewport
+    }
+  };
+}
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const isFiniteNonNegative = (value: unknown): value is number =>
+  typeof value === 'number' && Number.isFinite(value) && value >= 0;
+
+const requireString = (value: unknown, label: string): string => {
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error(`${label} must be a non-empty string`);
+  }
+  return value;
+};
+
+const policiesEqual = (left: unknown, right: BaselinePolicy): boolean =>
+  isRecord(left) && JSON.stringify(left) === JSON.stringify(right);
+
+const validateSelection = (value: unknown): CaptureSummaryV1['selection'] => {
+  if (!isRecord(value)) throw new Error('capture selection must be an object');
+  const allowed = new Set(['clusters', 'ids', 'target', 'viewports']);
+  for (const key of Object.keys(value)) {
+    if (!allowed.has(key))
+      throw new Error(`unknown capture selection field: ${key}`);
+  }
+  for (const key of ['clusters', 'ids', 'viewports'] as const) {
+    const list = value[key];
+    if (list === undefined) continue;
+    if (
+      !Array.isArray(list) ||
+      list.length === 0 ||
+      list.some((item) => typeof item !== 'string' || item.length === 0) ||
+      new Set(list).size !== list.length
+    ) {
+      throw new Error(
+        `capture selection ${key} must contain unique non-empty strings`
+      );
+    }
+  }
+  if (
+    value.target !== undefined &&
+    (typeof value.target !== 'string' || value.target.trim().length === 0)
+  ) {
+    throw new Error('capture selection target must be a non-empty string');
+  }
+  return value as CaptureSummaryV1['selection'];
+};
+
+const validateCaptureError = (value: unknown, label: string): void => {
+  if (!isRecord(value)) throw new Error(`${label} must be an object`);
+  requireString(value.name, `${label}.name`);
+  requireString(value.message, `${label}.message`);
+};
+
+const validateCaptureRow = (
+  value: unknown,
+  expected: VisualCase,
+  index: number
+): CaptureCaseSummaryV1 => {
+  if (!isRecord(value))
+    throw new Error(`capture case ${index} must be an object`);
+  if (value.id !== expected.entry.id || value.viewport !== expected.viewport) {
+    throw new Error(
+      `capture case ${index} does not match manifest selection order`
+    );
+  }
+  if (value.path !== expected.entry.path)
+    throw new Error('capture case path drift');
+  if (value.auth !== expected.entry.auth)
+    throw new Error('capture case auth drift');
+  if (!policiesEqual(value.baselinePolicy, expected.entry.baselinePolicy)) {
+    throw new Error('capture case baseline policy drift');
+  }
+  if (!isFiniteNonNegative(value.durationMs)) {
+    throw new Error('capture case durationMs must be finite and non-negative');
+  }
+  if (!Array.isArray(value.blockedRequests)) {
+    throw new Error('capture case blockedRequests must be an array');
+  }
+  if (value.finalUrl !== undefined && typeof value.finalUrl !== 'string') {
+    throw new Error('capture case finalUrl must be a string');
+  }
+  if (value.status !== 'passed' && value.status !== 'failed') {
+    throw new Error('capture case status is invalid');
+  }
+  const expectedArtifact = `current/${expected.entry.id}/${expected.viewport}.png`;
+  if (value.status === 'passed') {
+    if (value.artifact !== expectedArtifact) {
+      throw new Error(
+        `passed capture case must name exactly ${expectedArtifact}`
+      );
+    }
+    if (value.error !== undefined) {
+      throw new Error('passed capture case must not contain an error');
+    }
+  } else {
+    if (value.artifact !== undefined) {
+      throw new Error('failed capture case must not name an artifact');
+    }
+    validateCaptureError(value.error, 'failed capture case error');
+  }
+  return value as unknown as CaptureCaseSummaryV1;
+};
+
+export function validateCaptureSummary(
+  value: unknown,
+  manifest: readonly RouteEntry[]
+): CaptureSummaryV1 {
+  if (!isRecord(value)) throw new Error('capture summary must be an object');
+  if (value.schemaVersion !== 1)
+    throw new Error('capture summary schema version must be 1');
+  if (value.command !== 'capture')
+    throw new Error('capture summary command must be capture');
+  if (value.outputBucket !== 'current')
+    throw new Error('capture summary output bucket must be current');
+  requireString(value.baseUrl, 'capture summary baseUrl');
+  requireString(value.startedAt, 'capture summary startedAt');
+  requireString(value.finishedAt, 'capture summary finishedAt');
+  if (!isRecord(value.runtime))
+    throw new Error('capture summary runtime must be an object');
+  requireString(value.runtime.node, 'capture runtime node');
+  requireString(value.runtime.os, 'capture runtime os');
+  if (
+    value.runtime.browser !== undefined &&
+    typeof value.runtime.browser !== 'string'
+  ) {
+    throw new Error('capture runtime browser must be a string');
+  }
+  const selection = validateSelection(value.selection);
+  const expectedCases = selectVisualCases(manifest, selection);
+  if (
+    !Array.isArray(value.cases) ||
+    value.cases.length !== expectedCases.length
+  ) {
+    throw new Error(
+      'capture summary case count does not match manifest selection'
+    );
+  }
+  const rows = value.cases.map((row, index) =>
+    validateCaptureRow(row, expectedCases[index], index)
+  );
+  const keys = rows.map(({ id, viewport }) => `${id}\0${viewport}`);
+  if (new Set(keys).size !== keys.length)
+    throw new Error('duplicate capture case');
+  if (!Array.isArray(value.runErrors))
+    throw new Error('capture summary runErrors must be an array');
+  for (const runError of value.runErrors) {
+    validateCaptureError(runError, 'capture run error');
+    if (
+      !isRecord(runError) ||
+      (runError.phase !== 'prepare' && runError.phase !== 'cleanup')
+    ) {
+      throw new Error('capture run error phase is invalid');
+    }
+  }
+  if (!isRecord(value.totals))
+    throw new Error('capture summary totals must be an object');
+  const passed = rows.filter(({ status }) => status === 'passed').length;
+  const failed = rows.filter(({ status }) => status === 'failed').length;
+  if (
+    value.totals.selected !== rows.length ||
+    value.totals.passed !== passed ||
+    value.totals.failed !== failed
+  ) {
+    throw new Error('capture summary totals drift');
+  }
+  const status = failed > 0 || value.runErrors.length > 0 ? 'failed' : 'passed';
+  if (value.status !== status) throw new Error('capture summary status drift');
+  return value as unknown as CaptureSummaryV1;
+}
+
+export interface DiffRunErrorV1 extends CaptureErrorV1 {
+  phase: 'asset-tree' | 'capture-summary';
+}
+
+export interface DiffSummaryV1 {
+  capture: CaptureSummaryV1 | null;
+  finishedAt: string;
+  gateVerdict: 'fail' | 'pass';
+  maxDiffRatio: number;
+  pixelSensitivity: number;
+  results: DiffResult[];
+  runErrors: DiffRunErrorV1[];
+  schemaVersion: 1;
+  startedAt: string;
+  totals: {
+    failed: number;
+    notEnforced: number;
+    passed: number;
+    selected: number;
+  };
+}
+
+export interface DiffPaths {
+  artifactDir: string;
+  baselineDir: string;
+  captureSummary: string;
+  currentDir: string;
+  diffDir: string;
+  reportFile: string;
+  summaryFile: string;
+}
+
+export interface RunDiffOptions {
+  manifest: readonly RouteEntry[];
+  maxDiffRatio: number;
+  paths: DiffPaths;
+  pixelSensitivity: number;
+  readBytes?: (file: string) => Promise<Buffer>;
+}
+
+export interface DiffRunResult {
+  exitCode: 0 | 1;
+  summary: DiffSummaryV1;
+}
+
+const isPortableReportAsset = (
+  value: unknown,
+  bucket: 'baseline' | 'current' | 'diff',
+  result: Pick<DiffResult, 'id' | 'viewport'>
+): boolean =>
+  value === undefined ||
+  value === `report-assets/${bucket}/${result.id}/${result.viewport}.png`;
+
+const validateDimensions = (
+  value: unknown,
+  evidence: EvidenceState,
+  label: string
+): void => {
+  if (evidence !== 'valid') {
+    if (value !== null) throw new Error(`${label} dimensions must be null`);
+    return;
+  }
+  if (
+    !isRecord(value) ||
+    !Number.isInteger(value.width) ||
+    !Number.isInteger(value.height) ||
+    (value.width as number) <= 0 ||
+    (value.height as number) <= 0
+  ) {
+    throw new Error(`${label} dimensions are invalid`);
+  }
+};
+
+const validateResultPolicy = (value: unknown): BaselinePolicy => {
+  if (!isRecord(value)) throw new Error('diff result policy must be an object');
+  if (value.kind === 'blocking-candidate') {
+    return { kind: 'blocking-candidate' };
+  }
+  if (
+    (value.kind === 'reference-only' || value.kind === 'missing') &&
+    typeof value.reason === 'string' &&
+    value.reason.trim().length > 0
+  ) {
+    return { kind: value.kind, reason: value.reason };
+  }
+  throw new Error('diff result policy is invalid');
+};
+
+export function validateDiffSummary(value: unknown): DiffSummaryV1 {
+  if (!isRecord(value)) throw new Error('diff summary must be an object');
+  if (value.schemaVersion !== 1)
+    throw new Error('diff summary schema version must be 1');
+  if (
+    typeof value.maxDiffRatio !== 'number' ||
+    !Number.isFinite(value.maxDiffRatio) ||
+    value.maxDiffRatio < 0 ||
+    value.maxDiffRatio >= 1
+  ) {
+    throw new Error('diff summary maxDiffRatio is invalid');
+  }
+  if (
+    typeof value.pixelSensitivity !== 'number' ||
+    !Number.isFinite(value.pixelSensitivity) ||
+    value.pixelSensitivity < 0 ||
+    value.pixelSensitivity > 1
+  ) {
+    throw new Error('diff summary pixelSensitivity is invalid');
+  }
+  requireString(value.startedAt, 'diff summary startedAt');
+  requireString(value.finishedAt, 'diff summary finishedAt');
+  if (value.gateVerdict !== 'pass' && value.gateVerdict !== 'fail') {
+    throw new Error('diff summary gate verdict is invalid');
+  }
+  if (!Array.isArray(value.runErrors))
+    throw new Error('diff summary runErrors must be an array');
+  for (const error of value.runErrors) {
+    validateCaptureError(error, 'diff run error');
+    if (
+      !isRecord(error) ||
+      (error.phase !== 'capture-summary' && error.phase !== 'asset-tree')
+    ) {
+      throw new Error('diff run error phase is invalid');
+    }
+  }
+  if (!Array.isArray(value.results))
+    throw new Error('diff summary results must be an array');
+  const results = value.results as unknown as DiffResult[];
+  const keys = new Set<string>();
+  for (const result of results) {
+    if (!isRecord(result)) throw new Error('diff result must be an object');
+    const id = requireString(result.id, 'diff result id');
+    const resultPath = requireString(result.path, 'diff result path');
+    const viewport = requireString(result.viewport, 'diff result viewport');
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(id)) {
+      throw new Error('diff result id is unsafe');
+    }
+    if (
+      !resultPath.startsWith('/') ||
+      resultPath.includes('\\') ||
+      resultPath.includes('?') ||
+      resultPath.includes('#')
+    ) {
+      throw new Error('diff result path is invalid');
+    }
+    if (viewport !== 'desktop' && viewport !== 'mobile') {
+      throw new Error('diff result viewport is invalid');
+    }
+    if (
+      !['admin', 'anonymous', 'company', 'individual'].includes(
+        String(result.auth)
+      )
+    ) {
+      throw new Error('diff result auth is invalid');
+    }
+    const key = `${result.id}\0${result.viewport}`;
+    if (keys.has(key)) throw new Error('duplicate diff result');
+    keys.add(key);
+    if (!Array.isArray(result.issues))
+      throw new Error('diff result issues must be an array');
+    for (const issue of result.issues) {
+      if (!isRecord(issue))
+        throw new Error('diff result issue must be an object');
+      requireString(issue.code, 'diff result issue code');
+      requireString(issue.message, 'diff result issue message');
+      if (
+        ![
+          'baseline',
+          'capture',
+          'comparison',
+          'current',
+          'policy',
+          'run'
+        ].includes(String(issue.scope))
+      ) {
+        throw new Error('diff result issue scope is invalid');
+      }
+    }
+    const baselinePolicy = validateResultPolicy(result.baselinePolicy);
+    if (
+      !['invalid', 'missing', 'read-error', 'valid'].includes(
+        String(result.baselineEvidence)
+      )
+    ) {
+      throw new Error('diff result baseline evidence is invalid');
+    }
+    if (
+      !['invalid', 'missing', 'read-error', 'valid'].includes(
+        String(result.currentEvidence)
+      )
+    ) {
+      throw new Error('diff result current evidence is invalid');
+    }
+    const baselineEvidence = result.baselineEvidence as EvidenceState;
+    const currentEvidence = result.currentEvidence as EvidenceState;
+    validateDimensions(result.baselineDimensions, baselineEvidence, 'baseline');
+    validateDimensions(result.currentDimensions, currentEvidence, 'current');
+    if (!isPortableReportAsset(result.baselineAsset, 'baseline', result)) {
+      throw new Error('diff result baseline asset is not portable');
+    }
+    if (!isPortableReportAsset(result.currentAsset, 'current', result)) {
+      throw new Error('diff result current asset is not portable');
+    }
+    if (!isPortableReportAsset(result.diffAsset, 'diff', result)) {
+      throw new Error('diff result diff asset is not portable');
+    }
+    if (
+      (baselineEvidence === 'valid') !==
+      (result.baselineAsset !== undefined)
+    ) {
+      throw new Error('diff result baseline asset contradicts its evidence');
+    }
+    if ((currentEvidence === 'valid') !== (result.currentAsset !== undefined)) {
+      throw new Error('diff result current asset contradicts its evidence');
+    }
+    if (!['fail', 'not-enforced', 'pass'].includes(result.gateVerdict)) {
+      throw new Error('diff result gate verdict is invalid');
+    }
+    if (!['changed', 'identical', 'not-run'].includes(result.comparison)) {
+      throw new Error('diff result comparison is invalid');
+    }
+    if (result.ratio !== null && !isFiniteNonNegative(result.ratio)) {
+      throw new Error('diff result ratio is invalid');
+    }
+    if (
+      !isFiniteNonNegative(result.diffPixels) ||
+      !isFiniteNonNegative(result.totalPixels)
+    ) {
+      throw new Error('diff result pixel totals are invalid');
+    }
+    if (
+      !Number.isInteger(result.diffPixels) ||
+      !Number.isInteger(result.totalPixels)
+    ) {
+      throw new Error('diff result pixel totals must be integers');
+    }
+    if (result.verdict !== 'pass' && result.verdict !== 'fail') {
+      throw new Error('diff result verdict is invalid');
+    }
+    if (
+      result.dimensionsMatch !== null &&
+      typeof result.dimensionsMatch !== 'boolean'
+    ) {
+      throw new Error('diff result dimensions verdict is invalid');
+    }
+    if (result.comparison === 'not-run') {
+      if (
+        result.ratio !== null ||
+        result.totalPixels !== 0 ||
+        result.diffPixels !== 0 ||
+        result.dimensionsMatch !== null ||
+        result.diffAsset !== undefined
+      ) {
+        throw new Error('not-run diff result contains comparison evidence');
+      }
+    } else {
+      if (
+        result.ratio === null ||
+        result.totalPixels <= 0 ||
+        typeof result.dimensionsMatch !== 'boolean' ||
+        result.ratio !== result.diffPixels / result.totalPixels
+      ) {
+        throw new Error('diff result comparison evidence is inconsistent');
+      }
+      if (
+        (result.comparison === 'changed') !==
+        (result.diffAsset !== undefined)
+      ) {
+        throw new Error('diff result diff asset contradicts its comparison');
+      }
+      if (
+        result.comparison === 'identical' &&
+        (result.diffPixels !== 0 ||
+          result.ratio !== 0 ||
+          !result.dimensionsMatch)
+      ) {
+        throw new Error('identical diff result is inconsistent');
+      }
+    }
+    const evidenceFault =
+      baselineEvidence !== 'valid' || currentEvidence !== 'valid';
+    const comparisonFailure =
+      result.dimensionsMatch === false ||
+      (result.ratio !== null && result.ratio > value.maxDiffRatio);
+    const factualFailure =
+      evidenceFault || baselinePolicy.kind === 'missing' || comparisonFailure;
+    const expectedVerdict = factualFailure ? 'fail' : 'pass';
+    const expectedResultGate = policyGateVerdict(
+      baselinePolicy,
+      evidenceFault,
+      factualFailure
+    );
+    if (
+      result.verdict !== expectedVerdict ||
+      result.gateVerdict !== expectedResultGate
+    ) {
+      throw new Error('diff result verdict drift');
+    }
+  }
+  if (!isRecord(value.totals))
+    throw new Error('diff summary totals must be an object');
+  const totals = resultTotals(results);
+  if (
+    value.totals.selected !== totals.selected ||
+    value.totals.passed !== totals.passed ||
+    value.totals.failed !== totals.failed ||
+    value.totals.notEnforced !== totals.notEnforced
+  ) {
+    throw new Error('diff summary totals drift');
+  }
+  const captureFailed =
+    isRecord(value.capture) && value.capture.status === 'failed';
+  const expectedGate =
+    value.runErrors.length > 0 || captureFailed || totals.failed > 0
+      ? 'fail'
+      : 'pass';
+  if (value.gateVerdict !== expectedGate)
+    throw new Error('diff summary gate verdict drift');
+  if (value.capture !== null) {
+    if (
+      !isRecord(value.capture) ||
+      value.capture.schemaVersion !== 1 ||
+      value.capture.command !== 'capture' ||
+      value.capture.outputBucket !== 'current' ||
+      (value.capture.status !== 'passed' && value.capture.status !== 'failed')
+    ) {
+      throw new Error('diff summary capture metadata is invalid');
+    }
+  } else if (value.runErrors.length === 0) {
+    throw new Error(
+      'diff summary without capture metadata must have a run error'
+    );
+  }
+  return value as unknown as DiffSummaryV1;
+}
+
+const sanitizeError = (error: unknown): CaptureErrorV1 => ({
+  message: error instanceof Error ? error.message : String(error),
+  name: error instanceof Error ? error.name || 'Error' : 'Error'
+});
+
+const isWithin = (root: string, candidate: string): boolean => {
+  const relative = path.relative(root, candidate);
+  return (
+    relative === '' ||
+    (relative !== '..' &&
+      !relative.startsWith(`..${path.sep}`) &&
+      !path.isAbsolute(relative))
+  );
+};
+
+const hasSymlinkBelowRoot = async (
+  file: string,
+  root: string
+): Promise<boolean> => {
+  const resolvedRoot = path.resolve(root);
+  let candidate = path.resolve(file);
+  while (candidate !== resolvedRoot && isWithin(resolvedRoot, candidate)) {
+    try {
+      if ((await lstat(candidate)).isSymbolicLink()) return true;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+    }
+    candidate = path.dirname(candidate);
+  }
+  return false;
+};
+
+const readEvidence = async (
+  file: string,
+  root: string,
+  readBytes: (file: string) => Promise<Buffer>
+): Promise<PngEvidenceInput> => {
+  try {
+    const fileStatus = await lstat(file);
+    if (fileStatus.isSymbolicLink() || !fileStatus.isFile()) {
+      return { kind: 'read-error', message: 'asset must be a regular file' };
+    }
+    const [canonicalRoot, canonicalFile] = await Promise.all([
+      realpath(root),
+      realpath(file)
+    ]);
+    if (!isWithin(canonicalRoot, canonicalFile)) {
+      return {
+        kind: 'read-error',
+        message: 'asset must remain within its approved source root'
+      };
+    }
+    return { bytes: await readBytes(file), kind: 'bytes' };
+  } catch (error) {
+    if (
+      (error as NodeJS.ErrnoException).code === 'ENOENT' &&
+      !(await hasSymlinkBelowRoot(file, root))
+    ) {
+      return { kind: 'missing' };
+    }
+    const problem = error as NodeJS.ErrnoException;
+    return {
+      kind: 'read-error',
+      message: problem.code ?? (error instanceof Error ? error.name : 'Error')
+    };
+  }
+};
+
+const atomicJson = async (file: string, value: unknown): Promise<void> => {
+  await mkdir(path.dirname(file), { recursive: true });
+  const partial = path.join(
+    path.dirname(file),
+    `.${path.basename(file)}.${process.pid}.${Date.now()}.partial`
+  );
+  await writeFile(partial, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  await rename(partial, file);
+};
+
+const resultTotals = (results: readonly DiffResult[]) => ({
+  failed: results.filter(({ gateVerdict }) => gateVerdict === 'fail').length,
+  notEnforced: results.filter(
+    ({ gateVerdict }) => gateVerdict === 'not-enforced'
+  ).length,
+  passed: results.filter(({ gateVerdict }) => gateVerdict === 'pass').length,
+  selected: results.length
+});
+
+export async function runDiff(options: RunDiffOptions): Promise<DiffRunResult> {
+  if (
+    options.paths.summaryFile !==
+      path.join(options.paths.diffDir, 'summary.json') ||
+    options.paths.reportFile !== path.join(options.paths.diffDir, 'report.html')
+  ) {
+    throw new Error(
+      'diff summary and report paths must be exact diff directory children'
+    );
+  }
+  if (
+    !Number.isFinite(options.maxDiffRatio) ||
+    options.maxDiffRatio < 0 ||
+    options.maxDiffRatio >= 1
+  ) {
+    throw new Error('max diff ratio must be in the range [0, 1)');
+  }
+  if (
+    !Number.isFinite(options.pixelSensitivity) ||
+    options.pixelSensitivity < 0 ||
+    options.pixelSensitivity > 1
+  ) {
+    throw new Error('pixel sensitivity must be in the range [0, 1]');
+  }
+  const startedAt = new Date().toISOString();
+  const results: DiffResult[] = [];
+  const runErrors: DiffRunErrorV1[] = [];
+  let capture: CaptureSummaryV1 | null = null;
+  const readBytes = options.readBytes ?? readFile;
+  await mkdir(path.dirname(options.paths.diffDir), { recursive: true });
+  const generationId = `${process.pid}-${randomUUID()}`;
+  const stageRoot = `${options.paths.diffDir}.stage-${generationId}`;
+  const backupRoot = `${options.paths.diffDir}.backup-${generationId}`;
+  const lockRoot = `${options.paths.diffDir}.lock`;
+  await mkdir(lockRoot);
+  try {
+    await mkdir(stageRoot);
+    const stageAssets = path.join(stageRoot, 'report-assets');
+    for (const bucket of ['baseline', 'current', 'diff']) {
+      await mkdir(path.join(stageAssets, bucket), { recursive: true });
+    }
+
+    try {
+      const raw = await readBytes(options.paths.captureSummary);
+      capture = validateCaptureSummary(
+        JSON.parse(raw.toString('utf8')),
+        options.manifest
+      );
+    } catch (error) {
+      const problem = error as NodeJS.ErrnoException;
+      const sanitized = sanitizeError(error);
+      runErrors.push({
+        message:
+          problem.code === 'ENOENT'
+            ? 'capture summary is missing'
+            : sanitized.message
+                .split(options.paths.artifactDir)
+                .join('<artifact-dir>'),
+        name: sanitized.name,
+        phase: 'capture-summary'
+      });
+    }
+
+    if (capture) {
+      const selectedCases = selectVisualCases(
+        options.manifest,
+        capture.selection
+      );
+      for (let index = 0; index < selectedCases.length; index += 1) {
+        const subject = selectedCases[index];
+        const captureResult = capture.cases[index];
+        const caseRelative = `${subject.entry.id}/${subject.viewport}.png`;
+        const baselineSource = path.join(
+          options.paths.baselineDir,
+          subject.entry.id,
+          `${subject.viewport}.png`
+        );
+        const baselineInput = await readEvidence(
+          baselineSource,
+          options.paths.baselineDir,
+          readBytes
+        );
+        const currentInput =
+          captureResult.status === 'failed'
+            ? ({ kind: 'missing' } as const)
+            : await readEvidence(
+                path.join(
+                  options.paths.currentDir,
+                  subject.entry.id,
+                  `${subject.viewport}.png`
+                ),
+                options.paths.currentDir,
+                readBytes
+              );
+        const compared = comparePngCase({
+          baselineBytes: baselineInput,
+          captureResult,
+          currentBytes: currentInput,
+          maxDiffRatio: options.maxDiffRatio,
+          pixelSensitivity: options.pixelSensitivity,
+          visualCase: subject
+        });
+        if (
+          baselineInput.kind === 'bytes' &&
+          compared.result.baselineEvidence === 'valid'
+        ) {
+          compared.result.baselineAsset = `report-assets/baseline/${caseRelative}`;
+          const output = path.join(
+            stageAssets,
+            'baseline',
+            subject.entry.id,
+            `${subject.viewport}.png`
+          );
+          await mkdir(path.dirname(output), { recursive: true });
+          await writeFile(output, baselineInput.bytes);
+        }
+        if (
+          currentInput.kind === 'bytes' &&
+          compared.result.currentEvidence === 'valid'
+        ) {
+          compared.result.currentAsset = `report-assets/current/${caseRelative}`;
+          const output = path.join(
+            stageAssets,
+            'current',
+            subject.entry.id,
+            `${subject.viewport}.png`
+          );
+          await mkdir(path.dirname(output), { recursive: true });
+          await writeFile(output, currentInput.bytes);
+        }
+        if (compared.diffPng) {
+          compared.result.diffAsset = `report-assets/diff/${caseRelative}`;
+          const output = path.join(
+            stageAssets,
+            'diff',
+            subject.entry.id,
+            `${subject.viewport}.png`
+          );
+          await mkdir(path.dirname(output), { recursive: true });
+          await writeFile(output, compared.diffPng);
+        }
+        results.push(compared.result);
+      }
+    }
+
+    const totals = resultTotals(results);
+    const gateVerdict =
+      runErrors.length > 0 || capture?.status === 'failed' || totals.failed > 0
+        ? 'fail'
+        : 'pass';
+    const summary: DiffSummaryV1 = {
+      capture,
+      finishedAt: new Date().toISOString(),
+      gateVerdict,
+      maxDiffRatio: options.maxDiffRatio,
+      pixelSensitivity: options.pixelSensitivity,
+      results,
+      runErrors,
+      schemaVersion: 1,
+      startedAt,
+      totals
+    };
+    await atomicJson(path.join(stageRoot, 'summary.json'), summary);
+
+    let previousGeneration = false;
+    let promotedGeneration = false;
+    try {
+      try {
+        await lstat(options.paths.diffDir);
+        await rename(options.paths.diffDir, backupRoot);
+        previousGeneration = true;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+      }
+      await rename(stageRoot, options.paths.diffDir);
+      promotedGeneration = true;
+      if (previousGeneration) {
+        await rm(backupRoot, { force: true, recursive: true });
+        previousGeneration = false;
+      }
+    } catch (error) {
+      if (promotedGeneration) {
+        await rm(options.paths.diffDir, { force: true, recursive: true });
+      }
+      if (previousGeneration) await rename(backupRoot, options.paths.diffDir);
+      throw error;
+    } finally {
+      await rm(stageRoot, { force: true, recursive: true });
+      await rm(backupRoot, { force: true, recursive: true });
+      await rm(lockRoot, { force: true, recursive: true });
+    }
+    return { exitCode: gateVerdict === 'pass' ? 0 : 1, summary };
+  } finally {
+    await rm(stageRoot, { force: true, recursive: true });
+    await rm(backupRoot, { force: true, recursive: true });
+    await rm(lockRoot, { force: true, recursive: true });
+  }
+}

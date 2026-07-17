@@ -165,6 +165,20 @@ describe('parseVisualArgs', () => {
       ).toBe(Number(threshold));
     }
   );
+
+  it.each([
+    ['diff', '--only=home'],
+    ['diff', '--cluster=public-static'],
+    ['diff', '--target=src/routes/Home.tsx'],
+    ['diff', '--viewport=desktop'],
+    ['report', '--threshold=0.001'],
+    ['report', '--only=home'],
+    ['report', '--target=src/routes/Home.tsx']
+  ] as const)('rejects flags that %s does not own: %s', (command, argument) => {
+    expect(() => parseVisualArgs([argument], command)).toThrow(
+      `${command} does not accept`
+    );
+  });
 });
 
 describe('resolveVisualPaths', () => {
