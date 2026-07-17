@@ -38,7 +38,7 @@ const ProductionPhoto: React.FC<
 
   const onFileChange = (e: any) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && data) {
       setImgUrl(URL.createObjectURL(file));
       const storageRef = ref(
         firebaseStorage,

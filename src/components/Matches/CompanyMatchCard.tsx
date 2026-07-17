@@ -118,7 +118,7 @@ export const CompanyMatchCard = ({
     talentAccountId: string
   ) => {
     const contactEmail = currentUser?.email || NO_EMAIL;
-    const talentFullName = `${account?.data.first_name} ${account?.data.last_name}`;
+    const talentFullName = `${account.data?.first_name} ${account.data?.last_name}`;
     const shortMessage = artistToTheaterMessage(
       roleName || UNKNOWN_ROLE,
       productionName,

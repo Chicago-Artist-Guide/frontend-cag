@@ -58,20 +58,20 @@ export const TalentMatchCard = ({
     talentAccountId: string
   ) => {
     const contactEmail =
-      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL;
+      userProfile.data?.primary_contact_email || currentUser?.email || NO_EMAIL;
     const shortMessage = theaterToArtistMessage(
       roleName,
       productionName,
       contactEmail
     );
     const emailText = theaterToArtistEmailText(
-      userProfile?.data.theatre_name,
+      userProfile.data?.theatre_name || '',
       roleName,
       productionName,
       contactEmail
     );
     const emailHtml = theaterToArtistEmailHtml(
-      userProfile?.data.theatre_name,
+      userProfile.data?.theatre_name || '',
       roleName,
       productionName,
       contactEmail

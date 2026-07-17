@@ -57,20 +57,18 @@ const mockGetProfileById = vi.mocked(getProfileById);
 const buildUserContext = (type: 'company' | 'individual'): UserContextType => ({
   account: {
     data: { type, uid: 'auth-owner' },
-    id: 'account-1',
-    ref: null
+    id: 'account-1'
   },
   currentUser: null,
   profile: {
     data: { account_id: 'account-1', uid: 'auth-owner' },
-    id: 'profile-1',
-    ref: null
+    id: 'profile-1'
   },
+  setAccount: vi.fn(),
   setAccountData: vi.fn(),
-  setAccountRef: vi.fn(),
   setCurrentUser: vi.fn(),
-  setProfileData: vi.fn(),
-  setProfileRef: vi.fn()
+  setProfile: vi.fn(),
+  setProfileData: vi.fn()
 });
 
 const renderOwnerProfile = async (type: 'company' | 'individual') => {

@@ -11,6 +11,7 @@ import { Production } from '../components/Profile/Company/types';
 import { getProduction } from '../components/Profile/Company/api';
 import { fetchRolesForTalent } from '../components/Matches/api';
 import { ProductionRole, RoleMatchFilters } from '../components/Matches/types';
+import type { IndividualProfileDataFullInit } from '../components/SignUp/Individual/types';
 
 interface RoleMatchContextValue {
   productions: { [key: string]: Production };
@@ -60,7 +61,16 @@ export const RoleMatchProvider: React.FC<
     const profileData = profile.data;
 
     setLoading(true);
-    fetchRolesForTalent(firestore, profileData).then((filteredRoles) => {
+    if (!profileData) {
+      setRoles([]);
+      setLoading(false);
+      return;
+    }
+
+    fetchRolesForTalent(
+      firestore,
+      profileData as IndividualProfileDataFullInit
+    ).then((filteredRoles) => {
       setRoles(filteredRoles);
       setLoading(false);
     });

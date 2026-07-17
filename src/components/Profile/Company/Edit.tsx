@@ -41,9 +41,13 @@ const CompanyProfileEdit: React.FC<
   } = useUserContext();
   // Initialize form values directly from data - no useEffect needed
   const [formValues, setFormValues] = useForm<Profile>(
-    data || {
+    (data as Profile | null) || {
       additional_photos: {},
-      awards: []
+      awards: [],
+      account_id: '',
+      complete_profile: false,
+      theatre_name: '',
+      uid: ''
     }
   );
   const locations = [

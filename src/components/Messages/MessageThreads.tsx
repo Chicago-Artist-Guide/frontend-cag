@@ -46,12 +46,12 @@ const MessageThreads: React.FC<
       const data = await Promise.all(
         threads.map(async (thread) => {
           const whichStatus =
-            account.data.type === 'company'
+            account.data?.type === 'company'
               ? thread.theater_status
               : thread.talent_status;
           const statusNew = whichStatus === 'new';
           const recipientIdRef =
-            account.data.type === 'company'
+            account.data?.type === 'company'
               ? thread.talent_account_id
               : thread.theater_account_id;
           const recipientId =
@@ -63,7 +63,7 @@ const MessageThreads: React.FC<
           const getRecipientProfile =
             await findProfileByUidOrAccountId(recipientId);
           const recipientName =
-            account.data.type === 'company'
+            account.data?.type === 'company'
               ? await getAccountDisplayName(recipientId)
               : await getTheaterDisplayNameByUid(recipientId);
 

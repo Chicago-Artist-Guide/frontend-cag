@@ -57,7 +57,7 @@ export const MessageThread: React.FC<
 
   const loadRecipientNameForThread = async (recipientId: string) => {
     const recipientName =
-      account.data.type === 'company'
+      account.data?.type === 'company'
         ? await getAccountDisplayName(recipientId)
         : await getTheaterDisplayNameByUid(recipientId);
 
@@ -98,7 +98,7 @@ export const MessageThread: React.FC<
     const productionName = production?.production_name || UNKNOWN_PRODUCTION;
     const messageEmailAddress =
       accountTypeForMatch === 'theater'
-        ? profile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+        ? profile.data?.primary_contact_email || currentUser?.email || NO_EMAIL
         : currentUser?.email || NO_EMAIL;
 
     return accountTypeForMatch === 'theater'
@@ -111,12 +111,12 @@ export const MessageThread: React.FC<
     const productionName = production?.production_name || UNKNOWN_PRODUCTION;
     const messageEmailAddress =
       accountTypeForMatch === 'theater'
-        ? profile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+        ? profile.data?.primary_contact_email || currentUser?.email || NO_EMAIL
         : currentUser?.email || NO_EMAIL;
 
     if (accountTypeForMatch === 'theater') {
       const theaterName =
-        profile.data.theatre_name || production?.theater_name || 'Theater';
+        profile.data?.theatre_name || production?.theater_name || 'Theater';
 
       return {
         text: theaterToArtistEmailText(
@@ -135,7 +135,7 @@ export const MessageThread: React.FC<
     }
 
     const talentFullName =
-      `${profile.data.first_name || ''} ${profile.data.last_name || ''}`.trim() ||
+      `${profile.data?.first_name || ''} ${profile.data?.last_name || ''}`.trim() ||
       'Artist';
 
     return {

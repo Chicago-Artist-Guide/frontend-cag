@@ -140,19 +140,19 @@ const buildUserContextValue = (
 ): UserContextType => ({
   account: {
     id: 'account-1',
-    ref: null,
     data: {
+      uid: 'user-1',
+      type: 'individual',
       first_name: 'Casey',
       last_name: 'Artist'
     }
   },
-  setAccountRef: vi.fn(),
+  setAccount: vi.fn(),
   profile: {
     id: 'profile-1',
-    ref: null,
     data: profileData
   },
-  setProfileRef: vi.fn(),
+  setProfile: vi.fn(),
   setAccountData: vi.fn(),
   setProfileData: vi.fn(),
   currentUser: null,

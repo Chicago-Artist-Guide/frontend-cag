@@ -37,12 +37,12 @@ const profileData = {
 const buildContext = (
   profileId: string | null = 'profile-1'
 ): UserContextType => ({
-  account: { id: 'account-1', ref: null, data: {} },
+  account: { id: 'account-1', data: { uid: 'user-1', type: 'company' } },
+  setAccount: vi.fn(),
   setAccountData: vi.fn(),
-  setAccountRef: vi.fn(),
-  profile: { id: profileId, ref: null, data: profileData },
+  profile: { id: profileId, data: profileData },
+  setProfile: vi.fn(),
   setProfileData: vi.fn(),
-  setProfileRef: vi.fn(),
   currentUser: null,
   setCurrentUser: vi.fn()
 });

@@ -7,12 +7,13 @@ import { useFirebaseContext } from '../context/FirebaseContext';
 import { MatchProvider } from '../context/MatchContext';
 import { RoleMatchProvider } from '../context/RoleMatchContext';
 import { useUserContext } from '../context/UserContext';
+import type { AccountType } from '../services/accounts/types';
 
 const Matches = () => {
   const { firebaseFirestore } = useFirebaseContext();
   const { productionId, roleId } = useParams();
   const { account } = useUserContext();
-  const [accountType, setAccountType] = useState(null);
+  const [accountType, setAccountType] = useState<AccountType | null>(null);
 
   useEffect(() => {
     const accountData = account?.data;

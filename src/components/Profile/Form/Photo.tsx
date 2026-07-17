@@ -6,7 +6,6 @@ import ResponsiveImageUpload from '../../shared/ResponsiveImageUpload';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useUserContext } from '../../../context/UserContext';
 import { breakpoints } from '../../../theme/styleVars';
-import { Profile } from '../Company/types';
 
 const FormPhoto: React.FC<
   React.PropsWithChildren<{
@@ -18,7 +17,7 @@ const FormPhoto: React.FC<
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
-  }: { profile: { data: Profile } } = useUserContext();
+  } = useUserContext();
   const [currentImageUrl, setCurrentImageUrl] = useState<string | undefined>(
     src
   );

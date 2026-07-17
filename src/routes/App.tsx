@@ -20,29 +20,29 @@ const App = () => {
   const {
     account,
     profile,
-    setAccountRef,
+    setAccount,
     setAccountData,
-    setProfileRef,
+    setProfile,
     setProfileData
-  } = useProfileData(currentUser, firestore);
+  } = useProfileData(currentUser);
 
   const userContextValue = useMemo(
     () => ({
       account,
-      setAccountRef,
+      setAccount,
       setAccountData,
       profile,
-      setProfileRef,
+      setProfile,
       setProfileData,
       currentUser,
       setCurrentUser
     }),
     [
       account,
-      setAccountRef,
+      setAccount,
       setAccountData,
       profile,
-      setProfileRef,
+      setProfile,
       setProfileData,
       currentUser,
       setCurrentUser

@@ -1,11 +1,15 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { useUserContext } from '../../../context/UserContext';
+import { createAccount } from '../../../services/accounts/client';
+import {
+  createProfile,
+  updateProfile
+} from '../../../services/profiles/client';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
 import CompanyBasics from './Basics';
@@ -27,8 +31,8 @@ const CompanySignUp: React.FC<
     setCurrentStep: (x: number) => void;
   }>
 > = ({ currentStep, setCurrentStep }) => {
-  const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { profile, setAccountRef, setProfileRef } = useUserContext();
+  const { firebaseAuth } = useFirebaseContext();
+  const { profile, setAccount, setProfile } = useUserContext();
   const { lglApiKey } = useMarketingContext();
   const [formValues, setFormValues] = useForm<CompanyData>(defaultFormState);
   const [stepErrors, setStepErrors] = useState(defaultErrorState);
@@ -61,7 +65,7 @@ const CompanySignUp: React.FC<
 
     try {
       const userId = userResponse.user.uid;
-      const account = await addDoc(collection(firebaseFirestore, 'accounts'), {
+      const account = await createAccount({
         uid: userId,
         type: 'company',
         email: emailAddress,
@@ -69,13 +73,13 @@ const CompanySignUp: React.FC<
         privacy_agreement: true
       });
 
-      const profile = await addDoc(collection(firebaseFirestore, 'profiles'), {
+      const createdProfile = await createProfile({
         uid: userId,
         account_id: account.id
       });
 
-      setAccountRef(account);
-      setProfileRef(profile);
+      setAccount(account);
+      setProfile(createdProfile);
 
       // submit to marketing
       await submitLGLConstituent({
@@ -95,8 +99,8 @@ const CompanySignUp: React.FC<
   };
 
   const completeSignUp = async () => {
-    if (profile.ref) {
-      await updateDoc(profile.ref, {
+    if (profile.id) {
+      await updateProfile(profile.id, {
         theatre_name: formValues.theatreName,
         number_of_members: formValues.numberOfMembers,
         primary_contact: formValues.primaryContact,

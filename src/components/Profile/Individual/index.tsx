@@ -72,8 +72,12 @@ const IndividualProfile: React.FC<
     awards: false,
     offstage_roles: false
   });
-  const [editProfile, setEditProfile] = useState(profile?.data);
-  const [editAccount, setEditAccount] = useState(account?.data);
+  const [editProfile, setEditProfile] = useState<IndividualProfileDataFullInit>(
+    profile.data as IndividualProfileDataFullInit
+  );
+  const [editAccount, setEditAccount] = useState<IndividualAccountInit>(
+    account.data as IndividualAccountInit
+  );
 
   // websites
   const [websiteId, setWebsiteId] = useState(1);
@@ -90,9 +94,7 @@ const IndividualProfile: React.FC<
   const [skillTags, setTags] = useState([
     ...(editProfile?.additional_skills_manual || [])
   ] as string[]);
-  const [trainings] = useState([
-    ...(editProfile?.training_institutions || [])
-  ] as string[]);
+  const [trainings] = useState([...(editProfile?.training_institutions || [])]);
   const [isKeyReleased, setIsKeyReleased] = useState(false);
 
   // awards
@@ -196,9 +198,9 @@ const IndividualProfile: React.FC<
             ? [profileData.union_status]
             : profileData.union_status || []
       };
-      setEditProfile(normalizedProfile);
+      setEditProfile(normalizedProfile as IndividualProfileDataFullInit);
     } else {
-      setEditProfile(profileData);
+      setEditProfile(profileData as unknown as IndividualProfileDataFullInit);
     }
 
     updatePerformanceState();
@@ -1110,7 +1112,7 @@ const IndividualProfile: React.FC<
               <>
                 <HeaderNamePronouns>
                   <h2>
-                    {account?.data.first_name} {account?.data.last_name}
+                    {account.data?.first_name} {account.data?.last_name}
                   </h2>
                   <p>
                     {profile?.data?.pronouns || profile?.data?.pronouns_other}
@@ -1259,7 +1261,7 @@ const IndividualProfile: React.FC<
                 {hasNonEmptyValues(profile?.data?.upcoming_performances) && (
                   <DetailSection title="Upcoming Features">
                     <Features
-                      features={profile.data.upcoming_performances}
+                      features={profile.data?.upcoming_performances || []}
                       emptyPlaceholder=""
                     />
                   </DetailSection>
@@ -1349,7 +1351,7 @@ const IndividualProfile: React.FC<
                 {hasNonEmptyValues(profile?.data?.past_performances) && (
                   <DetailSection title="Previous Productions">
                     <Features
-                      features={profile.data.past_performances}
+                      features={profile.data?.past_performances || []}
                       emptyPlaceholder=""
                     />
                   </DetailSection>
