@@ -5,38 +5,47 @@ import {
 } from './route-contract';
 
 describe('route contract', () => {
-  it('contains each current public URL exactly once', () => {
-    expect(applicationRoutes.map(({ path }) => path)).toEqual([
-      '/home',
-      '/donate',
-      '/faq',
-      '/terms-of-service',
-      '/privacy-policy',
-      '/about-us',
-      '/theatre-resources',
-      '/roles',
-      '/shows',
-      '/shows/smoke-production',
-      '/events',
-      '/get-involved',
-      '/login',
-      '/logout',
-      '/forgot-password',
-      '/sign-up',
-      '/profile',
-      '/profile/view/smoke-account',
-      '/profile/messages',
-      '/profile/messages/smoke-thread',
-      '/profile/search/roles',
-      '/profile/search/talent/smoke-production',
-      '/profile/search/talent/smoke-production/smoke-role',
-      '/production/smoke-production/manage',
-      '/admin',
-      '/admin/analytics',
-      '/admin/users',
-      '/admin/openings',
-      '/admin/events',
-      '/admin/companies'
+  it('contains each current application URL exactly once', () => {
+    expect(applicationRoutes).toEqual([
+      { path: '/home', routeClass: 'public' },
+      { path: '/donate', routeClass: 'public' },
+      { path: '/faq', routeClass: 'public' },
+      { path: '/terms-of-service', routeClass: 'public' },
+      { path: '/privacy-policy', routeClass: 'public' },
+      { path: '/about-us', routeClass: 'public' },
+      { path: '/theatre-resources', routeClass: 'public' },
+      { path: '/roles', routeClass: 'public' },
+      { path: '/shows', routeClass: 'public' },
+      { path: '/shows/smoke-production', routeClass: 'public' },
+      { path: '/events', routeClass: 'public' },
+      { path: '/get-involved', routeClass: 'public' },
+      { path: '/login', routeClass: 'account' },
+      { path: '/logout', routeClass: 'account' },
+      { path: '/forgot-password', routeClass: 'account' },
+      { path: '/sign-up', routeClass: 'account' },
+      { path: '/profile', routeClass: 'account' },
+      { path: '/profile/view/smoke-account', routeClass: 'account' },
+      { path: '/profile/messages', routeClass: 'account' },
+      { path: '/profile/messages/smoke-thread', routeClass: 'account' },
+      { path: '/profile/search/roles', routeClass: 'account' },
+      {
+        path: '/profile/search/talent/smoke-production',
+        routeClass: 'account'
+      },
+      {
+        path: '/profile/search/talent/smoke-production/smoke-role',
+        routeClass: 'account'
+      },
+      {
+        path: '/production/smoke-production/manage',
+        routeClass: 'account'
+      },
+      { path: '/admin', routeClass: 'admin' },
+      { path: '/admin/analytics', routeClass: 'admin' },
+      { path: '/admin/users', routeClass: 'admin' },
+      { path: '/admin/openings', routeClass: 'admin' },
+      { path: '/admin/events', routeClass: 'admin' },
+      { path: '/admin/companies', routeClass: 'admin' }
     ]);
   });
 
@@ -57,5 +66,14 @@ describe('route contract', () => {
       '/production/smoke-production/manage',
       '/admin/analytics'
     ]);
+
+    const smokeRouteClasses = smokeHtmlRoutes.map(
+      (smokePath) =>
+        applicationRoutes.find(({ path }) => path === smokePath)?.routeClass
+    );
+
+    expect(new Set(smokeRouteClasses)).toEqual(
+      new Set(['public', 'account', 'admin'])
+    );
   });
 });

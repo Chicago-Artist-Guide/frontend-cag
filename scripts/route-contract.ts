@@ -41,10 +41,15 @@ export const applicationRoutes = [
   { path: '/admin/companies', routeClass: 'admin' }
 ] as const satisfies readonly ApplicationRoute[];
 
+export type ApplicationPath = (typeof applicationRoutes)[number]['path'];
+
 export const redirectRoutes = [
   { destination: '/home', path: '/' },
   { destination: '/admin/analytics', path: '/analytics' }
-] as const;
+] as const satisfies readonly {
+  destination: ApplicationPath;
+  path: '/' | '/analytics';
+}[];
 
 export const smokeHtmlRoutes = [
   '/home',
@@ -54,4 +59,4 @@ export const smokeHtmlRoutes = [
   '/profile/search/talent/smoke-production/smoke-role',
   '/production/smoke-production/manage',
   '/admin/analytics'
-] as const;
+] as const satisfies readonly ApplicationPath[];
