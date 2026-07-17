@@ -1,8 +1,13 @@
 # CDK/Fargate Delivery Design
 
+> **Application migration update:**
+> `2026-07-16-nextjs-wholesale-migration-design.md` governs the application
+> migration and service-layer design. The infrastructure and delivery
+> decisions below remain current.
+
 ## Goal
 
-Make the Next.js compatibility host reproducible from a clean checkout and
+Make the Next.js standalone application host reproducible from a clean checkout and
 deployable to an isolated AWS ECS/Fargate stack through GitHub Actions. A
 maintainer must be able to approve a GitHub Environment deployment, receive an
 Application Load Balancer URL, run the repository smoke test against it, and
@@ -90,10 +95,13 @@ are not owned by an individual preview stack.
 This hosting change deliberately keeps Firebase intact, but it establishes the
 order for replacing it without another big-bang rewrite:
 
-1. Run the existing UI in the Next.js compatibility host.
-2. Put stable domain-service interfaces in front of current Firebase functions.
-3. Move each domain's query execution behind authenticated server endpoints,
-   while the service still reads and writes Firebase.
+1. Move the complete route table to the Next.js App Router and remove React
+   Router and the compatibility shell.
+2. Put typed domain services in front of current Firebase functions while
+   authenticated reads and writes remain client-side.
+3. Move each domain's query execution behind its server service when its
+   authorization and credential design is approved, while the service still
+   reads and writes Firebase.
 4. Add a relational store, schema, indexes, migrations, reconciliation, and
    observability only after those contracts exist.
 5. Backfill and dual-read/dual-write one bounded domain, compare results, move
