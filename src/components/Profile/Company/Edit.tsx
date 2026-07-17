@@ -1,4 +1,3 @@
-import { getDoc, updateDoc } from '@firebase/firestore';
 import { uuidv4 } from '@firebase/util';
 import { faFloppyDisk, faTrashCan } from '@fortawesome/free-regular-svg-icons';
 import React, { useEffect, useRef } from 'react';
@@ -9,6 +8,7 @@ import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
+import { updateProfile } from '../../../services/profiles/client';
 import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import { neighborhoods } from '../../../utils/lookups';
 import { ErrorMessage } from '../../../utils/validation';
@@ -36,7 +36,7 @@ const CompanyProfileEdit: React.FC<
   }>
 > = ({ toggleEdit, autoAddAward = false }) => {
   const {
-    profile: { ref, data },
+    profile: { id, data },
     setProfileData
   } = useUserContext();
   // Initialize form values directly from data - no useEffect needed
@@ -55,15 +55,14 @@ const CompanyProfileEdit: React.FC<
   ];
 
   const handleSubmit = async () => {
-    if (ref && JSON.stringify(data) !== JSON.stringify(formValues)) {
+    if (id && JSON.stringify(data) !== JSON.stringify(formValues)) {
       const nextData = {
         ...data,
         ...formValues,
         awards: formValues.awards?.filter((award) => award.award_name) || []
       };
-      await updateDoc(ref, nextData);
-      const profileData = await getDoc(ref);
-      setProfileData(profileData.data());
+      await updateProfile(id, nextData);
+      setProfileData(nextData);
     }
     toggleEdit();
   };

@@ -6,12 +6,6 @@ import {
   faXmark
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  DocumentData,
-  DocumentSnapshot,
-  onSnapshot,
-  updateDoc
-} from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
@@ -21,6 +15,14 @@ import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
 import { Button, Checkbox, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
+import {
+  subscribeToAccount,
+  updateAccount
+} from '../../../services/accounts/client';
+import {
+  subscribeToProfile,
+  updateProfile
+} from '../../../services/profiles/client';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { hasNonEmptyValues } from '../../../utils/hasNonEmptyValues';
 import { formatUnionStatusDisplay } from '../../../utils/lookups';
@@ -211,13 +213,12 @@ const IndividualProfile: React.FC<
       return;
     }
 
-    if (profile.ref) {
-      const unsubscribeProfile = onSnapshot(
-        profile.ref,
-        (snapshot: DocumentSnapshot<DocumentData>) => {
-          const updatedProfileData = snapshot.data();
-          if (updatedProfileData) {
-            setProfileData(updatedProfileData);
+    if (profile.id) {
+      const unsubscribeProfile = subscribeToProfile(
+        profile.id,
+        (updatedProfile) => {
+          if (updatedProfile) {
+            setProfileData(updatedProfile.data);
           } else {
             console.log('Profile document does not exist');
           }
@@ -227,7 +228,7 @@ const IndividualProfile: React.FC<
       // Clean up the subscription on unmount
       return () => unsubscribeProfile();
     }
-  }, [previewMode]); // removing profile.ref to save calls to firebase
+  }, [previewMode, profile.id, setProfileData]);
 
   useEffect(() => {
     // Skip real-time listeners when viewing another user's profile
@@ -235,13 +236,12 @@ const IndividualProfile: React.FC<
       return;
     }
 
-    if (account.ref) {
-      const unsubscribeAccount = onSnapshot(
-        account.ref,
-        (snapshot: DocumentSnapshot<DocumentData>) => {
-          const updatedAccountData = snapshot.data();
-          if (updatedAccountData) {
-            setAccountData(updatedAccountData);
+    if (account.id) {
+      const unsubscribeAccount = subscribeToAccount(
+        account.id,
+        (updatedAccount) => {
+          if (updatedAccount) {
+            setAccountData(updatedAccount.data);
           } else {
             console.log('Account document does not exist');
           }
@@ -251,7 +251,7 @@ const IndividualProfile: React.FC<
       // Clean up the subscription on unmount
       return () => unsubscribeAccount();
     }
-  }, [previewMode]); // removing account.ref to save calls to firebase
+  }, [account.id, previewMode, setAccountData]);
 
   const onEditModeClick = (
     e: React.MouseEvent<HTMLElement>,
@@ -373,10 +373,10 @@ const IndividualProfile: React.FC<
 
   const saveProfilePicture = async (pfpImgUrl: string) => {
     try {
-      if (profile.ref) {
-        await updateDoc(profile.ref, { ['profile_image_url']: pfpImgUrl });
+      if (profile.id) {
+        await updateProfile(profile.id, { profile_image_url: pfpImgUrl });
       } else {
-        // no profile.ref
+        // no profile ID
         // look up?
       }
     } catch (err) {
@@ -440,12 +440,12 @@ const IndividualProfile: React.FC<
     };
 
     try {
-      if (profile.ref) {
-        await updateDoc(profile.ref, { ...personalDetailsData });
+      if (profile.id) {
+        await updateProfile(profile.id, personalDetailsData);
 
         setEditMode({ ...editMode, personalDetails: false });
       } else {
-        // no profile.ref
+        // no profile ID
         // look up?
       }
     } catch (err) {
@@ -466,13 +466,13 @@ const IndividualProfile: React.FC<
     };
 
     try {
-      if (account.ref && profile.ref) {
-        await updateDoc(account.ref, { ...headlineAccountDetails });
-        await updateDoc(profile.ref, { ...headlineProfileDetails });
+      if (account.id && profile.id) {
+        await updateAccount(account.id, headlineAccountDetails);
+        await updateProfile(profile.id, headlineProfileDetails);
 
         setEditMode({ ...editMode, headline: false });
       } else {
-        // no profile.ref
+        // no account or profile ID
         // look up?
       }
     } catch (err) {
@@ -492,8 +492,8 @@ const IndividualProfile: React.FC<
     if (!newData) {
       // If no data exists, save an empty array to allow clearing
       try {
-        if (profile.ref) {
-          await updateDoc(profile.ref, { [section]: [] });
+        if (profile.id) {
+          await updateProfile(profile.id, { [section]: [] });
           setEditMode({ ...editMode, [editModeName]: false });
         }
       } catch (err) {
@@ -502,8 +502,8 @@ const IndividualProfile: React.FC<
       return;
     }
     try {
-      if (profile.ref) {
-        await updateDoc(profile.ref, { [section]: newData });
+      if (profile.id) {
+        await updateProfile(profile.id, { [section]: newData });
         setEditMode({ ...editMode, [editModeName]: false });
       }
     } catch (err) {
@@ -526,12 +526,12 @@ const IndividualProfile: React.FC<
     };
 
     try {
-      if (profile.ref) {
-        await updateDoc(profile.ref, { ...skillsProps });
+      if (profile.id) {
+        await updateProfile(profile.id, skillsProps);
 
         setEditMode({ ...editMode, skills: false });
       } else {
-        // no profile.ref
+        // no profile ID
         // look up?
       }
     } catch (err) {
@@ -540,14 +540,13 @@ const IndividualProfile: React.FC<
   };
 
   const submitOffStageSkills = async (selectedRoles: any) => {
-    if (!profile.ref) {
+    if (!profile.id) {
       console.error('No profile ref found');
       return;
     }
 
     try {
-      // Combine all updates into a single updateDoc call
-      await updateDoc(profile.ref, selectedRoles);
+      await updateProfile(profile.id, selectedRoles);
       setEditMode({ ...editMode, offstage_roles: false });
     } catch (err) {
       console.error('Error updating off stage skills:', err);
