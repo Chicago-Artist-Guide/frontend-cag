@@ -8,6 +8,7 @@ import {
   mkdtemp,
   open,
   readFile,
+  readdir,
   realpath,
   rename,
   rm,
@@ -44,6 +45,7 @@ type CalibrationStage = 'build' | 'semantic' | 'visual';
 
 export interface CalibrationInventoryEntry {
   bytes: number;
+  kind?: 'directory';
   relativePath: string;
   sha256: string;
 }
@@ -65,6 +67,12 @@ export interface CalibrationEnvironment {
   publicValueHashes: Array<{ name: string; sha256: string }>;
 }
 
+export interface EvidenceRootIdentity {
+  canonicalPath: string;
+  device: string;
+  inode: string;
+}
+
 export interface CommandResult {
   code: number | null;
   signal: NodeJS.Signals | null;
@@ -84,6 +92,7 @@ export interface CalibrationCommandSpecification {
 export interface SpawnedChild {
   exitCode: number | null;
   kill(signal?: NodeJS.Signals | number): boolean;
+  pid?: number;
   signalCode: NodeJS.Signals | null;
 }
 
@@ -141,6 +150,8 @@ export interface CalibrationRecord {
 
 export interface CalibrationDependencies {
   assertPortAvailable(): Promise<void>;
+  announceRecord(file: string): void;
+  assertNoDotenv(cwd: string): Promise<void>;
   copyCorpus(
     sourceRoot: string,
     destinationRoot: string,
@@ -155,10 +166,12 @@ export interface CalibrationDependencies {
     cwd: string,
     environment: Record<string, string>
   ): Promise<BuildMetadata>;
+  resolveEvidenceRoot(root: string): Promise<EvidenceRootIdentity>;
   runCommand(
     specification: CalibrationCommandSpecification
   ): Promise<CommandResult>;
   spawnServer(cwd: string, environment: Record<string, string>): SpawnedChild;
+  stopServer(child: SpawnedChild, exit: Promise<CommandResult>): Promise<void>;
   waitForServerExit(child: SpawnedChild): Promise<CommandResult>;
   writeRecord(file: string, record: CalibrationRecord): Promise<void>;
 }
@@ -283,23 +296,109 @@ const assertSafeEvidenceDirectories = async (
   }
 };
 
+export async function resolveEvidenceRootIdentity(
+  root: string
+): Promise<EvidenceRootIdentity> {
+  if (!path.isAbsolute(root)) throw new Error('evidence root must be absolute');
+  const canonicalPath = await realpath(root);
+  let handle: Awaited<ReturnType<typeof open>> | undefined;
+  try {
+    handle = await open(
+      canonicalPath,
+      fsConstants.O_RDONLY | fsConstants.O_DIRECTORY | fsConstants.O_NOFOLLOW
+    );
+    const before = await handle.stat({ bigint: true });
+    if (!before.isDirectory()) throw new Error('not a directory');
+    const after = await handle.stat({ bigint: true });
+    if (
+      before.dev !== after.dev ||
+      before.ino !== after.ino ||
+      before.mtimeNs !== after.mtimeNs ||
+      before.ctimeNs !== after.ctimeNs
+    ) {
+      throw new Error('root changed during inspection');
+    }
+    return {
+      canonicalPath,
+      device: before.dev.toString(),
+      inode: before.ino.toString()
+    };
+  } catch {
+    throw new Error('evidence root must be a stable real directory');
+  } finally {
+    await handle?.close().catch(() => undefined);
+  }
+}
+
 export async function inventoryCalibrationCorpus(
   root: string
 ): Promise<CalibrationInventory> {
-  if (!path.isAbsolute(root)) throw new Error('evidence root must be absolute');
-  const canonicalRoot = await realpath(root);
+  const rootBefore = await resolveEvidenceRootIdentity(root);
+  const canonicalRoot = rootBefore.canonicalPath;
   const inventory: CalibrationInventory = [];
-  for (const relativePath of CALIBRATION_RELATIVE_FILES) {
-    await assertSafeEvidenceDirectories(canonicalRoot, relativePath);
-    const absolutePath = path.join(canonicalRoot, relativePath);
-    const read = await readRegularFileNoFollow(absolutePath);
-    inventory.push({
-      bytes: read.bytes,
-      relativePath,
-      sha256: read.sha256
-    });
+  const walk = async (directory: string, prefix: string): Promise<void> => {
+    const entries = (await readdir(directory, { withFileTypes: true })).sort(
+      (left, right) => left.name.localeCompare(right.name)
+    );
+    for (const entry of entries) {
+      const absolutePath = path.join(directory, entry.name);
+      const relativePath = prefix ? `${prefix}/${entry.name}` : entry.name;
+      const status = await lstat(absolutePath);
+      if (
+        entry.isDirectory() &&
+        status.isDirectory() &&
+        !status.isSymbolicLink()
+      ) {
+        inventory.push({
+          bytes: 0,
+          kind: 'directory',
+          relativePath: `${relativePath}/`,
+          sha256: sha256('directory')
+        });
+        await walk(absolutePath, relativePath);
+      } else if (
+        entry.isFile() &&
+        status.isFile() &&
+        !status.isSymbolicLink()
+      ) {
+        const read = await readRegularFileNoFollow(absolutePath);
+        inventory.push({
+          bytes: read.bytes,
+          relativePath,
+          sha256: read.sha256
+        });
+      } else {
+        throw new Error(
+          'approved evidence tree entries must be real files or directories'
+        );
+      }
+    }
+  };
+  await walk(canonicalRoot, '');
+  inventory.sort((left, right) =>
+    left.relativePath.localeCompare(right.relativePath)
+  );
+  const rootAfter = await resolveEvidenceRootIdentity(root);
+  if (JSON.stringify(rootAfter) !== JSON.stringify(rootBefore)) {
+    throw new Error('evidence root changed during inventory');
   }
   return inventory;
+}
+
+export function selectCalibrationInventory(
+  inventory: CalibrationInventory
+): CalibrationInventory {
+  return CALIBRATION_RELATIVE_FILES.map((relativePath) => {
+    const matches = inventory.filter(
+      (entry) => entry.relativePath === relativePath && entry.kind === undefined
+    );
+    if (matches.length !== 1) {
+      throw new Error(
+        `approved calibration evidence is missing: ${relativePath}`
+      );
+    }
+    return matches[0];
+  });
 }
 
 const inventoriesEqual = (
@@ -335,9 +434,46 @@ export async function copyCalibrationCorpus(
   await chmod(destinationRoot, 0o555);
 }
 
+export async function assertSecureGenerationParent(
+  parent: string
+): Promise<void> {
+  const status = await lstat(parent).catch(() => undefined);
+  const currentUid = process.getuid?.();
+  if (
+    !status ||
+    !status.isDirectory() ||
+    status.isSymbolicLink() ||
+    currentUid === undefined ||
+    status.uid !== currentUid ||
+    (await realpath(parent)) !== path.resolve(parent)
+  ) {
+    throw new Error('calibration parent must be a real owned directory');
+  }
+  await chmod(parent, 0o700);
+  const secured = await lstat(parent);
+  if ((secured.mode & 0o777) !== 0o700) {
+    throw new Error('calibration parent must have 0700 permissions');
+  }
+}
+
+export async function assertNoCalibrationDotenv(cwd: string): Promise<void> {
+  const names = await readdir(cwd);
+  if (
+    names.some(
+      (name) =>
+        name === '.env' ||
+        name === '.env.local' ||
+        name.startsWith('.env.production')
+    )
+  ) {
+    throw new Error('Next dotenv files are prohibited during calibration');
+  }
+}
+
 const createCalibrationGeneration = async (): Promise<CalibrationPaths> => {
   const parent = '/private/tmp/cag-vr';
   await mkdir(parent, { mode: 0o700, recursive: true });
+  await assertSecureGenerationParent(parent);
   const generationDir = await mkdtemp(path.join(parent, 'calibration-'));
   await chmod(generationDir, 0o700);
   const baselineDir = path.join(generationDir, 'baseline');
@@ -378,29 +514,61 @@ const writeCalibrationRecord = async (
   }
 };
 
+const announceCalibrationRecord = (file: string): void => {
+  process.stderr.write(`Calibration record: ${file}\n`);
+};
+
 const waitForChild = (child: ChildProcess): Promise<CommandResult> =>
-  new Promise((resolve, reject) => {
+  new Promise((resolve) => {
     if (child.exitCode !== null || child.signalCode !== null) {
       resolve({ code: child.exitCode, signal: child.signalCode });
       return;
     }
-    child.once('error', reject);
+    child.once('error', () => resolve({ code: null, signal: null }));
     child.once('exit', (code, signal) => resolve({ code, signal }));
   });
+
+const signalReason = (
+  signal: AbortSignal | undefined
+): NodeJS.Signals | null =>
+  signal?.reason === 'SIGINT'
+    ? 'SIGINT'
+    : signal?.reason === 'SIGTERM'
+      ? 'SIGTERM'
+      : null;
+
+const killProcessTree = (
+  child: SpawnedChild,
+  signal: NodeJS.Signals
+): boolean => {
+  if (process.platform !== 'win32' && child.pid) {
+    try {
+      process.kill(-child.pid, signal);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return child.kill(signal);
+};
 
 const runSpawnedCommand = async (
   specification: CalibrationCommandSpecification
 ): Promise<CommandResult> => {
+  if (specification.signal?.aborted) {
+    return { code: null, signal: signalReason(specification.signal) };
+  }
   const child = spawn(specification.executable, specification.args, {
     cwd: specification.cwd,
+    detached: process.platform !== 'win32',
     env: specification.environment,
     shell: false,
     stdio: 'inherit'
   });
   let forceTimer: NodeJS.Timeout | undefined;
   const terminate = () => {
-    child.kill('SIGTERM');
-    forceTimer = setTimeout(() => child.kill('SIGKILL'), 5_000);
+    killProcessTree(child, 'SIGTERM');
+    forceTimer = setTimeout(() => killProcessTree(child, 'SIGKILL'), 5_000);
     forceTimer.unref();
   };
   const timeout = setTimeout(terminate, specification.timeoutMs);
@@ -429,7 +597,13 @@ const spawnNextServer = (
       '--port',
       '3100'
     ],
-    { cwd, env: environment, shell: false, stdio: 'inherit' }
+    {
+      cwd,
+      detached: process.platform !== 'win32',
+      env: environment,
+      shell: false,
+      stdio: 'inherit'
+    }
   );
 
 const waitForSpawnedServer = (child: SpawnedChild): Promise<CommandResult> =>
@@ -450,6 +624,7 @@ const assertCalibrationPortAvailable = async (): Promise<void> =>
 const boundedSignal = (outer: AbortSignal | undefined, timeoutMs: number) => {
   const controller = new AbortController();
   const abort = () => controller.abort(outer?.reason);
+  if (outer?.aborted) abort();
   outer?.addEventListener('abort', abort, { once: true });
   const timeout = setTimeout(() => controller.abort('timeout'), timeoutMs);
   timeout.unref();
@@ -588,6 +763,8 @@ const readProductionBuildMetadata = async (
 
 const productionDependencies: CalibrationDependencies = {
   assertPortAvailable: assertCalibrationPortAvailable,
+  announceRecord: announceCalibrationRecord,
+  assertNoDotenv: assertNoCalibrationDotenv,
   copyCorpus: copyCalibrationCorpus,
   createGeneration: createCalibrationGeneration,
   inventoryCorpus: inventoryCalibrationCorpus,
@@ -595,8 +772,10 @@ const productionDependencies: CalibrationDependencies = {
   probeHealth: probeCalibrationHealth,
   probeHydratedRoute: probeCalibrationHydration,
   readBuildMetadata: readProductionBuildMetadata,
+  resolveEvidenceRoot: resolveEvidenceRootIdentity,
   runCommand: runSpawnedCommand,
   spawnServer: spawnNextServer,
+  stopServer: stopOwnedServer,
   waitForServerExit: waitForSpawnedServer,
   writeRecord: writeCalibrationRecord
 };
@@ -661,21 +840,81 @@ const signalExitCode = (signal: AbortSignal | undefined): number | undefined =>
         : 1
     : undefined;
 
-const terminateServer = async (
-  child: SpawnedChild,
-  exit: Promise<CommandResult>
-): Promise<void> => {
-  if (child.exitCode !== null || child.signalCode !== null) return;
-  child.kill('SIGTERM');
+const awaitExitWithin = async (
+  exit: Promise<CommandResult>,
+  timeoutMs: number
+): Promise<boolean> => {
   let timer: NodeJS.Timeout | undefined;
-  const bounded = new Promise<'timeout'>((resolve) => {
-    timer = setTimeout(() => resolve('timeout'), 5_000);
+  const timeout = new Promise<false>((resolve) => {
+    timer = setTimeout(() => resolve(false), timeoutMs);
     timer.unref();
   });
-  if ((await Promise.race([exit, bounded])) === 'timeout') {
-    child.kill('SIGKILL');
+  try {
+    return (await Promise.race([exit.then(() => true), timeout])) === true;
+  } finally {
+    if (timer) clearTimeout(timer);
   }
-  if (timer) clearTimeout(timer);
+};
+
+export async function stopOwnedServer(
+  child: SpawnedChild,
+  exit: Promise<CommandResult>,
+  timeoutMs = 5_000
+): Promise<void> {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  killProcessTree(child, 'SIGTERM');
+  if (await awaitExitWithin(exit, timeoutMs)) return;
+  killProcessTree(child, 'SIGKILL');
+  if (!(await awaitExitWithin(exit, timeoutMs))) {
+    throw new Error('owned server cleanup could not be proved');
+  }
+}
+
+const assertIndependentEvidenceRoots = (
+  baseline: EvidenceRootIdentity,
+  staging: EvidenceRootIdentity
+): void => {
+  if (
+    (baseline.device === staging.device && baseline.inode === staging.inode) ||
+    pathsOverlap(baseline.canonicalPath, staging.canonicalPath) ||
+    pathsOverlap(staging.canonicalPath, baseline.canonicalPath)
+  ) {
+    throw new Error('approved evidence roots are not physically independent');
+  }
+};
+
+const runWithOwnedServer = async <T>(
+  operation: (signal: AbortSignal) => Promise<T>,
+  serverExit: Promise<CommandResult>,
+  outerSignal: AbortSignal | undefined
+): Promise<T> => {
+  if (outerSignal?.aborted) throw new Error('calibration aborted');
+  const controller = new AbortController();
+  const abort = () => controller.abort(outerSignal?.reason);
+  outerSignal?.addEventListener('abort', abort, { once: true });
+  const operationOutcome = operation(controller.signal).then(
+    (value) => ({ kind: 'value' as const, value }),
+    () => ({ kind: 'error' as const })
+  );
+  const exitOutcome = serverExit.then(() => ({ kind: 'exit' as const }));
+  try {
+    const outcome = await Promise.race([operationOutcome, exitOutcome]);
+    if (outcome.kind === 'exit') {
+      controller.abort('owned-server-exited');
+      await operationOutcome;
+      throw new Error('owned calibration server exited');
+    }
+    if (outcome.kind === 'error') throw new Error('owned operation failed');
+    if (outerSignal?.aborted) throw new Error('calibration aborted');
+    const stillAlive = await Promise.race([
+      serverExit.then(() => false),
+      Promise.resolve(true)
+    ]);
+    if (!stillAlive) throw new Error('owned calibration server exited');
+    return outcome.value;
+  } finally {
+    outerSignal?.removeEventListener('abort', abort);
+  }
 };
 
 export async function runCalibrationCommand(
@@ -694,19 +933,8 @@ export async function runCalibrationCommand(
     return 1;
   }
 
-  let sourceInventory: CalibrationInventory;
-  let stagingInventory: CalibrationInventory;
-  try {
-    sourceInventory = await dependencies.inventoryCorpus(
-      configuration.approvedBaselineDir
-    );
-    stagingInventory = await dependencies.inventoryCorpus(
-      configuration.approvedStagingDir
-    );
-    if (!inventoriesEqual(sourceInventory, stagingInventory)) return 1;
-  } catch {
-    return 1;
-  }
+  const interruptedBeforeStart = signalExitCode(options.signal);
+  if (interruptedBeforeStart !== undefined) return interruptedBeforeStart;
 
   let paths: CalibrationPaths;
   try {
@@ -720,8 +948,8 @@ export async function runCalibrationCommand(
     commands: {},
     evidence: {
       copiedInventory: [],
-      sourceInventory,
-      stagingInventory
+      sourceInventory: [],
+      stagingInventory: []
     },
     generation: path.basename(paths.generationDir),
     provenance: {
@@ -744,6 +972,7 @@ export async function runCalibrationCommand(
   let serverExit: Promise<CommandResult> | undefined;
   let resultCode = 1;
   let currentStage = 'preparing';
+  let copied = false;
   const retain = async () => dependencies.writeRecord(paths.recordFile, record);
   const fail = (stage: string) => {
     record.failure = { code: 'calibration-stage-failed', stage };
@@ -751,17 +980,43 @@ export async function runCalibrationCommand(
   };
 
   try {
+    dependencies.announceRecord(paths.recordFile);
     await retain();
+
+    currentStage = 'evidence-root-preflight';
+    const [baselineIdentity, stagingIdentity] = await Promise.all([
+      dependencies.resolveEvidenceRoot(configuration.approvedBaselineDir),
+      dependencies.resolveEvidenceRoot(configuration.approvedStagingDir)
+    ]);
+    assertIndependentEvidenceRoots(baselineIdentity, stagingIdentity);
+    record.evidence.sourceInventory = await dependencies.inventoryCorpus(
+      configuration.approvedBaselineDir
+    );
+    record.evidence.stagingInventory = await dependencies.inventoryCorpus(
+      configuration.approvedStagingDir
+    );
+    const sourceSelection = selectCalibrationInventory(
+      record.evidence.sourceInventory
+    );
+    const stagingSelection = selectCalibrationInventory(
+      record.evidence.stagingInventory
+    );
+    if (!inventoriesEqual(sourceSelection, stagingSelection)) {
+      throw new Error('approved evidence proofs differ');
+    }
+    await retain();
+
     currentStage = 'copy';
     await dependencies.copyCorpus(
       configuration.approvedBaselineDir,
       paths.baselineDir,
-      sourceInventory
+      sourceSelection
     );
+    copied = true;
     record.evidence.copiedInventory = await dependencies.inventoryCorpus(
       paths.baselineDir
     );
-    if (!inventoriesEqual(record.evidence.copiedInventory, sourceInventory)) {
+    if (!inventoriesEqual(record.evidence.copiedInventory, sourceSelection)) {
       throw new Error('copied evidence mismatch');
     }
     record.status = 'prepared';
@@ -769,6 +1024,9 @@ export async function runCalibrationCommand(
 
     currentStage = 'port-preflight';
     await dependencies.assertPortAvailable();
+
+    currentStage = 'dotenv-preflight';
+    await dependencies.assertNoDotenv(cwd);
 
     currentStage = 'build';
     const build = commandSpecification(
@@ -794,14 +1052,27 @@ export async function runCalibrationCommand(
     };
     await retain();
 
+    currentStage = 'port-pre-spawn';
+    await dependencies.assertPortAvailable();
+
     currentStage = 'server-start';
     server = dependencies.spawnServer(cwd, configuration.childEnvironment);
-    serverExit = dependencies.waitForServerExit(server);
+    serverExit = dependencies
+      .waitForServerExit(server)
+      .catch(() => ({ code: null, signal: null }));
 
     currentStage = 'readiness';
-    await dependencies.probeHealth(options.signal);
+    await runWithOwnedServer(
+      (signal) => dependencies.probeHealth(signal),
+      serverExit,
+      options.signal
+    );
     record.readiness.health = true;
-    await dependencies.probeHydratedRoute(options.signal);
+    await runWithOwnedServer(
+      (signal) => dependencies.probeHydratedRoute(signal),
+      serverExit,
+      options.signal
+    );
     record.readiness.hydratedFaq = true;
     record.status = 'ready';
     await retain();
@@ -814,15 +1085,24 @@ export async function runCalibrationCommand(
       paths,
       options.signal
     );
-    const semanticResult = await dependencies.runCommand(semantic).catch(
-      (): CommandResult => ({ code: null, signal: null })
-    );
+    const semanticResult = await runWithOwnedServer(
+      (signal) => dependencies.runCommand({ ...semantic, signal }),
+      serverExit,
+      options.signal
+    ).catch((error: unknown): CommandResult => {
+      if (server?.exitCode !== null || options.signal?.aborted) throw error;
+      return { code: null, signal: null };
+    });
     record.commands.semantic = recordedCommand(semantic, semanticResult);
     record.status = 'semantic-complete';
     await retain();
 
     currentStage = 'visual-health';
-    await dependencies.probeHealth(options.signal);
+    await runWithOwnedServer(
+      (signal) => dependencies.probeHealth(signal),
+      serverExit,
+      options.signal
+    );
 
     currentStage = 'visual';
     const visual = commandSpecification(
@@ -832,26 +1112,14 @@ export async function runCalibrationCommand(
       paths,
       options.signal
     );
-    const visualResult = await dependencies.runCommand(visual);
+    const visualResult = await runWithOwnedServer(
+      (signal) => dependencies.runCommand({ ...visual, signal }),
+      serverExit,
+      options.signal
+    );
     record.commands.visual = recordedCommand(visual, visualResult);
     record.status = 'visual-complete';
     await retain();
-
-    currentStage = 'post-run-integrity';
-    const postSource = await dependencies.inventoryCorpus(
-      configuration.approvedBaselineDir
-    );
-    const postStaging = await dependencies.inventoryCorpus(
-      configuration.approvedStagingDir
-    );
-    const postCopy = await dependencies.inventoryCorpus(paths.baselineDir);
-    if (
-      !inventoriesEqual(postSource, sourceInventory) ||
-      !inventoriesEqual(postStaging, stagingInventory) ||
-      !inventoriesEqual(postCopy, record.evidence.copiedInventory)
-    ) {
-      throw new Error('post-run evidence mismatch');
-    }
 
     const stagesPassed =
       semanticResult.code === 0 &&
@@ -861,14 +1129,39 @@ export async function runCalibrationCommand(
     record.status = stagesPassed ? 'passed' : 'failed';
     if (!stagesPassed) fail('gates');
     resultCode = stagesPassed ? 0 : 1;
-    await retain();
   } catch {
     fail(currentStage);
     resultCode = signalExitCode(options.signal) ?? 1;
   } finally {
     if (server && serverExit) {
-      await terminateServer(server, serverExit).catch(() => undefined);
+      try {
+        await dependencies.stopServer(server, serverExit);
+      } catch {
+        fail('server-cleanup');
+        resultCode = 1;
+      }
     }
+    try {
+      currentStage = 'post-run-integrity';
+      const [postSource, postStaging, postCopy] = await Promise.all([
+        dependencies.inventoryCorpus(configuration.approvedBaselineDir),
+        dependencies.inventoryCorpus(configuration.approvedStagingDir),
+        dependencies.inventoryCorpus(paths.baselineDir)
+      ]);
+      const integrityMatches =
+        copied &&
+        inventoriesEqual(postSource, record.evidence.sourceInventory) &&
+        inventoriesEqual(postStaging, record.evidence.stagingInventory) &&
+        inventoriesEqual(postCopy, record.evidence.copiedInventory);
+      if (!integrityMatches) {
+        fail('post-run-integrity');
+        resultCode = 1;
+      }
+    } catch {
+      fail('post-run-integrity');
+      resultCode = 1;
+    }
+    if (resultCode === 0) record.status = 'passed';
     record.completedAt = dependencies.now().toISOString();
     await retain().catch(() => undefined);
   }

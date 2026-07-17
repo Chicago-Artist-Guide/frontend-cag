@@ -18,9 +18,14 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   CALIBRATION_CASES,
   CALIBRATION_RELATIVE_FILES,
+  assertNoCalibrationDotenv,
+  assertSecureGenerationParent,
   createCalibrationEnvironment,
   inventoryCalibrationCorpus,
+  resolveEvidenceRootIdentity,
   runCalibrationCommand,
+  selectCalibrationInventory,
+  stopOwnedServer,
   type CalibrationDependencies,
   type CalibrationInventory,
   type CalibrationRecord,
@@ -86,6 +91,12 @@ const harness = () => {
     assertPortAvailable: async () => {
       events.push('port');
     },
+    announceRecord: (file) => {
+      events.push(`announce:${file}`);
+    },
+    assertNoDotenv: async () => {
+      events.push('dotenv');
+    },
     copyCorpus: async () => {
       events.push('copy');
     },
@@ -118,6 +129,11 @@ const harness = () => {
       nextVersion: '16.2.10',
       npmVersion: '10.9.4'
     }),
+    resolveEvidenceRoot: async (root) => ({
+      canonicalPath: root,
+      device: '1',
+      inode: root.includes('baseline') ? '1' : '2'
+    }),
     runCommand: async (specification) => {
       events.push(`command:${specification.stage}`);
       return { code: 0, signal: null };
@@ -125,6 +141,10 @@ const harness = () => {
     spawnServer: () => {
       events.push('server');
       return server;
+    },
+    stopServer: async (child) => {
+      events.push('stop');
+      child.kill('SIGTERM');
     },
     waitForServerExit: async () =>
       new Promise((resolve) =>
@@ -157,11 +177,19 @@ describe('calibration corpus', () => {
     const root = await createCorpus('cag-calibration-corpus-');
 
     await expect(inventoryCalibrationCorpus(root)).resolves.toEqual(
-      CALIBRATION_RELATIVE_FILES.map((relativePath) => ({
-        bytes: Buffer.byteLength(`png:${relativePath}`),
-        relativePath,
-        sha256: digest(`png:${relativePath}`)
-      }))
+      CALIBRATION_RELATIVE_FILES.flatMap((relativePath) => [
+        {
+          bytes: 0,
+          kind: 'directory',
+          relativePath: `${path.dirname(relativePath)}/`,
+          sha256: digest('directory')
+        },
+        {
+          bytes: Buffer.byteLength(`png:${relativePath}`),
+          relativePath,
+          sha256: digest(`png:${relativePath}`)
+        }
+      ])
     );
   });
 
@@ -174,7 +202,77 @@ describe('calibration corpus', () => {
     await symlink(replacement, target);
 
     await expect(inventoryCalibrationCorpus(root)).rejects.toThrow(
-      'approved evidence must be a regular file'
+      'approved evidence tree entries must be real files or directories'
+    );
+  });
+
+  it('inventories legitimate extra evidence but requires the fixed selected files', async () => {
+    const root = await createCorpus('cag-calibration-exact-tree-');
+    await writeFile(path.join(root, 'unexpected.png'), 'unexpected');
+    const expanded = await inventoryCalibrationCorpus(root);
+    expect(
+      expanded.some(({ relativePath }) => relativePath === 'unexpected.png')
+    ).toBe(true);
+    expect(selectCalibrationInventory(expanded)).toHaveLength(6);
+
+    await rm(path.join(root, 'unexpected.png'));
+    const expected = path.join(root, CALIBRATION_RELATIVE_FILES[0]);
+    await writeFile(
+      path.join(path.dirname(expected), 'renamed.png'),
+      'renamed'
+    );
+    await rm(expected);
+    await expect(
+      inventoryCalibrationCorpus(root).then(selectCalibrationInventory)
+    ).rejects.toThrow(
+      'approved calibration evidence is missing: about-us/desktop.png'
+    );
+  });
+
+  it('resolves physical identity for symlink aliases', async () => {
+    const root = await createCorpus('cag-calibration-root-');
+    const alias = `${root}-alias`;
+    temporaryDirectories.push(alias);
+    await symlink(root, alias);
+
+    await expect(resolveEvidenceRootIdentity(root)).resolves.toEqual(
+      await resolveEvidenceRootIdentity(alias)
+    );
+  });
+});
+
+describe('calibration filesystem preflight', () => {
+  it('rejects Next dotenv files that could override explicit build values', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'cag-calibration-env-'));
+    temporaryDirectories.push(root);
+    await writeFile(path.join(root, '.env.local'), 'SECRET=value');
+
+    await expect(assertNoCalibrationDotenv(root)).rejects.toThrow(
+      'Next dotenv files are prohibited during calibration'
+    );
+  });
+
+  it('repairs an owned real generation parent to private permissions', async () => {
+    const created = await mkdtemp(path.join(os.tmpdir(), 'cag-vr-parent-'));
+    temporaryDirectories.push(created);
+    const parent = await resolveEvidenceRootIdentity(created).then(
+      ({ canonicalPath }) => canonicalPath
+    );
+    await chmod(parent, 0o755);
+
+    await assertSecureGenerationParent(parent);
+
+    expect((await lstat(parent)).mode & 0o777).toBe(0o700);
+  });
+
+  it('rejects a symlink generation parent', async () => {
+    const target = await mkdtemp(path.join(os.tmpdir(), 'cag-vr-target-'));
+    const parent = `${target}-alias`;
+    temporaryDirectories.push(target, parent);
+    await symlink(target, parent);
+
+    await expect(assertSecureGenerationParent(parent)).rejects.toThrow(
+      'calibration parent must be a real owned directory'
     );
   });
 });
@@ -254,16 +352,20 @@ describe('runCalibrationCommand', () => {
     ).resolves.toBe(0);
 
     expect(test.events).toEqual([
+      'generation',
+      'announce:/private/tmp/cag-vr/calibration-test/calibration-record.json',
+      'record:preparing',
       'inventory:1',
       'inventory:2',
-      'generation',
       'record:preparing',
       'copy',
       'inventory:3',
       'record:prepared',
       'port',
+      'dotenv',
       'command:build',
       'record:built',
+      'port',
       'server',
       'health',
       'hydrated',
@@ -273,10 +375,10 @@ describe('runCalibrationCommand', () => {
       'health',
       'command:visual',
       'record:visual-complete',
+      'stop',
       'inventory:4',
       'inventory:5',
       'inventory:6',
-      'record:passed',
       'record:passed'
     ]);
     expect(test.server.kill).toHaveBeenCalledWith('SIGTERM');
@@ -327,6 +429,51 @@ describe('runCalibrationCommand', () => {
     expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
   });
 
+  it('allows independent full corpora to differ outside the fixed six', async () => {
+    const test = harness();
+    const source = [
+      ...inventory(),
+      { bytes: 3, relativePath: 'company-profile/desktop.png', sha256: 'aaa' }
+    ];
+    const staging = [
+      ...inventory(),
+      { bytes: 4, relativePath: 'events/desktop.png', sha256: 'bbbb' }
+    ];
+    const inventories = [
+      source,
+      staging,
+      inventory(),
+      source,
+      staging,
+      inventory()
+    ];
+    test.dependencies.inventoryCorpus = async () => {
+      const next = inventories.shift();
+      if (!next) throw new Error('unexpected inventory call');
+      return next;
+    };
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(0);
+  });
+
+  it('rejects physical aliases before copying or building', async () => {
+    const test = harness();
+    test.dependencies.resolveEvidenceRoot = async () => ({
+      canonicalPath: '/proof/canonical',
+      device: '1',
+      inode: '1'
+    });
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(1);
+    expect(test.events).not.toContain('copy');
+    expect(test.events).not.toContain('command:build');
+    expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
+  });
+
   it('still runs the visual gate when the semantic command cannot start', async () => {
     const test = harness();
     test.dependencies.runCommand = async (specification) => {
@@ -355,6 +502,7 @@ describe('runCalibrationCommand', () => {
       runCalibrationCommand([], environment, '/repo', test.dependencies)
     ).resolves.toBe(1);
     expect(test.events).not.toContain('server');
+    expect(test.events).toContain('inventory:6');
     expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
   });
 
@@ -370,6 +518,7 @@ describe('runCalibrationCommand', () => {
     ).resolves.toBe(1);
     expect(test.server.kill).toHaveBeenCalledWith('SIGTERM');
     expect(test.events).not.toContain('command:semantic');
+    expect(test.events).toContain('inventory:6');
     expect(JSON.stringify(test.records.at(-1))).not.toContain('secret');
   });
 
@@ -409,6 +558,77 @@ describe('runCalibrationCommand', () => {
       expect(test.server.kill).toHaveBeenCalled();
     }
   );
+
+  it('records corpus preflight failure in an announced generation', async () => {
+    const test = harness();
+    test.dependencies.inventoryCorpus = async () => {
+      test.events.push('inventory:failed');
+      throw new Error('untrusted detail');
+    };
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(1);
+    expect(test.events.slice(0, 3)).toEqual([
+      'generation',
+      'announce:/private/tmp/cag-vr/calibration-test/calibration-record.json',
+      'record:preparing'
+    ]);
+    expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
+    expect(JSON.stringify(test.records)).not.toContain('untrusted detail');
+  });
+
+  it('fails immediately for an already-aborted signal without preflight or commands', async () => {
+    const test = harness();
+    const controller = new AbortController();
+    controller.abort('SIGINT');
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies, {
+        signal: controller.signal
+      })
+    ).resolves.toBe(130);
+    expect(test.events).not.toContain('inventory:1');
+    expect(test.events.some((event) => event.startsWith('command:'))).toBe(
+      false
+    );
+    expect(test.records).toEqual([]);
+  });
+
+  it('does not run visual after the owned server exits during semantic checks', async () => {
+    const test = harness();
+    test.dependencies.runCommand = async (specification) => {
+      test.events.push(`command:${specification.stage}`);
+      if (specification.stage === 'semantic') {
+        test.server.exitCode = 1;
+        test.server.emit('exit', 1, null);
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      return { code: 0, signal: null };
+    };
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(1);
+    expect(test.events).not.toContain('command:visual');
+    expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
+  });
+
+  it('fails a nominal run when owned-server cleanup cannot be proved', async () => {
+    const test = harness();
+    test.dependencies.stopServer = async () => {
+      test.events.push('stop');
+      throw new Error('cleanup did not complete');
+    };
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(1);
+    expect(test.records.at(-1)).toMatchObject({
+      failure: { stage: 'server-cleanup' },
+      status: 'failed'
+    });
+  });
 });
 
 describe('immutable copied permissions', () => {
@@ -418,5 +638,23 @@ describe('immutable copied permissions', () => {
     await chmod(file, 0o444);
     expect((await lstat(file)).mode & 0o777).toBe(0o444);
     expect(fsConstants.O_NOFOLLOW).toBeTypeOf('number');
+  });
+
+  it('fails cleanup after TERM and KILL when no owned exit is observed', async () => {
+    const child: SpawnedChild = {
+      exitCode: null,
+      kill: vi.fn(() => false),
+      signalCode: null
+    };
+    const neverExits = new Promise<{
+      code: number | null;
+      signal: NodeJS.Signals | null;
+    }>(() => undefined);
+
+    await expect(stopOwnedServer(child, neverExits, 1)).rejects.toThrow(
+      'owned server cleanup could not be proved'
+    );
+    expect(child.kill).toHaveBeenNthCalledWith(1, 'SIGTERM');
+    expect(child.kill).toHaveBeenNthCalledWith(2, 'SIGKILL');
   });
 });
