@@ -96,6 +96,11 @@ export interface SpawnedChild {
   signalCode: NodeJS.Signals | null;
 }
 
+export interface ProcessTreeOperations {
+  isAlive(child: SpawnedChild): boolean;
+  kill(child: SpawnedChild, signal: NodeJS.Signals): boolean;
+}
+
 interface BuildMetadata {
   buildId: string;
   gitRevision: string;
@@ -118,6 +123,7 @@ export interface CalibrationRecord {
     stagingInventory: CalibrationInventory;
   };
   failure?: { code: string; stage: string };
+  failures: Array<{ code: string; stage: string }>;
   generation: string;
   metadata?: BuildMetadata & { nodeVersion: string };
   provenance: {
@@ -233,7 +239,12 @@ export function createCalibrationEnvironment(
   const publicValueHashes: Array<{ name: string; sha256: string }> = [];
   for (const name of PUBLIC_ENVIRONMENT_NAMES) {
     const value = environment[name];
-    if (!value) throw new Error(`${name} is required`);
+    if (
+      value === undefined ||
+      (value.length === 0 && name !== 'NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID')
+    ) {
+      throw new Error(`${name} is required`);
+    }
     childEnvironment[name] = value;
     publicValueHashes.push({ name, sha256: sha256(value) });
   }
@@ -552,6 +563,25 @@ const killProcessTree = (
   return child.kill(signal);
 };
 
+const isProcessTreeAlive = (child: SpawnedChild): boolean => {
+  if (process.platform !== 'win32' && child.pid) {
+    try {
+      process.kill(-child.pid, 0);
+      return true;
+    } catch (error) {
+      return (error as NodeJS.ErrnoException).code !== 'ESRCH';
+    }
+  }
+  return process.platform === 'win32'
+    ? child.exitCode === null && child.signalCode === null
+    : false;
+};
+
+const productionProcessTreeOperations: ProcessTreeOperations = {
+  isAlive: isProcessTreeAlive,
+  kill: killProcessTree
+};
+
 const runSpawnedCommand = async (
   specification: CalibrationCommandSpecification
 ): Promise<CommandResult> => {
@@ -565,21 +595,39 @@ const runSpawnedCommand = async (
     shell: false,
     stdio: 'inherit'
   });
-  let forceTimer: NodeJS.Timeout | undefined;
+  const exit = waitForChild(child);
+  let termination: Promise<void> | undefined;
+  let resolveTermination: ((result: CommandResult) => void) | undefined;
+  let rejectTermination: ((error: unknown) => void) | undefined;
+  const terminationOutcome = new Promise<CommandResult>((resolve, reject) => {
+    resolveTermination = resolve;
+    rejectTermination = reject;
+  });
   const terminate = () => {
-    killProcessTree(child, 'SIGTERM');
-    forceTimer = setTimeout(() => killProcessTree(child, 'SIGKILL'), 5_000);
-    forceTimer.unref();
+    if (termination) return;
+    termination = stopOwnedServer(child, exit);
+    void termination.then(
+      () =>
+        resolveTermination?.({
+          code: null,
+          signal: signalReason(specification.signal)
+        }),
+      (error: unknown) => rejectTermination?.(error)
+    );
   };
   const timeout = setTimeout(terminate, specification.timeoutMs);
   timeout.unref();
   specification.signal?.addEventListener('abort', terminate, { once: true });
   try {
-    return await waitForChild(child);
+    return await Promise.race([exit, terminationOutcome]);
   } finally {
     clearTimeout(timeout);
-    if (forceTimer) clearTimeout(forceTimer);
     specification.signal?.removeEventListener('abort', terminate);
+    if (termination) {
+      await termination;
+    } else {
+      await stopOwnedServer(child, exit);
+    }
   }
 };
 
@@ -840,32 +888,32 @@ const signalExitCode = (signal: AbortSignal | undefined): number | undefined =>
         : 1
     : undefined;
 
-const awaitExitWithin = async (
-  exit: Promise<CommandResult>,
-  timeoutMs: number
+const waitForProcessTreeExit = async (
+  child: SpawnedChild,
+  timeoutMs: number,
+  operations: ProcessTreeOperations
 ): Promise<boolean> => {
-  let timer: NodeJS.Timeout | undefined;
-  const timeout = new Promise<false>((resolve) => {
-    timer = setTimeout(() => resolve(false), timeoutMs);
-    timer.unref();
-  });
-  try {
-    return (await Promise.race([exit.then(() => true), timeout])) === true;
-  } finally {
-    if (timer) clearTimeout(timer);
+  const deadline = Date.now() + timeoutMs;
+  while (operations.isAlive(child)) {
+    if (Date.now() >= deadline) return false;
+    await new Promise((resolve) =>
+      setTimeout(resolve, Math.min(25, timeoutMs))
+    );
   }
+  return true;
 };
 
 export async function stopOwnedServer(
   child: SpawnedChild,
-  exit: Promise<CommandResult>,
-  timeoutMs = 5_000
+  _exit: Promise<CommandResult>,
+  timeoutMs = 5_000,
+  operations: ProcessTreeOperations = productionProcessTreeOperations
 ): Promise<void> {
-  if (child.exitCode !== null || child.signalCode !== null) return;
-  killProcessTree(child, 'SIGTERM');
-  if (await awaitExitWithin(exit, timeoutMs)) return;
-  killProcessTree(child, 'SIGKILL');
-  if (!(await awaitExitWithin(exit, timeoutMs))) {
+  if (!operations.isAlive(child)) return;
+  operations.kill(child, 'SIGTERM');
+  if (await waitForProcessTreeExit(child, timeoutMs, operations)) return;
+  operations.kill(child, 'SIGKILL');
+  if (!(await waitForProcessTreeExit(child, timeoutMs, operations))) {
     throw new Error('owned server cleanup could not be proved');
   }
 }
@@ -951,6 +999,7 @@ export async function runCalibrationCommand(
       sourceInventory: [],
       stagingInventory: []
     },
+    failures: [],
     generation: path.basename(paths.generationDir),
     provenance: {
       approvedCapture: '2026-05-05',
@@ -975,7 +1024,9 @@ export async function runCalibrationCommand(
   let copied = false;
   const retain = async () => dependencies.writeRecord(paths.recordFile, record);
   const fail = (stage: string) => {
-    record.failure = { code: 'calibration-stage-failed', stage };
+    const failure = { code: 'calibration-stage-failed', stage };
+    record.failure = failure;
+    record.failures.push(failure);
     record.status = 'failed';
   };
 
@@ -1016,7 +1067,10 @@ export async function runCalibrationCommand(
     record.evidence.copiedInventory = await dependencies.inventoryCorpus(
       paths.baselineDir
     );
-    if (!inventoriesEqual(record.evidence.copiedInventory, sourceSelection)) {
+    const copiedSelection = selectCalibrationInventory(
+      record.evidence.copiedInventory
+    );
+    if (!inventoriesEqual(copiedSelection, sourceSelection)) {
       throw new Error('copied evidence mismatch');
     }
     record.status = 'prepared';
@@ -1090,7 +1144,13 @@ export async function runCalibrationCommand(
       serverExit,
       options.signal
     ).catch((error: unknown): CommandResult => {
-      if (server?.exitCode !== null || options.signal?.aborted) throw error;
+      if (
+        server?.exitCode !== null ||
+        server?.signalCode !== null ||
+        options.signal?.aborted
+      ) {
+        throw error;
+      }
       return { code: null, signal: null };
     });
     record.commands.semantic = recordedCommand(semantic, semanticResult);
@@ -1163,7 +1223,13 @@ export async function runCalibrationCommand(
     }
     if (resultCode === 0) record.status = 'passed';
     record.completedAt = dependencies.now().toISOString();
-    await retain().catch(() => undefined);
+    try {
+      await retain();
+    } catch {
+      fail('record-write');
+      resultCode = 1;
+      await retain().catch(() => undefined);
+    }
   }
 
   return resultCode;

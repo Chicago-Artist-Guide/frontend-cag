@@ -76,11 +76,19 @@ class FakeChild extends EventEmitter implements SpawnedChild {
 }
 
 const inventory = (suffix = ''): CalibrationInventory =>
-  CALIBRATION_RELATIVE_FILES.map((relativePath) => ({
-    bytes: 10,
-    relativePath,
-    sha256: digest(`${relativePath}${suffix}`)
-  }));
+  CALIBRATION_RELATIVE_FILES.flatMap((relativePath) => [
+    {
+      bytes: 0,
+      kind: 'directory' as const,
+      relativePath: `${path.dirname(relativePath)}/`,
+      sha256: digest(`directory${suffix}`)
+    },
+    {
+      bytes: 10,
+      relativePath,
+      sha256: digest(`${relativePath}${suffix}`)
+    }
+  ]);
 
 const harness = () => {
   const events: string[] = [];
@@ -334,6 +342,26 @@ describe('calibration environment', () => {
         }))
     );
   });
+
+  it('requires the measurement ID variable but permits analytics-disabled empty', () => {
+    const result = createCalibrationEnvironment(
+      {
+        ...publicValues,
+        NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: '',
+        VR_APPROVED_BASELINE_DIR: '/proof/baseline',
+        VR_APPROVED_STAGING_DIR: '/proof/staging'
+      },
+      '/repo'
+    );
+
+    expect(result.childEnvironment.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID).toBe(
+      ''
+    );
+    expect(result.publicValueHashes).toContainEqual({
+      name: 'NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID',
+      sha256: digest('')
+    });
+  });
 });
 
 describe('runCalibrationCommand', () => {
@@ -575,6 +603,12 @@ describe('runCalibrationCommand', () => {
       'record:preparing'
     ]);
     expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
+    expect(test.records.at(-1)?.failures).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ stage: 'evidence-root-preflight' }),
+        expect.objectContaining({ stage: 'post-run-integrity' })
+      ])
+    );
     expect(JSON.stringify(test.records)).not.toContain('untrusted detail');
   });
 
@@ -614,6 +648,24 @@ describe('runCalibrationCommand', () => {
     expect(test.records.at(-1)).toMatchObject({ status: 'failed' });
   });
 
+  it('does not swallow a signal-only owned server exit during semantic checks', async () => {
+    const test = harness();
+    test.dependencies.runCommand = async (specification) => {
+      test.events.push(`command:${specification.stage}`);
+      if (specification.stage === 'semantic') {
+        test.server.signalCode = 'SIGTERM';
+        test.server.emit('exit', null, 'SIGTERM');
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      return { code: 0, signal: null };
+    };
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(1);
+    expect(test.events).not.toContain('command:visual');
+  });
+
   it('fails a nominal run when owned-server cleanup cannot be proved', async () => {
     const test = harness();
     test.dependencies.stopServer = async () => {
@@ -626,6 +678,27 @@ describe('runCalibrationCommand', () => {
     ).resolves.toBe(1);
     expect(test.records.at(-1)).toMatchObject({
       failure: { stage: 'server-cleanup' },
+      status: 'failed'
+    });
+  });
+
+  it('fails and retries retention when the final record write fails', async () => {
+    const test = harness();
+    const writeRecord = test.dependencies.writeRecord;
+    let rejectedFinal = false;
+    test.dependencies.writeRecord = async (file, record) => {
+      if (record.completedAt && !rejectedFinal) {
+        rejectedFinal = true;
+        throw new Error('record device failed once');
+      }
+      await writeRecord(file, record);
+    };
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(1);
+    expect(test.records.at(-1)).toMatchObject({
+      failure: { stage: 'record-write' },
       status: 'failed'
     });
   });
@@ -651,10 +724,42 @@ describe('immutable copied permissions', () => {
       signal: NodeJS.Signals | null;
     }>(() => undefined);
 
-    await expect(stopOwnedServer(child, neverExits, 1)).rejects.toThrow(
-      'owned server cleanup could not be proved'
-    );
-    expect(child.kill).toHaveBeenNthCalledWith(1, 'SIGTERM');
-    expect(child.kill).toHaveBeenNthCalledWith(2, 'SIGKILL');
+    const operations = {
+      isAlive: vi.fn(() => true),
+      kill: vi.fn(() => false)
+    };
+    await expect(
+      stopOwnedServer(child, neverExits, 1, operations)
+    ).rejects.toThrow('owned server cleanup could not be proved');
+    expect(operations.kill).toHaveBeenNthCalledWith(1, child, 'SIGTERM');
+    expect(operations.kill).toHaveBeenNthCalledWith(2, child, 'SIGKILL');
+  });
+
+  it('kills a surviving process group even after its leader exited', async () => {
+    const child: SpawnedChild = {
+      exitCode: 0,
+      kill: vi.fn(() => false),
+      pid: 123,
+      signalCode: null
+    };
+    let groupAlive = true;
+    const operations = {
+      isAlive: vi.fn(() => groupAlive),
+      kill: vi.fn((_child: SpawnedChild, signal: NodeJS.Signals) => {
+        if (signal === 'SIGKILL') groupAlive = false;
+        return true;
+      })
+    };
+
+    await expect(
+      stopOwnedServer(
+        child,
+        Promise.resolve({ code: 0, signal: null }),
+        1,
+        operations
+      )
+    ).resolves.toBeUndefined();
+    expect(operations.kill).toHaveBeenNthCalledWith(1, child, 'SIGTERM');
+    expect(operations.kill).toHaveBeenNthCalledWith(2, child, 'SIGKILL');
   });
 });
