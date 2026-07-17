@@ -35,7 +35,7 @@ const entry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
   fullPage: true,
   id: 'fixture',
   path: '/home',
-  readiness: { visible: ['main'] },
+  readiness: { visible: ['main h1'] },
   sourceGlobs: ['src/components/Home/**'],
   viewports: ['desktop'],
   ...overrides
@@ -220,11 +220,33 @@ describe('visual manifest', () => {
       problem: 'mask selector'
     },
     {
-      manifest: [entry({ allowBrokenImages: [''] })],
+      manifest: [
+        entry({
+          allowBrokenImages: [{ reason: '', selector: 'img.optional' }]
+        })
+      ],
+      problem: 'broken-image exemption reason'
+    },
+    {
+      manifest: [
+        entry({
+          allowBrokenImages: [{ reason: 'remote image', selector: ' ' }]
+        })
+      ],
       problem: 'broken-image exemption'
     }
   ])('rejects $problem violations', ({ manifest, problem }) => {
     expect(() => validateVisualManifest(manifest)).toThrow(problem);
+  });
+
+  it('uses route-specific semantic readiness instead of a generic main node', () => {
+    expect(
+      MANIFEST.every(
+        ({ readiness }) =>
+          !readiness.visible.includes('main') &&
+          !readiness.visible.includes('body')
+      )
+    ).toBe(true);
   });
 });
 

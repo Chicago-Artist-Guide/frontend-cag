@@ -61,7 +61,7 @@ const BASELINE_POLICY_KINDS: readonly BaselinePolicy['kind'][] = [
 ];
 
 export interface RouteEntry {
-  allowBrokenImages?: string[];
+  allowBrokenImages?: Array<{ reason: string; selector: string }>;
   auth: AuthState;
   baselinePolicy: BaselinePolicy;
   clusters: RouteCluster[];
@@ -195,8 +195,17 @@ export function validateVisualManifest(
         throw new Error(`${entry.id} mask selector must be non-empty`);
       }
     }
-    if (entry.allowBrokenImages?.some((exemption) => !isNonEmpty(exemption))) {
-      throw new Error(`${entry.id} broken-image exemption must be non-empty`);
+    for (const exemption of entry.allowBrokenImages ?? []) {
+      if (!isNonEmpty(exemption.reason)) {
+        throw new Error(
+          `${entry.id} broken-image exemption reason must be non-empty`
+        );
+      }
+      if (!isNonEmpty(exemption.selector)) {
+        throw new Error(
+          `${entry.id} broken-image exemption selector must be non-empty`
+        );
+      }
     }
   }
 
@@ -218,7 +227,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'home',
     path: '/home',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/Home.tsx',
       'src/components/Home/**',
@@ -233,7 +242,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'faq',
     path: '/faq',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/FAQ.tsx',
       'src/components/FAQ/**',
@@ -248,7 +257,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'donate',
     path: '/donate',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: ['src/routes/Donate.tsx', 'src/components/layout/**'],
     viewports: ['desktop']
   },
@@ -261,7 +270,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'events',
     path: '/events',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/Events.tsx',
       'src/components/Events/**',
@@ -278,7 +287,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'shows',
     path: '/shows',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/PublicShows.tsx',
       'src/components/PublicShows/**',
@@ -295,7 +304,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'get-involved',
     path: '/get-involved',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/GetInvolved.tsx',
       'src/components/GetInvolved/**',
@@ -310,7 +319,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'about-us',
     path: '/about-us',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/WhoWeAre.tsx',
       'src/components/WhoWeAre/**',
@@ -327,7 +336,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'theatre-resources',
     path: '/theatre-resources',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/TheaterResources.tsx',
       'src/components/layout/**'
@@ -341,7 +350,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'login',
     path: '/login',
-    readiness: { visible: ['form'] },
+    readiness: { visible: ['main form'] },
     sourceGlobs: [
       'src/routes/Login.tsx',
       'src/components/Login/**',
@@ -356,7 +365,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'signup',
     path: '/sign-up',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/SignUp.tsx',
       'src/components/SignUp/**',
@@ -371,7 +380,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'forgot-password',
     path: '/forgot-password',
-    readiness: { visible: ['form'] },
+    readiness: { visible: ['main form'] },
     sourceGlobs: ['src/routes/ForgotPassword.tsx', 'src/components/layout/**'],
     viewports: ['desktop']
   },
@@ -384,7 +393,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'company-profile',
     path: '/profile',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/Profile.tsx',
       'src/components/Profile/**',
@@ -401,7 +410,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'company-messages',
     path: '/profile/messages',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/Messages.tsx',
       'src/components/Messages/**',
@@ -418,7 +427,7 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'company-roles-search',
     path: '/profile/search/roles',
-    readiness: { visible: ['main'] },
+    readiness: { visible: ['main h1'] },
     sourceGlobs: [
       'src/routes/Matches.tsx',
       'src/components/Matches/**',
