@@ -112,15 +112,20 @@ describe('AppProviders', () => {
     expect(source.match(/<ErrorBoundary>/g)).toHaveLength(1);
   });
 
-  it('is mounted exactly once by App and never by the root layout', () => {
+  it('is mounted only by the authorized legacy and native shell owners', () => {
     const appSource = readProjectFile('src/routes/App.tsx');
+    const siteShellSource = readProjectFile('app/site-shell.tsx');
     const legacyAppSource = readProjectFile('app/legacy-app.tsx');
-    const layoutSource = readProjectFile('app/layout.tsx');
+    const rootLayoutSource = readProjectFile('app/layout.tsx');
+    const mainLayoutSource = readProjectFile('app/(main)/layout.tsx');
+    const catchAllSource = readProjectFile('app/[[...path]]/page.tsx');
 
     expect(appSource.match(/<AppProviders>/g)).toHaveLength(1);
+    expect(siteShellSource.match(/<AppProviders>/g)).toHaveLength(1);
     expect(appSource).not.toMatch(
       /FirebaseContext\.Provider|UserContext\.Provider|AdminProvider|MarketingContext\.Provider|PaginationProvider/
     );
+    expect(siteShellSource).not.toMatch(/LegacyApp|src\/routes\/App/);
     expect(legacyAppSource).toMatch(
       /dynamic\([\s\S]*import\('\.\.\/src\/routes\/App'\)[\s\S]*ssr:\s*false[\s\S]*\)/
     );
@@ -128,8 +133,22 @@ describe('AppProviders', () => {
       /const LegacyApp\s*=\s*\(\)\s*=>\s*<App\s*\/>/
     );
     expect(legacyAppSource).not.toMatch(/AppProviders|SiteShell/);
-    expect(layoutSource).not.toMatch(
-      /AppProviders|FirebaseContext|UserContext|AdminProvider|MarketingContext|PaginationProvider/
-    );
+    for (const source of [
+      rootLayoutSource,
+      mainLayoutSource,
+      legacyAppSource,
+      catchAllSource
+    ]) {
+      expect(source).not.toMatch(
+        /AppProviders|FirebaseContext|UserContext|AdminProvider|MarketingContext|PaginationProvider/
+      );
+    }
+    expect(catchAllSource).toMatch(/LegacyApp/);
+    expect(catchAllSource).not.toMatch(/SiteShell/);
+    expect(
+      fs.existsSync(
+        path.resolve(__dirname, '(main)', '[[...path]]', 'page.tsx')
+      )
+    ).toBe(false);
   });
 });

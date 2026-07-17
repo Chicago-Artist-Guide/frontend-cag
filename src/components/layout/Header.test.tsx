@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import React from 'react';
 import {
   act,
@@ -6,22 +8,45 @@ import {
   screen,
   waitFor
 } from '@testing-library/react';
-import { MemoryRouter, useNavigate } from 'react-router-dom';
 
 const headerMocks = vi.hoisted(() => ({
   getUnreadThreadCount: vi.fn(),
+  navigateLegacyDocument: vi.fn(),
+  nextLinkDefaultPrevented: [] as boolean[],
+  pathname: '/home',
+  reloadDocument: vi.fn(),
   useAdminAuth: vi.fn(),
+  usePathname: vi.fn(),
   useUserContext: vi.fn()
 }));
 
+vi.mock('next/link', () => ({
+  default: ({ children, onClick, ...props }: React.ComponentProps<'a'>) => (
+    <a
+      {...props}
+      onClick={(event) => {
+        onClick?.(event);
+        headerMocks.nextLinkDefaultPrevented.push(event.defaultPrevented);
+        event.preventDefault();
+      }}
+    >
+      {children}
+    </a>
+  )
+}));
+vi.mock('next/navigation', () => ({
+  usePathname: headerMocks.usePathname
+}));
+vi.mock('../../utils/navigation', () => ({
+  navigateLegacyDocument: headerMocks.navigateLegacyDocument,
+  reloadDocument: headerMocks.reloadDocument
+}));
 vi.mock('../../services/messages/client', () => ({
   getUnreadThreadCount: headerMocks.getUnreadThreadCount
 }));
-
 vi.mock('../../context/UserContext', () => ({
   useUserContext: headerMocks.useUserContext
 }));
-
 vi.mock('../../hooks/useAdminAuth', () => ({
   useAdminAuth: headerMocks.useAdminAuth
 }));
@@ -42,10 +67,11 @@ const deferred = <T,>(): Deferred<T> => {
   return { promise, resolve };
 };
 
-const routerFuture = {
-  v7_relativeSplatPath: true,
-  v7_startTransition: true
-} as const;
+const anonymousUserState = () => ({
+  account: null,
+  currentUser: null,
+  profile: { id: null }
+});
 
 const individualUserState = (accountId = 'account-1') => ({
   account: {
@@ -56,18 +82,155 @@ const individualUserState = (accountId = 'account-1') => ({
   profile: { id: 'profile-1' }
 });
 
-const HeaderWithNavigation = () => {
-  const navigate = useNavigate();
+const hrefFor = (name: string) =>
+  screen.getByRole('link', { exact: true, name }).getAttribute('href');
 
-  return (
-    <>
-      <button type="button" onClick={() => navigate('/about-us')}>
-        Change route
-      </button>
-      <Header />
-    </>
-  );
-};
+describe('Header Next navigation boundary', () => {
+  let userState:
+    | ReturnType<typeof anonymousUserState>
+    | ReturnType<typeof individualUserState>;
+
+  beforeEach(() => {
+    userState = anonymousUserState();
+    headerMocks.getUnreadThreadCount.mockReset();
+    headerMocks.navigateLegacyDocument.mockReset();
+    headerMocks.nextLinkDefaultPrevented.length = 0;
+    headerMocks.pathname = '/home';
+    headerMocks.reloadDocument.mockReset();
+    headerMocks.useAdminAuth.mockReset();
+    headerMocks.usePathname.mockReset();
+    headerMocks.useUserContext.mockReset();
+    headerMocks.useAdminAuth.mockReturnValue({
+      adminRole: null,
+      isAdmin: false
+    });
+    headerMocks.usePathname.mockImplementation(() => headerMocks.pathname);
+    headerMocks.useUserContext.mockImplementation(() => userState);
+  });
+
+  it('renders every anonymous internal destination as an accessible href', () => {
+    render(<Header />);
+
+    expect(screen.getByRole('img', { name: 'CAG Logo' })).toHaveAttribute(
+      'src',
+      '/images/cagLogo1.svg'
+    );
+    expect(hrefFor('CAG Logo')).toBe('/');
+    expect(hrefFor('HOME')).toBe('/');
+    expect(hrefFor('ABOUT US')).toBe('/about-us');
+    expect(hrefFor('DONATE')).toBe('/donate');
+    expect(hrefFor('GET INVOLVED')).toBe('/get-involved');
+    expect(hrefFor('EVENTS')).toBe('/events');
+    expect(hrefFor('SIGN UP')).toBe('/sign-up');
+    expect(hrefFor('LOGIN')).toBe('/login');
+    expect(screen.queryByRole('link', { name: 'PROFILE' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'ADMIN' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'LOGOUT' })).toBeNull();
+  });
+
+  it('preserves profile and logout visibility for authenticated users', () => {
+    userState = individualUserState();
+    headerMocks.getUnreadThreadCount.mockResolvedValue(0);
+    render(<Header />);
+
+    expect(hrefFor('PROFILE')).toBe('/profile');
+    expect(hrefFor('LOGOUT')).toBe('/logout');
+    expect(screen.queryByRole('link', { name: 'SIGN UP' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'LOGIN' })).toBeNull();
+  });
+
+  it('preserves the admin link without inventing authenticated visibility', () => {
+    headerMocks.useAdminAuth.mockReturnValue({
+      adminRole: 'admin',
+      isAdmin: true
+    });
+    render(<Header />);
+
+    expect(hrefFor('ADMIN')).toBe('/admin');
+    expect(hrefFor('SIGN UP')).toBe('/sign-up');
+    expect(hrefFor('LOGIN')).toBe('/login');
+    expect(screen.queryByRole('link', { name: 'PROFILE' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'LOGOUT' })).toBeNull();
+  });
+
+  it('hard reloads only a same-page signup click and prevents double navigation', () => {
+    headerMocks.pathname = '/sign-up';
+    const view = render(<Header />);
+
+    expect(fireEvent.click(screen.getByRole('link', { name: 'SIGN UP' }))).toBe(
+      false
+    );
+    expect(headerMocks.reloadDocument).toHaveBeenCalledOnce();
+    expect(headerMocks.reloadDocument).toHaveBeenCalledWith(window.location);
+    expect(headerMocks.nextLinkDefaultPrevented.at(-1)).toBe(true);
+    expect(headerMocks.navigateLegacyDocument).not.toHaveBeenCalled();
+
+    headerMocks.pathname = '/home';
+    view.rerender(<Header />);
+    fireEvent.click(screen.getByRole('link', { name: 'SIGN UP' }));
+    expect(headerMocks.nextLinkDefaultPrevented.at(-1)).toBe(false);
+    expect(headerMocks.reloadDocument).toHaveBeenCalledOnce();
+  });
+
+  it('passes every internal Next Link href to the document boundary', () => {
+    render(<Header />);
+    const links = [
+      ['CAG Logo', '/'],
+      ['HOME', '/'],
+      ['ABOUT US', '/about-us'],
+      ['DONATE', '/donate'],
+      ['GET INVOLVED', '/get-involved'],
+      ['EVENTS', '/events'],
+      ['SIGN UP', '/sign-up'],
+      ['LOGIN', '/login']
+    ] as const;
+
+    for (const [name] of links) {
+      fireEvent.click(screen.getByRole('link', { exact: true, name }));
+    }
+
+    expect(headerMocks.navigateLegacyDocument).toHaveBeenCalledTimes(
+      links.length
+    );
+    expect(
+      headerMocks.navigateLegacyDocument.mock.calls.map((call) => call[1])
+    ).toEqual(links.map(([, href]) => href));
+    for (const [locationLike, , click] of headerMocks.navigateLegacyDocument
+      .mock.calls) {
+      expect(locationLike).toBe(window.location);
+      expect(click).toEqual(expect.objectContaining({ button: 0 }));
+    }
+  });
+
+  it('closes the mobile menu on outside clicks and pathname changes', () => {
+    const view = render(<Header />);
+    const toggle = screen.getByRole('button');
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.mouseDown(document.body);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    headerMocks.pathname = '/about-us';
+    view.rerender(<Header />);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('contains no React Router navigation or refresh workaround', () => {
+    const source = readFileSync(
+      path.resolve(process.cwd(), 'src/components/layout/Header.tsx'),
+      'utf8'
+    );
+
+    expect(source).not.toMatch(
+      /react-router|useLocation|useNavigate|router\.refresh|\bnavigate\s*\(/u
+    );
+    expect(source).toMatch(/usePathname/u);
+    expect(source).toMatch(/reloadDocument\(window\.location\)/u);
+  });
+});
 
 describe('Header unread-interest badge', () => {
   let userState = individualUserState();
@@ -75,29 +238,27 @@ describe('Header unread-interest badge', () => {
   beforeEach(() => {
     userState = individualUserState();
     headerMocks.getUnreadThreadCount.mockReset();
+    headerMocks.navigateLegacyDocument.mockReset();
+    headerMocks.nextLinkDefaultPrevented.length = 0;
+    headerMocks.pathname = '/home';
+    headerMocks.reloadDocument.mockReset();
     headerMocks.useAdminAuth.mockReset();
+    headerMocks.usePathname.mockReset();
     headerMocks.useUserContext.mockReset();
     headerMocks.useAdminAuth.mockReturnValue({
       adminRole: null,
       isAdmin: false
     });
+    headerMocks.usePathname.mockImplementation(() => headerMocks.pathname);
     headerMocks.useUserContext.mockImplementation(() => userState);
   });
 
-  it('loads on mount and path changes and renders only positive unread counts', async () => {
+  it('loads on mount and primitive pathname changes and renders positive counts', async () => {
     headerMocks.getUnreadThreadCount
       .mockResolvedValueOnce(3)
       .mockResolvedValueOnce(4);
-    render(
-      <MemoryRouter future={routerFuture} initialEntries={['/']}>
-        <HeaderWithNavigation />
-      </MemoryRouter>
-    );
+    const view = render(<Header />);
 
-    expect(screen.getByRole('img', { name: 'CAG Logo' })).toHaveAttribute(
-      'src',
-      '/images/cagLogo1.svg'
-    );
     expect(await screen.findByLabelText('3 unread messages')).toHaveTextContent(
       '3'
     );
@@ -106,7 +267,8 @@ describe('Header unread-interest badge', () => {
       'individual'
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Change route' }));
+    headerMocks.pathname = '/about-us';
+    view.rerender(<Header />);
 
     await waitFor(() => {
       expect(headerMocks.getUnreadThreadCount).toHaveBeenCalledTimes(2);
@@ -116,43 +278,33 @@ describe('Header unread-interest badge', () => {
     );
   });
 
-  it('resets the badge without querying for company or missing accounts', async () => {
-    headerMocks.getUnreadThreadCount.mockResolvedValue(5);
-    const view = render(
-      <MemoryRouter future={routerFuture}>
-        <Header />
-      </MemoryRouter>
-    );
+  it('resets without querying for failed, company, or missing accounts', async () => {
+    headerMocks.getUnreadThreadCount.mockResolvedValueOnce(5);
+    const view = render(<Header />);
     expect(
       await screen.findByLabelText('5 unread messages')
     ).toBeInTheDocument();
+
+    headerMocks.getUnreadThreadCount.mockRejectedValueOnce(
+      new Error('offline')
+    );
+    headerMocks.pathname = '/profile/messages';
+    view.rerender(<Header />);
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/unread messages/)).toBeNull();
+    });
 
     userState = {
       ...individualUserState(),
       account: { data: { type: 'company' }, id: 'company-1' }
     };
-    view.rerender(
-      <MemoryRouter future={routerFuture}>
-        <Header />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.queryByLabelText(/unread messages/)
-      ).not.toBeInTheDocument();
-    });
-    expect(headerMocks.getUnreadThreadCount).toHaveBeenCalledOnce();
+    view.rerender(<Header />);
+    expect(screen.queryByLabelText(/unread messages/)).toBeNull();
 
     userState = individualUserState('');
-    view.rerender(
-      <MemoryRouter future={routerFuture}>
-        <Header />
-      </MemoryRouter>
-    );
-
-    expect(screen.queryByLabelText(/unread messages/)).not.toBeInTheDocument();
-    expect(headerMocks.getUnreadThreadCount).toHaveBeenCalledOnce();
+    view.rerender(<Header />);
+    expect(screen.queryByLabelText(/unread messages/)).toBeNull();
+    expect(headerMocks.getUnreadThreadCount).toHaveBeenCalledTimes(2);
   });
 
   it('ignores stale unread results after the account changes', async () => {
@@ -160,11 +312,7 @@ describe('Header unread-interest badge', () => {
     headerMocks.getUnreadThreadCount
       .mockReturnValueOnce(firstRequest.promise)
       .mockResolvedValueOnce(2);
-    const view = render(
-      <MemoryRouter future={routerFuture}>
-        <Header />
-      </MemoryRouter>
-    );
+    const view = render(<Header />);
     await waitFor(() => {
       expect(headerMocks.getUnreadThreadCount).toHaveBeenCalledWith(
         'account-1',
@@ -173,11 +321,7 @@ describe('Header unread-interest badge', () => {
     });
 
     userState = individualUserState('account-2');
-    view.rerender(
-      <MemoryRouter future={routerFuture}>
-        <Header />
-      </MemoryRouter>
-    );
+    view.rerender(<Header />);
     expect(
       await screen.findByLabelText('2 unread messages')
     ).toBeInTheDocument();
@@ -187,9 +331,7 @@ describe('Header unread-interest badge', () => {
       await firstRequest.promise;
     });
 
-    expect(
-      screen.queryByLabelText('9 unread messages')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('9 unread messages')).toBeNull();
     expect(screen.getByLabelText('2 unread messages')).toBeInTheDocument();
   });
 });
