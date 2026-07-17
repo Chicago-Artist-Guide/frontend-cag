@@ -1,4 +1,4 @@
-import { mkdir, rename, rm, writeFile } from 'node:fs/promises';
+import { mkdir, realpath, rename, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import type { BaselinePolicy, VisualCase, VisualSelection } from './manifest';
@@ -181,16 +181,38 @@ export async function writeCapturePngAtomically(
       'capture artifact must remain within the capture output root'
     );
   }
-  const directory = path.dirname(resolvedFinal);
-  await mkdir(directory, { recursive: true });
+  await mkdir(resolvedRoot, { recursive: true });
+  const canonicalRoot = await realpath(resolvedRoot);
+  let currentDirectory = resolvedRoot;
+  for (const segment of segments.slice(0, -1)) {
+    currentDirectory = path.join(currentDirectory, segment);
+    try {
+      await mkdir(currentDirectory);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
+    }
+    const canonicalDirectory = await realpath(currentDirectory);
+    const canonicalRelative = path.relative(canonicalRoot, canonicalDirectory);
+    if (
+      canonicalRelative === '..' ||
+      canonicalRelative.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(canonicalRelative)
+    ) {
+      throw new Error(
+        'capture artifact parent must remain within the canonical capture output root'
+      );
+    }
+  }
+  const directory = await realpath(currentDirectory);
+  const canonicalFinal = path.join(directory, path.basename(resolvedFinal));
   const partialPath = path.join(
     directory,
-    `.${path.basename(resolvedFinal, '.png')}.${process.pid}.${Date.now()}.partial.png`
+    `.${path.basename(canonicalFinal, '.png')}.${process.pid}.${Date.now()}.partial.png`
   );
   await rm(partialPath, { force: true });
   try {
     await writePartial(partialPath);
-    await rename(partialPath, resolvedFinal);
+    await rename(partialPath, canonicalFinal);
   } catch (error) {
     await rm(partialPath, { force: true });
     throw error;

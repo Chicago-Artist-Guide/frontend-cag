@@ -1,6 +1,14 @@
 // @vitest-environment node
 
-import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  readdir,
+  rm,
+  symlink,
+  writeFile
+} from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -279,6 +287,30 @@ describe('writeCapturePngAtomically', () => {
       expect(wrote).toBe(false);
     }
   );
+
+  it('rejects a symlinked case directory before writing outside the output root', async () => {
+    const directory = await outputDirectory();
+    const root = path.join(directory, 'current');
+    const outside = path.join(directory, 'outside');
+    await mkdir(root, { recursive: true });
+    await mkdir(outside, { recursive: true });
+    await symlink(outside, path.join(root, 'home'), 'dir');
+    let wrote = false;
+
+    await expect(
+      writeCapturePngAtomically(
+        path.join(root, 'home', 'desktop.png'),
+        root,
+        async (partialPath) => {
+          wrote = true;
+          await writeFile(partialPath, 'escaped image');
+        }
+      )
+    ).rejects.toThrow('canonical capture output root');
+
+    expect(wrote).toBe(false);
+    expect(await readdir(outside)).toEqual([]);
+  });
 });
 
 describe('ensureBaseUrlReachable', () => {

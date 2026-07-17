@@ -323,7 +323,8 @@ describe.sequential('stabilizePage', () => {
           fixtureEntry({ allowBrokenImages: [], masks: [] }),
           { assertNoMutations: () => undefined, diagnostics: [] },
           '/tmp/unused.png',
-          500
+          500,
+          'https://fixture.test'
         )
       ).rejects.toThrow('pathname changed from /home to /login');
     } finally {
@@ -365,12 +366,50 @@ describe.sequential('stabilizePage', () => {
             diagnostics: []
           },
           screenshotPath,
-          500
+          500,
+          'https://fixture.test'
         )
       ).rejects.toThrow('pathname changed from /home to /after-shot');
       expect(guardChecks).toBe(2);
     } finally {
       await rm(screenshotPath, { force: true });
+      await context.close();
+    }
+  });
+
+  it('rejects a same-path redirect to an unexpected origin', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/home', (route) =>
+      route.fulfill({
+        body: `<main><h1>Ready</h1></main>
+          <script>location.replace('https://other.test/home')</script>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route('https://other.test/home', (route) =>
+      route.fulfill({
+        body: '<main><h1>Ready</h1></main>',
+        contentType: 'text/html'
+      })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/home');
+    try {
+      await expect.poll(() => page.url()).toBe('https://other.test/home');
+      await expect(
+        captureStablePage(
+          page,
+          fixtureEntry({ allowBrokenImages: [], masks: [] }),
+          { assertNoMutations: () => undefined, diagnostics: [] },
+          '/tmp/unused.png',
+          500,
+          'https://fixture.test'
+        )
+      ).rejects.toThrow(
+        'origin changed from https://fixture.test to https://other.test'
+      );
+    } finally {
       await context.close();
     }
   });
@@ -472,6 +511,31 @@ describe('capture request policy', () => {
       'mutation-block'
     ],
     [
+      'https://firebasestorage.googleapis.com/v0/b/bucket/o?name=poster.png',
+      'POST',
+      'mutation-block'
+    ],
+    [
+      'https://firebasestorage.googleapis.com/v0/b/bucket/o/poster.png',
+      'PUT',
+      'mutation-block'
+    ],
+    [
+      'https://firebasestorage.googleapis.com/v0/b/bucket/o/poster.png',
+      'PATCH',
+      'mutation-block'
+    ],
+    [
+      'https://firebasestorage.googleapis.com/v0/b/bucket/o/poster.png',
+      'DELETE',
+      'mutation-block'
+    ],
+    [
+      'https://firebasestorage.googleapis.com/v0/b/bucket/o/poster.png?alt=media',
+      'GET',
+      'allow'
+    ],
+    [
       'https://api.littlegreenlight.com/api/v1/constituents',
       'POST',
       'mutation-block'
@@ -523,6 +587,41 @@ describe('capture request policy', () => {
           fetch(
             'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents:runQuery',
             { method: 'POST' }
+          ).then((response) => response.status)
+        )
+      ).resolves.toBe(200);
+      expect(() => guard.assertNoMutations()).toThrow('known mutation');
+    } finally {
+      await context.close();
+      await browser.close();
+    }
+  });
+
+  it('aborts a routed resumable Storage POST while allowing a routed GET', async () => {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    await context.route('https://firebasestorage.googleapis.com/**', (route) =>
+      route.fulfill({
+        body: '{}',
+        headers: { 'access-control-allow-origin': '*' },
+        status: 200
+      })
+    );
+    const guard = await prepareCaptureContext(context);
+    const page = await context.newPage();
+    try {
+      await expect(
+        page.evaluate(() =>
+          fetch(
+            'https://firebasestorage.googleapis.com/v0/b/bucket/o?name=poster.png',
+            { method: 'POST' }
+          )
+        )
+      ).rejects.toThrow();
+      await expect(
+        page.evaluate(() =>
+          fetch(
+            'https://firebasestorage.googleapis.com/v0/b/bucket/o/poster.png?alt=media'
           ).then((response) => response.status)
         )
       ).resolves.toBe(200);

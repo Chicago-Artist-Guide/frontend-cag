@@ -477,7 +477,7 @@ const existingManifest: RouteEntry[] = [
       visible: [
         'main h1:has-text("YOUR PROFILE"):visible',
         'main h2:has-text("Basic Group Info"):visible',
-        'main h2:has-text("Active Shows"):visible'
+        'main h3:has-text("Active Shows"):visible'
       ]
     },
     sourceGlobs: [

@@ -67,6 +67,7 @@ async function main(): Promise<void> {
   const { cases, command, paths, selection } = invocation;
   const outputDir =
     command === 'baseline' ? paths.baselineDir : paths.currentDir;
+  const expectedOrigin = new URL(paths.baseUrl).origin;
   let browser: Browser | undefined;
 
   const result = await runCapture({
@@ -101,7 +102,9 @@ async function main(): Promise<void> {
               page,
               entry,
               requestGuard,
-              partialPath
+              partialPath,
+              15_000,
+              expectedOrigin
             );
             finalUrl = captured.finalUrl;
             stability = captured.stability;

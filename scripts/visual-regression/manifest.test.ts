@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { applicationRoutes } from '../route-contract';
 import {
@@ -285,7 +287,7 @@ describe('visual manifest', () => {
       'company-profile': [
         'main h1:has-text("YOUR PROFILE"):visible',
         'main h2:has-text("Basic Group Info"):visible',
-        'main h2:has-text("Active Shows"):visible'
+        'main h3:has-text("Active Shows"):visible'
       ],
       'company-roles-search': [
         'main h1:has-text("Matches"):visible',
@@ -334,6 +336,27 @@ describe('visual manifest', () => {
         'main iframe[title^="Submit and View Links"]:visible'
       ]
     });
+  });
+
+  it('grounds the Active Shows readiness selector in its rendered heading element', () => {
+    const companyProfile = readFileSync(
+      path.resolve(process.cwd(), 'src/components/Profile/Company/index.tsx'),
+      'utf8'
+    );
+    const detailSection = readFileSync(
+      path.resolve(
+        process.cwd(),
+        'src/components/Profile/shared/DetailSection.tsx'
+      ),
+      'utf8'
+    );
+    const profile = MANIFEST.find(({ id }) => id === 'company-profile');
+
+    expect(companyProfile).toContain('<DetailSection title="Active Shows">');
+    expect(detailSection).toContain('const DetailSectionTitle = styled.h3');
+    expect(profile?.readiness.visible).toContain(
+      'main h3:has-text("Active Shows"):visible'
+    );
   });
 
   it.each([

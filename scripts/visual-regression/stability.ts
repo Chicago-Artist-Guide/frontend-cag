@@ -149,8 +149,7 @@ export function classifyCaptureRequest({
 
   if (
     NON_IDEMPOTENT_METHODS.has(normalizedMethod) &&
-    ((lowerUrl.includes('firebasestorage.googleapis.com') &&
-      (lowerUrl.includes('uploadtype=') || normalizedMethod !== 'POST')) ||
+    (lowerUrl.includes('firebasestorage.googleapis.com') ||
       lowerUrl.includes('storage.googleapis.com'))
   ) {
     return 'mutation-block';
@@ -538,12 +537,21 @@ export async function stabilizePage(
   };
 }
 
-const assertPagePath = (page: Page, expectedPath: string): string => {
+const assertPageLocation = (
+  page: Page,
+  expectedOrigin: string,
+  expectedPath: string
+): string => {
   const finalUrl = page.url();
-  const actualPath = new URL(finalUrl).pathname;
-  if (actualPath !== expectedPath) {
+  const actual = new URL(finalUrl);
+  if (actual.origin !== expectedOrigin) {
     throw new Error(
-      `capture pathname changed from ${expectedPath} to ${actualPath}`
+      `capture origin changed from ${expectedOrigin} to ${actual.origin}`
+    );
+  }
+  if (actual.pathname !== expectedPath) {
+    throw new Error(
+      `capture pathname changed from ${expectedPath} to ${actual.pathname}`
     );
   }
   return finalUrl;
@@ -554,11 +562,12 @@ export async function captureStablePage(
   entry: RouteEntry,
   requestGuard: CaptureRequestGuard,
   partialPath: string,
-  timeoutMs = 15_000
+  timeoutMs: number,
+  expectedOrigin: string
 ): Promise<{ finalUrl: string; stability: StabilityResult }> {
-  assertPagePath(page, entry.path);
+  assertPageLocation(page, expectedOrigin, entry.path);
   const stabilized = await stabilizePage(page, entry, { timeoutMs });
-  assertPagePath(page, entry.path);
+  assertPageLocation(page, expectedOrigin, entry.path);
   requestGuard.assertNoMutations();
   await page.screenshot({
     animations: 'disabled',
@@ -568,6 +577,6 @@ export async function captureStablePage(
     type: 'png'
   });
   requestGuard.assertNoMutations();
-  const finalUrl = assertPagePath(page, entry.path);
+  const finalUrl = assertPageLocation(page, expectedOrigin, entry.path);
   return { finalUrl, stability: stabilized.result };
 }
