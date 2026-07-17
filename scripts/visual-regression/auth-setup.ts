@@ -53,6 +53,7 @@ interface MutationGuard {
 export interface AuthSetupDependencies {
   launchBrowser(): Promise<AuthSetupBrowser>;
   prepareContext(context: AuthSetupContext): Promise<MutationGuard>;
+  promoteState(partial: string, final: string): Promise<void>;
 }
 
 export interface AuthSetupEnvironment extends VisualEnvironment {
@@ -65,7 +66,8 @@ const productionDependencies: AuthSetupDependencies = {
   prepareContext: async (context) =>
     prepareCaptureContext(
       context as Parameters<typeof prepareCaptureContext>[0]
-    )
+    ),
+  promoteState: rename
 };
 
 const exactProfileUrl = (raw: string, expectedOrigin: string): boolean => {
@@ -136,8 +138,12 @@ export async function runAuthSetupCommand(
     const parsed = JSON.parse(await readFile(partialPath, 'utf8')) as unknown;
     validateAuthStorageState(parsed, expectedOrigin);
     await chmod(partialPath, 0o600);
+    await page.close();
+    page = undefined;
+    await context.close();
+    context = undefined;
     guard.assertNoMutations();
-    await rename(partialPath, finalPath);
+    await dependencies.promoteState(partialPath, finalPath);
     await chmod(finalPath, 0o600);
     return 0;
   } catch {

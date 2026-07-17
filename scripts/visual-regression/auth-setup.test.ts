@@ -5,6 +5,7 @@ import {
   mkdir,
   mkdtemp,
   readFile,
+  rename,
   rm,
   stat,
   writeFile
@@ -62,16 +63,30 @@ const firebaseState = (origin: string) => ({
 });
 
 async function fixture(
-  options: { invalidState?: boolean; failMarker?: boolean } = {}
+  options: {
+    failGuardAt?: 1 | 2;
+    failMarker?: boolean;
+    finalUrl?: string;
+    invalidState?: boolean;
+    mutationDuringClose?: boolean;
+  } = {}
 ) {
   const cwd = await mkdtemp(path.join(os.tmpdir(), 'cag-auth-setup-'));
   temporaryDirectories.push(cwd);
   const authDir = path.join(cwd, 'auth');
   const events: string[] = [];
-  let finalUrl = 'http://127.0.0.1:3000/profile';
-  const closePage = vi.fn(async () => undefined);
-  const closeContext = vi.fn(async () => undefined);
-  const closeBrowser = vi.fn(async () => undefined);
+  const finalUrl = options.finalUrl ?? 'http://127.0.0.1:3000/profile';
+  let mutationDuringClose = false;
+  const closePage = vi.fn(async () => {
+    events.push('page-close');
+  });
+  const closeContext = vi.fn(async () => {
+    events.push('context-close');
+    mutationDuringClose = options.mutationDuringClose ?? false;
+  });
+  const closeBrowser = vi.fn(async () => {
+    events.push('browser-close');
+  });
   const page: AuthSetupPage = {
     close: closePage,
     fill: vi.fn(async (selector, value) => {
@@ -88,9 +103,10 @@ async function fixture(
       }
     })),
     url: () => finalUrl,
-    waitForURL: vi.fn(async () => {
-      events.push('wait-url');
-      finalUrl = 'http://127.0.0.1:3000/profile';
+    waitForURL: vi.fn(async (matcher) => {
+      const matched = matcher(new URL(finalUrl));
+      events.push(`wait-url:${String(matched)}`);
+      if (!matched) throw new Error('URL did not match');
     })
   };
   const context: AuthSetupContext = {
@@ -114,7 +130,18 @@ async function fixture(
     close: closeBrowser,
     newContext: async () => context
   };
-  const assertNoMutations = vi.fn(() => events.push('assert-mutations'));
+  let guardCalls = 0;
+  const assertNoMutations = vi.fn(() => {
+    guardCalls += 1;
+    events.push(`assert-mutations:${guardCalls}`);
+    if (options.failGuardAt === guardCalls || mutationDuringClose) {
+      throw new Error('mutation blocked');
+    }
+  });
+  const promoteState = vi.fn(async (partial: string, final: string) => {
+    events.push('promote');
+    await rename(partial, final);
+  });
   return {
     assertNoMutations,
     authDir,
@@ -132,10 +159,19 @@ async function fixture(
       VR_COMPANY_PASSWORD: 'do-not-log'
     },
     events,
+    dependencies: {
+      launchBrowser: async () => browser,
+      prepareContext: async () => {
+        events.push('prepare');
+        return { assertNoMutations };
+      },
+      promoteState
+    },
     prepareContext: vi.fn(async () => {
       events.push('prepare');
       return { assertNoMutations };
-    })
+    }),
+    promoteState
   };
 }
 
@@ -143,10 +179,7 @@ describe('runAuthSetupCommand', () => {
   it('installs the guard before login and atomically saves validated IndexedDB evidence', async () => {
     const test = await fixture();
     await expect(
-      runAuthSetupCommand([], test.environment, test.cwd, {
-        launchBrowser: async () => test.browser,
-        prepareContext: test.prepareContext
-      })
+      runAuthSetupCommand([], test.environment, test.cwd, test.dependencies)
     ).resolves.toBe(0);
 
     expect(test.events.indexOf('prepare')).toBeLessThan(
@@ -155,8 +188,11 @@ describe('runAuthSetupCommand', () => {
     expect(test.events).toContain('marker:text="YOUR PROFILE"');
     expect(test.events).toContain('marker:text="Basic Group Info"');
     expect(
-      test.events.filter((event) => event === 'assert-mutations')
+      test.events.filter((event) => event.startsWith('assert-mutations:'))
     ).toHaveLength(2);
+    expect(test.events).toContain('assert-mutations:1');
+    expect(test.events).toContain('assert-mutations:2');
+    expect(test.events).toContain('wait-url:true');
     expect(test.events).toContain('storage:true');
     const final = path.join(test.authDir, 'company.json');
     expect(JSON.parse(await readFile(final, 'utf8'))).toEqual(
@@ -167,6 +203,16 @@ describe('runAuthSetupCommand', () => {
     expect(test.closePage).toHaveBeenCalledOnce();
     expect(test.closeContext).toHaveBeenCalledOnce();
     expect(test.closeBrowser).toHaveBeenCalledOnce();
+    expect(test.events.indexOf('page-close')).toBeLessThan(
+      test.events.indexOf('context-close')
+    );
+    expect(test.events.indexOf('context-close')).toBeLessThan(
+      test.events.indexOf('assert-mutations:2')
+    );
+    expect(test.events.indexOf('assert-mutations:2')).toBeLessThan(
+      test.events.indexOf('promote')
+    );
+    expect(test.promoteState).toHaveBeenCalledOnce();
   });
 
   it('preserves valid prior evidence and removes partials after validation failure', async () => {
@@ -177,10 +223,7 @@ describe('runAuthSetupCommand', () => {
     await chmod(final, 0o600);
 
     await expect(
-      runAuthSetupCommand([], test.environment, test.cwd, {
-        launchBrowser: async () => test.browser,
-        prepareContext: test.prepareContext
-      })
+      runAuthSetupCommand([], test.environment, test.cwd, test.dependencies)
     ).resolves.toBe(1);
 
     expect(await readFile(final, 'utf8')).toBe('{"prior":true}');
@@ -190,6 +233,69 @@ describe('runAuthSetupCommand', () => {
     expect(test.closePage).toHaveBeenCalledOnce();
     expect(test.closeContext).toHaveBeenCalledOnce();
     expect(test.closeBrowser).toHaveBeenCalledOnce();
+    expect(test.promoteState).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['wrong origin', { finalUrl: 'http://localhost:3000/profile' }],
+    ['wrong path', { finalUrl: 'http://127.0.0.1:3000/login' }],
+    ['query', { finalUrl: 'http://127.0.0.1:3000/profile?next=x' }],
+    ['hash', { finalUrl: 'http://127.0.0.1:3000/profile#private' }],
+    ['marker failure', { failMarker: true }],
+    ['first guard failure', { failGuardAt: 1 as const }],
+    ['final guard failure', { failGuardAt: 2 as const }],
+    ['post-close guard failure', { mutationDuringClose: true }]
+  ])('preserves prior evidence after %s', async (_label, options) => {
+    const test = await fixture(options);
+    await mkdir(test.authDir, { recursive: true });
+    const final = path.join(test.authDir, 'company.json');
+    const prior = Buffer.from('prior-company-state');
+    await writeFile(final, prior, { mode: 0o600 });
+
+    await expect(
+      runAuthSetupCommand([], test.environment, test.cwd, test.dependencies)
+    ).resolves.toBe(1);
+
+    expect(await readFile(final)).toEqual(prior);
+    await expect(
+      (await import('node:fs/promises')).readdir(test.authDir)
+    ).resolves.toEqual(['company.json']);
+    expect(test.promoteState).not.toHaveBeenCalled();
+    expect(test.closeBrowser).toHaveBeenCalledOnce();
+  });
+
+  it('never logs visual credentials on a failed guarded promotion', async () => {
+    const test = await fixture({ failGuardAt: 1 });
+    const log = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const error = vi
+      .spyOn(console, 'error')
+      .mockImplementation(() => undefined);
+    try {
+      await runAuthSetupCommand(
+        [],
+        {
+          ...test.environment,
+          VR_COMPANY_EMAIL: 'SECRET_EMAIL_CANARY',
+          VR_COMPANY_PASSWORD: 'SECRET_PASSWORD_CANARY'
+        },
+        test.cwd,
+        test.dependencies
+      );
+      const output = [
+        ...log.mock.calls,
+        ...warn.mock.calls,
+        ...error.mock.calls
+      ]
+        .flat()
+        .join(' ');
+      expect(output).not.toContain('SECRET_EMAIL_CANARY');
+      expect(output).not.toContain('SECRET_PASSWORD_CANARY');
+    } finally {
+      log.mockRestore();
+      warn.mockRestore();
+      error.mockRestore();
+    }
   });
 
   it('fails without opening a browser when credentials or arguments are invalid', async () => {
@@ -198,7 +304,8 @@ describe('runAuthSetupCommand', () => {
     await expect(
       runAuthSetupCommand(['--state=admin'], test.environment, test.cwd, {
         launchBrowser,
-        prepareContext: test.prepareContext
+        prepareContext: test.prepareContext,
+        promoteState: test.promoteState
       })
     ).resolves.toBe(1);
     await expect(
@@ -206,7 +313,11 @@ describe('runAuthSetupCommand', () => {
         [],
         { ...test.environment, VR_COMPANY_PASSWORD: undefined },
         test.cwd,
-        { launchBrowser, prepareContext: test.prepareContext }
+        {
+          launchBrowser,
+          prepareContext: test.prepareContext,
+          promoteState: test.promoteState
+        }
       )
     ).resolves.toBe(1);
     expect(launchBrowser).not.toHaveBeenCalled();

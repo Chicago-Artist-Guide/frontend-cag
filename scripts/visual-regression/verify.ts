@@ -108,30 +108,48 @@ export async function runVerifyCommand(
   ) {
     return 1;
   }
-  if (
-    !(await invalidateGeneratedEvidence(
-      paths.captureSummary,
-      paths.diffDir,
-      paths.reportFile
-    ))
-  ) {
+  const verifyTarget = path.join(paths.artifactDir, 'verify-run');
+  let verifyLock: Awaited<ReturnType<typeof acquireGenerationLock>> | undefined;
+  try {
+    await mkdir(paths.artifactDir, { recursive: true });
+    verifyLock = await acquireGenerationLock(verifyTarget);
+  } catch {
     return 1;
   }
 
-  const captureCode = await runStage(
-    dependencies.capture,
-    captureArgs,
-    environment,
-    cwd
-  );
-  const diffCode = await runStage(
-    dependencies.diff,
-    diffArgs,
-    environment,
-    cwd
-  );
-  const reportCode = await runStage(dependencies.report, [], environment, cwd);
-  return captureCode || diffCode || reportCode;
+  try {
+    if (
+      !(await invalidateGeneratedEvidence(
+        paths.captureSummary,
+        paths.diffDir,
+        paths.reportFile
+      ))
+    ) {
+      return 1;
+    }
+
+    const captureCode = await runStage(
+      dependencies.capture,
+      captureArgs,
+      environment,
+      cwd
+    );
+    const diffCode = await runStage(
+      dependencies.diff,
+      diffArgs,
+      environment,
+      cwd
+    );
+    const reportCode = await runStage(
+      dependencies.report,
+      [],
+      environment,
+      cwd
+    );
+    return captureCode || diffCode || reportCode;
+  } finally {
+    await verifyLock.release().catch(() => undefined);
+  }
 }
 
 if (

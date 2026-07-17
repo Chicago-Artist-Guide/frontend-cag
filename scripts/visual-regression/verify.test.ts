@@ -48,6 +48,63 @@ async function fixture() {
 }
 
 describe('runVerifyCommand', () => {
+  it('holds exclusive verifier ownership across capture, diff, and report', async () => {
+    const test = await fixture();
+    let releaseCapture: (() => void) | undefined;
+    let captureStarted: (() => void) | undefined;
+    const captureGate = new Promise<void>((resolve) => {
+      releaseCapture = resolve;
+    });
+    const started = new Promise<void>((resolve) => {
+      captureStarted = resolve;
+    });
+    const firstCalls: string[] = [];
+    const firstRun = runVerifyCommand([], test.environment, test.cwd, {
+      capture: async () => {
+        firstCalls.push('capture');
+        await writeFile(test.captureSummary, '{"owner":"first"}');
+        await writeFile(test.currentFile, 'first-current');
+        captureStarted?.();
+        await captureGate;
+        return 0;
+      },
+      diff: async () => {
+        firstCalls.push('diff');
+        await mkdir(path.dirname(test.summaryFile), { recursive: true });
+        await writeFile(test.summaryFile, '{"owner":"first"}');
+        return 0;
+      },
+      report: async () => {
+        firstCalls.push('report');
+        await writeFile(test.reportFile, '<html>first</html>');
+        return 0;
+      }
+    });
+
+    await started;
+    const secondStage = vi.fn(async () => 0 as const);
+    try {
+      await expect(
+        runVerifyCommand([], test.environment, test.cwd, {
+          capture: secondStage,
+          diff: secondStage,
+          report: secondStage
+        })
+      ).resolves.toBe(1);
+      expect(secondStage).not.toHaveBeenCalled();
+      expect(await readFile(test.captureSummary, 'utf8')).toContain('first');
+      expect(await readFile(test.currentFile, 'utf8')).toBe('first-current');
+    } finally {
+      releaseCapture?.();
+    }
+
+    await expect(firstRun).resolves.toBe(0);
+    expect(firstCalls).toEqual(['capture', 'diff', 'report']);
+    expect(await readFile(test.captureSummary, 'utf8')).toContain('first');
+    expect(await readFile(test.summaryFile, 'utf8')).toContain('first');
+    expect(await readFile(test.reportFile, 'utf8')).toContain('first');
+  });
+
   it('canonicalizes ownership and runs capture, diff, then report', async () => {
     const test = await fixture();
     const calls: Array<[string, readonly string[]]> = [];

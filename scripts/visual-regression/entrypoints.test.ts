@@ -1,8 +1,10 @@
 // @vitest-environment node
 
 import { describe, expect, it } from 'vitest';
-import { runCaptureCommand } from './capture';
+import { validateAuthStorageState } from './auth-state';
+import { captureContextOptionsFor, runCaptureCommand } from './capture';
 import { runDiffCommand } from './diff';
+import { MANIFEST } from './manifest';
 import { runReportCommand } from './report';
 
 describe('visual command entrypoints', () => {
@@ -33,5 +35,51 @@ describe('visual command entrypoints', () => {
     await expect(
       runReportCommand(['--threshold=0.1'], environment, '/tmp/cag-vr-entry')
     ).rejects.toThrow('report does not accept');
+  });
+
+  it('passes validated IndexedDB auth state to Playwright in memory', () => {
+    const company = MANIFEST.find(({ id }) => id === 'company-profile');
+    if (!company) throw new Error('company visual fixture is missing');
+    const storageState = validateAuthStorageState(
+      {
+        cookies: [],
+        origins: [
+          {
+            indexedDB: [
+              {
+                name: 'firebaseLocalStorageDb',
+                stores: [
+                  {
+                    autoIncrement: false,
+                    indexes: [],
+                    keyPath: 'fbase_key',
+                    name: 'firebaseLocalStorage',
+                    records: [
+                      {
+                        value: {
+                          fbase_key: 'firebase:authUser:test-api-key:[DEFAULT]',
+                          value: { uid: 'fixture' }
+                        }
+                      }
+                    ]
+                  }
+                ],
+                version: 1
+              }
+            ],
+            localStorage: [],
+            origin: 'http://127.0.0.1:3000'
+          }
+        ]
+      },
+      'http://127.0.0.1:3000'
+    );
+
+    const options = captureContextOptionsFor(
+      { entry: company, viewport: 'desktop' },
+      new Map([['company', storageState]])
+    );
+    expect(options.storageState).toBe(storageState);
+    expect(typeof options.storageState).toBe('object');
   });
 });

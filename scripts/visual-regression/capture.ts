@@ -37,7 +37,7 @@ type RuntimeContextOptions = Omit<BrowserContextOptions, 'storageState'> & {
   storageState?: ValidatedAuthStorageState;
 };
 
-const contextOptionsFor = (
+export const captureContextOptionsFor = (
   visualCase: VisualCase,
   authStates: ReadonlyMap<
     Exclude<VisualCase['entry']['auth'], 'anonymous'>,
@@ -104,7 +104,10 @@ export async function runCaptureCommand(
           outputDir,
           async (partialPath) => {
             context = await captureBrowser.newContext(
-              contextOptionsFor(visualCase, authStates) as BrowserContextOptions
+              captureContextOptionsFor(
+                visualCase,
+                authStates
+              ) as BrowserContextOptions
             );
             requestGuard = await prepareCaptureContext(context);
             const page = await context.newPage();
