@@ -548,6 +548,15 @@ const signalReason = (
       ? 'SIGTERM'
       : null;
 
+export const failClosedCommandResult = (
+  observed: CommandResult,
+  terminationRequested: boolean,
+  signal: AbortSignal | undefined
+): CommandResult =>
+  terminationRequested
+    ? { code: null, signal: signalReason(signal) }
+    : observed;
+
 const killProcessTree = (
   child: SpawnedChild,
   signal: NodeJS.Signals
@@ -618,8 +627,9 @@ const runSpawnedCommand = async (
   const timeout = setTimeout(terminate, specification.timeoutMs);
   timeout.unref();
   specification.signal?.addEventListener('abort', terminate, { once: true });
+  let observed: CommandResult;
   try {
-    return await Promise.race([exit, terminationOutcome]);
+    observed = await Promise.race([exit, terminationOutcome]);
   } finally {
     clearTimeout(timeout);
     specification.signal?.removeEventListener('abort', terminate);
@@ -629,6 +639,11 @@ const runSpawnedCommand = async (
       await stopOwnedServer(child, exit);
     }
   }
+  return failClosedCommandResult(
+    observed,
+    termination !== undefined,
+    specification.signal
+  );
 };
 
 const spawnNextServer = (

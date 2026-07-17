@@ -21,6 +21,7 @@ import {
   assertNoCalibrationDotenv,
   assertSecureGenerationParent,
   createCalibrationEnvironment,
+  failClosedCommandResult,
   inventoryCalibrationCorpus,
   resolveEvidenceRootIdentity,
   runCalibrationCommand,
@@ -705,6 +706,16 @@ describe('runCalibrationCommand', () => {
 });
 
 describe('immutable copied permissions', () => {
+  it('never accepts leader exit zero after command termination began', () => {
+    expect(
+      failClosedCommandResult(
+        { code: 0, signal: null },
+        true,
+        new AbortController().signal
+      )
+    ).toEqual({ code: null, signal: null });
+  });
+
   it('documents the expected no-write permission bits', async () => {
     const root = await createCorpus('cag-calibration-mode-');
     const file = path.join(root, CALIBRATION_RELATIVE_FILES[0]);
