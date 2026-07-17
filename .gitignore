@@ -46,6 +46,7 @@ docs/
 
 # Visual regression — auth state and run outputs (baselines are committed per-PR)
 scripts/visual-regression/.auth/
+scripts/visual-regression/artifacts/
 scripts/visual-regression/snapshots/current/
 scripts/visual-regression/snapshots/diff/
 
