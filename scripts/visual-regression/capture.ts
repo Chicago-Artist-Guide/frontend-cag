@@ -3,8 +3,12 @@ import {
   type Browser,
   type BrowserContextOptions
 } from '@playwright/test';
-import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import {
+  loadSelectedAuthStates,
+  type ValidatedAuthStorageState
+} from './auth-state';
 import {
   CaptureCaseFailure,
   ensureBaseUrlReachable,
@@ -21,19 +25,27 @@ import {
   type StabilityResult
 } from './stability';
 
-const environment = (): VisualEnvironment => ({
-  VR_ARTIFACT_DIR: process.env.VR_ARTIFACT_DIR,
-  VR_AUTH_DIR: process.env.VR_AUTH_DIR,
-  VR_BASELINE_DIR: process.env.VR_BASELINE_DIR,
-  VR_BASE_URL: process.env.VR_BASE_URL
-});
+export interface CaptureCommandDependencies {
+  launchBrowser(): Promise<Browser>;
+}
+
+const productionDependencies: CaptureCommandDependencies = {
+  launchBrowser: async () => chromium.launch({ headless: true })
+};
+
+type RuntimeContextOptions = Omit<BrowserContextOptions, 'storageState'> & {
+  storageState?: ValidatedAuthStorageState;
+};
 
 const contextOptionsFor = (
   visualCase: VisualCase,
-  authDir: string
-): BrowserContextOptions => {
+  authStates: ReadonlyMap<
+    Exclude<VisualCase['entry']['auth'], 'anonymous'>,
+    ValidatedAuthStorageState
+  >
+): RuntimeContextOptions => {
   const viewport = VIEWPORTS[visualCase.viewport];
-  const options: BrowserContextOptions = {
+  const options: Omit<BrowserContextOptions, 'storageState'> = {
     colorScheme: 'light',
     deviceScaleFactor: viewport.deviceScaleFactor,
     locale: 'en-US',
@@ -43,32 +55,34 @@ const contextOptionsFor = (
     viewport: { height: viewport.height, width: viewport.width }
   };
   if (visualCase.entry.auth !== 'anonymous') {
-    const stateFile = path.join(authDir, `${visualCase.entry.auth}.json`);
-    if (!existsSync(stateFile)) {
+    const storageState = authStates.get(visualCase.entry.auth);
+    if (!storageState) {
       throw new Error(
         `missing ${visualCase.entry.auth} auth state; run visual auth setup first`
       );
     }
-    options.storageState = stateFile;
+    return { ...options, storageState };
   }
   return options;
 };
 
-async function main(): Promise<void> {
-  const invocation = await resolveCaptureInvocation(
-    process.argv.slice(2),
-    environment(),
-    process.cwd()
-  );
-  if (!invocation) {
-    process.exitCode = 1;
-    return;
-  }
+export async function runCaptureCommand(
+  argv: readonly string[],
+  environment: VisualEnvironment,
+  cwd: string,
+  dependencies: CaptureCommandDependencies = productionDependencies
+): Promise<0 | 1> {
+  const invocation = await resolveCaptureInvocation(argv, environment, cwd);
+  if (!invocation) return 1;
   const { cases, command, paths, selection } = invocation;
   const outputDir =
     command === 'baseline' ? paths.baselineDir : paths.currentDir;
   const expectedOrigin = new URL(paths.baseUrl).origin;
   let browser: Browser | undefined;
+  let authStates = new Map<
+    Exclude<VisualCase['entry']['auth'], 'anonymous'>,
+    ValidatedAuthStorageState
+  >();
 
   const result = await runCapture({
     artifactDir: paths.artifactDir,
@@ -90,7 +104,7 @@ async function main(): Promise<void> {
           outputDir,
           async (partialPath) => {
             context = await captureBrowser.newContext(
-              contextOptionsFor(visualCase, paths.authDir)
+              contextOptionsFor(visualCase, authStates) as BrowserContextOptions
             );
             requestGuard = await prepareCaptureContext(context);
             const page = await context.newPage();
@@ -137,17 +151,30 @@ async function main(): Promise<void> {
     },
     command,
     prepare: async () => {
+      authStates = await loadSelectedAuthStates(
+        cases,
+        paths.authDir,
+        paths.baseUrl
+      );
       await ensureBaseUrlReachable(paths.baseUrl);
-      browser = await chromium.launch({ headless: true });
+      browser = await dependencies.launchBrowser();
     },
     selection,
     summaryPath: paths.captureSummary
   });
 
-  if (!result.ok) process.exitCode = 1;
+  return result.ok ? 0 : 1;
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
+  void runCaptureCommand(process.argv.slice(2), process.env, process.cwd())
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch(() => {
+      process.exitCode = 1;
+    });
+}

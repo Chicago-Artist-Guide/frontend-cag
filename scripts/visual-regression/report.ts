@@ -1,7 +1,11 @@
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { parseVisualArgs, resolveSafeVisualPaths } from './config';
+import {
+  parseVisualArgs,
+  resolveSafeVisualPaths,
+  type VisualEnvironment
+} from './config';
 import {
   acquireGenerationLock,
   validateDiffSummary,
@@ -212,18 +216,25 @@ export async function runReport(
   }
 }
 
-async function main(): Promise<void> {
-  parseVisualArgs(process.argv.slice(2), 'report');
-  const paths = resolveSafeVisualPaths(process.env, process.cwd());
-  process.exitCode = await runReport(paths.summaryFile, paths.reportFile);
+export async function runReportCommand(
+  argv: readonly string[],
+  environment: VisualEnvironment,
+  cwd: string
+): Promise<0 | 1> {
+  parseVisualArgs(argv, 'report');
+  const paths = resolveSafeVisualPaths(environment, cwd);
+  return runReport(paths.summaryFile, paths.reportFile);
 }
 
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
 ) {
-  void main().catch((error: unknown) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
+  void runReportCommand(process.argv.slice(2), process.env, process.cwd())
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch(() => {
+      process.exitCode = 1;
+    });
 }

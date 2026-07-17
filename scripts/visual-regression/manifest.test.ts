@@ -11,7 +11,8 @@ import {
   readinessSelectorForMarker,
   selectVisualCases,
   validateVisualManifest,
-  type RouteEntry
+  type RouteEntry,
+  type VisualSelection
 } from './manifest';
 
 const baselineIds = [
@@ -183,7 +184,7 @@ describe('visual manifest', () => {
         entry({
           baselinePolicy: {
             kind: 'not-a-policy'
-          } as RouteEntry['baselinePolicy']
+          } as unknown as RouteEntry['baselinePolicy']
         })
       ],
       problem: 'unknown baseline policy'
@@ -475,7 +476,9 @@ describe('selectVisualCases', () => {
     [{ clusters: ['unknown' as never] }, 'unknown route cluster'],
     [{ viewports: ['unknown' as never] }, 'unknown viewport']
   ] as const)('rejects invalid selection %j', (selection, problem) => {
-    expect(() => selectVisualCases(MANIFEST, selection)).toThrow(problem);
+    expect(() =>
+      selectVisualCases(MANIFEST, selection as VisualSelection)
+    ).toThrow(problem);
   });
 
   it('rejects a valid filter combination that selects no cases', () => {
