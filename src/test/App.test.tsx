@@ -1,10 +1,15 @@
 import React from 'react';
 import { render } from '@testing-library/react';
-import App from '../routes/App';
 
-test('renders app with home content', () => {
-  const { getAllByText } = render(<App />);
-  const headings = getAllByText(/Discover your next/i);
+test('renders app with home content', async () => {
+  window.history.replaceState({}, '', '/home');
+  const { default: App } = await import('../routes/App');
+
+  const { getAllByRole } = render(<App />);
+  const headings = getAllByRole('heading', {
+    name: /Discover your next dream gig/i
+  });
+
   expect(headings.length).toBeGreaterThan(0);
   expect(headings[0]).toBeInTheDocument();
 });
