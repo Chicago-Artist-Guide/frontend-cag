@@ -598,6 +598,29 @@ describe('validateCaptureSummary', () => {
     expect(validated.cases[0].error?.message).toContain('<path>');
     expect(validated.cases[0].error?.message).toContain('<url>');
   });
+
+  it.each([';', '!', ']', '}'])(
+    'redacts a POSIX diagnostic path after the %s boundary',
+    (boundary) => {
+      const subject = visualCase();
+      const failed: CaptureCaseSummaryV1 = {
+        ...passedCapture(subject),
+        artifact: undefined,
+        error: {
+          message: `failed${boundary}/opt/SECRET/key`,
+          name: 'Error'
+        },
+        status: 'failed'
+      };
+
+      const validated = validateCaptureSummary(
+        captureSummary([subject], [failed]),
+        MANIFEST
+      );
+
+      expect(validated.cases[0].error?.message).toBe(`failed${boundary}<path>`);
+    }
+  );
 });
 
 describe('runDiff', () => {

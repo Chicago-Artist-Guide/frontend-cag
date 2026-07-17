@@ -347,7 +347,7 @@ const sanitizeDiagnosticMessage = (value: string): string => {
     .replace(/\\\\[^\\\s]+\\[^\s,;'"<>]+/gu, '<path>')
     .replace(/\b[A-Za-z]:[\\/][^\s,;'"<>]+/gu, '<path>')
     .replace(
-      /(^|[\s("'=:,[{])\/(?!\/)[^\s,;'"<>)}\]]*/gu,
+      /(^|[^A-Za-z0-9._~%/\\-])\/(?!\/)[^\s,;'"<>)}\]]*/gu,
       (match, prefix: string) =>
         match.length === prefix.length + 1 ? match : `${prefix}<path>`
     )
