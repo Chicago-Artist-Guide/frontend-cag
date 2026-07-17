@@ -1,8 +1,11 @@
 import React from 'react';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
-import { redBlob, yellowBlob1 } from '../../images';
-import { emailWhiteIcon } from '../../images/icons-home';
+import {
+  emailWhiteIcon,
+  redBlob,
+  yellowBlob1
+} from '../../config/publicImages';
 import { BlobBox } from '../layout';
 
 const EmailList = () => {

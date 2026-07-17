@@ -7,14 +7,16 @@ import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
 import { media } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
+import {
+  Envelope,
+  Facebook,
+  FooterBg,
+  Insta,
+  Linkedin,
+  LogoSrc,
+  Medium
+} from '../../config/publicImages';
 import { zeffyUrl } from '../../utils/marketing';
-import FooterBg from '../../images/footer-background.png';
-import Envelope from '../../images/icons-footer/email.png';
-import Facebook from '../../images/icons-footer/social_facebook.png';
-import Insta from '../../images/icons-footer/social_instagram.png';
-import Linkedin from '../../images/icons-footer/social_linkedin.png';
-import Medium from '../../images/icons-footer/social_medium.png';
-import LogoSrc from '../../images/logoPlain.svg';
 
 const Footer = () => (
   <FooterNavbar className="justify-content-center nav container" expand="sm">

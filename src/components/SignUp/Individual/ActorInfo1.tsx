@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Checkbox from '../../../components/shared/Checkbox';
 import PrivateLabel from '../../../components/shared/PrivateLabel';
-import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { yellow_blob } from '../../../config/publicImages';
 import { colors, fonts } from '../../../theme/styleVars';
 import { Title } from '../../layout/Titles';
 import { ethnicityTypes, IndividualData, pronouns } from './types';

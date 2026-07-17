@@ -19,7 +19,7 @@ import Button from '../../../components/shared/Button';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { colors, fonts, breakpoints } from '../../../theme/styleVars';
 import { faCalendarAlt } from '@fortawesome/free-solid-svg-icons';
-import Logo from '../../../images/cagLogo1.svg';
+import { Logo } from '../../../config/publicImages';
 
 // Custom URL validation that adds protocol if missing
 const urlValidator = (url: string) => {

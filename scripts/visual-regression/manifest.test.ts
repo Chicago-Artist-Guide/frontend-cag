@@ -480,12 +480,12 @@ describe('visual manifest', () => {
       )
     ).toEqual(['home', 'donate']);
     expect(
-      entriesForTarget('src/images/supporters/young-leaders-fund.png').map(
+      entriesForTarget('public/images/supporters/young-leaders-fund.png').map(
         ({ id }) => id
       )
     ).toEqual(['home', 'donate']);
     expect(
-      entriesForTarget('src/images/sponsors/west-loop-soul.png').map(
+      entriesForTarget('public/images/sponsors/west-loop-soul.png').map(
         ({ id }) => id
       )
     ).toEqual(['home', 'donate']);
@@ -493,7 +493,7 @@ describe('visual manifest', () => {
       entriesForTarget('src/utils/supporters.ts').map(({ id }) => id)
     ).toEqual(['home', 'donate']);
     expect(
-      entriesForTarget('src/images/donate/keys.png').map(({ id }) => id)
+      entriesForTarget('public/images/donate/keys.png').map(({ id }) => id)
     ).toEqual(['donate']);
   });
 

@@ -142,6 +142,22 @@ const checkHtml = async (options, path) => {
   }
 };
 
+const checkPublicAsset = async (options, path, expectedContentType) => {
+  const { dispose, response } = await requestWithRetry({ ...options, path });
+  try {
+    requireSuccess(path, response);
+
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes(expectedContentType)) {
+      throw new Error(
+        `${path} returned content type ${JSON.stringify(contentType)}; expected ${JSON.stringify(expectedContentType)}`
+      );
+    }
+  } finally {
+    dispose();
+  }
+};
+
 const findStaticPath = (html) => {
   const match = html.match(
     /(?:^|[\s<])(?:src|href)\s*=\s*(["'])(\/_next\/static\/[^"']+)\1/i
@@ -194,6 +210,9 @@ export const smokeServer = async ({
   } finally {
     dispose();
   }
+
+  await checkPublicAsset(options, '/images/cagLogo1.svg', 'image/svg+xml');
+  await checkPublicAsset(options, '/images/donate/stage_bow.png', 'image/png');
 };
 
 const isMainModule =

@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageContainer, Title } from '../components/layout';
 import Button from '../components/shared/Button';
 import { useUserContext } from '../context/UserContext';
-import Red_Blob from '../images/red_blob.svg';
+import { Red_Blob } from '../config/publicImages';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();

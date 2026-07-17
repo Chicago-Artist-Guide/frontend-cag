@@ -26,10 +26,6 @@ vi.mock('../../hooks/useAdminAuth', () => ({
   useAdminAuth: headerMocks.useAdminAuth
 }));
 
-vi.mock('../../images/cagLogo1.svg', () => ({
-  default: 'cag-logo.svg'
-}));
-
 import Header from './Header';
 
 interface Deferred<T> {
@@ -98,6 +94,10 @@ describe('Header unread-interest badge', () => {
       </MemoryRouter>
     );
 
+    expect(screen.getByRole('img', { name: 'CAG Logo' })).toHaveAttribute(
+      'src',
+      '/images/cagLogo1.svg'
+    );
     expect(await screen.findByLabelText('3 unread messages')).toHaveTextContent(
       '3'
     );

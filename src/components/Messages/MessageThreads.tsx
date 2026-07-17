@@ -10,7 +10,7 @@ import {
 import { findProfileByUidOrAccountId } from '../../services/profiles/client';
 import { getProduction } from '../Profile/Company/api';
 import { MessageThreadType } from './types';
-import { defaultPfp } from '../../images';
+import { defaultPfp } from '../../config/publicImages';
 
 interface MessageThreadsProps {
   onThreadSelect: (threadId: string) => void;

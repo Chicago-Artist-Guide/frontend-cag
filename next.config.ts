@@ -7,15 +7,7 @@ const nextConfig: NextConfig = {
   images: {
     disableStaticImages: true
   },
-  output: 'standalone',
-  webpack: (config) => {
-    config.module.rules.push({
-      test: /\.(gif|jpe?g|png|svg)$/i,
-      type: 'asset/resource'
-    });
-
-    return config;
-  }
+  output: 'standalone'
 };
 
 export default nextConfig;

@@ -2,18 +2,18 @@ import React from 'react';
 import styled from 'styled-components';
 import PageContainer from '../components/layout/PageContainer';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
+import {
+  CoinsIcon,
+  KeysIcon,
+  LaptopIcon,
+  SignBoardIcon,
+  StageBowIcon,
+  StageLightIcon
+} from '../config/publicImages';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import { zeffyUrl } from '../utils/marketing';
 
 import { supporters as corporateSponsors } from '../utils/supporters';
-
-// Donate impact icons
-import KeysIcon from '../images/donate/keys.png';
-import StageBowIcon from '../images/donate/stage_bow.png';
-import CoinsIcon from '../images/donate/coins.png';
-import SignBoardIcon from '../images/donate/sign_board.png';
-import LaptopIcon from '../images/donate/laptop.png';
-import StageLightIcon from '../images/donate/stage_light.png';
 
 const Donate = () => {
   return (

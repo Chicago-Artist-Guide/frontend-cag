@@ -318,8 +318,8 @@ const existingManifest: RouteEntry[] = [
       'src/routes/Home.tsx',
       'src/components/Home/**',
       'src/components/Redesign/PartnerSlider.tsx',
-      'src/images/sponsors/**',
-      'src/images/supporters/**',
+      'public/images/sponsors/**',
+      'public/images/supporters/**',
       'src/utils/supporters.ts',
       'src/components/layout/**'
     ],
@@ -365,9 +365,9 @@ const existingManifest: RouteEntry[] = [
       'src/routes/Donate.tsx',
       'src/components/Redesign/PartnerSlider.tsx',
       'src/components/layout/**',
-      'src/images/donate/**',
-      'src/images/sponsors/**',
-      'src/images/supporters/**',
+      'public/images/donate/**',
+      'public/images/sponsors/**',
+      'public/images/supporters/**',
       'src/utils/supporters.ts'
     ],
     viewports: ['desktop']

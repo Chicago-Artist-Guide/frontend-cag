@@ -3,18 +3,18 @@ import Collapsible from '../components/layout/Collapsible';
 import { homeFAQ } from '../components/FAQ/homeFAQ';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
+import {
+  BabesBlades,
+  ChicagoFringeOpera,
+  CircaPinto,
+  Corn,
+  GreatWorks,
+  Jackalope,
+  MPaact,
+  Pegasus,
+  TheStoryTheatre
+} from '../config/publicImages';
 import { zeffyUrl } from '../utils/marketing';
-
-// Partners
-import MPaact from '../images/partners/mpaact_hq-1.jpg';
-import ChicagoFringeOpera from '../images/partners/chicago-fringe-opera-1.png';
-import TheStoryTheatre from '../images/partners/the-story-theatre-1.png';
-import BabesBlades from '../images/partners/babes-blades-1.jpg';
-import CircaPinto from '../images/partners/circa-pintig-1.jpg';
-import Corn from '../images/partners/corn-1.jpg';
-import GreatWorks from '../images/partners/great-works-1.jpg';
-import Jackalope from '../images/partners/jackalope-1.png';
-import Pegasus from '../images/partners/pegasus-logo-1.jpg';
 
 import { supporters } from '../utils/supporters';
 

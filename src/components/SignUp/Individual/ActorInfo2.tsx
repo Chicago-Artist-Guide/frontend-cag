@@ -7,7 +7,7 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Checkbox, PrivateLabel } from '../../../components/shared';
-import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { yellow_blob } from '../../../config/publicImages';
 import { colors, fonts } from '../../../theme/styleVars';
 import { Title } from '../../layout';
 import {

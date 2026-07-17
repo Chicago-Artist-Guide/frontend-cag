@@ -3,7 +3,7 @@ import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import styled from 'styled-components';
-import Ribbon from '../../../images/icons-profile/ribbon.svg';
+import { Ribbon } from '../../../config/publicImages';
 import { colors, fonts } from '../../../theme/styleVars';
 import { ProfileAwards } from '../../SignUp/Individual/types';
 

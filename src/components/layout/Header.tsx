@@ -5,7 +5,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
-import Logo from '../../images/cagLogo1.svg';
+import { Logo } from '../../config/publicImages';
 import { getUnreadThreadCount } from '../../services/messages/client';
 import { colors } from '../../theme/styleVars';
 

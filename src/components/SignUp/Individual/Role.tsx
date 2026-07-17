@@ -2,9 +2,7 @@ import clsx from 'clsx';
 import React, { type JSX } from 'react';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
-import BothStage from '../../../images/icons-signup/both-stage.svg';
-import OffStage from '../../../images/icons-signup/off-stage.svg';
-import OnStage from '../../../images/icons-signup/on-stage.svg';
+import { BothStage, OffStage, OnStage } from '../../../config/publicImages';
 import type { IndividualData, IndividualRoles } from './types';
 
 // Mobile-first styled components

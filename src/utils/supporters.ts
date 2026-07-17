@@ -1,9 +1,10 @@
-// Supporter/Sponsor images
-import Driehaus from '../images/supporters/driehaus.svg';
-import Gios from '../images/supporters/gios.png';
-import PFM from '../images/supporters/pfm.png';
-import YoungLeadersFund from '../images/supporters/young-leaders-fund.png';
-import WestLoopSoul from '../images/sponsors/west-loop-soul.png';
+import {
+  Driehaus,
+  Gios,
+  PFM,
+  WestLoopSoul,
+  YoungLeadersFund
+} from '../config/publicImages';
 
 export interface Supporter {
   src: string;

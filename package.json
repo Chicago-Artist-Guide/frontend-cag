@@ -9,11 +9,11 @@
   },
   "scripts": {
     "setup": "npm ci && npm --prefix infra ci",
-    "dev": "next dev --webpack",
+    "dev": "next dev",
     "dev:container": "docker compose --env-file .env.local up --build app",
     "dev:container:start": "npm ci --prefer-offline && npm run dev -- --hostname 0.0.0.0",
     "start": "next start",
-    "build": "next build --webpack",
+    "build": "next build",
     "build:legacy": "tsc && vite build",
     "start:legacy": "vite",
     "preview:legacy": "vite preview",

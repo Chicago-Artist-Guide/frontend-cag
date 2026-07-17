@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { yellow_blob } from '../../../config/publicImages';
 import { colors, fonts } from '../../../theme/styleVars';
 import SignUpBody from '../shared/Body';
 import SignUpHeader from '../shared/Header';

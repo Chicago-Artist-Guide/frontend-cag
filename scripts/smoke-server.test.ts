@@ -9,6 +9,10 @@ const htmlResponse = (body: string) =>
   });
 
 const staticPath = '/_next/static/chunks/app/home/page.js';
+const publicAssetPaths = [
+  '/images/cagLogo1.svg',
+  '/images/donate/stage_bow.png'
+] as const;
 
 const healthyResponse = async (input: string | URL | Request) => {
   const pathname = new URL(input.toString()).pathname;
@@ -27,6 +31,16 @@ const healthyResponse = async (input: string | URL | Request) => {
   }
   if (pathname === staticPath) {
     return new Response('asset');
+  }
+  if (pathname === publicAssetPaths[0]) {
+    return new Response('<svg></svg>', {
+      headers: { 'Content-Type': 'image/svg+xml' }
+    });
+  }
+  if (pathname === publicAssetPaths[1]) {
+    return new Response('png', {
+      headers: { 'Content-Type': 'image/png' }
+    });
   }
 
   return new Response('not found', {
@@ -60,7 +74,8 @@ describe('smokeServer', () => {
       '/api/health/ready',
       '/home',
       '/about-us',
-      staticPath
+      staticPath,
+      ...publicAssetPaths
     ]);
   });
 
@@ -73,7 +88,7 @@ describe('smokeServer', () => {
       fetchImpl: healthyFetch
     });
 
-    expect(timeout).toHaveBeenCalledTimes(5);
+    expect(timeout).toHaveBeenCalledTimes(7);
     expect(timeout).toHaveBeenCalledWith(5000);
     healthyFetch.mock.calls.forEach(([, init]) => {
       expect(init).toEqual({ signal });
@@ -90,7 +105,7 @@ describe('smokeServer', () => {
       requestTimeoutMs: 1234
     });
 
-    expect(timeout).toHaveBeenCalledTimes(5);
+    expect(timeout).toHaveBeenCalledTimes(7);
     expect(timeout).toHaveBeenCalledWith(1234);
   });
 
@@ -177,7 +192,7 @@ describe('smokeServer', () => {
       fetchImpl
     });
 
-    expect(fetchImpl).toHaveBeenCalledTimes(6);
+    expect(fetchImpl).toHaveBeenCalledTimes(8);
   });
 
   it('rejects a non-success response with its route and status', async () => {
@@ -241,6 +256,25 @@ describe('smokeServer', () => {
     await expect(
       smokeServer({ baseUrl: 'http://example.test', fetchImpl })
     ).rejects.toThrow(`${staticPath} returned 404 Not Found`);
+  });
+
+  it('identifies a failing migrated public image', async () => {
+    const fetchImpl = vi.fn<typeof fetch>(async (input) => {
+      const pathname = new URL(input.toString()).pathname;
+
+      if (pathname === publicAssetPaths[1]) {
+        return new Response('missing', {
+          status: 404,
+          statusText: 'Not Found'
+        });
+      }
+
+      return healthyResponse(input);
+    });
+
+    await expect(
+      smokeServer({ baseUrl: 'http://example.test', fetchImpl })
+    ).rejects.toThrow(`${publicAssetPaths[1]} returned 404 Not Found`);
   });
 
   it('rejects a home shell without a root-relative static reference', async () => {
