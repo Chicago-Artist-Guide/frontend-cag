@@ -98,26 +98,83 @@ const getModuleImports = (
   return { named, namespaces };
 };
 
-const collectConstInitializers = (sourceFile: ts.SourceFile) => {
-  const initializers = new Map<string, ts.Expression>();
+interface StaticBindings {
+  declarations: Map<string, ts.VariableDeclaration[]>;
+  sourceFile: ts.SourceFile;
+}
 
-  sourceFile.statements.forEach((statement) => {
+const collectStaticBindings = (sourceFile: ts.SourceFile): StaticBindings => {
+  const declarations = new Map<string, ts.VariableDeclaration[]>();
+
+  const visit = (node: ts.Node) => {
     if (
-      !ts.isVariableStatement(statement) ||
-      !(statement.declarationList.flags & ts.NodeFlags.Const)
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      ts.isVariableDeclarationList(node.parent) &&
+      Boolean(node.parent.flags & ts.NodeFlags.Const)
     ) {
-      return;
+      const namedDeclarations = declarations.get(node.name.text) ?? [];
+      namedDeclarations.push(node);
+      declarations.set(node.name.text, namedDeclarations);
     }
 
-    statement.declarationList.declarations.forEach((declaration) => {
-      if (ts.isIdentifier(declaration.name) && declaration.initializer) {
-        initializers.set(declaration.name.text, declaration.initializer);
-      }
-    });
-  });
+    ts.forEachChild(node, visit);
+  };
 
-  return initializers;
+  visit(sourceFile);
+  return { declarations, sourceFile };
 };
+
+const isWithinNode = (node: ts.Node, ancestor: ts.Node) => {
+  let current: ts.Node | undefined = node;
+
+  while (current) {
+    if (current === ancestor) return true;
+    current = current.parent;
+  }
+
+  return false;
+};
+
+const getLexicalScope = (declaration: ts.VariableDeclaration) => {
+  let current: ts.Node | undefined = declaration.parent;
+
+  while (current) {
+    if (
+      ts.isSourceFile(current) ||
+      ts.isBlock(current) ||
+      ts.isCaseBlock(current) ||
+      ts.isForStatement(current) ||
+      ts.isForInStatement(current) ||
+      ts.isForOfStatement(current)
+    ) {
+      return current;
+    }
+    current = current.parent;
+  }
+
+  return undefined;
+};
+
+const findVisibleConstDeclaration = (
+  identifier: ts.Identifier,
+  bindings: StaticBindings
+) =>
+  (bindings.declarations.get(identifier.text) ?? [])
+    .filter((declaration) => {
+      const scope = getLexicalScope(declaration);
+
+      return (
+        declaration.getStart(bindings.sourceFile) <
+          identifier.getStart(bindings.sourceFile) &&
+        Boolean(scope && isWithinNode(identifier, scope))
+      );
+    })
+    .sort(
+      (left, right) =>
+        right.getStart(bindings.sourceFile) - left.getStart(bindings.sourceFile)
+    )[0];
 
 const unwrapExpression = (expression: ts.Expression): ts.Expression => {
   if (
@@ -135,23 +192,21 @@ const unwrapExpression = (expression: ts.Expression): ts.Expression => {
 const getObjectPropertyInitializer = (
   expression: ts.Expression,
   propertyName: string,
-  constInitializers: Map<string, ts.Expression>,
-  visited: Set<string>
+  bindings: StaticBindings,
+  visited: Set<ts.VariableDeclaration>
 ): ts.Expression | undefined => {
   const unwrapped = unwrapExpression(expression);
 
   if (ts.isIdentifier(unwrapped)) {
-    if (visited.has(unwrapped.text)) return undefined;
-
-    const initializer = constInitializers.get(unwrapped.text);
-    if (!initializer) return undefined;
+    const declaration = findVisibleConstDeclaration(unwrapped, bindings);
+    if (!declaration?.initializer || visited.has(declaration)) return undefined;
 
     const nextVisited = new Set(visited);
-    nextVisited.add(unwrapped.text);
+    nextVisited.add(declaration);
     return getObjectPropertyInitializer(
-      initializer,
+      declaration.initializer,
       propertyName,
-      constInitializers,
+      bindings,
       nextVisited
     );
   }
@@ -177,8 +232,8 @@ const getObjectPropertyInitializer = (
 
 const resolveStaticString = (
   expression: ts.Expression,
-  constInitializers: Map<string, ts.Expression>,
-  visited = new Set<string>()
+  bindings: StaticBindings,
+  visited = new Set<ts.VariableDeclaration>()
 ): string | undefined => {
   const unwrapped = unwrapExpression(expression);
 
@@ -190,14 +245,12 @@ const resolveStaticString = (
   }
 
   if (ts.isIdentifier(unwrapped)) {
-    if (visited.has(unwrapped.text)) return undefined;
-
-    const initializer = constInitializers.get(unwrapped.text);
-    if (!initializer) return undefined;
+    const declaration = findVisibleConstDeclaration(unwrapped, bindings);
+    if (!declaration?.initializer || visited.has(declaration)) return undefined;
 
     const nextVisited = new Set(visited);
-    nextVisited.add(unwrapped.text);
-    return resolveStaticString(initializer, constInitializers, nextVisited);
+    nextVisited.add(declaration);
+    return resolveStaticString(declaration.initializer, bindings, nextVisited);
   }
 
   if (ts.isTemplateExpression(unwrapped)) {
@@ -206,7 +259,7 @@ const resolveStaticString = (
     for (const span of unwrapped.templateSpans) {
       const expressionValue = resolveStaticString(
         span.expression,
-        constInitializers,
+        bindings,
         new Set(visited)
       );
       if (expressionValue === undefined) return undefined;
@@ -222,12 +275,12 @@ const resolveStaticString = (
   ) {
     const left = resolveStaticString(
       unwrapped.left,
-      constInitializers,
+      bindings,
       new Set(visited)
     );
     const right = resolveStaticString(
       unwrapped.right,
-      constInitializers,
+      bindings,
       new Set(visited)
     );
 
@@ -243,7 +296,7 @@ const resolveStaticString = (
       : unwrapped.argumentExpression
         ? resolveStaticString(
             unwrapped.argumentExpression,
-            constInitializers,
+            bindings,
             new Set(visited)
           )
         : undefined;
@@ -252,13 +305,32 @@ const resolveStaticString = (
     const initializer = getObjectPropertyInitializer(
       unwrapped.expression,
       propertyName,
-      constInitializers,
+      bindings,
       new Set(visited)
     );
 
     return initializer
-      ? resolveStaticString(initializer, constInitializers, new Set(visited))
+      ? resolveStaticString(initializer, bindings, new Set(visited))
       : undefined;
+  }
+
+  return undefined;
+};
+
+const getImportedCallName = (
+  expression: ts.LeftHandSideExpression,
+  imports: ModuleImports
+) => {
+  if (ts.isIdentifier(expression)) {
+    return imports.named.get(expression.text);
+  }
+
+  if (
+    ts.isPropertyAccessExpression(expression) &&
+    ts.isIdentifier(expression.expression) &&
+    imports.namespaces.has(expression.expression.text)
+  ) {
+    return expression.name.text;
   }
 
   return undefined;
@@ -269,21 +341,25 @@ const isImportedCall = (
   imports: ModuleImports,
   importedName?: string
 ) => {
-  if (ts.isIdentifier(expression)) {
-    const originalName = imports.named.get(expression.text);
-    return (
-      originalName !== undefined &&
-      (importedName === undefined || originalName === importedName)
-    );
-  }
+  const callName = getImportedCallName(expression, imports);
 
   return (
-    ts.isPropertyAccessExpression(expression) &&
-    ts.isIdentifier(expression.expression) &&
-    imports.namespaces.has(expression.expression.text) &&
-    (importedName === undefined || expression.name.text === importedName)
+    callName !== undefined &&
+    (importedName === undefined || callName === importedName)
   );
 };
+
+const firestorePathArgumentIndexes = new Map<string, number[]>([
+  ['collection', [1]],
+  ['collectionGroup', [1]],
+  ['doc', [1]]
+]);
+
+const isAccountProfilePath = (value: string | undefined) =>
+  value
+    ?.split('/')
+    .some((segment) => segment === 'accounts' || segment === 'profiles') ??
+  false;
 
 const analyzeAccountProfileFirestoreSource = (source: string, file: string) => {
   const sourceFile = parseSource(source, file);
@@ -291,25 +367,28 @@ const analyzeAccountProfileFirestoreSource = (source: string, file: string) => {
     sourceFile,
     new Set(['@firebase/firestore', 'firebase/firestore'])
   );
-  const constInitializers = collectConstInitializers(sourceFile);
+  const bindings = collectStaticBindings(sourceFile);
   let hasAccess = false;
 
   const visit = (node: ts.Node) => {
-    if (
-      ts.isCallExpression(node) &&
-      isImportedCall(node.expression, imports) &&
-      node.arguments.some((argument) => {
-        const value = resolveStaticString(argument, constInitializers);
-        return (
-          value === 'accounts' ||
-          value === 'profiles' ||
-          value?.startsWith('accounts/') ||
-          value?.startsWith('profiles/')
-        );
-      })
-    ) {
-      hasAccess = true;
-      return;
+    if (ts.isCallExpression(node)) {
+      const callName = getImportedCallName(node.expression, imports);
+      const pathIndexes = callName
+        ? firestorePathArgumentIndexes.get(callName)
+        : undefined;
+
+      if (
+        pathIndexes?.some((startIndex) =>
+          node.arguments
+            .slice(startIndex)
+            .some((argument) =>
+              isAccountProfilePath(resolveStaticString(argument, bindings))
+            )
+        )
+      ) {
+        hasAccess = true;
+        return;
+      }
     }
 
     if (!hasAccess) ts.forEachChild(node, visit);
@@ -385,13 +464,25 @@ const getExportedFirebaseParameterViolations = (
     string,
     ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression
   >();
+  const anonymousDefaultFunctions: (
+    | ts.FunctionDeclaration
+    | ts.ArrowFunction
+    | ts.FunctionExpression
+  )[] = [];
   const exportedNames = new Set<string>();
 
   sourceFile.statements.forEach((statement) => {
-    if (ts.isFunctionDeclaration(statement) && statement.name) {
-      functions.set(statement.name.text, statement);
-      if (hasModifier(statement, ts.SyntaxKind.ExportKeyword)) {
-        exportedNames.add(statement.name.text);
+    if (ts.isFunctionDeclaration(statement)) {
+      if (statement.name) {
+        functions.set(statement.name.text, statement);
+        if (hasModifier(statement, ts.SyntaxKind.ExportKeyword)) {
+          exportedNames.add(statement.name.text);
+        }
+      } else if (
+        hasModifier(statement, ts.SyntaxKind.ExportKeyword) &&
+        hasModifier(statement, ts.SyntaxKind.DefaultKeyword)
+      ) {
+        anonymousDefaultFunctions.push(statement);
       }
       return;
     }
@@ -413,6 +504,20 @@ const getExportedFirebaseParameterViolations = (
       return;
     }
 
+    if (ts.isExportAssignment(statement)) {
+      const expression = unwrapExpression(statement.expression);
+
+      if (
+        ts.isArrowFunction(expression) ||
+        ts.isFunctionExpression(expression)
+      ) {
+        anonymousDefaultFunctions.push(expression);
+      } else if (ts.isIdentifier(expression)) {
+        exportedNames.add(expression.text);
+      }
+      return;
+    }
+
     if (
       ts.isExportDeclaration(statement) &&
       statement.exportClause &&
@@ -425,15 +530,24 @@ const getExportedFirebaseParameterViolations = (
     }
   });
 
-  return [...functions.entries()].flatMap(([name, fn]) => {
-    if (!exportedNames.has(name)) return [];
-
-    return fn.parameters.flatMap((parameter) =>
+  const getParameterViolations = (
+    name: string,
+    fn: ts.FunctionDeclaration | ts.ArrowFunction | ts.FunctionExpression
+  ) =>
+    fn.parameters.flatMap((parameter) =>
       parameter.type && typeContainsFirebase(parameter.type)
         ? [`${name}: ${parameter.name.getText(sourceFile)}`]
         : []
     );
-  });
+
+  return [
+    ...[...functions.entries()].flatMap(([name, fn]) =>
+      exportedNames.has(name) ? getParameterViolations(name, fn) : []
+    ),
+    ...anonymousDefaultFunctions.flatMap((fn) =>
+      getParameterViolations('default', fn)
+    )
+  ];
 };
 
 const getInitializeAppCalls = (source: string, file: string) => {
@@ -537,6 +651,34 @@ describe('account and profile consumer boundary', () => {
     ).toEqual(fixtures.map(({ file }) => file).sort());
   });
 
+  it('ignores account/profile strings passed to non-path Firestore APIs', () => {
+    const source = `
+      import { where } from 'firebase/firestore';
+      where('kind', '==', 'profiles');
+    `;
+
+    expect(
+      analyzeAccountProfileFirestoreSource(source, 'src/routes/Filter.ts')
+    ).toBe(false);
+  });
+
+  it('resolves account/profile collection paths from nested local constants', () => {
+    const source = [
+      "import { collection } from 'firebase/firestore';",
+      'export function load(db: unknown) {',
+      "  const domain = 'account';",
+      '  if (db) {',
+      '    const collectionName = `${domain}s`;',
+      '    return collection(db, collectionName);',
+      '  }',
+      '}'
+    ].join('\n');
+
+    expect(
+      analyzeAccountProfileFirestoreSource(source, 'src/routes/Nested.ts')
+    ).toBe(true);
+  });
+
   it('detects Firebase parameters on every exported function form through import and type aliases', () => {
     const source = `
       import type { Firestore as Database } from 'firebase/firestore';
@@ -549,6 +691,32 @@ describe('account and profile consumer boundary', () => {
     expect(
       getExportedFirebaseParameterViolations(source, 'src/services/example.ts')
     ).toEqual(['direct: db', 'aliased: db', 'defaultExport: db']);
+  });
+
+  it('detects Firebase parameters on anonymous default exports', () => {
+    const defaultArrow = `
+      import type { Firestore as Database } from 'firebase/firestore';
+      type DatabaseAlias = Database;
+      export default (db: DatabaseAlias) => db;
+    `;
+    const defaultFunction = `
+      import type { Firestore as Database } from 'firebase/firestore';
+      type DatabaseAlias = Database;
+      export default function (db: DatabaseAlias): DatabaseAlias { return db; }
+    `;
+
+    expect(
+      getExportedFirebaseParameterViolations(
+        defaultArrow,
+        'src/services/default-arrow.ts'
+      )
+    ).toEqual(['default: db']);
+    expect(
+      getExportedFirebaseParameterViolations(
+        defaultFunction,
+        'src/services/default-function.ts'
+      )
+    ).toEqual(['default: db']);
   });
 
   it('detects initializeApp calls made through an import alias', () => {
