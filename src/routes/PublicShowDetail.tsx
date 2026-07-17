@@ -9,10 +9,8 @@ import { useFirebaseContext } from '../context/FirebaseContext';
 import { usePagination } from '../context/PaginationContext';
 import { useUserContext } from '../context/UserContext';
 import { Production } from '../components/Profile/Company/types';
-import {
-  getTheaterAccountByUid,
-  getTheaterByAccountId
-} from '../components/Profile/Company/api';
+import { getAccountByIdOrUid } from '../services/accounts/client';
+import { findProfileByAccountId } from '../services/profiles/client';
 import styled from 'styled-components';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 import PublicRoleCard from '../components/PublicShows/PublicRoleCard';
@@ -132,24 +130,22 @@ const PublicShowDetail = () => {
         setTheaterName(productionData.theater_name);
       } else if (currentUser && productionData.account_id) {
         try {
-          const theaterAccount = await getTheaterAccountByUid(
-            firebaseFirestore,
+          const theaterAccount = await getAccountByIdOrUid(
             productionData.account_id
           );
 
           if (!isMounted) return;
 
           if (theaterAccount) {
-            const theaterProfile = await getTheaterByAccountId(
-              firebaseFirestore,
+            const theaterProfile = await findProfileByAccountId(
               theaterAccount.id
             );
 
             if (!isMounted) return;
 
             const resolvedName =
-              (theaterProfile && theaterProfile.theatre_name) ||
-              (theaterAccount as any).theater_name ||
+              theaterProfile?.data.theatre_name ||
+              theaterAccount.data.theater_name ||
               '';
             setTheaterName(resolvedName);
           }

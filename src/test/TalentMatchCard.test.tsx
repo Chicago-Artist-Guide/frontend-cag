@@ -9,7 +9,7 @@ import { createTheaterTalentMatch } from '../components/Matches/api';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { useUserContext } from '../context/UserContext';
 import { sendMessageThreadWithEmail } from '../components/Messages/api';
-import { getAccountWithAccountId } from '../components/Profile/shared/api';
+import { getAccountByIdOrUid } from '../services/accounts/client';
 import {
   theaterToArtistMessage,
   theaterToArtistEmailText
@@ -37,12 +37,12 @@ vi.mock('../components/Messages/api', () => ({
   sendMessageThreadWithEmail: vi.fn()
 }));
 
-vi.mock('../components/Profile/shared/api', () => ({
-  getAccountWithAccountId: vi.fn()
+vi.mock('../services/accounts/client', () => ({
+  getAccountByIdOrUid: vi.fn()
 }));
 
 const mockSendMessageThreadWithEmail = vi.mocked(sendMessageThreadWithEmail);
-const mockGetAccountWithAccountId = vi.mocked(getAccountWithAccountId);
+const mockGetAccountByIdOrUid = vi.mocked(getAccountByIdOrUid);
 const mockUseFirebaseContext = vi.mocked(useFirebaseContext);
 const mockUseUserContext = vi.mocked(useUserContext);
 const mockCreateTheaterTalentMatch = vi.mocked(createTheaterTalentMatch);
@@ -105,8 +105,11 @@ describe('TalentMatchCard decline action', () => {
     beforeEach(() => {
       vi.clearAllMocks();
       mockCreateTheaterTalentMatch.mockResolvedValue({ id: 'match-1' } as any);
-      mockGetAccountWithAccountId.mockResolvedValue({
-        email: 'talent@example.com'
+      mockGetAccountByIdOrUid.mockResolvedValue({
+        data: {
+          email: 'talent@example.com'
+        },
+        id: 'talent-1'
       } as any);
       mockSendMessageThreadWithEmail.mockResolvedValue('thread-1');
       mockUseFirebaseContext.mockReturnValue({

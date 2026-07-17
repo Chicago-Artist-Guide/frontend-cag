@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { getAccountWithAccountId } from '../Profile/shared/api';
+import { getAccountByIdOrUid } from '../../services/accounts/client';
 import { sendMessageThreadWithEmail } from '../Messages/api';
 import {
   NO_EMAIL,
@@ -77,11 +77,8 @@ export const TalentMatchCard = ({
       contactEmail
     );
 
-    const talentAccount = await getAccountWithAccountId(
-      firebaseFirestore,
-      talentAccountId
-    );
-    const talentEmail = talentAccount && talentAccount.email;
+    const talentAccount = await getAccountByIdOrUid(talentAccountId);
+    const talentEmail = talentAccount?.data.email;
 
     return sendMessageThreadWithEmail({
       firebaseStore: firebaseFirestore,

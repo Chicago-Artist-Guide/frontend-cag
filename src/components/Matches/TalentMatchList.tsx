@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
-import { getNameForAccount } from '../../components/Profile/shared/api';
+import { getAccountDisplayName } from '../../services/accounts/client';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMatches } from '../../context/MatchContext';
 import { useUserContext } from '../../context/UserContext';
@@ -81,10 +81,7 @@ export const TalentMatchList = () => {
   const fetchFullNames = async () => {
     const profilesWithNames = await Promise.all(
       matches.map(async (m) => {
-        const fullName = await getNameForAccount(
-          firebaseFirestore,
-          m.account_id
-        );
+        const fullName = await getAccountDisplayName(m.account_id);
         const findMatch = await getTheaterTalentMatch(
           firebaseFirestore,
           production?.production_id || '',

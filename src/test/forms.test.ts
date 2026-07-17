@@ -182,21 +182,24 @@ describe('DEV-488: Signup + edit form contracts', () => {
   describe('Item 14: Theatre lookup falls back across profile + account', () => {
     it('PublicShowCard resolves account by uid then prefers theatre_name with theater_name fallback', () => {
       const src = readSource('components/PublicShows/PublicShowCard.tsx');
-      expect(src).toMatch(/getTheaterAccountByUid/);
+      expect(src).toMatch(/getAccountByIdOrUid/);
+      expect(src).toMatch(/findProfileByAccountId/);
       expect(src).toMatch(/theatre_name/);
       expect(src).toMatch(/theater_name/);
     });
 
     it('PublicShowDetail uses the same fallback path', () => {
       const src = readSource('routes/PublicShowDetail.tsx');
-      expect(src).toMatch(/getTheaterAccountByUid/);
+      expect(src).toMatch(/getAccountByIdOrUid/);
+      expect(src).toMatch(/findProfileByAccountId/);
       expect(src).toMatch(/theatre_name/);
       expect(src).toMatch(/theater_name/);
     });
 
     it('CompanyMatchCard uses the same fallback path for the by-line theater name', () => {
       const src = readSource('components/Matches/CompanyMatchCard.tsx');
-      expect(src).toMatch(/getTheaterAccountByUid/);
+      expect(src).toMatch(/getAccountByIdOrUid/);
+      expect(src).toMatch(/findProfileByAccountId/);
       expect(src).toMatch(/theatre_name/);
       expect(src).toMatch(/theater_name/);
     });

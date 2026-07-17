@@ -4,10 +4,10 @@ import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
 import {
-  getNameForAccount,
-  getProfileWithUid,
-  getTheaterNameForAccount
-} from '../Profile/shared/api';
+  getAccountDisplayName,
+  getTheaterDisplayNameByUid
+} from '../../services/accounts/client';
+import { findProfileByUidOrAccountId } from '../../services/profiles/client';
 import { getProduction } from '../Profile/Company/api';
 import { MessageThreadType } from './types';
 import { defaultPfp } from '../../images';
@@ -60,19 +60,16 @@ const MessageThreads: React.FC<
               : recipientIdRef.id;
 
           // start getting more data
-          const getRecipientProfile = await getProfileWithUid(
-            firebaseFirestore,
-            recipientId
-          );
+          const getRecipientProfile =
+            await findProfileByUidOrAccountId(recipientId);
           const recipientName =
             account.data.type === 'company'
-              ? await getNameForAccount(firebaseFirestore, recipientId)
-              : await getTheaterNameForAccount(firebaseFirestore, recipientId);
+              ? await getAccountDisplayName(recipientId)
+              : await getTheaterDisplayNameByUid(recipientId);
 
-          let threadPreviewImg =
-            getRecipientProfile && getRecipientProfile?.profile_image_url
-              ? getRecipientProfile?.profile_image_url
-              : defaultPfp;
+          let threadPreviewImg = getRecipientProfile?.data.profile_image_url
+            ? getRecipientProfile.data.profile_image_url
+            : defaultPfp;
 
           // if the theater company doesn't have a pfp, use the production image if there is one
           if (threadPreviewImg === defaultPfp && thread.production_id) {
