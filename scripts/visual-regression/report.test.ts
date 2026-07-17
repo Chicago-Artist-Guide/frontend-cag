@@ -36,6 +36,7 @@ const summary = (results: DiffResult[]): DiffSummaryV1 => ({
   gateVerdict: results.some(({ gateVerdict }) => gateVerdict === 'fail')
     ? 'fail'
     : 'pass',
+  generationId: 'fixture-generation',
   maxDiffRatio: 0.001,
   pixelSensitivity: 0.1,
   results,
@@ -171,5 +172,77 @@ describe('renderReport', () => {
     } finally {
       await rm(root, { force: true, recursive: true });
     }
+  });
+
+  it('rechecks the generation before committing a report', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'cag-report-race-'));
+    try {
+      const summaryFile = path.join(root, 'summary.json');
+      const reportFile = path.join(root, 'report.html');
+      const oldGreen = summary([result({})]);
+      oldGreen.generationId = 'old-green';
+      oldGreen.capture = {
+        baseUrl: 'http://127.0.0.1:3000/',
+        cases: [
+          {
+            artifact: 'current/faq/desktop.png',
+            auth: 'anonymous',
+            baselinePolicy: { kind: 'blocking-candidate' },
+            blockedRequests: [],
+            durationMs: 1,
+            id: 'faq',
+            path: '/faq',
+            status: 'passed',
+            viewport: 'desktop'
+          }
+        ],
+        command: 'capture',
+        finishedAt: '2026-07-17T01:00:01.000Z',
+        outputBucket: 'current',
+        runtime: { node: 'v22.22.0', os: 'darwin' },
+        runErrors: [],
+        schemaVersion: 1,
+        selection: { ids: ['faq'], viewports: ['desktop'] },
+        startedAt: '2026-07-17T01:00:00.000Z',
+        status: 'passed',
+        totals: { failed: 0, passed: 1, selected: 1 }
+      };
+      const newRed = structuredClone(oldGreen);
+      newRed.generationId = 'new-red';
+      newRed.gateVerdict = 'fail';
+      newRed.runErrors = [
+        { message: 'new failure', name: 'Error', phase: 'asset-tree' }
+      ];
+      await writeFile(summaryFile, JSON.stringify(oldGreen));
+      let beforeCommitCalled = false;
+
+      const code = await runReport(summaryFile, reportFile, {
+        beforeCommit: async () => {
+          beforeCommitCalled = true;
+          await writeFile(summaryFile, JSON.stringify(newRed));
+        }
+      });
+
+      expect(code).toBe(1);
+      expect(beforeCommitCalled).toBe(true);
+      await expect(readFile(reportFile)).rejects.toThrow();
+    } finally {
+      await rm(root, { force: true, recursive: true });
+    }
+  });
+
+  it('renders validated capture cleanup errors even when every pixel is identical', () => {
+    const input = summary([result({})]);
+    input.gateVerdict = 'fail';
+    input.runErrors = [
+      {
+        message: 'browser cleanup failed',
+        name: 'Error',
+        phase: 'capture-cleanup'
+      }
+    ];
+    const html = renderReport(input);
+    expect(html).toContain('capture-cleanup');
+    expect(html).toContain('browser cleanup failed');
   });
 });

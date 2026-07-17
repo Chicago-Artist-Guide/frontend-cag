@@ -15,14 +15,17 @@ import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { CaptureCaseSummaryV1, CaptureSummaryV1 } from './capture-core';
 import {
+  acquireGenerationLock,
   comparePngCase,
   runDiff,
   validateCaptureSummary,
+  validateDiffSummary,
   type PngEvidenceInput
 } from './diff-core';
 import { MANIFEST, type BaselinePolicy, type VisualCase } from './manifest';
 
 const temporaryDirectories: string[] = [];
+type SummaryRecord = Record<string, unknown>;
 
 afterEach(async () => {
   await Promise.all(
@@ -93,6 +96,68 @@ const captureSummary = (
     passed: rows.filter(({ status }) => status === 'passed').length,
     selected: rows.length
   }
+});
+
+describe('generation lock', () => {
+  it('recovers a stale owner but never removes a live owner lock', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'cag-diff-lock-'));
+    temporaryDirectories.push(root);
+    const diffDir = path.join(root, 'diff');
+    const lockRoot = `${diffDir}.lock`;
+    await mkdir(lockRoot);
+    await writeFile(
+      path.join(lockRoot, 'owner.json'),
+      JSON.stringify({
+        pid: 2_147_483_647,
+        startedAt: '2026-07-17T01:00:00.000Z',
+        token: 'stale-owner'
+      })
+    );
+
+    const recovered = await acquireGenerationLock(diffDir);
+    await recovered.release();
+    await expect(readFile(path.join(lockRoot, 'owner.json'))).rejects.toThrow();
+
+    await mkdir(lockRoot);
+    await writeFile(
+      path.join(lockRoot, 'owner.json'),
+      JSON.stringify({
+        pid: process.pid,
+        startedAt: '2026-07-17T01:00:00.000Z',
+        token: 'live-owner'
+      })
+    );
+    await expect(acquireGenerationLock(diffDir)).rejects.toThrow(
+      'another visual diff generation is active'
+    );
+    expect(
+      JSON.parse(await readFile(path.join(lockRoot, 'owner.json'), 'utf8'))
+        .token
+    ).toBe('live-owner');
+  });
+
+  it('does not release a lock after its owner token changes', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'cag-diff-owner-'));
+    temporaryDirectories.push(root);
+    const diffDir = path.join(root, 'diff');
+    const lock = await acquireGenerationLock(diffDir);
+    await writeFile(
+      path.join(`${diffDir}.lock`, 'owner.json'),
+      JSON.stringify({
+        pid: process.pid,
+        startedAt: '2026-07-17T01:00:00.000Z',
+        token: 'replacement-owner'
+      })
+    );
+
+    await lock.release();
+
+    expect(
+      JSON.parse(
+        await readFile(path.join(`${diffDir}.lock`, 'owner.json'), 'utf8')
+      ).token
+    ).toBe('replacement-owner');
+  });
 });
 
 describe('comparePngCase', () => {
@@ -289,7 +354,6 @@ describe('validateCaptureSummary', () => {
     ).toHaveLength(2);
   });
 
-  type SummaryRecord = Record<string, unknown>;
   const firstRow = (summary: SummaryRecord): SummaryRecord =>
     (summary.cases as SummaryRecord[])[0];
 
@@ -398,6 +462,107 @@ describe('validateCaptureSummary', () => {
     expect(() =>
       validateCaptureSummary(captureSummary([subject], [passed]), MANIFEST)
     ).toThrow('passed capture case must name');
+  });
+
+  it('reconstructs the full summary instead of returning the caller object', () => {
+    const subject = visualCase();
+    const raw = captureSummary([subject]);
+    const validated = validateCaptureSummary(raw, MANIFEST);
+    expect(validated).not.toBe(raw);
+    expect(validated.cases[0]).not.toBe(raw.cases[0]);
+    expect(validated).toEqual(raw);
+  });
+
+  it.each([
+    [
+      'summary',
+      (value: SummaryRecord) => {
+        value.junk = 'secret';
+      }
+    ],
+    [
+      'runtime',
+      (value: SummaryRecord) => {
+        (value.runtime as SummaryRecord).junk = true;
+      }
+    ],
+    [
+      'selection',
+      (value: SummaryRecord) => {
+        (value.selection as SummaryRecord).junk = true;
+      }
+    ],
+    [
+      'row',
+      (value: SummaryRecord) => {
+        firstRow(value).junk = true;
+      }
+    ],
+    [
+      'blocked request',
+      (value: SummaryRecord) => {
+        firstRow(value).blockedRequests = [
+          {
+            disposition: 'silent-block',
+            junk: 'secret',
+            method: 'POST',
+            url: 'https://example.test/collect'
+          }
+        ];
+      }
+    ],
+    [
+      'stability',
+      (value: SummaryRecord) => {
+        firstRow(value).stability = {
+          durationMs: 1,
+          fonts: [],
+          frames: [],
+          images: { checked: 0, exemptedBroken: [] },
+          intervalsCleared: 0,
+          junk: true,
+          masks: []
+        };
+      }
+    ]
+  ] as Array<[string, (value: SummaryRecord) => void]>)(
+    'rejects unknown fields in the nested %s object',
+    (_label, mutate) => {
+      const subject = visualCase();
+      const raw = structuredClone(
+        captureSummary([subject])
+      ) as unknown as SummaryRecord;
+      mutate(raw);
+      expect(() => validateCaptureSummary(raw, MANIFEST)).toThrow('unknown');
+    }
+  );
+
+  it('rejects credentialed or unsanitized capture URLs', () => {
+    const subject = visualCase();
+    const raw = structuredClone(captureSummary([subject]));
+    raw.baseUrl = 'https://user:secret@example.test';
+    expect(() => validateCaptureSummary(raw, MANIFEST)).toThrow('sanitized');
+    raw.baseUrl = 'http://127.0.0.1:3000';
+    raw.cases[0].finalUrl = 'http://127.0.0.1:3000/faq?token=secret';
+    expect(() => validateCaptureSummary(raw, MANIFEST)).toThrow('sanitized');
+  });
+
+  it('sanitizes absolute filesystem paths from capture failure diagnostics', () => {
+    const subject = visualCase();
+    const failed: CaptureCaseSummaryV1 = {
+      ...passedCapture(subject),
+      artifact: undefined,
+      error: {
+        message: 'failed /Users/person/private.json and C:\\secret\\key.txt',
+        name: 'Error'
+      },
+      status: 'failed'
+    };
+    const validated = validateCaptureSummary(
+      captureSummary([subject], [failed]),
+      MANIFEST
+    );
+    expect(validated.cases[0].error?.message).not.toMatch(/(?:\/Users|C:\\)/u);
   });
 });
 
@@ -709,7 +874,11 @@ describe('runDiff', () => {
     await mkdir(path.dirname(baselineFile), { recursive: true });
     await writeFile(baselineFile, png(1, 1, [0, 0, 0, 255]));
     const reads: string[] = [];
+    const opened: string[] = [];
     const run = await runDiff({
+      afterEvidenceOpen: async (file) => {
+        opened.push(file);
+      },
       manifest: MANIFEST,
       maxDiffRatio: 0.001,
       paths,
@@ -721,7 +890,179 @@ describe('runDiff', () => {
       }
     });
     expect(run.exitCode).toBe(1);
-    expect(reads).toContain(baselineFile);
-    expect(reads.some((file) => file.startsWith(paths.currentDir))).toBe(false);
+    expect(opened).toContain(baselineFile);
+    expect(opened.some((file) => file.startsWith(paths.currentDir))).toBe(
+      false
+    );
+    expect(reads).toEqual([paths.captureSummary]);
+  });
+
+  it('reads evidence from the already-open descriptor when the source path is swapped', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    const baselineFile = path.join(
+      paths.baselineDir,
+      subject.entry.id,
+      'desktop.png'
+    );
+    const currentFile = path.join(
+      paths.currentDir,
+      subject.entry.id,
+      'desktop.png'
+    );
+    await mkdir(path.dirname(baselineFile), { recursive: true });
+    await mkdir(path.dirname(currentFile), { recursive: true });
+    const black = png(1, 1, [0, 0, 0, 255]);
+    const outside = path.join(path.dirname(paths.artifactDir), 'outside.png');
+    await writeFile(baselineFile, black);
+    await writeFile(currentFile, black);
+    await writeFile(outside, png(1, 1, [255, 255, 255, 255]));
+    let swapped = false;
+
+    const run = await runDiff({
+      afterEvidenceOpen: async (file) => {
+        if (file !== baselineFile || swapped) return;
+        swapped = true;
+        await rm(baselineFile);
+        await symlink(outside, baselineFile);
+      },
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+
+    expect(run.summary.results[0].comparison).toBe('identical');
+    expect(
+      await readFile(
+        path.join(
+          paths.diffDir,
+          `report-assets/baseline/${subject.entry.id}/desktop.png`
+        )
+      )
+    ).toEqual(black);
+  });
+
+  it('installs an asset-tree failure generation after a recoverable staged write fault', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    for (const root of [paths.baselineDir, paths.currentDir]) {
+      await mkdir(path.join(root, subject.entry.id), { recursive: true });
+      await writeFile(
+        path.join(root, subject.entry.id, 'desktop.png'),
+        png(1, 1, [0, 0, 0, 255])
+      );
+    }
+    await mkdir(paths.diffDir, { recursive: true });
+    await writeFile(paths.reportFile, 'stale green');
+    let failed = false;
+
+    const run = await runDiff({
+      fault: (operation) => {
+        if (operation === 'write-asset' && !failed) {
+          failed = true;
+          throw new Error('injected /private/write failure');
+        }
+      },
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+
+    expect(run.exitCode).toBe(1);
+    expect(run.summary.runErrors).toEqual([
+      expect.objectContaining({ phase: 'asset-tree' })
+    ]);
+    expect(JSON.stringify(run.summary)).not.toContain('/private');
+    await expect(readFile(paths.reportFile)).rejects.toThrow();
+    expect(
+      JSON.parse(await readFile(paths.summaryFile, 'utf8')).gateVerdict
+    ).toBe('fail');
+  });
+
+  it('installs a red generation and preserves the backup when rollback fails', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    for (const root of [paths.baselineDir, paths.currentDir]) {
+      await mkdir(path.join(root, subject.entry.id), { recursive: true });
+      await writeFile(
+        path.join(root, subject.entry.id, 'desktop.png'),
+        png(1, 1, [0, 0, 0, 255])
+      );
+    }
+    await mkdir(paths.diffDir, { recursive: true });
+    await writeFile(paths.reportFile, 'recoverable previous generation');
+
+    const run = await runDiff({
+      fault: (operation) => {
+        if (operation === 'promote' || operation === 'rollback') {
+          throw new Error(`injected ${operation} failure`);
+        }
+      },
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+
+    expect(run.exitCode).toBe(1);
+    expect(run.summary.runErrors[0].phase).toBe('asset-tree');
+    const siblings = await readdir(path.dirname(paths.diffDir));
+    expect(
+      siblings.some((name) =>
+        name.startsWith(`${path.basename(paths.diffDir)}.backup-`)
+      )
+    ).toBe(true);
+    expect(
+      JSON.parse(await readFile(paths.summaryFile, 'utf8')).gateVerdict
+    ).toBe('fail');
+  });
+
+  it('rejects forged diff/capture correspondence even when forged totals look green', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    for (const root of [paths.baselineDir, paths.currentDir]) {
+      await mkdir(path.join(root, subject.entry.id), { recursive: true });
+      await writeFile(
+        path.join(root, subject.entry.id, 'desktop.png'),
+        png(1, 1, [0, 0, 0, 255])
+      );
+    }
+    const run = await runDiff({
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+    const forged = structuredClone(run.summary) as unknown as SummaryRecord;
+    forged.results = [];
+    forged.totals = { failed: 0, notEnforced: 0, passed: 0, selected: 0 };
+    forged.gateVerdict = 'pass';
+    (forged.capture as SummaryRecord).status = 'failed';
+    (forged.capture as SummaryRecord).totals = {
+      failed: 0,
+      passed: 999,
+      selected: 999
+    };
+    (forged.capture as SummaryRecord).baseUrl = 'file:///etc/passwd';
+
+    expect(() => validateDiffSummary(forged)).toThrow();
   });
 });

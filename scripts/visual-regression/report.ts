@@ -3,6 +3,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseVisualArgs, resolveSafeVisualPaths } from './config';
 import {
+  acquireGenerationLock,
   validateDiffSummary,
   type DiffIssue,
   type DiffResult,
@@ -160,36 +161,52 @@ export function renderReport(summary: DiffSummaryV1): string {
 `;
 }
 
-const writeReportAtomically = async (
-  file: string,
-  html: string
-): Promise<void> => {
-  await mkdir(path.dirname(file), { recursive: true });
-  const partial = path.join(
-    path.dirname(file),
-    `.${path.basename(file)}.${process.pid}.partial`
-  );
-  try {
-    await writeFile(partial, html, 'utf8');
-    await rename(partial, file);
-  } finally {
-    await rm(partial, { force: true });
-  }
-};
+export interface RunReportOptions {
+  beforeCommit?: () => Promise<void>;
+}
 
 export async function runReport(
   summaryFile: string,
-  reportFile: string
+  reportFile: string,
+  options: RunReportOptions = {}
 ): Promise<0 | 1> {
+  const diffDir = path.dirname(summaryFile);
+  if (
+    summaryFile !== path.join(diffDir, 'summary.json') ||
+    reportFile !== path.join(diffDir, 'report.html')
+  ) {
+    await rm(reportFile, { force: true });
+    return 1;
+  }
+  let release: (() => Promise<void>) | undefined;
+  const partial = path.join(
+    diffDir,
+    `.${path.basename(reportFile)}.${process.pid}.partial`
+  );
   try {
-    const summary = validateDiffSummary(
-      JSON.parse(await readFile(summaryFile, 'utf8'))
-    );
-    await writeReportAtomically(reportFile, renderReport(summary));
+    const lock = await acquireGenerationLock(diffDir);
+    release = lock.release;
+    const source = await readFile(summaryFile, 'utf8');
+    const summary = validateDiffSummary(JSON.parse(source));
+    await mkdir(diffDir, { recursive: true });
+    await writeFile(partial, renderReport(summary), 'utf8');
+    await options.beforeCommit?.();
+    const currentSource = await readFile(summaryFile, 'utf8');
+    const current = validateDiffSummary(JSON.parse(currentSource));
+    if (
+      currentSource !== source ||
+      current.generationId !== summary.generationId
+    ) {
+      throw new Error('diff generation changed while rendering report');
+    }
+    await rename(partial, reportFile);
     return 0;
   } catch {
     await rm(reportFile, { force: true });
     return 1;
+  } finally {
+    await rm(partial, { force: true });
+    await release?.();
   }
 }
 
