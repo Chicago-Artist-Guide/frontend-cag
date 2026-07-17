@@ -65,6 +65,30 @@ const visualCase = (
   viewport: 'desktop'
 });
 
+const stabilityFor = (
+  subject: VisualCase
+): NonNullable<CaptureCaseSummaryV1['stability']> | null => {
+  if (subject.entry.baselinePolicy.kind !== 'blocking-candidate') return null;
+  return {
+    durationMs: 1,
+    fonts: (subject.entry.requiredFonts ?? []).map((font, index) => ({
+      ...font,
+      resolvedFamily: `__${font.family.replace(/\s/gu, '')}_fixture`,
+      resources: [
+        {
+          sameOrigin: true,
+          url: `http://127.0.0.1:3000/_next/static/media/font-${index}.woff2`
+        }
+      ],
+      status: 'loaded'
+    })),
+    frames: [],
+    images: { checked: 0, exemptedBroken: [] },
+    intervalsCleared: 0,
+    masks: []
+  };
+};
+
 const passedCapture = (subject: VisualCase): CaptureCaseSummaryV1 => ({
   artifact: `current/${subject.entry.id}/${subject.viewport}.png`,
   auth: subject.entry.auth,
@@ -74,7 +98,7 @@ const passedCapture = (subject: VisualCase): CaptureCaseSummaryV1 => ({
   finalUrl: `http://127.0.0.1:3000${subject.entry.path}`,
   id: subject.entry.id,
   path: subject.entry.path,
-  stability: null,
+  stability: stabilityFor(subject),
   status: 'passed',
   viewport: subject.viewport
 });
@@ -503,37 +527,16 @@ describe('validateCaptureSummary', () => {
 
   it('preserves exact required-font and same-origin media evidence', () => {
     const subject = visualCase();
+    const expectedStability = stabilityFor(subject);
     const row: CaptureCaseSummaryV1 = {
       ...passedCapture(subject),
-      stability: {
-        durationMs: 1,
-        fonts: [
-          {
-            family: 'Montserrat',
-            resolvedFamily: '__Montserrat_fixture',
-            resources: [
-              {
-                sameOrigin: true,
-                url: 'http://127.0.0.1:3000/_next/static/media/font.woff2'
-              }
-            ],
-            status: 'loaded',
-            style: 'normal',
-            variable: '--font-montserrat',
-            weight: '400'
-          }
-        ],
-        frames: [],
-        images: { checked: 0, exemptedBroken: [] },
-        intervalsCleared: 0,
-        masks: []
-      }
+      stability: expectedStability
     };
 
     expect(
       validateCaptureSummary(captureSummary([subject], [row]), MANIFEST)
         .cases[0].stability?.fonts
-    ).toEqual(row.stability?.fonts);
+    ).toEqual(expectedStability?.fonts);
 
     const invalid = structuredClone(row);
     if (invalid.stability) {
@@ -544,6 +547,87 @@ describe('validateCaptureSummary', () => {
       validateCaptureSummary(captureSummary([subject], [invalid]), MANIFEST)
     ).toThrow('same-origin Next media');
   });
+
+  it.each([
+    [
+      'null stability',
+      (row: SummaryRecord) => {
+        row.stability = null;
+      },
+      'non-null stability'
+    ],
+    [
+      'partial required fonts',
+      (row: SummaryRecord) => {
+        const stability = row.stability as SummaryRecord;
+        (stability.fonts as unknown[]).pop();
+      },
+      'exact required font tuples'
+    ],
+    [
+      'arbitrary font tuple',
+      (row: SummaryRecord) => {
+        const stability = row.stability as SummaryRecord;
+        const fonts = stability.fonts as SummaryRecord[];
+        fonts[0].family = 'Arbitrary';
+      },
+      'exact required font tuples'
+    ],
+    [
+      'non-loaded required font',
+      (row: SummaryRecord) => {
+        const stability = row.stability as SummaryRecord;
+        const fonts = stability.fonts as SummaryRecord[];
+        fonts[0].status = 'error';
+      },
+      'must be loaded'
+    ],
+    [
+      'missing font resource evidence',
+      (row: SummaryRecord) => {
+        const stability = row.stability as SummaryRecord;
+        const fonts = stability.fonts as SummaryRecord[];
+        fonts[0].resources = [];
+      },
+      'resource evidence'
+    ],
+    [
+      'external font diagnostic',
+      (row: SummaryRecord) => {
+        row.blockedRequests = [
+          {
+            disposition: 'external-font-block',
+            method: 'GET',
+            url: 'https://fonts.gstatic.com/s/font.woff2'
+          }
+        ];
+      },
+      'prohibited request diagnostics'
+    ],
+    [
+      'mutation diagnostic',
+      (row: SummaryRecord) => {
+        row.blockedRequests = [
+          {
+            disposition: 'mutation-block',
+            method: 'POST',
+            url: 'https://firestore.googleapis.com/v1/documents:commit'
+          }
+        ];
+      },
+      'prohibited request diagnostics'
+    ]
+  ] as Array<[string, (row: SummaryRecord) => void, string]>)(
+    'rejects a passed blocking row with %s',
+    (_label, mutate, problem) => {
+      const subject = visualCase();
+      const raw = structuredClone(
+        captureSummary([subject])
+      ) as unknown as SummaryRecord;
+      mutate(firstRow(raw));
+      expect(() => validateCaptureSummary(raw, MANIFEST)).toThrow(problem);
+    }
+  );
 
   it.each([
     [

@@ -737,6 +737,14 @@ const validateCaptureRow = (
           baseOrigin,
           expectedPath: expected.entry.path
         });
+  const stability =
+    value.stability === undefined
+      ? undefined
+      : validateStability(
+          value.stability,
+          `capture case ${index}.stability`,
+          baseOrigin
+        );
   if (value.status !== 'passed' && value.status !== 'failed') {
     throw new Error('capture case status is invalid');
   }
@@ -751,6 +759,57 @@ const validateCaptureRow = (
     }
     if (value.error !== undefined) {
       throw new Error('passed capture case must not contain an error');
+    }
+    if (baselinePolicy.kind === 'blocking-candidate') {
+      if (!stability) {
+        throw new Error(
+          'passed blocking capture case must include non-null stability'
+        );
+      }
+      if (
+        blockedRequests.some(
+          ({ disposition }) =>
+            disposition === 'external-font-block' ||
+            disposition === 'mutation-block'
+        )
+      ) {
+        throw new Error(
+          'passed blocking capture case contains prohibited request diagnostics'
+        );
+      }
+      const requiredFonts = expected.entry.requiredFonts;
+      if (!requiredFonts || requiredFonts.length === 0) {
+        throw new Error(
+          'passed blocking capture case manifest must declare required fonts'
+        );
+      }
+      const exactFonts =
+        stability.fonts.length === requiredFonts.length &&
+        stability.fonts.every((font, fontIndex) => {
+          const required = requiredFonts[fontIndex];
+          return (
+            required !== undefined &&
+            font.family === required.family &&
+            font.style === required.style &&
+            font.variable === required.variable &&
+            font.weight === required.weight
+          );
+        });
+      if (!exactFonts) {
+        throw new Error(
+          'passed blocking capture case must include exact required font tuples'
+        );
+      }
+      if (
+        stability.fonts.some(
+          ({ resources, status }) =>
+            status !== 'loaded' || resources.length === 0
+        )
+      ) {
+        throw new Error(
+          'passed blocking capture case required fonts must be loaded with resources'
+        );
+      }
     }
     artifact = expectedArtifact;
   } else {
@@ -772,15 +831,7 @@ const validateCaptureRow = (
     ...(finalUrl ? { finalUrl } : {}),
     id: expected.entry.id,
     path: expected.entry.path,
-    ...(value.stability !== undefined
-      ? {
-          stability: validateStability(
-            value.stability,
-            `capture case ${index}.stability`,
-            baseOrigin
-          )
-        }
-      : {}),
+    ...(stability !== undefined ? { stability } : {}),
     status: value.status,
     viewport: expected.viewport
   };
