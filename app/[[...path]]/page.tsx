@@ -7,7 +7,7 @@ interface LegacyPageProps {
 
 const LegacyPage = async ({ params }: LegacyPageProps) => {
   const { path = [] } = await params;
-  const requestedPathname = `/${path.join('/')}`;
+  const requestedPathname = `/${path.map(encodeURIComponent).join('/')}`;
 
   return <LegacyApp key={requestedPathname} />;
 };

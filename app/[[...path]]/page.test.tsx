@@ -22,4 +22,21 @@ describe('legacy catch-all remount key', () => {
     expect(root.key).toBe('/');
     expect(new Set([home.key, messages.key, root.key]).size).toBe(3);
   });
+
+  it('preserves decoded segment boundaries and reserved characters', async () => {
+    const embeddedSlash = await LegacyPage({
+      params: Promise.resolve({ path: ['x', 'a/b'] })
+    });
+    const separateSegments = await LegacyPage({
+      params: Promise.resolve({ path: ['x', 'a', 'b'] })
+    });
+    const reservedCharacters = await LegacyPage({
+      params: Promise.resolve({ path: ['x', 'a b?#%'] })
+    });
+
+    expect(embeddedSlash.key).toBe('/x/a%2Fb');
+    expect(separateSegments.key).toBe('/x/a/b');
+    expect(reservedCharacters.key).toBe('/x/a%20b%3F%23%25');
+    expect(embeddedSlash.key).not.toBe(separateSegments.key);
+  });
 });
