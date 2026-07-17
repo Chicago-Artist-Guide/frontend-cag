@@ -322,7 +322,7 @@ const assertExactKeys = (
 const sanitizeDiagnosticMessage = (value: string): string => {
   const urls: string[] = [];
   const tokenized = value.replace(
-    /\b(?:file|ftp|https?|wss?):\/\/[^\s"'<>]+/giu,
+    /\b[A-Za-z][A-Za-z0-9+.-]*:\/\/[^\s"'<>]+/gu,
     (candidate) => {
       let replacement = candidate;
       try {
@@ -346,8 +346,10 @@ const sanitizeDiagnosticMessage = (value: string): string => {
   return tokenized
     .replace(/\\\\[^\\\s]+\\[^\s,;'"<>]+/gu, '<path>')
     .replace(/\b[A-Za-z]:[\\/][^\s,;'"<>]+/gu, '<path>')
-    .replace(/(^|[\s("'=:])\/(?!\/)[^\s,;'"<>)]*/gu, (match, prefix: string) =>
-      match.length === prefix.length + 1 ? match : `${prefix}<path>`
+    .replace(
+      /(^|[\s("'=:,[{])\/(?!\/)[^\s,;'"<>)}\]]*/gu,
+      (match, prefix: string) =>
+        match.length === prefix.length + 1 ? match : `${prefix}<path>`
     )
     .replace(/\uE000url-(\d+)\uE001/gu, (_match, index: string) =>
       String(urls[Number(index)])
@@ -1438,6 +1440,17 @@ const pinEvidenceRoot = async (root: string): Promise<PinnedEvidenceRoot> => {
   };
 };
 
+const pinOptionalEvidenceRoot = async (
+  root: string
+): Promise<PinnedEvidenceRoot | null> => {
+  try {
+    return await pinEvidenceRoot(root);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
+    throw error;
+  }
+};
+
 const assertPinnedEvidenceRoot = async (
   root: PinnedEvidenceRoot
 ): Promise<void> => {
@@ -1859,9 +1872,14 @@ export async function runDiff(options: RunDiffOptions): Promise<DiffRunResult> {
         options.manifest,
         capture.selection
       );
+      const needsCurrentRoot = capture.cases.some(
+        ({ status }) => status === 'passed'
+      );
       const [baselineRoot, currentRoot] = await Promise.all([
-        pinEvidenceRoot(options.paths.baselineDir),
-        pinEvidenceRoot(options.paths.currentDir)
+        pinOptionalEvidenceRoot(options.paths.baselineDir),
+        needsCurrentRoot
+          ? pinOptionalEvidenceRoot(options.paths.currentDir)
+          : Promise.resolve(null)
       ]);
       for (let index = 0; index < selectedCases.length; index += 1) {
         const subject = selectedCases[index];
@@ -1872,23 +1890,27 @@ export async function runDiff(options: RunDiffOptions): Promise<DiffRunResult> {
           subject.entry.id,
           `${subject.viewport}.png`
         );
-        const baselineInput = await readEvidence(
-          baselineSource,
-          baselineRoot,
-          options.afterEvidenceOpen
-        );
+        const baselineInput = baselineRoot
+          ? await readEvidence(
+              baselineSource,
+              baselineRoot,
+              options.afterEvidenceOpen
+            )
+          : ({ kind: 'missing' } as const);
         const currentInput =
           captureResult.status === 'failed'
             ? ({ kind: 'missing' } as const)
-            : await readEvidence(
-                path.join(
-                  options.paths.currentDir,
-                  subject.entry.id,
-                  `${subject.viewport}.png`
-                ),
-                currentRoot,
-                options.afterEvidenceOpen
-              );
+            : currentRoot
+              ? await readEvidence(
+                  path.join(
+                    options.paths.currentDir,
+                    subject.entry.id,
+                    `${subject.viewport}.png`
+                  ),
+                  currentRoot,
+                  options.afterEvidenceOpen
+                )
+              : ({ kind: 'missing' } as const);
         const compared = comparePngCase({
           baselineBytes: baselineInput,
           captureResult,

@@ -582,7 +582,7 @@ describe('validateCaptureSummary', () => {
       artifact: undefined,
       error: {
         message:
-          'failed /opt/app/key /workspace/job.txt /Volumes/data/x C:\\secret\\key.txt \\\\server\\share\\key https://user:pass@example.test/a?token=secret#fragment',
+          'failed [/opt/SECRET/key] postgres://user:pw@db.test/app?token=SECRET mongodb://db.test/app#fragment redis://user:pw@cache.test/0 grpc://api.test/call?token=SECRET custom+rpc://host/path?q=SECRET /workspace/job.txt /Volumes/data/x C:\\secret\\key.txt \\\\server\\share\\key',
         name: '/usr/bin/custom-error'
       },
       status: 'failed'
@@ -593,7 +593,7 @@ describe('validateCaptureSummary', () => {
     );
     const serialized = JSON.stringify(validated);
     expect(serialized).not.toMatch(
-      /(?:\/opt|\/workspace|\/Volumes|\/usr|C:\\|\\\\server|secret|fragment|user:pass)/u
+      /(?:\/opt|\/workspace|\/Volumes|\/usr|C:\\|\\\\server|secret|fragment|user:pw)/iu
     );
     expect(validated.cases[0].error?.message).toContain('<path>');
     expect(validated.cases[0].error?.message).toContain('<url>');
@@ -684,6 +684,86 @@ describe('runDiff', () => {
     expect(JSON.parse(await readFile(paths.summaryFile, 'utf8'))).toEqual(
       run.summary
     );
+  });
+
+  it('preserves failed capture rows when the unused current root is absent', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    const failed: CaptureCaseSummaryV1 = {
+      ...passedCapture(subject),
+      artifact: undefined,
+      error: { message: 'capture failed', name: 'Error' },
+      status: 'failed'
+    };
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject], [failed]))
+    );
+    await mkdir(path.join(paths.baselineDir, subject.entry.id), {
+      recursive: true
+    });
+    await writeFile(
+      path.join(paths.baselineDir, subject.entry.id, 'desktop.png'),
+      png(1, 1, [0, 0, 0, 255])
+    );
+    await rm(paths.currentDir, { recursive: true });
+
+    const run = await runDiff({
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+
+    expect(run.summary.capture?.cases).toHaveLength(1);
+    expect(run.summary.results).toHaveLength(1);
+    expect(run.summary.results[0]).toMatchObject({
+      baselineEvidence: 'valid',
+      comparison: 'not-run',
+      currentEvidence: 'missing',
+      id: subject.entry.id
+    });
+    expect(run.summary.results[0].issues.map(({ code }) => code)).toContain(
+      'capture-failed'
+    );
+    expect(run.summary.runErrors).toEqual([]);
+  });
+
+  it('preserves the capture matrix when the optional baseline root is absent', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    await mkdir(path.join(paths.currentDir, subject.entry.id), {
+      recursive: true
+    });
+    await writeFile(
+      path.join(paths.currentDir, subject.entry.id, 'desktop.png'),
+      png(1, 1, [0, 0, 0, 255])
+    );
+    await rm(paths.baselineDir, { recursive: true });
+
+    const run = await runDiff({
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+
+    expect(run.summary.capture?.cases).toHaveLength(1);
+    expect(run.summary.results).toHaveLength(1);
+    expect(run.summary.results[0]).toMatchObject({
+      baselineEvidence: 'missing',
+      comparison: 'not-run',
+      currentEvidence: 'valid',
+      id: subject.entry.id
+    });
+    expect(run.summary.results[0].issues.map(({ code }) => code)).toContain(
+      'missing-baseline'
+    );
+    expect(run.summary.runErrors).toEqual([]);
   });
 
   it('preflights baseline evidence even when capture failed and never copies stale current', async () => {
