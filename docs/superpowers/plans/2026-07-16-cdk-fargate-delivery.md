@@ -424,6 +424,12 @@ standalone HTTP smoke, both Compose configurations, actionlint, and YAML parsing
 passed. CDK tests now remove their isolated assembly directories after every
 test so repeated local verification remains disk-bounded.
 
+Before handoff, the feature commits were replayed onto the current `staging`
+tip so recent React 19, messaging, matching, and dependency work remains intact.
+The combined Next.js type-check required explicit guards around existing account
+lookups that can return `false`; the notification and in-app message behavior is
+unchanged.
+
 The production Docker smoke was invoked and stopped at its explicit external
 precondition because Docker Desktop's daemon is not running on this machine;
 the command emitted the actionable daemon diagnostic. No AWS deployment, DNS
