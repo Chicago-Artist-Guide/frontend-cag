@@ -394,8 +394,8 @@ npm test
 npm run build
 npm --prefix infra run verify
 npm run container:smoke
-ruby -e "require 'yaml'; Dir['.github/workflows/*.{yml,yaml}'].each { |f| YAML.load_file(f, aliases: true); puts f }"
-git diff --check origin/master...HEAD
+ruby -e "require 'yaml'; Dir['.github/workflows/*.{yml,yaml}'].each { |f| YAML.load_file(f); puts f }"
+git diff --check origin/staging...HEAD
 ```
 
 If Docker is unavailable, record that single external blocker and retain the
@@ -403,28 +403,31 @@ passing unit/build/synth evidence; do not claim the container ran.
 
 - [x] **Step 3: Request independent spec and code-quality reviews**
 
-Provide reviewers the design, plan, `origin/master` base SHA, and final head
+Provide reviewers the design, plan, `origin/staging` base SHA, and final head
 SHA. Fix all critical and important findings, then rerun affected verification.
 
 - [x] **Step 4: Commit and push only**
 
 Commit the scoped changes on `dev-512`, push to `origin/dev-512`, confirm PR
-#335 remains open and draft against `master`, and do not merge, close, or change
-its base.
+#335 remains open and draft against `staging`, and do not merge or close it.
+`master` remains the primary production CI branch.
 
 ## Execution record — July 16, 2026
 
 Tasks 1-6 and Task 7 steps 1-3 were implemented with test-first red/green
 evidence. Independent CDK, container, and workflow reviews approved the final
 remediations with no remaining scoped findings. A fresh Node 22 installation
-passed the repository's complete `npm run verify` command: 256 application
+passed the repository's complete `npm run verify` command: 308 application
 tests, 46 infrastructure tests, the production Next.js build, lint with the
-existing 371-warning ceiling, and credential-free synthesis. Live standalone
-HTTP smoke, both Compose configurations, actionlint, and YAML parsing passed.
+inherited staging baseline of 406 warnings, and credential-free synthesis. Live
+standalone HTTP smoke, both Compose configurations, actionlint, and YAML parsing
+passed. CDK tests now remove their isolated assembly directories after every
+test so repeated local verification remains disk-bounded.
 
 The production Docker smoke was invoked and stopped at its explicit external
 precondition because Docker Desktop's daemon is not running on this machine;
 the command emitted the actionable daemon diagnostic. No AWS deployment, DNS
 change, Amplify mutation, database, GitHub Environment, credential write, or
 PR merge was performed. Task 7 step 4 was completed by pushing only `dev-512`
-and confirming PR #335 remained open and draft against `master`.
+and confirming PR #335 remained open and draft against `staging`; `master`
+remains the primary production CI branch.

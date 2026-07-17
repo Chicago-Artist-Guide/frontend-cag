@@ -81,6 +81,7 @@ export const TalentMatchCard = ({
       firebaseFirestore,
       talentAccountId
     );
+    const talentEmail = talentAccount && talentAccount.email;
 
     return sendMessageThreadWithEmail({
       firebaseStore: firebaseFirestore,
@@ -90,9 +91,9 @@ export const TalentMatchCard = ({
       shortMessage,
       productionId,
       roleId,
-      email: talentAccount?.email
+      email: talentEmail
         ? {
-            to: talentAccount.email,
+            to: talentEmail,
             subject: theaterToArtistEmailSubject(roleName, productionName),
             text: emailText,
             html: emailHtml

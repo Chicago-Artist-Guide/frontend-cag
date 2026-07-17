@@ -166,7 +166,7 @@ export const MessageThread: React.FC<
         talentId
       );
 
-      if (!talentAccount?.email) {
+      if (!talentAccount || !talentAccount.email) {
         console.error(
           'Could not find account or account email address for talent.'
         );
@@ -194,7 +194,7 @@ export const MessageThread: React.FC<
         theaterId
       );
 
-      if (theaterAccount?.email) {
+      if (theaterAccount && theaterAccount.email) {
         toEmail = theaterAccount.email;
       } else {
         console.log(

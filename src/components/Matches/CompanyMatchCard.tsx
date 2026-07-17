@@ -144,13 +144,13 @@ export const CompanyMatchCard = ({
 
     let toEmail = theater?.primary_contact_email;
 
-    if (!toEmail) {
+    if (!toEmail && theater) {
       const theaterAccount = await getTheaterAccountByAccountId(
         firebaseFirestore,
         theater.account_id
       );
 
-      if (theaterAccount?.email) {
+      if (theaterAccount && theaterAccount.email) {
         toEmail = theaterAccount.email;
       }
     }

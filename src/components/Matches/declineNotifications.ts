@@ -41,10 +41,11 @@ const notifyDeclinedMatches = async (
         firebaseStore,
         talentAccountId
       );
+      const accountEmail = account && account.email;
       const shortMessage = theaterDeclineArtistMessage(roleName, theaterName);
       const emailText = theaterDeclineArtistEmailText(theaterName, roleName);
 
-      if (account?.email) {
+      if (accountEmail) {
         await sendMessageThreadWithEmail({
           firebaseStore,
           theaterAccountId,
@@ -54,7 +55,7 @@ const notifyDeclinedMatches = async (
           productionId: production.production_id,
           roleId: match.role_id,
           email: {
-            to: account.email,
+            to: accountEmail,
             subject: theaterDeclineArtistEmailSubject(
               roleName,
               production.production_name

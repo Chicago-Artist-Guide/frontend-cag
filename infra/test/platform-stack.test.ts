@@ -1,6 +1,5 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { App } from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import type {
   AssetManifest,
@@ -12,6 +11,7 @@ import {
   PlatformStack,
   type PublicBuildArguments
 } from '../lib/platform-stack.js';
+import { createTestApp } from './test-app.js';
 
 const buildArguments: PublicBuildArguments = {
   NEXT_PUBLIC_FIREBASE_API_KEY: 'api-key',
@@ -26,7 +26,7 @@ const createStack = (
   stageName: 'preview' | 'production' | 'staging',
   previewId?: string
 ) => {
-  const app = new App();
+  const app = createTestApp();
   const target = resolveDeploymentTarget(stageName, previewId);
   const stack = new PlatformStack(app, target.stackName, {
     buildArguments,

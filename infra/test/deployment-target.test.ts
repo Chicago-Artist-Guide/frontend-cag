@@ -1,4 +1,3 @@
-import { App } from 'aws-cdk-lib';
 import {
   configurePlatformApp,
   readPublicBuildArguments
@@ -7,6 +6,7 @@ import {
   resolveDeploymentTarget,
   resolveRequestedDeploymentTargets
 } from '../lib/deployment-target.js';
+import { createTestApp } from './test-app.js';
 
 const buildArguments = {
   NEXT_PUBLIC_FIREBASE_API_KEY: 'api-key',
@@ -108,7 +108,7 @@ describe('resolveRequestedDeploymentTargets', () => {
 
 describe('configurePlatformApp', () => {
   it('creates staging and production by default', () => {
-    const app = new App();
+    const app = createTestApp();
 
     const stacks = configurePlatformApp(app, buildArguments);
 
@@ -119,7 +119,7 @@ describe('configurePlatformApp', () => {
   });
 
   it('creates only an explicitly requested preview', () => {
-    const app = new App({
+    const app = createTestApp({
       context: { previewId: 'dev-511', stage: 'preview' }
     });
 
