@@ -100,30 +100,48 @@ const getModuleImports = (
 
 interface StaticBindings {
   declarations: Map<string, ts.VariableDeclaration[]>;
+  lexicalDeclarations: Map<string, ts.Declaration[]>;
   sourceFile: ts.SourceFile;
+  typeAliases: Map<string, ts.TypeAliasDeclaration>;
 }
 
 const collectStaticBindings = (sourceFile: ts.SourceFile): StaticBindings => {
   const declarations = new Map<string, ts.VariableDeclaration[]>();
+  const lexicalDeclarations = new Map<string, ts.Declaration[]>();
+  const typeAliases = new Map<string, ts.TypeAliasDeclaration>();
+
+  const addLexicalDeclaration = (name: string, declaration: ts.Declaration) => {
+    const namedDeclarations = lexicalDeclarations.get(name) ?? [];
+    namedDeclarations.push(declaration);
+    lexicalDeclarations.set(name, namedDeclarations);
+  };
 
   const visit = (node: ts.Node) => {
-    if (
-      ts.isVariableDeclaration(node) &&
-      ts.isIdentifier(node.name) &&
-      node.initializer &&
-      ts.isVariableDeclarationList(node.parent) &&
-      Boolean(node.parent.flags & ts.NodeFlags.Const)
-    ) {
-      const namedDeclarations = declarations.get(node.name.text) ?? [];
-      namedDeclarations.push(node);
-      declarations.set(node.name.text, namedDeclarations);
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
+      addLexicalDeclaration(node.name.text, node);
+
+      if (
+        node.initializer &&
+        ts.isVariableDeclarationList(node.parent) &&
+        Boolean(node.parent.flags & ts.NodeFlags.Const)
+      ) {
+        const namedDeclarations = declarations.get(node.name.text) ?? [];
+        namedDeclarations.push(node);
+        declarations.set(node.name.text, namedDeclarations);
+      }
+    } else if (ts.isParameter(node) && ts.isIdentifier(node.name)) {
+      addLexicalDeclaration(node.name.text, node);
+    } else if (ts.isFunctionDeclaration(node) && node.name) {
+      addLexicalDeclaration(node.name.text, node);
+    } else if (ts.isTypeAliasDeclaration(node)) {
+      typeAliases.set(node.name.text, node);
     }
 
     ts.forEachChild(node, visit);
   };
 
   visit(sourceFile);
-  return { declarations, sourceFile };
+  return { declarations, lexicalDeclarations, sourceFile, typeAliases };
 };
 
 const isWithinNode = (node: ts.Node, ancestor: ts.Node) => {
@@ -156,6 +174,72 @@ const getLexicalScope = (declaration: ts.VariableDeclaration) => {
 
   return undefined;
 };
+
+const getBindingScope = (declaration: ts.Declaration): ts.Node | undefined => {
+  if (ts.isParameter(declaration)) {
+    return declaration.parent;
+  }
+
+  if (ts.isFunctionDeclaration(declaration)) {
+    let current: ts.Node | undefined = declaration.parent;
+
+    while (current) {
+      if (ts.isSourceFile(current) || ts.isBlock(current)) return current;
+      current = current.parent;
+    }
+    return undefined;
+  }
+
+  if (ts.isVariableDeclaration(declaration)) {
+    if (ts.isCatchClause(declaration.parent)) {
+      return declaration.parent.block;
+    }
+
+    if (
+      ts.isVariableDeclarationList(declaration.parent) &&
+      !(declaration.parent.flags & ts.NodeFlags.BlockScoped)
+    ) {
+      let current: ts.Node | undefined = declaration.parent;
+
+      while (current) {
+        if (ts.isFunctionLike(current)) return current;
+        if (ts.isSourceFile(current)) return current;
+        current = current.parent;
+      }
+      return undefined;
+    }
+
+    return getLexicalScope(declaration);
+  }
+
+  return undefined;
+};
+
+const findVisibleLexicalBinding = (
+  identifier: ts.Identifier,
+  bindings: StaticBindings
+) =>
+  (bindings.lexicalDeclarations.get(identifier.text) ?? [])
+    .map((declaration) => ({
+      declaration,
+      scope: getBindingScope(declaration)
+    }))
+    .filter(
+      (
+        candidate
+      ): candidate is { declaration: ts.Declaration; scope: ts.Node } =>
+        Boolean(candidate.scope && isWithinNode(identifier, candidate.scope))
+    )
+    .sort((left, right) => {
+      const widthDifference =
+        left.scope.getWidth(bindings.sourceFile) -
+        right.scope.getWidth(bindings.sourceFile);
+
+      return widthDifference === 0
+        ? right.declaration.getStart(bindings.sourceFile) -
+            left.declaration.getStart(bindings.sourceFile)
+        : widthDifference;
+    })[0]?.declaration;
 
 const findVisibleConstDeclaration = (
   identifier: ts.Identifier,
@@ -327,10 +411,11 @@ const getImportedCallName = (
 
   if (ts.isIdentifier(unwrapped)) {
     const declaration = bindings
-      ? findVisibleConstDeclaration(unwrapped, bindings)
+      ? findVisibleLexicalBinding(unwrapped, bindings)
       : undefined;
 
-    if (declaration?.initializer) {
+    if (declaration && ts.isVariableDeclaration(declaration)) {
+      if (!declaration.initializer) return undefined;
       if (visited.has(declaration)) return undefined;
 
       const nextVisited = new Set(visited);
@@ -343,14 +428,15 @@ const getImportedCallName = (
       );
     }
 
+    if (declaration) return undefined;
+
     return imports.named.get(unwrapped.text);
   }
 
   if (
     ts.isPropertyAccessExpression(unwrapped) &&
     ts.isIdentifier(unwrapped.expression) &&
-    (!bindings ||
-      !findVisibleConstDeclaration(unwrapped.expression, bindings)) &&
+    (!bindings || !findVisibleLexicalBinding(unwrapped.expression, bindings)) &&
     imports.namespaces.has(unwrapped.expression.text)
   ) {
     return unwrapped.name.text;
@@ -450,35 +536,11 @@ const getExportedLocalNames = (sourceFile: ts.SourceFile) => {
   return exportedNames;
 };
 
-const isInsideExportedFunction = (
-  node: ts.Node,
-  sourceFile: ts.SourceFile,
-  exportedNames: Set<string>
-) => {
+const isInsideFunction = (node: ts.Node, sourceFile: ts.SourceFile) => {
   let current: ts.Node | undefined = node.parent;
 
   while (current && current !== sourceFile) {
-    if (ts.isFunctionDeclaration(current)) {
-      return (
-        (!current.name &&
-          current.modifiers?.some(
-            (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword
-          )) ||
-        Boolean(current.name && exportedNames.has(current.name.text))
-      );
-    }
-
-    if (ts.isArrowFunction(current) || ts.isFunctionExpression(current)) {
-      if (ts.isExportAssignment(current.parent)) return true;
-
-      if (
-        ts.isVariableDeclaration(current.parent) &&
-        ts.isIdentifier(current.parent.name) &&
-        exportedNames.has(current.parent.name.text)
-      ) {
-        return true;
-      }
-    }
+    if (ts.isFunctionLike(current)) return true;
 
     current = current.parent;
   }
@@ -486,28 +548,105 @@ const isInsideExportedFunction = (
   return false;
 };
 
+type ReferencePathParity = 0 | 1 | undefined;
+
+const getTypeReferenceParity = (
+  type: ts.TypeNode | undefined,
+  imports: ModuleImports,
+  bindings: StaticBindings,
+  visited = new Set<string>()
+): ReferencePathParity => {
+  if (!type) return undefined;
+
+  if (ts.isParenthesizedTypeNode(type)) {
+    return getTypeReferenceParity(type.type, imports, bindings, visited);
+  }
+
+  if (ts.isUnionTypeNode(type)) {
+    const parities = type.types.map((member) =>
+      getTypeReferenceParity(member, imports, bindings, new Set(visited))
+    );
+
+    return parities.every((parity) => parity === parities[0])
+      ? parities[0]
+      : undefined;
+  }
+
+  if (!ts.isTypeReferenceNode(type)) return undefined;
+
+  if (ts.isIdentifier(type.typeName)) {
+    const localName = type.typeName.text;
+    const importedName = imports.named.get(localName) ?? localName;
+
+    if (importedName === 'CollectionReference') return 1;
+    if (importedName === 'DocumentReference' || importedName === 'Firestore') {
+      return 0;
+    }
+
+    const alias = bindings.typeAliases.get(localName);
+    if (!alias || visited.has(localName)) return undefined;
+
+    const nextVisited = new Set(visited);
+    nextVisited.add(localName);
+    return getTypeReferenceParity(alias.type, imports, bindings, nextVisited);
+  }
+
+  if (
+    ts.isQualifiedName(type.typeName) &&
+    ts.isIdentifier(type.typeName.left) &&
+    imports.namespaces.has(type.typeName.left.text)
+  ) {
+    if (type.typeName.right.text === 'CollectionReference') return 1;
+    if (
+      type.typeName.right.text === 'DocumentReference' ||
+      type.typeName.right.text === 'Firestore'
+    ) {
+      return 0;
+    }
+  }
+
+  return undefined;
+};
+
 const getReferencePathParity = (
   expression: ts.Expression | undefined,
   imports: ModuleImports,
   bindings: StaticBindings,
-  visited = new Set<ts.VariableDeclaration>()
-): 0 | 1 => {
-  if (!expression) return 0;
+  visited = new Set<ts.Declaration>()
+): ReferencePathParity => {
+  if (!expression) return undefined;
 
   const unwrapped = unwrapExpression(expression);
 
   if (ts.isIdentifier(unwrapped)) {
-    const declaration = findVisibleConstDeclaration(unwrapped, bindings);
-    if (declaration?.initializer && !visited.has(declaration)) {
-      const nextVisited = new Set(visited);
-      nextVisited.add(declaration);
-      return getReferencePathParity(
-        declaration.initializer,
-        imports,
-        bindings,
-        nextVisited
-      );
+    const declaration = findVisibleLexicalBinding(unwrapped, bindings);
+
+    if (declaration) {
+      const typedParity =
+        ts.isVariableDeclaration(declaration) || ts.isParameter(declaration)
+          ? getTypeReferenceParity(declaration.type, imports, bindings)
+          : undefined;
+      if (typedParity !== undefined) return typedParity;
+
+      if (
+        ts.isVariableDeclaration(declaration) &&
+        declaration.initializer &&
+        !visited.has(declaration)
+      ) {
+        const nextVisited = new Set(visited);
+        nextVisited.add(declaration);
+        return getReferencePathParity(
+          declaration.initializer,
+          imports,
+          bindings,
+          nextVisited
+        );
+      }
+
+      return undefined;
     }
+
+    return undefined;
   }
 
   if (ts.isCallExpression(unwrapped)) {
@@ -519,9 +658,11 @@ const getReferencePathParity = (
 
     if (callName === 'collection' || callName === 'collectionGroup') return 1;
     if (callName === 'doc') return 0;
+
+    return undefined;
   }
 
-  return 0;
+  return undefined;
 };
 
 interface CollectionSegmentAnalysis {
@@ -548,6 +689,17 @@ const analyzeCollectionSegments = (
 
   let parity = getReferencePathParity(call.arguments[0], imports, bindings);
   let dynamicCollection = false;
+  const pathSegmentCount = call.arguments.slice(1).reduce((count, argument) => {
+    const value = resolveStaticString(argument, bindings);
+    return count + (value === undefined ? 1 : value.split('/').length);
+  }, 0);
+
+  if (parity === undefined) {
+    parity =
+      callName === 'doc'
+        ? ((pathSegmentCount % 2) as 0 | 1)
+        : (((pathSegmentCount + 1) % 2) as 0 | 1);
+  }
 
   for (const argument of call.arguments.slice(1)) {
     const value = resolveStaticString(argument, bindings);
@@ -617,8 +769,7 @@ const analyzeAccountProfileFirestoreSource = (source: string, file: string) => {
 
         if (
           analysis.accountProfile ||
-          (analysis.dynamicCollection &&
-            isInsideExportedFunction(node, sourceFile, exportedNames))
+          (analysis.dynamicCollection && isInsideFunction(node, sourceFile))
         ) {
           hasAccess = true;
           return;
@@ -789,6 +940,7 @@ const getInitializeAppCalls = (source: string, file: string) => {
   const sourceFile = parseSource(source, file);
   const appImports = getModuleImports(sourceFile, new Set(['firebase/app']));
   const bindings = collectStaticBindings(sourceFile);
+  const exportedNames = getExportedLocalNames(sourceFile);
   const initializationNodes: ts.Node[] = getModuleReExports(
     sourceFile,
     new Set(['firebase/app'])
@@ -798,6 +950,20 @@ const getInitializeAppCalls = (source: string, file: string) => {
         importedName === '*' || importedName === 'initializeApp'
     )
     .map(({ statement }) => statement);
+
+  for (const [name, declarations] of bindings.declarations) {
+    if (!exportedNames.has(name)) continue;
+
+    declarations.forEach((declaration) => {
+      if (
+        declaration.initializer &&
+        getImportedCallName(declaration.initializer, appImports, bindings) ===
+          'initializeApp'
+      ) {
+        initializationNodes.push(declaration);
+      }
+    });
+  }
 
   const visit = (node: ts.Node) => {
     if (
@@ -952,8 +1118,20 @@ describe('account and profile consumer boundary', () => {
         file: 'src/routes/DocumentWrapper.ts',
         source: `
           import { doc } from 'firebase/firestore';
-          export const getDocument = (parent: unknown, path: string) =>
-            doc(parent as never, path);
+          export const getDocument = (
+            parent: unknown,
+            collectionPath: string,
+            documentId: string
+          ) => doc(parent as never, collectionPath, documentId);
+        `
+      },
+      {
+        file: 'src/routes/LocalWrapper.ts',
+        source: `
+          import { collection } from 'firebase/firestore';
+          const getCollection = (db: unknown, path: string) =>
+            collection(db as never, path);
+          getCollection(db, 'accounts');
         `
       }
     ];
@@ -966,6 +1144,58 @@ describe('account and profile consumer boundary', () => {
         fixtures.map(({ file }) => file)
       )
     ).toEqual(fixtures.map(({ file }) => file).sort());
+  });
+
+  it('ignores named and namespace Firestore callees shadowed by lexical bindings', () => {
+    const fixtures = [
+      `
+        import { collection } from 'firebase/firestore';
+        function run(collection: (...args: unknown[]) => unknown) {
+          collection(db, 'accounts');
+        }
+      `,
+      `
+        import * as firestore from 'firebase/firestore';
+        function run(firestore: { collection: (...args: unknown[]) => unknown }) {
+          firestore.collection(db, 'profiles');
+        }
+      `,
+      `
+        import { collection } from 'firebase/firestore';
+        {
+          let collection = (...args: unknown[]) => args;
+          collection(db, 'accounts');
+        }
+      `,
+      `
+        import { doc } from 'firebase/firestore';
+        function run() {
+          var doc = (...args: unknown[]) => args;
+          doc(db, 'profiles', 'id');
+        }
+      `,
+      `
+        import { collection } from 'firebase/firestore';
+        function run() {
+          function collection(...args: unknown[]) { return args; }
+          collection(db, 'accounts');
+        }
+      `,
+      `
+        import { doc } from 'firebase/firestore';
+        try { throw new Error('expected'); }
+        catch (doc) { doc(db, 'profiles', 'id'); }
+      `
+    ];
+
+    fixtures.forEach((source, index) => {
+      expect(
+        analyzeAccountProfileFirestoreSource(
+          source,
+          `src/routes/Shadowed-${index}.ts`
+        )
+      ).toBe(false);
+    });
   });
 
   it('distinguishes collection segments from document IDs and shadowed constructors', () => {
@@ -1030,6 +1260,65 @@ describe('account and profile consumer boundary', () => {
     });
   });
 
+  it('uses reference types to establish path parity without treating unknown references as Firestore roots', () => {
+    const collectionReference = `
+      import { doc, type CollectionReference } from 'firebase/firestore';
+      const settings: CollectionReference = getSettingsCollection();
+      doc(settings, 'profiles');
+    `;
+    const dynamicCollectionDocumentId = `
+      import { doc, type CollectionReference } from 'firebase/firestore';
+      export const getProfile = (
+        settings: CollectionReference,
+        id: string
+      ) => doc(settings, id);
+    `;
+    const unknownReference = `
+      import { doc } from 'firebase/firestore';
+      const reference = getReference();
+      doc(reference, 'accounts');
+    `;
+    const documentReferences = [
+      `
+        import { collection, type DocumentReference } from 'firebase/firestore';
+        const setting: DocumentReference = getSettingDocument();
+        collection(setting, 'profiles');
+      `,
+      `
+        import { doc, type DocumentReference } from 'firebase/firestore';
+        const setting: DocumentReference = getSettingDocument();
+        doc(setting, 'accounts', 'account-id');
+      `
+    ];
+
+    expect(
+      analyzeAccountProfileFirestoreSource(
+        collectionReference,
+        'src/routes/TypedCollectionReference.ts'
+      )
+    ).toBe(false);
+    expect(
+      analyzeAccountProfileFirestoreSource(
+        dynamicCollectionDocumentId,
+        'src/routes/DynamicCollectionDocumentId.ts'
+      )
+    ).toBe(false);
+    expect(
+      analyzeAccountProfileFirestoreSource(
+        unknownReference,
+        'src/routes/UnknownReference.ts'
+      )
+    ).toBe(false);
+    documentReferences.forEach((source, index) => {
+      expect(
+        analyzeAccountProfileFirestoreSource(
+          source,
+          `src/routes/TypedDocumentReference-${index}.ts`
+        )
+      ).toBe(true);
+    });
+  });
+
   it('detects Firebase parameters on every exported function form through import and type aliases', () => {
     const source = `
       import type { Firestore as Database } from 'firebase/firestore';
@@ -1087,12 +1376,19 @@ describe('account and profile consumer boundary', () => {
     `;
     const directReExport =
       "export { initializeApp as init } from 'firebase/app';";
+    const exportedCallableAlias = `
+      import { initializeApp } from 'firebase/app';
+      export const init = initializeApp;
+    `;
 
     expect(
       getInitializeAppCalls(callableAlias, 'src/lib/callable-alias.ts')
     ).toHaveLength(1);
     expect(
       getInitializeAppCalls(directReExport, 'src/lib/re-export.ts')
+    ).toHaveLength(1);
+    expect(
+      getInitializeAppCalls(exportedCallableAlias, 'src/lib/exported-alias.ts')
     ).toHaveLength(1);
   });
 
