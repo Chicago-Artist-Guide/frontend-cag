@@ -9,6 +9,12 @@ import {
 
 const ERROR_SETTLE_TIME_MS = 750;
 
+test.beforeEach(async ({ page }) => {
+  await page.route('https://firestore.googleapis.com/**', (route) =>
+    route.abort('blockedbyclient')
+  );
+});
+
 const markerLocator = (page: Page, marker: BrowserMarker) =>
   marker.kind === 'heading'
     ? page.getByRole('heading', { exact: true, name: marker.value }).first()
@@ -41,6 +47,27 @@ test.describe('logged-out application route contract', () => {
       await assertLoggedOutExpectation(page, route.loggedOut, pageErrors);
     });
   }
+});
+
+test('Donate exposes the approved Young Leaders Fund supporter link', async ({
+  page
+}) => {
+  await page.goto('/donate');
+
+  const supporter = page.getByRole('link', {
+    exact: true,
+    name: 'Young Leaders Fund, an initiative of The Chicago Community Trust'
+  });
+
+  await expect(supporter).toBeVisible();
+  await expect(supporter).toHaveAttribute(
+    'href',
+    'https://www.cct.org/young-leaders-fund/'
+  );
+  await expect(supporter.locator('img')).toHaveAttribute(
+    'alt',
+    'Young Leaders Fund, an initiative of The Chicago Community Trust'
+  );
 });
 
 test.describe('compatibility redirect contract', () => {

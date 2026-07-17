@@ -52,6 +52,26 @@ export interface CalibrationInventoryEntry {
 
 export type CalibrationInventory = CalibrationInventoryEntry[];
 
+export interface CalibrationProvenance {
+  approval: {
+    approvedAt: string;
+    approvedBy: string;
+    reason: string;
+  };
+  baselineSet: string;
+  files: Array<{
+    approvedCapture: string;
+    bytes: number;
+    independentCapture: string;
+    reason: string;
+    relationship: 'byte-identical';
+    relativePath: string;
+    sha256: string;
+    sourceRevision?: string;
+  }>;
+  schemaVersion: 1;
+}
+
 export interface CalibrationPaths {
   artifactDir: string;
   authDir: string;
@@ -126,11 +146,9 @@ export interface CalibrationRecord {
   failures: Array<{ code: string; stage: string }>;
   generation: string;
   metadata?: BuildMetadata & { nodeVersion: string };
-  provenance: {
-    approvedCapture: '2026-05-05';
-    independentStagingCapture: '2026-05-09';
-    relationship: 'byte-identical';
-  };
+  provenance:
+    | { status: 'unverified' }
+    | (CalibrationProvenance & { status: 'verified' });
   publicEnvironment: Array<{ name: string; sha256: string }>;
   readiness: {
     health: boolean;
@@ -168,6 +186,10 @@ export interface CalibrationDependencies {
   now(): Date;
   probeHealth(signal?: AbortSignal): Promise<void>;
   probeHydratedRoute(signal?: AbortSignal): Promise<void>;
+  readProvenance(
+    root: string,
+    selection: CalibrationInventory
+  ): Promise<CalibrationProvenance>;
   readBuildMetadata(
     cwd: string,
     environment: Record<string, string>
@@ -188,6 +210,238 @@ export interface CalibrationOptions {
 
 const sha256 = (value: string | Buffer): string =>
   createHash('sha256').update(value).digest('hex');
+
+const legacyCalibrationProvenance = (
+  selection: CalibrationInventory
+): CalibrationProvenance => ({
+  approval: {
+    approvedAt: '2026-05-09',
+    approvedBy: 'legacy-corpus-review',
+    reason: 'Approved React compatibility corpus with independent staging proof.'
+  },
+  baselineSet: 'legacy-may-2026',
+  files: selection.map(({ bytes, relativePath, sha256: fileSha256 }) => ({
+    approvedCapture: '2026-05-05',
+    bytes,
+    independentCapture: '2026-05-09',
+    reason: 'Inherited byte-identical compatibility capture.',
+    relationship: 'byte-identical',
+    relativePath,
+    sha256: fileSha256
+  })),
+  schemaVersion: 1
+});
+
+const PROVENANCE_FILE = 'calibration-provenance.json';
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/u;
+const SAFE_BASELINE_SET = /^[a-z0-9]+(?:[a-z0-9-]*[a-z0-9])?$/u;
+const SHA256 = /^[a-f0-9]{64}$/u;
+const GIT_REVISION = /^[a-f0-9]{40}$/u;
+
+const LEGACY_MAY_SELECTION: CalibrationInventory = [
+  {
+    bytes: 333044,
+    relativePath: 'about-us/desktop.png',
+    sha256: '1170e9d3925426b07a10e59e7a89597f857aa171ab14223b7d82ccb7257ac8b1'
+  },
+  {
+    bytes: 839746,
+    relativePath: 'donate/desktop.png',
+    sha256: 'f46a6f7c60b74ec6da3abc715a4b32e5dc3d06b00afedf317daf254c6b1e4efb'
+  },
+  {
+    bytes: 193321,
+    relativePath: 'faq/desktop.png',
+    sha256: '7341f236880d6206f84ddbe430c9bdca8b0709666298ac1a5b1b2fba9241a088'
+  },
+  {
+    bytes: 66129,
+    relativePath: 'forgot-password/desktop.png',
+    sha256: '500ac8c3ef8d062e7a1e45d2200e77530f760be161d600c98b2190503ea48463'
+  },
+  {
+    bytes: 66162,
+    relativePath: 'login/desktop.png',
+    sha256: '2281135f6445b0bbad6b7b869dc1a051d756a7562c599873f4c7501f736e3d09'
+  },
+  {
+    bytes: 87862,
+    relativePath: 'signup/desktop.png',
+    sha256: '5f6ddb0c2298c0ea5b0e3b8258636bf9f7ad04591e8735ece6c8f80e81dab0fa'
+  }
+];
+
+const isPinnedLegacyMaySelection = (selection: CalibrationInventory): boolean =>
+  selection.length === LEGACY_MAY_SELECTION.length &&
+  selection.every((entry, index) => {
+    const expected = LEGACY_MAY_SELECTION[index];
+    return (
+      entry.bytes === expected.bytes &&
+      entry.relativePath === expected.relativePath &&
+      entry.sha256 === expected.sha256
+    );
+  });
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);
+
+const assertExactKeys = (
+  value: Record<string, unknown>,
+  expected: readonly string[],
+  label: string
+): void => {
+  const actual = Object.keys(value).sort();
+  const sortedExpected = [...expected].sort();
+  if (
+    actual.length !== sortedExpected.length ||
+    actual.some((key, index) => key !== sortedExpected[index])
+  ) {
+    throw new Error(`invalid ${label} fields`);
+  }
+};
+
+const requiredString = (
+  value: unknown,
+  label: string,
+  pattern?: RegExp
+): string => {
+  if (
+    typeof value !== 'string' ||
+    value.trim().length === 0 ||
+    (pattern && !pattern.test(value))
+  ) {
+    throw new Error(`invalid ${label}`);
+  }
+  return value;
+};
+
+const requiredDate = (value: unknown, label: string): string => {
+  const date = requiredString(value, label, ISO_DATE);
+  const [year, month, day] = date.split('-').map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  if (
+    parsed.getUTCFullYear() !== year ||
+    parsed.getUTCMonth() !== month - 1 ||
+    parsed.getUTCDate() !== day
+  ) {
+    throw new Error(`invalid ${label}`);
+  }
+  return date;
+};
+
+export const validateCalibrationProvenance = (
+  value: unknown,
+  selection: CalibrationInventory
+): CalibrationProvenance => {
+  if (!isObject(value)) throw new Error('invalid calibration provenance');
+  assertExactKeys(
+    value,
+    ['approval', 'baselineSet', 'files', 'schemaVersion'],
+    'calibration provenance'
+  );
+  if (value.schemaVersion !== 1) {
+    throw new Error('invalid calibration provenance schema');
+  }
+  const baselineSet = requiredString(
+    value.baselineSet,
+    'baseline set',
+    SAFE_BASELINE_SET
+  );
+  if (!isObject(value.approval)) {
+    throw new Error('invalid calibration approval');
+  }
+  assertExactKeys(
+    value.approval,
+    ['approvedAt', 'approvedBy', 'reason'],
+    'calibration approval'
+  );
+  const approval = {
+    approvedAt: requiredDate(value.approval.approvedAt, 'approval date'),
+    approvedBy: requiredString(value.approval.approvedBy, 'approval owner'),
+    reason: requiredString(value.approval.reason, 'approval reason')
+  };
+  if (!Array.isArray(value.files) || value.files.length !== selection.length) {
+    throw new Error('invalid calibration provenance files');
+  }
+  const files = value.files.map((entry, index) => {
+    if (!isObject(entry)) throw new Error('invalid calibration provenance file');
+    const expected = selection[index];
+    const hasSourceRevision = Object.hasOwn(entry, 'sourceRevision');
+    assertExactKeys(
+      entry,
+      [
+        'approvedCapture',
+        'bytes',
+        'independentCapture',
+        'reason',
+        'relationship',
+        'relativePath',
+        'sha256',
+        ...(hasSourceRevision ? ['sourceRevision'] : [])
+      ],
+      'calibration provenance file'
+    );
+    const relativePath = requiredString(entry.relativePath, 'evidence path');
+    const fileSha256 = requiredString(entry.sha256, 'evidence hash', SHA256);
+    if (
+      !expected ||
+      relativePath !== expected.relativePath ||
+      entry.bytes !== expected.bytes ||
+      fileSha256 !== expected.sha256 ||
+      entry.relationship !== 'byte-identical'
+    ) {
+      throw new Error('calibration provenance does not match evidence');
+    }
+    const sourceRevision = hasSourceRevision
+      ? requiredString(entry.sourceRevision, 'source revision', GIT_REVISION)
+      : undefined;
+    return {
+      approvedCapture: requiredDate(
+        entry.approvedCapture,
+        'approved capture date'
+      ),
+      bytes: expected.bytes,
+      independentCapture: requiredDate(
+        entry.independentCapture,
+        'independent capture date'
+      ),
+      reason: requiredString(entry.reason, 'evidence reason'),
+      relationship: 'byte-identical' as const,
+      relativePath,
+      sha256: fileSha256,
+      ...(sourceRevision ? { sourceRevision } : {})
+    };
+  });
+  return { approval, baselineSet, files, schemaVersion: 1 };
+};
+
+export const readCalibrationProvenance = async (
+  root: string,
+  selection: CalibrationInventory
+): Promise<CalibrationProvenance> => {
+  const provenanceFile = path.join(root, PROVENANCE_FILE);
+  try {
+    await lstat(provenanceFile);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      if (!isPinnedLegacyMaySelection(selection)) {
+        throw new Error(
+          'calibration provenance is required for non-legacy evidence'
+        );
+      }
+      return legacyCalibrationProvenance(selection);
+    }
+    throw new Error('calibration provenance cannot be inspected');
+  }
+  const evidence = await readRegularFileNoFollow(provenanceFile);
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(evidence.buffer.toString('utf8'));
+  } catch {
+    throw new Error('calibration provenance must be valid JSON');
+  }
+  return validateCalibrationProvenance(parsed, selection);
+};
 
 const pathsOverlap = (left: string, right: string): boolean => {
   const relative = path.relative(left, right);
@@ -834,6 +1088,7 @@ const productionDependencies: CalibrationDependencies = {
   now: () => new Date(),
   probeHealth: probeCalibrationHealth,
   probeHydratedRoute: probeCalibrationHydration,
+  readProvenance: readCalibrationProvenance,
   readBuildMetadata: readProductionBuildMetadata,
   resolveEvidenceRoot: resolveEvidenceRootIdentity,
   runCommand: runSpawnedCommand,
@@ -1016,11 +1271,7 @@ export async function runCalibrationCommand(
     },
     failures: [],
     generation: path.basename(paths.generationDir),
-    provenance: {
-      approvedCapture: '2026-05-05',
-      independentStagingCapture: '2026-05-09',
-      relationship: 'byte-identical'
-    },
+    provenance: { status: 'unverified' },
     publicEnvironment: configuration.publicValueHashes,
     readiness: { health: false, hydratedFaq: false },
     reports: {
@@ -1070,6 +1321,20 @@ export async function runCalibrationCommand(
     if (!inventoriesEqual(sourceSelection, stagingSelection)) {
       throw new Error('approved evidence proofs differ');
     }
+    const [sourceProvenance, stagingProvenance] = await Promise.all([
+      dependencies.readProvenance(
+        configuration.approvedBaselineDir,
+        sourceSelection
+      ),
+      dependencies.readProvenance(
+        configuration.approvedStagingDir,
+        stagingSelection
+      )
+    ]);
+    if (JSON.stringify(sourceProvenance) !== JSON.stringify(stagingProvenance)) {
+      throw new Error('approved evidence provenance differs');
+    }
+    record.provenance = { ...sourceProvenance, status: 'verified' };
     await retain();
 
     currentStage = 'copy';

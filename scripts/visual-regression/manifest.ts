@@ -317,6 +317,10 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Home.tsx',
       'src/components/Home/**',
+      'src/components/Redesign/PartnerSlider.tsx',
+      'src/images/sponsors/**',
+      'src/images/supporters/**',
+      'src/utils/supporters.ts',
       'src/components/layout/**'
     ],
     viewports: ['desktop']
@@ -352,11 +356,20 @@ const existingManifest: RouteEntry[] = [
     readiness: {
       visible: [
         'main h1:has-text("Donate to Support Chicago Artists"):visible',
-        'main a:has-text("Donate Securely Now"):visible'
+        'main a:has-text("Donate Securely Now"):visible',
+        'main img[alt="Young Leaders Fund, an initiative of The Chicago Community Trust"]:visible'
       ]
     },
     requiredFonts: REQUIRED_BRAND_FONTS,
-    sourceGlobs: ['src/routes/Donate.tsx', 'src/components/layout/**'],
+    sourceGlobs: [
+      'src/routes/Donate.tsx',
+      'src/components/Redesign/PartnerSlider.tsx',
+      'src/components/layout/**',
+      'src/images/donate/**',
+      'src/images/sponsors/**',
+      'src/images/supporters/**',
+      'src/utils/supporters.ts'
+    ],
     viewports: ['desktop']
   },
   {

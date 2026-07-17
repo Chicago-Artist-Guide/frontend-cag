@@ -381,7 +381,8 @@ describe('visual manifest', () => {
       ],
       donate: [
         'main h1:has-text("Donate to Support Chicago Artists"):visible',
-        'main a:has-text("Donate Securely Now"):visible'
+        'main a:has-text("Donate Securely Now"):visible',
+        'main img[alt="Young Leaders Fund, an initiative of The Chicago Community Trust"]:visible'
       ],
       events: [
         'main h1:has-text("EVENTS"):visible',
@@ -458,6 +459,42 @@ describe('visual manifest', () => {
     expect(entry?.readiness.visible).toEqual([
       'main h1:has-text("Discover your next"):has-text("dream gig"):visible'
     ]);
+  });
+
+  it('tracks supporter content as Donate readiness and shared migration scope', () => {
+    const supporters = readFileSync(
+      path.resolve(process.cwd(), 'src/utils/supporters.ts'),
+      'utf8'
+    );
+    const donate = MANIFEST.find(({ id }) => id === 'donate');
+
+    expect(supporters).toContain(
+      "alt: 'Young Leaders Fund, an initiative of The Chicago Community Trust'"
+    );
+    expect(donate?.readiness.visible).toContain(
+      'main img[alt="Young Leaders Fund, an initiative of The Chicago Community Trust"]:visible'
+    );
+    expect(
+      entriesForTarget('src/components/Redesign/PartnerSlider.tsx').map(
+        ({ id }) => id
+      )
+    ).toEqual(['home', 'donate']);
+    expect(
+      entriesForTarget('src/images/supporters/young-leaders-fund.png').map(
+        ({ id }) => id
+      )
+    ).toEqual(['home', 'donate']);
+    expect(
+      entriesForTarget('src/images/sponsors/west-loop-soul.png').map(
+        ({ id }) => id
+      )
+    ).toEqual(['home', 'donate']);
+    expect(
+      entriesForTarget('src/utils/supporters.ts').map(({ id }) => id)
+    ).toEqual(['home', 'donate']);
+    expect(
+      entriesForTarget('src/images/donate/keys.png').map(({ id }) => id)
+    ).toEqual(['donate']);
   });
 
   it.each([

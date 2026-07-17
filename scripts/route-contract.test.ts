@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import {
   applicationRoutes,
   redirectRoutes,
@@ -5,6 +6,18 @@ import {
 } from './route-contract';
 
 describe('route contract', () => {
+  it('blocks live Firestore reads during browser characterization', () => {
+    const browserContract = readFileSync(
+      'e2e/route-characterization.e2e.ts',
+      'utf8'
+    );
+
+    expect(browserContract).toContain(
+      "page.route('https://firestore.googleapis.com/**'"
+    );
+    expect(browserContract).toContain("route.abort('blockedbyclient')");
+  });
+
   it('defines a logged-out browser expectation for every route', () => {
     expect(applicationRoutes.every((route) => 'loggedOut' in route)).toBe(true);
   });

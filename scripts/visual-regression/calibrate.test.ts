@@ -23,10 +23,12 @@ import {
   createCalibrationEnvironment,
   failClosedCommandResult,
   inventoryCalibrationCorpus,
+  readCalibrationProvenance,
   resolveEvidenceRootIdentity,
   runCalibrationCommand,
   selectCalibrationInventory,
   stopOwnedServer,
+  validateCalibrationProvenance,
   type CalibrationDependencies,
   type CalibrationInventory,
   type CalibrationRecord,
@@ -132,6 +134,24 @@ const harness = () => {
     probeHydratedRoute: async () => {
       events.push('hydrated');
     },
+    readProvenance: async (_root, selection) => ({
+      approval: {
+        approvedAt: '2026-05-09',
+        approvedBy: 'legacy-corpus-review',
+        reason: 'Approved React compatibility corpus.'
+      },
+      baselineSet: 'legacy-may-2026',
+      files: selection.map(({ bytes, relativePath, sha256 }) => ({
+        approvedCapture: '2026-05-05',
+        bytes,
+        independentCapture: '2026-05-09',
+        reason: 'Inherited byte-identical compatibility capture.',
+        relationship: 'byte-identical',
+        relativePath,
+        sha256
+      })),
+      schemaVersion: 1
+    }),
     readBuildMetadata: async () => ({
       buildId: 'build-id',
       gitRevision: 'abc123',
@@ -247,6 +267,80 @@ describe('calibration corpus', () => {
     await expect(resolveEvidenceRootIdentity(root)).resolves.toEqual(
       await resolveEvidenceRootIdentity(alias)
     );
+  });
+
+  it('loads file-scoped provenance bound to the selected evidence bytes', async () => {
+    const root = await createCorpus('cag-calibration-provenance-');
+    const selection = selectCalibrationInventory(
+      await inventoryCalibrationCorpus(root)
+    );
+    const provenance = {
+      approval: {
+        approvedAt: '2026-07-17',
+        approvedBy: 'project-owner',
+        reason: 'Intentional supporter content update reviewed.'
+      },
+      baselineSet: 'compatibility-v2-2026-07-17',
+      files: selection.map(({ bytes, relativePath, sha256 }) => ({
+        approvedCapture: '2026-07-17',
+        bytes,
+        independentCapture: '2026-07-17',
+        reason: 'Reviewed compatibility capture.',
+        relationship: 'byte-identical',
+        relativePath,
+        sha256,
+        ...(relativePath === 'donate/desktop.png'
+          ? { sourceRevision: 'dd0cf898700d7f9317078e94ad9564865135f18e' }
+          : {})
+      })),
+      schemaVersion: 1
+    } as const;
+    await writeFile(
+      path.join(root, 'calibration-provenance.json'),
+      `${JSON.stringify(provenance, null, 2)}\n`
+    );
+
+    await expect(readCalibrationProvenance(root, selection)).resolves.toEqual(
+      provenance
+    );
+  });
+
+  it('rejects a changed corpus when file-scoped provenance is missing', async () => {
+    const root = await createCorpus('cag-calibration-unversioned-');
+    const selection = selectCalibrationInventory(
+      await inventoryCalibrationCorpus(root)
+    );
+
+    await expect(readCalibrationProvenance(root, selection)).rejects.toThrow(
+      'provenance is required'
+    );
+  });
+
+  it('rejects impossible calendar dates in approval provenance', () => {
+    const selected = inventory().filter(({ kind }) => kind !== 'directory');
+    expect(() =>
+      validateCalibrationProvenance(
+        {
+          approval: {
+            approvedAt: '2026-02-31',
+            approvedBy: 'project-owner',
+            reason: 'Reviewed change.'
+          },
+          baselineSet: 'compatibility-v2-2026-07-17',
+          files: selected.map(({ bytes, relativePath, sha256 }) => ({
+            approvedCapture: '2026-07-17',
+            bytes,
+            independentCapture: '2026-07-17',
+            reason: 'Reviewed compatibility capture.',
+            relationship: 'byte-identical',
+            relativePath,
+            sha256
+          })),
+          schemaVersion: 1
+        },
+        selected
+      )
+    ).toThrow('approval date');
   });
 });
 
@@ -372,6 +466,47 @@ describe('runCalibrationCommand', () => {
     VR_APPROVED_BASELINE_DIR: '/proof/baseline',
     VR_APPROVED_STAGING_DIR: '/proof/staging'
   };
+
+  it('records verified file-scoped provenance from both evidence roots', async () => {
+    const test = harness();
+    const provenance = {
+      approval: {
+        approvedAt: '2026-07-17',
+        approvedBy: 'project-owner',
+        reason: 'Intentional supporter content update reviewed.'
+      },
+      baselineSet: 'compatibility-v2-2026-07-17',
+      files: inventory()
+        .filter(({ kind }) => kind !== 'directory')
+        .map(({ bytes, relativePath, sha256 }) => ({
+          approvedCapture: '2026-07-17',
+          bytes,
+          independentCapture: '2026-07-17',
+          reason: 'Reviewed compatibility capture.',
+          relationship: 'byte-identical' as const,
+          relativePath,
+          sha256
+        })),
+      schemaVersion: 1 as const
+    };
+    const roots: string[] = [];
+    Object.assign(test.dependencies, {
+      readProvenance: async (root: string) => {
+        roots.push(root);
+        return provenance;
+      }
+    });
+
+    await expect(
+      runCalibrationCommand([], environment, '/repo', test.dependencies)
+    ).resolves.toBe(0);
+
+    expect(roots).toEqual(['/proof/baseline', '/proof/staging']);
+    expect(test.records.at(-1)?.provenance).toEqual({
+      ...provenance,
+      status: 'verified'
+    });
+  });
 
   it('owns one build and server while running semantic then visual gates', async () => {
     const test = harness();
