@@ -1,25 +1,29 @@
-import { getAnalytics } from 'firebase/analytics';
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { useMemo } from 'react';
-import { firebaseClientConfig } from '../config/publicEnv';
+import { useEffect, useMemo, useState } from 'react';
+import {
+  getFirebaseAnalytics,
+  getFirebaseClient
+} from '../lib/firebase/client';
+import type { Analytics } from 'firebase/analytics';
 
 const useFirebase = () => {
-  const app = useMemo(() => initializeApp(firebaseClientConfig), []);
-  const analytics = useMemo(() => {
-    if (typeof window === 'undefined' || !firebaseClientConfig.measurementId) {
-      return null;
-    }
+  const client = useMemo(() => getFirebaseClient(), []);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
-    return getAnalytics(app);
-  }, [app]);
-  const auth = useMemo(() => getAuth(app), [app]);
-  const firestore = useMemo(() => getFirestore(app), [app]);
-  const storage = useMemo(() => getStorage(app), [app]);
+  useEffect(() => {
+    let isMounted = true;
 
-  return { app, analytics, auth, firestore, storage };
+    getFirebaseAnalytics().then((firebaseAnalytics) => {
+      if (isMounted) {
+        setAnalytics(firebaseAnalytics);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  return useMemo(() => ({ ...client, analytics }), [analytics, client]);
 };
 
 export default useFirebase;

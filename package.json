@@ -55,6 +55,7 @@
     "axios": "^1.8.2",
     "better-npm-audit": "^3.7.3",
     "bootstrap": "^4.6.2",
+    "client-only": "0.0.1",
     "clsx": "^1.2.1",
     "date-fns": "^2.29.3",
     "firebase": "^10.9.0",
