@@ -5,7 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { renderReport, runReport } from './report';
-import type { DiffResult, DiffSummaryV1 } from './diff-core';
+import {
+  acquireGenerationLock,
+  type DiffResult,
+  type DiffSummaryV1
+} from './diff-core';
 
 const result = (overrides: Partial<DiffResult>): DiffResult => ({
   auth: 'anonymous',
@@ -226,6 +230,23 @@ describe('renderReport', () => {
       expect(code).toBe(1);
       expect(beforeCommitCalled).toBe(true);
       await expect(readFile(reportFile)).rejects.toThrow();
+    } finally {
+      await rm(root, { force: true, recursive: true });
+    }
+  });
+
+  it('does not invalidate a report when another owner holds the generation lock', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'cag-report-lock-'));
+    try {
+      const summaryFile = path.join(root, 'summary.json');
+      const reportFile = path.join(root, 'report.html');
+      await writeFile(reportFile, 'owner A report');
+      const ownerA = await acquireGenerationLock(root);
+
+      expect(await runReport(summaryFile, reportFile)).toBe(1);
+      expect(await readFile(reportFile, 'utf8')).toBe('owner A report');
+
+      await ownerA.release();
     } finally {
       await rm(root, { force: true, recursive: true });
     }

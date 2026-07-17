@@ -5,8 +5,10 @@ import {
   mkdtemp,
   readFile,
   readdir,
+  rename,
   rm,
   symlink,
+  utimes,
   writeFile
 } from 'node:fs/promises';
 import os from 'node:os';
@@ -23,6 +25,7 @@ import {
   type PngEvidenceInput
 } from './diff-core';
 import { MANIFEST, type BaselinePolicy, type VisualCase } from './manifest';
+import { renderReport } from './report';
 
 const temporaryDirectories: string[] = [];
 type SummaryRecord = Record<string, unknown>;
@@ -99,41 +102,68 @@ const captureSummary = (
 });
 
 describe('generation lock', () => {
-  it('recovers a stale owner but never removes a live owner lock', async () => {
+  it('recovers dead and expired owners but never removes a live lease', async () => {
     const root = await mkdtemp(path.join(os.tmpdir(), 'cag-diff-lock-'));
     temporaryDirectories.push(root);
     const diffDir = path.join(root, 'diff');
     const lockRoot = `${diffDir}.lock`;
-    await mkdir(lockRoot);
     await writeFile(
-      path.join(lockRoot, 'owner.json'),
+      lockRoot,
       JSON.stringify({
         pid: 2_147_483_647,
-        startedAt: '2026-07-17T01:00:00.000Z',
+        startedAt: new Date().toISOString(),
         token: 'stale-owner'
       })
     );
 
     const recovered = await acquireGenerationLock(diffDir);
     await recovered.release();
-    await expect(readFile(path.join(lockRoot, 'owner.json'))).rejects.toThrow();
+    await expect(readFile(lockRoot)).rejects.toThrow();
 
-    await mkdir(lockRoot);
     await writeFile(
-      path.join(lockRoot, 'owner.json'),
+      lockRoot,
       JSON.stringify({
         pid: process.pid,
-        startedAt: '2026-07-17T01:00:00.000Z',
+        startedAt: new Date().toISOString(),
         token: 'live-owner'
       })
     );
     await expect(acquireGenerationLock(diffDir)).rejects.toThrow(
       'another visual diff generation is active'
     );
-    expect(
-      JSON.parse(await readFile(path.join(lockRoot, 'owner.json'), 'utf8'))
-        .token
-    ).toBe('live-owner');
+    expect(JSON.parse(await readFile(lockRoot, 'utf8')).token).toBe(
+      'live-owner'
+    );
+
+    await writeFile(
+      lockRoot,
+      JSON.stringify({
+        pid: process.pid,
+        startedAt: '2000-01-01T00:00:00.000Z',
+        token: 'reused-pid-expired-lease'
+      })
+    );
+    const afterReuse = await acquireGenerationLock(diffDir);
+    await afterReuse.release();
+    await expect(readFile(lockRoot)).rejects.toThrow();
+  });
+
+  it('does not brick on an orphaned pre-publication claim', async () => {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'cag-diff-claim-'));
+    temporaryDirectories.push(root);
+    const diffDir = path.join(root, 'diff');
+    await writeFile(`${diffDir}.lock.claim-crashed`, 'incomplete');
+    await writeFile(`${diffDir}.lock`, '');
+    await expect(acquireGenerationLock(diffDir)).rejects.toThrow(
+      'another visual diff generation is publishing'
+    );
+    expect(await readFile(`${diffDir}.lock`, 'utf8')).toBe('');
+    await utimes(`${diffDir}.lock`, new Date(0), new Date(0));
+
+    const lock = await acquireGenerationLock(diffDir);
+    await lock.release();
+
+    await expect(readFile(`${diffDir}.lock`)).rejects.toThrow();
   });
 
   it('does not release a lock after its owner token changes', async () => {
@@ -142,7 +172,7 @@ describe('generation lock', () => {
     const diffDir = path.join(root, 'diff');
     const lock = await acquireGenerationLock(diffDir);
     await writeFile(
-      path.join(`${diffDir}.lock`, 'owner.json'),
+      `${diffDir}.lock`,
       JSON.stringify({
         pid: process.pid,
         startedAt: '2026-07-17T01:00:00.000Z',
@@ -152,11 +182,9 @@ describe('generation lock', () => {
 
     await lock.release();
 
-    expect(
-      JSON.parse(
-        await readFile(path.join(`${diffDir}.lock`, 'owner.json'), 'utf8')
-      ).token
-    ).toBe('replacement-owner');
+    expect(JSON.parse(await readFile(`${diffDir}.lock`, 'utf8')).token).toBe(
+      'replacement-owner'
+    );
   });
 });
 
@@ -547,14 +575,15 @@ describe('validateCaptureSummary', () => {
     expect(() => validateCaptureSummary(raw, MANIFEST)).toThrow('sanitized');
   });
 
-  it('sanitizes absolute filesystem paths from capture failure diagnostics', () => {
+  it('sanitizes arbitrary filesystem paths and sensitive URLs from diagnostics', () => {
     const subject = visualCase();
     const failed: CaptureCaseSummaryV1 = {
       ...passedCapture(subject),
       artifact: undefined,
       error: {
-        message: 'failed /Users/person/private.json and C:\\secret\\key.txt',
-        name: 'Error'
+        message:
+          'failed /opt/app/key /workspace/job.txt /Volumes/data/x C:\\secret\\key.txt \\\\server\\share\\key https://user:pass@example.test/a?token=secret#fragment',
+        name: '/usr/bin/custom-error'
       },
       status: 'failed'
     };
@@ -562,7 +591,12 @@ describe('validateCaptureSummary', () => {
       captureSummary([subject], [failed]),
       MANIFEST
     );
-    expect(validated.cases[0].error?.message).not.toMatch(/(?:\/Users|C:\\)/u);
+    const serialized = JSON.stringify(validated);
+    expect(serialized).not.toMatch(
+      /(?:\/opt|\/workspace|\/Volumes|\/usr|C:\\|\\\\server|secret|fragment|user:pass)/u
+    );
+    expect(validated.cases[0].error?.message).toContain('<path>');
+    expect(validated.cases[0].error?.message).toContain('<url>');
   });
 });
 
@@ -947,6 +981,54 @@ describe('runDiff', () => {
     ).toEqual(black);
   });
 
+  it('rejects evidence when its pinned source root is replaced by an outside symlink', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    const baselineFile = path.join(
+      paths.baselineDir,
+      subject.entry.id,
+      'desktop.png'
+    );
+    const currentFile = path.join(
+      paths.currentDir,
+      subject.entry.id,
+      'desktop.png'
+    );
+    await mkdir(path.dirname(baselineFile), { recursive: true });
+    await mkdir(path.dirname(currentFile), { recursive: true });
+    const black = png(1, 1, [0, 0, 0, 255]);
+    await writeFile(baselineFile, black);
+    await writeFile(currentFile, black);
+    const movedRoot = `${paths.baselineDir}-moved`;
+    const outsideRoot = path.join(path.dirname(paths.artifactDir), 'outside');
+    const outsideFile = path.join(outsideRoot, subject.entry.id, 'desktop.png');
+    await mkdir(path.dirname(outsideFile), { recursive: true });
+    await writeFile(outsideFile, png(1, 1, [255, 255, 255, 255]));
+    let replaced = false;
+
+    const run = await runDiff({
+      afterEvidenceOpen: async (file) => {
+        if (file !== baselineFile || replaced) return;
+        replaced = true;
+        await rename(paths.baselineDir, movedRoot);
+        await symlink(outsideRoot, paths.baselineDir, 'dir');
+      },
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+
+    expect(run.summary.results[0].baselineEvidence).toBe('read-error');
+    expect(run.summary.results[0].baselineAsset).toBeUndefined();
+    expect(run.summary.results[0].comparison).toBe('not-run');
+    expect(JSON.stringify(run.summary)).not.toContain('outside');
+  });
+
   it('installs an asset-tree failure generation after a recoverable staged write fault', async () => {
     const paths = await makeRun();
     const subject = visualCase();
@@ -1031,6 +1113,49 @@ describe('runDiff', () => {
     ).toBe('fail');
   });
 
+  it('keeps capture failure paths and sensitive URLs out of JSON and HTML', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    const failed: CaptureCaseSummaryV1 = {
+      ...passedCapture(subject),
+      artifact: undefined,
+      error: {
+        message:
+          'failure /app/runtime/key \\\\server\\share\\token https://user:pass@example.test/a?token=secret#fragment',
+        name: '/opt/bin/browser-error'
+      },
+      status: 'failed'
+    };
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject], [failed]))
+    );
+    await mkdir(path.join(paths.baselineDir, subject.entry.id), {
+      recursive: true
+    });
+    await writeFile(
+      path.join(paths.baselineDir, subject.entry.id, 'desktop.png'),
+      png(1, 1, [0, 0, 0, 255])
+    );
+
+    const run = await runDiff({
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+    const serialized = JSON.stringify(run.summary);
+    const html = renderReport(validateDiffSummary(run.summary));
+
+    for (const output of [serialized, html]) {
+      expect(output).not.toMatch(
+        /(?:\/app|\/opt|\\\\server|secret|fragment|user:pass)/u
+      );
+    }
+    expect(serialized).toContain('<path>');
+    expect(html).toContain('&lt;path&gt;');
+  });
+
   it('rejects forged diff/capture correspondence even when forged totals look green', async () => {
     const paths = await makeRun();
     const subject = visualCase();
@@ -1064,5 +1189,50 @@ describe('runDiff', () => {
     (forged.capture as SummaryRecord).baseUrl = 'file:///etc/passwd';
 
     expect(() => validateDiffSummary(forged)).toThrow();
+  });
+
+  it('rejects a failed capture row paired with stale successful comparison evidence', async () => {
+    const paths = await makeRun();
+    const subject = visualCase();
+    await writeFile(
+      paths.captureSummary,
+      JSON.stringify(captureSummary([subject]))
+    );
+    for (const root of [paths.baselineDir, paths.currentDir]) {
+      await mkdir(path.join(root, subject.entry.id), { recursive: true });
+      await writeFile(
+        path.join(root, subject.entry.id, 'desktop.png'),
+        png(1, 1, [0, 0, 0, 255])
+      );
+    }
+    const run = await runDiff({
+      manifest: MANIFEST,
+      maxDiffRatio: 0.001,
+      paths,
+      pixelSensitivity: 0.1
+    });
+    const forged = structuredClone(run.summary);
+    const row = forged.capture?.cases[0];
+    if (!forged.capture || !row) throw new Error('capture fixture missing');
+    delete row.artifact;
+    row.error = { message: 'capture failed', name: 'Error' };
+    row.status = 'failed';
+    forged.capture.status = 'failed';
+    forged.capture.totals = { failed: 1, passed: 0, selected: 1 };
+    forged.gateVerdict = 'fail';
+
+    expect(() => validateDiffSummary(forged)).toThrow(
+      'failed capture case has stale comparison evidence'
+    );
+
+    const passedWithFailureIssue = structuredClone(run.summary);
+    passedWithFailureIssue.results[0].issues.push({
+      code: 'capture-failed',
+      message: 'stale failure',
+      scope: 'capture'
+    });
+    expect(() => validateDiffSummary(passedWithFailureIssue)).toThrow(
+      'passed capture case contains a capture failure issue'
+    );
   });
 });

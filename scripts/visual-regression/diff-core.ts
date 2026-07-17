@@ -1,4 +1,5 @@
 import {
+  link,
   lstat,
   mkdir,
   open,
@@ -318,10 +319,40 @@ const assertExactKeys = (
   if (unknown) throw new Error(`unknown ${label} field: ${unknown}`);
 };
 
-const sanitizeDiagnosticMessage = (value: string): string =>
-  value
-    .replace(/\b[A-Za-z]:\\[^\s,;]+/gu, '<path>')
-    .replace(/\/(?:Users|private|tmp|var|etc|home)\/[^\s,;]+/gu, '<path>');
+const sanitizeDiagnosticMessage = (value: string): string => {
+  const urls: string[] = [];
+  const tokenized = value.replace(
+    /\b(?:file|ftp|https?|wss?):\/\/[^\s"'<>]+/giu,
+    (candidate) => {
+      let replacement = candidate;
+      try {
+        const url = new URL(candidate);
+        if (
+          url.protocol === 'file:' ||
+          url.username.length > 0 ||
+          url.password.length > 0 ||
+          url.search.length > 0 ||
+          url.hash.length > 0
+        ) {
+          replacement = '<url>';
+        }
+      } catch {
+        replacement = '<url>';
+      }
+      const index = urls.push(replacement) - 1;
+      return `\uE000url-${index}\uE001`;
+    }
+  );
+  return tokenized
+    .replace(/\\\\[^\\\s]+\\[^\s,;'"<>]+/gu, '<path>')
+    .replace(/\b[A-Za-z]:[\\/][^\s,;'"<>]+/gu, '<path>')
+    .replace(/(^|[\s("'=:])\/(?!\/)[^\s,;'"<>)]*/gu, (match, prefix: string) =>
+      match.length === prefix.length + 1 ? match : `${prefix}<path>`
+    )
+    .replace(/\uE000url-(\d+)\uE001/gu, (_match, index: string) =>
+      String(urls[Number(index)])
+    );
+};
 
 const validateSanitizedUrl = (
   value: unknown,
@@ -449,7 +480,7 @@ const validateCaptureError = (
     message: sanitizeDiagnosticMessage(
       requireString(value.message, `${label}.message`)
     ),
-    name: requireString(value.name, `${label}.name`)
+    name: sanitizeDiagnosticMessage(requireString(value.name, `${label}.name`))
   };
 };
 
@@ -953,6 +984,52 @@ const validateEmbeddedCapture = (
     ) {
       throw new Error(`diff result ${index} does not match its capture case`);
     }
+    const captureFailureIssues = result.issues.filter(
+      ({ code }) => code === 'capture-failed'
+    );
+    const baselineEvidenceCode =
+      result.baselineEvidence === 'valid'
+        ? null
+        : result.baselineEvidence === 'invalid'
+          ? 'invalid-baseline'
+          : result.baselineEvidence === 'read-error'
+            ? 'baseline-read-error'
+            : 'missing-baseline';
+    const baselineEvidenceIssues = result.issues.filter(({ code }) =>
+      ['baseline-read-error', 'invalid-baseline', 'missing-baseline'].includes(
+        code
+      )
+    );
+    if (
+      (baselineEvidenceCode === null && baselineEvidenceIssues.length > 0) ||
+      (baselineEvidenceCode !== null &&
+        (baselineEvidenceIssues.length !== 1 ||
+          baselineEvidenceIssues[0].code !== baselineEvidenceCode))
+    ) {
+      throw new Error('baseline evidence issue drift');
+    }
+    if (row.status === 'failed') {
+      if (
+        result.comparison !== 'not-run' ||
+        result.currentEvidence !== 'missing' ||
+        result.currentAsset !== undefined ||
+        result.diffAsset !== undefined ||
+        result.currentDimensions !== null ||
+        result.diffPixels !== 0 ||
+        result.totalPixels !== 0 ||
+        result.ratio !== null ||
+        result.dimensionsMatch !== null ||
+        result.verdict !== 'fail' ||
+        result.gateVerdict !== 'fail' ||
+        captureFailureIssues.length !== 1 ||
+        captureFailureIssues[0].scope !== 'capture' ||
+        captureFailureIssues[0].message !== row.error?.message
+      ) {
+        throw new Error('failed capture case has stale comparison evidence');
+      }
+    } else if (captureFailureIssues.length > 0) {
+      throw new Error('passed capture case contains a capture failure issue');
+    }
   });
   return capture;
 };
@@ -1229,6 +1306,7 @@ export function validateDiffSummary(value: unknown): DiffSummaryV1 {
     baselinePolicy: validateResultPolicy(result.baselinePolicy),
     issues: result.issues.map((issue) => ({
       ...issue,
+      code: sanitizeDiagnosticMessage(issue.code),
       message: sanitizeDiagnosticMessage(issue.message)
     }))
   }));
@@ -1298,7 +1376,9 @@ const sanitizeError = (error: unknown): CaptureErrorV1 => ({
   message: sanitizeDiagnosticMessage(
     error instanceof Error ? error.message : String(error)
   ),
-  name: error instanceof Error ? error.name || 'Error' : 'Error'
+  name: sanitizeDiagnosticMessage(
+    error instanceof Error ? error.name || 'Error' : 'Error'
+  )
 });
 
 const isWithin = (root: string, candidate: string): boolean => {
@@ -1328,25 +1408,70 @@ const hasSymlinkBelowRoot = async (
   return false;
 };
 
+interface PinnedEvidenceRoot {
+  canonical: string;
+  configured: string;
+  dev: number;
+  ino: number;
+}
+
+const pinEvidenceRoot = async (root: string): Promise<PinnedEvidenceRoot> => {
+  const configured = path.resolve(root);
+  const status = await lstat(configured);
+  if (status.isSymbolicLink() || !status.isDirectory()) {
+    throw new Error('evidence root must be a real directory');
+  }
+  const canonical = await realpath(configured);
+  const canonicalStatus = await lstat(canonical);
+  if (
+    !canonicalStatus.isDirectory() ||
+    canonicalStatus.dev !== status.dev ||
+    canonicalStatus.ino !== status.ino
+  ) {
+    throw new Error('evidence root identity is invalid');
+  }
+  return {
+    canonical,
+    configured,
+    dev: status.dev,
+    ino: status.ino
+  };
+};
+
+const assertPinnedEvidenceRoot = async (
+  root: PinnedEvidenceRoot
+): Promise<void> => {
+  const status = await lstat(root.configured);
+  if (
+    status.isSymbolicLink() ||
+    !status.isDirectory() ||
+    status.dev !== root.dev ||
+    status.ino !== root.ino ||
+    (await realpath(root.configured)) !== root.canonical
+  ) {
+    throw new Error('evidence root identity changed');
+  }
+};
+
 const readEvidence = async (
   file: string,
-  root: string,
+  root: PinnedEvidenceRoot,
   afterOpen?: (file: string) => Promise<void>
 ): Promise<PngEvidenceInput> => {
   let handle: Awaited<ReturnType<typeof open>> | undefined;
   try {
-    if (await hasSymlinkBelowRoot(file, root)) {
+    await assertPinnedEvidenceRoot(root);
+    if (await hasSymlinkBelowRoot(file, root.configured)) {
       return { kind: 'read-error', message: 'asset must be a regular file' };
     }
     handle = await open(file, constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0));
+    await assertPinnedEvidenceRoot(root);
     const fileStatus = await handle.stat();
     if (!fileStatus.isFile()) {
       return { kind: 'read-error', message: 'asset must be a regular file' };
     }
-    const [canonicalRoot, canonicalFile] = await Promise.all([
-      realpath(root),
-      realpath(file)
-    ]);
+    const canonicalRoot = root.canonical;
+    const canonicalFile = await realpath(file);
     if (!isWithin(canonicalRoot, canonicalFile)) {
       return {
         kind: 'read-error',
@@ -1365,11 +1490,20 @@ const readEvidence = async (
       };
     }
     await afterOpen?.(file);
+    await assertPinnedEvidenceRoot(root);
     return { bytes: await handle.readFile(), kind: 'bytes' };
   } catch (error) {
+    try {
+      await assertPinnedEvidenceRoot(root);
+    } catch {
+      return {
+        kind: 'read-error',
+        message: 'evidence root identity changed'
+      };
+    }
     if (
       (error as NodeJS.ErrnoException).code === 'ENOENT' &&
-      !(await hasSymlinkBelowRoot(file, root))
+      !(await hasSymlinkBelowRoot(file, root.configured))
     ) {
       return { kind: 'missing' };
     }
@@ -1399,6 +1533,9 @@ interface GenerationLockOwner {
   token: string;
 }
 
+const GENERATION_LOCK_LEASE_MS = 30 * 60 * 1000;
+const INCOMPLETE_LOCK_GRACE_MS = 30 * 1000;
+
 export interface GenerationLock {
   release: () => Promise<void>;
   token: string;
@@ -1416,9 +1553,7 @@ const isLivePid = (pid: number): boolean => {
 const readLockOwner = async (
   lockRoot: string
 ): Promise<GenerationLockOwner> => {
-  const value: unknown = JSON.parse(
-    await readFile(path.join(lockRoot, 'owner.json'), 'utf8')
-  );
+  const value: unknown = JSON.parse(await readFile(lockRoot, 'utf8'));
   if (!isRecord(value)) throw new Error('visual diff lock owner is invalid');
   assertExactKeys(
     value,
@@ -1428,9 +1563,16 @@ const readLockOwner = async (
   if (!Number.isInteger(value.pid) || (value.pid as number) <= 0) {
     throw new Error('visual diff lock pid is invalid');
   }
+  const startedAt = requireString(
+    value.startedAt,
+    'visual diff lock startedAt'
+  );
+  if (!Number.isFinite(Date.parse(startedAt))) {
+    throw new Error('visual diff lock startedAt is invalid');
+  }
   return {
     pid: value.pid as number,
-    startedAt: requireString(value.startedAt, 'visual diff lock startedAt'),
+    startedAt,
     token: requireString(value.token, 'visual diff lock token')
   };
 };
@@ -1445,16 +1587,16 @@ export const acquireGenerationLock = async (
     startedAt: new Date().toISOString(),
     token: randomUUID()
   };
+  const claimRoot = `${lockRoot}.claim-${owner.token}`;
+  await writeFile(claimRoot, `${JSON.stringify(owner)}\n`, {
+    encoding: 'utf8',
+    flag: 'wx'
+  });
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       fault?.('acquire-lock');
-      await mkdir(lockRoot);
-      try {
-        await atomicJson(path.join(lockRoot, 'owner.json'), owner);
-      } catch (error) {
-        await rm(lockRoot, { force: true, recursive: true });
-        throw error;
-      }
+      await link(claimRoot, lockRoot);
+      await rm(claimRoot, { force: true });
       return {
         token: owner.token,
         release: async () => {
@@ -1463,34 +1605,95 @@ export const acquireGenerationLock = async (
             current = await readLockOwner(lockRoot);
           } catch (error) {
             if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
-            throw error;
+            return;
           }
           if (current.token !== owner.token) return;
           const releaseRoot = `${lockRoot}.release-${owner.token}`;
-          await rename(lockRoot, releaseRoot);
-          await rm(releaseRoot, { force: true, recursive: true });
+          try {
+            await rename(lockRoot, releaseRoot);
+            const moved = await readLockOwner(releaseRoot);
+            if (moved.token !== owner.token) {
+              try {
+                await rename(releaseRoot, lockRoot);
+              } catch {
+                // A replacement owner already occupies the canonical lock.
+              }
+              return;
+            }
+            await rm(releaseRoot, { force: true });
+          } catch (error) {
+            if ((error as NodeJS.ErrnoException).code !== 'ENOENT') throw error;
+          }
         }
       };
     } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') throw error;
-      const current = await readLockOwner(lockRoot);
-      if (isLivePid(current.pid)) {
-        throw new Error('another visual diff generation is active');
+      if ((error as NodeJS.ErrnoException).code !== 'EEXIST') {
+        await rm(claimRoot, { force: true });
+        throw error;
       }
-      const staleRoot = `${lockRoot}.stale-${current.token}-${randomUUID()}`;
+      let current: GenerationLockOwner | undefined;
+      let expectedIdentity: { dev: number; ino: number } | undefined;
+      try {
+        current = await readLockOwner(lockRoot);
+        const age = Date.now() - Date.parse(current.startedAt);
+        if (isLivePid(current.pid) && age <= GENERATION_LOCK_LEASE_MS) {
+          await rm(claimRoot, { force: true });
+          throw new Error('another visual diff generation is active');
+        }
+      } catch (readError) {
+        if (
+          readError instanceof Error &&
+          readError.message === 'another visual diff generation is active'
+        ) {
+          throw readError;
+        }
+        const status = await lstat(lockRoot);
+        if (Date.now() - status.mtimeMs <= INCOMPLETE_LOCK_GRACE_MS) {
+          await rm(claimRoot, { force: true });
+          throw new Error('another visual diff generation is publishing');
+        }
+        expectedIdentity = { dev: status.dev, ino: status.ino };
+      }
+      const staleRoot = `${lockRoot}.stale-${current?.token ?? 'incomplete'}-${randomUUID()}`;
       try {
         await rename(lockRoot, staleRoot);
       } catch (renameError) {
         if ((renameError as NodeJS.ErrnoException).code === 'ENOENT') continue;
+        await rm(claimRoot, { force: true });
         throw renameError;
       }
-      const moved = await readLockOwner(staleRoot);
-      if (moved.token !== current.token) {
-        throw new Error('visual diff lock owner changed during stale recovery');
+      try {
+        if (current) {
+          const moved = await readLockOwner(staleRoot);
+          if (moved.token !== current.token) {
+            throw new Error(
+              'visual diff lock owner changed during stale recovery'
+            );
+          }
+        } else if (expectedIdentity) {
+          const moved = await lstat(staleRoot);
+          if (
+            moved.dev !== expectedIdentity.dev ||
+            moved.ino !== expectedIdentity.ino
+          ) {
+            throw new Error(
+              'visual diff lock identity changed during stale recovery'
+            );
+          }
+        }
+        await rm(staleRoot, { force: true });
+      } catch (recoveryError) {
+        try {
+          await rename(staleRoot, lockRoot);
+        } catch {
+          // A replacement owner already occupies the canonical lock.
+        }
+        await rm(claimRoot, { force: true });
+        throw recoveryError;
       }
-      await rm(staleRoot, { force: true, recursive: true });
     }
   }
+  await rm(claimRoot, { force: true });
   throw new Error('could not acquire visual diff generation lock');
 };
 
@@ -1656,6 +1859,10 @@ export async function runDiff(options: RunDiffOptions): Promise<DiffRunResult> {
         options.manifest,
         capture.selection
       );
+      const [baselineRoot, currentRoot] = await Promise.all([
+        pinEvidenceRoot(options.paths.baselineDir),
+        pinEvidenceRoot(options.paths.currentDir)
+      ]);
       for (let index = 0; index < selectedCases.length; index += 1) {
         const subject = selectedCases[index];
         const captureResult = capture.cases[index];
@@ -1667,7 +1874,7 @@ export async function runDiff(options: RunDiffOptions): Promise<DiffRunResult> {
         );
         const baselineInput = await readEvidence(
           baselineSource,
-          options.paths.baselineDir,
+          baselineRoot,
           options.afterEvidenceOpen
         );
         const currentInput =
@@ -1679,7 +1886,7 @@ export async function runDiff(options: RunDiffOptions): Promise<DiffRunResult> {
                   subject.entry.id,
                   `${subject.viewport}.png`
                 ),
-                options.paths.currentDir,
+                currentRoot,
                 options.afterEvidenceOpen
               );
         const compared = comparePngCase({

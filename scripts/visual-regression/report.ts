@@ -179,6 +179,7 @@ export async function runReport(
     return 1;
   }
   let release: (() => Promise<void>) | undefined;
+  let acquired = false;
   const partial = path.join(
     diffDir,
     `.${path.basename(reportFile)}.${process.pid}.partial`
@@ -186,6 +187,7 @@ export async function runReport(
   try {
     const lock = await acquireGenerationLock(diffDir);
     release = lock.release;
+    acquired = true;
     const source = await readFile(summaryFile, 'utf8');
     const summary = validateDiffSummary(JSON.parse(source));
     await mkdir(diffDir, { recursive: true });
@@ -202,7 +204,7 @@ export async function runReport(
     await rename(partial, reportFile);
     return 0;
   } catch {
-    await rm(reportFile, { force: true });
+    if (acquired) await rm(reportFile, { force: true });
     return 1;
   } finally {
     await rm(partial, { force: true });
