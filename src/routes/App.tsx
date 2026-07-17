@@ -1,14 +1,16 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import AppProviders from '../../app/providers';
-import AppRoutes from './app-routes';
+import { appRouteObjects } from './app-routes';
 
-const router = createBrowserRouter([{ path: '*', element: <AppRoutes /> }]);
+const App = () => {
+  const [router] = React.useState(() => createBrowserRouter(appRouteObjects));
 
-const App = () => (
-  <AppProviders>
-    <RouterProvider router={router} />
-  </AppProviders>
-);
+  return (
+    <AppProviders>
+      <RouterProvider router={router} />
+    </AppProviders>
+  );
+};
 
 export default App;
