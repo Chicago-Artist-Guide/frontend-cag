@@ -4,12 +4,17 @@ import {
   getFirebaseClient
 } from '../lib/firebase/client';
 import type { Analytics } from 'firebase/analytics';
+import type { FirebaseClient } from '../lib/firebase/client';
 
 const useFirebase = () => {
-  const client = useMemo(() => getFirebaseClient(), []);
+  const [client] = useState<FirebaseClient | null>(() =>
+    typeof window === 'undefined' ? null : getFirebaseClient()
+  );
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
   useEffect(() => {
+    if (!client) return;
+
     let isMounted = true;
 
     getFirebaseAnalytics().then((firebaseAnalytics) => {
@@ -21,9 +26,18 @@ const useFirebase = () => {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [client]);
 
-  return useMemo(() => ({ ...client, analytics }), [analytics, client]);
+  return useMemo(
+    () => ({
+      analytics,
+      app: client?.app ?? null,
+      auth: client?.auth ?? null,
+      firestore: client?.firestore ?? null,
+      storage: client?.storage ?? null
+    }),
+    [analytics, client]
+  );
 };
 
 export default useFirebase;
