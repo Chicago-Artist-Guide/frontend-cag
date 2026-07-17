@@ -318,19 +318,42 @@ const resolveStaticString = (
 };
 
 const getImportedCallName = (
-  expression: ts.LeftHandSideExpression,
-  imports: ModuleImports
+  expression: ts.Expression,
+  imports: ModuleImports,
+  bindings?: StaticBindings,
+  visited = new Set<ts.VariableDeclaration>()
 ) => {
-  if (ts.isIdentifier(expression)) {
-    return imports.named.get(expression.text);
+  const unwrapped = unwrapExpression(expression);
+
+  if (ts.isIdentifier(unwrapped)) {
+    const declaration = bindings
+      ? findVisibleConstDeclaration(unwrapped, bindings)
+      : undefined;
+
+    if (declaration?.initializer) {
+      if (visited.has(declaration)) return undefined;
+
+      const nextVisited = new Set(visited);
+      nextVisited.add(declaration);
+      return getImportedCallName(
+        declaration.initializer,
+        imports,
+        bindings,
+        nextVisited
+      );
+    }
+
+    return imports.named.get(unwrapped.text);
   }
 
   if (
-    ts.isPropertyAccessExpression(expression) &&
-    ts.isIdentifier(expression.expression) &&
-    imports.namespaces.has(expression.expression.text)
+    ts.isPropertyAccessExpression(unwrapped) &&
+    ts.isIdentifier(unwrapped.expression) &&
+    (!bindings ||
+      !findVisibleConstDeclaration(unwrapped.expression, bindings)) &&
+    imports.namespaces.has(unwrapped.expression.text)
   ) {
-    return expression.name.text;
+    return unwrapped.name.text;
   }
 
   return undefined;
@@ -339,9 +362,10 @@ const getImportedCallName = (
 const isImportedCall = (
   expression: ts.LeftHandSideExpression,
   imports: ModuleImports,
-  importedName?: string
+  importedName?: string,
+  bindings?: StaticBindings
 ) => {
-  const callName = getImportedCallName(expression, imports);
+  const callName = getImportedCallName(expression, imports, bindings);
 
   return (
     callName !== undefined &&
@@ -349,17 +373,199 @@ const isImportedCall = (
   );
 };
 
-const firestorePathArgumentIndexes = new Map<string, number[]>([
-  ['collection', [1]],
-  ['collectionGroup', [1]],
-  ['doc', [1]]
+const firestorePathConstructors = new Set([
+  'collection',
+  'collectionGroup',
+  'doc'
 ]);
 
-const isAccountProfilePath = (value: string | undefined) =>
-  value
-    ?.split('/')
-    .some((segment) => segment === 'accounts' || segment === 'profiles') ??
-  false;
+const isAccountProfileCollection = (value: string | undefined) =>
+  value === 'accounts' || value === 'profiles';
+
+const getModuleReExports = (
+  sourceFile: ts.SourceFile,
+  moduleNames: Set<string>
+) =>
+  sourceFile.statements.flatMap((statement) => {
+    if (
+      !ts.isExportDeclaration(statement) ||
+      !statement.moduleSpecifier ||
+      !ts.isStringLiteral(statement.moduleSpecifier) ||
+      !moduleNames.has(statement.moduleSpecifier.text)
+    ) {
+      return [];
+    }
+
+    if (!statement.exportClause) return [{ importedName: '*', statement }];
+    if (!ts.isNamedExports(statement.exportClause)) return [];
+
+    return statement.exportClause.elements.map((element) => ({
+      importedName: element.propertyName?.text ?? element.name.text,
+      statement
+    }));
+  });
+
+const getExportedLocalNames = (sourceFile: ts.SourceFile) => {
+  const exportedNames = new Set<string>();
+
+  sourceFile.statements.forEach((statement) => {
+    if (
+      ts.isVariableStatement(statement) &&
+      statement.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
+      )
+    ) {
+      statement.declarationList.declarations.forEach((declaration) => {
+        if (ts.isIdentifier(declaration.name)) {
+          exportedNames.add(declaration.name.text);
+        }
+      });
+    } else if (
+      ts.isFunctionDeclaration(statement) &&
+      statement.name &&
+      statement.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword
+      )
+    ) {
+      exportedNames.add(statement.name.text);
+    } else if (
+      ts.isExportDeclaration(statement) &&
+      !statement.moduleSpecifier &&
+      statement.exportClause &&
+      ts.isNamedExports(statement.exportClause)
+    ) {
+      statement.exportClause.elements.forEach((element) => {
+        exportedNames.add(element.propertyName?.text ?? element.name.text);
+      });
+    } else if (
+      ts.isExportAssignment(statement) &&
+      ts.isIdentifier(unwrapExpression(statement.expression))
+    ) {
+      exportedNames.add(
+        (unwrapExpression(statement.expression) as ts.Identifier).text
+      );
+    }
+  });
+
+  return exportedNames;
+};
+
+const isInsideExportedFunction = (
+  node: ts.Node,
+  sourceFile: ts.SourceFile,
+  exportedNames: Set<string>
+) => {
+  let current: ts.Node | undefined = node.parent;
+
+  while (current && current !== sourceFile) {
+    if (ts.isFunctionDeclaration(current)) {
+      return (
+        (!current.name &&
+          current.modifiers?.some(
+            (modifier) => modifier.kind === ts.SyntaxKind.DefaultKeyword
+          )) ||
+        Boolean(current.name && exportedNames.has(current.name.text))
+      );
+    }
+
+    if (ts.isArrowFunction(current) || ts.isFunctionExpression(current)) {
+      if (ts.isExportAssignment(current.parent)) return true;
+
+      if (
+        ts.isVariableDeclaration(current.parent) &&
+        ts.isIdentifier(current.parent.name) &&
+        exportedNames.has(current.parent.name.text)
+      ) {
+        return true;
+      }
+    }
+
+    current = current.parent;
+  }
+
+  return false;
+};
+
+const getReferencePathParity = (
+  expression: ts.Expression | undefined,
+  imports: ModuleImports,
+  bindings: StaticBindings,
+  visited = new Set<ts.VariableDeclaration>()
+): 0 | 1 => {
+  if (!expression) return 0;
+
+  const unwrapped = unwrapExpression(expression);
+
+  if (ts.isIdentifier(unwrapped)) {
+    const declaration = findVisibleConstDeclaration(unwrapped, bindings);
+    if (declaration?.initializer && !visited.has(declaration)) {
+      const nextVisited = new Set(visited);
+      nextVisited.add(declaration);
+      return getReferencePathParity(
+        declaration.initializer,
+        imports,
+        bindings,
+        nextVisited
+      );
+    }
+  }
+
+  if (ts.isCallExpression(unwrapped)) {
+    const callName = getImportedCallName(
+      unwrapped.expression,
+      imports,
+      bindings
+    );
+
+    if (callName === 'collection' || callName === 'collectionGroup') return 1;
+    if (callName === 'doc') return 0;
+  }
+
+  return 0;
+};
+
+interface CollectionSegmentAnalysis {
+  accountProfile: boolean;
+  dynamicCollection: boolean;
+}
+
+const analyzeCollectionSegments = (
+  call: ts.CallExpression,
+  callName: string,
+  imports: ModuleImports,
+  bindings: StaticBindings
+): CollectionSegmentAnalysis => {
+  if (callName === 'collectionGroup') {
+    const collectionName = call.arguments[1]
+      ? resolveStaticString(call.arguments[1], bindings)
+      : undefined;
+
+    return {
+      accountProfile: isAccountProfileCollection(collectionName),
+      dynamicCollection: collectionName === undefined
+    };
+  }
+
+  let parity = getReferencePathParity(call.arguments[0], imports, bindings);
+  let dynamicCollection = false;
+
+  for (const argument of call.arguments.slice(1)) {
+    const value = resolveStaticString(argument, bindings);
+    const segments = value === undefined ? [undefined] : value.split('/');
+
+    for (const segment of segments) {
+      if (parity === 0) {
+        if (isAccountProfileCollection(segment)) {
+          return { accountProfile: true, dynamicCollection };
+        }
+        if (segment === undefined) dynamicCollection = true;
+      }
+      parity = parity === 0 ? 1 : 0;
+    }
+  }
+
+  return { accountProfile: false, dynamicCollection };
+};
 
 const analyzeAccountProfileFirestoreSource = (source: string, file: string) => {
   const sourceFile = parseSource(source, file);
@@ -368,26 +574,55 @@ const analyzeAccountProfileFirestoreSource = (source: string, file: string) => {
     new Set(['@firebase/firestore', 'firebase/firestore'])
   );
   const bindings = collectStaticBindings(sourceFile);
+  const exportedNames = getExportedLocalNames(sourceFile);
+  const reExportsPathConstructor = getModuleReExports(
+    sourceFile,
+    new Set(['@firebase/firestore', 'firebase/firestore'])
+  ).some(
+    ({ importedName }) =>
+      importedName === '*' || firestorePathConstructors.has(importedName)
+  );
   let hasAccess = false;
+
+  if (reExportsPathConstructor) return true;
+
+  for (const [name, declarations] of bindings.declarations) {
+    if (!exportedNames.has(name)) continue;
+
+    if (
+      declarations.some(
+        (declaration) =>
+          declaration.initializer &&
+          firestorePathConstructors.has(
+            getImportedCallName(declaration.initializer, imports, bindings) ??
+              ''
+          )
+      )
+    ) {
+      return true;
+    }
+  }
 
   const visit = (node: ts.Node) => {
     if (ts.isCallExpression(node)) {
-      const callName = getImportedCallName(node.expression, imports);
-      const pathIndexes = callName
-        ? firestorePathArgumentIndexes.get(callName)
-        : undefined;
+      const callName = getImportedCallName(node.expression, imports, bindings);
 
-      if (
-        pathIndexes?.some((startIndex) =>
-          node.arguments
-            .slice(startIndex)
-            .some((argument) =>
-              isAccountProfilePath(resolveStaticString(argument, bindings))
-            )
-        )
-      ) {
-        hasAccess = true;
-        return;
+      if (callName && firestorePathConstructors.has(callName)) {
+        const analysis = analyzeCollectionSegments(
+          node,
+          callName,
+          imports,
+          bindings
+        );
+
+        if (
+          analysis.accountProfile ||
+          (analysis.dynamicCollection &&
+            isInsideExportedFunction(node, sourceFile, exportedNames))
+        ) {
+          hasAccess = true;
+          return;
+        }
       }
     }
 
@@ -553,20 +788,29 @@ const getExportedFirebaseParameterViolations = (
 const getInitializeAppCalls = (source: string, file: string) => {
   const sourceFile = parseSource(source, file);
   const appImports = getModuleImports(sourceFile, new Set(['firebase/app']));
-  const calls: ts.CallExpression[] = [];
+  const bindings = collectStaticBindings(sourceFile);
+  const initializationNodes: ts.Node[] = getModuleReExports(
+    sourceFile,
+    new Set(['firebase/app'])
+  )
+    .filter(
+      ({ importedName }) =>
+        importedName === '*' || importedName === 'initializeApp'
+    )
+    .map(({ statement }) => statement);
 
   const visit = (node: ts.Node) => {
     if (
       ts.isCallExpression(node) &&
-      isImportedCall(node.expression, appImports, 'initializeApp')
+      isImportedCall(node.expression, appImports, 'initializeApp', bindings)
     ) {
-      calls.push(node);
+      initializationNodes.push(node);
     }
     ts.forEachChild(node, visit);
   };
 
   visit(sourceFile);
-  return calls;
+  return initializationNodes;
 };
 
 const userContextConsumers = [
@@ -679,6 +923,113 @@ describe('account and profile consumer boundary', () => {
     ).toBe(true);
   });
 
+  it('detects callable aliases, namespace calls, re-exports, and exported wrappers around Firestore path constructors', () => {
+    const fixtures = [
+      {
+        file: 'src/routes/CallableAlias.ts',
+        source:
+          "import { collection } from 'firebase/firestore'; const getCollection = collection; getCollection(db, 'profiles');"
+      },
+      {
+        file: 'src/routes/NamespaceCall.ts',
+        source:
+          "import * as firestore from 'firebase/firestore'; firestore.collection(db, 'accounts');"
+      },
+      {
+        file: 'src/routes/ReExport.ts',
+        source:
+          "export { collection as fsCollection } from 'firebase/firestore';"
+      },
+      {
+        file: 'src/routes/Wrapper.ts',
+        source: `
+          import { collection } from 'firebase/firestore';
+          export const getCollection = (parent: unknown, path: string) =>
+            collection(parent as never, path);
+        `
+      },
+      {
+        file: 'src/routes/DocumentWrapper.ts',
+        source: `
+          import { doc } from 'firebase/firestore';
+          export const getDocument = (parent: unknown, path: string) =>
+            doc(parent as never, path);
+        `
+      }
+    ];
+
+    fixtures.forEach(({ file, source }) => {
+      expect(analyzeAccountProfileFirestoreSource(source, file)).toBe(true);
+    });
+    expect(
+      findUnexpectedAccountProfileFirestoreFiles(
+        fixtures.map(({ file }) => file)
+      )
+    ).toEqual(fixtures.map(({ file }) => file).sort());
+  });
+
+  it('distinguishes collection segments from document IDs and shadowed constructors', () => {
+    const allowed = [
+      {
+        file: 'src/routes/DocumentId.ts',
+        source:
+          "import { doc } from 'firebase/firestore'; doc(db, 'settings', 'profiles');"
+      },
+      {
+        file: 'src/routes/ReferenceDocumentId.ts',
+        source:
+          "import { collection, doc } from 'firebase/firestore'; doc(collection(db, 'settings'), 'profiles');"
+      },
+      {
+        file: 'src/routes/DynamicDocumentId.ts',
+        source: `
+          import { doc } from 'firebase/firestore';
+          export const getSetting = (db: unknown, id: string) =>
+            doc(db as never, 'settings', id);
+        `
+      },
+      {
+        file: 'src/routes/Shadowed.ts',
+        source: `
+          import { doc } from 'firebase/firestore';
+          {
+            const doc = (...args: unknown[]) => args;
+            doc(db, 'accounts', 'id');
+          }
+        `
+      }
+    ];
+    const denied = [
+      {
+        file: 'src/routes/RootCollection.ts',
+        source:
+          "import { doc } from 'firebase/firestore'; doc(db, 'accounts', 'id');"
+      },
+      {
+        file: 'src/routes/NestedCollection.ts',
+        source:
+          "import { doc } from 'firebase/firestore'; doc(db, 'settings', 'id', 'profiles', 'profile-id');"
+      },
+      {
+        file: 'src/routes/DocumentReferenceCollection.ts',
+        source:
+          "import { collection, doc } from 'firebase/firestore'; collection(doc(db, 'settings', 'id'), 'profiles');"
+      },
+      {
+        file: 'src/routes/CollectionReferenceNestedCollection.ts',
+        source:
+          "import { collection, doc } from 'firebase/firestore'; doc(collection(db, 'settings'), 'setting-id', 'profiles', 'profile-id');"
+      }
+    ];
+
+    allowed.forEach(({ file, source }) => {
+      expect(analyzeAccountProfileFirestoreSource(source, file)).toBe(false);
+    });
+    denied.forEach(({ file, source }) => {
+      expect(analyzeAccountProfileFirestoreSource(source, file)).toBe(true);
+    });
+  });
+
   it('detects Firebase parameters on every exported function form through import and type aliases', () => {
     const source = `
       import type { Firestore as Database } from 'firebase/firestore';
@@ -726,6 +1077,23 @@ describe('account and profile consumer boundary', () => {
     `;
 
     expect(getInitializeAppCalls(source, 'src/lib/other.ts')).toHaveLength(1);
+  });
+
+  it('detects initializeApp callable aliases and direct re-exports', () => {
+    const callableAlias = `
+      import { initializeApp } from 'firebase/app';
+      const init = initializeApp;
+      init(config);
+    `;
+    const directReExport =
+      "export { initializeApp as init } from 'firebase/app';";
+
+    expect(
+      getInitializeAppCalls(callableAlias, 'src/lib/callable-alias.ts')
+    ).toHaveLength(1);
+    expect(
+      getInitializeAppCalls(directReExport, 'src/lib/re-export.ts')
+    ).toHaveLength(1);
   });
 
   it('rejects a new account/profile Firestore consumer outside the boundary', () => {
