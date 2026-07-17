@@ -45,5 +45,9 @@ describe('useAuthState', () => {
     rerender({ currentAuth: null });
     expect(authMocks.unsubscribe).toHaveBeenCalledOnce();
     expect(authMocks.onAuthStateChanged).toHaveBeenCalledOnce();
+    expect(result.current.currentUser).toBeNull();
+
+    act(() => onChange?.({ uid: 'stale-user' }));
+    expect(result.current.currentUser).toBeNull();
   });
 });

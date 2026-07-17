@@ -114,12 +114,20 @@ describe('AppProviders', () => {
 
   it('is mounted exactly once by App and never by the root layout', () => {
     const appSource = readProjectFile('src/routes/App.tsx');
+    const legacyAppSource = readProjectFile('app/legacy-app.tsx');
     const layoutSource = readProjectFile('app/layout.tsx');
 
     expect(appSource.match(/<AppProviders>/g)).toHaveLength(1);
     expect(appSource).not.toMatch(
       /FirebaseContext\.Provider|UserContext\.Provider|AdminProvider|MarketingContext\.Provider|PaginationProvider/
     );
+    expect(legacyAppSource).toMatch(
+      /dynamic\([\s\S]*import\('\.\.\/src\/routes\/App'\)[\s\S]*ssr:\s*false[\s\S]*\)/
+    );
+    expect(legacyAppSource).toMatch(
+      /const LegacyApp\s*=\s*\(\)\s*=>\s*<App\s*\/>/
+    );
+    expect(legacyAppSource).not.toMatch(/AppProviders|SiteShell/);
     expect(layoutSource).not.toMatch(
       /AppProviders|FirebaseContext|UserContext|AdminProvider|MarketingContext|PaginationProvider/
     );

@@ -5,12 +5,20 @@ const useAuthState = (auth: Auth | null) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
 
   useEffect(() => {
-    if (!auth) return;
+    if (!auth) {
+      setCurrentUser(null);
+      return;
+    }
 
-    const unsubscribe = onAuthStateChanged(auth, (user) =>
-      setCurrentUser(user)
-    );
-    return unsubscribe;
+    let isActive = true;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (isActive) setCurrentUser(user);
+    });
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
   }, [auth]);
 
   return { currentUser, setCurrentUser };
