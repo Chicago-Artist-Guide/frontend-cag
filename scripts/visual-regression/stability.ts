@@ -295,13 +295,9 @@ const waitForImages = async (page: Page, timeoutMs: number): Promise<void> => {
       pending.map(
         (image) =>
           new Promise<void>((resolve) => {
-            const timer = window.setTimeout(resolve, timeout);
-            const done = () => {
-              window.clearTimeout(timer);
-              resolve();
-            };
-            image.addEventListener('error', done, { once: true });
-            image.addEventListener('load', done, { once: true });
+            window.setTimeout(resolve, timeout);
+            image.addEventListener('error', () => resolve(), { once: true });
+            image.addEventListener('load', () => resolve(), { once: true });
           })
       )
     );
@@ -335,52 +331,46 @@ const inspectFonts = async (
 
   return withTimeout(
     page.evaluate(async (requiredFonts) => {
-      const unquote = (value: string): string =>
-        value.trim().replace(/^['"]|['"]$/gu, '');
-      const firstFamily = (value: string): string => {
-        const match = value.trim().match(/^(?:'([^']+)'|"([^"]+)"|([^,]+))/u);
-        return unquote(match?.[1] ?? match?.[2] ?? match?.[3] ?? '');
-      };
-      const normalizeDescriptor = (value: string, fallback: string): string =>
-        value.trim() || fallback;
       const fontRules: Array<{
         family: string;
         sources: string[];
         style: string;
         weight: string;
       }> = [];
-      const collectRules = (rules: CSSRuleList): void => {
-        for (const rule of Array.from(rules)) {
-          if (rule instanceof CSSFontFaceRule) {
-            const sources = Array.from(
-              rule.style
-                .getPropertyValue('src')
-                .matchAll(/url\((['"]?)(.*?)\1\)/gu)
-            ).map((match) => new URL(match[2], document.baseURI).toString());
-            fontRules.push({
-              family: unquote(rule.style.getPropertyValue('font-family')),
-              sources,
-              style: normalizeDescriptor(
-                rule.style.getPropertyValue('font-style'),
-                'normal'
-              ),
-              weight: normalizeDescriptor(
-                rule.style.getPropertyValue('font-weight'),
-                'normal'
-              )
-            });
-            continue;
-          }
-          if ('cssRules' in rule) {
-            collectRules((rule as CSSGroupingRule).cssRules);
-          }
-        }
-      };
+      const pendingRules: CSSRule[] = [];
       for (const sheet of Array.from(document.styleSheets)) {
         try {
-          collectRules(sheet.cssRules);
+          pendingRules.push(...Array.from(sheet.cssRules));
         } catch {
           // Cross-origin sheets are not acceptable evidence and are ignored.
+        }
+      }
+      while (pendingRules.length > 0) {
+        const rule = pendingRules.shift();
+        if (!rule) continue;
+        if (rule instanceof CSSFontFaceRule) {
+          const sources = Array.from(
+            rule.style
+              .getPropertyValue('src')
+              .matchAll(/url\((['"]?)(.*?)\1\)/gu)
+          ).map((match) => new URL(match[2], document.baseURI).toString());
+          fontRules.push({
+            family: rule.style
+              .getPropertyValue('font-family')
+              .trim()
+              .replace(/^['"]|['"]$/gu, ''),
+            sources,
+            style:
+              rule.style.getPropertyValue('font-style').trim() || 'normal',
+            weight:
+              rule.style.getPropertyValue('font-weight').trim() || 'normal'
+          });
+          continue;
+        }
+        if ('cssRules' in rule) {
+          pendingRules.push(
+            ...Array.from((rule as CSSGroupingRule).cssRules)
+          );
         }
       }
 
@@ -396,7 +386,17 @@ const inspectFonts = async (
             `required font variable is missing: ${required.variable}`
           );
         }
-        const resolvedFamily = firstFamily(variableValue);
+        const familyMatch = variableValue
+          .trim()
+          .match(/^(?:'([^']+)'|"([^"]+)"|([^,]+))/u);
+        const resolvedFamily = (
+          familyMatch?.[1] ??
+          familyMatch?.[2] ??
+          familyMatch?.[3] ??
+          ''
+        )
+          .trim()
+          .replace(/^['"]|['"]$/gu, '');
         if (!resolvedFamily) {
           throw new Error(
             `required font variable is missing: ${required.variable}`
@@ -428,7 +428,8 @@ const inspectFonts = async (
 
         const matchingFaces = Array.from(document.fonts).filter(
           (font) =>
-            unquote(font.family) === resolvedFamily &&
+            font.family.trim().replace(/^['"]|['"]$/gu, '') ===
+              resolvedFamily &&
             font.style === required.style &&
             font.weight === required.weight
         );
