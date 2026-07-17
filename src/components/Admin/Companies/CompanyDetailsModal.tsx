@@ -52,7 +52,7 @@ const Header = styled.div`
   border-bottom: 1px solid ${colors.lightGrey};
 
   h2 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -82,7 +82,7 @@ const CloseButton = styled.button`
   }
 `;
 const SectionTitle = styled.h3`
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 1rem;
   font-weight: 700;
   color: ${colors.slate};
@@ -100,14 +100,14 @@ const InfoGrid = styled.div`
 `;
 
 const Label = styled.div`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: ${colors.grayishBlue};
 `;
 
 const Value = styled.div`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.875rem;
   color: ${colors.slate};
   word-break: break-word;
@@ -151,14 +151,14 @@ const ProductionRow = styled.div`
 `;
 
 const ProductionName = styled.div`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: ${colors.slate};
 `;
 
 const ProductionMeta = styled.div`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.75rem;
   color: ${colors.grayishBlue};
 `;

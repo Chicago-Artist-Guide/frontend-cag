@@ -61,7 +61,7 @@ const Header = styled.div`
   border-bottom: 1px solid ${colors.lightGrey};
 
   h2 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -98,7 +98,7 @@ const CloseButton = styled.button`
  */
 const Label = styled.label`
   display: block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: ${colors.slate};
@@ -113,7 +113,7 @@ const Input = styled(Field)`
   padding: 0.75rem 1rem;
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   color: ${colors.slate};
   transition: all 0.2s ease;
@@ -138,7 +138,7 @@ const Select = styled(Field)`
   padding: 0.75rem 1rem;
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   color: ${colors.slate};
   transition: all 0.2s ease;
@@ -165,7 +165,7 @@ const Textarea = styled(Field)`
   padding: 0.75rem 1rem;
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   color: ${colors.slate};
   transition: all 0.2s ease;
@@ -183,7 +183,7 @@ const Textarea = styled(Field)`
  * Error message
  */
 const ErrorMessage = styled.div`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.75rem;
   color: ${colors.salmon};
   margin-top: 0.25rem;
@@ -198,7 +198,7 @@ const SectionDivider = styled.div`
   padding-top: 1.5rem;
 
   h3 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -223,7 +223,7 @@ const Footer = styled.div`
  * Status message
  */
 const StatusMessage = styled.div<{ $type: 'error' | 'success' }>`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.875rem;
   color: ${(props) => (props.$type === 'error' ? colors.salmon : colors.mint)};
 `;
@@ -237,7 +237,7 @@ const WarningMessage = styled.div`
   border: 1px solid ${colors.salmon};
   border-radius: 8px;
   color: ${colors.slate};
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.875rem;
   margin-bottom: 1rem;
   line-height: 1.5;

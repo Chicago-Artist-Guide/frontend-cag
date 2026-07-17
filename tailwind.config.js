@@ -11,13 +11,13 @@ export default {
     extend: {
       fontFamily: {
         'open-sans': [
-          'Open Sans',
+          'var(--font-open-sans)',
           'sans-serif',
           ...defaultTheme.fontFamily.sans
         ],
-        lora: ['Lora', 'serif', ...defaultTheme.fontFamily.serif],
+        lora: ['var(--font-lora)', 'serif', ...defaultTheme.fontFamily.serif],
         montserrat: [
-          'Montserrat',
+          'var(--font-montserrat)',
           'sans-serif',
           ...defaultTheme.fontFamily.sans
         ]

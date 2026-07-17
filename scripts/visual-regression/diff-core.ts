@@ -509,6 +509,7 @@ const validateBlockedRequests = (
       throw new Error(`${requestLabel} must be an object`);
     assertExactKeys(request, ['disposition', 'method', 'url'], requestLabel);
     if (
+      request.disposition !== 'external-font-block' &&
       request.disposition !== 'mutation-block' &&
       request.disposition !== 'silent-block'
     ) {
@@ -524,7 +525,8 @@ const validateBlockedRequests = (
 
 const validateStability = (
   value: unknown,
-  label: string
+  label: string,
+  baseOrigin: string
 ): CaptureCaseSummaryV1['stability'] => {
   if (value === null) return null;
   if (!isRecord(value)) throw new Error(`${label} must be an object or null`);
@@ -541,16 +543,67 @@ const validateStability = (
   const fonts = value.fonts.map((font, index) => {
     const itemLabel = `${label}.fonts[${index}]`;
     if (!isRecord(font)) throw new Error(`${itemLabel} must be an object`);
-    assertExactKeys(font, ['family', 'status', 'style', 'weight'], itemLabel);
+    assertExactKeys(
+      font,
+      [
+        'family',
+        'resolvedFamily',
+        'resources',
+        'status',
+        'style',
+        'variable',
+        'weight'
+      ],
+      itemLabel
+    );
     if (
       !['unloaded', 'loading', 'loaded', 'error'].includes(String(font.status))
     ) {
       throw new Error(`${itemLabel}.status is invalid`);
     }
+    const family = requireString(font.family, `${itemLabel}.family`);
+    const resolvedFamily = requireString(
+      font.resolvedFamily,
+      `${itemLabel}.resolvedFamily`
+    );
+    if (typeof font.variable !== 'string') {
+      throw new Error(`${itemLabel}.variable must be a string`);
+    }
+    const variable = font.variable;
+    if (!Array.isArray(font.resources)) {
+      throw new Error(`${itemLabel}.resources must be an array`);
+    }
+    const resources = font.resources.map((resource, resourceIndex) => {
+      const resourceLabel = `${itemLabel}.resources[${resourceIndex}]`;
+      if (!isRecord(resource)) {
+        throw new Error(`${resourceLabel} must be an object`);
+      }
+      assertExactKeys(resource, ['sameOrigin', 'url'], resourceLabel);
+      if (resource.sameOrigin !== true) {
+        throw new Error(`${resourceLabel}.sameOrigin must be true`);
+      }
+      const url = validateSanitizedUrl(resource.url, `${resourceLabel}.url`);
+      const parsed = new URL(url);
+      if (
+        parsed.origin !== baseOrigin ||
+        !parsed.pathname.startsWith('/_next/static/media/')
+      ) {
+        throw new Error(`${resourceLabel} must be same-origin Next media`);
+      }
+      return { sameOrigin: true as const, url };
+    });
+    if (variable && resources.length === 0) {
+      throw new Error(
+        `${itemLabel} required font must include resource evidence`
+      );
+    }
     return {
-      family: requireString(font.family, `${itemLabel}.family`),
+      family,
+      resolvedFamily,
+      resources,
       status: font.status as FontFaceLoadStatus,
       style: requireString(font.style, `${itemLabel}.style`),
+      variable,
       weight: requireString(font.weight, `${itemLabel}.weight`)
     };
   });
@@ -723,7 +776,8 @@ const validateCaptureRow = (
       ? {
           stability: validateStability(
             value.stability,
-            `capture case ${index}.stability`
+            `capture case ${index}.stability`,
+            baseOrigin
           )
         }
       : {}),

@@ -33,7 +33,7 @@ const DashboardContainer = styled.div`
  * Section title (for Quick Actions heading)
  */
 const SectionTitle = styled.h2`
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 1.5rem;
   font-weight: 700;
   color: ${colors.slate};
@@ -45,7 +45,7 @@ const SectionTitle = styled.h2`
  * Section subtitle
  */
 const SectionSubtitle = styled.p`
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   color: ${colors.grayishBlue};
   margin-bottom: 2rem;
@@ -91,7 +91,7 @@ const WelcomeCard = styled.div`
   }
 
   h2 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
@@ -100,7 +100,7 @@ const WelcomeCard = styled.div`
   }
 
   p {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--font-open-sans), sans-serif;
     font-size: 1.125rem;
     opacity: 0.95;
     margin-bottom: 1.5rem;
@@ -196,7 +196,7 @@ const QuickActionCard = styled(Link)`
   }
 
   .title {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.125rem;
     font-weight: 600;
     color: ${colors.slate};
@@ -205,7 +205,7 @@ const QuickActionCard = styled(Link)`
   }
 
   .description {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--font-open-sans), sans-serif;
     font-size: 0.875rem;
     color: ${colors.grayishBlue};
     line-height: 1.6;
@@ -251,7 +251,7 @@ const StatCard = styled.div`
   }
 
   .label {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     color: ${colors.grayishBlue};
@@ -261,14 +261,14 @@ const StatCard = styled.div`
   }
 
   .value {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
     color: ${colors.slate};
   }
 
   .change {
-    font-family: 'Open Sans', sans-serif;
+    font-family: var(--font-open-sans), sans-serif;
     font-size: 0.75rem;
     margin-top: 0.5rem;
     color: ${colors.mint};

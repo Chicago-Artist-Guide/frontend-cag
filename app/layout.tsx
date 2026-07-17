@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import React, { type ReactNode } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../src/styles/App.scss';
+import { lora, montserrat, openSans } from './fonts';
 
 export const metadata: Metadata = {
   description:
@@ -14,7 +15,10 @@ interface RootLayoutProps {
 }
 
 const RootLayout = ({ children }: RootLayoutProps) => (
-  <html lang="en">
+  <html
+    className={`${montserrat.variable} ${openSans.variable} ${lora.variable}`}
+    lang="en"
+  >
     <body>{children}</body>
   </html>
 );

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import { applicationRoutes } from '../route-contract';
 import {
   MANIFEST,
+  REQUIRED_BRAND_FONTS,
   ROUTE_CLUSTERS,
   VIEWPORTS,
   VIEWPORT_NAMES,
@@ -32,6 +33,39 @@ const baselineIds = [
   'company-roles-search'
 ];
 
+const expectedRequiredFonts = [
+  {
+    family: 'Montserrat',
+    style: 'normal',
+    variable: '--font-montserrat',
+    weight: '400'
+  },
+  {
+    family: 'Montserrat',
+    style: 'normal',
+    variable: '--font-montserrat',
+    weight: '700'
+  },
+  {
+    family: 'Open Sans',
+    style: 'normal',
+    variable: '--font-open-sans',
+    weight: '300'
+  },
+  {
+    family: 'Open Sans',
+    style: 'normal',
+    variable: '--font-open-sans',
+    weight: '600'
+  },
+  {
+    family: 'Lora',
+    style: 'italic',
+    variable: '--font-lora',
+    weight: '400'
+  }
+] as const;
+
 const entry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
   auth: 'anonymous',
   baselinePolicy: { kind: 'blocking-candidate' },
@@ -40,6 +74,7 @@ const entry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
   id: 'fixture',
   path: '/home',
   readiness: { visible: ['h1:has-text("Fixture heading")'] },
+  requiredFonts: expectedRequiredFonts,
   sourceGlobs: ['src/components/Home/**'],
   viewports: ['desktop'],
   ...overrides
@@ -139,6 +174,54 @@ describe('visual manifest', () => {
         ({ baselinePolicy }) => baselinePolicy.kind !== 'blocking-candidate'
       )
     ).toBe(true);
+  });
+
+  it('requires the exact five legacy faces for every blocking candidate', () => {
+    expect(REQUIRED_BRAND_FONTS).toEqual(expectedRequiredFonts);
+    expect(
+      MANIFEST.filter(
+        ({ baselinePolicy }) => baselinePolicy.kind === 'blocking-candidate'
+      ).every(({ requiredFonts }) => requiredFonts === REQUIRED_BRAND_FONTS)
+    ).toBe(true);
+    expect(
+      MANIFEST.filter(
+        ({ baselinePolicy }) => baselinePolicy.kind !== 'blocking-candidate'
+      ).every(({ requiredFonts }) => requiredFonts === undefined)
+    ).toBe(true);
+  });
+
+  it.each([
+    { requiredFonts: undefined, problem: 'must declare required fonts' },
+    { requiredFonts: [], problem: 'must declare required fonts' },
+    {
+      requiredFonts: expectedRequiredFonts.slice(0, 4),
+      problem: 'exact legacy font tuples'
+    },
+    {
+      requiredFonts: [...expectedRequiredFonts, expectedRequiredFonts[0]],
+      problem: 'exact legacy font tuples'
+    }
+  ])(
+    'rejects a blocking candidate that $problem',
+    ({ requiredFonts, problem }) => {
+      expect(() => validateVisualManifest([entry({ requiredFonts })])).toThrow(
+        problem
+      );
+    }
+  );
+
+  it('allows a reference-only route to omit required fonts', () => {
+    expect(() =>
+      validateVisualManifest([
+        entry({
+          baselinePolicy: {
+            kind: 'reference-only',
+            reason: 'Fixture reference route.'
+          },
+          requiredFonts: undefined
+        })
+      ])
+    ).not.toThrow();
   });
 
   it('allows one URL to have separate anonymous and authenticated states', () => {

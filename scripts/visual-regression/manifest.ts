@@ -58,6 +58,46 @@ export type BaselinePolicy =
   | { kind: 'reference-only'; reason: string }
   | { kind: 'missing'; reason: string };
 
+export interface RequiredFont {
+  family: 'Lora' | 'Montserrat' | 'Open Sans';
+  style: 'italic' | 'normal';
+  variable: '--font-lora' | '--font-montserrat' | '--font-open-sans';
+  weight: '300' | '400' | '600' | '700';
+}
+
+export const REQUIRED_BRAND_FONTS = [
+  {
+    family: 'Montserrat',
+    style: 'normal',
+    variable: '--font-montserrat',
+    weight: '400'
+  },
+  {
+    family: 'Montserrat',
+    style: 'normal',
+    variable: '--font-montserrat',
+    weight: '700'
+  },
+  {
+    family: 'Open Sans',
+    style: 'normal',
+    variable: '--font-open-sans',
+    weight: '300'
+  },
+  {
+    family: 'Open Sans',
+    style: 'normal',
+    variable: '--font-open-sans',
+    weight: '600'
+  },
+  {
+    family: 'Lora',
+    style: 'italic',
+    variable: '--font-lora',
+    weight: '400'
+  }
+] as const satisfies readonly RequiredFont[];
+
 const BASELINE_POLICY_KINDS: readonly BaselinePolicy['kind'][] = [
   'blocking-candidate',
   'reference-only',
@@ -77,6 +117,7 @@ export interface RouteEntry {
     hidden?: string[];
     visible: string[];
   };
+  requiredFonts?: readonly RequiredFont[];
   sourceGlobs: string[];
   viewports: ViewportName[];
 }
@@ -188,6 +229,27 @@ export function validateVisualManifest(
     ) {
       throw new Error(`${entry.id} baseline reason must be non-empty`);
     }
+    if (entry.baselinePolicy.kind === 'blocking-candidate') {
+      if (!entry.requiredFonts || entry.requiredFonts.length === 0) {
+        throw new Error(`${entry.id} must declare required fonts`);
+      }
+      const actual = entry.requiredFonts.map(
+        ({ family, style, variable, weight }) =>
+          `${family}\0${style}\0${variable}\0${weight}`
+      );
+      const expected = REQUIRED_BRAND_FONTS.map(
+        ({ family, style, variable, weight }) =>
+          `${family}\0${style}\0${variable}\0${weight}`
+      );
+      if (
+        actual.length !== expected.length ||
+        actual.some((tuple, index) => tuple !== expected[index])
+      ) {
+        throw new Error(
+          `${entry.id} must declare the exact legacy font tuples`
+        );
+      }
+    }
     if (
       entry.readiness.visible.length === 0 ||
       entry.readiness.visible.some((selector) => !isNonEmpty(selector))
@@ -272,6 +334,7 @@ const existingManifest: RouteEntry[] = [
         'main h2:has-text("Find out what we\'re all about"):visible'
       ]
     },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
       'src/routes/FAQ.tsx',
       'src/components/FAQ/**',
@@ -292,6 +355,7 @@ const existingManifest: RouteEntry[] = [
         'main a:has-text("Donate Securely Now"):visible'
       ]
     },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: ['src/routes/Donate.tsx', 'src/components/layout/**'],
     viewports: ['desktop']
   },
@@ -378,6 +442,7 @@ const existingManifest: RouteEntry[] = [
         'main h2:has-text("Mission"):visible'
       ]
     },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
       'src/routes/WhoWeAre.tsx',
       'src/components/WhoWeAre/**',
@@ -421,6 +486,7 @@ const existingManifest: RouteEntry[] = [
         'main input#formBasicPassword:visible'
       ]
     },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
       'src/routes/Login.tsx',
       'src/components/Login/**',
@@ -442,6 +508,7 @@ const existingManifest: RouteEntry[] = [
         'main h3:has-text("Theatre Group"):visible'
       ]
     },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
       'src/routes/SignUp.tsx',
       'src/components/SignUp/**',
@@ -463,6 +530,7 @@ const existingManifest: RouteEntry[] = [
         'main input[type="email"]:visible'
       ]
     },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: ['src/routes/ForgotPassword.tsx', 'src/components/layout/**'],
     viewports: ['desktop']
   },

@@ -38,7 +38,7 @@ const AddButton = styled.button`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -120,7 +120,7 @@ const StatCard = styled.div`
   }
 
   .label {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     color: ${colors.grayishBlue};
@@ -130,7 +130,7 @@ const StatCard = styled.div`
   }
 
   .value {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 2.5rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -170,7 +170,7 @@ const EventCard = styled.div`
   }
 
   .event-name {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.125rem;
     font-weight: 600;
     color: ${colors.slate};

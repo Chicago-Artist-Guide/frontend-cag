@@ -9,6 +9,7 @@ import type { RouteEntry } from './manifest';
 
 export type CaptureRequestDisposition =
   | 'allow'
+  | 'external-font-block'
   | 'mutation-block'
   | 'silent-block';
 
@@ -32,8 +33,14 @@ export interface StabilityResult {
   durationMs: number;
   fonts: Array<{
     family: string;
+    resolvedFamily: string;
+    resources: Array<{
+      sameOrigin: true;
+      url: string;
+    }>;
     status: FontFaceLoadStatus;
     style: string;
+    variable: string;
     weight: string;
   }>;
   frames: Array<{
@@ -107,6 +114,18 @@ export function classifyCaptureRequest({
 }: CaptureRequestInput): CaptureRequestDisposition {
   const normalizedMethod = method.toUpperCase();
   const lowerUrl = url.toLowerCase();
+
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    if (
+      hostname === 'fonts.googleapis.com' ||
+      hostname === 'fonts.gstatic.com'
+    ) {
+      return 'external-font-block';
+    }
+  } catch {
+    // Invalid URLs fall through to the existing fail-closed host policies.
+  }
 
   if (
     lowerUrl.includes('google-analytics.com') ||
@@ -229,6 +248,14 @@ export async function prepareCaptureContext(
 
   return {
     assertNoMutations() {
+      const externalFonts = diagnostics.filter(
+        ({ disposition }) => disposition === 'external-font-block'
+      );
+      if (externalFonts.length > 0) {
+        throw new Error(
+          `visual capture blocked ${externalFonts.length} external Google Font request(s)`
+        );
+      }
       const mutations = diagnostics.filter(
         ({ disposition }) => disposition === 'mutation-block'
       );
@@ -279,6 +306,195 @@ const waitForImages = async (page: Page, timeoutMs: number): Promise<void> => {
       )
     );
   }, timeoutMs);
+};
+
+const inspectFonts = async (
+  page: Page,
+  entry: RouteEntry,
+  timeoutMs: number
+): Promise<StabilityResult['fonts']> => {
+  if (!entry.requiredFonts || entry.requiredFonts.length === 0) {
+    if (entry.baselinePolicy.kind === 'blocking-candidate') {
+      throw new Error('blocking candidate must declare required fonts');
+    }
+    return page.evaluate(() =>
+      Array.from(document.fonts).map((font) => {
+        const family = font.family.replace(/^['"]|['"]$/gu, '');
+        return {
+          family,
+          resolvedFamily: family,
+          resources: [],
+          status: font.status,
+          style: font.style,
+          variable: '',
+          weight: font.weight
+        };
+      })
+    );
+  }
+
+  return withTimeout(
+    page.evaluate(async (requiredFonts) => {
+      const unquote = (value: string): string =>
+        value.trim().replace(/^['"]|['"]$/gu, '');
+      const firstFamily = (value: string): string => {
+        const match = value.trim().match(/^(?:'([^']+)'|"([^"]+)"|([^,]+))/u);
+        return unquote(match?.[1] ?? match?.[2] ?? match?.[3] ?? '');
+      };
+      const normalizeDescriptor = (value: string, fallback: string): string =>
+        value.trim() || fallback;
+      const fontRules: Array<{
+        family: string;
+        sources: string[];
+        style: string;
+        weight: string;
+      }> = [];
+      const collectRules = (rules: CSSRuleList): void => {
+        for (const rule of Array.from(rules)) {
+          if (rule instanceof CSSFontFaceRule) {
+            const sources = Array.from(
+              rule.style
+                .getPropertyValue('src')
+                .matchAll(/url\((['"]?)(.*?)\1\)/gu)
+            ).map((match) => new URL(match[2], document.baseURI).toString());
+            fontRules.push({
+              family: unquote(rule.style.getPropertyValue('font-family')),
+              sources,
+              style: normalizeDescriptor(
+                rule.style.getPropertyValue('font-style'),
+                'normal'
+              ),
+              weight: normalizeDescriptor(
+                rule.style.getPropertyValue('font-weight'),
+                'normal'
+              )
+            });
+            continue;
+          }
+          if ('cssRules' in rule) {
+            collectRules((rule as CSSGroupingRule).cssRules);
+          }
+        }
+      };
+      for (const sheet of Array.from(document.styleSheets)) {
+        try {
+          collectRules(sheet.cssRules);
+        } catch {
+          // Cross-origin sheets are not acceptable evidence and are ignored.
+        }
+      }
+
+      const pageOrigin = location.origin;
+      const results = [];
+
+      for (const required of requiredFonts) {
+        const variableValue = getComputedStyle(
+          document.documentElement
+        ).getPropertyValue(required.variable);
+        if (!variableValue.trim()) {
+          throw new Error(
+            `required font variable is missing: ${required.variable}`
+          );
+        }
+        const resolvedFamily = firstFamily(variableValue);
+        if (!resolvedFamily) {
+          throw new Error(
+            `required font variable is missing: ${required.variable}`
+          );
+        }
+
+        const matchingRules = fontRules.filter(
+          (rule) =>
+            rule.family === resolvedFamily &&
+            rule.style === required.style &&
+            rule.weight === required.weight
+        );
+        if (matchingRules.length === 0) {
+          throw new Error(
+            `required font face is absent: ${required.family} ${required.style} ${required.weight}`
+          );
+        }
+
+        try {
+          await document.fonts.load(
+            `${required.style} ${required.weight} 16px "${resolvedFamily.replace(/"/gu, '\\"')}"`,
+            'Chicago Artist Guide'
+          );
+        } catch {
+          throw new Error(
+            `required font load failed: ${required.family} ${required.style} ${required.weight}`
+          );
+        }
+
+        const matchingFaces = Array.from(document.fonts).filter(
+          (font) =>
+            unquote(font.family) === resolvedFamily &&
+            font.style === required.style &&
+            font.weight === required.weight
+        );
+        if (matchingFaces.length === 0) {
+          throw new Error(
+            `required font face is absent: ${required.family} ${required.style} ${required.weight}`
+          );
+        }
+        const loadedFace = matchingFaces.find(
+          ({ status }) => status === 'loaded'
+        );
+        if (!loadedFace) {
+          throw new Error(
+            `required font did not load: ${required.family} ${required.style} ${required.weight}`
+          );
+        }
+
+        const sourceUrls = matchingRules.flatMap(({ sources }) => sources);
+        if (
+          sourceUrls.some((rawUrl) => {
+            const hostname = new URL(rawUrl).hostname.toLowerCase();
+            return (
+              hostname === 'fonts.googleapis.com' ||
+              hostname === 'fonts.gstatic.com'
+            );
+          })
+        ) {
+          throw new Error('external Google Font resource is prohibited');
+        }
+        const resources = sourceUrls
+          .filter((rawUrl) =>
+            performance
+              .getEntriesByType('resource')
+              .some((entry) => entry.name === rawUrl)
+          )
+          .map((rawUrl) => new URL(rawUrl))
+          .filter(
+            (url) =>
+              url.origin === pageOrigin &&
+              url.pathname.startsWith('/_next/static/media/')
+          )
+          .map((url) => ({
+            sameOrigin: true as const,
+            url: `${url.origin}${url.pathname}`
+          }));
+        if (resources.length === 0) {
+          throw new Error(
+            `required font lacks same-origin Next font resource evidence: ${required.family} ${required.style} ${required.weight}`
+          );
+        }
+
+        results.push({
+          family: required.family,
+          resolvedFamily,
+          resources,
+          status: loadedFace.status,
+          style: required.style,
+          variable: required.variable,
+          weight: required.weight
+        });
+      }
+      return results;
+    }, entry.requiredFonts),
+    timeoutMs,
+    `required font loading did not settle within ${timeoutMs}ms`
+  );
 };
 
 const inspectImages = async (
@@ -497,14 +713,7 @@ export async function stabilizePage(
     timeoutMs,
     `font readiness did not settle within ${timeoutMs}ms`
   );
-  const fonts = await page.evaluate(() =>
-    Array.from(document.fonts).map((font) => ({
-      family: font.family.replace(/^['"]|['"]$/gu, ''),
-      status: font.status,
-      style: font.style,
-      weight: font.weight
-    }))
-  );
+  const fonts = await inspectFonts(page, entry, timeoutMs);
   const failedFont = fonts.find(({ status }) => status === 'error');
   if (failedFont) {
     throw new Error(`declared font failed: ${failedFont.family}`);

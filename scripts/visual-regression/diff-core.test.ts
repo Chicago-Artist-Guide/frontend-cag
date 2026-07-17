@@ -501,6 +501,50 @@ describe('validateCaptureSummary', () => {
     expect(validated).toEqual(raw);
   });
 
+  it('preserves exact required-font and same-origin media evidence', () => {
+    const subject = visualCase();
+    const row: CaptureCaseSummaryV1 = {
+      ...passedCapture(subject),
+      stability: {
+        durationMs: 1,
+        fonts: [
+          {
+            family: 'Montserrat',
+            resolvedFamily: '__Montserrat_fixture',
+            resources: [
+              {
+                sameOrigin: true,
+                url: 'http://127.0.0.1:3000/_next/static/media/font.woff2'
+              }
+            ],
+            status: 'loaded',
+            style: 'normal',
+            variable: '--font-montserrat',
+            weight: '400'
+          }
+        ],
+        frames: [],
+        images: { checked: 0, exemptedBroken: [] },
+        intervalsCleared: 0,
+        masks: []
+      }
+    };
+
+    expect(
+      validateCaptureSummary(captureSummary([subject], [row]), MANIFEST)
+        .cases[0].stability?.fonts
+    ).toEqual(row.stability?.fonts);
+
+    const invalid = structuredClone(row);
+    if (invalid.stability) {
+      invalid.stability.fonts[0].resources[0].url =
+        'https://fonts.gstatic.com/s/montserrat/font.woff2';
+    }
+    expect(() =>
+      validateCaptureSummary(captureSummary([subject], [invalid]), MANIFEST)
+    ).toThrow('same-origin Next media');
+  });
+
   it.each([
     [
       'summary',

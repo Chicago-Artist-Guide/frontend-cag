@@ -16,12 +16,19 @@ import {
   prepareCaptureContext,
   stabilizePage
 } from './stability';
-import type { RouteEntry } from './manifest';
+import type { RequiredFont, RouteEntry } from './manifest';
 
 const fontFile = path.resolve(
   process.cwd(),
   'node_modules/next/dist/next-devtools/server/font/geist-latin.woff2'
 );
+
+const requiredFixtureFont: RequiredFont = {
+  family: 'Montserrat',
+  style: 'normal',
+  variable: '--font-montserrat',
+  weight: '400'
+};
 
 const fixtureEntry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
   allowBrokenImages: [
@@ -247,6 +254,200 @@ describe.sequential('stabilizePage', () => {
     }
   });
 
+  it('force-loads a required CSS-variable face and records same-origin resource evidence', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/required', (route) =>
+      route.fulfill({
+        body: `<!doctype html><style>
+          :root { --font-montserrat: 'FixtureGenerated'; }
+          @font-face {
+            font-family: 'FixtureGenerated';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/_next/static/media/fixture.woff2') format('woff2');
+          }
+        </style><main><h1>Ready</h1></main>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route(
+      'https://fixture.test/_next/static/media/fixture.woff2',
+      async (route) =>
+        route.fulfill({
+          body: await readFile(fontFile),
+          contentType: 'font/woff2'
+        })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/required');
+    try {
+      const stabilized = await stabilizePage(
+        page,
+        fixtureEntry({
+          allowBrokenImages: [],
+          baselinePolicy: { kind: 'blocking-candidate' },
+          masks: [],
+          requiredFonts: [requiredFixtureFont]
+        }),
+        { timeoutMs: 1_000 }
+      );
+      expect(stabilized.result.fonts).toEqual([
+        {
+          family: 'Montserrat',
+          resolvedFamily: 'FixtureGenerated',
+          resources: [
+            {
+              sameOrigin: true,
+              url: 'https://fixture.test/_next/static/media/fixture.woff2'
+            }
+          ],
+          status: 'loaded',
+          style: 'normal',
+          variable: '--font-montserrat',
+          weight: '400'
+        }
+      ]);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it.each([
+    {
+      html: '<style></style><main><h1>Ready</h1></main>',
+      problem: 'required font variable is missing'
+    },
+    {
+      html: `<style>:root { --font-montserrat: 'AbsentGenerated'; }</style>
+        <main><h1>Ready</h1></main>`,
+      problem: 'required font face is absent'
+    }
+  ])('fails closed when $problem', async ({ html, problem }) => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/required', (route) =>
+      route.fulfill({ body: html, contentType: 'text/html' })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/required');
+    try {
+      await expect(
+        stabilizePage(
+          page,
+          fixtureEntry({
+            allowBrokenImages: [],
+            baselinePolicy: { kind: 'blocking-candidate' },
+            masks: [],
+            requiredFonts: [requiredFixtureFont]
+          }),
+          { timeoutMs: 500 }
+        )
+      ).rejects.toThrow(problem);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it('fails when a required face reaches error status', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/required', (route) =>
+      route.fulfill({
+        body: `<style>
+          :root { --font-montserrat: 'FailedGenerated'; }
+          @font-face {
+            font-family: 'FailedGenerated';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/_next/static/media/missing.woff2') format('woff2');
+          }
+        </style><main><h1>Ready</h1></main>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route(
+      'https://fixture.test/_next/static/media/missing.woff2',
+      (route) => route.abort()
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/required');
+    try {
+      await expect(
+        stabilizePage(
+          page,
+          fixtureEntry({
+            allowBrokenImages: [],
+            baselinePolicy: { kind: 'blocking-candidate' },
+            masks: [],
+            requiredFonts: [requiredFixtureFont]
+          }),
+          { timeoutMs: 500 }
+        )
+      ).rejects.toThrow(/required font (?:load failed|did not load)/u);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it('rejects a loaded face without a same-origin Next media resource', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/required', (route) =>
+      route.fulfill({
+        body: `<style>
+          :root { --font-montserrat: 'WrongResourceGenerated'; }
+          @font-face {
+            font-family: 'WrongResourceGenerated';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/fixture.woff2') format('woff2');
+          }
+        </style><main><h1>Ready</h1></main>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route('https://fixture.test/fixture.woff2', async (route) =>
+      route.fulfill({
+        body: await readFile(fontFile),
+        contentType: 'font/woff2'
+      })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/required');
+    try {
+      await expect(
+        stabilizePage(
+          page,
+          fixtureEntry({
+            allowBrokenImages: [],
+            baselinePolicy: { kind: 'blocking-candidate' },
+            masks: [],
+            requiredFonts: [requiredFixtureFont]
+          }),
+          { timeoutMs: 1_000 }
+        )
+      ).rejects.toThrow('same-origin Next font resource evidence');
+    } finally {
+      await context.close();
+    }
+  });
+
+  it('rejects a blocking candidate without required font tuples', async () => {
+    const { context, page } = await fixture();
+    try {
+      await expect(
+        stabilizePage(
+          page,
+          fixtureEntry({ baselinePolicy: { kind: 'blocking-candidate' } }),
+          { timeoutMs: 1_000 }
+        )
+      ).rejects.toThrow('blocking candidate must declare required fonts');
+    } finally {
+      await context.close();
+    }
+  });
+
   it('bounds font readiness with the per-case timeout', async () => {
     const context = await browser.newContext();
     await prepareCaptureContext(context);
@@ -286,12 +487,45 @@ describe.sequential('stabilizePage', () => {
   });
 
   it('rejects visible cross-origin frames for blocking candidates', async () => {
-    const { context, page } = await fixture();
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/required', (route) =>
+      route.fulfill({
+        body: `<style>
+          :root { --font-montserrat: 'FixtureGenerated'; }
+          @font-face {
+            font-family: 'FixtureGenerated';
+            font-style: normal;
+            font-weight: 400;
+            src: url('/_next/static/media/fixture.woff2') format('woff2');
+          }
+        </style><main><h1>Ready</h1><iframe src="https://frame.test/embed"></iframe></main>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route(
+      'https://fixture.test/_next/static/media/fixture.woff2',
+      async (route) =>
+        route.fulfill({
+          body: await readFile(fontFile),
+          contentType: 'font/woff2'
+        })
+    );
+    await context.route('https://frame.test/embed', (route) =>
+      route.fulfill({ body: '<p>remote frame</p>', contentType: 'text/html' })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/required');
     try {
       await expect(
         stabilizePage(
           page,
-          fixtureEntry({ baselinePolicy: { kind: 'blocking-candidate' } }),
+          fixtureEntry({
+            allowBrokenImages: [],
+            baselinePolicy: { kind: 'blocking-candidate' },
+            masks: [],
+            requiredFonts: [requiredFixtureFont]
+          }),
           { timeoutMs: 1_000 }
         )
       ).rejects.toThrow('cross-origin iframe');
@@ -479,6 +713,16 @@ describe.sequential('stabilizePage', () => {
 
 describe('capture request policy', () => {
   it.each([
+    [
+      'https://fonts.googleapis.com/css2?family=Lora',
+      'GET',
+      'external-font-block'
+    ],
+    [
+      'https://fonts.gstatic.com/s/lora/font.woff2',
+      'GET',
+      'external-font-block'
+    ],
     ['https://www.google-analytics.com/g/collect', 'POST', 'silent-block'],
     ['https://www.zeffy.com/cdn-cgi/rum', 'POST', 'silent-block'],
     [

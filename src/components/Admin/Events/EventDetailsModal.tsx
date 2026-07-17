@@ -73,7 +73,7 @@ const Header = styled.div`
   }
 
   .event-name {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.75rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -110,7 +110,7 @@ const Section = styled.div`
   margin-bottom: 2rem;
 
   .section-title {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 0.875rem;
     font-weight: 700;
     color: ${colors.grayishBlue};
@@ -123,7 +123,7 @@ const Section = styled.div`
     margin-bottom: 1rem;
 
     .label {
-      font-family: 'Montserrat', sans-serif;
+      font-family: var(--font-montserrat), sans-serif;
       font-size: 0.75rem;
       font-weight: 600;
       color: ${colors.grayishBlue};
@@ -133,7 +133,7 @@ const Section = styled.div`
     }
 
     .value {
-      font-family: 'Open Sans', sans-serif;
+      font-family: var(--font-open-sans), sans-serif;
       font-size: 1rem;
       color: ${colors.slate};
       line-height: 1.6;
@@ -144,7 +144,7 @@ const Badge = styled.span<{ variant?: string }>`
   display: inline-block;
   padding: 0.375rem 0.75rem;
   border-radius: 6px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
@@ -192,7 +192,7 @@ const LinkButton = styled.a`
   padding: 0.75rem 1.5rem;
   background: ${colors.mint};
   color: white;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   text-decoration: none;
@@ -220,7 +220,7 @@ const EditButton = styled.button`
   padding: 0.75rem 1.5rem;
   background: white;
   color: ${colors.mint};
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;

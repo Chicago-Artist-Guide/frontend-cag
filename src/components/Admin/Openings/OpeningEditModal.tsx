@@ -41,7 +41,7 @@ const Header = styled.div`
   border-bottom: 1px solid ${colors.lightGrey};
 
   h2 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -64,7 +64,7 @@ const Header = styled.div`
 `;
 const Label = styled.label`
   display: block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: ${colors.slate};
@@ -74,7 +74,7 @@ const Label = styled.label`
 const Input = styled(Field)`
   width: 100%;
   padding: 0.75rem 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
@@ -90,7 +90,7 @@ const Input = styled(Field)`
 const Select = styled(Field)`
   width: 100%;
   padding: 0.75rem 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
@@ -108,7 +108,7 @@ const Select = styled(Field)`
 const TextArea = styled(Field)`
   width: 100%;
   padding: 0.75rem 1rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 1rem;
   border: 1px solid ${colors.lightGrey};
   border-radius: 8px;
@@ -127,7 +127,7 @@ const ErrorText = styled.div`
   color: ${colors.salmon};
   font-size: 0.75rem;
   margin-top: 0.25rem;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
 `;
 
 const FormError = styled.div`
@@ -144,7 +144,7 @@ const Button = styled.button<{ variant?: 'primary' | 'secondary' }>`
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
