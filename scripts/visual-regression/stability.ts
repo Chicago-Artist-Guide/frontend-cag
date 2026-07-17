@@ -36,7 +36,12 @@ export interface StabilityResult {
     style: string;
     weight: string;
   }>;
-  frames: Array<{ crossOrigin: boolean; src: string; visible: boolean }>;
+  frames: Array<{
+    crossOrigin: boolean;
+    declaredSrc: string;
+    src: string;
+    visible: boolean;
+  }>;
   images: {
     checked: number;
     exemptedBroken: Array<{
@@ -122,6 +127,26 @@ export function classifyCaptureRequest({
     return 'mutation-block';
   }
 
+  if (lowerUrl.includes('firestore.googleapis.com')) {
+    let pathname = '';
+    try {
+      pathname = new URL(url).pathname.toLowerCase();
+    } catch {
+      pathname = lowerUrl;
+    }
+    const isReadRpc =
+      pathname.endsWith(':runquery') || pathname.endsWith(':batchget');
+    if (
+      pathname.includes('/documents') &&
+      !isReadRpc &&
+      (normalizedMethod === 'PATCH' ||
+        normalizedMethod === 'DELETE' ||
+        normalizedMethod === 'POST')
+    ) {
+      return 'mutation-block';
+    }
+  }
+
   if (
     NON_IDEMPOTENT_METHODS.has(normalizedMethod) &&
     ((lowerUrl.includes('firebasestorage.googleapis.com') &&
@@ -179,7 +204,7 @@ export async function prepareCaptureContext(
       url: request.url()
     });
     if (disposition === 'allow') {
-      await route.continue();
+      await route.fallback();
       return;
     }
     diagnostics.push({
@@ -352,23 +377,28 @@ const inspectMasks = async (
   return { locators, results };
 };
 
-const inspectFrames = async (page: Page): Promise<StabilityResult['frames']> =>
-  page.locator('iframe').evaluateAll((nodes) =>
-    nodes.map((node) => {
+const inspectFrames = async (
+  page: Page
+): Promise<StabilityResult['frames']> => {
+  const locators = page.locator('iframe');
+  const frames: StabilityResult['frames'] = [];
+  const parentUrl = new URL(page.url());
+  const count = await locators.count();
+  for (let index = 0; index < count; index += 1) {
+    const locator = locators.nth(index);
+    const element = await locator.elementHandle();
+    const navigatedFrame = await element?.contentFrame();
+    const attributes = await locator.evaluate((node) => {
       const frame = node as HTMLIFrameElement;
-      const source = frame.src || 'about:blank';
-      let crossOrigin = false;
-      try {
-        crossOrigin =
-          new URL(source, document.baseURI).origin !== location.origin;
-      } catch {
-        crossOrigin = true;
-      }
       const style = getComputedStyle(frame);
       const rectangle = frame.getBoundingClientRect();
+      const declared = frame.getAttribute('src');
       return {
-        crossOrigin,
-        src: source,
+        declaredSrc: frame.hasAttribute('srcdoc')
+          ? 'about:srcdoc'
+          : declared
+            ? new URL(declared, document.baseURI).toString()
+            : 'about:blank',
         visible:
           style.display !== 'none' &&
           style.visibility !== 'hidden' &&
@@ -376,8 +406,27 @@ const inspectFrames = async (page: Page): Promise<StabilityResult['frames']> =>
           rectangle.height > 0 &&
           rectangle.width > 0
       };
-    })
-  );
+    });
+    const source = navigatedFrame?.url() || attributes.declaredSrc;
+    const inheritsParentOrigin =
+      source === 'about:blank' || source === 'about:srcdoc';
+    let crossOrigin = false;
+    if (!inheritsParentOrigin) {
+      try {
+        crossOrigin = new URL(source).origin !== parentUrl.origin;
+      } catch {
+        crossOrigin = true;
+      }
+    }
+    frames.push({
+      crossOrigin,
+      declaredSrc: attributes.declaredSrc,
+      src: source,
+      visible: attributes.visible
+    });
+  }
+  return frames;
+};
 
 export async function stabilizePage(
   page: Page,
@@ -453,6 +502,7 @@ export async function stabilizePage(
   const masks = await inspectMasks(page, entry);
   const frames = (await inspectFrames(page)).map((frame) => ({
     ...frame,
+    declaredSrc: sanitizeUrl(frame.declaredSrc),
     src: sanitizeUrl(frame.src)
   }));
   if (
@@ -464,11 +514,15 @@ export async function stabilizePage(
     );
   }
 
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) =>
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
-      )
+  await withTimeout(
+    page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+        )
+    ),
+    timeoutMs,
+    `animation-frame settle did not complete within ${timeoutMs}ms`
   );
 
   return {
@@ -482,4 +536,38 @@ export async function stabilizePage(
       masks: masks.results
     }
   };
+}
+
+const assertPagePath = (page: Page, expectedPath: string): string => {
+  const finalUrl = page.url();
+  const actualPath = new URL(finalUrl).pathname;
+  if (actualPath !== expectedPath) {
+    throw new Error(
+      `capture pathname changed from ${expectedPath} to ${actualPath}`
+    );
+  }
+  return finalUrl;
+};
+
+export async function captureStablePage(
+  page: Page,
+  entry: RouteEntry,
+  requestGuard: CaptureRequestGuard,
+  partialPath: string,
+  timeoutMs = 15_000
+): Promise<{ finalUrl: string; stability: StabilityResult }> {
+  assertPagePath(page, entry.path);
+  const stabilized = await stabilizePage(page, entry, { timeoutMs });
+  assertPagePath(page, entry.path);
+  requestGuard.assertNoMutations();
+  await page.screenshot({
+    animations: 'disabled',
+    fullPage: entry.fullPage,
+    mask: stabilized.maskLocators,
+    path: partialPath,
+    type: 'png'
+  });
+  requestGuard.assertNoMutations();
+  const finalUrl = assertPagePath(page, entry.path);
+  return { finalUrl, stability: stabilized.result };
 }

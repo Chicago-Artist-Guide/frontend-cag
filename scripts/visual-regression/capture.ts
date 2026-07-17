@@ -7,24 +7,16 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import {
   CaptureCaseFailure,
+  ensureBaseUrlReachable,
   runCapture,
   writeCapturePngAtomically
 } from './capture-core';
+import { type VisualEnvironment } from './config';
+import { resolveCaptureInvocation } from './capture-preflight';
+import { VIEWPORTS, type VisualCase } from './manifest';
 import {
-  parseVisualArgs,
-  resolveVisualPaths,
-  resolveVisualSelection,
-  type VisualEnvironment
-} from './config';
-import {
-  MANIFEST,
-  VIEWPORTS,
-  selectVisualCases,
-  type VisualCase
-} from './manifest';
-import {
+  captureStablePage,
   prepareCaptureContext,
-  stabilizePage,
   type CaptureRequestGuard,
   type StabilityResult
 } from './stability';
@@ -35,31 +27,6 @@ const environment = (): VisualEnvironment => ({
   VR_BASELINE_DIR: process.env.VR_BASELINE_DIR,
   VR_BASE_URL: process.env.VR_BASE_URL
 });
-
-const captureCommand = (
-  argv: readonly string[]
-): { command: 'baseline' | 'capture'; flags: string[] } => {
-  const [requestedCommand, ...flags] = argv;
-  if (requestedCommand !== 'baseline' && requestedCommand !== 'capture') {
-    throw new Error(
-      'visual capture requires a leading baseline or capture command'
-    );
-  }
-  return { command: requestedCommand, flags };
-};
-
-const ensureBaseUrlReachable = async (baseUrl: string): Promise<void> => {
-  for (let attempt = 0; attempt < 20; attempt += 1) {
-    try {
-      const response = await fetch(baseUrl, { redirect: 'manual' });
-      if (response.status < 500) return;
-    } catch {
-      // The compatibility host may still be starting.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  throw new Error(`visual capture host is not reachable at ${baseUrl}`);
-};
 
 const contextOptionsFor = (
   visualCase: VisualCase,
@@ -88,11 +55,16 @@ const contextOptionsFor = (
 };
 
 async function main(): Promise<void> {
-  const { command, flags } = captureCommand(process.argv.slice(2));
-  const args = parseVisualArgs(flags, command);
-  const paths = resolveVisualPaths(environment(), process.cwd());
-  const selection = resolveVisualSelection(args, MANIFEST, process.cwd());
-  const cases = selectVisualCases(MANIFEST, selection);
+  const invocation = await resolveCaptureInvocation(
+    process.argv.slice(2),
+    environment(),
+    process.cwd()
+  );
+  if (!invocation) {
+    process.exitCode = 1;
+    return;
+  }
+  const { cases, command, paths, selection } = invocation;
   const outputDir =
     command === 'baseline' ? paths.baselineDir : paths.currentDir;
   let browser: Browser | undefined;
@@ -112,37 +84,32 @@ async function main(): Promise<void> {
       let finalUrl: string | undefined;
       let stability: StabilityResult | undefined;
       try {
-        await writeCapturePngAtomically(finalArtifact, async (partialPath) => {
-          context = await captureBrowser.newContext(
-            contextOptionsFor(visualCase, paths.authDir)
-          );
-          requestGuard = await prepareCaptureContext(context);
-          const page = await context.newPage();
-          await page.goto(`${paths.baseUrl}${entry.path}`, {
-            timeout: 30_000,
-            waitUntil: 'domcontentloaded'
-          });
-          finalUrl = page.url();
-          if (new URL(finalUrl).pathname !== entry.path) {
-            throw new Error(
-              `capture navigation changed pathname from ${entry.path} to ${new URL(finalUrl).pathname}`
+        await writeCapturePngAtomically(
+          finalArtifact,
+          outputDir,
+          async (partialPath) => {
+            context = await captureBrowser.newContext(
+              contextOptionsFor(visualCase, paths.authDir)
             );
+            requestGuard = await prepareCaptureContext(context);
+            const page = await context.newPage();
+            await page.goto(`${paths.baseUrl}${entry.path}`, {
+              timeout: 30_000,
+              waitUntil: 'domcontentloaded'
+            });
+            const captured = await captureStablePage(
+              page,
+              entry,
+              requestGuard,
+              partialPath
+            );
+            finalUrl = captured.finalUrl;
+            stability = captured.stability;
+            await context.close();
+            context = undefined;
+            requestGuard.assertNoMutations();
           }
-          const stabilized = await stabilizePage(page, entry);
-          stability = stabilized.result;
-          requestGuard.assertNoMutations();
-          await page.screenshot({
-            animations: 'disabled',
-            fullPage: entry.fullPage,
-            mask: stabilized.maskLocators,
-            path: partialPath,
-            type: 'png'
-          });
-          requestGuard.assertNoMutations();
-          await context.close();
-          context = undefined;
-          requestGuard.assertNoMutations();
-        });
+        );
         if (!finalUrl || !requestGuard || !stability) {
           throw new Error('capture completed without required diagnostics');
         }

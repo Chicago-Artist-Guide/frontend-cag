@@ -48,6 +48,8 @@ export interface VisualPaths {
   summaryFile: string;
 }
 
+export type SafeVisualPaths = Omit<VisualPaths, 'baseUrl'>;
+
 const DEFAULT_THRESHOLD = 0.001;
 
 const parseList = (value: string, flag: string): string[] => {
@@ -323,10 +325,10 @@ const resolveBaseUrl = (configured: string | undefined): string => {
   return url.origin;
 };
 
-export function resolveVisualPaths(
+export function resolveSafeVisualPaths(
   environment: VisualEnvironment,
   cwd: string
-): VisualPaths {
+): SafeVisualPaths {
   const baselineDir = resolveEnvironmentPath(
     environment,
     'VR_BASELINE_DIR',
@@ -360,13 +362,22 @@ export function resolveVisualPaths(
   return {
     artifactDir,
     authDir,
-    baseUrl: resolveBaseUrl(environment.VR_BASE_URL),
     baselineDir,
     captureSummary: path.join(artifactDir, 'capture-summary.json'),
     currentDir,
     diffDir,
     reportFile: path.join(diffDir, 'report.html'),
     summaryFile: path.join(diffDir, 'summary.json')
+  };
+}
+
+export function resolveVisualPaths(
+  environment: VisualEnvironment,
+  cwd: string
+): VisualPaths {
+  return {
+    ...resolveSafeVisualPaths(environment, cwd),
+    baseUrl: resolveBaseUrl(environment.VR_BASE_URL)
   };
 }
 

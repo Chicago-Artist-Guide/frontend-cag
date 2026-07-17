@@ -6,7 +6,11 @@
  * needed to use the existing screenshots during the App Router migration.
  */
 
-import { applicationRoutes, type ApplicationPath } from '../route-contract';
+import {
+  applicationRoutes,
+  type ApplicationPath,
+  type BrowserMarker
+} from '../route-contract';
 
 export type AuthState = 'admin' | 'anonymous' | 'company' | 'individual';
 
@@ -101,6 +105,17 @@ const applicationPaths = new Set<string>(
 );
 
 const isNonEmpty = (value: string): boolean => value.trim().length > 0;
+const SAFE_ROUTE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+export const readinessSelectorForMarker = (
+  marker: BrowserMarker | undefined
+): string => {
+  if (!marker) throw new Error('route marker is required');
+  const value = marker.value.replace(/\\/gu, '\\\\').replace(/"/gu, '\\"');
+  return marker.kind === 'heading'
+    ? `main h1:has-text("${value}"):visible`
+    : `main :text-is("${value}"):visible`;
+};
 
 export function validateVisualManifest(
   manifest: readonly RouteEntry[]
@@ -115,6 +130,11 @@ export function validateVisualManifest(
   for (const entry of manifest) {
     if (!isNonEmpty(entry.id)) {
       throw new Error('visual route id must be non-empty');
+    }
+    if (!SAFE_ROUTE_ID.test(entry.id)) {
+      throw new Error(
+        `visual route id must be a safe lowercase slug: ${entry.id}`
+      );
     }
     if (ids.has(entry.id)) {
       throw new Error(`duplicate visual route id: ${entry.id}`);
@@ -227,7 +247,9 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'home',
     path: '/home',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: ['main h1:has-text("Discover your next dream gig"):visible']
+    },
     sourceGlobs: [
       'src/routes/Home.tsx',
       'src/components/Home/**',
@@ -242,7 +264,12 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'faq',
     path: '/faq',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("FREQUENTLY ASKED QUESTIONS"):visible',
+        'main h2:has-text("Find out what we\'re all about"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/FAQ.tsx',
       'src/components/FAQ/**',
@@ -257,7 +284,12 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'donate',
     path: '/donate',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("Donate to Support Chicago Artists"):visible',
+        'main a:has-text("Donate Securely Now"):visible'
+      ]
+    },
     sourceGlobs: ['src/routes/Donate.tsx', 'src/components/layout/**'],
     viewports: ['desktop']
   },
@@ -270,7 +302,14 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'events',
     path: '/events',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      hidden: ['main :text-is("Loading events...")'],
+      visible: [
+        'main h1:has-text("EVENTS"):visible',
+        'main h2:has-text("Upcoming Events"):visible',
+        'main h2:has-text("Past Events"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Events.tsx',
       'src/components/Events/**',
@@ -287,7 +326,12 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'shows',
     path: '/shows',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("THEATRE SHOWS"):visible',
+        'main h1:has-text("THEATRE SHOWS") ~ div.mt-4 h3, main h1:has-text("THEATRE SHOWS") ~ p:has-text("No active shows found at this time. Please check back later.")'
+      ]
+    },
     sourceGlobs: [
       'src/routes/PublicShows.tsx',
       'src/components/PublicShows/**',
@@ -304,7 +348,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'get-involved',
     path: '/get-involved',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      hidden: ['main :text-is("Loading opportunities...")'],
+      visible: [
+        'main h1:has-text("Get involved"):visible',
+        'main form textarea#message:visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/GetInvolved.tsx',
       'src/components/GetInvolved/**',
@@ -319,7 +369,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'about-us',
     path: '/about-us',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("ABOUT US"):visible',
+        'main h2:has-text("Vision"):visible',
+        'main h2:has-text("Mission"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/WhoWeAre.tsx',
       'src/components/WhoWeAre/**',
@@ -336,7 +392,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'theatre-resources',
     path: '/theatre-resources',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("THEATRE RESOURCES"):visible',
+        'main table th:has-text("Organization"):visible',
+        'main iframe[title^="Submit and View Links"]:visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/TheaterResources.tsx',
       'src/components/layout/**'
@@ -350,7 +412,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'login',
     path: '/login',
-    readiness: { visible: ['main form'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("WELCOME BACK"):visible',
+        'main label[for="formBasicEmail"]:visible',
+        'main input#formBasicPassword:visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Login.tsx',
       'src/components/Login/**',
@@ -365,7 +433,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'signup',
     path: '/sign-up',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("BUILD CONNECTIONS TODAY"):visible',
+        'main h3:has-text("Individual Artist"):visible',
+        'main h3:has-text("Theatre Group"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/SignUp.tsx',
       'src/components/SignUp/**',
@@ -380,7 +454,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'forgot-password',
     path: '/forgot-password',
-    readiness: { visible: ['main form'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("RESET YOUR PASSWORD"):visible',
+        'main label:has-text("Email"):visible',
+        'main input[type="email"]:visible'
+      ]
+    },
     sourceGlobs: ['src/routes/ForgotPassword.tsx', 'src/components/layout/**'],
     viewports: ['desktop']
   },
@@ -393,7 +473,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'company-profile',
     path: '/profile',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("YOUR PROFILE"):visible',
+        'main h2:has-text("Basic Group Info"):visible',
+        'main h2:has-text("Active Shows"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Profile.tsx',
       'src/components/Profile/**',
@@ -410,7 +496,13 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'company-messages',
     path: '/profile/messages',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      hidden: ['main :text-is("Loading threads...")'],
+      visible: [
+        'main h1:has-text("Messages"):visible',
+        'main h4:has-text("Threads"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Messages.tsx',
       'src/components/Messages/**',
@@ -427,7 +519,12 @@ const existingManifest: RouteEntry[] = [
     fullPage: true,
     id: 'company-roles-search',
     path: '/profile/search/roles',
-    readiness: { visible: ['main h1'] },
+    readiness: {
+      visible: [
+        'main h1:has-text("Matches"):visible',
+        'main h2:has-text("Filter Talent"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Matches.tsx',
       'src/components/Matches/**',

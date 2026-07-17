@@ -6,10 +6,12 @@ import {
   type BrowserContext,
   type Page
 } from '@playwright/test';
-import { readFile } from 'node:fs/promises';
+import { readFile, rm } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import {
+  captureStablePage,
   classifyCaptureRequest,
   prepareCaptureContext,
   stabilizePage
@@ -35,7 +37,10 @@ const fixtureEntry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
   id: 'fixture',
   masks: [{ reason: 'Volatile fixture value.', selector: '#masked' }],
   path: '/home',
-  readiness: { hidden: ['#loading'], visible: ['#ready'] },
+  readiness: {
+    hidden: ['#loading'],
+    visible: ['h1:has-text("Ready"):visible']
+  },
   sourceGlobs: ['src/components/Home/**'],
   viewports: ['desktop'],
   ...overrides
@@ -145,6 +150,7 @@ describe.sequential('stabilizePage', () => {
       expect(stabilized.result.frames).toEqual([
         {
           crossOrigin: true,
+          declaredSrc: 'https://frame.test/embed',
           src: 'https://frame.test/embed',
           visible: true
         }
@@ -166,12 +172,17 @@ describe.sequential('stabilizePage', () => {
 
   it.each([
     {
-      entry: fixtureEntry({ readiness: { visible: ['#missing'] } }),
+      entry: fixtureEntry({
+        readiness: { visible: ['h1:has-text("Missing"):visible'] }
+      }),
       problem: 'visible readiness'
     },
     {
       entry: fixtureEntry({
-        readiness: { hidden: ['#animated'], visible: ['main'] }
+        readiness: {
+          hidden: ['#animated'],
+          visible: ['h1:has-text("Ready"):visible']
+        }
       }),
       problem: 'hidden readiness'
     },
@@ -226,7 +237,7 @@ describe.sequential('stabilizePage', () => {
           fixtureEntry({
             allowBrokenImages: [],
             masks: [],
-            readiness: { visible: ['#ready'] }
+            readiness: { visible: ['h1:has-text("Ready"):visible'] }
           }),
           { timeoutMs: 500 }
         )
@@ -264,7 +275,7 @@ describe.sequential('stabilizePage', () => {
           fixtureEntry({
             allowBrokenImages: [],
             masks: [],
-            readiness: { visible: ['#ready'] }
+            readiness: { visible: ['h1:has-text("Ready"):visible'] }
           }),
           { timeoutMs: 100 }
         )
@@ -288,6 +299,143 @@ describe.sequential('stabilizePage', () => {
       await context.close();
     }
   });
+
+  it('fails when async navigation changes the route during stabilization', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/home', (route) =>
+      route.fulfill({
+        body: `<main><h1 hidden>Ready</h1></main><script>
+          setTimeout(() => {
+            history.replaceState({}, '', '/login');
+            document.querySelector('h1').hidden = false;
+          }, 40);
+        </script>`,
+        contentType: 'text/html'
+      })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/home');
+    try {
+      await expect(
+        captureStablePage(
+          page,
+          fixtureEntry({ allowBrokenImages: [], masks: [] }),
+          { assertNoMutations: () => undefined, diagnostics: [] },
+          '/tmp/unused.png',
+          500
+        )
+      ).rejects.toThrow('pathname changed from /home to /login');
+    } finally {
+      await context.close();
+    }
+  });
+
+  it('rechecks pathname and mutation diagnostics after screenshot', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/home', (route) =>
+      route.fulfill({
+        body: '<main><h1>Ready</h1></main>',
+        contentType: 'text/html'
+      })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/home');
+    const originalScreenshot = page.screenshot.bind(page);
+    page.screenshot = async (options) => {
+      const screenshot = await originalScreenshot(options);
+      await page.evaluate(() => history.replaceState({}, '', '/after-shot'));
+      return screenshot;
+    };
+    const screenshotPath = path.join(
+      os.tmpdir(),
+      `cag-after-shot-${process.pid}.png`
+    );
+    let guardChecks = 0;
+    try {
+      await expect(
+        captureStablePage(
+          page,
+          fixtureEntry({ allowBrokenImages: [], masks: [] }),
+          {
+            assertNoMutations: () => {
+              guardChecks += 1;
+            },
+            diagnostics: []
+          },
+          screenshotPath,
+          500
+        )
+      ).rejects.toThrow('pathname changed from /home to /after-shot');
+      expect(guardChecks).toBe(2);
+    } finally {
+      await rm(screenshotPath, { force: true });
+      await context.close();
+    }
+  });
+
+  it('uses navigated child-frame URLs and inherited blank/srcdoc origins', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/page', (route) =>
+      route.fulfill({
+        body: `<main><h1>Ready</h1>
+          <iframe src="/redirect?token=private"></iframe>
+          <iframe></iframe>
+          <iframe srcdoc="<p>inline</p>"></iframe>
+        </main>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route(
+      'https://fixture.test/redirect?token=private',
+      (route) =>
+        route.fulfill({
+          body: '<script>location.replace("https://frame.test/final")</script>',
+          contentType: 'text/html'
+        })
+    );
+    await context.route('https://frame.test/final', (route) =>
+      route.fulfill({ body: '<p>cross origin</p>', contentType: 'text/html' })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/page');
+    try {
+      await expect
+        .poll(() => page.frames().map((frame) => frame.url()))
+        .toContain('https://frame.test/final');
+      const stabilized = await stabilizePage(
+        page,
+        fixtureEntry({ allowBrokenImages: [], masks: [] })
+      );
+      expect(stabilized.result.frames).toEqual([
+        expect.objectContaining({
+          crossOrigin: true,
+          declaredSrc: 'https://fixture.test/redirect',
+          src: 'https://frame.test/final'
+        }),
+        expect.objectContaining({ crossOrigin: false, src: 'about:blank' }),
+        expect.objectContaining({ crossOrigin: false, src: 'about:srcdoc' })
+      ]);
+    } finally {
+      await context.close();
+    }
+  });
+
+  it('bounds the final animation-frame settle', async () => {
+    const { context, page } = await fixture();
+    await page.evaluate(() => {
+      window.requestAnimationFrame = () => 0;
+    });
+    try {
+      await expect(
+        stabilizePage(page, fixtureEntry(), { timeoutMs: 100 })
+      ).rejects.toThrow('animation-frame settle did not complete within 100ms');
+    } finally {
+      await context.close();
+    }
+  });
 });
 
 describe('capture request policy', () => {
@@ -301,6 +449,21 @@ describe('capture request policy', () => {
     [
       'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents:commit',
       'POST',
+      'mutation-block'
+    ],
+    [
+      'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents/accounts?documentId=new',
+      'POST',
+      'mutation-block'
+    ],
+    [
+      'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents/accounts/one',
+      'PATCH',
+      'mutation-block'
+    ],
+    [
+      'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents/accounts/one',
+      'DELETE',
       'mutation-block'
     ],
     [
@@ -318,9 +481,55 @@ describe('capture request policy', () => {
       'POST',
       'allow'
     ],
+    [
+      'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents:runQuery',
+      'POST',
+      'allow'
+    ],
+    [
+      'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents:batchGet',
+      'POST',
+      'allow'
+    ],
     ['https://securetoken.googleapis.com/v1/token', 'POST', 'allow'],
     ['https://fixture.test/page', 'GET', 'allow']
   ] as const)('classifies %s %s as %s', (url, method, expected) => {
     expect(classifyCaptureRequest({ method, url })).toBe(expected);
+  });
+
+  it('aborts a routed REST mutation while allowing a routed query POST', async () => {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    await context.route('https://firestore.googleapis.com/**', (route) =>
+      route.fulfill({
+        body: '{}',
+        headers: { 'access-control-allow-origin': '*' },
+        status: 200
+      })
+    );
+    const guard = await prepareCaptureContext(context);
+    const page = await context.newPage();
+    try {
+      await expect(
+        page.evaluate(() =>
+          fetch(
+            'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents/accounts/one',
+            { method: 'DELETE' }
+          )
+        )
+      ).rejects.toThrow();
+      await expect(
+        page.evaluate(() =>
+          fetch(
+            'https://firestore.googleapis.com/v1/projects/cag/databases/(default)/documents:runQuery',
+            { method: 'POST' }
+          ).then((response) => response.status)
+        )
+      ).resolves.toBe(200);
+      expect(() => guard.assertNoMutations()).toThrow('known mutation');
+    } finally {
+      await context.close();
+      await browser.close();
+    }
   });
 });

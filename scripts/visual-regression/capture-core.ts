@@ -157,24 +157,80 @@ const writeSummaryAtomically = async (
 
 export async function writeCapturePngAtomically(
   finalPath: string,
+  outputRoot: string,
   writePartial: (partialPath: string) => Promise<void>
 ): Promise<void> {
-  const directory = path.dirname(finalPath);
+  const resolvedRoot = path.resolve(outputRoot);
+  const resolvedFinal = path.resolve(finalPath);
+  const relative = path.relative(resolvedRoot, resolvedFinal);
+  const segments = relative.split(path.sep);
+  const safeSegments = segments.every((segment, index) =>
+    index === segments.length - 1
+      ? /^[a-z0-9]+(?:-[a-z0-9]+)*\.png$/u.test(segment)
+      : /^[a-z0-9]+(?:-[a-z0-9]+)*$/u.test(segment)
+  );
+  if (
+    finalPath.includes('\\') ||
+    relative === '' ||
+    relative === '..' ||
+    relative.startsWith(`..${path.sep}`) ||
+    path.isAbsolute(relative) ||
+    !safeSegments
+  ) {
+    throw new Error(
+      'capture artifact must remain within the capture output root'
+    );
+  }
+  const directory = path.dirname(resolvedFinal);
   await mkdir(directory, { recursive: true });
   const partialPath = path.join(
     directory,
-    `.${path.basename(finalPath, '.png')}.${process.pid}.${Date.now()}.partial.png`
+    `.${path.basename(resolvedFinal, '.png')}.${process.pid}.${Date.now()}.partial.png`
   );
-  await rm(finalPath, { force: true });
   await rm(partialPath, { force: true });
   try {
     await writePartial(partialPath);
-    await rename(partialPath, finalPath);
+    await rename(partialPath, resolvedFinal);
   } catch (error) {
     await rm(partialPath, { force: true });
-    await rm(finalPath, { force: true });
     throw error;
   }
+}
+
+export interface ReachabilityOptions {
+  attempts?: number;
+  attemptTimeoutMs?: number;
+  fetchImpl?: typeof fetch;
+  retryDelayMs?: number;
+}
+
+export async function ensureBaseUrlReachable(
+  baseUrl: string,
+  options: ReachabilityOptions = {}
+): Promise<void> {
+  const attempts = options.attempts ?? 20;
+  const attemptTimeoutMs = options.attemptTimeoutMs ?? 1_000;
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const retryDelayMs = options.retryDelayMs ?? 500;
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), attemptTimeoutMs);
+    try {
+      const response = await fetchImpl(baseUrl, {
+        redirect: 'manual',
+        signal: controller.signal
+      });
+      if (response.status < 500) return;
+    } catch {
+      // Bounded retries handle a compatibility host that is still starting.
+    } finally {
+      clearTimeout(timer);
+    }
+    if (attempt + 1 < attempts && retryDelayMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+    }
+  }
+  throw new Error(`visual capture host is not reachable at ${baseUrl}`);
 }
 
 const commonFor = (visualCase: VisualCase) => ({

@@ -6,6 +6,7 @@ import {
   VIEWPORTS,
   VIEWPORT_NAMES,
   entriesForTarget,
+  readinessSelectorForMarker,
   selectVisualCases,
   validateVisualManifest,
   type RouteEntry
@@ -35,7 +36,7 @@ const entry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
   fullPage: true,
   id: 'fixture',
   path: '/home',
-  readiness: { visible: ['main h1'] },
+  readiness: { visible: ['h1:has-text("Fixture heading")'] },
   sourceGlobs: ['src/components/Home/**'],
   viewports: ['desktop'],
   ...overrides
@@ -196,11 +197,18 @@ describe('visual manifest', () => {
       problem: 'baseline reason'
     },
     {
-      manifest: [entry({ readiness: { visible: [] } })],
+      manifest: [entry({ readiness: { visible: [' '] } })],
       problem: 'visible readiness selector'
     },
     {
-      manifest: [entry({ readiness: { hidden: [''], visible: ['main'] } })],
+      manifest: [
+        entry({
+          readiness: {
+            hidden: [''],
+            visible: ['h1:has-text("Fixture heading")']
+          }
+        })
+      ],
       problem: 'hidden readiness selector'
     },
     {
@@ -239,14 +247,107 @@ describe('visual manifest', () => {
     expect(() => validateVisualManifest(manifest)).toThrow(problem);
   });
 
-  it('uses route-specific semantic readiness instead of a generic main node', () => {
+  it('reuses each anonymous semantic route-contract marker as readiness', () => {
+    const routeByPath = new Map(
+      applicationRoutes.map((route) => [route.path, route])
+    );
     expect(
-      MANIFEST.every(
-        ({ readiness }) =>
-          !readiness.visible.includes('main') &&
-          !readiness.visible.includes('body')
+      MANIFEST.filter(({ auth }) => auth === 'anonymous').map(
+        ({ path, readiness }) => [path, readiness.visible[0]]
       )
-    ).toBe(true);
+    ).toEqual(
+      MANIFEST.filter(({ auth }) => auth === 'anonymous').map(({ path }) => [
+        path,
+        readinessSelectorForMarker(routeByPath.get(path)?.loggedOut.marker)
+      ])
+    );
+  });
+
+  it('uses a distinct route-specific marker for every visual state', () => {
+    const primarySelectors = MANIFEST.map(
+      ({ readiness }) => readiness.visible[0]
+    );
+    expect(new Set(primarySelectors).size).toBe(primarySelectors.length);
+    expect(
+      Object.fromEntries(
+        MANIFEST.map(({ id, readiness }) => [id, readiness.visible])
+      )
+    ).toEqual({
+      'about-us': [
+        'main h1:has-text("ABOUT US"):visible',
+        'main h2:has-text("Vision"):visible',
+        'main h2:has-text("Mission"):visible'
+      ],
+      'company-messages': [
+        'main h1:has-text("Messages"):visible',
+        'main h4:has-text("Threads"):visible'
+      ],
+      'company-profile': [
+        'main h1:has-text("YOUR PROFILE"):visible',
+        'main h2:has-text("Basic Group Info"):visible',
+        'main h2:has-text("Active Shows"):visible'
+      ],
+      'company-roles-search': [
+        'main h1:has-text("Matches"):visible',
+        'main h2:has-text("Filter Talent"):visible'
+      ],
+      donate: [
+        'main h1:has-text("Donate to Support Chicago Artists"):visible',
+        'main a:has-text("Donate Securely Now"):visible'
+      ],
+      events: [
+        'main h1:has-text("EVENTS"):visible',
+        'main h2:has-text("Upcoming Events"):visible',
+        'main h2:has-text("Past Events"):visible'
+      ],
+      faq: [
+        'main h1:has-text("FREQUENTLY ASKED QUESTIONS"):visible',
+        'main h2:has-text("Find out what we\'re all about"):visible'
+      ],
+      'forgot-password': [
+        'main h1:has-text("RESET YOUR PASSWORD"):visible',
+        'main label:has-text("Email"):visible',
+        'main input[type="email"]:visible'
+      ],
+      'get-involved': [
+        'main h1:has-text("Get involved"):visible',
+        'main form textarea#message:visible'
+      ],
+      home: ['main h1:has-text("Discover your next dream gig"):visible'],
+      login: [
+        'main h1:has-text("WELCOME BACK"):visible',
+        'main label[for="formBasicEmail"]:visible',
+        'main input#formBasicPassword:visible'
+      ],
+      shows: [
+        'main h1:has-text("THEATRE SHOWS"):visible',
+        'main h1:has-text("THEATRE SHOWS") ~ div.mt-4 h3, main h1:has-text("THEATRE SHOWS") ~ p:has-text("No active shows found at this time. Please check back later.")'
+      ],
+      signup: [
+        'main h1:has-text("BUILD CONNECTIONS TODAY"):visible',
+        'main h3:has-text("Individual Artist"):visible',
+        'main h3:has-text("Theatre Group"):visible'
+      ],
+      'theatre-resources': [
+        'main h1:has-text("THEATRE RESOURCES"):visible',
+        'main table th:has-text("Organization"):visible',
+        'main iframe[title^="Submit and View Links"]:visible'
+      ]
+    });
+  });
+
+  it.each([
+    '.',
+    '..',
+    '../home',
+    '/home',
+    'Home',
+    'home\\desktop',
+    'home/name'
+  ])('rejects unsafe visual route id %j', (id) => {
+    expect(() => validateVisualManifest([entry({ id })])).toThrow(
+      'safe lowercase slug'
+    );
   });
 });
 

@@ -4,7 +4,11 @@ import { mkdtemp, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { runCapture, writeCapturePngAtomically } from './capture-core';
+import {
+  ensureBaseUrlReachable,
+  runCapture,
+  writeCapturePngAtomically
+} from './capture-core';
 import { MANIFEST, type VisualCase } from './manifest';
 
 const temporaryDirectories: string[] = [];
@@ -215,10 +219,14 @@ describe('writeCapturePngAtomically', () => {
     const directory = await outputDirectory();
     const finalPath = path.join(directory, 'current/home/desktop.png');
 
-    await writeCapturePngAtomically(finalPath, async (partialPath) => {
-      expect(partialPath).toMatch(/\.partial\.png$/u);
-      await writeFile(partialPath, 'fresh image');
-    });
+    await writeCapturePngAtomically(
+      finalPath,
+      path.join(directory, 'current'),
+      async (partialPath) => {
+        expect(partialPath).toMatch(/\.partial\.png$/u);
+        await writeFile(partialPath, 'fresh image');
+      }
+    );
 
     expect(await readFile(finalPath, 'utf8')).toBe('fresh image');
     expect(await readdir(path.dirname(finalPath))).toEqual(['desktop.png']);
@@ -227,17 +235,68 @@ describe('writeCapturePngAtomically', () => {
   it('removes stale and partial images when capture fails', async () => {
     const directory = await outputDirectory();
     const finalPath = path.join(directory, 'current/home/desktop.png');
-    await writeCapturePngAtomically(finalPath, async (partialPath) => {
-      await writeFile(partialPath, 'stale image');
-    });
+    await writeCapturePngAtomically(
+      finalPath,
+      path.join(directory, 'current'),
+      async (partialPath) => {
+        await writeFile(partialPath, 'stale image');
+      }
+    );
 
     await expect(
-      writeCapturePngAtomically(finalPath, async (partialPath) => {
-        await writeFile(partialPath, 'partial image');
-        throw new Error('screenshot failed');
-      })
+      writeCapturePngAtomically(
+        finalPath,
+        path.join(directory, 'current'),
+        async (partialPath) => {
+          await writeFile(partialPath, 'partial image');
+          throw new Error('screenshot failed');
+        }
+      )
     ).rejects.toThrow('screenshot failed');
 
-    expect(await readdir(path.dirname(finalPath))).toEqual([]);
+    expect(await readFile(finalPath, 'utf8')).toBe('stale image');
+    expect(await readdir(path.dirname(finalPath))).toEqual(['desktop.png']);
+  });
+
+  it.each([
+    '../outside.png',
+    '/tmp/absolute.png',
+    'current\\home\\desktop.png',
+    '.',
+    'CURRENT/home/desktop.png'
+  ])(
+    'rejects unsafe resolved artifact target %j before filesystem mutation',
+    async (candidate) => {
+      const directory = await outputDirectory();
+      const root = path.join(directory, 'current');
+      const finalPath = path.resolve(root, candidate);
+      let wrote = false;
+      await expect(
+        writeCapturePngAtomically(finalPath, root, async () => {
+          wrote = true;
+        })
+      ).rejects.toThrow('within the capture output root');
+      expect(wrote).toBe(false);
+    }
+  );
+});
+
+describe('ensureBaseUrlReachable', () => {
+  it('aborts a blackholed fetch within the configured attempt deadline', async () => {
+    const startedAt = Date.now();
+    await expect(
+      ensureBaseUrlReachable('https://fixture.test', {
+        attempts: 1,
+        attemptTimeoutMs: 40,
+        fetchImpl: (_input, init) =>
+          new Promise((_, reject) => {
+            init?.signal?.addEventListener('abort', () =>
+              reject(new DOMException('aborted', 'AbortError'))
+            );
+          }),
+        retryDelayMs: 0
+      })
+    ).rejects.toThrow('not reachable');
+    expect(Date.now() - startedAt).toBeLessThan(500);
   });
 });
