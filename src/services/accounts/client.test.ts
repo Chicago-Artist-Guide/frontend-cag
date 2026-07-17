@@ -1,4 +1,4 @@
-import type { AccountData, AccountDto } from './types';
+import type { AccountData, AccountDto, Unsubscribe } from './types';
 
 const firebaseMocks = vi.hoisted(() => ({
   accountsRef: { path: 'accounts' },
@@ -86,6 +86,10 @@ describe('account client service', () => {
       accountsRef,
       constraints
     }));
+  });
+
+  it('exports the unsubscribe contract from the public types module', () => {
+    expectTypeOf<Unsubscribe>().toEqualTypeOf<() => void>();
   });
 
   it('performs no Firebase work when the module is imported', async () => {

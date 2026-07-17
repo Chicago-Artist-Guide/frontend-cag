@@ -17,9 +17,12 @@ import type {
   DocumentSnapshot
 } from 'firebase/firestore';
 import { getFirebaseClient } from '../../lib/firebase/client';
-import type { AccountData, AccountDto, AccountPatch } from './types';
-
-type Unsubscribe = () => void;
+import type {
+  AccountData,
+  AccountDto,
+  AccountPatch,
+  Unsubscribe
+} from './types';
 
 const getAccountsCollection = (): CollectionReference<DocumentData> =>
   collection(getFirebaseClient().firestore, 'accounts');

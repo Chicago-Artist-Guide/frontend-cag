@@ -15,3 +15,5 @@ export interface AccountDto<TData extends AccountData = AccountData> {
 }
 
 export type AccountPatch = Partial<AccountData> & Record<string, unknown>;
+
+export type Unsubscribe = () => void;
