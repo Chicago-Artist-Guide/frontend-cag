@@ -10,6 +10,26 @@ import {
   type DiffResult,
   type DiffSummaryV1
 } from './diff-core';
+import { REQUIRED_BRAND_FONTS } from './manifest';
+
+const blockingFontStability = {
+  durationMs: 1,
+  fonts: REQUIRED_BRAND_FONTS.map((font, index) => ({
+    ...font,
+    resolvedFamily: `__${font.family.replace(/\s/gu, '')}_fixture`,
+    resources: [
+      {
+        sameOrigin: true as const,
+        url: `http://127.0.0.1:3000/_next/static/media/font-${index}.woff2`
+      }
+    ],
+    status: 'loaded' as const
+  })),
+  frames: [],
+  images: { checked: 0, exemptedBroken: [] },
+  intervalsCleared: 0,
+  masks: []
+};
 
 const result = (overrides: Partial<DiffResult>): DiffResult => ({
   auth: 'anonymous',
@@ -196,6 +216,7 @@ describe('renderReport', () => {
             durationMs: 1,
             id: 'faq',
             path: '/faq',
+            stability: blockingFontStability,
             status: 'passed',
             viewport: 'desktop'
           }
