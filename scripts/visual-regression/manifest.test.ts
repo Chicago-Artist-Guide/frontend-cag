@@ -254,11 +254,13 @@ describe('visual manifest', () => {
       applicationRoutes.map((route) => [route.path, route])
     );
     expect(
-      MANIFEST.filter(({ auth }) => auth === 'anonymous').map(
-        ({ path, readiness }) => [path, readiness.visible[0]]
-      )
+      MANIFEST.filter(
+        ({ auth, id }) => auth === 'anonymous' && id !== 'home'
+      ).map(({ path, readiness }) => [path, readiness.visible[0]])
     ).toEqual(
-      MANIFEST.filter(({ auth }) => auth === 'anonymous').map(({ path }) => [
+      MANIFEST.filter(
+        ({ auth, id }) => auth === 'anonymous' && id !== 'home'
+      ).map(({ path }) => [
         path,
         readinessSelectorForMarker(routeByPath.get(path)?.loggedOut.marker)
       ])
@@ -315,7 +317,9 @@ describe('visual manifest', () => {
         'main h1:has-text("Get involved"):visible',
         'main form textarea#message:visible'
       ],
-      home: ['main h1:has-text("Discover your next dream gig"):visible'],
+      home: [
+        'main h1:has-text("Discover your next"):has-text("dream gig"):visible'
+      ],
       login: [
         'main h1:has-text("WELCOME BACK"):visible',
         'main label[for="formBasicEmail"]:visible',
@@ -357,6 +361,19 @@ describe('visual manifest', () => {
     expect(profile?.readiness.visible).toContain(
       'main h3:has-text("Active Shows"):visible'
     );
+  });
+
+  it('grounds Home readiness in the heading fragments separated by a break', () => {
+    const home = readFileSync(
+      path.resolve(process.cwd(), 'src/routes/Home.tsx'),
+      'utf8'
+    );
+    const entry = MANIFEST.find(({ id }) => id === 'home');
+
+    expect(home).toMatch(/Discover your next\s*<br \/>\s*dream gig/u);
+    expect(entry?.readiness.visible).toEqual([
+      'main h1:has-text("Discover your next"):has-text("dream gig"):visible'
+    ]);
   });
 
   it.each([

@@ -248,7 +248,9 @@ const existingManifest: RouteEntry[] = [
     id: 'home',
     path: '/home',
     readiness: {
-      visible: ['main h1:has-text("Discover your next dream gig"):visible']
+      visible: [
+        'main h1:has-text("Discover your next"):has-text("dream gig"):visible'
+      ]
     },
     sourceGlobs: [
       'src/routes/Home.tsx',

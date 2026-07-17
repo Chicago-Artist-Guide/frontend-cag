@@ -118,6 +118,19 @@ export function classifyCaptureRequest({
     return 'silent-block';
   }
 
+  try {
+    const parsedUrl = new URL(url);
+    if (
+      normalizedMethod === 'POST' &&
+      parsedUrl.hostname === 'www.zeffy.com' &&
+      parsedUrl.pathname === '/cdn-cgi/rum'
+    ) {
+      return 'silent-block';
+    }
+  } catch {
+    // Invalid URLs fall through to the existing fail-closed host policies.
+  }
+
   if (
     lowerUrl.includes('firestore.googleapis.com') &&
     (lowerUrl.includes('firestore/write/channel') ||

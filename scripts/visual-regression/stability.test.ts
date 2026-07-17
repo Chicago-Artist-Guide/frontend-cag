@@ -480,6 +480,7 @@ describe.sequential('stabilizePage', () => {
 describe('capture request policy', () => {
   it.each([
     ['https://www.google-analytics.com/g/collect', 'POST', 'silent-block'],
+    ['https://www.zeffy.com/cdn-cgi/rum', 'POST', 'silent-block'],
     [
       'https://firestore.googleapis.com/google.firestore.v1.Firestore/Write/channel',
       'POST',
@@ -537,6 +538,11 @@ describe('capture request policy', () => {
     ],
     [
       'https://api.littlegreenlight.com/api/v1/constituents',
+      'POST',
+      'mutation-block'
+    ],
+    [
+      'https://www.zeffy.com/en-US/donation-form/example',
       'POST',
       'mutation-block'
     ],
@@ -626,6 +632,46 @@ describe('capture request policy', () => {
         )
       ).resolves.toBe(200);
       expect(() => guard.assertNoMutations()).toThrow('known mutation');
+    } finally {
+      await context.close();
+      await browser.close();
+    }
+  });
+
+  it('silently blocks routed Zeffy RUM but diagnoses an ordinary Zeffy POST as mutation', async () => {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext();
+    await context.route('https://www.zeffy.com/**', (route) =>
+      route.fulfill({
+        body: '{}',
+        headers: { 'access-control-allow-origin': '*' },
+        status: 200
+      })
+    );
+    const guard = await prepareCaptureContext(context);
+    const page = await context.newPage();
+    try {
+      await expect(
+        page.evaluate(() =>
+          fetch('https://www.zeffy.com/cdn-cgi/rum', { method: 'POST' })
+        )
+      ).rejects.toThrow();
+      expect(() => guard.assertNoMutations()).not.toThrow();
+      expect(guard.diagnostics).toContainEqual(
+        expect.objectContaining({ disposition: 'silent-block' })
+      );
+
+      await expect(
+        page.evaluate(() =>
+          fetch('https://www.zeffy.com/en-US/donation-form/example', {
+            method: 'POST'
+          })
+        )
+      ).rejects.toThrow();
+      expect(() => guard.assertNoMutations()).toThrow('known mutation');
+      expect(guard.diagnostics).toContainEqual(
+        expect.objectContaining({ disposition: 'mutation-block' })
+      );
     } finally {
       await context.close();
       await browser.close();
