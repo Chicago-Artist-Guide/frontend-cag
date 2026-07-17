@@ -498,6 +498,38 @@ describe('visual manifest', () => {
   });
 
   it.each([
+    'src/config/publicImages.ts',
+    'public/images/cagLogo1.svg',
+    'public/images/logoPlain.svg',
+    'public/images/footer-background.png',
+    'public/images/icons-footer/social_instagram.png'
+  ])('selects every route for shared shell source %s', (target) => {
+    expect(entriesForTarget(target).map(({ id }) => id)).toEqual(baselineIds);
+  });
+
+  it.each([
+    ['public/images/partners/mpaact_hq-1.jpg', ['home']],
+    ['public/images/icons-home/makeProfile.svg', ['home']],
+    ['public/images/donate/stage_bow.png', ['donate']],
+    ['public/images/events/cag-baret.png', ['events']],
+    ['public/images/who-we-are/board/Board_Adler.jpg', ['about-us']],
+    ['public/images/icons-signup/individual.svg', ['signup']],
+    ['public/images/icons-profile/ribbon.svg', ['company-profile']],
+    ['public/images/defaultpfp.png', ['company-messages']],
+    ['public/images/blue_blob.svg', ['faq', 'theatre-resources']],
+    [
+      'public/images/red_blob.svg',
+      ['home', 'login', 'signup', 'forgot-password']
+    ],
+    ['public/images/yellow_blob_2.svg', ['signup']]
+  ] as const)(
+    'selects only consuming routes for public asset %s',
+    (target, expectedIds) => {
+      expect(entriesForTarget(target).map(({ id }) => id)).toEqual(expectedIds);
+    }
+  );
+
+  it.each([
     '.',
     '..',
     '../home',

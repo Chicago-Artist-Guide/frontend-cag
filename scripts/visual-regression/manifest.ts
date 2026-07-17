@@ -299,6 +299,15 @@ const referenceOnly = (reason: string): BaselinePolicy => ({
   reason
 });
 
+const SHARED_SHELL_SOURCE_GLOBS = [
+  'src/config/publicImages.ts',
+  'src/components/layout/**',
+  'public/images/cagLogo1.svg',
+  'public/images/logoPlain.svg',
+  'public/images/footer-background.png',
+  'public/images/icons-footer/**'
+] as const;
+
 const existingManifest: RouteEntry[] = [
   {
     auth: 'anonymous',
@@ -318,10 +327,15 @@ const existingManifest: RouteEntry[] = [
       'src/routes/Home.tsx',
       'src/components/Home/**',
       'src/components/Redesign/PartnerSlider.tsx',
+      'public/images/partners/**',
+      'public/images/icons-home/**',
       'public/images/sponsors/**',
       'public/images/supporters/**',
+      'public/images/green_blob.svg',
+      'public/images/red_blob.svg',
+      'public/images/yellow_blob_1.svg',
       'src/utils/supporters.ts',
-      'src/components/layout/**'
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -342,7 +356,9 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/FAQ.tsx',
       'src/components/FAQ/**',
-      'src/components/layout/**'
+      'public/images/blue_blob.svg',
+      'public/images/streaming_dance.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -364,11 +380,11 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Donate.tsx',
       'src/components/Redesign/PartnerSlider.tsx',
-      'src/components/layout/**',
       'public/images/donate/**',
       'public/images/sponsors/**',
       'public/images/supporters/**',
-      'src/utils/supporters.ts'
+      'src/utils/supporters.ts',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -392,7 +408,8 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Events.tsx',
       'src/components/Events/**',
-      'src/components/layout/**'
+      'public/images/events/**',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -414,7 +431,7 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/PublicShows.tsx',
       'src/components/PublicShows/**',
-      'src/components/layout/**'
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -437,7 +454,7 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/GetInvolved.tsx',
       'src/components/GetInvolved/**',
-      'src/components/layout/**'
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -459,7 +476,8 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/WhoWeAre.tsx',
       'src/components/WhoWeAre/**',
-      'src/components/layout/**'
+      'public/images/who-we-are/**',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -481,7 +499,9 @@ const existingManifest: RouteEntry[] = [
     },
     sourceGlobs: [
       'src/routes/TheaterResources.tsx',
-      'src/components/layout/**'
+      'public/images/blue_blob.svg',
+      'public/images/streaming_dance.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -503,7 +523,8 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Login.tsx',
       'src/components/Login/**',
-      'src/components/layout/**'
+      'public/images/red_blob.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -525,7 +546,11 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/SignUp.tsx',
       'src/components/SignUp/**',
-      'src/components/layout/**'
+      'public/images/icons-signup/**',
+      'public/images/red_blob.svg',
+      'public/images/yellow_blob_1.svg',
+      'public/images/yellow_blob_2.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -544,7 +569,11 @@ const existingManifest: RouteEntry[] = [
       ]
     },
     requiredFonts: REQUIRED_BRAND_FONTS,
-    sourceGlobs: ['src/routes/ForgotPassword.tsx', 'src/components/layout/**'],
+    sourceGlobs: [
+      'src/routes/ForgotPassword.tsx',
+      'public/images/red_blob.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
     viewports: ['desktop']
   },
   {
@@ -566,7 +595,8 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Profile.tsx',
       'src/components/Profile/**',
-      'src/components/layout/**'
+      'public/images/icons-profile/**',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -589,7 +619,8 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Messages.tsx',
       'src/components/Messages/**',
-      'src/components/layout/**'
+      'public/images/defaultpfp.png',
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   },
@@ -611,7 +642,7 @@ const existingManifest: RouteEntry[] = [
     sourceGlobs: [
       'src/routes/Matches.tsx',
       'src/components/Matches/**',
-      'src/components/layout/**'
+      ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
   }
