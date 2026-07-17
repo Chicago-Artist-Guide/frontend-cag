@@ -63,7 +63,7 @@ const useProfileData = (currentUser: User | null, firestore: Firestore) => {
   }, [currentUser, firestore]);
 
   const setAccountRef = useCallback(
-    (ref: any) => setAccount((prev) => ({ ...prev, ref })),
+    (ref: any) => setAccount((prev) => ({ ...prev, id: ref?.id ?? null, ref })),
     []
   );
   const setAccountData = useCallback(
@@ -71,7 +71,7 @@ const useProfileData = (currentUser: User | null, firestore: Firestore) => {
     []
   );
   const setProfileRef = useCallback(
-    (ref: any) => setProfile((prev) => ({ ...prev, ref })),
+    (ref: any) => setProfile((prev) => ({ ...prev, id: ref?.id ?? null, ref })),
     []
   );
   const setProfileData = useCallback(
