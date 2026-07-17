@@ -312,7 +312,7 @@ export const MessageThread: React.FC<
   };
 
   useEffect(() => {
-    const accountIdStr = account.ref?.id || null;
+    const accountIdStr = account.id || null;
     const accountType = account?.data?.type || null;
 
     if (!accountIdStr || !accountType) {
@@ -352,7 +352,7 @@ export const MessageThread: React.FC<
     }
 
     const lastMessage = currentThreadMessages.at(-1);
-    const accountIdStr = account.ref?.id || null;
+    const accountIdStr = account.id || null;
 
     if (!lastMessage || !accountIdStr || accountIdStr === null) {
       return;

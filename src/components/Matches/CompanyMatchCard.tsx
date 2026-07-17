@@ -58,10 +58,10 @@ export const CompanyMatchCard = ({
   const findMatch = async () => {
     const productionId = production?.production_id || '';
     const roleId = role.role_id || '';
-    const talentAccountId = account.ref?.id;
+    const talentAccountId = account.id;
 
     if (!talentAccountId) {
-      console.error('Cannot find current user account ref');
+      console.error('Cannot find current user account id');
       return false;
     }
 
@@ -181,11 +181,11 @@ export const CompanyMatchCard = ({
     try {
       const productionId = production?.production_id || '';
       const roleId = role.role_id || '';
-      const talentAccountId = account.ref?.id;
+      const talentAccountId = account.id;
       const theaterAccountId = production?.account_id || '';
 
       if (!talentAccountId) {
-        console.error('Cannot find current user account ref');
+        console.error('Cannot find current user account id');
         return false;
       }
 

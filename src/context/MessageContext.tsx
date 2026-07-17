@@ -131,7 +131,7 @@ export const MessageProvider: React.FC<
   };
 
   const updateThreadStatus = async (threadId: string, status: string) => {
-    const accountId = account.ref?.id;
+    const accountId = account.id;
     const threadDoc = doc(firestore, 'threads', threadId);
 
     await updateDoc(threadDoc, { status });

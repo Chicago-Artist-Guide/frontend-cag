@@ -21,7 +21,7 @@ export const TalentMatchList = () => {
   const [cardsLoading, setCardsLoading] = useState(true);
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
 
-  const theaterAccountId = account?.ref?.id || '';
+  const theaterAccountId = account?.id || '';
   const productionId = production?.production_id || '';
   const roleId = currentRoleId || '';
   const selectedStatuses = filters.matchStatus || [];

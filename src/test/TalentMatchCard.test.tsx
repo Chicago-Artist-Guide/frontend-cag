@@ -85,9 +85,9 @@ describe('TalentMatchCard decline action', () => {
     } as any);
     mockUseUserContext.mockReturnValue({
       account: {
-        ref: {
-          id: 'theater-1'
-        }
+        id: 'account-1',
+        ref: null,
+        data: {}
       },
       currentUser: {
         email: 'theater@example.com'
@@ -113,7 +113,7 @@ describe('TalentMatchCard decline action', () => {
         firebaseFirestore: store
       } as any);
       mockUseUserContext.mockReturnValue({
-        account: { ref: { id: 'theater-1' } },
+        account: { id: 'account-1', ref: null, data: {} },
         currentUser: { email: 'theater@example.com' },
         profile: {
           data: {
@@ -161,7 +161,7 @@ describe('TalentMatchCard decline action', () => {
       expect(mockSendMessageThreadWithEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           firebaseStore: store,
-          theaterAccountId: 'theater-1',
+          theaterAccountId: 'account-1',
           talentAccountId: 'talent-1',
           theaterOrTalent: 'theater',
           shortMessage,

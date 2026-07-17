@@ -13,7 +13,7 @@ import { getUnreadThreadCount } from '../Messages/api';
 const Header = () => {
   const { currentUser, account } = useUserContext();
   const {
-    profile: { ref: profileRef }
+    profile: { id: profileId }
   } = useUserContext();
   const { isAdmin, adminRole } = useAdminAuth();
   const { firebaseFirestore } = useFirebaseContext();
@@ -70,7 +70,7 @@ const Header = () => {
   // notifications are a separate, unticketed requirement.
   useEffect(() => {
     const loadUnreadCount = async () => {
-      const accountId = account?.ref?.id;
+      const accountId = account?.id;
       const accountType = account?.data?.type;
 
       if (!accountId || accountType !== 'individual') {
@@ -131,11 +131,13 @@ const Header = () => {
           <Nav.Link as={Link} to="/events" onClick={handleNavClick}>
             EVENTS
           </Nav.Link>
-          {profileRef !== null ? (
+          {profileId !== null ? (
             <Nav.Link as={Link} to="/profile" onClick={handleNavClick}>
               PROFILE
               {unreadCount > 0 && (
-                <NotificationBadge aria-label={`${unreadCount} unread messages`}>
+                <NotificationBadge
+                  aria-label={`${unreadCount} unread messages`}
+                >
                   {unreadCount}
                 </NotificationBadge>
               )}

@@ -26,7 +26,7 @@ export const CompanyMatchList = () => {
   const [states, setStates] = useState<Record<string, RoleState>>({});
   const [loadingStates, setLoadingStates] = useState(true);
 
-  const talentAccountId = account?.ref?.id || '';
+  const talentAccountId = account?.id || '';
 
   useEffect(() => {
     let cancelled = false;

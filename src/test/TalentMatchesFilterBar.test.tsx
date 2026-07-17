@@ -65,7 +65,7 @@ describe('TalentMatchesFilterBar close role', () => {
     mockUseMatches.mockReturnValue(baseContext as any);
     mockUseFirebaseContext.mockReturnValue({ firebaseFirestore: {} } as any);
     mockUseUserContext.mockReturnValue({
-      account: { ref: { id: 'theater-1' }, data: { account_id: 'theater-1' } },
+      account: { id: 'account-1', ref: null, data: {} },
       profile: { data: { theatre_name: 'Demo Theatre' } }
     } as any);
     mockUpdateRoleStatus.mockResolvedValue([
@@ -114,7 +114,7 @@ describe('TalentMatchesFilterBar close role', () => {
       {},
       expect.objectContaining({ production_id: 'p1' }),
       'r1',
-      'theater-1',
+      'account-1',
       'Demo Theatre'
     );
     expect(baseContext.setRoles).toHaveBeenCalled();

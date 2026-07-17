@@ -22,4 +22,9 @@ describe('DEV-382: artist unread-interest badge on the Header', () => {
   it('does not gate the unread query on company accounts', () => {
     expect(headerSource).not.toMatch(/accountType === 'company'/);
   });
+
+  it('reads account and profile IDs from user state', () => {
+    expect(headerSource).toMatch(/accountId = account\?\.id/);
+    expect(headerSource).toMatch(/profileId/);
+  });
 });

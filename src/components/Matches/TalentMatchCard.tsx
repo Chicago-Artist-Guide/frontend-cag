@@ -105,7 +105,7 @@ export const TalentMatchCard = ({
   const createMatch = async (status: boolean) => {
     try {
       const talentAccountId = profile.account_id;
-      const currUserAccountId = account.ref?.id;
+      const currUserAccountId = account.id;
 
       await createTheaterTalentMatch(
         firebaseFirestore,
@@ -117,7 +117,7 @@ export const TalentMatchCard = ({
       );
 
       if (!currUserAccountId) {
-        console.error('Caanot find current user ref account id.');
+        console.error('Cannot find current user account id.');
         return false;
       }
 

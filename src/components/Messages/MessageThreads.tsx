@@ -34,7 +34,7 @@ const MessageThreads: React.FC<
 
   useEffect(() => {
     const loadThreadsAsync = async () => {
-      const accountId = account.ref?.id || '';
+      const accountId = account.id || '';
       await loadThreads(accountId);
     };
 
