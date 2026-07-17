@@ -576,11 +576,18 @@ const getTypeReferenceParity = (
 
   if (ts.isIdentifier(type.typeName)) {
     const localName = type.typeName.text;
-    const importedName = imports.named.get(localName) ?? localName;
+    const importedName = imports.named.get(localName);
 
-    if (importedName === 'CollectionReference') return 1;
-    if (importedName === 'DocumentReference' || importedName === 'Firestore') {
-      return 0;
+    if (importedName !== undefined) {
+      if (importedName === 'CollectionReference') return 1;
+      if (
+        importedName === 'DocumentReference' ||
+        importedName === 'Firestore'
+      ) {
+        return 0;
+      }
+
+      return undefined;
     }
 
     const alias = bindings.typeAliases.get(localName);
@@ -1316,6 +1323,54 @@ describe('account and profile consumer boundary', () => {
           `src/routes/TypedDocumentReference-${index}.ts`
         )
       ).toBe(true);
+    });
+  });
+
+  it('resolves misleading local reference aliases through their Firebase import', () => {
+    const source = `
+      import { doc, type DocumentReference as FirebaseDoc } from 'firebase/firestore';
+      type CollectionReference = FirebaseDoc;
+      const settings: CollectionReference = getSettingDocument();
+      doc(settings, 'profiles', 'profile-id');
+    `;
+
+    expect(
+      analyzeAccountProfileFirestoreSource(
+        source,
+        'src/routes/AliasedFirebaseDocumentReference.ts'
+      )
+    ).toBe(true);
+  });
+
+  it('does not infer Firebase parity from unrelated local type names', () => {
+    const fixtures = [
+      `
+        import { doc } from 'firebase/firestore';
+        type CollectionReference = { local: true };
+        const settings: CollectionReference = getLocalReference();
+        doc(settings, 'settings', 'profiles');
+      `,
+      `
+        import { doc } from 'firebase/firestore';
+        type DocumentReference = { local: true };
+        const settings: DocumentReference = getLocalReference();
+        doc(settings, 'profiles');
+      `,
+      `
+        import { doc } from 'firebase/firestore';
+        type Firestore = { local: true };
+        const settings: Firestore = getLocalReference();
+        doc(settings, 'accounts');
+      `
+    ];
+
+    fixtures.forEach((source, index) => {
+      expect(
+        analyzeAccountProfileFirestoreSource(
+          source,
+          `src/routes/LocalTypeCollision-${index}.ts`
+        )
+      ).toBe(false);
     });
   });
 
