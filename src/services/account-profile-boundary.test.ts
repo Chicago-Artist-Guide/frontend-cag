@@ -19,6 +19,7 @@ const legacyAccountProfileFirestoreFiles = new Set([
 
 const accountProfileAdapters = new Set([
   'src/services/accounts/client.ts',
+  'src/services/messages/client.ts',
   'src/services/profiles/client.ts'
 ]);
 
@@ -1484,6 +1485,14 @@ describe('account and profile consumer boundary', () => {
     const source = readProjectFile('src/context/UserContext.tsx');
 
     expect(source).not.toMatch(/DocumentReference/);
+    expect(source).not.toMatch(/@firebase\/firestore|firebase\/firestore/);
+  });
+
+  it('keeps Header on the messages service boundary', () => {
+    const source = readProjectFile('src/components/layout/Header.tsx');
+
+    expect(source).toMatch(/services\/messages\/client/);
+    expect(source).not.toMatch(/FirebaseContext|useFirebaseContext/);
     expect(source).not.toMatch(/@firebase\/firestore|firebase\/firestore/);
   });
 

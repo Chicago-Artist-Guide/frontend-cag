@@ -4,19 +4,17 @@ import Navbar from 'react-bootstrap/Navbar';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
-import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
 import Logo from '../../images/cagLogo1.svg';
+import { getUnreadThreadCount } from '../../services/messages/client';
 import { colors } from '../../theme/styleVars';
-import { getUnreadThreadCount } from '../Messages/api';
 
 const Header = () => {
   const { currentUser, account } = useUserContext();
   const {
     profile: { id: profileId }
   } = useUserContext();
-  const { isAdmin, adminRole } = useAdminAuth();
-  const { firebaseFirestore } = useFirebaseContext();
+  const { isAdmin } = useAdminAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [expanded, setExpanded] = useState(false);
@@ -69,25 +67,29 @@ const Header = () => {
   // seen). Scoped to individual/artist accounts only — theatre-side
   // notifications are a separate, unticketed requirement.
   useEffect(() => {
-    const loadUnreadCount = async () => {
-      const accountId = account?.id;
-      const accountType = account?.data?.type;
+    let active = true;
+    const accountId = account?.id;
+    const accountType = account?.data?.type;
 
-      if (!accountId || accountType !== 'individual') {
-        setUnreadCount(0);
-        return;
-      }
+    if (!accountId || accountType !== 'individual') {
+      setUnreadCount(0);
+      return () => {
+        active = false;
+      };
+    }
 
-      const count = await getUnreadThreadCount(
-        firebaseFirestore,
-        accountId,
-        accountType
-      );
-      setUnreadCount(count);
+    getUnreadThreadCount(accountId, accountType)
+      .then((count) => {
+        if (active) setUnreadCount(count);
+      })
+      .catch(() => {
+        if (active) setUnreadCount(0);
+      });
+
+    return () => {
+      active = false;
     };
-
-    loadUnreadCount();
-  }, [account, location.pathname]);
+  }, [account?.data?.type, account?.id, location.pathname]);
 
   // Handle nav link clicks - close menu
   const handleNavClick = () => {
