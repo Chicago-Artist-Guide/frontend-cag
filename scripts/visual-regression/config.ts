@@ -1,3 +1,4 @@
+import { existsSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import {
   ROUTE_CLUSTERS,
@@ -80,8 +81,11 @@ const parseThreshold = (value: string): number => {
   if (!Number.isFinite(threshold)) {
     throw new Error('--threshold must be a finite number');
   }
-  if (threshold < 0 || threshold > 1) {
-    throw new Error('--threshold must be between 0 and 1');
+  if (threshold < 0) {
+    throw new Error('--threshold must be greater than or equal to 0');
+  }
+  if (threshold >= 1) {
+    throw new Error('--threshold must be less than 1');
   }
   return threshold;
 };
@@ -201,7 +205,60 @@ const resolveEnvironmentPath = (
   if (configured !== undefined && configured.trim().length === 0) {
     throw new Error(`${key} must not be empty`);
   }
-  return path.resolve(cwd, configured ?? fallback);
+  return path.resolve(cwd, configured?.trim() ?? fallback);
+};
+
+interface CanonicalPath {
+  caseInsensitive: boolean;
+  value: string;
+}
+
+const toggledCaseAlias = (candidate: string): string | undefined => {
+  const basename = path.basename(candidate);
+  const toggled = basename.replace(/[A-Za-z]/u, (character) =>
+    character === character.toLowerCase()
+      ? character.toUpperCase()
+      : character.toLowerCase()
+  );
+  if (toggled === basename) return undefined;
+  return path.join(path.dirname(candidate), toggled);
+};
+
+const isCaseInsensitiveFilesystem = (existingPath: string): boolean => {
+  let candidate = existingPath;
+  while (path.dirname(candidate) !== candidate) {
+    const alias = toggledCaseAlias(candidate);
+    if (alias !== undefined) {
+      if (!existsSync(alias)) return false;
+      try {
+        return realpathSync.native(alias) === realpathSync.native(candidate);
+      } catch {
+        return false;
+      }
+    }
+    candidate = path.dirname(candidate);
+  }
+  return process.platform === 'win32';
+};
+
+const canonicalizeForComparison = (candidate: string): CanonicalPath => {
+  let existingAncestor = candidate;
+  const missingSegments: string[] = [];
+
+  while (!existsSync(existingAncestor)) {
+    const parent = path.dirname(existingAncestor);
+    if (parent === existingAncestor) break;
+    missingSegments.unshift(path.basename(existingAncestor));
+    existingAncestor = parent;
+  }
+
+  const canonicalAncestor = existsSync(existingAncestor)
+    ? realpathSync.native(existingAncestor)
+    : existingAncestor;
+  return {
+    caseInsensitive: isCaseInsensitiveFilesystem(existingAncestor),
+    value: path.resolve(canonicalAncestor, ...missingSegments)
+  };
 };
 
 const isAncestorOrEqual = (ancestor: string, candidate: string): boolean => {
@@ -214,11 +271,37 @@ const isAncestorOrEqual = (ancestor: string, candidate: string): boolean => {
   );
 };
 
+const assertDirectoriesDoNotOverlap = (
+  leftLabel: string,
+  left: string,
+  rightLabel: string,
+  right: string
+): void => {
+  const canonicalLeft = canonicalizeForComparison(left);
+  const canonicalRight = canonicalizeForComparison(right);
+  const shouldFoldCase =
+    canonicalLeft.caseInsensitive || canonicalRight.caseInsensitive;
+  const comparableLeft = shouldFoldCase
+    ? canonicalLeft.value.toLowerCase()
+    : canonicalLeft.value;
+  const comparableRight = shouldFoldCase
+    ? canonicalRight.value.toLowerCase()
+    : canonicalRight.value;
+  if (
+    isAncestorOrEqual(comparableLeft, comparableRight) ||
+    isAncestorOrEqual(comparableRight, comparableLeft)
+  ) {
+    throw new Error(
+      `${leftLabel} and ${rightLabel} directories must not overlap`
+    );
+  }
+};
+
 const resolveBaseUrl = (configured: string | undefined): string => {
   if (configured !== undefined && configured.trim().length === 0) {
     throw new Error('VR_BASE_URL must not be empty');
   }
-  const raw = configured ?? 'http://127.0.0.1:3000';
+  const raw = configured?.trim() ?? 'http://127.0.0.1:3000';
   let url: URL;
   try {
     url = new URL(raw);
@@ -228,7 +311,16 @@ const resolveBaseUrl = (configured: string | undefined): string => {
   if (url.protocol !== 'http:' && url.protocol !== 'https:') {
     throw new Error('VR_BASE_URL must be a valid HTTP(S) URL');
   }
-  return url.toString().replace(/\/$/, '');
+  if (url.username.length > 0 || url.password.length > 0) {
+    throw new Error('VR_BASE_URL must not contain credentials');
+  }
+  if (url.search.length > 0 || url.hash.length > 0) {
+    throw new Error('VR_BASE_URL must not contain a query or hash');
+  }
+  if (!/^\/+$/u.test(url.pathname)) {
+    throw new Error('VR_BASE_URL must be an origin without a pathname');
+  }
+  return url.origin;
 };
 
 export function resolveVisualPaths(
@@ -254,12 +346,14 @@ export function resolveVisualPaths(
     cwd
   );
 
-  if (
-    isAncestorOrEqual(baselineDir, artifactDir) ||
-    isAncestorOrEqual(artifactDir, baselineDir)
-  ) {
-    throw new Error('baseline and artifact directories must not overlap');
-  }
+  assertDirectoriesDoNotOverlap(
+    'baseline',
+    baselineDir,
+    'artifact',
+    artifactDir
+  );
+  assertDirectoriesDoNotOverlap('baseline', baselineDir, 'auth', authDir);
+  assertDirectoriesDoNotOverlap('artifact', artifactDir, 'auth', authDir);
 
   const currentDir = path.join(artifactDir, 'current');
   const diffDir = path.join(artifactDir, 'diff');
@@ -278,12 +372,33 @@ export function resolveVisualPaths(
 
 export function resolveVisualSelection(
   args: VisualArgs,
-  manifest: readonly RouteEntry[]
+  manifest: readonly RouteEntry[],
+  cwd: string
 ): VisualSelection {
   const selection: VisualSelection = {};
   if (args.clusters !== undefined) selection.clusters = [...args.clusters];
   if (args.ids !== undefined) selection.ids = [...args.ids];
-  if (args.target !== undefined) selection.target = args.target;
+  if (args.target !== undefined) {
+    if (path.isAbsolute(args.target)) {
+      throw new Error(
+        '--target must be repository-relative and remain within the repository'
+      );
+    }
+    const repositoryRoot = path.resolve(cwd);
+    const resolvedTarget = path.resolve(repositoryRoot, args.target);
+    const relativeTarget = path.relative(repositoryRoot, resolvedTarget);
+    if (
+      relativeTarget === '' ||
+      relativeTarget === '..' ||
+      relativeTarget.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativeTarget)
+    ) {
+      throw new Error(
+        '--target must be repository-relative and remain within the repository'
+      );
+    }
+    selection.target = relativeTarget.split(path.sep).join('/');
+  }
   if (args.viewports !== undefined) selection.viewports = [...args.viewports];
 
   selectVisualCases(manifest, selection);

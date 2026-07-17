@@ -1,3 +1,11 @@
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  rmSync,
+  symlinkSync
+} from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { MANIFEST } from './manifest';
@@ -130,12 +138,17 @@ describe('parseVisualArgs', () => {
     {
       argv: ['--threshold=-0.01'],
       command: 'verify',
-      problem: 'between 0 and 1'
+      problem: 'greater than or equal to 0'
+    },
+    {
+      argv: ['--threshold=1'],
+      command: 'verify',
+      problem: 'less than 1'
     },
     {
       argv: ['--threshold=1.01'],
       command: 'verify',
-      problem: 'between 0 and 1'
+      problem: 'less than 1'
     }
   ] as const)(
     'rejects unsafe or malformed CLI input: $argv',
@@ -144,8 +157,8 @@ describe('parseVisualArgs', () => {
     }
   );
 
-  it.each(['0', '1'])(
-    'accepts the inclusive threshold boundary %s',
+  it.each(['0', '0.999999'])(
+    'accepts threshold value %s in the lower-inclusive, upper-exclusive range',
     (threshold) => {
       expect(
         parseVisualArgs([`--threshold=${threshold}`], 'diff').threshold
@@ -187,9 +200,9 @@ describe('resolveVisualPaths', () => {
     expect(
       resolveVisualPaths(
         {
-          VR_ARTIFACT_DIR: './runs/one',
-          VR_AUTH_DIR: '../shared/auth',
-          VR_BASELINE_DIR: '/approved/cag/baseline',
+          VR_ARTIFACT_DIR: ' ./runs/one ',
+          VR_AUTH_DIR: ' ../shared/auth ',
+          VR_BASELINE_DIR: ' /approved/cag/baseline ',
           VR_BASE_URL: 'http://localhost:4321/'
         },
         cwd
@@ -231,9 +244,137 @@ describe('resolveVisualPaths', () => {
   );
 
   it.each([
+    {
+      environment: {
+        VR_AUTH_DIR: '/evidence',
+        VR_BASELINE_DIR: '/evidence'
+      },
+      pair: 'baseline and auth'
+    },
+    {
+      environment: {
+        VR_AUTH_DIR: '/evidence/auth',
+        VR_BASELINE_DIR: '/evidence'
+      },
+      pair: 'baseline and auth'
+    },
+    {
+      environment: {
+        VR_AUTH_DIR: '/evidence',
+        VR_BASELINE_DIR: '/evidence/baseline'
+      },
+      pair: 'baseline and auth'
+    },
+    {
+      environment: {
+        VR_ARTIFACT_DIR: '/evidence',
+        VR_AUTH_DIR: '/evidence'
+      },
+      pair: 'artifact and auth'
+    },
+    {
+      environment: {
+        VR_ARTIFACT_DIR: '/evidence',
+        VR_AUTH_DIR: '/evidence/auth'
+      },
+      pair: 'artifact and auth'
+    },
+    {
+      environment: {
+        VR_ARTIFACT_DIR: '/evidence/run',
+        VR_AUTH_DIR: '/evidence'
+      },
+      pair: 'artifact and auth'
+    }
+  ])('rejects $pair overlap in both directions', ({ environment, pair }) => {
+    expect(() => resolveVisualPaths(environment, cwd)).toThrow(
+      `${pair} directories must not overlap`
+    );
+  });
+
+  it('detects overlap through a real symlink and nonexistent descendants', () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), 'cag-vr-config-'));
+    try {
+      const approved = path.join(root, 'approved');
+      const alias = path.join(root, 'approved-alias');
+      mkdirSync(approved);
+      symlinkSync(approved, alias, 'dir');
+
+      expect(() =>
+        resolveVisualPaths(
+          {
+            VR_ARTIFACT_DIR: path.join(alias, 'corpus/run'),
+            VR_AUTH_DIR: path.join(root, 'auth'),
+            VR_BASELINE_DIR: path.join(approved, 'corpus')
+          },
+          cwd
+        )
+      ).toThrow('baseline and artifact directories must not overlap');
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
+
+  it('detects case aliases when the filesystem is case-insensitive', () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), 'cag-vr-case-'));
+    try {
+      const canonical = path.join(root, 'Approved');
+      const alias = path.join(root, 'approved');
+      mkdirSync(canonical);
+      if (!existsSync(alias)) return;
+
+      expect(() =>
+        resolveVisualPaths(
+          {
+            VR_ARTIFACT_DIR: path.join(alias, 'corpus/run'),
+            VR_AUTH_DIR: path.join(root, 'auth'),
+            VR_BASELINE_DIR: path.join(canonical, 'corpus')
+          },
+          cwd
+        )
+      ).toThrow('baseline and artifact directories must not overlap');
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
+
+  it('case-folds nonexistent descendants on a case-insensitive filesystem', () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), 'cag-vr-missing-case-'));
+    try {
+      const caseProbe = path.join(root, 'CASE-PROBE');
+      mkdirSync(caseProbe);
+      if (!existsSync(path.join(root, 'case-probe'))) return;
+
+      expect(() =>
+        resolveVisualPaths(
+          {
+            VR_ARTIFACT_DIR: path.join(root, 'future-corpus/run'),
+            VR_AUTH_DIR: path.join(root, 'auth'),
+            VR_BASELINE_DIR: path.join(root, 'FUTURE-CORPUS')
+          },
+          cwd
+        )
+      ).toThrow('baseline and artifact directories must not overlap');
+    } finally {
+      rmSync(root, { force: true, recursive: true });
+    }
+  });
+
+  it('normalizes repeated root slashes to an origin-only base URL', () => {
+    expect(
+      resolveVisualPaths({ VR_BASE_URL: 'https://example.com:8443////' }, cwd)
+        .baseUrl
+    ).toBe('https://example.com:8443');
+  });
+
+  it.each([
     { VR_BASE_URL: '' },
     { VR_BASE_URL: 'not-a-url' },
     { VR_BASE_URL: 'file:///tmp/site' },
+    { VR_BASE_URL: 'https://user:secret@example.com' },
+    { VR_BASE_URL: 'https://example.com?mode=visual' },
+    { VR_BASE_URL: 'https://example.com#visual' },
+    { VR_BASE_URL: 'https://example.com/app' },
     { VR_ARTIFACT_DIR: ' ' },
     { VR_AUTH_DIR: '' },
     { VR_BASELINE_DIR: ' ' }
@@ -243,6 +384,8 @@ describe('resolveVisualPaths', () => {
 });
 
 describe('resolveVisualSelection', () => {
+  const cwd = path.resolve('/work/cag');
+
   it('returns a validated manifest selection without mutating the manifest', () => {
     const snapshot = JSON.stringify(MANIFEST);
     const args = parseVisualArgs(
@@ -255,7 +398,7 @@ describe('resolveVisualSelection', () => {
       'verify'
     );
 
-    expect(resolveVisualSelection(args, MANIFEST)).toEqual({
+    expect(resolveVisualSelection(args, MANIFEST, cwd)).toEqual({
       clusters: ['public-static'],
       ids: ['home', 'faq'],
       target: 'src/components/Home',
@@ -266,7 +409,7 @@ describe('resolveVisualSelection', () => {
 
   it('rejects unknown route IDs against the selected manifest', () => {
     const args = parseVisualArgs(['--only=not-a-route'], 'verify');
-    expect(() => resolveVisualSelection(args, MANIFEST)).toThrow(
+    expect(() => resolveVisualSelection(args, MANIFEST, cwd)).toThrow(
       'unknown visual route id'
     );
   });
@@ -276,8 +419,30 @@ describe('resolveVisualSelection', () => {
       ['--cluster=account-auth', '--only=home'],
       'verify'
     );
-    expect(() => resolveVisualSelection(args, MANIFEST)).toThrow(
+    expect(() => resolveVisualSelection(args, MANIFEST, cwd)).toThrow(
       'selection selected no visual cases'
     );
   });
+
+  it('normalizes repository-relative target dot segments before selection', () => {
+    const args = parseVisualArgs(
+      ['--only=home', '--target=./src/components/FAQ/../Home'],
+      'verify'
+    );
+
+    expect(resolveVisualSelection(args, MANIFEST, cwd)).toMatchObject({
+      ids: ['home'],
+      target: 'src/components/Home'
+    });
+  });
+
+  it.each(['../outside', 'src/../../../outside', '/absolute/outside'])(
+    'rejects target escape %s',
+    (target) => {
+      const args = parseVisualArgs([`--target=${target}`], 'verify');
+      expect(() => resolveVisualSelection(args, MANIFEST, cwd)).toThrow(
+        '--target must be repository-relative and remain within the repository'
+      );
+    }
+  );
 });
