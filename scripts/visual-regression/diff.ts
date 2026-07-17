@@ -14,7 +14,7 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
-import { MANIFEST, entriesForTarget, VIEWPORTS } from './manifest';
+import { MANIFEST, selectVisualCases } from './manifest';
 
 const SNAP_DIR = path.resolve(
   process.cwd(),
@@ -144,28 +144,26 @@ function padTo(src: PNG, width: number, height: number): PNG {
 
 async function main() {
   const args = parseArgs();
-  const entries = args.target ? entriesForTarget(args.target) : MANIFEST;
+  const cases = selectVisualCases(MANIFEST, { target: args.target });
 
   const results: DiffEntry[] = [];
   await fs.mkdir(DIFF_DIR, { recursive: true });
 
-  for (const entry of entries) {
-    for (const viewport of entry.viewports ?? [VIEWPORTS.desktop]) {
-      const result = await diffPair(entry.name, viewport.name);
-      results.push(result);
-      const pct = (result.diffRatio * 100).toFixed(3);
-      const tag =
-        result.status === 'ok'
-          ? '✓'
-          : result.status === 'changed'
-            ? result.diffRatio > args.threshold
-              ? '✗'
-              : '~'
-            : '?';
-      console.log(
-        `[diff] ${tag} ${result.route} ${result.viewport}: ${result.status} (${result.diffPixels}px, ${pct}%)`
-      );
-    }
+  for (const { entry, viewport } of cases) {
+    const result = await diffPair(entry.id, viewport);
+    results.push(result);
+    const pct = (result.diffRatio * 100).toFixed(3);
+    const tag =
+      result.status === 'ok'
+        ? '✓'
+        : result.status === 'changed'
+          ? result.diffRatio > args.threshold
+            ? '✗'
+            : '~'
+          : '?';
+    console.log(
+      `[diff] ${tag} ${result.route} ${result.viewport}: ${result.status} (${result.diffPixels}px, ${pct}%)`
+    );
   }
 
   await fs.writeFile(

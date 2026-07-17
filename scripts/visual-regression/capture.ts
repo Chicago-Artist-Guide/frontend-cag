@@ -27,8 +27,8 @@ import { existsSync } from 'node:fs';
 import {
   MANIFEST,
   VIEWPORTS,
-  entriesForTarget,
-  type RouteEntry
+  selectVisualCases,
+  type VisualCase
 } from './manifest';
 
 const BASE_URL = process.env.VR_BASE_URL ?? 'http://localhost:3000';
@@ -58,15 +58,6 @@ function parseArgs(): Args {
   return args as Args;
 }
 
-function selectEntries(args: Args): RouteEntry[] {
-  let entries = args.target ? entriesForTarget(args.target) : MANIFEST;
-  if (args.only) {
-    const allow = new Set(args.only);
-    entries = entries.filter((e) => allow.has(e.name));
-  }
-  return entries;
-}
-
 async function ensureBaseUrlReachable(): Promise<void> {
   for (let i = 0; i < 20; i++) {
     try {
@@ -84,62 +75,69 @@ async function ensureBaseUrlReachable(): Promise<void> {
 
 async function contextFor(
   browser: Awaited<ReturnType<typeof chromium.launch>>,
-  entry: RouteEntry
+  visualCase: VisualCase
 ): Promise<BrowserContext> {
-  if (entry.auth === 'public') {
-    return browser.newContext();
+  const viewport = VIEWPORTS[visualCase.viewport];
+  const contextOptions = {
+    deviceScaleFactor: viewport.deviceScaleFactor,
+    viewport: { height: viewport.height, width: viewport.width }
+  };
+  if (visualCase.entry.auth === 'anonymous') {
+    return browser.newContext(contextOptions);
   }
-  const stateFile = path.join(AUTH_DIR, `${entry.auth}.json`);
+  const stateFile = path.join(AUTH_DIR, `${visualCase.entry.auth}.json`);
   if (!existsSync(stateFile)) {
     throw new Error(
       `[capture] missing ${stateFile} — run scripts/visual-regression/auth-setup.ts first`
     );
   }
-  return browser.newContext({ storageState: stateFile });
+  return browser.newContext({ ...contextOptions, storageState: stateFile });
 }
 
-async function captureEntry(
+async function captureCase(
   browser: Awaited<ReturnType<typeof chromium.launch>>,
-  entry: RouteEntry,
+  visualCase: VisualCase,
   bucket: Args['bucket']
 ) {
-  const context = await contextFor(browser, entry);
+  const { entry, viewport: viewportName } = visualCase;
+  const context = await contextFor(browser, visualCase);
   try {
-    for (const viewport of entry.viewports ?? [VIEWPORTS.desktop]) {
-      const page = await context.newPage();
-      await page.setViewportSize({
-        width: viewport.width,
-        height: viewport.height
+    const page = await context.newPage();
+
+    const url = `${BASE_URL}${entry.path}`;
+    console.log(`[capture] ${entry.id} ${viewportName} → ${url}`);
+
+    // 'load' instead of 'networkidle' — the app uses Firebase realtime
+    // listeners that keep sockets busy, so 'networkidle' never resolves.
+    await page.goto(url, { waitUntil: 'load', timeout: 30_000 });
+    for (const selector of entry.readiness.visible) {
+      await page.waitForSelector(selector, { timeout: 15_000 }).catch(() => {
+        console.warn(
+          `[capture] visible readiness "${selector}" did not match for ${entry.id}; continuing`
+        );
       });
-
-      const url = `${BASE_URL}${entry.path}`;
-      console.log(`[capture] ${entry.name} ${viewport.name} → ${url}`);
-
-      // 'load' instead of 'networkidle' — the app uses Firebase realtime
-      // listeners that keep sockets busy, so 'networkidle' never resolves.
-      await page.goto(url, { waitUntil: 'load', timeout: 30_000 });
-      if (entry.waitFor) {
-        await page
-          .waitForSelector(entry.waitFor, { timeout: 15_000 })
-          .catch(() => {
-            console.warn(
-              `[capture] waitFor "${entry.waitFor}" did not match for ${entry.name}; continuing`
-            );
-          });
-      }
-      // Settle for animations, lazy images, and Firebase data fetches.
-      await page.waitForTimeout(1500);
-
-      const outDir = path.join(SNAP_DIR, bucket, entry.name);
-      await fs.mkdir(outDir, { recursive: true });
-      const file = path.join(outDir, `${viewport.name}.png`);
-      await page.screenshot({
-        path: file,
-        fullPage: entry.fullPage ?? false,
-        animations: 'disabled'
-      });
-      await page.close();
     }
+    for (const selector of entry.readiness.hidden ?? []) {
+      await page
+        .waitForSelector(selector, { state: 'hidden', timeout: 15_000 })
+        .catch(() => {
+          console.warn(
+            `[capture] hidden readiness "${selector}" did not settle for ${entry.id}; continuing`
+          );
+        });
+    }
+    // Settle for animations, lazy images, and Firebase data fetches.
+    await page.waitForTimeout(1500);
+
+    const outDir = path.join(SNAP_DIR, bucket, entry.id);
+    await fs.mkdir(outDir, { recursive: true });
+    const file = path.join(outDir, `${viewportName}.png`);
+    await page.screenshot({
+      path: file,
+      fullPage: entry.fullPage,
+      animations: 'disabled'
+    });
+    await page.close();
   } finally {
     await context.close();
   }
@@ -147,26 +145,26 @@ async function captureEntry(
 
 async function main() {
   const args = parseArgs();
-  const entries = selectEntries(args);
-  if (entries.length === 0) {
-    console.warn(
-      '[capture] no manifest entries matched filters; nothing to do'
-    );
-    return;
-  }
+  const cases = selectVisualCases(MANIFEST, {
+    ids: args.only,
+    target: args.target
+  });
   await ensureBaseUrlReachable();
 
   console.log(
-    `[capture] bucket=${args.bucket} entries=${entries.map((e) => e.name).join(',')}`
+    `[capture] bucket=${args.bucket} cases=${cases.map(({ entry, viewport }) => `${entry.id}:${viewport}`).join(',')}`
   );
 
   const browser = await chromium.launch();
   try {
-    for (const entry of entries) {
+    for (const visualCase of cases) {
       try {
-        await captureEntry(browser, entry, args.bucket);
+        await captureCase(browser, visualCase, args.bucket);
       } catch (err) {
-        console.error(`[capture] FAILED ${entry.name}:`, err);
+        console.error(
+          `[capture] FAILED ${visualCase.entry.id}:${visualCase.viewport}:`,
+          err
+        );
       }
     }
   } finally {
