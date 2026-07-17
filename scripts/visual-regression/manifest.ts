@@ -54,6 +54,12 @@ export type BaselinePolicy =
   | { kind: 'reference-only'; reason: string }
   | { kind: 'missing'; reason: string };
 
+const BASELINE_POLICY_KINDS: readonly BaselinePolicy['kind'][] = [
+  'blocking-candidate',
+  'reference-only',
+  'missing'
+];
+
 export interface RouteEntry {
   allowBrokenImages?: string[];
   auth: AuthState;
@@ -137,6 +143,9 @@ export function validateVisualManifest(
         throw new Error(`unknown route cluster: ${cluster}`);
       }
     }
+    if (new Set(entry.clusters).size !== entry.clusters.length) {
+      throw new Error(`${entry.id} has a duplicate route cluster`);
+    }
     if (entry.viewports.length === 0) {
       throw new Error(`${entry.id} must declare at least one viewport`);
     }
@@ -144,6 +153,14 @@ export function validateVisualManifest(
       if (!VIEWPORT_NAMES.includes(viewport)) {
         throw new Error(`unknown viewport: ${viewport}`);
       }
+    }
+    if (new Set(entry.viewports).size !== entry.viewports.length) {
+      throw new Error(`${entry.id} has a duplicate viewport`);
+    }
+    if (!BASELINE_POLICY_KINDS.includes(entry.baselinePolicy.kind)) {
+      throw new Error(
+        `unknown baseline policy: ${String(entry.baselinePolicy.kind)}`
+      );
     }
     if (
       entry.baselinePolicy.kind !== 'blocking-candidate' &&
@@ -507,6 +524,9 @@ export function selectVisualCases(
 }
 
 /** Compatibility wrapper for scripts that still select entries by target. */
-export function entriesForTarget(target: string): RouteEntry[] {
-  return selectVisualCases(MANIFEST, { target }).map(({ entry }) => entry);
+export function entriesForTarget(
+  target: string,
+  manifest: readonly RouteEntry[] = MANIFEST
+): RouteEntry[] {
+  return manifest.filter((entry) => matchesTarget(entry, target));
 }

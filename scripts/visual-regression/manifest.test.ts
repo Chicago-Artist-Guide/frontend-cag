@@ -5,6 +5,7 @@ import {
   ROUTE_CLUSTERS,
   VIEWPORTS,
   VIEWPORT_NAMES,
+  entriesForTarget,
   selectVisualCases,
   validateVisualManifest,
   type RouteEntry
@@ -43,6 +44,25 @@ const entry = (overrides: Partial<RouteEntry> = {}): RouteEntry => ({
 describe('visual manifest', () => {
   it('preserves the existing baseline directory IDs exactly', () => {
     expect(MANIFEST.map(({ id }) => id)).toEqual(baselineIds);
+  });
+
+  it('keeps every baseline ID assigned to its current route and auth state', () => {
+    expect(MANIFEST.map(({ auth, id, path }) => [id, path, auth])).toEqual([
+      ['home', '/home', 'anonymous'],
+      ['faq', '/faq', 'anonymous'],
+      ['donate', '/donate', 'anonymous'],
+      ['events', '/events', 'anonymous'],
+      ['shows', '/shows', 'anonymous'],
+      ['get-involved', '/get-involved', 'anonymous'],
+      ['about-us', '/about-us', 'anonymous'],
+      ['theatre-resources', '/theatre-resources', 'anonymous'],
+      ['login', '/login', 'anonymous'],
+      ['signup', '/sign-up', 'anonymous'],
+      ['forgot-password', '/forgot-password', 'anonymous'],
+      ['company-profile', '/profile', 'company'],
+      ['company-messages', '/profile/messages', 'company'],
+      ['company-roles-search', '/profile/search/roles', 'company']
+    ]);
   });
 
   it('is a validated view of the application route contract', () => {
@@ -146,6 +166,24 @@ describe('visual manifest', () => {
     {
       manifest: [entry({ viewports: ['not-a-viewport' as never] })],
       problem: 'unknown viewport'
+    },
+    {
+      manifest: [entry({ clusters: ['public-static', 'public-static'] })],
+      problem: 'duplicate route cluster'
+    },
+    {
+      manifest: [entry({ viewports: ['desktop', 'desktop'] })],
+      problem: 'duplicate viewport'
+    },
+    {
+      manifest: [
+        entry({
+          baselinePolicy: {
+            kind: 'not-a-policy'
+          } as RouteEntry['baselinePolicy']
+        })
+      ],
+      problem: 'unknown baseline policy'
     },
     {
       manifest: [
@@ -252,6 +290,17 @@ describe('selectVisualCases', () => {
         target: 'src/components/layout/Header.tsx'
       }).map(({ entry: selectedEntry }) => selectedEntry.id)
     ).toEqual(['layout']);
+  });
+
+  it('returns each matching entry once when it has multiple viewports', () => {
+    const routes = validateVisualManifest([
+      entry({ id: 'home', viewports: ['desktop', 'mobile'] }),
+      entry({ id: 'faq', path: '/faq', sourceGlobs: ['src/components/FAQ/**'] })
+    ]);
+
+    expect(entriesForTarget('src/components/Home', routes)).toEqual([
+      routes[0]
+    ]);
   });
 
   it.each([
