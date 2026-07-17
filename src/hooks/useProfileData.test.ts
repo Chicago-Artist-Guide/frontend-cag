@@ -76,6 +76,37 @@ describe('useProfileData', () => {
     expect(result.current.profile).toEqual(profile);
   });
 
+  it('preserves manually published DTOs when same-user reads finish late', async () => {
+    const accountResult =
+      deferred<Awaited<ReturnType<typeof findAccountByUid>>>();
+    const profileResult =
+      deferred<Awaited<ReturnType<typeof findProfileByUid>>>();
+    mockFindAccountByUid.mockReturnValue(accountResult.promise);
+    mockFindProfileByUid.mockReturnValue(profileResult.promise);
+    const account = {
+      id: 'created-account',
+      data: { uid: 'user-1', type: 'individual' as const }
+    };
+    const profile = {
+      id: 'created-profile',
+      data: { uid: 'user-1', account_id: 'created-account' }
+    };
+    const { result } = renderHook(() => useProfileData(user('user-1')));
+
+    act(() => {
+      result.current.setAccount(account);
+      result.current.setProfile(profile);
+    });
+
+    await act(async () => {
+      accountResult.resolve(null);
+      profileResult.resolve(null);
+    });
+
+    expect(result.current.account).toEqual(account);
+    expect(result.current.profile).toEqual(profile);
+  });
+
   it('leaves each missing document empty', async () => {
     mockFindAccountByUid.mockResolvedValue({
       id: 'account-1',

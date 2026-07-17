@@ -1,5 +1,5 @@
 import { User } from 'firebase/auth';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AccountContextData,
   ProfileContextData,
@@ -19,16 +19,20 @@ const emptyProfile = (): UserDocument<ProfileContextData> => ({
 
 const useProfileData = (currentUser: User | null) => {
   const currentUserUid = currentUser?.uid;
-  const [account, setAccount] =
+  const accountRevision = useRef(0);
+  const profileRevision = useRef(0);
+  const [account, setAccountState] =
     useState<UserDocument<AccountContextData>>(emptyAccount);
-  const [profile, setProfile] =
+  const [profile, setProfileState] =
     useState<UserDocument<ProfileContextData>>(emptyProfile);
 
   useEffect(() => {
     let cancelled = false;
+    const accountLoadRevision = ++accountRevision.current;
+    const profileLoadRevision = ++profileRevision.current;
 
-    setAccount(emptyAccount());
-    setProfile(emptyProfile());
+    setAccountState(emptyAccount());
+    setProfileState(emptyProfile());
 
     if (!currentUserUid) {
       return () => {
@@ -44,8 +48,12 @@ const useProfileData = (currentUser: User | null) => {
 
       if (cancelled) return;
 
-      setAccount(nextAccount ?? emptyAccount());
-      setProfile(nextProfile ?? emptyProfile());
+      if (accountRevision.current === accountLoadRevision) {
+        setAccountState(nextAccount ?? emptyAccount());
+      }
+      if (profileRevision.current === profileLoadRevision) {
+        setProfileState(nextProfile ?? emptyProfile());
+      }
     };
 
     void queryAccountAndProfile();
@@ -55,16 +63,28 @@ const useProfileData = (currentUser: User | null) => {
     };
   }, [currentUserUid]);
 
-  const setAccountData = useCallback(
-    (data: AccountContextData | null) =>
-      setAccount((previous) => ({ ...previous, data })),
+  const setAccount = useCallback(
+    (nextAccount: UserDocument<AccountContextData>) => {
+      accountRevision.current += 1;
+      setAccountState(nextAccount);
+    },
     []
   );
-  const setProfileData = useCallback(
-    (data: ProfileContextData | null) =>
-      setProfile((previous) => ({ ...previous, data })),
+  const setAccountData = useCallback((data: AccountContextData | null) => {
+    accountRevision.current += 1;
+    setAccountState((previous) => ({ ...previous, data }));
+  }, []);
+  const setProfile = useCallback(
+    (nextProfile: UserDocument<ProfileContextData>) => {
+      profileRevision.current += 1;
+      setProfileState(nextProfile);
+    },
     []
   );
+  const setProfileData = useCallback((data: ProfileContextData | null) => {
+    profileRevision.current += 1;
+    setProfileState((previous) => ({ ...previous, data }));
+  }, []);
 
   return {
     account,
