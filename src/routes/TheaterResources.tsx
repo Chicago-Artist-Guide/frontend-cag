@@ -1,6 +1,4 @@
 import React from 'react';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
 import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';
@@ -9,8 +7,8 @@ import { blueBlob, streamingDance } from '../config/publicImages';
 const TheaterResources = () => {
   return (
     <PageContainer>
-      <Row>
-        <Col lg={8}>
+      <div className="row">
+        <div className="col-lg-8">
           <Title>THEATRE RESOURCES</Title>
           <Tagline>Submit or view a resource!</Tagline>
           <p className="margin-container">
@@ -53,11 +51,11 @@ const TheaterResources = () => {
             title="Submit and View Links to Theatre Resources"
             width="100%"
           />
-        </Col>
-        <Col lg={4}>
+        </div>
+        <div className="col-lg-4">
           <SVGLayer blob={blueBlob} dancer={streamingDance} />
-        </Col>
-      </Row>
+        </div>
+      </div>
     </PageContainer>
   );
 };

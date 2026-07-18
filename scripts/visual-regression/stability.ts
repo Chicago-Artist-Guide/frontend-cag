@@ -349,28 +349,26 @@ const inspectFonts = async (
         const rule = pendingRules.shift();
         if (!rule) continue;
         if (rule instanceof CSSFontFaceRule) {
+          const sourceBase = rule.parentStyleSheet?.href ?? document.baseURI;
           const sources = Array.from(
             rule.style
               .getPropertyValue('src')
               .matchAll(/url\((['"]?)(.*?)\1\)/gu)
-          ).map((match) => new URL(match[2], document.baseURI).toString());
+          ).map((match) => new URL(match[2], sourceBase).toString());
           fontRules.push({
             family: rule.style
               .getPropertyValue('font-family')
               .trim()
               .replace(/^['"]|['"]$/gu, ''),
             sources,
-            style:
-              rule.style.getPropertyValue('font-style').trim() || 'normal',
+            style: rule.style.getPropertyValue('font-style').trim() || 'normal',
             weight:
               rule.style.getPropertyValue('font-weight').trim() || 'normal'
           });
           continue;
         }
         if ('cssRules' in rule) {
-          pendingRules.push(
-            ...Array.from((rule as CSSGroupingRule).cssRules)
-          );
+          pendingRules.push(...Array.from((rule as CSSGroupingRule).cssRules));
         }
       }
 

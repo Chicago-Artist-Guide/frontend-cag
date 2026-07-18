@@ -19,6 +19,8 @@ import {
 const baselineIds = [
   'home',
   'faq',
+  'terms-of-service',
+  'privacy-policy',
   'donate',
   'events',
   'shows',
@@ -89,6 +91,8 @@ describe('visual manifest', () => {
     expect(MANIFEST.map(({ auth, id, path }) => [id, path, auth])).toEqual([
       ['home', '/home', 'anonymous'],
       ['faq', '/faq', 'anonymous'],
+      ['terms-of-service', '/terms-of-service', 'anonymous'],
+      ['privacy-policy', '/privacy-policy', 'anonymous'],
       ['donate', '/donate', 'anonymous'],
       ['events', '/events', 'anonymous'],
       ['shows', '/shows', 'anonymous'],
@@ -153,8 +157,10 @@ describe('visual manifest', () => {
       'get-involved': ['public-data'],
       home: ['public-static', 'shell'],
       login: ['account-auth'],
+      'privacy-policy': ['public-static'],
       shows: ['public-data'],
       signup: ['account-auth'],
+      'terms-of-service': ['public-static'],
       'theatre-resources': ['public-static']
     });
     expect(
@@ -163,6 +169,8 @@ describe('visual manifest', () => {
       ).map(({ id }) => id)
     ).toEqual([
       'faq',
+      'terms-of-service',
+      'privacy-policy',
       'donate',
       'about-us',
       'login',
@@ -410,6 +418,11 @@ describe('visual manifest', () => {
         'main label[for="formBasicEmail"]:visible',
         'main input#formBasicPassword:visible'
       ],
+      'privacy-policy': [
+        'main h1:has-text("PRIVACY POLICY"):visible',
+        'main :text-is("Last updated May 24, 2023"):visible',
+        'main #toc:has-text("TABLE OF CONTENTS"):visible'
+      ],
       shows: [
         'main h1:has-text("THEATRE SHOWS"):visible',
         'main h1:has-text("THEATRE SHOWS") ~ div.mt-4 h3, main h1:has-text("THEATRE SHOWS") ~ p:has-text("No active shows found at this time. Please check back later.")'
@@ -419,12 +432,94 @@ describe('visual manifest', () => {
         'main h3:has-text("Individual Artist"):visible',
         'main h3:has-text("Theatre Group"):visible'
       ],
+      'terms-of-service': [
+        'main h1:has-text("TERMS OF SERVICE"):visible',
+        'main h3:has-text("1. Introduction"):visible',
+        'main h3:has-text("7. General Terms"):visible'
+      ],
       'theatre-resources': [
         'main h1:has-text("THEATRE RESOURCES"):visible',
         'main table th:has-text("Organization"):visible',
         'main iframe[title^="Submit and View Links"]:visible'
       ]
     });
+  });
+
+  it('promotes both reviewed legal routes to exact-font blocking candidates', () => {
+    expect(
+      MANIFEST.filter(({ id }) =>
+        ['terms-of-service', 'privacy-policy'].includes(id)
+      ).map(
+        ({
+          auth,
+          baselinePolicy,
+          clusters,
+          fullPage,
+          id,
+          path,
+          requiredFonts,
+          sourceGlobs,
+          viewports
+        }) => ({
+          auth,
+          baselinePolicy,
+          clusters,
+          fullPage,
+          id,
+          path,
+          requiredFonts,
+          sourceGlobs,
+          viewports
+        })
+      )
+    ).toEqual([
+      {
+        auth: 'anonymous',
+        baselinePolicy: { kind: 'blocking-candidate' },
+        clusters: ['public-static'],
+        fullPage: true,
+        id: 'terms-of-service',
+        path: '/terms-of-service',
+        requiredFonts: expectedRequiredFonts,
+        sourceGlobs: [
+          'app/(main)/(public)/terms-of-service/**',
+          'src/routes/TOS.tsx',
+          'src/components/Legal/LegalPageStyles.tsx',
+          ...[
+            'src/config/publicImages.ts',
+            'src/components/layout/**',
+            'public/images/cagLogo1.svg',
+            'public/images/logoPlain.svg',
+            'public/images/footer-background.png',
+            'public/images/icons-footer/**'
+          ]
+        ],
+        viewports: ['desktop']
+      },
+      {
+        auth: 'anonymous',
+        baselinePolicy: { kind: 'blocking-candidate' },
+        clusters: ['public-static'],
+        fullPage: true,
+        id: 'privacy-policy',
+        path: '/privacy-policy',
+        requiredFonts: expectedRequiredFonts,
+        sourceGlobs: [
+          'app/(main)/(public)/privacy-policy/**',
+          'src/routes/PrivacyPolicy.tsx',
+          'src/components/Legal/LegalPageStyles.tsx',
+          ...[
+            'src/config/publicImages.ts',
+            'src/components/layout/**',
+            'public/images/cagLogo1.svg',
+            'public/images/logoPlain.svg',
+            'public/images/footer-background.png',
+            'public/images/icons-footer/**'
+          ]
+        ],
+        viewports: ['desktop']
+      }
+    ]);
   });
 
   it('grounds the Active Shows readiness selector in its rendered heading element', () => {
@@ -607,6 +702,36 @@ describe('selectVisualCases', () => {
       }).map(({ entry: selectedEntry }) => selectedEntry.id)
     ).toEqual(['layout']);
   });
+
+  it.each([
+    ['app/(main)/(public)/home/page.tsx', ['home']],
+    ['src/components/Home/HomeFaq.tsx', ['home']],
+    ['src/components/Redesign/Values.tsx', ['home']],
+    ['app/(main)/(public)/faq/page.tsx', ['faq']],
+    ['app/(main)/(public)/faq/faq-accordion.tsx', ['faq']],
+    ['app/(main)/(public)/terms-of-service/page.tsx', ['terms-of-service']],
+    ['app/(main)/(public)/privacy-policy/page.tsx', ['privacy-policy']],
+    [
+      'src/components/Legal/LegalPageStyles.tsx',
+      ['terms-of-service', 'privacy-policy']
+    ],
+    ['app/(main)/(public)/donate/page.tsx', ['donate']],
+    ['app/(main)/(public)/donate/donate-page-frame.tsx', ['donate']],
+    ['app/(main)/(public)/about-us/page.tsx', ['about-us']],
+    ['src/components/WhoWeAre/AboutContent.tsx', ['about-us']],
+    ['src/components/WhoWeAre/Team.tsx', ['about-us']],
+    ['app/(main)/(public)/theatre-resources/page.tsx', ['theatre-resources']]
+  ] as const)(
+    'maps migrated target %s to its concrete visual route',
+    (target, expectedIds) => {
+      expect(entriesForTarget(target).map(({ id }) => id)).toEqual(expectedIds);
+      expect(
+        selectVisualCases(MANIFEST, { target }).map(
+          ({ entry: route }) => route.id
+        )
+      ).toEqual(expectedIds);
+    }
+  );
 
   it('returns each matching entry once when it has multiple viewports', () => {
     const routes = validateVisualManifest([

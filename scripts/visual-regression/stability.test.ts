@@ -313,6 +313,64 @@ describe.sequential('stabilizePage', () => {
     }
   });
 
+  it('resolves Turbopack font URLs against the stylesheet that declares them', async () => {
+    const context = await browser.newContext();
+    await prepareCaptureContext(context);
+    await context.route('https://fixture.test/required', (route) =>
+      route.fulfill({
+        body: `<!doctype html>
+          <link rel="stylesheet" href="/_next/static/chunks/fonts.css">
+          <main><h1>Ready</h1></main>`,
+        contentType: 'text/html'
+      })
+    );
+    await context.route(
+      'https://fixture.test/_next/static/chunks/fonts.css',
+      (route) =>
+        route.fulfill({
+          body: `:root { --font-montserrat: 'FixtureGenerated'; }
+            @font-face {
+              font-family: 'FixtureGenerated';
+              font-style: normal;
+              font-weight: 400;
+              src: url('../media/fixture.woff2') format('woff2');
+            }`,
+          contentType: 'text/css'
+        })
+    );
+    await context.route(
+      'https://fixture.test/_next/static/media/fixture.woff2',
+      async (route) =>
+        route.fulfill({
+          body: await readFile(fontFile),
+          contentType: 'font/woff2'
+        })
+    );
+    const page = await context.newPage();
+    await page.goto('https://fixture.test/required');
+    try {
+      const stabilized = await stabilizePage(
+        page,
+        fixtureEntry({
+          allowBrokenImages: [],
+          baselinePolicy: { kind: 'blocking-candidate' },
+          masks: [],
+          requiredFonts: [requiredFixtureFont]
+        }),
+        { timeoutMs: 1_000 }
+      );
+
+      expect(stabilized.result.fonts[0].resources).toEqual([
+        {
+          sameOrigin: true,
+          url: 'https://fixture.test/_next/static/media/fixture.woff2'
+        }
+      ]);
+    } finally {
+      await context.close();
+    }
+  });
+
   it.each([
     {
       html: '<style></style><main><h1>Ready</h1></main>',
@@ -697,14 +755,18 @@ describe.sequential('stabilizePage', () => {
   });
 
   it('bounds the final animation-frame settle', async () => {
-    const { context, page } = await fixture();
+    const { context, page } = await fixture('<main><h1>Ready</h1></main>');
     await page.evaluate(() => {
       window.requestAnimationFrame = () => 0;
     });
     try {
       await expect(
-        stabilizePage(page, fixtureEntry(), { timeoutMs: 100 })
-      ).rejects.toThrow('animation-frame settle did not complete within 100ms');
+        stabilizePage(
+          page,
+          fixtureEntry({ allowBrokenImages: [], masks: [] }),
+          { timeoutMs: 250 }
+        )
+      ).rejects.toThrow('animation-frame settle did not complete within 250ms');
     } finally {
       await context.close();
     }

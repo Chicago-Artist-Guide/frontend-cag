@@ -324,9 +324,11 @@ const existingManifest: RouteEntry[] = [
       ]
     },
     sourceGlobs: [
+      'app/(main)/(public)/home/**',
       'src/routes/Home.tsx',
       'src/components/Home/**',
       'src/components/Redesign/PartnerSlider.tsx',
+      'src/components/Redesign/Values.tsx',
       'public/images/partners/**',
       'public/images/icons-home/**',
       'public/images/sponsors/**',
@@ -354,10 +356,57 @@ const existingManifest: RouteEntry[] = [
     },
     requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
+      'app/(main)/(public)/faq/**',
       'src/routes/FAQ.tsx',
       'src/components/FAQ/**',
       'public/images/blue_blob.svg',
       'public/images/streaming_dance.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
+  },
+  {
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
+    fullPage: true,
+    id: 'terms-of-service',
+    path: '/terms-of-service',
+    readiness: {
+      visible: [
+        'main h1:has-text("TERMS OF SERVICE"):visible',
+        'main h3:has-text("1. Introduction"):visible',
+        'main h3:has-text("7. General Terms"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
+    sourceGlobs: [
+      'app/(main)/(public)/terms-of-service/**',
+      'src/routes/TOS.tsx',
+      'src/components/Legal/LegalPageStyles.tsx',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
+  },
+  {
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
+    fullPage: true,
+    id: 'privacy-policy',
+    path: '/privacy-policy',
+    readiness: {
+      visible: [
+        'main h1:has-text("PRIVACY POLICY"):visible',
+        'main :text-is("Last updated May 24, 2023"):visible',
+        'main #toc:has-text("TABLE OF CONTENTS"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
+    sourceGlobs: [
+      'app/(main)/(public)/privacy-policy/**',
+      'src/routes/PrivacyPolicy.tsx',
+      'src/components/Legal/LegalPageStyles.tsx',
       ...SHARED_SHELL_SOURCE_GLOBS
     ],
     viewports: ['desktop']
@@ -378,6 +427,7 @@ const existingManifest: RouteEntry[] = [
     },
     requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
+      'app/(main)/(public)/donate/**',
       'src/routes/Donate.tsx',
       'src/components/Redesign/PartnerSlider.tsx',
       'public/images/donate/**',
@@ -474,6 +524,7 @@ const existingManifest: RouteEntry[] = [
     },
     requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
+      'app/(main)/(public)/about-us/**',
       'src/routes/WhoWeAre.tsx',
       'src/components/WhoWeAre/**',
       'public/images/who-we-are/**',
@@ -498,6 +549,7 @@ const existingManifest: RouteEntry[] = [
       ]
     },
     sourceGlobs: [
+      'app/(main)/(public)/theatre-resources/**',
       'src/routes/TheaterResources.tsx',
       'public/images/blue_blob.svg',
       'public/images/streaming_dance.svg',

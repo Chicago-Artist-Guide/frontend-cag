@@ -59,11 +59,16 @@ const bytes = (value: Buffer): PngEvidenceInput => ({
 
 const visualCase = (
   policy: BaselinePolicy = { kind: 'blocking-candidate' },
-  index = 1
-): VisualCase => ({
-  entry: { ...MANIFEST[index], baselinePolicy: policy },
-  viewport: 'desktop'
-});
+  id = 'faq'
+): VisualCase => {
+  const entry = MANIFEST.find((candidate) => candidate.id === id);
+  if (!entry) throw new Error(`missing visual fixture: ${id}`);
+
+  return {
+    entry: { ...entry, baselinePolicy: policy },
+    viewport: 'desktop'
+  };
+};
 
 const stabilityFor = (
   subject: VisualCase
@@ -400,7 +405,10 @@ describe('comparePngCase', () => {
 
 describe('validateCaptureSummary', () => {
   it('accepts an exact current capture matrix in manifest selection order', () => {
-    const cases = [visualCase(undefined, 1), visualCase(undefined, 2)];
+    const cases = [
+      visualCase(undefined, 'faq'),
+      visualCase(undefined, 'donate')
+    ];
     expect(
       validateCaptureSummary(captureSummary(cases), MANIFEST).cases
     ).toHaveLength(2);
@@ -774,7 +782,10 @@ describe('runDiff', () => {
 
   it('continues deterministically after bad evidence and creates portable assets', async () => {
     const paths = await makeRun();
-    const cases = [visualCase(undefined, 1), visualCase(undefined, 2)];
+    const cases = [
+      visualCase(undefined, 'faq'),
+      visualCase(undefined, 'donate')
+    ];
     await writeFile(
       paths.captureSummary,
       JSON.stringify(captureSummary(cases))

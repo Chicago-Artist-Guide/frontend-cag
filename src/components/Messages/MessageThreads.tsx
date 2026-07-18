@@ -28,20 +28,31 @@ const MessageThreads: React.FC<
   const { threadId } = useParams();
   const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
-  const { threads, loadThreads } = useMessages();
+  const { clearMessages, threads, threadsAccountId, loadThreads } =
+    useMessages();
   const [loading, setLoading] = useState(true);
   const [threadData, setThreadData] = useState<MessageThreadTypeExtended[]>([]);
 
   useEffect(() => {
-    const loadThreadsAsync = async () => {
-      const accountId = account.id || '';
-      await loadThreads(accountId);
-    };
+    clearMessages();
+    setThreadData([]);
 
-    loadThreadsAsync();
-  }, [account]);
+    if (!account.id) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    loadThreads(account.id);
+  }, [account.id, clearMessages, loadThreads]);
 
   useEffect(() => {
+    if (!account.id || threadsAccountId !== account.id) {
+      setThreadData([]);
+      return;
+    }
+
+    let active = true;
     const fetchThreadsData = async () => {
       const data = await Promise.all(
         threads.map(async (thread) => {
@@ -96,19 +107,27 @@ const MessageThreads: React.FC<
         })
       );
 
-      setThreadData(data);
-      setLoading(false);
+      if (active) {
+        setThreadData(data);
+        setLoading(false);
+      }
     };
 
     fetchThreadsData();
-  }, [account, threads]);
+    return () => {
+      active = false;
+    };
+  }, [account, firebaseFirestore, threads, threadsAccountId]);
+
+  const hasCurrentAccountThreads =
+    Boolean(account.id) && threadsAccountId === account.id;
 
   return (
     <div className="h-full overflow-y-auto">
       <h4 className="mb-4 px-2 text-base font-semibold sm:px-0 sm:text-lg">
         Threads
       </h4>
-      {loading ? (
+      {account.id && (!hasCurrentAccountThreads || loading) ? (
         <p className="px-2 sm:px-0">Loading threads...</p>
       ) : (
         <div className="space-y-2 sm:space-y-4">

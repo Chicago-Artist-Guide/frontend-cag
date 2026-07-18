@@ -1,6 +1,6 @@
+import Link from 'next/link';
 import React from 'react';
-import Collapsible from '../components/layout/Collapsible';
-import { homeFAQ } from '../components/FAQ/homeFAQ';
+import HomeFaq from '../components/Home/HomeFaq';
 import Values from '../components/Redesign/Values';
 import PartnerSlider from '../components/Redesign/PartnerSlider';
 import {
@@ -21,68 +21,51 @@ import { supporters } from '../utils/supporters';
 const Donate = '/donate.png';
 const Hero = '/hero.png';
 
+const partners = [
+  { src: MPaact, alt: 'MPAACT', url: 'https://www.mpaact.org/' },
+  {
+    src: ChicagoFringeOpera,
+    alt: 'Chicago Fringe Opera',
+    url: 'https://www.chicagofringeopera.com/'
+  },
+  {
+    src: TheStoryTheatre,
+    alt: 'The Story Theatre',
+    url: 'https://thestorytheatre.org/'
+  },
+  {
+    src: BabesBlades,
+    alt: 'Babes with Blades',
+    url: 'https://babeswithblades.org/'
+  },
+  {
+    src: CircaPinto,
+    alt: 'Circa Pinto',
+    url: 'https://www.circapintig.org/'
+  },
+  {
+    src: Corn,
+    alt: 'Corn',
+    url: 'https://www.cornservatory.org/'
+  },
+  {
+    src: GreatWorks,
+    alt: 'Great Works',
+    url: 'https://www.greatworkstheatre.com/'
+  },
+  {
+    src: Jackalope,
+    alt: 'Jackalope',
+    url: 'https://www.jackalopetheatre.org/'
+  },
+  {
+    src: Pegasus,
+    alt: 'Pegasus',
+    url: 'https://pegasustheatrechicago.org/'
+  }
+];
+
 const Home = () => {
-  const sectionTitles = {
-    about: 'What is Chicago Artist Guide (CAG)?',
-    price: 'Is it Free?',
-    profile: 'Who can make an Artist Profile?',
-    jobs: 'How can my Theatre Company sign up to post jobs?',
-    identity:
-      'Will I be excluded from casting searches based on how I self-identify?'
-  };
-
-  const subContainer = (props: any) => {
-    return (
-      <div key={props.id}>
-        <p>{props.answer}</p>
-      </div>
-    );
-  };
-
-  const partners = [
-    { src: MPaact, alt: 'MPAACT', url: 'https://www.mpaact.org/' },
-    {
-      src: ChicagoFringeOpera,
-      alt: 'Chicago Fringe Opera',
-      url: 'https://www.chicagofringeopera.com/'
-    },
-    {
-      src: TheStoryTheatre,
-      alt: 'The Story Theatre',
-      url: 'https://thestorytheatre.org/'
-    },
-    {
-      src: BabesBlades,
-      alt: 'Babes with Blades',
-      url: 'https://babeswithblades.org/'
-    },
-    {
-      src: CircaPinto,
-      alt: 'Circa Pinto',
-      url: 'https://www.circapintig.org/'
-    },
-    {
-      src: Corn,
-      alt: 'Corn',
-      url: 'https://www.cornservatory.org/'
-    },
-    {
-      src: GreatWorks,
-      alt: 'Great Works',
-      url: 'https://www.greatworkstheatre.com/'
-    },
-    {
-      src: Jackalope,
-      alt: 'Jackalope',
-      url: 'https://www.jackalopetheatre.org/'
-    },
-    {
-      src: Pegasus,
-      alt: 'Pegasus',
-      url: 'https://pegasustheatrechicago.org/'
-    }
-  ];
-
   return (
     <>
       {/* Hero */}
@@ -105,16 +88,18 @@ const Home = () => {
             Free for everyone. Proudly made in Chicago.
           </h3>
           <div className="mt-8 flex flex-col gap-4">
-            <a href="/sign-up">
-              <button className="w-full rounded-full bg-butter px-8 py-3 text-base font-semibold text-white hover:bg-yellow">
-                Join Now
-              </button>
-            </a>
-            <a href="/shows">
-              <button className="w-full rounded-full bg-mint px-8 py-3 text-base font-semibold text-white hover:bg-mint/80">
-                Browse Shows
-              </button>
-            </a>
+            <Link
+              className="block w-full rounded-full bg-butter px-8 py-3 text-center text-base font-semibold text-white hover:bg-yellow"
+              href="/sign-up"
+            >
+              Join Now
+            </Link>
+            <Link
+              className="block w-full rounded-full bg-mint px-8 py-3 text-center text-base font-semibold text-white hover:bg-mint/80"
+              href="/shows"
+            >
+              Browse Shows
+            </Link>
           </div>
         </div>
       </div>
@@ -137,16 +122,18 @@ const Home = () => {
             Free for everyone. Proudly made in Chicago.
           </h3>
           <div className="mt-12 flex flex-col gap-4 md:flex-row">
-            <a href="/sign-up">
-              <button className="w-full rounded-full bg-butter px-14 py-2 text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit">
-                Join Now
-              </button>
-            </a>
-            <a href="/shows">
-              <button className="w-full rounded-full bg-mint px-14 py-2 text-lg font-semibold text-white hover:bg-mint/80 md:py-3 lg:w-fit">
-                Browse Shows
-              </button>
-            </a>
+            <Link
+              className="block w-full rounded-full bg-butter px-14 py-2 text-center text-lg font-semibold text-white hover:bg-yellow md:py-3 lg:w-fit"
+              href="/sign-up"
+            >
+              Join Now
+            </Link>
+            <Link
+              className="block w-full rounded-full bg-mint px-14 py-2 text-center text-lg font-semibold text-white hover:bg-mint/80 md:py-3 lg:w-fit"
+              href="/shows"
+            >
+              Browse Shows
+            </Link>
           </div>
         </div>
       </div>
@@ -187,12 +174,7 @@ const Home = () => {
           </h1>
         </div>
         <div className="col-span-1 mx-4 sm:mx-8 lg:col-span-2 lg:mx-12 xl:mx-20">
-          <Collapsible
-            sectionTitles={sectionTitles}
-            subSections={homeFAQ}
-            subContainer={subContainer}
-            grid={false}
-          />
+          <HomeFaq />
         </div>
       </div>
       {/* Diversify max-w-7xl */}
@@ -207,7 +189,12 @@ const Home = () => {
                 Your support of the Chicago Artist Guide helps us offer this
                 platform to our users free of cost.
               </h3>
-              <a href={zeffyUrl} target="_blank" className="mt-4 md:w-fit">
+              <a
+                href={zeffyUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 md:w-fit"
+              >
                 <button className="w-full rounded-full bg-salmon px-8 py-3 text-center text-lg font-semibold text-white hover:bg-blush sm:px-12 sm:text-xl md:w-fit md:px-14">
                   Donate
                 </button>
@@ -244,7 +231,6 @@ const Home = () => {
                 height: '100%'
               }}
               src="https://www.zeffy.com/en-US/embed/newsletter-form/sign-up-for-our-newsletter-859"
-              allowTransparency={true}
             />
           </div>
         </div>

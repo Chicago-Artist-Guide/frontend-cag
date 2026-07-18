@@ -171,10 +171,7 @@ export const applicationRoutes = [
   {
     loggedOut: {
       destination: '/profile/messages',
-      marker: { kind: 'heading', value: 'Messages' },
-      pageErrors: [
-        'Invalid document reference. Document references must have an even number of segments, but accounts has 1.'
-      ]
+      marker: { kind: 'heading', value: 'Messages' }
     },
     path: '/profile/messages',
     routeClass: 'account'
@@ -183,10 +180,7 @@ export const applicationRoutes = [
     loggedOut: {
       destination: '/profile/messages/smoke-thread',
       marker: { kind: 'heading', value: 'Messages' },
-      pageErrors: [
-        'Invalid document reference. Document references must have an even number of segments, but accounts has 1.',
-        'Failed to get document because the client is offline.'
-      ]
+      pageErrors: ['Failed to get document because the client is offline.']
     },
     path: '/profile/messages/smoke-thread',
     routeClass: 'account'

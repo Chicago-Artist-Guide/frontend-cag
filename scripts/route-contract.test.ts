@@ -157,17 +157,8 @@ describe('route contract', () => {
         .map(({ loggedOut, path }) => [path, loggedOut.pageErrors])
     ).toEqual([
       [
-        '/profile/messages',
-        [
-          'Invalid document reference. Document references must have an even number of segments, but accounts has 1.'
-        ]
-      ],
-      [
         '/profile/messages/smoke-thread',
-        [
-          'Invalid document reference. Document references must have an even number of segments, but accounts has 1.',
-          'Failed to get document because the client is offline.'
-        ]
+        ['Failed to get document because the client is offline.']
       ],
       [
         '/profile/search/talent/smoke-production',
