@@ -5,6 +5,7 @@ import { vi } from 'vitest';
 const state = vi.hoisted(() => ({
   account: { data: null as { type: string } | null, id: '' },
   clearMessages: vi.fn(),
+  firebaseFirestore: {},
   loadThreads: vi.fn(),
   messageContext: {
     threads: [] as Array<{
@@ -28,7 +29,9 @@ vi.mock('../../context/UserContext', () => ({
   useUserContext: () => ({ account: state.account })
 }));
 vi.mock('../../context/FirebaseContext', () => ({
-  useFirebaseContext: () => ({ firebaseFirestore: {} })
+  useFirebaseContext: () => ({
+    firebaseFirestore: state.firebaseFirestore
+  })
 }));
 vi.mock('../../context/MessageContext', () => ({
   useMessages: () => ({

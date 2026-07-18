@@ -78,7 +78,7 @@ const MessageThreads: React.FC<
               ? await getAccountDisplayName(recipientId)
               : await getTheaterDisplayNameByUid(recipientId);
 
-          let threadPreviewImg = getRecipientProfile?.data.profile_image_url
+          let threadPreviewImg = getRecipientProfile?.data?.profile_image_url
             ? getRecipientProfile.data.profile_image_url
             : defaultPfp;
 
