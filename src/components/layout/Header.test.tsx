@@ -112,8 +112,8 @@ describe('Header Next navigation boundary', () => {
       'src',
       '/images/cagLogo1.svg'
     );
-    expect(hrefFor('CAG Logo')).toBe('/');
-    expect(hrefFor('HOME')).toBe('/');
+    expect(hrefFor('CAG Logo')).toBe('/home');
+    expect(hrefFor('HOME')).toBe('/home');
     expect(hrefFor('ABOUT US')).toBe('/about-us');
     expect(hrefFor('DONATE')).toBe('/donate');
     expect(hrefFor('GET INVOLVED')).toBe('/get-involved');

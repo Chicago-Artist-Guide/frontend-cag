@@ -96,7 +96,7 @@ const Header = () => {
       expanded={expanded}
       onToggle={setExpanded}
     >
-      <Navbar.Brand as={Link} href="/" onClick={handleNavClick}>
+      <Navbar.Brand as={Link} href="/home" onClick={handleNavClick}>
         <LogoImage src={Logo} alt="CAG Logo" height="60" width="70" />
       </Navbar.Brand>
       <Navbar.Toggle
@@ -106,7 +106,7 @@ const Header = () => {
       />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ml-auto ms-auto">
-          <Nav.Link as={Link} href="/" onClick={handleNavClick}>
+          <Nav.Link as={Link} href="/home" onClick={handleNavClick}>
             HOME
           </Nav.Link>
           <Nav.Link as={Link} href="/about-us" onClick={handleNavClick}>
