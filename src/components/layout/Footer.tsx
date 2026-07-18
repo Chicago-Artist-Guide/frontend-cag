@@ -17,13 +17,8 @@ import {
   Medium
 } from '../../config/publicImages';
 import { zeffyUrl } from '../../utils/marketing';
-import { navigateLegacyDocument } from '../../utils/navigation';
 
 const Footer = () => {
-  const handleInternalNavigation = (event: React.MouseEvent, href: string) => {
-    navigateLegacyDocument(window.location, href, event);
-  };
-
   return (
     <FooterNavbar className="justify-content-center nav container" expand="sm">
       <div className="container mt-12">
@@ -35,22 +30,12 @@ const Footer = () => {
           >
             <Nav className="flex-column m-auto" fill>
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/"
-                  onClick={(event) => handleInternalNavigation(event, '/')}
-                >
+                <Nav.Link as={Link} href="/">
                   HOME
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/about-us"
-                  onClick={(event) =>
-                    handleInternalNavigation(event, '/about-us')
-                  }
-                >
+                <Nav.Link as={Link} href="/about-us">
                   ABOUT US
                 </Nav.Link>
               </Nav.Item>
@@ -58,13 +43,7 @@ const Footer = () => {
                 <Nav.Link href={zeffyUrl}>DONATE</Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/events"
-                  onClick={(event) =>
-                    handleInternalNavigation(event, '/events')
-                  }
-                >
+                <Nav.Link as={Link} href="/events">
                   EVENTS
                 </Nav.Link>
               </Nav.Item>
@@ -114,11 +93,7 @@ const Footer = () => {
           >
             <Nav className="flex-column m-auto" fill>
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/faq"
-                  onClick={(event) => handleInternalNavigation(event, '/faq')}
-                >
+                <Nav.Link as={Link} href="/faq">
                   FAQ
                 </Nav.Link>
               </Nav.Item>
@@ -128,35 +103,17 @@ const Footer = () => {
               </Nav.Link>
             </Nav.Item> */}
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/theatre-resources"
-                  onClick={(event) =>
-                    handleInternalNavigation(event, '/theatre-resources')
-                  }
-                >
+                <Nav.Link as={Link} href="/theatre-resources">
                   THEATRE RESOURCES
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/terms-of-service"
-                  onClick={(event) =>
-                    handleInternalNavigation(event, '/terms-of-service')
-                  }
-                >
+                <Nav.Link as={Link} href="/terms-of-service">
                   TERMS OF SERVICE
                 </Nav.Link>
               </Nav.Item>
               <Nav.Item>
-                <Nav.Link
-                  as={Link}
-                  href="/privacy-policy"
-                  onClick={(event) =>
-                    handleInternalNavigation(event, '/privacy-policy')
-                  }
-                >
+                <Nav.Link as={Link} href="/privacy-policy">
                   PRIVACY POLICY
                 </Nav.Link>
               </Nav.Item>

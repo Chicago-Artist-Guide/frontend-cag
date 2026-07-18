@@ -9,7 +9,7 @@ import { useAdminAuth } from '../../hooks/useAdminAuth';
 import { Logo } from '../../config/publicImages';
 import { getUnreadThreadCount } from '../../services/messages/client';
 import { colors } from '../../theme/styleVars';
-import { navigateLegacyDocument, reloadDocument } from '../../utils/navigation';
+import { reloadDocument } from '../../utils/navigation';
 
 const Header = () => {
   const { currentUser, account } = useUserContext();
@@ -24,6 +24,7 @@ const Header = () => {
 
   // Handle sign-up link click to reset to initial screen when already on sign-up page
   const handleSignUpClick = (e: React.MouseEvent) => {
+    setExpanded(false);
     if (pathname === '/sign-up') {
       e.preventDefault();
       reloadDocument(window.location);
@@ -82,9 +83,8 @@ const Header = () => {
   }, [account?.data?.type, account?.id, pathname]);
 
   // Handle nav link clicks - close menu
-  const handleNavClick = (event: React.MouseEvent, href: string) => {
+  const handleNavClick = () => {
     setExpanded(false);
-    navigateLegacyDocument(window.location, href, event);
   };
 
   return (
@@ -96,11 +96,7 @@ const Header = () => {
       expanded={expanded}
       onToggle={setExpanded}
     >
-      <Navbar.Brand
-        as={Link}
-        href="/"
-        onClick={(event) => handleNavClick(event, '/')}
-      >
+      <Navbar.Brand as={Link} href="/" onClick={handleNavClick}>
         <LogoImage src={Logo} alt="CAG Logo" height="60" width="70" />
       </Navbar.Brand>
       <Navbar.Toggle
@@ -110,50 +106,26 @@ const Header = () => {
       />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ml-auto ms-auto">
-          <Nav.Link
-            as={Link}
-            href="/"
-            onClick={(event) => handleNavClick(event, '/')}
-          >
+          <Nav.Link as={Link} href="/" onClick={handleNavClick}>
             HOME
           </Nav.Link>
-          <Nav.Link
-            as={Link}
-            href="/about-us"
-            onClick={(event) => handleNavClick(event, '/about-us')}
-          >
+          <Nav.Link as={Link} href="/about-us" onClick={handleNavClick}>
             ABOUT US
           </Nav.Link>
           {/* <Nav.Link as={Link} href="/shows" onClick={handleNavClick}>
             SHOWS
           </Nav.Link> */}
-          <Nav.Link
-            as={Link}
-            href="/donate"
-            onClick={(event) => handleNavClick(event, '/donate')}
-          >
+          <Nav.Link as={Link} href="/donate" onClick={handleNavClick}>
             DONATE
           </Nav.Link>
-          <Nav.Link
-            as={Link}
-            href="/get-involved"
-            onClick={(event) => handleNavClick(event, '/get-involved')}
-          >
+          <Nav.Link as={Link} href="/get-involved" onClick={handleNavClick}>
             GET INVOLVED
           </Nav.Link>
-          <Nav.Link
-            as={Link}
-            href="/events"
-            onClick={(event) => handleNavClick(event, '/events')}
-          >
+          <Nav.Link as={Link} href="/events" onClick={handleNavClick}>
             EVENTS
           </Nav.Link>
           {profileId !== null ? (
-            <Nav.Link
-              as={Link}
-              href="/profile"
-              onClick={(event) => handleNavClick(event, '/profile')}
-            >
+            <Nav.Link as={Link} href="/profile" onClick={handleNavClick}>
               PROFILE
               {unreadCount > 0 && (
                 <NotificationBadge
@@ -165,43 +137,21 @@ const Header = () => {
             </Nav.Link>
           ) : (
             <>
-              <Nav.Link
-                as={Link}
-                href="/sign-up"
-                onClick={(e) => {
-                  handleSignUpClick(e);
-                  setExpanded(false);
-                  if (!e.defaultPrevented) {
-                    navigateLegacyDocument(window.location, '/sign-up', e);
-                  }
-                }}
-              >
+              <Nav.Link as={Link} href="/sign-up" onClick={handleSignUpClick}>
                 SIGN UP
               </Nav.Link>
-              <Nav.Link
-                as={Link}
-                href="/login"
-                onClick={(event) => handleNavClick(event, '/login')}
-              >
+              <Nav.Link as={Link} href="/login" onClick={handleNavClick}>
                 LOGIN
               </Nav.Link>
             </>
           )}
           {isAdmin && (
-            <Nav.Link
-              as={Link}
-              href="/admin"
-              onClick={(event) => handleNavClick(event, '/admin')}
-            >
+            <Nav.Link as={Link} href="/admin" onClick={handleNavClick}>
               ADMIN
             </Nav.Link>
           )}
           {currentUser !== null && (
-            <Nav.Link
-              as={Link}
-              href="/logout"
-              onClick={(event) => handleNavClick(event, '/logout')}
-            >
+            <Nav.Link as={Link} href="/logout" onClick={handleNavClick}>
               LOGOUT
             </Nav.Link>
           )}

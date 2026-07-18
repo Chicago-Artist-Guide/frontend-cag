@@ -11,7 +11,6 @@ import {
 
 const headerMocks = vi.hoisted(() => ({
   getUnreadThreadCount: vi.fn(),
-  navigateLegacyDocument: vi.fn(),
   nextLinkDefaultPrevented: [] as boolean[],
   pathname: '/home',
   reloadDocument: vi.fn(),
@@ -38,7 +37,6 @@ vi.mock('next/navigation', () => ({
   usePathname: headerMocks.usePathname
 }));
 vi.mock('../../utils/navigation', () => ({
-  navigateLegacyDocument: headerMocks.navigateLegacyDocument,
   reloadDocument: headerMocks.reloadDocument
 }));
 vi.mock('../../services/messages/client', () => ({
@@ -93,7 +91,6 @@ describe('Header Next navigation boundary', () => {
   beforeEach(() => {
     userState = anonymousUserState();
     headerMocks.getUnreadThreadCount.mockReset();
-    headerMocks.navigateLegacyDocument.mockReset();
     headerMocks.nextLinkDefaultPrevented.length = 0;
     headerMocks.pathname = '/home';
     headerMocks.reloadDocument.mockReset();
@@ -163,7 +160,6 @@ describe('Header Next navigation boundary', () => {
     expect(headerMocks.reloadDocument).toHaveBeenCalledOnce();
     expect(headerMocks.reloadDocument).toHaveBeenCalledWith(window.location);
     expect(headerMocks.nextLinkDefaultPrevented.at(-1)).toBe(true);
-    expect(headerMocks.navigateLegacyDocument).not.toHaveBeenCalled();
 
     headerMocks.pathname = '/home';
     view.rerender(<Header />);
@@ -172,7 +168,7 @@ describe('Header Next navigation boundary', () => {
     expect(headerMocks.reloadDocument).toHaveBeenCalledOnce();
   });
 
-  it('passes every internal Next Link href to the document boundary', () => {
+  it('lets every ordinary internal Next Link perform client navigation', () => {
     render(<Header />);
     const links = [
       ['CAG Logo', '/'],
@@ -189,17 +185,9 @@ describe('Header Next navigation boundary', () => {
       fireEvent.click(screen.getByRole('link', { exact: true, name }));
     }
 
-    expect(headerMocks.navigateLegacyDocument).toHaveBeenCalledTimes(
-      links.length
+    expect(headerMocks.nextLinkDefaultPrevented).toEqual(
+      links.map(() => false)
     );
-    expect(
-      headerMocks.navigateLegacyDocument.mock.calls.map((call) => call[1])
-    ).toEqual(links.map(([, href]) => href));
-    for (const [locationLike, , click] of headerMocks.navigateLegacyDocument
-      .mock.calls) {
-      expect(locationLike).toBe(window.location);
-      expect(click).toEqual(expect.objectContaining({ button: 0 }));
-    }
   });
 
   it('closes the mobile menu on outside clicks and pathname changes', () => {
@@ -227,6 +215,7 @@ describe('Header Next navigation boundary', () => {
     expect(source).not.toMatch(
       /react-router|useLocation|useNavigate|router\.refresh|\bnavigate\s*\(/u
     );
+    expect(source).not.toMatch(/navigateLegacyDocument/u);
     expect(source).toMatch(/usePathname/u);
     expect(source).toMatch(/reloadDocument\(window\.location\)/u);
   });
@@ -238,7 +227,6 @@ describe('Header unread-interest badge', () => {
   beforeEach(() => {
     userState = individualUserState();
     headerMocks.getUnreadThreadCount.mockReset();
-    headerMocks.navigateLegacyDocument.mockReset();
     headerMocks.nextLinkDefaultPrevented.length = 0;
     headerMocks.pathname = '/home';
     headerMocks.reloadDocument.mockReset();

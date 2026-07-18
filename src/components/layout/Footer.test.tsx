@@ -6,7 +6,7 @@ import { vi } from 'vitest';
 import { zeffyUrl } from '../../utils/marketing';
 
 const footerMocks = vi.hoisted(() => ({
-  navigateLegacyDocument: vi.fn()
+  nextLinkDefaultPrevented: [] as boolean[]
 }));
 
 vi.mock('next/link', () => ({
@@ -17,6 +17,7 @@ vi.mock('next/link', () => ({
       {...props}
       onClick={(event) => {
         props.onClick?.(event);
+        footerMocks.nextLinkDefaultPrevented.push(event.defaultPrevented);
         event.preventDefault();
       }}
     >
@@ -24,10 +25,6 @@ vi.mock('next/link', () => ({
     </a>
   )
 }));
-vi.mock('../../utils/navigation', () => ({
-  navigateLegacyDocument: footerMocks.navigateLegacyDocument
-}));
-
 import Footer from './Footer';
 
 const internalLinks = [
@@ -51,7 +48,7 @@ const externalHrefs = [
 
 describe('Footer navigation boundary', () => {
   beforeEach(() => {
-    footerMocks.navigateLegacyDocument.mockReset();
+    footerMocks.nextLinkDefaultPrevented.length = 0;
   });
 
   it('uses Next links for every internal destination', () => {
@@ -86,7 +83,7 @@ describe('Footer navigation boundary', () => {
     );
   });
 
-  it('passes every internal Next Link href to the document boundary', () => {
+  it('lets every internal Next Link perform client navigation', () => {
     render(<Footer />);
 
     for (const [name] of internalLinks) {
@@ -94,17 +91,9 @@ describe('Footer navigation boundary', () => {
       fireEvent.click(link);
     }
 
-    expect(footerMocks.navigateLegacyDocument).toHaveBeenCalledTimes(
-      internalLinks.length
+    expect(footerMocks.nextLinkDefaultPrevented).toEqual(
+      internalLinks.map(() => false)
     );
-    expect(
-      footerMocks.navigateLegacyDocument.mock.calls.map((call) => call[1])
-    ).toEqual(internalLinks.map(([, href]) => href));
-    for (const [locationLike, , click] of footerMocks.navigateLegacyDocument
-      .mock.calls) {
-      expect(locationLike).toBe(window.location);
-      expect(click).toEqual(expect.objectContaining({ button: 0 }));
-    }
   });
 
   it('contains no React Router dependency', () => {
@@ -114,6 +103,8 @@ describe('Footer navigation boundary', () => {
     );
 
     expect(source).toContain("from 'next/link'");
-    expect(source).not.toMatch(/react-router-dom|\bto=/u);
+    expect(source).not.toMatch(
+      /navigateLegacyDocument|react-router-dom|\bto=/u
+    );
   });
 });
