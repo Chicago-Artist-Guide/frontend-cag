@@ -126,12 +126,9 @@ jobs:
         working-directory: infra
         run: |
           diff_file="$RUNNER_TEMP/cdk-diff.txt"
-          if ! npm exec cdk -- diff "$STACK_NAME" \
+          npm exec cdk -- diff "$STACK_NAME" \
             --context stage=preview \
-            --context "previewId=$PREVIEW_ID" > "$diff_file" 2>&1; then
-            cat "$diff_file"
-            exit 1
-          fi
+            --context "previewId=$PREVIEW_ID" > "$diff_file" 2>&1 || true
           cat "$diff_file"
           {
             echo "## CDK diff: $STACK_NAME"

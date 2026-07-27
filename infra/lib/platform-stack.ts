@@ -8,11 +8,13 @@ import {
   type StackProps,
   Tags
 } from 'aws-cdk-lib';
+import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import type { Construct } from 'constructs';
 import type { DeploymentTarget } from './deployment-target.js';
 
@@ -33,6 +35,11 @@ export type PublicBuildArguments = Record<
 export interface PlatformStackProps extends StackProps {
   buildArguments: PublicBuildArguments;
   target: DeploymentTarget;
+  certificateArn?: string;
+  webAclArn?: string;
+  flowLogs?: boolean;
+  cpu?: number;
+  memoryLimitMiB?: number;
 }
 
 const repositoryRoot = resolve(
@@ -42,7 +49,16 @@ const repositoryRoot = resolve(
 
 export class PlatformStack extends Stack {
   constructor(scope: Construct, id: string, props: PlatformStackProps) {
-    const { buildArguments, target, ...stackProps } = props;
+    const {
+      buildArguments,
+      target,
+      certificateArn,
+      webAclArn,
+      flowLogs = false,
+      cpu = 256,
+      memoryLimitMiB = 512,
+      ...stackProps
+    } = props;
     super(scope, id, {
       ...stackProps,
       terminationProtection: target.isProduction
@@ -69,6 +85,22 @@ export class PlatformStack extends Stack {
         }
       ]
     });
+    if (flowLogs) {
+      const flowLogGroup = new logs.LogGroup(this, 'VpcFlowLogGroup', {
+        logGroupName: `/cag/${target.deploymentId}/vpc-flow-logs`,
+        removalPolicy: target.isProduction
+          ? RemovalPolicy.RETAIN
+          : RemovalPolicy.DESTROY,
+        retention: target.isProduction
+          ? logs.RetentionDays.ONE_MONTH
+          : logs.RetentionDays.ONE_WEEK
+      });
+      new ec2.FlowLog(this, 'VpcFlowLogs', {
+        resourceType: ec2.FlowLogResourceType.fromVpc(vpc),
+        destination: ec2.FlowLogDestination.toCloudWatchLogs(flowLogGroup)
+      });
+    }
+
 
     const applicationImage = new ecrAssets.DockerImageAsset(
       this,
@@ -101,8 +133,8 @@ export class PlatformStack extends Stack {
       this,
       'TaskDefinition',
       {
-        cpu: 256,
-        memoryLimitMiB: 512,
+        cpu,
+        memoryLimitMiB,
         runtimePlatform: {
           cpuArchitecture: ecs.CpuArchitecture.X86_64,
           operatingSystemFamily: ecs.OperatingSystemFamily.LINUX
@@ -181,23 +213,62 @@ export class PlatformStack extends Stack {
       port: 80,
       protocol: elbv2.ApplicationProtocol.HTTP
     });
-    listener.addTargets('ApplicationTargets', {
-      deregistrationDelay: Duration.seconds(30),
-      healthCheck: {
-        healthyHttpCodes: '200',
-        interval: Duration.seconds(30),
-        path: '/api/health/ready',
-        timeout: Duration.seconds(5)
-      },
-      port: 3000,
-      protocol: elbv2.ApplicationProtocol.HTTP,
-      targets: [service]
-    });
+    if (certificateArn) {
+      listener.addAction('RedirectToHttps', {
+        action: elbv2.ListenerAction.redirect({
+          permanent: true,
+          port: '443',
+          protocol: 'HTTPS'
+        })
+      });
+      const certificate = acm.Certificate.fromCertificateArn(
+        this,
+        'Certificate',
+        certificateArn
+      );
+      const httpsListener = loadBalancer.addListener('HttpsListener', {
+        certificates: [certificate],
+        port: 443,
+        protocol: elbv2.ApplicationProtocol.HTTPS
+      });
+      httpsListener.addTargets('ApplicationTargets', {
+        deregistrationDelay: Duration.seconds(30),
+        healthCheck: {
+          healthyHttpCodes: '200',
+          interval: Duration.seconds(30),
+          path: '/api/health/ready',
+          timeout: Duration.seconds(5)
+        },
+        port: 3000,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        targets: [service]
+      });
+    } else {
+      listener.addTargets('ApplicationTargets', {
+        deregistrationDelay: Duration.seconds(30),
+        healthCheck: {
+          healthyHttpCodes: '200',
+          interval: Duration.seconds(30),
+          path: '/api/health/ready',
+          timeout: Duration.seconds(5)
+        },
+        port: 3000,
+        protocol: elbv2.ApplicationProtocol.HTTP,
+        targets: [service]
+      });
+    }
     service.connections.allowFrom(
       loadBalancer,
       ec2.Port.tcp(3000),
       'Allow ALB traffic to the application'
     );
+    if (webAclArn) {
+      new wafv2.CfnWebACLAssociation(this, 'WebAclAssociation', {
+        resourceArn: loadBalancer.loadBalancerArn,
+        webAclArn
+      });
+    }
+
 
     const scaling = service.autoScaleTaskCount({
       maxCapacity: target.isProduction ? 4 : 2,
@@ -230,7 +301,7 @@ export class PlatformStack extends Stack {
       value: loadBalancer.loadBalancerDnsName
     });
     new CfnOutput(this, 'LoadBalancerUrl', {
-      value: `http://${loadBalancer.loadBalancerDnsName}`
+      value: `${certificateArn ? 'https' : 'http'}://${loadBalancer.loadBalancerDnsName}`
     });
   }
 }

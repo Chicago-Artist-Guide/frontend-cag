@@ -9,6 +9,7 @@ import type { CloudAssembly } from 'aws-cdk-lib/cx-api';
 import { resolveDeploymentTarget } from '../lib/deployment-target.js';
 import {
   PlatformStack,
+  type PlatformStackProps,
   type PublicBuildArguments
 } from '../lib/platform-stack.js';
 import { createTestApp } from './test-app.js';
@@ -21,16 +22,22 @@ const buildArguments: PublicBuildArguments = {
   NEXT_PUBLIC_FIREBASE_SENDER_ID: 'sender-id',
   NEXT_PUBLIC_LGL_API_KEY: 'lgl-key'
 };
-
 const createStack = (
   stageName: 'preview' | 'production' | 'staging',
-  previewId?: string
+  previewId?: string,
+  overrides?: Partial<
+    Pick<
+      PlatformStackProps,
+      'certificateArn' | 'webAclArn' | 'flowLogs' | 'cpu' | 'memoryLimitMiB'
+    >
+  >
 ) => {
   const app = createTestApp();
   const target = resolveDeploymentTarget(stageName, previewId);
   const stack = new PlatformStack(app, target.stackName, {
     buildArguments,
-    target
+    target,
+    ...overrides
   });
 
   return { app, stack, template: Template.fromStack(stack) };
@@ -322,5 +329,92 @@ describe('PlatformStack', () => {
         ])
       }
     );
+  });
+  it('creates only an HTTP listener when no certificateArn is provided', () => {
+    const { template } = createStack('staging');
+
+    template.resourceCountIs('AWS::ElasticLoadBalancingV2::Listener', 1);
+  });
+
+  it('creates HTTP and HTTPS listeners when certificateArn is provided', () => {
+    const { template } = createStack('staging', undefined, {
+      certificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/test'
+    });
+
+    template.resourceCountIs('AWS::ElasticLoadBalancingV2::Listener', 2);
+    template.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', {
+      Port: 443,
+      Protocol: 'HTTPS'
+    });
+    template.hasResourceProperties('AWS::ElasticLoadBalancingV2::Listener', {
+      Port: 80,
+      Protocol: 'HTTP'
+    });
+    template.hasResourceProperties(
+      'AWS::ElasticLoadBalancingV2::Listener',
+      Match.objectLike({
+        DefaultActions: Match.arrayWith([
+          Match.objectLike({
+            Type: 'redirect',
+            RedirectConfig: Match.objectLike({
+              Port: '443',
+              Protocol: 'HTTPS'
+            })
+          })
+        ])
+      })
+    );
+  });
+
+  it('does not create VPC Flow Logs when flowLogs is false', () => {
+    const { template } = createStack('staging');
+
+    template.resourceCountIs('AWS::EC2::FlowLog', 0);
+  });
+
+  it('creates VPC Flow Logs when flowLogs is true', () => {
+    const { template } = createStack('staging', undefined, {
+      flowLogs: true
+    });
+
+    template.resourceCountIs('AWS::EC2::FlowLog', 1);
+    template.hasResourceProperties('AWS::Logs::LogGroup', {
+      LogGroupName: '/cag/staging/vpc-flow-logs'
+    });
+  });
+
+  it('uses default CPU 256 and memory 512 for preview stacks', () => {
+    const { template } = createStack('preview', 'dev-511');
+
+    template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+      Cpu: '256',
+      Memory: '512'
+    });
+  });
+
+  it('accepts overridden CPU and memory values', () => {
+    const { template } = createStack('production', undefined, {
+      cpu: 512,
+      memoryLimitMiB: 1024
+    });
+
+    template.hasResourceProperties('AWS::ECS::TaskDefinition', {
+      Cpu: '512',
+      Memory: '1024'
+    });
+  });
+
+  it('uses https:// in LoadBalancerUrl when certificateArn is provided', () => {
+    const { template } = createStack('staging', undefined, {
+      certificateArn: 'arn:aws:acm:us-east-1:123456789012:certificate/test'
+    });
+
+    template.hasOutput('LoadBalancerUrl', {
+      Value: {
+        'Fn::Join': Match.arrayWith([
+          Match.arrayWith([Match.stringLikeRegexp('^https://')])
+        ])
+      }
+    });
   });
 });
