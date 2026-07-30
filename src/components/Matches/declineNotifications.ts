@@ -44,7 +44,7 @@ const notifyDeclinedMatches = async (
       const shortMessage = theaterDeclineArtistMessage(roleName, theaterName);
       const emailText = theaterDeclineArtistEmailText(theaterName, roleName);
 
-      if (account?.email) {
+      if (account && account.email) {
         await sendMessageThreadWithEmail({
           firebaseStore,
           theaterAccountId,

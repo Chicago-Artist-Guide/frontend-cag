@@ -90,7 +90,7 @@ export const TalentMatchCard = ({
       shortMessage,
       productionId,
       roleId,
-      email: talentAccount?.email
+      email: talentAccount && talentAccount.email
         ? {
             to: talentAccount.email,
             subject: theaterToArtistEmailSubject(roleName, productionName),

@@ -120,7 +120,8 @@ export const CompanyMatchCard = ({
 
   const sendApplyNotifications = async (
     theaterAccountId: string,
-    talentAccountId: string
+    talentAccountId: string,
+    theaterProfile: Profile
   ) => {
     const contactEmail = currentUser?.email || NO_EMAIL;
     const talentFullName = `${account?.data.first_name} ${account?.data.last_name}`;
@@ -142,15 +143,15 @@ export const CompanyMatchCard = ({
       contactEmail
     );
 
-    let toEmail = theater?.primary_contact_email;
+    let toEmail = theaterProfile.primary_contact_email;
 
     if (!toEmail) {
       const theaterAccount = await getTheaterAccountByAccountId(
         firebaseFirestore,
-        theater.account_id
+        theaterProfile.account_id
       );
 
-      if (theaterAccount?.email) {
+      if (theaterAccount && theaterAccount.email) {
         toEmail = theaterAccount.email;
       }
     }
@@ -212,7 +213,8 @@ export const CompanyMatchCard = ({
 
         const messageThreadId = await sendApplyNotifications(
           theaterAccountId,
-          talentAccountId
+          talentAccountId,
+          theater
         );
 
         return messageThreadId;
