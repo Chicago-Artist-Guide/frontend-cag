@@ -9,7 +9,7 @@ import { PageContainer, Title } from '../components/layout';
 import Button from '../components/shared/Button';
 import { useFirebaseContext } from '../context/FirebaseContext';
 import { useUserContext } from '../context/UserContext';
-import Red_Blob from '../images/red_blob.svg';
+import { Red_Blob } from '../config/publicImages';
 
 const Login = () => {
   const navigate = useNavigate();

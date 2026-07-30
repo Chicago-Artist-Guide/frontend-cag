@@ -1,49 +1,42 @@
-// Board of Directors
-import Adler from '../../images/who-we-are/board/Board_Adler.jpg';
-import Cooper from '../../images/who-we-are/board/Board_Cooper.png';
-import Dolezalek from '../../images/who-we-are/board/Board_Dolezalek.png';
-import Frazier from '../../images/who-we-are/board/Board_Frazier.png';
-import GomezBeloz from '../../images/who-we-are/board/Board_Gomez-Beloz.jpg';
-import Goins from '../../images/who-we-are/board/Board_Goins.jpg';
-import Laws from '../../images/who-we-are/board/Board_Laws.jpg';
-import McCall from '../../images/who-we-are/board/Board_McCall.jpg';
-
-// Artist Auxiliary Board
-import Ferro from '../../images/who-we-are/board/Board_Ferro.png';
-import Kauffman from '../../images/who-we-are/board/Board_Kauffman.png';
-import Mangren from '../../images/who-we-are/board/Board_Mangren.jpg';
-import Kester from '../../images/who-we-are/board/Board_Kester.png';
-import Tayler from '../../images/who-we-are/board/Board_Tayler.jpg';
-import Carter from '../../images/who-we-are/board/Board_Carter.jpg';
-import Johnson from '../../images/who-we-are/board/Board_Johnson.jpg';
-import Mason from '../../images/who-we-are/board/Board_Mason.jpg';
-import Russell from '../../images/who-we-are/board/Board_Russell.jpg';
-import Spielman from '../../images/who-we-are/board/Board_Spielman.png';
-import Uyao from '../../images/who-we-are/board/Board_Uyao.jpg';
-import Moorman from '../../images/who-we-are/operations/Staff_Moorman.png';
-
-// Business Operations
-import Schutz from '../../images/who-we-are/board/Board_Schutz.png';
-import Adamy from '../../images/who-we-are/operations/Staff_Adamy.png';
-import Newsome from '../../images/who-we-are/operations/Staff_Newsome.png';
-import Walton from '../../images/who-we-are/operations/Staff_Walton.jpg';
-import Cadenhead from '../../images/who-we-are/board/Board_Cadenhead.png';
-import Benda from '../../images/who-we-are/operations/Staff_Benda.jpg';
-import Ledesma from '../../images/who-we-are/operations/Staff_Ledesma.jpg';
-import Meyers from '../../images/who-we-are/operations/Staff_Meyers.jpg';
-
-// Site Development
-import MendezGonzalez from '../../images/who-we-are/board/Board_Mendez_Gonzalez.jpg';
-import Fischer from '../../images/who-we-are/technical/Staff_Fischer.jpg';
-import JewellAlex from '../../images/who-we-are/technical/Staff_Jewell.jpg';
-import Knuteson from '../../images/who-we-are/technical/Staff_Knuteson.jpg';
-import Goldstein from '../../images/who-we-are/technical/Staff_Goldstein.png';
-import Glendinning from '../../images/who-we-are/technical/Staff_Glendinning.jpg';
-
-// Advisory Board
-import Silva from '../../images/who-we-are/board/Board_Silva.jpg';
-import Steinrock from '../../images/who-we-are/board/Board_Steinrock.jpg';
-import JewellJordin from '../../images/who-we-are/operations/Staff_Jewell.jpg';
+import {
+  Adamy,
+  Adler,
+  Benda,
+  Cadenhead,
+  Carter,
+  Cooper,
+  Dolezalek,
+  Ferro,
+  Fischer,
+  Frazier,
+  Glendinning,
+  Goins,
+  Goldstein,
+  GomezBeloz,
+  JewellAlex,
+  JewellJordin,
+  Johnson,
+  Kauffman,
+  Kester,
+  Knuteson,
+  Laws,
+  Ledesma,
+  Mangren,
+  Mason,
+  McCall,
+  MendezGonzalez,
+  Meyers,
+  Moorman,
+  Newsome,
+  Russell,
+  Schutz,
+  Silva,
+  Spielman,
+  Steinrock,
+  Tayler,
+  Uyao,
+  Walton
+} from '../../config/publicImages';
 
 const bioId = () => (<any>crypto).randomUUID();
 

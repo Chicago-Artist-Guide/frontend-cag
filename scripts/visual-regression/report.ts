@@ -1,115 +1,240 @@
-/**
- * Renders an HTML side-by-side report from snapshots/diff/summary.json.
- *
- * Usage:
- *   npx tsx scripts/visual-regression/report.ts
- *
- * Output: scripts/visual-regression/snapshots/diff/report.html
- */
-
+import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import fs from 'node:fs/promises';
-import type { DiffEntry } from './diff';
+import { pathToFileURL } from 'node:url';
+import {
+  parseVisualArgs,
+  resolveSafeVisualPaths,
+  type VisualEnvironment
+} from './config';
+import {
+  acquireGenerationLock,
+  validateDiffSummary,
+  type DiffIssue,
+  type DiffResult,
+  type DiffSummaryV1
+} from './diff-core';
 
-const SNAP_DIR = path.resolve(
-  process.cwd(),
-  'scripts/visual-regression/snapshots'
-);
-const DIFF_DIR = path.join(SNAP_DIR, 'diff');
+const CSP =
+  "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; object-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'";
 
-function relFromReport(absPath: string): string {
-  return path.relative(DIFF_DIR, absPath);
-}
+const escapeHtml = (value: unknown): string =>
+  String(value)
+    .replace(/&/gu, '&amp;')
+    .replace(/</gu, '&lt;')
+    .replace(/>/gu, '&gt;')
+    .replace(/"/gu, '&quot;')
+    .replace(/'/gu, '&#39;');
 
-function escape(s: string): string {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
+const codePointCompare = (left: string, right: string): number => {
+  const leftPoints = Array.from(
+    left,
+    (character) => character.codePointAt(0) ?? 0
+  );
+  const rightPoints = Array.from(
+    right,
+    (character) => character.codePointAt(0) ?? 0
+  );
+  const length = Math.max(leftPoints.length, rightPoints.length);
+  for (let index = 0; index < length; index += 1) {
+    const difference =
+      (leftPoints[index] ?? Number.NEGATIVE_INFINITY) -
+      (rightPoints[index] ?? Number.NEGATIVE_INFINITY);
+    if (difference !== 0) return difference;
+  }
+  return 0;
+};
 
-function renderRow(r: DiffEntry): string {
-  const pct = (r.diffRatio * 100).toFixed(3);
-  const cls =
-    r.status === 'ok' ? 'ok' : r.status === 'changed' ? 'changed' : 'missing';
-  return `
-    <section class="row ${cls}">
-      <header>
-        <h2>${escape(r.route)} <span class="vp">${escape(r.viewport)}</span></h2>
-        <span class="badge ${cls}">${r.status}</span>
-        <span class="metric">${r.diffPixels.toLocaleString()} px (${pct}%)</span>
-      </header>
-      <div class="grid">
-        <figure><figcaption>baseline</figcaption><img src="${escape(relFromReport(r.baselinePath))}" loading="lazy" /></figure>
-        <figure><figcaption>current</figcaption><img src="${escape(relFromReport(r.currentPath))}" loading="lazy" /></figure>
-        <figure><figcaption>diff</figcaption><img src="${escape(relFromReport(r.diffPath))}" loading="lazy" /></figure>
-      </div>
-    </section>`;
-}
+const issueKey = (issues: readonly DiffIssue[]): string =>
+  issues
+    .map(({ code }) => code)
+    .sort(codePointCompare)
+    .join('\0');
 
-async function main() {
-  const summaryFile = path.join(DIFF_DIR, 'summary.json');
-  const summary = JSON.parse(await fs.readFile(summaryFile, 'utf8')) as {
-    threshold: number;
-    results: DiffEntry[];
-  };
+const viewGroup = (result: DiffResult): number => {
+  if (result.gateVerdict === 'fail') return 0;
+  if (result.gateVerdict === 'not-enforced') return 1;
+  if (result.comparison === 'changed') return 2;
+  return 3;
+};
 
-  // Sort: changed first (descending diffRatio), then missing, then ok
-  const order = (s: DiffEntry['status']) =>
-    s === 'changed'
-      ? 0
-      : s === 'missing-baseline' || s === 'missing-current'
-        ? 1
-        : 2;
-  const sorted = [...summary.results].sort((a, b) => {
-    const o = order(a.status) - order(b.status);
-    return o !== 0 ? o : b.diffRatio - a.diffRatio;
+const viewportOrder = (viewport: string): number =>
+  viewport === 'desktop' ? 0 : viewport === 'mobile' ? 1 : 2;
+
+const sortedView = (results: readonly DiffResult[]): DiffResult[] =>
+  [...results].sort((left, right) => {
+    const group = viewGroup(left) - viewGroup(right);
+    if (group !== 0) return group;
+    const issues = codePointCompare(
+      issueKey(left.issues),
+      issueKey(right.issues)
+    );
+    if (issues !== 0) return issues;
+    const leftRatio = left.ratio ?? Number.NEGATIVE_INFINITY;
+    const rightRatio = right.ratio ?? Number.NEGATIVE_INFINITY;
+    if (leftRatio !== rightRatio) return rightRatio - leftRatio;
+    const id = codePointCompare(left.id, right.id);
+    if (id !== 0) return id;
+    return viewportOrder(left.viewport) - viewportOrder(right.viewport);
   });
 
-  const html = `<!DOCTYPE html>
+const imageOrPlaceholder = (
+  label: string,
+  asset: string | undefined,
+  evidence: string
+): string => {
+  const body = asset
+    ? `<img alt="${escapeHtml(label)}" loading="lazy" src="${escapeHtml(asset)}" />`
+    : `<div class="placeholder">asset unavailable (${escapeHtml(evidence)})</div>`;
+  return `<figure><figcaption>${escapeHtml(label)}</figcaption>${body}</figure>`;
+};
+
+const renderResult = (result: DiffResult): string => {
+  const changedUnderThreshold =
+    result.comparison === 'changed' && result.gateVerdict === 'pass';
+  const classes = [
+    'row',
+    `gate-${result.gateVerdict}`,
+    changedUnderThreshold ? 'changed-under-threshold' : ''
+  ]
+    .filter(Boolean)
+    .join(' ');
+  const ratio =
+    result.ratio === null
+      ? 'not available'
+      : `${(result.ratio * 100).toFixed(6)}%`;
+  const issues =
+    result.issues.length === 0
+      ? '<li>none</li>'
+      : result.issues
+          .map(
+            ({ code, message, scope }) =>
+              `<li><code>${escapeHtml(code)}</code> [${escapeHtml(scope)}] ${escapeHtml(message)}</li>`
+          )
+          .join('');
+  return `<section class="${escapeHtml(classes)}" data-id="${escapeHtml(result.id)}">
+  <header><h2>${escapeHtml(result.id)} <span>${escapeHtml(result.viewport)}</span></h2><strong>${escapeHtml(result.gateVerdict)}</strong></header>
+  <p><code>${escapeHtml(result.path)}</code> · ${escapeHtml(result.comparison)} · ${escapeHtml(String(result.diffPixels))} pixels · ${escapeHtml(ratio)}</p>
+  <ul>${issues}</ul>
+  <div class="grid">
+    ${imageOrPlaceholder('baseline', result.baselineAsset, result.baselineEvidence)}
+    ${imageOrPlaceholder('current', result.currentAsset, result.currentEvidence)}
+    ${imageOrPlaceholder('diff', result.diffAsset, result.comparison)}
+  </div>
+</section>`;
+};
+
+export function renderReport(summary: DiffSummaryV1): string {
+  const results = sortedView(summary.results);
+  const runErrors = summary.runErrors
+    .map(
+      ({ message, name, phase }) =>
+        `<li><code>${escapeHtml(phase)}</code> ${escapeHtml(name)}: ${escapeHtml(message)}</li>`
+    )
+    .join('');
+  return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy" content="${escapeHtml(CSP)}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Visual Regression Report</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin: 0; font: 14px/1.5 -apple-system, BlinkMacSystemFont, sans-serif; background: #0e1116; color: #e6edf3; padding: 24px; }
-    h1 { margin: 0 0 4px; }
-    .summary { color: #8b949e; margin-bottom: 24px; }
-    .row { background: #161b22; border: 1px solid #30363d; border-radius: 8px; margin-bottom: 16px; padding: 16px; }
-    .row.changed { border-color: #d29922; }
-    .row.missing { border-color: #f85149; }
-    .row.ok { opacity: 0.5; }
-    .row header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 12px; }
-    .row h2 { margin: 0; font-size: 16px; }
-    .vp { color: #8b949e; font-weight: normal; font-size: 13px; }
-    .badge { padding: 2px 8px; border-radius: 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .badge.ok { background: #1f6feb33; color: #58a6ff; }
-    .badge.changed { background: #d2992233; color: #f0b429; }
-    .badge.missing { background: #f8514933; color: #ff7b72; }
-    .metric { color: #8b949e; margin-left: auto; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+    body { background: #0e1116; color: #e6edf3; font: 14px/1.5 system-ui, sans-serif; margin: 0; padding: 24px; }
+    .summary, figcaption, header span { color: #8b949e; }
+    .row { background: #161b22; border: 2px solid #30363d; border-radius: 8px; margin: 16px 0; padding: 16px; }
+    .gate-fail { border-color: #f85149; }
+    .gate-not-enforced { border-color: #d29922; }
+    .changed-under-threshold { border-style: dashed; border-color: #58a6ff; }
+    header { align-items: baseline; display: flex; gap: 12px; justify-content: space-between; }
+    h1, h2 { margin-top: 0; }
+    .grid { display: grid; gap: 12px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     figure { margin: 0; }
-    figcaption { font-size: 12px; color: #8b949e; margin-bottom: 4px; }
-    img { width: 100%; max-height: 600px; object-fit: contain; background: #0e1116; border: 1px solid #30363d; border-radius: 4px; }
+    img { background: #0e1116; border: 1px solid #30363d; max-height: 600px; object-fit: contain; width: 100%; }
+    .placeholder { align-items: center; border: 1px dashed #8b949e; display: flex; justify-content: center; min-height: 120px; }
+    code { overflow-wrap: anywhere; }
   </style>
 </head>
 <body>
   <h1>Visual Regression Report</h1>
-  <p class="summary">
-    threshold = ${summary.threshold} •
-    ${summary.results.filter((r) => r.status === 'changed').length} changed •
-    ${summary.results.filter((r) => r.status.startsWith('missing')).length} missing •
-    ${summary.results.filter((r) => r.status === 'ok').length} ok
-  </p>
-  ${sorted.map(renderRow).join('\n')}
+  <p class="summary">gate ${escapeHtml(summary.gateVerdict)} · threshold ${escapeHtml(String(summary.maxDiffRatio))} · selected ${escapeHtml(String(summary.totals.selected))} · failed ${escapeHtml(String(summary.totals.failed))} · informational ${escapeHtml(String(summary.totals.notEnforced))}</p>
+  ${runErrors ? `<aside><h2>Run errors</h2><ul>${runErrors}</ul></aside>` : ''}
+  ${results.map(renderResult).join('\n')}
 </body>
 </html>
 `;
-
-  const out = path.join(DIFF_DIR, 'report.html');
-  await fs.writeFile(out, html);
-  console.log(`[report] wrote ${out}`);
 }
 
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+export interface RunReportOptions {
+  beforeCommit?: () => Promise<void>;
+}
+
+export async function runReport(
+  summaryFile: string,
+  reportFile: string,
+  options: RunReportOptions = {}
+): Promise<0 | 1> {
+  const diffDir = path.dirname(summaryFile);
+  if (
+    summaryFile !== path.join(diffDir, 'summary.json') ||
+    reportFile !== path.join(diffDir, 'report.html')
+  ) {
+    await rm(reportFile, { force: true });
+    return 1;
+  }
+  let release: (() => Promise<void>) | undefined;
+  let acquired = false;
+  const partial = path.join(
+    diffDir,
+    `.${path.basename(reportFile)}.${process.pid}.partial`
+  );
+  try {
+    const lock = await acquireGenerationLock(diffDir);
+    release = lock.release;
+    acquired = true;
+    const source = await readFile(summaryFile, 'utf8');
+    const summary = validateDiffSummary(JSON.parse(source));
+    await mkdir(diffDir, { recursive: true });
+    await writeFile(partial, renderReport(summary), 'utf8');
+    await options.beforeCommit?.();
+    const currentSource = await readFile(summaryFile, 'utf8');
+    const current = validateDiffSummary(JSON.parse(currentSource));
+    if (
+      currentSource !== source ||
+      current.generationId !== summary.generationId
+    ) {
+      throw new Error('diff generation changed while rendering report');
+    }
+    await rename(partial, reportFile);
+    return 0;
+  } catch {
+    if (acquired) await rm(reportFile, { force: true });
+    return 1;
+  } finally {
+    await rm(partial, { force: true });
+    await release?.();
+  }
+}
+
+export async function runReportCommand(
+  argv: readonly string[],
+  environment: VisualEnvironment,
+  cwd: string
+): Promise<0 | 1> {
+  parseVisualArgs(argv, 'report');
+  const paths = resolveSafeVisualPaths(environment, cwd);
+  return runReport(paths.summaryFile, paths.reportFile);
+}
+
+if (
+  process.argv[1] &&
+  import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
+) {
+  void runReportCommand(process.argv.slice(2), process.env, process.cwd())
+    .then((code) => {
+      process.exitCode = code;
+    })
+    .catch(() => {
+      process.exitCode = 1;
+    });
+}

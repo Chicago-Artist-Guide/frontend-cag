@@ -8,8 +8,7 @@ import Collapsible from '../components/layout/Collapsible';
 import PageContainer from '../components/layout/PageContainer';
 import { Tagline, Title } from '../components/layout/Titles';
 import SVGLayer from '../components/SVGLayer';
-import blueBlob from '../images/blue_blob.svg';
-import streamingDance from '../images/streaming_dance.svg';
+import { blueBlob, streamingDance } from '../config/publicImages';
 
 const FAQ = () => {
   const sectionTitles = {

@@ -1,213 +1,56 @@
+import Link from 'next/link';
 import React from 'react';
-import styled from 'styled-components';
-import Collapsible from '../components/layout/Collapsible';
 import PageContainer from '../components/layout/PageContainer';
-import bios from '../components/WhoWeAre/bios';
-import Team from '../components/WhoWeAre/Team';
+import AboutFrame from '../components/WhoWeAre/AboutFrame';
+import AboutTeam from '../components/WhoWeAre/AboutTeam';
 
 const WhoWeAre = () => {
-  const sectionTitles = {
-    board: 'BOARD OF DIRECTORS',
-    artists: 'ARTIST AUXILIARY BOARD',
-    operations: 'BUSINESS OPERATIONS',
-    technical: 'SITE DEVELOPMENT',
-    artistAdvisory: 'ADVISORY BOARD'
-  };
-
   return (
     <PageContainer>
-      <div className="max-w-full">
-        <HeaderSection>
-          <PageTitle>ABOUT US</PageTitle>
-          <DividerBar />
-        </HeaderSection>
+      <AboutFrame className="max-w-full">
+        <div className="header-section">
+          <h1 className="page-title">ABOUT US</h1>
+          <div className="divider-bar" />
+        </div>
 
-        <AboutSection>
-          <VisionMissionWrapper>
-            <AboutCard>
-              <AboutTitle>Vision</AboutTitle>
-              <AboutText>Theatre for everyone, made by anyone.</AboutText>
-            </AboutCard>
+        <div className="about-section">
+          <div className="vision-mission-wrapper">
+            <div className="about-card">
+              <h2 className="about-title">Vision</h2>
+              <p className="about-text">
+                Theatre for everyone, made by anyone.
+              </p>
+            </div>
 
-            <AboutCard>
-              <AboutTitle>Mission</AboutTitle>
-              <AboutText>
+            <div className="about-card">
+              <h2 className="about-title">Mission</h2>
+              <p className="about-text">
                 To diversify Chicago theatre with a centralized online network
                 for artists, producers, and community groups.
-              </AboutText>
-              <AboutText>
+              </p>
+              <p className="about-text">
                 Learn more about us on our{' '}
-                <a
-                  href="/faq"
+                <Link
                   className="font-semibold text-[#82b29a] no-underline hover:text-[#6fa086] hover:underline"
+                  href="/faq"
                 >
                   FAQ page
-                </a>
+                </Link>
                 .
-              </AboutText>
-            </AboutCard>
-          </VisionMissionWrapper>
-        </AboutSection>
-
-        <TeamSection>
-          <MeetOurTeamTitle>Meet Our Team</MeetOurTeamTitle>
-          <div className="w-[100%]">
-            <Collapsible
-              sectionTitles={sectionTitles}
-              subSections={bios}
-              subContainer={Team}
-              grid={true}
-            />
+              </p>
+            </div>
           </div>
-        </TeamSection>
-      </div>
+        </div>
+
+        <div className="team-section">
+          <h2 className="meet-our-team-title">Meet Our Team</h2>
+          <div className="w-[100%]">
+            <AboutTeam />
+          </div>
+        </div>
+      </AboutFrame>
     </PageContainer>
   );
 };
 
 export default WhoWeAre;
-const HeaderSection = styled.div`
-  margin-bottom: 32px;
-  text-align: center;
-
-  @media (min-width: 768px) {
-    margin-bottom: 48px;
-  }
-`;
-
-const PageTitle = styled.h1`
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: #2f4550;
-  text-transform: uppercase;
-
-  @media (min-width: 640px) {
-    font-size: 2.5rem;
-    margin-bottom: 32px;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 3rem;
-    margin-bottom: 40px;
-  }
-`;
-
-const DividerBar = styled.div`
-  width: 100%;
-  max-width: 200px;
-  height: 3px;
-  border-radius: 2px;
-  margin: 0 auto;
-  background-image: linear-gradient(90deg, #efc93d 0%, #e17b60 100%);
-
-  @media (min-width: 640px) {
-    max-width: 250px;
-    height: 4px;
-  }
-
-  @media (min-width: 768px) {
-    max-width: 300px;
-  }
-`;
-
-const AboutSection = styled.div`
-  margin-bottom: 48px;
-
-  @media (min-width: 768px) {
-    margin-bottom: 64px;
-  }
-`;
-
-const VisionMissionWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  @media (min-width: 768px) {
-    flex-direction: row;
-    gap: 32px;
-  }
-
-  @media (min-width: 1024px) {
-    gap: 48px;
-  }
-`;
-
-const AboutCard = styled.div`
-  background: #f8f9fa;
-  border-radius: 12px;
-  padding: 24px;
-  flex: 1;
-
-  @media (min-width: 640px) {
-    padding: 32px;
-  }
-
-  @media (min-width: 768px) {
-    padding: 36px;
-  }
-`;
-
-const AboutTitle = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin-bottom: 16px;
-  color: #2f4550;
-
-  @media (min-width: 640px) {
-    font-size: 1.75rem;
-    margin-bottom: 20px;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 2rem;
-    margin-bottom: 24px;
-  }
-`;
-
-const AboutText = styled.p`
-  font-size: 1rem;
-  line-height: 1.6;
-  color: #444;
-  margin-bottom: 16px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  @media (min-width: 640px) {
-    font-size: 1.1rem;
-    line-height: 1.7;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 1.125rem;
-  }
-`;
-const TeamSection = styled.div`
-  margin-top: 48px;
-
-  @media (min-width: 768px) {
-    margin-top: 64px;
-  }
-`;
-
-const MeetOurTeamTitle = styled.h2`
-  font-size: 1.75rem;
-  font-weight: 700;
-  margin-bottom: 32px;
-  color: #2f4550;
-  text-align: center;
-
-  @media (min-width: 640px) {
-    font-size: 2rem;
-    margin-bottom: 40px;
-  }
-
-  @media (min-width: 768px) {
-    font-size: 2.25rem;
-    margin-bottom: 48px;
-    text-align: left;
-  }
-`;

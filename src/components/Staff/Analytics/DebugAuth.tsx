@@ -58,11 +58,11 @@ const DebugAuth: React.FC<React.PropsWithChildren<unknown>> = () => {
       </div>
 
       <div className="debug-item">
-        <strong>Account Ref:</strong> {account?.ref ? 'Present' : 'Missing'}
+        <strong>Account ID:</strong> {account?.id || 'Missing'}
       </div>
 
       <div className="debug-item">
-        <strong>Profile Ref:</strong> {profile?.ref ? 'Present' : 'Missing'}
+        <strong>Profile ID:</strong> {profile?.id || 'Missing'}
       </div>
 
       <div className={`debug-item ${isStaff ? 'success' : 'error'}`}>

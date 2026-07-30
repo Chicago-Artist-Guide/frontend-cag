@@ -9,6 +9,9 @@ const headerSource = fs.readFileSync(
 describe('DEV-382: artist unread-interest badge on the Header', () => {
   it('imports getUnreadThreadCount', () => {
     expect(headerSource).toMatch(/import\s*{\s*getUnreadThreadCount\s*}/);
+    expect(headerSource).toMatch(/services\/messages\/client/);
+    expect(headerSource).not.toMatch(/Messages\/api/);
+    expect(headerSource).not.toMatch(/FirebaseContext|useFirebaseContext/);
   });
 
   it('only renders the badge when unreadCount is greater than 0', () => {
@@ -21,5 +24,10 @@ describe('DEV-382: artist unread-interest badge on the Header', () => {
 
   it('does not gate the unread query on company accounts', () => {
     expect(headerSource).not.toMatch(/accountType === 'company'/);
+  });
+
+  it('reads account and profile IDs from user state', () => {
+    expect(headerSource).toMatch(/accountId = account\?\.id/);
+    expect(headerSource).toMatch(/profileId/);
   });
 });

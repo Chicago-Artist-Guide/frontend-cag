@@ -61,7 +61,7 @@ export const MatchProvider: React.FC<
 > = ({ firestore, productionId, roleIdParam, children }) => {
   const navigate = useNavigate();
   const { account } = useUserContext();
-  const theaterAccountId = account?.ref?.id;
+  const theaterAccountId = account?.id || undefined;
   const [matches, setMatches] = useState<IndividualProfileDataFullInit[]>([]);
   const [loading, setLoading] = useState(true);
   const [foundRole, setFoundRole] = useState<'loading' | 'found' | 'not-found'>(

@@ -1,0 +1,84 @@
+{
+  "sourceRepository": "https://github.com/google/fonts",
+  "sourceCommit": "389b770410cc0b7c21c85673bfa2077420fe7f65",
+  "retrievedAt": "2026-07-17",
+  "assets": [
+    {
+      "family": "Lora",
+      "file": "lora-italic-latin-400.woff2",
+      "originalUrl": "https://fonts.gstatic.com/s/lora/v37/0QI8MX1D_JOuMw_hLdO6T2wV9KnW-MoFoq92nPWc3ZyhTg.woff2",
+      "sha256": "e93da94dec22f905fdb1f79589eb50200922d3b18f191514ca3312ffbe4ff6f0",
+      "sourceFile": "ofl/lora/Lora-Italic[wght].ttf",
+      "sourceGitBlob": "e973ccf7e5c69a831090c729a0dc2c592f42f4cc",
+      "sourceSha256": "22d8d8854b53807aa664ca34f2031a9ed57a1d0dea296b8b96cdd3aad937a2b3",
+      "style": "italic",
+      "subset": "latin",
+      "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+      "weights": ["400"],
+      "woff2": {
+        "flavor": "TrueType",
+        "length": 22740,
+        "numTables": 15,
+        "totalSfntSize": 48968
+      }
+    },
+    {
+      "family": "Montserrat",
+      "file": "montserrat-normal-latin.woff2",
+      "originalUrl": "https://fonts.gstatic.com/s/montserrat/v31/JTUSjIg1_i6t8kCHKm459WlhyyTh89Y.woff2",
+      "sha256": "6438d7b8ea9c7c3992d5e2fd2afdb1ff948570a3ef0bedae76247b51632960ba",
+      "sourceFile": "ofl/montserrat/Montserrat[wght].ttf",
+      "sourceGitBlob": "c97aca18592834d8706549c279cb8d5ac5d85f69",
+      "sourceSha256": "0f7b311b2f3279e4eef9b2f968bcdbab6e28f4daeb1f049f4f278a902bcd82f7",
+      "style": "normal",
+      "subset": "latin",
+      "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+      "weights": ["400", "700"],
+      "woff2": {
+        "flavor": "TrueType",
+        "length": 35508,
+        "numTables": 20,
+        "totalSfntSize": 93292
+      }
+    },
+    {
+      "family": "Open Sans",
+      "file": "open-sans-normal-latin.woff2",
+      "originalUrl": "https://fonts.gstatic.com/s/opensans/v44/memvYaGs126MiZpBA-UvWbX2vVnXBbObj2OVTS-mu0SC55I.woff2",
+      "sha256": "441af0def989ebfdbd6ad85ffaed85e967ab21a05f1dd342f16259464a206dd0",
+      "sourceFile": "ofl/opensans/OpenSans[wdth,wght].ttf",
+      "sourceGitBlob": "9db85693b027f3b05f6d77471d215f20707127c1",
+      "sourceSha256": "36643644f318a812aab2d2ed3bb98f8cf0872527f835fe9398d95fe6b9adb878",
+      "style": "normal",
+      "subset": "latin",
+      "unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD",
+      "weights": ["300", "600"],
+      "woff2": {
+        "flavor": "TrueType",
+        "length": 42964,
+        "numTables": 19,
+        "totalSfntSize": 72520
+      }
+    }
+  ],
+  "licenses": [
+    {
+      "family": "Lora",
+      "file": "OFL-Lora.txt",
+      "sha256": "1d9a970809ac804b582a6ce7f0ebc4e7fefcbfd7ff6299cad35ee656a21be716",
+      "sourceUrl": "https://raw.githubusercontent.com/google/fonts/389b770410cc0b7c21c85673bfa2077420fe7f65/ofl/lora/OFL.txt"
+    },
+    {
+      "family": "Montserrat",
+      "file": "OFL-Montserrat.txt",
+      "sha256": "8b7141c03fa4f8d44e6345d5d4931709290f0f67875e452e95ac1fd3a027802e",
+      "sourceUrl": "https://raw.githubusercontent.com/google/fonts/389b770410cc0b7c21c85673bfa2077420fe7f65/ofl/montserrat/OFL.txt"
+    },
+    {
+      "family": "Open Sans",
+      "file": "OFL-OpenSans.txt",
+      "sha256": "fbbbcfef55318de350562559b671360de6d597112ecc5c73881b05092db89602",
+      "sourceUrl": "https://raw.githubusercontent.com/google/fonts/389b770410cc0b7c21c85673bfa2077420fe7f65/ofl/opensans/OFL.txt"
+    }
+  ]
+}

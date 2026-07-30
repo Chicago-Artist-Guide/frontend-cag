@@ -1,7 +1,7 @@
 import React, { lazy } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
-import Layout from '../components/layout';
+import { Navigate, type RouteObject } from 'react-router-dom';
 import AdminLayout from '../components/Admin/Layout/AdminLayout';
+import LegacyLayout from './LegacyLayout';
 
 import Home from './Home';
 import Donate from './Donate';
@@ -44,60 +44,58 @@ const CompanyManagement = lazy(
   () => import('../components/Admin/Companies/CompanyManagement')
 );
 
-const AppRoutes = () => {
-  return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Navigate to="/home" replace />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/donate" element={<Donate />} />
-        <Route path="/faq" element={<FAQ />} />
-        <Route path="/terms-of-service" element={<TOS />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/about-us" element={<WhoWeAre />} />
-        <Route path="/theatre-resources" element={<TheaterResources />} />
-        <Route path="/roles" element={<PublicRoles />} />
-        <Route path="/shows" element={<PublicShows />} />
-        <Route path="/shows/:productionId" element={<PublicShowDetail />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/get-involved" element={<GetInvolved />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/logout" element={<Logout />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/profile/view/:accountId" element={<Profile />} />
-        <Route path="/profile/messages/:threadId?" element={<Messages />} />
-        <Route
-          path="/production/:productionId/manage"
-          element={<ManageProduction />}
-        />
-        <Route path="/profile/search/roles" element={<Matches />} />
-        <Route
-          path="/profile/search/talent/:productionId/:roleId?"
-          element={<Matches />}
-        />
+export const appRouteObjects: RouteObject[] = [
+  {
+    element: <LegacyLayout />,
+    children: [
+      { path: '/', element: <Navigate to="/home" replace /> },
+      { path: '/home', element: <Home /> },
+      { path: '/donate', element: <Donate /> },
+      { path: '/faq', element: <FAQ /> },
+      { path: '/terms-of-service', element: <TOS /> },
+      { path: '/privacy-policy', element: <PrivacyPolicy /> },
+      { path: '/about-us', element: <WhoWeAre /> },
+      { path: '/theatre-resources', element: <TheaterResources /> },
+      { path: '/roles', element: <PublicRoles /> },
+      { path: '/shows', element: <PublicShows /> },
+      { path: '/shows/:productionId', element: <PublicShowDetail /> },
+      { path: '/events', element: <Events /> },
+      { path: '/get-involved', element: <GetInvolved /> },
+      { path: '/login', element: <Login /> },
+      { path: '/logout', element: <Logout /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/sign-up', element: <SignUp /> },
+      { path: '/profile', element: <Profile /> },
+      { path: '/profile/view/:accountId', element: <Profile /> },
+      { path: '/profile/messages/:threadId?', element: <Messages /> },
+      {
+        path: '/production/:productionId/manage',
+        element: <ManageProduction />
+      },
+      { path: '/profile/search/roles', element: <Matches /> },
+      {
+        path: '/profile/search/talent/:productionId/:roleId?',
+        element: <Matches />
+      },
+      {
+        path: '/analytics',
+        element: <Navigate to="/admin/analytics" replace />
+      },
+      { path: '*', element: <NotFound /> }
+    ]
+  },
+  {
+    path: '/admin',
+    element: <AdminLayout />,
+    children: [
+      { index: true, element: <AdminDashboard /> },
+      { path: 'analytics', element: <AnalyticsDashboard /> },
+      { path: 'users', element: <UserManagement /> },
+      { path: 'openings', element: <OpeningsManagement /> },
+      { path: 'events', element: <EventsManagement /> },
+      { path: 'companies', element: <CompanyManagement /> }
+    ]
+  }
+];
 
-        {/* Legacy route - redirect to new admin analytics */}
-        <Route
-          path="/analytics"
-          element={<Navigate to="/admin/analytics" replace />}
-        />
-
-        <Route path="*" element={<NotFound />} />
-      </Route>
-
-      {/* Admin routes - separate layout */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="analytics" element={<AnalyticsDashboard />} />
-        <Route path="users" element={<UserManagement />} />
-        <Route path="openings" element={<OpeningsManagement />} />
-        <Route path="events" element={<EventsManagement />} />
-        <Route path="companies" element={<CompanyManagement />} />
-      </Route>
-    </Routes>
-  );
-};
-
-export default AppRoutes;
+export default appRouteObjects;

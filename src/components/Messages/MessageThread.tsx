@@ -3,13 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
-import { getTheaterAccountByAccountId } from '../Profile/Company/api';
 import {
-  getNameForAccount,
-  getTheaterNameForAccount,
-  getAccountWithAccountId,
-  getProfileWithUid
-} from '../Profile/shared/api';
+  getAccountByIdOrUid,
+  getAccountDisplayName,
+  getTheaterDisplayNameByUid
+} from '../../services/accounts/client';
+import { findProfileByUidOrAccountId } from '../../services/profiles/client';
 import { getProduction } from '../Profile/Company/api';
 import { Production, Role } from '../Profile/Company/types';
 import {
@@ -58,9 +57,9 @@ export const MessageThread: React.FC<
 
   const loadRecipientNameForThread = async (recipientId: string) => {
     const recipientName =
-      account.data.type === 'company'
-        ? await getNameForAccount(firebaseFirestore, recipientId)
-        : await getTheaterNameForAccount(firebaseFirestore, recipientId);
+      account.data?.type === 'company'
+        ? await getAccountDisplayName(recipientId)
+        : await getTheaterDisplayNameByUid(recipientId);
 
     recipientName && setRecipientName(recipientName);
   };
@@ -99,7 +98,7 @@ export const MessageThread: React.FC<
     const productionName = production?.production_name || UNKNOWN_PRODUCTION;
     const messageEmailAddress =
       accountTypeForMatch === 'theater'
-        ? profile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+        ? profile.data?.primary_contact_email || currentUser?.email || NO_EMAIL
         : currentUser?.email || NO_EMAIL;
 
     return accountTypeForMatch === 'theater'
@@ -112,12 +111,12 @@ export const MessageThread: React.FC<
     const productionName = production?.production_name || UNKNOWN_PRODUCTION;
     const messageEmailAddress =
       accountTypeForMatch === 'theater'
-        ? profile.data.primary_contact_email || currentUser?.email || NO_EMAIL
+        ? profile.data?.primary_contact_email || currentUser?.email || NO_EMAIL
         : currentUser?.email || NO_EMAIL;
 
     if (accountTypeForMatch === 'theater') {
       const theaterName =
-        profile.data.theatre_name || production?.theater_name || 'Theater';
+        profile.data?.theatre_name || production?.theater_name || 'Theater';
 
       return {
         text: theaterToArtistEmailText(
@@ -136,7 +135,7 @@ export const MessageThread: React.FC<
     }
 
     const talentFullName =
-      `${profile.data.first_name || ''} ${profile.data.last_name || ''}`.trim() ||
+      `${profile.data?.first_name || ''} ${profile.data?.last_name || ''}`.trim() ||
       'Artist';
 
     return {
@@ -161,41 +160,32 @@ export const MessageThread: React.FC<
     talentId: string
   ) => {
     if (accountTypeForMatch === 'theater') {
-      const talentAccount = await getAccountWithAccountId(
-        firebaseFirestore,
-        talentId
-      );
+      const talentAccount = await getAccountByIdOrUid(talentId);
 
-      if (!talentAccount?.email) {
+      if (!talentAccount?.data.email) {
         console.error(
           'Could not find account or account email address for talent.'
         );
         return null;
       }
 
-      return talentAccount.email;
+      return talentAccount.data.email;
     }
 
-    const theaterProfile = await getProfileWithUid(
-      firebaseFirestore,
-      theaterId
-    );
+    const theaterProfile = await findProfileByUidOrAccountId(theaterId);
 
     if (!theaterProfile) {
       console.error('Could not find profile for theater');
       return null;
     }
 
-    let toEmail = theaterProfile.primary_contact_email;
+    let toEmail = theaterProfile.data.primary_contact_email;
 
     if (!toEmail) {
-      const theaterAccount = await getTheaterAccountByAccountId(
-        firebaseFirestore,
-        theaterId
-      );
+      const theaterAccount = await getAccountByIdOrUid(theaterId);
 
-      if (theaterAccount?.email) {
-        toEmail = theaterAccount.email;
+      if (theaterAccount?.data.email) {
+        toEmail = theaterAccount.data.email;
       } else {
         console.log(
           'Could not find account or account email address for theater'
@@ -312,7 +302,7 @@ export const MessageThread: React.FC<
   };
 
   useEffect(() => {
-    const accountIdStr = account.ref?.id || null;
+    const accountIdStr = account.id || null;
     const accountType = account?.data?.type || null;
 
     if (!accountIdStr || !accountType) {
@@ -352,7 +342,7 @@ export const MessageThread: React.FC<
     }
 
     const lastMessage = currentThreadMessages.at(-1);
-    const accountIdStr = account.ref?.id || null;
+    const accountIdStr = account.id || null;
 
     if (!lastMessage || !accountIdStr || accountIdStr === null) {
       return;

@@ -10,7 +10,8 @@ export const CompanyMatchesFilterBar = () => {
 
   useEffect(() => {
     const getProfileData = profile.data;
-    getProfileData && setProfileData(getProfileData);
+    getProfileData &&
+      setProfileData(getProfileData as IndividualProfileDataFullInit);
   }, [profile]);
 
   return (

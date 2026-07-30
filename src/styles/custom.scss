@@ -1,9 +1,9 @@
 @import 'bootstrap/scss/bootstrap';
 
 $body-bg: #f8f9fa;
-$montserrat: 'Montserrat', sans-serif;
-$lora: 'Lora', serif;
-$open-sans: 'Open Sans', sans-serif;
+$montserrat: var(--font-montserrat), sans-serif;
+$lora: var(--font-lora), serif;
+$open-sans: var(--font-open-sans), sans-serif;
 $main-font-color: #0c2028;
 $body-bg: #f8f9fa;
 $primary: #82b29a;

@@ -1,28 +1,43 @@
-import { getAnalytics } from 'firebase/analytics';
-import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
-import { useMemo } from 'react';
-
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_APP_FIREBASE_API_KEY,
-  authDomain: `${import.meta.env.VITE_APP_FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  projectId: import.meta.env.VITE_APP_FIREBASE_PROJECT_ID,
-  storageBucket: `${import.meta.env.VITE_APP_FIREBASE_PROJECT_ID}.appspot.com`,
-  messagingSenderId: import.meta.env.VITE_APP_FIREBASE_SENDER_ID,
-  appId: import.meta.env.VITE_APP_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_APP_FIREBASE_MID
-};
+import { useEffect, useMemo, useState } from 'react';
+import {
+  getFirebaseAnalytics,
+  getFirebaseClient
+} from '../lib/firebase/client';
+import type { Analytics } from 'firebase/analytics';
+import type { FirebaseClient } from '../lib/firebase/client';
 
 const useFirebase = () => {
-  const app = useMemo(() => initializeApp(firebaseConfig), []);
-  const analytics = useMemo(() => getAnalytics(app), [app]);
-  const auth = useMemo(() => getAuth(app), [app]);
-  const firestore = useMemo(() => getFirestore(app), [app]);
-  const storage = useMemo(() => getStorage(app), [app]);
+  const [client] = useState<FirebaseClient | null>(() =>
+    typeof window === 'undefined' ? null : getFirebaseClient()
+  );
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
-  return { app, analytics, auth, firestore, storage };
+  useEffect(() => {
+    if (!client) return;
+
+    let isMounted = true;
+
+    getFirebaseAnalytics().then((firebaseAnalytics) => {
+      if (isMounted) {
+        setAnalytics(firebaseAnalytics);
+      }
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [client]);
+
+  return useMemo(
+    () => ({
+      analytics,
+      app: client?.app ?? null,
+      auth: client?.auth ?? null,
+      firestore: client?.firestore ?? null,
+      storage: client?.storage ?? null
+    }),
+    [analytics, client]
+  );
 };
 
 export default useFirebase;

@@ -1,5 +1,4 @@
 import React, { Suspense } from 'react';
-import { Outlet } from 'react-router-dom';
 
 import GlobalStyle from '../../theme/globalStyles';
 import { ScrollToTop } from '../shared';
@@ -13,15 +12,13 @@ import InTouch from './InTouch';
 import PageContainer from './PageContainer';
 import { Tagline, Title, TitleThree, TitleTwo } from './Titles';
 
-export default function Layout() {
+export default function Layout({ children }: React.PropsWithChildren) {
   return (
     <main id="cag-frontend-app">
       <ScrollToTop />
       <GlobalStyle />
       <Header />
-      <Suspense fallback={<div>Loading...</div>}>
-        <Outlet />
-      </Suspense>
+      <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
       <Footer />
     </main>
   );

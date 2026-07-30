@@ -9,7 +9,7 @@ import {
   createMessageThread,
   sendMessageThreadWithEmail
 } from '../Messages/api';
-import { getAccountWithAccountId } from '../Profile/shared/api';
+import { getAccountByIdOrUid } from '../../services/accounts/client';
 import {
   UNKNOWN_ROLE,
   theaterDeclineArtistMessage,
@@ -37,14 +37,12 @@ const notifyDeclinedMatches = async (
         typeof match.talent_account_id === 'string'
           ? match.talent_account_id
           : match.talent_account_id.id;
-      const account = await getAccountWithAccountId(
-        firebaseStore,
-        talentAccountId
-      );
+      const account = await getAccountByIdOrUid(talentAccountId);
+      const accountEmail = account?.data.email;
       const shortMessage = theaterDeclineArtistMessage(roleName, theaterName);
       const emailText = theaterDeclineArtistEmailText(theaterName, roleName);
 
-      if (account?.email) {
+      if (accountEmail) {
         await sendMessageThreadWithEmail({
           firebaseStore,
           theaterAccountId,
@@ -54,7 +52,7 @@ const notifyDeclinedMatches = async (
           productionId: production.production_id,
           roleId: match.role_id,
           email: {
-            to: account.email,
+            to: accountEmail,
             subject: theaterDeclineArtistEmailSubject(
               roleName,
               production.production_name

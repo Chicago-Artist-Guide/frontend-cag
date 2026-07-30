@@ -1,41 +1,45 @@
-import { DocumentReference } from '@firebase/firestore';
 import { User } from 'firebase/auth';
 import { createContext, useContext } from 'react';
+import type { AccountData } from '../services/accounts/types';
+import type { ProfileData } from '../services/profiles/types';
 
-export type Document = {
+export type AccountContextData = AccountData & Record<string, any>;
+export type ProfileContextData = ProfileData & Record<string, any>;
+
+export type UserDocument<TData> = {
   id: string | null;
-  ref: DocumentReference | null;
-  data: any;
+  data: TData | null;
 };
 
 export type UserContextType = {
-  account: Document;
-  setAccountData: (x: any) => void;
-  setAccountRef: (x: DocumentReference | null) => void;
-  profile: Document;
-  setProfileData: (x: any) => void;
-  setProfileRef: (x: DocumentReference | null) => void;
+  account: UserDocument<AccountContextData>;
+  setAccount: (account: UserDocument<AccountContextData>) => void;
+  setAccountData: (data: AccountContextData | null) => void;
+  profile: UserDocument<ProfileContextData>;
+  setProfile: (profile: UserDocument<ProfileContextData>) => void;
+  setProfileData: (data: ProfileContextData | null) => void;
   currentUser: User | null;
-  setCurrentUser: (x: User | null) => void;
+  setCurrentUser: (user: User | null) => void;
+};
+
+const emptyAccount: UserDocument<AccountContextData> = {
+  id: null,
+  data: null
+};
+const emptyProfile: UserDocument<ProfileContextData> = {
+  id: null,
+  data: null
 };
 
 export const UserContext = createContext<UserContextType>({
-  profile: {
-    id: null,
-    ref: null,
-    data: null
-  },
-  setProfileRef: () => null,
-  setProfileData: () => null,
-  account: {
-    id: null,
-    ref: null,
-    data: null
-  },
-  setAccountRef: () => null,
-  setAccountData: () => null,
+  account: emptyAccount,
+  setAccount: () => undefined,
+  setAccountData: () => undefined,
+  profile: emptyProfile,
+  setProfile: () => undefined,
+  setProfileData: () => undefined,
   currentUser: null,
-  setCurrentUser: () => null
+  setCurrentUser: () => undefined
 });
 
 export const useUserContext = () => useContext(UserContext);

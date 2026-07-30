@@ -38,12 +38,8 @@ const CompanyProfile: React.FC<
   }>
 > = ({ previewMode = false }) => {
   const { firebaseFirestore: db } = useFirebaseContext();
-  const {
-    profile,
-    account: {
-      data: { uid }
-    }
-  } = useUserContext();
+  const { profile, account } = useUserContext();
+  const uid = account.data?.uid;
   const [editing, setEditing] = useState<Edit>(null);
   const [productions, setProductions] = useState<{
     active: Production[];

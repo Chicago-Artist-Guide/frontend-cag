@@ -100,7 +100,7 @@ const ManageProductionBasic: React.FC<
           <h5
             style={{
               color: '#537C8C',
-              fontFamily: '"Lora", serif',
+              fontFamily: 'var(--font-lora), serif',
               fontStyle: 'italic',
               marginBottom: 20
             }}

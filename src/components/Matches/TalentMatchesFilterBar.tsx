@@ -68,7 +68,7 @@ export const TalentMatchesFilterBar = () => {
 
   const selectedUnions = filters.union_status || [];
   const selectedMatchStatuses = filters.matchStatus || [];
-  const theaterAccountId = account?.ref?.id || account?.data?.account_id || '';
+  const theaterAccountId = account?.id || '';
   const theaterName =
     profileData?.theatre_name || account?.data?.theater_name || '';
 

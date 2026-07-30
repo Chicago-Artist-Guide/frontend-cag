@@ -1,5 +1,4 @@
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { addDoc, collection, updateDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';
 import { Step, useForm, useStep } from 'react-hooks-helper';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +6,11 @@ import styled from 'styled-components';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useMarketingContext } from '../../../context/MarketingContext';
 import { useUserContext } from '../../../context/UserContext';
+import { createAccount } from '../../../services/accounts/client';
+import {
+  createProfile,
+  updateProfile
+} from '../../../services/profiles/client';
 import { submitLGLConstituent } from '../../../utils/marketing';
 import PageContainer from '../../layout/PageContainer';
 import { Tagline, Title } from '../../layout/Titles';
@@ -101,8 +105,8 @@ const IndividualSignUp: React.FC<
   }>
 > = ({ currentStep, setCurrentStep }) => {
   const navigate = useNavigate();
-  const { firebaseAuth, firebaseFirestore } = useFirebaseContext();
-  const { profile, setAccountRef, setProfileRef } = useUserContext();
+  const { firebaseAuth } = useFirebaseContext();
+  const { profile, setAccount, setProfile } = useUserContext();
   const { lglApiKey } = useMarketingContext();
   const [formData, setForm] = useForm(defaultData); // useForm is an extension of React hooks to manage form state
   const [steps, setSteps] = useState<Step[]>(defaultSteps);
@@ -229,15 +233,12 @@ const IndividualSignUp: React.FC<
             email: basicsEmailAddress,
             uid: userId
           };
-          const accountRef = await addDoc(
-            collection(firebaseFirestore, 'accounts'),
-            accountInit
-          );
+          const account = await createAccount(accountInit);
 
           // create doc for profile
           const profileInit: IndividualProfileInit = {
             uid: userId,
-            account_id: accountRef.id,
+            account_id: account.id,
             stage_role: stageRole,
 
             // init progress in signup flow
@@ -245,14 +246,10 @@ const IndividualSignUp: React.FC<
             completed_profile_1: false,
             completed_profile_2: false
           };
-          const profileRef = await addDoc(
-            collection(firebaseFirestore, 'profiles'),
-            profileInit
-          );
+          const createdProfile = await createProfile(profileInit);
 
-          // store account and profile refs so we can update them later
-          setAccountRef(accountRef);
-          setProfileRef(profileRef);
+          setAccount(account);
+          setProfile(createdProfile);
 
           // submit to marketing
           if (emailListAgree) {
@@ -402,12 +399,7 @@ const IndividualSignUp: React.FC<
     };
 
     try {
-      if (profile?.ref) {
-        await updateDoc(profile.ref, { ...finalProfileData });
-      } else {
-        // no profileRef
-        // look up?
-      }
+      if (profile.id) await updateProfile(profile.id, finalProfileData);
     } catch (err) {
       console.error('Error updating profile data:', err);
     }

@@ -1,125 +1,129 @@
 import React from 'react';
+import Link from 'next/link';
 import Col from 'react-bootstrap/Col';
 import Image from 'react-bootstrap/Image';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Row from 'react-bootstrap/Row';
-import { Link } from 'react-router-dom';
 import { media } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
+import {
+  Envelope,
+  Facebook,
+  FooterBg,
+  Insta,
+  Linkedin,
+  LogoSrc,
+  Medium
+} from '../../config/publicImages';
 import { zeffyUrl } from '../../utils/marketing';
-import FooterBg from '../../images/footer-background.png';
-import Envelope from '../../images/icons-footer/email.png';
-import Facebook from '../../images/icons-footer/social_facebook.png';
-import Insta from '../../images/icons-footer/social_instagram.png';
-import Linkedin from '../../images/icons-footer/social_linkedin.png';
-import Medium from '../../images/icons-footer/social_medium.png';
-import LogoSrc from '../../images/logoPlain.svg';
 
-const Footer = () => (
-  <FooterNavbar className="justify-content-center nav container" expand="sm">
-    <div className="container mt-12">
-      <Row className="flex flex-1 justify-center">
-        <EdgeCols
-          md={{ order: 1, span: 3 }}
-          sm={{ order: 1, span: 4 }}
-          xs={{ span: 5 }}
-        >
-          <Nav className="flex-column m-auto" fill>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/">
-                HOME
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/about-us">
-                ABOUT US
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href={zeffyUrl}>DONATE</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/events">
-                EVENTS
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </EdgeCols>
-        <MidCol
-          md={{ order: 2, span: 4 }}
-          sm={{ order: 3, span: 6 }}
-          xs={{ order: 3, span: 12 }}
-        >
-          <div className="d-sm-none d-none d-md-block">
-            <FooterCAGLogo alt="Chicago Artist Guide" src={LogoSrc} />
-          </div>
-          <Nav className="icon-list m-auto" fill>
-            <Nav.Item>
-              <Nav.Link href="http://www.facebook.com/chiartistguide">
-                <FooterLogo src={Facebook} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="https://www.linkedin.com/company/chicago-artist-guide">
-                <FooterLogo src={Linkedin} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="https://www.instagram.com/chiartistguide">
-                <FooterLogo src={Insta} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="https://medium.com/chiartistguide">
-                <FooterLogo src={Medium} />
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link href="mailto:contact@chicagoartistguide.org">
-                <FooterLogo src={Envelope} />
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-          <CopyText>&copy; Chicago Artist Guide 2024</CopyText>
-        </MidCol>
-        <EdgeCols
-          md={{ order: 3, span: 3 }}
-          sm={{ order: 2, span: 4 }}
-          xs={{ span: 5 }}
-        >
-          <Nav className="flex-column m-auto" fill>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/faq">
-                FAQ
-              </Nav.Link>
-            </Nav.Item>
-            {/* <Nav.Item>
-              <Nav.Link as={Link} to="/shows">
+const Footer = () => {
+  return (
+    <FooterNavbar className="justify-content-center nav container" expand="sm">
+      <div className="container mt-12">
+        <Row className="flex flex-1 justify-center">
+          <EdgeCols
+            md={{ order: 1, span: 3 }}
+            sm={{ order: 1, span: 4 }}
+            xs={{ span: 5 }}
+          >
+            <Nav className="flex-column m-auto" fill>
+              <Nav.Item>
+                <Nav.Link as={Link} href="/">
+                  HOME
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} href="/about-us">
+                  ABOUT US
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href={zeffyUrl}>DONATE</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} href="/events">
+                  EVENTS
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </EdgeCols>
+          <MidCol
+            md={{ order: 2, span: 4 }}
+            sm={{ order: 3, span: 6 }}
+            xs={{ order: 3, span: 12 }}
+          >
+            <div className="d-sm-none d-none d-md-block">
+              <FooterCAGLogo alt="Chicago Artist Guide" src={LogoSrc} />
+            </div>
+            <Nav className="icon-list m-auto" fill>
+              <Nav.Item>
+                <Nav.Link href="http://www.facebook.com/chiartistguide">
+                  <FooterLogo src={Facebook} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="https://www.linkedin.com/company/chicago-artist-guide">
+                  <FooterLogo src={Linkedin} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="https://www.instagram.com/chiartistguide">
+                  <FooterLogo src={Insta} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="https://medium.com/chiartistguide">
+                  <FooterLogo src={Medium} />
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="mailto:contact@chicagoartistguide.org">
+                  <FooterLogo src={Envelope} />
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+            <CopyText>&copy; Chicago Artist Guide 2024</CopyText>
+          </MidCol>
+          <EdgeCols
+            md={{ order: 3, span: 3 }}
+            sm={{ order: 2, span: 4 }}
+            xs={{ span: 5 }}
+          >
+            <Nav className="flex-column m-auto" fill>
+              <Nav.Item>
+                <Nav.Link as={Link} href="/faq">
+                  FAQ
+                </Nav.Link>
+              </Nav.Item>
+              {/* <Nav.Item>
+              <Nav.Link as={Link} href="/shows">
                 SHOWS
               </Nav.Link>
             </Nav.Item> */}
-            <Nav.Item>
-              <Nav.Link as={Link} to="/theatre-resources">
-                THEATRE RESOURCES
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/terms-of-service">
-                TERMS OF SERVICE
-              </Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-              <Nav.Link as={Link} to="/privacy-policy">
-                PRIVACY POLICY
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
-        </EdgeCols>
-      </Row>
-    </div>
-  </FooterNavbar>
-);
+              <Nav.Item>
+                <Nav.Link as={Link} href="/theatre-resources">
+                  THEATRE RESOURCES
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} href="/terms-of-service">
+                  TERMS OF SERVICE
+                </Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link as={Link} href="/privacy-policy">
+                  PRIVACY POLICY
+                </Nav.Link>
+              </Nav.Item>
+            </Nav>
+          </EdgeCols>
+        </Row>
+      </div>
+    </FooterNavbar>
+  );
+};
 
 const FooterNavbar = styled(Navbar)`
   ${media.smaller`

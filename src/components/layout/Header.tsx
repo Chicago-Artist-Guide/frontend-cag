@@ -1,37 +1,33 @@
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useUserContext } from '../../context/UserContext';
-import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useAdminAuth } from '../../hooks/useAdminAuth';
-import Logo from '../../images/cagLogo1.svg';
+import { Logo } from '../../config/publicImages';
+import { getUnreadThreadCount } from '../../services/messages/client';
 import { colors } from '../../theme/styleVars';
-import { getUnreadThreadCount } from '../Messages/api';
+import { reloadDocument } from '../../utils/navigation';
 
 const Header = () => {
   const { currentUser, account } = useUserContext();
   const {
-    profile: { ref: profileRef }
+    profile: { id: profileId }
   } = useUserContext();
-  const { isAdmin, adminRole } = useAdminAuth();
-  const { firebaseFirestore } = useFirebaseContext();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { isAdmin } = useAdminAuth();
+  const pathname = usePathname();
   const [expanded, setExpanded] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
 
   // Handle sign-up link click to reset to initial screen when already on sign-up page
   const handleSignUpClick = (e: React.MouseEvent) => {
-    if (location.pathname === '/sign-up') {
+    setExpanded(false);
+    if (pathname === '/sign-up') {
       e.preventDefault();
-      // Force a refresh of the sign-up page to reset the state
-      navigate('/', { replace: true });
-      setTimeout(() => {
-        navigate('/sign-up');
-      }, 0);
+      reloadDocument(window.location);
     }
   };
 
@@ -43,51 +39,48 @@ const Header = () => {
       }
     };
 
-    // Close menu when route changes
-    const handleRouteChange = () => {
-      setExpanded(false);
-    };
-
     if (expanded) {
       document.addEventListener('mousedown', handleClickOutside);
-      window.addEventListener('popstate', handleRouteChange);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
-      window.removeEventListener('popstate', handleRouteChange);
     };
   }, [expanded]);
 
   // Close menu when location changes
   useEffect(() => {
     setExpanded(false);
-  }, [location.pathname]);
+  }, [pathname]);
 
   // DEV-382: keep the artist's unread-interest badge fresh on login and on
   // every navigation (e.g. after visiting Messages and marking a thread
   // seen). Scoped to individual/artist accounts only — theatre-side
   // notifications are a separate, unticketed requirement.
   useEffect(() => {
-    const loadUnreadCount = async () => {
-      const accountId = account?.ref?.id;
-      const accountType = account?.data?.type;
+    let active = true;
+    const accountId = account?.id;
+    const accountType = account?.data?.type;
 
-      if (!accountId || accountType !== 'individual') {
-        setUnreadCount(0);
-        return;
-      }
+    if (!accountId || accountType !== 'individual') {
+      setUnreadCount(0);
+      return () => {
+        active = false;
+      };
+    }
 
-      const count = await getUnreadThreadCount(
-        firebaseFirestore,
-        accountId,
-        accountType
-      );
-      setUnreadCount(count);
+    getUnreadThreadCount(accountId, accountType)
+      .then((count) => {
+        if (active) setUnreadCount(count);
+      })
+      .catch(() => {
+        if (active) setUnreadCount(0);
+      });
+
+    return () => {
+      active = false;
     };
-
-    loadUnreadCount();
-  }, [account, location.pathname]);
+  }, [account?.data?.type, account?.id, pathname]);
 
   // Handle nav link clicks - close menu
   const handleNavClick = () => {
@@ -103,7 +96,7 @@ const Header = () => {
       expanded={expanded}
       onToggle={setExpanded}
     >
-      <Navbar.Brand as={Link} to="/" onClick={handleNavClick}>
+      <Navbar.Brand as={Link} href="/home" onClick={handleNavClick}>
         <LogoImage src={Logo} alt="CAG Logo" height="60" width="70" />
       </Navbar.Brand>
       <Navbar.Toggle
@@ -113,57 +106,52 @@ const Header = () => {
       />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="ml-auto ms-auto">
-          <Nav.Link as={Link} to="/" onClick={handleNavClick}>
+          <Nav.Link as={Link} href="/home" onClick={handleNavClick}>
             HOME
           </Nav.Link>
-          <Nav.Link as={Link} to="/about-us" onClick={handleNavClick}>
+          <Nav.Link as={Link} href="/about-us" onClick={handleNavClick}>
             ABOUT US
           </Nav.Link>
-          {/* <Nav.Link as={Link} to="/shows" onClick={handleNavClick}>
+          {/* <Nav.Link as={Link} href="/shows" onClick={handleNavClick}>
             SHOWS
           </Nav.Link> */}
-          <Nav.Link as={Link} to="/donate" onClick={handleNavClick}>
+          <Nav.Link as={Link} href="/donate" onClick={handleNavClick}>
             DONATE
           </Nav.Link>
-          <Nav.Link as={Link} to="/get-involved" onClick={handleNavClick}>
+          <Nav.Link as={Link} href="/get-involved" onClick={handleNavClick}>
             GET INVOLVED
           </Nav.Link>
-          <Nav.Link as={Link} to="/events" onClick={handleNavClick}>
+          <Nav.Link as={Link} href="/events" onClick={handleNavClick}>
             EVENTS
           </Nav.Link>
-          {profileRef !== null ? (
-            <Nav.Link as={Link} to="/profile" onClick={handleNavClick}>
+          {profileId !== null ? (
+            <Nav.Link as={Link} href="/profile" onClick={handleNavClick}>
               PROFILE
               {unreadCount > 0 && (
-                <NotificationBadge aria-label={`${unreadCount} unread messages`}>
+                <NotificationBadge
+                  aria-label={`${unreadCount} unread messages`}
+                >
                   {unreadCount}
                 </NotificationBadge>
               )}
             </Nav.Link>
           ) : (
             <>
-              <Nav.Link
-                as={Link}
-                to="/sign-up"
-                onClick={(e) => {
-                  handleSignUpClick(e);
-                  handleNavClick();
-                }}
-              >
+              <Nav.Link as={Link} href="/sign-up" onClick={handleSignUpClick}>
                 SIGN UP
               </Nav.Link>
-              <Nav.Link as={Link} to="/login" onClick={handleNavClick}>
+              <Nav.Link as={Link} href="/login" onClick={handleNavClick}>
                 LOGIN
               </Nav.Link>
             </>
           )}
           {isAdmin && (
-            <Nav.Link as={Link} to="/admin" onClick={handleNavClick}>
+            <Nav.Link as={Link} href="/admin" onClick={handleNavClick}>
               ADMIN
             </Nav.Link>
           )}
           {currentUser !== null && (
-            <Nav.Link as={Link} to="/logout" onClick={handleNavClick}>
+            <Nav.Link as={Link} href="/logout" onClick={handleNavClick}>
               LOGOUT
             </Nav.Link>
           )}

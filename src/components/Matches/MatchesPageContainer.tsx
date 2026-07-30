@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useUserContext } from '../../context/UserContext';
+import type { AccountType } from '../../services/accounts/types';
 import { CompanyMatchList } from './CompanyMatchList';
 import { RoleMatchesFilterBar } from './RoleMatchesFilterBar';
 import { TalentMatchesFilterBar } from './TalentMatchesFilterBar';
@@ -7,7 +8,7 @@ import { TalentMatchList } from './TalentMatchList';
 
 export const MatchesPageContainer = () => {
   const { account } = useUserContext();
-  const [accountType, setAccountType] = useState(null);
+  const [accountType, setAccountType] = useState<AccountType | null>(null);
 
   useEffect(() => {
     const accountData = account?.data;

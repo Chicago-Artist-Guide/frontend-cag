@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import Checkbox from '../../../components/shared/Checkbox';
 import InputField from '../../../components/shared/Input';
-import Red_Blob from '../../../images/red_blob.svg';
+import { Red_Blob } from '../../../config/publicImages';
 import { colors, breakpoints } from '../../../theme/styleVars';
 import { ErrorMessage } from '../../../utils/validation';
 import { Title } from '../../layout/Titles';

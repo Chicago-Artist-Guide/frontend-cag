@@ -1,228 +1,804 @@
 /**
- * Visual regression manifest.
+ * Visual regression metadata layered on top of the application route contract.
  *
- * Each entry maps a route to its source dependencies. When a migration target
- * is given (e.g. src/components/Home), the runner picks only the entries whose
- * `sourceGlobs` overlap that target to keep capture time short.
- *
- * To add an auth-walled route, set `auth` to a defined state and ensure
- * auth-setup.ts produces a storageState for that state.
+ * Route URLs remain owned by scripts/route-contract.ts. This manifest adds the
+ * capture state, stability hints, source ownership, and baseline disposition
+ * needed to use the existing screenshots during the App Router migration.
  */
 
-export type AuthState = 'public' | 'company';
+import {
+  applicationRoutes,
+  type ApplicationPath,
+  type BrowserMarker
+} from '../route-contract';
 
-export type Viewport = {
-  name: string;
-  width: number;
+export type AuthState = 'admin' | 'anonymous' | 'company' | 'individual';
+
+export const ROUTE_CLUSTERS = [
+  'account-auth',
+  'admin',
+  'matches',
+  'messages',
+  'profile-production',
+  'public-data',
+  'public-static',
+  'shell'
+] as const;
+
+export type RouteCluster = (typeof ROUTE_CLUSTERS)[number];
+
+export const VIEWPORT_NAMES = ['desktop', 'mobile'] as const;
+
+export type ViewportName = (typeof VIEWPORT_NAMES)[number];
+
+export interface Viewport {
+  deviceScaleFactor: number;
   height: number;
+  name: ViewportName;
+  width: number;
+}
+
+export const VIEWPORTS: Record<ViewportName, Viewport> = {
+  desktop: {
+    deviceScaleFactor: 1,
+    height: 900,
+    name: 'desktop',
+    width: 1440
+  },
+  mobile: {
+    deviceScaleFactor: 1,
+    height: 844,
+    name: 'mobile',
+    width: 390
+  }
 };
 
-export const VIEWPORTS: Record<string, Viewport> = {
-  desktop: { name: 'desktop', width: 1440, height: 900 }
-  // tablet/mobile can be added later
-};
+export type BaselinePolicy =
+  | { kind: 'blocking-candidate' }
+  | { kind: 'reference-only'; reason: string }
+  | { kind: 'missing'; reason: string };
 
-export type RouteEntry = {
-  name: string;
-  path: string;
-  auth: AuthState;
-  waitFor?: string;
-  fullPage?: boolean;
-  viewports?: Viewport[];
-  sourceGlobs: string[];
-};
+export interface RequiredFont {
+  family: 'Lora' | 'Montserrat' | 'Open Sans';
+  style: 'italic' | 'normal';
+  variable: '--font-lora' | '--font-montserrat' | '--font-open-sans';
+  weight: '300' | '400' | '600' | '700';
+}
 
-const DEFAULT_VIEWPORTS = [VIEWPORTS.desktop];
-
-export const MANIFEST: RouteEntry[] = [
+export const REQUIRED_BRAND_FONTS = [
   {
-    name: 'home',
-    path: '/home',
-    auth: 'public',
-    waitFor: 'main',
+    family: 'Montserrat',
+    style: 'normal',
+    variable: '--font-montserrat',
+    weight: '400'
+  },
+  {
+    family: 'Montserrat',
+    style: 'normal',
+    variable: '--font-montserrat',
+    weight: '700'
+  },
+  {
+    family: 'Open Sans',
+    style: 'normal',
+    variable: '--font-open-sans',
+    weight: '300'
+  },
+  {
+    family: 'Open Sans',
+    style: 'normal',
+    variable: '--font-open-sans',
+    weight: '600'
+  },
+  {
+    family: 'Lora',
+    style: 'italic',
+    variable: '--font-lora',
+    weight: '400'
+  }
+] as const satisfies readonly RequiredFont[];
+
+const BASELINE_POLICY_KINDS: readonly BaselinePolicy['kind'][] = [
+  'blocking-candidate',
+  'reference-only',
+  'missing'
+];
+
+export interface RouteEntry {
+  allowBrokenImages?: Array<{ reason: string; selector: string }>;
+  auth: AuthState;
+  baselinePolicy: BaselinePolicy;
+  clusters: RouteCluster[];
+  fullPage: boolean;
+  id: string;
+  masks?: Array<{ reason: string; selector: string }>;
+  path: ApplicationPath;
+  readiness: {
+    hidden?: string[];
+    visible: string[];
+  };
+  requiredFonts?: readonly RequiredFont[];
+  sourceGlobs: string[];
+  viewports: ViewportName[];
+}
+
+export interface VisualSelection {
+  clusters?: RouteCluster[];
+  ids?: string[];
+  target?: string;
+  viewports?: ViewportName[];
+}
+
+export interface VisualCase {
+  entry: RouteEntry;
+  viewport: ViewportName;
+}
+
+const AUTH_STATES: readonly AuthState[] = [
+  'admin',
+  'anonymous',
+  'company',
+  'individual'
+];
+
+const applicationPaths = new Set<string>(
+  applicationRoutes.map(({ path }) => path)
+);
+
+const isNonEmpty = (value: string): boolean => value.trim().length > 0;
+const SAFE_ROUTE_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/u;
+
+export const readinessSelectorForMarker = (
+  marker: BrowserMarker | undefined
+): string => {
+  if (!marker) throw new Error('route marker is required');
+  const value = marker.value.replace(/\\/gu, '\\\\').replace(/"/gu, '\\"');
+  return marker.kind === 'heading'
+    ? `main h1:has-text("${value}"):visible`
+    : `main :text-is("${value}"):visible`;
+};
+
+export function validateVisualManifest(
+  manifest: readonly RouteEntry[]
+): readonly RouteEntry[] {
+  if (manifest.length === 0) {
+    throw new Error('visual manifest must contain at least one route');
+  }
+
+  const ids = new Set<string>();
+  const pathAuthStates = new Set<string>();
+
+  for (const entry of manifest) {
+    if (!isNonEmpty(entry.id)) {
+      throw new Error('visual route id must be non-empty');
+    }
+    if (!SAFE_ROUTE_ID.test(entry.id)) {
+      throw new Error(
+        `visual route id must be a safe lowercase slug: ${entry.id}`
+      );
+    }
+    if (ids.has(entry.id)) {
+      throw new Error(`duplicate visual route id: ${entry.id}`);
+    }
+    ids.add(entry.id);
+
+    const pathAuthState = `${entry.path}\0${entry.auth}`;
+    if (pathAuthStates.has(pathAuthState)) {
+      throw new Error(
+        `duplicate path/auth state: ${entry.path} (${entry.auth})`
+      );
+    }
+    pathAuthStates.add(pathAuthState);
+
+    if (!applicationPaths.has(entry.path)) {
+      throw new Error(`unknown application path: ${entry.path}`);
+    }
+    if (!AUTH_STATES.includes(entry.auth)) {
+      throw new Error(`unknown auth state: ${entry.auth}`);
+    }
+    if (entry.clusters.length === 0) {
+      throw new Error(`${entry.id} must declare at least one route cluster`);
+    }
+    for (const cluster of entry.clusters) {
+      if (!ROUTE_CLUSTERS.includes(cluster)) {
+        throw new Error(`unknown route cluster: ${cluster}`);
+      }
+    }
+    if (new Set(entry.clusters).size !== entry.clusters.length) {
+      throw new Error(`${entry.id} has a duplicate route cluster`);
+    }
+    if (entry.viewports.length === 0) {
+      throw new Error(`${entry.id} must declare at least one viewport`);
+    }
+    for (const viewport of entry.viewports) {
+      if (!VIEWPORT_NAMES.includes(viewport)) {
+        throw new Error(`unknown viewport: ${viewport}`);
+      }
+    }
+    if (new Set(entry.viewports).size !== entry.viewports.length) {
+      throw new Error(`${entry.id} has a duplicate viewport`);
+    }
+    if (!BASELINE_POLICY_KINDS.includes(entry.baselinePolicy.kind)) {
+      throw new Error(
+        `unknown baseline policy: ${String(entry.baselinePolicy.kind)}`
+      );
+    }
+    if (
+      entry.baselinePolicy.kind !== 'blocking-candidate' &&
+      !isNonEmpty(entry.baselinePolicy.reason)
+    ) {
+      throw new Error(`${entry.id} baseline reason must be non-empty`);
+    }
+    if (entry.baselinePolicy.kind === 'blocking-candidate') {
+      if (!entry.requiredFonts || entry.requiredFonts.length === 0) {
+        throw new Error(`${entry.id} must declare required fonts`);
+      }
+      const actual = entry.requiredFonts.map(
+        ({ family, style, variable, weight }) =>
+          `${family}\0${style}\0${variable}\0${weight}`
+      );
+      const expected = REQUIRED_BRAND_FONTS.map(
+        ({ family, style, variable, weight }) =>
+          `${family}\0${style}\0${variable}\0${weight}`
+      );
+      if (
+        actual.length !== expected.length ||
+        actual.some((tuple, index) => tuple !== expected[index])
+      ) {
+        throw new Error(
+          `${entry.id} must declare the exact legacy font tuples`
+        );
+      }
+    }
+    if (
+      entry.readiness.visible.length === 0 ||
+      entry.readiness.visible.some((selector) => !isNonEmpty(selector))
+    ) {
+      throw new Error(
+        `${entry.id} visible readiness selector must be non-empty`
+      );
+    }
+    if (entry.readiness.hidden?.some((selector) => !isNonEmpty(selector))) {
+      throw new Error(
+        `${entry.id} hidden readiness selector must be non-empty`
+      );
+    }
+    if (
+      entry.sourceGlobs.length === 0 ||
+      entry.sourceGlobs.some((glob) => !isNonEmpty(glob))
+    ) {
+      throw new Error(`${entry.id} source glob must be non-empty`);
+    }
+    for (const mask of entry.masks ?? []) {
+      if (!isNonEmpty(mask.reason)) {
+        throw new Error(`${entry.id} mask reason must be non-empty`);
+      }
+      if (!isNonEmpty(mask.selector)) {
+        throw new Error(`${entry.id} mask selector must be non-empty`);
+      }
+    }
+    for (const exemption of entry.allowBrokenImages ?? []) {
+      if (!isNonEmpty(exemption.reason)) {
+        throw new Error(
+          `${entry.id} broken-image exemption reason must be non-empty`
+        );
+      }
+      if (!isNonEmpty(exemption.selector)) {
+        throw new Error(
+          `${entry.id} broken-image exemption selector must be non-empty`
+        );
+      }
+    }
+  }
+
+  return manifest;
+}
+
+const referenceOnly = (reason: string): BaselinePolicy => ({
+  kind: 'reference-only',
+  reason
+});
+
+const SHARED_SHELL_SOURCE_GLOBS = [
+  'src/config/publicImages.ts',
+  'src/components/layout/**',
+  'public/images/cagLogo1.svg',
+  'public/images/logoPlain.svg',
+  'public/images/footer-background.png',
+  'public/images/icons-footer/**'
+] as const;
+
+const existingManifest: RouteEntry[] = [
+  {
+    auth: 'anonymous',
+    baselinePolicy: referenceOnly(
+      'Live cross-origin iframe content is not deterministic between captures.'
+    ),
+    clusters: ['public-static', 'shell'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'home',
+    path: '/home',
+    readiness: {
+      visible: [
+        'main h1:has-text("Discover your next"):has-text("dream gig"):visible'
+      ]
+    },
     sourceGlobs: [
+      'app/(main)/(public)/home/**',
       'src/routes/Home.tsx',
       'src/components/Home/**',
-      'src/components/layout/**'
-    ]
+      'src/components/Redesign/PartnerSlider.tsx',
+      'src/components/Redesign/Values.tsx',
+      'public/images/partners/**',
+      'public/images/icons-home/**',
+      'public/images/sponsors/**',
+      'public/images/supporters/**',
+      'public/images/green_blob.svg',
+      'public/images/red_blob.svg',
+      'public/images/yellow_blob_1.svg',
+      'src/utils/supporters.ts',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'faq',
-    path: '/faq',
-    auth: 'public',
-    waitFor: 'main',
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'faq',
+    path: '/faq',
+    readiness: {
+      visible: [
+        'main h1:has-text("FREQUENTLY ASKED QUESTIONS"):visible',
+        'main h2:has-text("Find out what we\'re all about"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
+      'app/(main)/(public)/faq/**',
       'src/routes/FAQ.tsx',
       'src/components/FAQ/**',
-      'src/components/layout/**'
-    ]
+      'public/images/blue_blob.svg',
+      'public/images/streaming_dance.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'donate',
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
+    fullPage: true,
+    id: 'terms-of-service',
+    path: '/terms-of-service',
+    readiness: {
+      visible: [
+        'main h1:has-text("TERMS OF SERVICE"):visible',
+        'main h3:has-text("1. Introduction"):visible',
+        'main h3:has-text("7. General Terms"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
+    sourceGlobs: [
+      'app/(main)/(public)/terms-of-service/**',
+      'src/routes/TOS.tsx',
+      'src/components/Legal/LegalPageStyles.tsx',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
+  },
+  {
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
+    fullPage: true,
+    id: 'privacy-policy',
+    path: '/privacy-policy',
+    readiness: {
+      visible: [
+        'main h1:has-text("PRIVACY POLICY"):visible',
+        'main :text-is("Last updated May 24, 2023"):visible',
+        'main #toc:has-text("TABLE OF CONTENTS"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
+    sourceGlobs: [
+      'app/(main)/(public)/privacy-policy/**',
+      'src/routes/PrivacyPolicy.tsx',
+      'src/components/Legal/LegalPageStyles.tsx',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
+  },
+  {
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
+    fullPage: true,
+    id: 'donate',
     path: '/donate',
-    auth: 'public',
-    waitFor: 'main',
-    fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
-    sourceGlobs: ['src/routes/Donate.tsx', 'src/components/layout/**']
+    readiness: {
+      visible: [
+        'main h1:has-text("Donate to Support Chicago Artists"):visible',
+        'main a:has-text("Donate Securely Now"):visible',
+        'main img[alt="Young Leaders Fund, an initiative of The Chicago Community Trust"]:visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
+    sourceGlobs: [
+      'app/(main)/(public)/donate/**',
+      'src/routes/Donate.tsx',
+      'src/components/Redesign/PartnerSlider.tsx',
+      'public/images/donate/**',
+      'public/images/sponsors/**',
+      'public/images/supporters/**',
+      'src/utils/supporters.ts',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'events',
-    path: '/events',
-    auth: 'public',
-    waitFor: 'main',
+    auth: 'anonymous',
+    baselinePolicy: referenceOnly(
+      'Live Firestore event data is not pinned to an emulator fixture.'
+    ),
+    clusters: ['public-data'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'events',
+    path: '/events',
+    readiness: {
+      hidden: ['main :text-is("Loading events...")'],
+      visible: [
+        'main h1:has-text("EVENTS"):visible',
+        'main h2:has-text("Upcoming Events"):visible',
+        'main h2:has-text("Past Events"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Events.tsx',
       'src/components/Events/**',
-      'src/components/layout/**'
-    ]
+      'public/images/events/**',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'shows',
-    path: '/shows',
-    auth: 'public',
-    waitFor: 'main',
+    auth: 'anonymous',
+    baselinePolicy: referenceOnly(
+      'Live Firestore show data is not pinned to an emulator fixture.'
+    ),
+    clusters: ['public-data'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'shows',
+    path: '/shows',
+    readiness: {
+      visible: [
+        'main h1:has-text("THEATRE SHOWS"):visible',
+        'main h1:has-text("THEATRE SHOWS") ~ div.mt-4 h3, main h1:has-text("THEATRE SHOWS") ~ p:has-text("No active shows found at this time. Please check back later.")'
+      ]
+    },
     sourceGlobs: [
       'src/routes/PublicShows.tsx',
       'src/components/PublicShows/**',
-      'src/components/layout/**'
-    ]
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'get-involved',
-    path: '/get-involved',
-    auth: 'public',
-    waitFor: 'main',
+    auth: 'anonymous',
+    baselinePolicy: referenceOnly(
+      'Live Get Involved data is not pinned to a deterministic fixture.'
+    ),
+    clusters: ['public-data'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'get-involved',
+    path: '/get-involved',
+    readiness: {
+      hidden: ['main :text-is("Loading opportunities...")'],
+      visible: [
+        'main h1:has-text("Get involved"):visible',
+        'main form textarea#message:visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/GetInvolved.tsx',
       'src/components/GetInvolved/**',
-      'src/components/layout/**'
-    ]
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'about-us',
-    path: '/about-us',
-    auth: 'public',
-    waitFor: 'main',
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['public-static'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'about-us',
+    path: '/about-us',
+    readiness: {
+      visible: [
+        'main h1:has-text("ABOUT US"):visible',
+        'main h2:has-text("Vision"):visible',
+        'main h2:has-text("Mission"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
+      'app/(main)/(public)/about-us/**',
       'src/routes/WhoWeAre.tsx',
       'src/components/WhoWeAre/**',
-      'src/components/layout/**'
-    ]
+      'public/images/who-we-are/**',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'theatre-resources',
+    auth: 'anonymous',
+    baselinePolicy: referenceOnly(
+      'Live cross-origin iframe content is not deterministic between captures.'
+    ),
+    clusters: ['public-static'],
+    fullPage: true,
+    id: 'theatre-resources',
     path: '/theatre-resources',
-    auth: 'public',
-    waitFor: 'main',
-    fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
-    sourceGlobs: ['src/routes/TheaterResources.tsx', 'src/components/layout/**']
+    readiness: {
+      visible: [
+        'main h1:has-text("THEATRE RESOURCES"):visible',
+        'main table th:has-text("Organization"):visible',
+        'main iframe[title^="Submit and View Links"]:visible'
+      ]
+    },
+    sourceGlobs: [
+      'app/(main)/(public)/theatre-resources/**',
+      'src/routes/TheaterResources.tsx',
+      'public/images/blue_blob.svg',
+      'public/images/streaming_dance.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'login',
-    path: '/login',
-    auth: 'public',
-    waitFor: 'form',
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['account-auth'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'login',
+    path: '/login',
+    readiness: {
+      visible: [
+        'main h1:has-text("WELCOME BACK"):visible',
+        'main label[for="formBasicEmail"]:visible',
+        'main input#formBasicPassword:visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
       'src/routes/Login.tsx',
       'src/components/Login/**',
-      'src/components/layout/**'
-    ]
+      'public/images/red_blob.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'signup',
-    path: '/sign-up',
-    auth: 'public',
-    waitFor: 'main',
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['account-auth'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'signup',
+    path: '/sign-up',
+    readiness: {
+      visible: [
+        'main h1:has-text("BUILD CONNECTIONS TODAY"):visible',
+        'main h3:has-text("Individual Artist"):visible',
+        'main h3:has-text("Theatre Group"):visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
     sourceGlobs: [
       'src/routes/SignUp.tsx',
       'src/components/SignUp/**',
-      'src/components/layout/**'
-    ]
+      'public/images/icons-signup/**',
+      'public/images/red_blob.svg',
+      'public/images/yellow_blob_1.svg',
+      'public/images/yellow_blob_2.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'forgot-password',
+    auth: 'anonymous',
+    baselinePolicy: { kind: 'blocking-candidate' },
+    clusters: ['account-auth'],
+    fullPage: true,
+    id: 'forgot-password',
     path: '/forgot-password',
-    auth: 'public',
-    waitFor: 'form',
-    fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
-    sourceGlobs: ['src/routes/ForgotPassword.tsx', 'src/components/layout/**']
+    readiness: {
+      visible: [
+        'main h1:has-text("RESET YOUR PASSWORD"):visible',
+        'main label:has-text("Email"):visible',
+        'main input[type="email"]:visible'
+      ]
+    },
+    requiredFonts: REQUIRED_BRAND_FONTS,
+    sourceGlobs: [
+      'src/routes/ForgotPassword.tsx',
+      'public/images/red_blob.svg',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'company-profile',
-    path: '/profile',
     auth: 'company',
-    waitFor: 'main',
+    baselinePolicy: referenceOnly(
+      'Authenticated company identity is not proven; this baseline currently duplicates the login screen.'
+    ),
+    clusters: ['profile-production', 'shell'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'company-profile',
+    path: '/profile',
+    readiness: {
+      visible: [
+        'main h1:has-text("YOUR PROFILE"):visible',
+        'main h2:has-text("Basic Group Info"):visible',
+        'main h3:has-text("Active Shows"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Profile.tsx',
       'src/components/Profile/**',
-      'src/components/layout/**'
-    ]
+      'public/images/icons-profile/**',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'company-messages',
-    path: '/profile/messages',
     auth: 'company',
-    waitFor: 'main',
+    baselinePolicy: referenceOnly(
+      'Authenticated company identity and deterministic message fixtures are not yet proven.'
+    ),
+    clusters: ['messages'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'company-messages',
+    path: '/profile/messages',
+    readiness: {
+      hidden: ['main :text-is("Loading threads...")'],
+      visible: [
+        'main h1:has-text("Messages"):visible',
+        'main h4:has-text("Threads"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Messages.tsx',
       'src/components/Messages/**',
-      'src/components/layout/**'
-    ]
+      'public/images/defaultpfp.png',
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   },
   {
-    name: 'company-roles-search',
-    path: '/profile/search/roles',
     auth: 'company',
-    waitFor: 'main',
+    baselinePolicy: referenceOnly(
+      'Authenticated company identity and deterministic role fixtures are not yet proven.'
+    ),
+    clusters: ['matches'],
     fullPage: true,
-    viewports: DEFAULT_VIEWPORTS,
+    id: 'company-roles-search',
+    path: '/profile/search/roles',
+    readiness: {
+      visible: [
+        'main h1:has-text("Matches"):visible',
+        'main h2:has-text("Filter Talent"):visible'
+      ]
+    },
     sourceGlobs: [
       'src/routes/Matches.tsx',
       'src/components/Matches/**',
-      'src/components/layout/**'
-    ]
+      ...SHARED_SHELL_SOURCE_GLOBS
+    ],
+    viewports: ['desktop']
   }
 ];
 
-/**
- * Returns the entries whose sourceGlobs overlap the given migration target.
- * Target is a path-prefix match against any glob's literal prefix
- * (everything before the first wildcard).
- */
-export function entriesForTarget(target: string): RouteEntry[] {
-  const normalized = target.replace(/\/$/, '');
-  return MANIFEST.filter((entry) =>
-    entry.sourceGlobs.some((glob) => {
-      const literalPrefix = glob.split(/[*?[]/)[0].replace(/\/$/, '');
-      return (
-        literalPrefix === normalized ||
-        literalPrefix.startsWith(normalized + '/') ||
-        normalized.startsWith(literalPrefix + '/') ||
-        normalized.startsWith(literalPrefix)
-      );
-    })
+export const MANIFEST = validateVisualManifest(existingManifest);
+
+const normalizeSourcePath = (sourcePath: string): string =>
+  sourcePath.trim().replace(/^\.\//, '').replace(/\/$/, '');
+
+const literalGlobPrefix = (glob: string): string => {
+  const wildcardIndexes = ['*', '?', '[']
+    .map((character) => glob.indexOf(character))
+    .filter((index) => index >= 0);
+  const end =
+    wildcardIndexes.length === 0 ? glob.length : Math.min(...wildcardIndexes);
+  return normalizeSourcePath(glob.slice(0, end));
+};
+
+const pathsOverlap = (left: string, right: string): boolean =>
+  left === right ||
+  left.startsWith(`${right}/`) ||
+  right.startsWith(`${left}/`);
+
+const matchesTarget = (entry: RouteEntry, target: string): boolean => {
+  const normalizedTarget = normalizeSourcePath(target);
+  return entry.sourceGlobs.some((glob) =>
+    pathsOverlap(literalGlobPrefix(glob), normalizedTarget)
   );
+};
+
+const validateSelectionValues = <T extends string>(
+  values: readonly T[] | undefined,
+  allowed: readonly T[],
+  label: string,
+  unknownLabel: string
+): void => {
+  if (values === undefined) return;
+  if (values.length === 0) {
+    throw new Error(`${label} filter must not be empty`);
+  }
+  for (const value of values) {
+    if (!allowed.includes(value)) {
+      throw new Error(`${unknownLabel}: ${value}`);
+    }
+  }
+};
+
+export function selectVisualCases(
+  manifest: readonly RouteEntry[],
+  selection: VisualSelection
+): VisualCase[] {
+  const manifestIds = manifest.map(({ id }) => id);
+  validateSelectionValues(
+    selection.ids,
+    manifestIds,
+    'ids',
+    'unknown visual route id'
+  );
+  validateSelectionValues(
+    selection.clusters,
+    ROUTE_CLUSTERS,
+    'clusters',
+    'unknown route cluster'
+  );
+  validateSelectionValues(
+    selection.viewports,
+    VIEWPORT_NAMES,
+    'viewports',
+    'unknown viewport'
+  );
+  if (selection.target !== undefined && !isNonEmpty(selection.target)) {
+    throw new Error('target filter must not be empty');
+  }
+
+  const ids = selection.ids ? new Set(selection.ids) : undefined;
+  const clusters = selection.clusters ? new Set(selection.clusters) : undefined;
+  const viewports = selection.viewports
+    ? new Set(selection.viewports)
+    : undefined;
+
+  const cases = manifest.flatMap((entry) => {
+    if (ids && !ids.has(entry.id)) return [];
+    if (clusters && !entry.clusters.some((cluster) => clusters.has(cluster))) {
+      return [];
+    }
+    if (selection.target && !matchesTarget(entry, selection.target)) return [];
+
+    return entry.viewports
+      .filter((viewport) => !viewports || viewports.has(viewport))
+      .map((viewport) => ({ entry, viewport }));
+  });
+
+  if (cases.length === 0) {
+    throw new Error('selection selected no visual cases');
+  }
+
+  return cases;
+}
+
+/** Compatibility wrapper for scripts that still select entries by target. */
+export function entriesForTarget(
+  target: string,
+  manifest: readonly RouteEntry[] = MANIFEST
+): RouteEntry[] {
+  return manifest.filter((entry) => matchesTarget(entry, target));
 }

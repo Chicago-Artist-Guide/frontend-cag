@@ -6,7 +6,7 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
-import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { yellow_blob } from '../../../config/publicImages';
 import { unionOptionLabels, unionOptions } from '../../../utils/lookups';
 import { Checkbox } from '../../shared';
 import { Tagline, Title } from '../../layout/Titles';

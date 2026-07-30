@@ -8,8 +8,8 @@ vi.mock('../components/Messages/api', () => ({
   createMessageThread: vi.fn(),
   sendMessageThreadWithEmail: vi.fn()
 }));
-vi.mock('../components/Profile/shared/api', () => ({
-  getAccountWithAccountId: vi.fn()
+vi.mock('../services/accounts/client', () => ({
+  getAccountByIdOrUid: vi.fn()
 }));
 
 import { sendDeferredDeclineNotifications } from '../components/Matches/declineNotifications';
@@ -21,7 +21,7 @@ import {
   createMessageThread,
   sendMessageThreadWithEmail
 } from '../components/Messages/api';
-import { getAccountWithAccountId } from '../components/Profile/shared/api';
+import { getAccountByIdOrUid } from '../services/accounts/client';
 import {
   theaterDeclineArtistMessage,
   theaterDeclineArtistEmailText,
@@ -45,8 +45,9 @@ describe('sendDeferredDeclineNotifications', () => {
       { id: 'm1', role_id: 'r1', talent_account_id: 'a1' },
       { id: 'm2', role_id: 'r1', talent_account_id: 'a2' }
     ] as any);
-    vi.mocked(getAccountWithAccountId).mockResolvedValue({
-      email: 'x@y.com'
+    vi.mocked(getAccountByIdOrUid).mockResolvedValue({
+      data: { email: 'x@y.com' },
+      id: 'a1'
     } as any);
     vi.mocked(sendMessageThreadWithEmail).mockResolvedValue('thread-1');
 
@@ -66,7 +67,10 @@ describe('sendDeferredDeclineNotifications', () => {
     vi.mocked(getDeclinedMatchesForProduction).mockResolvedValue([
       { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
     ] as any);
-    vi.mocked(getAccountWithAccountId).mockResolvedValue({} as any);
+    vi.mocked(getAccountByIdOrUid).mockResolvedValue({
+      data: {},
+      id: 'a1'
+    } as any);
     vi.mocked(createMessageThread).mockResolvedValue('thread-1');
 
     const n = await sendDeferredDeclineNotifications(
@@ -94,8 +98,9 @@ describe('sendDeferredDeclineNotifications', () => {
     vi.mocked(getDeclinedMatchesForProduction).mockResolvedValue([
       { id: 'm1', role_id: 'r1', talent_account_id: 'a1' }
     ] as any);
-    vi.mocked(getAccountWithAccountId).mockResolvedValue({
-      email: 'x@y.com'
+    vi.mocked(getAccountByIdOrUid).mockResolvedValue({
+      data: { email: 'x@y.com' },
+      id: 'a1'
     } as any);
     vi.mocked(sendMessageThreadWithEmail).mockResolvedValue('thread-1');
 

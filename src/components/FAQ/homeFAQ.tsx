@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { zeffyUrl } from '../../utils/marketing';
 
@@ -46,7 +47,7 @@ export const homeFAQ = {
       question: '',
       answer: [
         'Request a registration link through ',
-        <a href="/sign-up">this form</a>,
+        <Link href="/sign-up">this form</Link>,
         ' to start posting jobs. Questions? Reach out to Executive Director, ',
         <a href="mailto:anna@chicagoartistguide.org">Anna Schutz</a>,
         '.'

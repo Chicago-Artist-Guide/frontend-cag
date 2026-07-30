@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 interface PublicRolesSignUpCTAProps {
   // Optional override copy -- null states reuse this component with
@@ -59,7 +61,7 @@ const PublicRolesSignUpCTA: React.FC<PublicRolesSignUpCTAProps> = ({
               : // darkPrimary on white: 7.4:1 contrast (AAA).
                 'inline-flex items-center justify-center rounded-full bg-darkPrimary px-5 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white shadow-sm hover:bg-cornflower focus:outline-none focus:ring-2 focus:ring-darkPrimary focus:ring-offset-2'
           }
-          to="/sign-up"
+          href="/sign-up"
         >
           Join Free
         </Link>
@@ -70,7 +72,7 @@ const PublicRolesSignUpCTA: React.FC<PublicRolesSignUpCTAProps> = ({
               ? 'inline-flex items-center justify-center rounded-full border border-white/70 px-6 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-white hover:border-white hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-cornflower'
               : 'inline-flex items-center justify-center rounded-full border border-cornflower px-5 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-cornflower hover:bg-cornflower hover:text-white focus:outline-none focus:ring-2 focus:ring-cornflower focus:ring-offset-2'
           }
-          to="/faq"
+          href="/faq"
         >
           How it Works
         </Link>

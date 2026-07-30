@@ -4,13 +4,13 @@ import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
 import { useMessages } from '../../context/MessageContext';
 import {
-  getNameForAccount,
-  getProfileWithUid,
-  getTheaterNameForAccount
-} from '../Profile/shared/api';
+  getAccountDisplayName,
+  getTheaterDisplayNameByUid
+} from '../../services/accounts/client';
+import { findProfileByUidOrAccountId } from '../../services/profiles/client';
 import { getProduction } from '../Profile/Company/api';
 import { MessageThreadType } from './types';
-import { defaultPfp } from '../../images';
+import { defaultPfp } from '../../config/publicImages';
 
 interface MessageThreadsProps {
   onThreadSelect: (threadId: string) => void;
@@ -28,30 +28,41 @@ const MessageThreads: React.FC<
   const { threadId } = useParams();
   const { account } = useUserContext();
   const { firebaseFirestore } = useFirebaseContext();
-  const { threads, loadThreads } = useMessages();
+  const { clearMessages, threads, threadsAccountId, loadThreads } =
+    useMessages();
   const [loading, setLoading] = useState(true);
   const [threadData, setThreadData] = useState<MessageThreadTypeExtended[]>([]);
 
   useEffect(() => {
-    const loadThreadsAsync = async () => {
-      const accountId = account.ref?.id || '';
-      await loadThreads(accountId);
-    };
+    clearMessages();
+    setThreadData([]);
 
-    loadThreadsAsync();
-  }, [account]);
+    if (!account.id) {
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    loadThreads(account.id);
+  }, [account.id, clearMessages, loadThreads]);
 
   useEffect(() => {
+    if (!account.id || threadsAccountId !== account.id) {
+      setThreadData([]);
+      return;
+    }
+
+    let active = true;
     const fetchThreadsData = async () => {
       const data = await Promise.all(
         threads.map(async (thread) => {
           const whichStatus =
-            account.data.type === 'company'
+            account.data?.type === 'company'
               ? thread.theater_status
               : thread.talent_status;
           const statusNew = whichStatus === 'new';
           const recipientIdRef =
-            account.data.type === 'company'
+            account.data?.type === 'company'
               ? thread.talent_account_id
               : thread.theater_account_id;
           const recipientId =
@@ -60,19 +71,16 @@ const MessageThreads: React.FC<
               : recipientIdRef.id;
 
           // start getting more data
-          const getRecipientProfile = await getProfileWithUid(
-            firebaseFirestore,
-            recipientId
-          );
+          const getRecipientProfile =
+            await findProfileByUidOrAccountId(recipientId);
           const recipientName =
-            account.data.type === 'company'
-              ? await getNameForAccount(firebaseFirestore, recipientId)
-              : await getTheaterNameForAccount(firebaseFirestore, recipientId);
+            account.data?.type === 'company'
+              ? await getAccountDisplayName(recipientId)
+              : await getTheaterDisplayNameByUid(recipientId);
 
-          let threadPreviewImg =
-            getRecipientProfile && getRecipientProfile?.profile_image_url
-              ? getRecipientProfile?.profile_image_url
-              : defaultPfp;
+          let threadPreviewImg = getRecipientProfile?.data?.profile_image_url
+            ? getRecipientProfile.data.profile_image_url
+            : defaultPfp;
 
           // if the theater company doesn't have a pfp, use the production image if there is one
           if (threadPreviewImg === defaultPfp && thread.production_id) {
@@ -99,19 +107,27 @@ const MessageThreads: React.FC<
         })
       );
 
-      setThreadData(data);
-      setLoading(false);
+      if (active) {
+        setThreadData(data);
+        setLoading(false);
+      }
     };
 
     fetchThreadsData();
-  }, [account, threads]);
+    return () => {
+      active = false;
+    };
+  }, [account, firebaseFirestore, threads, threadsAccountId]);
+
+  const hasCurrentAccountThreads =
+    Boolean(account.id) && threadsAccountId === account.id;
 
   return (
     <div className="h-full overflow-y-auto">
       <h4 className="mb-4 px-2 text-base font-semibold sm:px-0 sm:text-lg">
         Threads
       </h4>
-      {loading ? (
+      {account.id && (!hasCurrentAccountThreads || loading) ? (
         <p className="px-2 sm:px-0">Loading threads...</p>
       ) : (
         <div className="space-y-2 sm:space-y-4">

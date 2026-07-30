@@ -4,13 +4,14 @@ import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { DividerBar } from '../../components/shared';
-import { redBlob, yellowBlob1 } from '../../images';
 import {
   makeProfile,
   promotions,
+  redBlob,
   receiveNotices,
-  submitToJobs
-} from '../../images/icons-home';
+  submitToJobs,
+  yellowBlob1
+} from '../../config/publicImages';
 import { breakpoints, colors } from '../../theme/styleVars';
 import { BlobBox, CardBox } from '../layout';
 

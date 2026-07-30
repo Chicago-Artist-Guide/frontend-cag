@@ -5,8 +5,11 @@ import Row from 'react-bootstrap/Row';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Checkbox, DividerBar, InputField } from '../../components/shared';
-import { redBlob, yellowBlob1 } from '../../images';
-import { emailWhiteIcon } from '../../images/icons-home';
+import {
+  emailWhiteIcon,
+  redBlob,
+  yellowBlob1
+} from '../../config/publicImages';
 import { colors } from '../../theme/styleVars';
 import { BlobBox } from '../layout';
 

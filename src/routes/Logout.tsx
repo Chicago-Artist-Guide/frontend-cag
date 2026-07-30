@@ -10,17 +10,14 @@ import { useUserContext } from '../context/UserContext';
 
 const Logout = () => {
   const { firebaseAuth } = useFirebaseContext();
-  const { setAccountRef, setAccountData, setProfileRef, setProfileData } =
-    useUserContext();
+  const { setAccount, setProfile } = useUserContext();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     signOut(firebaseAuth)
       .then(() => {
-        setAccountRef(null);
-        setAccountData(null);
-        setProfileRef(null);
-        setProfileData(null);
+        setAccount({ id: null, data: null });
+        setProfile({ id: null, data: null });
       })
       .catch((err) => {
         console.log('Sign out error', err);

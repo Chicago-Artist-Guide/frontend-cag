@@ -1,6 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
-import PageContainer from '../components/layout/PageContainer';
+import {
+  LegalList,
+  TermsContainer as TOSContainer
+} from '../components/Legal/LegalPageStyles';
 import { Title, TitleThree } from '../components/layout/Titles';
 
 const TOS = () => (
@@ -457,114 +459,110 @@ const TOS = () => (
       can and cannot do on our Services.
     </p>
     <p>You agree that you will:</p>
-    <ul>
-      <p>
-        <li>
-          Comply with all applicable laws, including, without limitation,
-          privacy laws, intellectual property laws, anti-spam laws, export
-          control laws, tax laws, and regulatory requirements;
-        </li>
-        <li>Provide accurate information to us and keep it updated;</li>
-        <li>Use your real name on your profile; and</li>
-        <li>Use the Services in a professional manner.</li>
-      </p>
-    </ul>
+    <LegalList>
+      <li>
+        Comply with all applicable laws, including, without limitation, privacy
+        laws, intellectual property laws, anti-spam laws, export control laws,
+        tax laws, and regulatory requirements;
+      </li>
+      <li>Provide accurate information to us and keep it updated;</li>
+      <li>Use your real name on your profile; and</li>
+      <li>Use the Services in a professional manner.</li>
+    </LegalList>
     <TitleThree>8.2 Don'ts</TitleThree>
     <p>You agree that you will not:</p>
-    <ul>
-      <p>
-        <li>
-          Create a false identity on CAG, misrepresent your identity, create a
-          Member profile for anyone other than yourself (a real person), or use
-          or attempt to use another's account;
-        </li>
-        <li>
-          Develop, support or use software, devices, scripts, robots or any
-          other means or processes (including crawlers, browser plugins and
-          add-ons or any other technology) to scrape the Services or otherwise
-          copy profiles and other data from the Services;
-        </li>
-        <li>
-          Override any security feature or bypass or circumvent any access
-          controls or use imits of the Service (such as caps on keyword searches
-          or profile views);
-        </li>
-        <li>
-          Copy, use, disclose or distribute any information obtained from the
-          Services, whether directly or through third parties (such as search
-          engines), without the consent of CAG;
-        </li>
-        <li>
-          Disclose information that you do not have the consent to disclose
-          (such as confidential information of others including your employer));
-        </li>
-        <li>
-          Violate the intellectual property rights of others, including
-          copyrights, patents, trademarks, trade secrets or other proprietary
-          rights. For example, do not copy or distribute (except through the
-          available sharing functionality) the posts or other content of others
-          without their permission, which they may give by posting under a
-          Creative Commons license;
-        </li>
-        <li>
-          Violate the intellectual property or other rights of CAG, including,
-          without limitation, (i) copying or distributing our learning videos or
-          other materials or (ii) copying or distributing our technology, unless
-          it is released under open source licenses; (iii) using the name
-          "Chicago Artist Guide" or our logos in any business name, email, or
-          URL except as provided in the Brand Guidelines;
-        </li>
-        <li>
-          Post anything that contains software viruses, worms, or any other
-          harmful code;
-        </li>
-        <li>
-          Reverse engineer, decompile, disassemble, decipher or otherwise
-          attempt to derive the source code for the Services or any related
-          technology that is not open source;
-        </li>
-        <li>
-          Imply or state that you are affiliated with or endorsed by CAG without
-          our express consent (e.g., representing yourself as an accredited CAG
-          trainer);
-        </li>
-        <li>
-          Rent, lease, loan, trade, sell/re-sell or otherwise monetize the
-          Services or related data or access to the same, without CAG's consent;
-        </li>
-        <li>
-          Deep-link to our Services for any purpose other than to promote your
-          profile or a Group on our Services, without CAG's consent;
-        </li>
-        <li>
-          Use bots or other automated methods to access the Services, add or
-          download contacts, send or redirect messages;
-        </li>
-        <li>
-          Monitor the Services' availability, performance or functionality for
-          any competitive purpose;
-        </li>
-        <li>
-          Engage in "framing," "mirroring," or otherwise simulating the
-          appearance or function of the Services;
-        </li>
-        <li>
-          Overlay or otherwise modify the Services or their appearance (such as
-          by inserting elements into the Services or removing, covering, or
-          obscuring an advertisement included on the Services);
-        </li>
-        <li>
-          Interfere with the operation of, or place an unreasonable load on, the
-          Services (e.g., spam, denial of service attack, viruses, gaming
-          algorithms); and/or
-        </li>
-        <li>
-          Violate the Professional Community Policies or any additional terms
-          concerning a specific Service that are provided when you sign up for
-          or start using such Service, and the Bing Maps terms where applicable.
-        </li>
-      </p>
-    </ul>
+    <LegalList>
+      <li>
+        Create a false identity on CAG, misrepresent your identity, create a
+        Member profile for anyone other than yourself (a real person), or use or
+        attempt to use another's account;
+      </li>
+      <li>
+        Develop, support or use software, devices, scripts, robots or any other
+        means or processes (including crawlers, browser plugins and add-ons or
+        any other technology) to scrape the Services or otherwise copy profiles
+        and other data from the Services;
+      </li>
+      <li>
+        Override any security feature or bypass or circumvent any access
+        controls or use imits of the Service (such as caps on keyword searches
+        or profile views);
+      </li>
+      <li>
+        Copy, use, disclose or distribute any information obtained from the
+        Services, whether directly or through third parties (such as search
+        engines), without the consent of CAG;
+      </li>
+      <li>
+        Disclose information that you do not have the consent to disclose (such
+        as confidential information of others including your employer));
+      </li>
+      <li>
+        Violate the intellectual property rights of others, including
+        copyrights, patents, trademarks, trade secrets or other proprietary
+        rights. For example, do not copy or distribute (except through the
+        available sharing functionality) the posts or other content of others
+        without their permission, which they may give by posting under a
+        Creative Commons license;
+      </li>
+      <li>
+        Violate the intellectual property or other rights of CAG, including,
+        without limitation, (i) copying or distributing our learning videos or
+        other materials or (ii) copying or distributing our technology, unless
+        it is released under open source licenses; (iii) using the name "Chicago
+        Artist Guide" or our logos in any business name, email, or URL except as
+        provided in the Brand Guidelines;
+      </li>
+      <li>
+        Post anything that contains software viruses, worms, or any other
+        harmful code;
+      </li>
+      <li>
+        Reverse engineer, decompile, disassemble, decipher or otherwise attempt
+        to derive the source code for the Services or any related technology
+        that is not open source;
+      </li>
+      <li>
+        Imply or state that you are affiliated with or endorsed by CAG without
+        our express consent (e.g., representing yourself as an accredited CAG
+        trainer);
+      </li>
+      <li>
+        Rent, lease, loan, trade, sell/re-sell or otherwise monetize the
+        Services or related data or access to the same, without CAG's consent;
+      </li>
+      <li>
+        Deep-link to our Services for any purpose other than to promote your
+        profile or a Group on our Services, without CAG's consent;
+      </li>
+      <li>
+        Use bots or other automated methods to access the Services, add or
+        download contacts, send or redirect messages;
+      </li>
+      <li>
+        Monitor the Services' availability, performance or functionality for any
+        competitive purpose;
+      </li>
+      <li>
+        Engage in "framing," "mirroring," or otherwise simulating the appearance
+        or function of the Services;
+      </li>
+      <li>
+        Overlay or otherwise modify the Services or their appearance (such as by
+        inserting elements into the Services or removing, covering, or obscuring
+        an advertisement included on the Services);
+      </li>
+      <li>
+        Interfere with the operation of, or place an unreasonable load on, the
+        Services (e.g., spam, denial of service attack, viruses, gaming
+        algorithms); and/or
+      </li>
+      <li>
+        Violate the Professional Community Policies or any additional terms
+        concerning a specific Service that are provided when you sign up for or
+        start using such Service, and the Bing Maps terms where applicable.
+      </li>
+    </LegalList>
     <h3>9. Complaints Regarding Content</h3>
     <p>
       Contact information for complaint about content provided by our Members.
@@ -584,9 +582,4 @@ const TOS = () => (
   </TOSContainer>
 );
 
-const TOSContainer = styled(PageContainer)`
-  h3 {
-    font-size: 20px;
-  }
-`;
 export default TOS;

@@ -7,7 +7,7 @@ import Nav from 'react-bootstrap/Nav';
 import Row from 'react-bootstrap/Row';
 import { media } from 'styled-bootstrap-grid';
 import styled from 'styled-components';
-import LinkedinLogo from '../../images/icons-footer/social_linkedin.png';
+import { LinkedinLogo } from '../../config/publicImages';
 import { colors } from '../../theme/styleVars';
 
 const Team = (props: any) => {

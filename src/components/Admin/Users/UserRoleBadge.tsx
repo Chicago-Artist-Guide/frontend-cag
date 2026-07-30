@@ -20,7 +20,7 @@ const Badge = styled.span<{ $roleColor: string }>`
   display: inline-block;
   padding: 0.25rem 0.75rem;
   border-radius: 6px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;

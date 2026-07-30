@@ -8,7 +8,7 @@ import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import Checkbox from '../../../components/shared/Checkbox';
 import GenericAccordion from '../../../components/shared/GenericAccordion';
-import yellow_blob_1 from '../../../images/yellow_blob_1.svg';
+import { yellow_blob_1 } from '../../../config/publicImages';
 import { fonts } from '../../../theme/styleVars';
 import { Tagline, Title } from '../../layout/Titles';
 import { offstageRolesOptions } from '../../Profile/shared/offstageRolesOptions';

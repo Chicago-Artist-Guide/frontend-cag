@@ -42,7 +42,7 @@ const Header = styled.div`
   border-bottom: 1px solid ${colors.lightGrey};
 
   h2 {
-    font-family: 'Montserrat', sans-serif;
+    font-family: var(--font-montserrat), sans-serif;
     font-size: 1.5rem;
     font-weight: 700;
     color: ${colors.slate};
@@ -73,7 +73,7 @@ const CloseButton = styled.button`
 `;
 const Label = styled.label`
   display: block;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
   font-size: 0.875rem;
   font-weight: 600;
   color: ${colors.slate};
@@ -107,7 +107,7 @@ const TextArea = styled.textarea<{ $hasError?: boolean }>`
   font-size: 1rem;
   min-height: 100px;
   resize: vertical;
-  font-family: 'Open Sans', sans-serif;
+  font-family: var(--font-open-sans), sans-serif;
 
   &:focus {
     outline: none;

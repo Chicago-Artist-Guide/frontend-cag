@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { IndividualProfileDataFullInit } from '../../components/SignUp/Individual/types';
 import { useUserContext } from '../../context/UserContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import { getAccountWithAccountId } from '../Profile/shared/api';
+import { getAccountByIdOrUid } from '../../services/accounts/client';
 import { sendMessageThreadWithEmail } from '../Messages/api';
 import {
   NO_EMAIL,
@@ -58,29 +58,27 @@ export const TalentMatchCard = ({
     talentAccountId: string
   ) => {
     const contactEmail =
-      userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL;
+      userProfile.data?.primary_contact_email || currentUser?.email || NO_EMAIL;
     const shortMessage = theaterToArtistMessage(
       roleName,
       productionName,
       contactEmail
     );
     const emailText = theaterToArtistEmailText(
-      userProfile?.data.theatre_name,
+      userProfile.data?.theatre_name || '',
       roleName,
       productionName,
       contactEmail
     );
     const emailHtml = theaterToArtistEmailHtml(
-      userProfile?.data.theatre_name,
+      userProfile.data?.theatre_name || '',
       roleName,
       productionName,
       contactEmail
     );
 
-    const talentAccount = await getAccountWithAccountId(
-      firebaseFirestore,
-      talentAccountId
-    );
+    const talentAccount = await getAccountByIdOrUid(talentAccountId);
+    const talentEmail = talentAccount?.data.email;
 
     return sendMessageThreadWithEmail({
       firebaseStore: firebaseFirestore,
@@ -90,9 +88,9 @@ export const TalentMatchCard = ({
       shortMessage,
       productionId,
       roleId,
-      email: talentAccount?.email
+      email: talentEmail
         ? {
-            to: talentAccount.email,
+            to: talentEmail,
             subject: theaterToArtistEmailSubject(roleName, productionName),
             text: emailText,
             html: emailHtml
@@ -104,7 +102,7 @@ export const TalentMatchCard = ({
   const createMatch = async (status: boolean) => {
     try {
       const talentAccountId = profile.account_id;
-      const currUserAccountId = account.ref?.id;
+      const currUserAccountId = account.id;
 
       await createTheaterTalentMatch(
         firebaseFirestore,
@@ -116,7 +114,7 @@ export const TalentMatchCard = ({
       );
 
       if (!currUserAccountId) {
-        console.error('Caanot find current user ref account id.');
+        console.error('Cannot find current user account id.');
         return false;
       }
 

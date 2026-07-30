@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
 import {
   Firestore,
   collection,
@@ -15,8 +22,10 @@ import { useUserContext } from './UserContext';
 import { MessageThreadType, MessageType } from '../components/Messages/types';
 
 interface MessageContextType {
+  clearMessages: () => void;
   threads: MessageThreadType[];
-  loadThreads: (accountId: string) => void;
+  threadsAccountId: string | null;
+  loadThreads: (accountId: string) => Promise<void>;
   currentThread: MessageThreadType | null;
   loadThread: (threadId: string) => void;
   updateThreadStatus: (threadId: string, status: string) => void;
@@ -29,8 +38,10 @@ interface MessageContextType {
 }
 
 const MessageContext = createContext<MessageContextType>({
+  clearMessages: () => undefined,
   threads: [],
-  loadThreads: () => null,
+  threadsAccountId: null,
+  loadThreads: async () => undefined,
   currentThread: null,
   loadThread: () => null,
   updateThreadStatus: () => null,
@@ -49,6 +60,8 @@ export const MessageProvider: React.FC<
 > = ({ children, firestore, threadIdParam }) => {
   const { account } = useUserContext();
   const [threads, setThreads] = useState<MessageThreadType[]>([]);
+  const [threadsAccountId, setThreadsAccountId] = useState<string | null>(null);
+  const threadLoadVersion = useRef(0);
   const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
     null
   );
@@ -56,27 +69,48 @@ export const MessageProvider: React.FC<
     MessageType[]
   >([]);
 
-  const loadThreads = async (accountId: string) => {
-    const threadsRef = collection(firestore, 'threads');
-    const currAccountRef = doc(firestore, 'accounts', accountId);
-    const threadQuery = query(
-      threadsRef,
-      or(
-        where('theater_account_id', '==', currAccountRef),
-        where('talent_account_id', '==', currAccountRef)
-      )
-    );
-    const threadSnapshot = await getDocs(threadQuery);
-    const userThreads = threadSnapshot.docs.map(
-      (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data()
-        }) as MessageThreadType
-    );
+  const clearMessages = useCallback(() => {
+    threadLoadVersion.current += 1;
+    setThreads([]);
+    setThreadsAccountId(null);
+    setCurrentThread(null);
+    setCurrentThreadMessages([]);
+  }, []);
 
-    setThreads(userThreads);
-  };
+  const loadThreads = useCallback(
+    async (accountId: string) => {
+      const loadVersion = threadLoadVersion.current + 1;
+      threadLoadVersion.current = loadVersion;
+      setThreads([]);
+      setThreadsAccountId(null);
+
+      const threadsRef = collection(firestore, 'threads');
+      const currAccountRef = doc(firestore, 'accounts', accountId);
+      const threadQuery = query(
+        threadsRef,
+        or(
+          where('theater_account_id', '==', currAccountRef),
+          where('talent_account_id', '==', currAccountRef)
+        )
+      );
+      const threadSnapshot = await getDocs(threadQuery);
+      const userThreads = threadSnapshot.docs.map(
+        (threadDocument) =>
+          ({
+            id: threadDocument.id,
+            ...threadDocument.data()
+          }) as MessageThreadType
+      );
+
+      if (threadLoadVersion.current !== loadVersion) {
+        return;
+      }
+
+      setThreads(userThreads);
+      setThreadsAccountId(accountId);
+    },
+    [firestore]
+  );
 
   const loadThread = async (threadId: string) => {
     const threadDoc = doc(firestore, 'threads', threadId);
@@ -131,7 +165,7 @@ export const MessageProvider: React.FC<
   };
 
   const updateThreadStatus = async (threadId: string, status: string) => {
-    const accountId = account.ref?.id;
+    const accountId = account.id;
     const threadDoc = doc(firestore, 'threads', threadId);
 
     await updateDoc(threadDoc, { status });
@@ -151,7 +185,9 @@ export const MessageProvider: React.FC<
   return (
     <MessageContext.Provider
       value={{
+        clearMessages,
         threads,
+        threadsAccountId,
         loadThreads,
         currentThread,
         loadThread,

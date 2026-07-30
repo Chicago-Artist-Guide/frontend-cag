@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import PublicRolesSignUpCTA from './PublicRolesSignUpCTA';
 
 // DEV-495: shown when there are zero open roles in the entire system (not
@@ -57,7 +59,7 @@ const PublicRolesEmptyState: React.FC = () => {
         <Link
           aria-label="Return to the Chicago Artist Guide home page"
           className="inline-flex items-center justify-center rounded-full border border-lightGrey px-5 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-grayishBlue hover:border-darkGrey hover:text-darkGrey"
-          to="/"
+          href="/"
         >
           Back to Home
         </Link>

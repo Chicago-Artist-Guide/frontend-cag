@@ -35,9 +35,9 @@ const colors = {
 };
 
 const fonts = {
-  lora: '"Lora", serif',
-  montserrat: '"Montserrat", sans-serif',
-  mainFont: '"Open Sans", sans-serif'
+  lora: 'var(--font-lora), serif',
+  montserrat: 'var(--font-montserrat), sans-serif',
+  mainFont: 'var(--font-open-sans), sans-serif'
 };
 
 const breakpoints = {

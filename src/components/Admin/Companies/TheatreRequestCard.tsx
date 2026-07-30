@@ -37,7 +37,7 @@ const MainInfo = styled.div`
 `;
 
 const CompanyName = styled.h3`
-  font-family: 'Montserrat', sans-serif;
+  font-family: var(--font-montserrat), sans-serif;
   font-size: 1.125rem;
   font-weight: 600;
   color: ${colors.slate};

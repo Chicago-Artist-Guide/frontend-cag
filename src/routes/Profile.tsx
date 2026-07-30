@@ -1,5 +1,4 @@
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getDoc } from 'firebase/firestore';
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
@@ -7,11 +6,14 @@ import CompanyProfile from '../components/Profile/Company';
 import IndividualProfile from '../components/Profile/Individual';
 import PageContainer from '../components/layout/PageContainer';
 import { useUserContext } from '../context/UserContext';
-import { useFirebaseContext } from '../context/FirebaseContext';
 import {
-  getProfileWithUid,
-  getAccountWithAccountId
-} from '../components/Profile/shared/api';
+  getAccountById,
+  getAccountByIdOrUid
+} from '../services/accounts/client';
+import {
+  findProfileByUidOrAccountId,
+  getProfileById
+} from '../services/profiles/client';
 import { colors, fonts } from '../theme/styleVars';
 
 const Profile: React.FC<
@@ -21,14 +23,9 @@ const Profile: React.FC<
 > = ({ previewMode = false }) => {
   const navigate = useNavigate();
   const { accountId } = useParams<{ accountId?: string }>();
+  const isPublicView = Boolean(accountId);
   const auth = getAuth();
-  const { firebaseFirestore } = useFirebaseContext();
-  const {
-    account: { ref: accountRef, data: account },
-    setAccountData,
-    profile: { ref: profileRef },
-    setProfileData
-  } = useUserContext();
+  const { account, setAccountData, profile, setProfileData } = useUserContext();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewingOtherProfile, setViewingOtherProfile] = useState(false);
@@ -41,18 +38,18 @@ const Profile: React.FC<
 
   const getProfileData = useCallback(async () => {
     // If viewing another user's profile
-    if (accountId && accountId !== account?.id) {
+    if (accountId && accountId !== account.id) {
       try {
         setViewingOtherProfile(true);
         const [profileData, accountData] = await Promise.all([
-          getProfileWithUid(firebaseFirestore, accountId),
-          getAccountWithAccountId(firebaseFirestore, accountId)
+          findProfileByUidOrAccountId(accountId),
+          getAccountByIdOrUid(accountId)
         ]);
 
         if (profileData && accountData) {
           // Store in separate state to avoid polluting user context
-          setViewedProfile(profileData);
-          setViewedAccount(accountData);
+          setViewedProfile(profileData.data);
+          setViewedAccount(accountData.data);
           setError(null);
         } else {
           setError('Profile not found');
@@ -67,7 +64,7 @@ const Profile: React.FC<
     }
 
     // Otherwise, load current user's profile
-    if (!profileRef || !accountRef) {
+    if (!profile.id || !account.id) {
       setLoading(false);
       return;
     }
@@ -77,12 +74,12 @@ const Profile: React.FC<
       setViewedProfile(null);
       setViewedAccount(null);
       const [profileData, accountData] = await Promise.all([
-        getDoc(profileRef),
-        getDoc(accountRef)
+        getProfileById(profile.id),
+        getAccountById(account.id)
       ]);
 
-      setProfileData(profileData.data());
-      setAccountData(accountData.data());
+      setProfileData(profileData?.data ?? null);
+      setAccountData(accountData?.data ?? null);
       setError(null);
     } catch (err) {
       console.error('Error loading profile data:', err);
@@ -90,15 +87,7 @@ const Profile: React.FC<
     } finally {
       setLoading(false);
     }
-  }, [
-    accountId,
-    account?.id,
-    profileRef,
-    accountRef,
-    setProfileData,
-    setAccountData,
-    firebaseFirestore
-  ]);
+  }, [accountId, account.id, profile.id, setProfileData, setAccountData]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -121,8 +110,8 @@ const Profile: React.FC<
       !contextSwappedRef.current
     ) {
       // Save original data before swapping
-      if (!originalAccountRef.current && account) {
-        originalAccountRef.current = account;
+      if (!originalAccountRef.current && account.data) {
+        originalAccountRef.current = account.data;
       }
 
       // Set viewed profile in context
@@ -172,15 +161,21 @@ const Profile: React.FC<
 
   // Determine which account to display (viewed or current)
   const displayAccount =
-    viewingOtherProfile && viewedAccount ? viewedAccount : account;
+    viewingOtherProfile && viewedAccount ? viewedAccount : account.data;
 
   if (displayAccount?.type === 'company') {
-    return <CompanyProfile previewMode={previewMode || viewingOtherProfile} />;
+    return (
+      <CompanyProfile
+        previewMode={previewMode || isPublicView || viewingOtherProfile}
+      />
+    );
   }
 
   if (displayAccount?.type === 'individual') {
     return (
-      <IndividualProfile previewMode={previewMode || viewingOtherProfile} />
+      <IndividualProfile
+        previewMode={previewMode || isPublicView || viewingOtherProfile}
+      />
     );
   }
 

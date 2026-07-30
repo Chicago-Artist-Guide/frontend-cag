@@ -6,7 +6,7 @@ import Row from 'react-bootstrap/Row';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { ImageUploadComponent } from '../../../components/shared';
-import yellow_blob from '../../../images/yellow_blob_2.svg';
+import { yellow_blob } from '../../../config/publicImages';
 import { Tagline, Title } from '../../layout/Titles';
 import { breakpoints } from '../../../theme/styleVars';
 import type { IndividualData } from './types';

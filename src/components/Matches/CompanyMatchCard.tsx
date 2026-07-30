@@ -5,11 +5,8 @@ import Swal from 'sweetalert2';
 import { useUserContext } from '../../context/UserContext';
 import { useRoleMatches } from '../../context/RoleMatchContext';
 import { useFirebaseContext } from '../../context/FirebaseContext';
-import {
-  getTheaterAccountByAccountId,
-  getTheaterAccountByUid,
-  getTheaterByAccountId
-} from '../Profile/Company/api';
+import { getAccountByIdOrUid } from '../../services/accounts/client';
+import { findProfileByAccountId } from '../../services/profiles/client';
 import { Profile, Production } from '../Profile/Company/types';
 import { sendMessageThreadWithEmail } from '../Messages/api';
 import {
@@ -58,10 +55,10 @@ export const CompanyMatchCard = ({
   const findMatch = async () => {
     const productionId = production?.production_id || '';
     const roleId = role.role_id || '';
-    const talentAccountId = account.ref?.id;
+    const talentAccountId = account.id;
 
     if (!talentAccountId) {
-      console.error('Cannot find current user account ref');
+      console.error('Cannot find current user account id');
       return false;
     }
 
@@ -91,18 +88,14 @@ export const CompanyMatchCard = ({
     // production.account_id is the company auth uid. Resolve account first so
     // we can fall back from profile.theatre_name to account.theater_name when
     // the company hasn't completed their detailed profile yet.
-    const theaterAccount = await getTheaterAccountByUid(
-      firebaseFirestore,
-      theaterAccountUid
-    );
+    const theaterAccount = await getAccountByIdOrUid(theaterAccountUid);
 
     if (!theaterAccount) {
       console.error('Could not find theater account by uid');
       return false;
     }
 
-    const theaterProfile = await getTheaterByAccountId(
-      firebaseFirestore,
+    const theaterProfile = await findProfileByAccountId<Profile>(
       theaterAccount.id
     );
 
@@ -111,11 +104,13 @@ export const CompanyMatchCard = ({
       return false;
     }
 
-    if (!theaterProfile.theatre_name && (theaterAccount as any).theater_name) {
-      theaterProfile.theatre_name = (theaterAccount as any).theater_name;
-    }
-
-    setTheater(theaterProfile);
+    setTheater({
+      ...theaterProfile.data,
+      theatre_name:
+        theaterProfile.data.theatre_name ||
+        theaterAccount.data.theater_name ||
+        ''
+    });
   };
 
   const sendApplyNotifications = async (
@@ -123,7 +118,7 @@ export const CompanyMatchCard = ({
     talentAccountId: string
   ) => {
     const contactEmail = currentUser?.email || NO_EMAIL;
-    const talentFullName = `${account?.data.first_name} ${account?.data.last_name}`;
+    const talentFullName = `${account.data?.first_name} ${account.data?.last_name}`;
     const shortMessage = artistToTheaterMessage(
       roleName || UNKNOWN_ROLE,
       productionName,
@@ -144,14 +139,11 @@ export const CompanyMatchCard = ({
 
     let toEmail = theater?.primary_contact_email;
 
-    if (!toEmail) {
-      const theaterAccount = await getTheaterAccountByAccountId(
-        firebaseFirestore,
-        theater.account_id
-      );
+    if (!toEmail && theater) {
+      const theaterAccount = await getAccountByIdOrUid(theater.account_id);
 
-      if (theaterAccount?.email) {
-        toEmail = theaterAccount.email;
+      if (theaterAccount?.data.email) {
+        toEmail = theaterAccount.data.email;
       }
     }
 
@@ -181,11 +173,11 @@ export const CompanyMatchCard = ({
     try {
       const productionId = production?.production_id || '';
       const roleId = role.role_id || '';
-      const talentAccountId = account.ref?.id;
+      const talentAccountId = account.id;
       const theaterAccountId = production?.account_id || '';
 
       if (!talentAccountId) {
-        console.error('Cannot find current user account ref');
+        console.error('Cannot find current user account id');
         return false;
       }
 

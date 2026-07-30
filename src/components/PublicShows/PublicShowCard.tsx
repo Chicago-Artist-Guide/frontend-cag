@@ -1,15 +1,14 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Col, Image, Row } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
 import { Production } from '../Profile/Company/types';
-import {
-  getTheaterAccountByUid,
-  getTheaterByAccountId
-} from '../Profile/Company/api';
-import { useFirebaseContext } from '../../context/FirebaseContext';
+import { getAccountByIdOrUid } from '../../services/accounts/client';
+import { findProfileByAccountId } from '../../services/profiles/client';
 import { useUserContext } from '../../context/UserContext';
 
 interface PublicShowCardProps {
@@ -19,7 +18,6 @@ interface PublicShowCardProps {
 const PublicShowCard: React.FC<
   React.PropsWithChildren<PublicShowCardProps>
 > = ({ show }) => {
-  const { firebaseFirestore } = useFirebaseContext();
   const { currentUser } = useUserContext();
   const [theaterName, setTheaterName] = useState<string>(
     show.theater_name || ''
@@ -51,10 +49,7 @@ const PublicShowCard: React.FC<
     // profile's theatre_name, falling back to the account's theater_name.
     const fetchTheaterName = async () => {
       try {
-        const account = await getTheaterAccountByUid(
-          firebaseFirestore,
-          show.account_id
-        );
+        const account = await getAccountByIdOrUid(show.account_id);
 
         if (!isMounted) return;
 
@@ -63,17 +58,12 @@ const PublicShowCard: React.FC<
           return;
         }
 
-        const profile = await getTheaterByAccountId(
-          firebaseFirestore,
-          account.id
-        );
+        const profile = await findProfileByAccountId(account.id);
 
         if (!isMounted) return;
 
         const resolvedName =
-          (profile && profile.theatre_name) ||
-          (account as any).theater_name ||
-          '';
+          profile?.data.theatre_name || account.data.theater_name || '';
         setTheaterName(resolvedName);
       } catch {
         // Silently ignore — theater name is non-critical display data.
@@ -85,7 +75,7 @@ const PublicShowCard: React.FC<
     return () => {
       isMounted = false;
     };
-  }, [show.theater_name, show.account_id, currentUser, firebaseFirestore]);
+  }, [show.theater_name, show.account_id, currentUser]);
 
   return (
     <ShowCard>
@@ -98,7 +88,7 @@ const PublicShowCard: React.FC<
             <div className="flex-grow-1">
               <ShowName>{show?.production_name}</ShowName>
               {theaterName ? (
-                <TheaterNameLink to={`/profile/view/${show?.account_id}`}>
+                <TheaterNameLink href={`/profile/view/${show?.account_id}`}>
                   {theaterName}
                 </TheaterNameLink>
               ) : null}
@@ -110,7 +100,7 @@ const PublicShowCard: React.FC<
               style={{ gap: '1em' }}
             >
               {show.production_id ? (
-                <Link to={`/shows/${show.production_id}`}>
+                <Link href={`/shows/${show.production_id}`}>
                   <ShowButton
                     text="View Details"
                     type="button"

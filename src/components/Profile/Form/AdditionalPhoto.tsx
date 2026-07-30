@@ -5,7 +5,6 @@ import styled from 'styled-components';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useUserContext } from '../../../context/UserContext';
 import { colors } from '../../../theme/styleVars';
-import { Profile } from '../Company/types';
 
 const AdditionalPhoto: React.FC<
   React.PropsWithChildren<{
@@ -18,7 +17,7 @@ const AdditionalPhoto: React.FC<
   const { firebaseStorage } = useFirebaseContext();
   const {
     profile: { data }
-  }: { profile: { data: Profile } } = useUserContext();
+  } = useUserContext();
   const [imgUrl, setImgUrl] = useState<string | undefined>(src);
   const fileInput = useRef<HTMLInputElement | null>(null);
 
@@ -30,7 +29,7 @@ const AdditionalPhoto: React.FC<
 
   const onFileChange = (e: any) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && data) {
       setImgUrl(URL.createObjectURL(file));
       const storageRef = ref(
         firebaseStorage,

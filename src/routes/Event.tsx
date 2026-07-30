@@ -5,9 +5,14 @@ import Row from 'react-bootstrap/esm/Row';
 import styled from 'styled-components';
 import { BlobBox, PageContainer, Tagline, Title } from '../components/layout';
 
-import { redBlob2, redBlob3, yellowBlob1, yellowBlob3 } from '../images';
-import CagBaret from '../images/events/cag-baret.png';
-import Group from '../images/icons-signup/group.svg';
+import {
+  CagBaret,
+  Group,
+  redBlob2,
+  redBlob3,
+  yellowBlob1,
+  yellowBlob3
+} from '../config/publicImages';
 import { breakpoints, colors, fonts } from '../theme/styleVars';
 
 const blobs = [

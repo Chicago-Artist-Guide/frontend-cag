@@ -1,90 +1,126 @@
 import { User } from 'firebase/auth';
 import {
-  Firestore,
-  collection,
-  getDocs,
-  limit,
-  query,
-  where
-} from 'firebase/firestore';
-import { useEffect, useState, useCallback } from 'react';
-import { Document } from '../context/UserContext';
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
+import {
+  AccountContextData,
+  ProfileContextData,
+  UserDocument
+} from '../context/UserContext';
+import { findAccountByUid } from '../services/accounts/client';
+import { findProfileByUid } from '../services/profiles/client';
 
-const useProfileData = (currentUser: User | null, firestore: Firestore) => {
-  const [account, setAccount] = useState<Document>({
-    id: null,
-    ref: null,
-    data: null
-  });
-  const [profile, setProfile] = useState<Document>({
-    id: null,
-    ref: null,
-    data: null
-  });
+const emptyAccount = (): UserDocument<AccountContextData> => ({
+  id: null,
+  data: null
+});
+const emptyProfile = (): UserDocument<ProfileContextData> => ({
+  id: null,
+  data: null
+});
+
+const useProfileData = (currentUser: User | null) => {
+  const currentUserUid = currentUser?.uid;
+  const setterGeneration = useMemo(() => Symbol(), [currentUserUid]);
+  const activeSetterGeneration = useRef(setterGeneration);
+  const accountRevision = useRef(0);
+  const profileRevision = useRef(0);
+  const [account, setAccountState] =
+    useState<UserDocument<AccountContextData>>(emptyAccount);
+  const [profile, setProfileState] =
+    useState<UserDocument<ProfileContextData>>(emptyProfile);
+
+  useLayoutEffect(() => {
+    activeSetterGeneration.current = setterGeneration;
+  }, [setterGeneration]);
 
   useEffect(() => {
-    if (!currentUser || !firestore) return;
+    let cancelled = false;
+    const accountLoadRevision = ++accountRevision.current;
+    const profileLoadRevision = ++profileRevision.current;
+
+    setAccountState(emptyAccount());
+    setProfileState(emptyProfile());
+
+    if (!currentUserUid) {
+      return () => {
+        cancelled = true;
+      };
+    }
 
     const queryAccountAndProfile = async () => {
-      if (!profile?.ref || !account?.ref) {
-        const accountQuery = query(
-          collection(firestore, 'accounts'),
-          where('uid', '==', currentUser?.uid),
-          limit(1)
-        );
-        const queryAccountSnapshot = await getDocs(accountQuery);
+      const [accountResult, profileResult] = await Promise.allSettled([
+        findAccountByUid<AccountContextData>(currentUserUid),
+        findProfileByUid<ProfileContextData>(currentUserUid)
+      ]);
 
-        const profileQuery = query(
-          collection(firestore, 'profiles'),
-          where('uid', '==', currentUser?.uid),
-          limit(1)
-        );
-        const queryProfileSnapshot = await getDocs(profileQuery);
+      if (cancelled) return;
 
-        if (!queryAccountSnapshot.empty) {
-          setAccount({
-            id: queryAccountSnapshot.docs[0].id,
-            ref: queryAccountSnapshot.docs[0].ref,
-            data: queryAccountSnapshot.docs[0].data()
-          });
-        }
-
-        if (!queryProfileSnapshot.empty) {
-          setProfile({
-            id: queryProfileSnapshot.docs[0].id,
-            ref: queryProfileSnapshot.docs[0].ref,
-            data: queryProfileSnapshot.docs[0].data()
-          });
-        }
+      if (
+        accountResult.status === 'fulfilled' &&
+        accountRevision.current === accountLoadRevision
+      ) {
+        setAccountState(accountResult.value ?? emptyAccount());
+      }
+      if (
+        profileResult.status === 'fulfilled' &&
+        profileRevision.current === profileLoadRevision
+      ) {
+        setProfileState(profileResult.value ?? emptyProfile());
       }
     };
 
-    queryAccountAndProfile();
-  }, [currentUser, firestore]);
+    void queryAccountAndProfile();
 
-  const setAccountRef = useCallback(
-    (ref: any) => setAccount((prev) => ({ ...prev, ref })),
-    []
+    return () => {
+      cancelled = true;
+    };
+  }, [currentUserUid]);
+
+  const setAccount = useCallback(
+    (nextAccount: UserDocument<AccountContextData>) => {
+      if (activeSetterGeneration.current !== setterGeneration) return;
+      accountRevision.current += 1;
+      setAccountState(nextAccount);
+    },
+    [setterGeneration]
   );
   const setAccountData = useCallback(
-    (data: any) => setAccount((prev) => ({ ...prev, data })),
-    []
+    (data: AccountContextData | null) => {
+      if (activeSetterGeneration.current !== setterGeneration) return;
+      accountRevision.current += 1;
+      setAccountState((previous) => ({ ...previous, data }));
+    },
+    [setterGeneration]
   );
-  const setProfileRef = useCallback(
-    (ref: any) => setProfile((prev) => ({ ...prev, ref })),
-    []
+  const setProfile = useCallback(
+    (nextProfile: UserDocument<ProfileContextData>) => {
+      if (activeSetterGeneration.current !== setterGeneration) return;
+      profileRevision.current += 1;
+      setProfileState(nextProfile);
+    },
+    [setterGeneration]
   );
   const setProfileData = useCallback(
-    (data: any) => setProfile((prev) => ({ ...prev, data })),
-    []
+    (data: ProfileContextData | null) => {
+      if (activeSetterGeneration.current !== setterGeneration) return;
+      profileRevision.current += 1;
+      setProfileState((previous) => ({ ...previous, data }));
+    },
+    [setterGeneration]
   );
 
   return {
     account,
     profile,
-    setAccountRef,
+    setAccount,
     setAccountData,
-    setProfileRef,
+    setProfile,
     setProfileData
   };
 };

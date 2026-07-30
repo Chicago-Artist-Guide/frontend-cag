@@ -1,6 +1,12 @@
 import React from 'react';
-import styled from 'styled-components';
-import PageContainer from '../components/layout/PageContainer';
+import {
+  BodyText,
+  Heading1,
+  Heading2,
+  NavLink,
+  PrivacyContainer as Container,
+  Subtitle
+} from '../components/Legal/LegalPageStyles';
 import { Title } from '../components/layout/Titles';
 
 const PrivacyPolicy = () => (
@@ -743,43 +749,5 @@ const PrivacyPolicy = () => (
     </div>
   </Container>
 );
-
-const Container = styled(PageContainer)`
-  h3 {
-    font-size: 20px;
-  }
-  background: transparent !important;
-`;
-
-const BodyText = styled.div`
-  color: #595959 !important;
-  font-size: 14px !important;
-  margin-top: 20px;
-`;
-
-const Subtitle = styled.div`
-  color: #595959 !important;
-  font-size: 14px !important;
-  font-weight: bold;
-`;
-
-const Heading1 = styled.div`
-  font-size: 19px !important;
-  color: #000000 !important;
-  font-weight: bold;
-  margin-top: 40px;
-`;
-
-const Heading2 = styled.div`
-  font-size: 17px !important;
-  color: #000000 !important;
-  font-weight: bold;
-  margin-top: 20px;
-`;
-
-const NavLink = styled.a`
-  font-size: 14px !important;
-  word-break: break-word !important;
-`;
 
 export default PrivacyPolicy;

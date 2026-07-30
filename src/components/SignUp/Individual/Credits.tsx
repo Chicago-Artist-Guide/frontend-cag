@@ -3,7 +3,6 @@ import Col from 'react-bootstrap/Col';
 import Container from 'react-bootstrap/Container';
 import Form from 'react-bootstrap/Form';
 import Row from 'react-bootstrap/Row';
-import 'react-datepicker/dist/react-datepicker.css';
 import { SetForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import InputField from '../../../components/shared/Input';

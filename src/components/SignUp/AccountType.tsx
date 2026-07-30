@@ -2,8 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Group from '../../images/icons-signup/group.svg';
-import Individual from '../../images/icons-signup/individual.svg';
+import { Group, Individual } from '../../config/publicImages';
 import { colors } from '../../theme/styleVars';
 import type { AccountTypeOptions } from './types';
 

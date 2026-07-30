@@ -1,0 +1,113 @@
+name: Destroy preview environment
+
+on:
+  workflow_dispatch:
+    inputs:
+      preview_id:
+        description: Lowercase preview slug used for deployment
+        required: true
+        type: string
+      confirmation:
+        description: Enter the exact stack name CagPlatform-preview-<preview_id>
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  cancel-in-progress: false
+  group: cag-preview-${{ inputs.preview_id }}
+
+jobs:
+  validate:
+    name: Validate preview destruction
+    runs-on: ubuntu-latest
+    outputs:
+      stack_name: ${{ steps.target.outputs.stack_name }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
+          node-version-file: .nvmrc
+
+      - name: Validate deployment target
+        id: target
+        env:
+          DESTROY_CONFIRMATION: ${{ inputs.confirmation }}
+          PREVIEW_ID: ${{ inputs.preview_id }}
+          TARGET_REF: ${{ github.ref_name }}
+        run: |
+          node scripts/deployment-target.mjs \
+            --stage preview \
+            --preview-id "$PREVIEW_ID" \
+            --ref "$TARGET_REF" \
+            --operation destroy \
+            --confirmation "$DESTROY_CONFIRMATION" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies without OIDC permission
+        run: npm --prefix infra ci
+
+      - name: Verify infrastructure without OIDC permission
+        run: npm --prefix infra run verify
+
+  destroy:
+    name: Destroy preview ${{ inputs.preview_id }}
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: preview-destroy
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PREVIEW_ID: ${{ inputs.preview_id }}
+      STACK_NAME: ${{ needs.validate.outputs.stack_name }}
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          cache-dependency-path: infra/package-lock.json
+          node-version-file: .nvmrc
+
+      - name: Install infrastructure without lifecycle scripts
+        run: npm --prefix infra ci --ignore-scripts
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
+        with:
+          allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
+          aws-region: ${{ vars.AWS_REGION }}
+          mask-aws-account-id: true
+          role-session-name: cag-preview-destroy-${{ github.run_id }}
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+
+      - name: Destroy exact preview stack
+        working-directory: infra
+        run: |
+          npm exec cdk -- destroy "$STACK_NAME" \
+            --context stage=preview \
+            --context "previewId=$PREVIEW_ID" \
+            --force
+
+      - name: Publish destruction summary
+        run: |
+          {
+            echo "## Preview destroyed"
+            echo "Removed stack: $STACK_NAME"
+            echo "No durable stack or DNS record was targeted."
+          } >> "$GITHUB_STEP_SUMMARY"
