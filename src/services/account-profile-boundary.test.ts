@@ -29,6 +29,11 @@ const namedSecondaryAppFiles = [
   'src/components/Admin/Companies/CompanyCreateModal.tsx',
   'src/components/Admin/Companies/TheatreRequestModal.tsx'
 ];
+// Server-side reader for PUBLIC collections only. Initializes its own named
+// app so it never shares connection state with the browser's [DEFAULT] app.
+// Held separately from namedSecondaryAppFiles because those are secondary
+// *auth* apps with a different required shape.
+const firebaseServerReader = 'src/lib/firebase/server.ts';
 
 const readProjectFile = (file: string) =>
   fs.readFileSync(path.resolve(projectRoot, file), 'utf8');
@@ -1510,7 +1515,11 @@ describe('account and profile consumer boundary', () => {
         (file) => getInitializeAppCalls(readProjectFile(file), file).length > 0
       )
       .sort();
-    const expectedFiles = [firebaseSingleton, ...namedSecondaryAppFiles].sort();
+    const expectedFiles = [
+      firebaseSingleton,
+      firebaseServerReader,
+      ...namedSecondaryAppFiles
+    ].sort();
     const singletonSource = readProjectFile(firebaseSingleton);
 
     expect(initializationFiles).toEqual(expectedFiles);
@@ -1523,6 +1532,41 @@ describe('account and profile consumer boundary', () => {
     expect(
       getInitializeAppCalls(singletonSource, firebaseSingleton)
     ).toHaveLength(1);
+  });
+
+  it('restricts the server Firestore reader to a named, server-only app', () => {
+    const source = readProjectFile(firebaseServerReader);
+
+    // A named app keeps server reads off the browser's [DEFAULT] app.
+    expect(source).toMatch(
+      /initializeApp\(\s*firebaseClientConfig,\s*SERVER_APP_NAME\s*\)/
+    );
+    // Must refuse to run in the browser — client code uses getFirebaseClient.
+    expect(source).toMatch(/typeof window !== 'undefined'/);
+    // There is no request identity on the server path, so it must never reach
+    // for auth. Anything requiring auth stays in the browser client.
+    expect(source).not.toMatch(/firebase\/auth|getAuth/);
+  });
+
+  it('never reads auth-gated collections from the server', () => {
+    // The server reader carries no user identity, so it is only ever valid
+    // against collections that are `allow read: if true` in firestore.rules.
+    // Reading accounts/profiles/threads/messages there would either be denied
+    // or — worse, if rules ever loosened — leak email addresses to unauth
+    // visitors. Guard the whole server service surface, not just one file.
+    const serverServiceFiles = productionSourceFiles.filter((file) =>
+      /^src\/services\/.+\/server\.ts$/.test(file)
+    );
+
+    expect(serverServiceFiles.length).toBeGreaterThan(0);
+
+    serverServiceFiles.forEach((file) => {
+      const source = readProjectFile(file);
+
+      expect(source).not.toMatch(
+        /'(accounts|profiles|threads|messages|admin_users|mail)'/
+      );
+    });
   });
 
   it.each(namedSecondaryAppFiles)(

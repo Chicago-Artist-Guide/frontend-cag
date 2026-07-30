@@ -12,7 +12,14 @@ export interface PublicConfig {
   };
   isDevelopment: boolean;
   lglApiKey: string;
+  siteUrl: string;
 }
+
+// Production origin, used as the fallback when NEXT_PUBLIC_SITE_URL is
+// unset — matches the hardcoded OpenGraph image host in app/layout.tsx.
+// Preview/staging environments override via the env var so sitemap.xml and
+// robots.txt point at their own origin instead of production.
+const DEFAULT_SITE_URL = 'https://www.chicagoartistguide.org';
 
 const valueOrEmpty = (value: string | undefined) => value || '';
 
@@ -36,7 +43,8 @@ export const createPublicConfig = (
       storageBucket: projectId ? `${projectId}.appspot.com` : ''
     },
     isDevelopment: environment.NODE_ENV !== 'production',
-    lglApiKey: valueOrEmpty(environment.NEXT_PUBLIC_LGL_API_KEY)
+    lglApiKey: valueOrEmpty(environment.NEXT_PUBLIC_LGL_API_KEY),
+    siteUrl: environment.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL
   };
 };
 
@@ -48,6 +56,7 @@ export const publicConfig = createPublicConfig({
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   NEXT_PUBLIC_FIREBASE_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_SENDER_ID,
   NEXT_PUBLIC_LGL_API_KEY: process.env.NEXT_PUBLIC_LGL_API_KEY,
+  NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
   NODE_ENV: process.env.NODE_ENV
 });
 

@@ -9,6 +9,7 @@ describe('createPublicConfig', () => {
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: 'cag-staging',
       NEXT_PUBLIC_FIREBASE_SENDER_ID: 'sender-id',
       NEXT_PUBLIC_LGL_API_KEY: 'lgl-key',
+      NEXT_PUBLIC_SITE_URL: 'https://staging.chicagoartistguide.org',
       NODE_ENV: 'development'
     });
 
@@ -23,7 +24,8 @@ describe('createPublicConfig', () => {
         storageBucket: 'cag-staging.appspot.com'
       },
       isDevelopment: true,
-      lglApiKey: 'lgl-key'
+      lglApiKey: 'lgl-key',
+      siteUrl: 'https://staging.chicagoartistguide.org'
     });
   });
 
@@ -40,6 +42,12 @@ describe('createPublicConfig', () => {
       storageBucket: ''
     });
     expect(config.lglApiKey).toBe('');
+  });
+
+  it('falls back to the production origin when NEXT_PUBLIC_SITE_URL is unset', () => {
+    const config = createPublicConfig({ NODE_ENV: 'test' });
+
+    expect(config.siteUrl).toBe('https://www.chicagoartistguide.org');
   });
 
   it('disables development-only behavior in production', () => {
