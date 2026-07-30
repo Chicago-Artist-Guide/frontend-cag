@@ -1,9 +1,5 @@
 import { readFileSync } from 'node:fs';
-import {
-  applicationRoutes,
-  redirectRoutes,
-  smokeHtmlRoutes
-} from './route-contract';
+import { applicationRoutes, redirectRoutes } from './route-contract';
 
 describe('route contract', () => {
   it('blocks live Firestore reads during browser characterization', () => {
@@ -35,7 +31,6 @@ describe('route contract', () => {
       { path: '/theatre-resources', routeClass: 'public' },
       { path: '/roles', routeClass: 'public' },
       { path: '/shows', routeClass: 'public' },
-      { path: '/shows/smoke-production', routeClass: 'public' },
       { path: '/events', routeClass: 'public' },
       { path: '/get-involved', routeClass: 'public' },
       { path: '/login', routeClass: 'account' },
@@ -43,22 +38,8 @@ describe('route contract', () => {
       { path: '/forgot-password', routeClass: 'account' },
       { path: '/sign-up', routeClass: 'account' },
       { path: '/profile', routeClass: 'account' },
-      { path: '/profile/view/smoke-account', routeClass: 'account' },
       { path: '/profile/messages', routeClass: 'account' },
-      { path: '/profile/messages/smoke-thread', routeClass: 'account' },
       { path: '/profile/search/roles', routeClass: 'account' },
-      {
-        path: '/profile/search/talent/smoke-production',
-        routeClass: 'account'
-      },
-      {
-        path: '/profile/search/talent/smoke-production/smoke-role',
-        routeClass: 'account'
-      },
-      {
-        path: '/production/smoke-production/manage',
-        routeClass: 'account'
-      },
       { path: '/admin', routeClass: 'admin' },
       { path: '/admin/analytics', routeClass: 'admin' },
       { path: '/admin/users', routeClass: 'admin' },
@@ -91,12 +72,6 @@ describe('route contract', () => {
       ],
       ['/roles', '/roles', 'heading', 'OPEN THEATRE ROLES'],
       ['/shows', '/shows', 'heading', 'THEATRE SHOWS'],
-      [
-        '/shows/smoke-production',
-        '/shows/smoke-production',
-        'heading',
-        'Show Not Found'
-      ],
       ['/events', '/events', 'heading', 'EVENTS'],
       ['/get-involved', '/get-involved', 'heading', 'Get involved'],
       ['/login', '/login', 'heading', 'WELCOME BACK'],
@@ -109,38 +84,8 @@ describe('route contract', () => {
       ],
       ['/sign-up', '/sign-up', 'heading', 'BUILD CONNECTIONS TODAY'],
       ['/profile', '/login', 'heading', 'WELCOME BACK'],
-      [
-        '/profile/view/smoke-account',
-        '/profile/view/smoke-account',
-        'text',
-        'Failed to load profile data. Please try again.'
-      ],
       ['/profile/messages', '/profile/messages', 'heading', 'Messages'],
-      [
-        '/profile/messages/smoke-thread',
-        '/profile/messages/smoke-thread',
-        'heading',
-        'Messages'
-      ],
       ['/profile/search/roles', '/profile/search/roles', 'heading', 'Matches'],
-      [
-        '/profile/search/talent/smoke-production',
-        '/profile/search/talent/smoke-production',
-        'heading',
-        'Matches'
-      ],
-      [
-        '/profile/search/talent/smoke-production/smoke-role',
-        '/profile/search/talent/smoke-production/smoke-role',
-        'heading',
-        'Matches'
-      ],
-      [
-        '/production/smoke-production/manage',
-        '/production/smoke-production/manage',
-        'heading',
-        'Manage Production'
-      ],
       ['/admin', '/admin', 'heading', 'Access Restricted'],
       ['/admin/analytics', '/admin/analytics', 'heading', 'Access Restricted'],
       ['/admin/users', '/admin/users', 'heading', 'Access Restricted'],
@@ -155,24 +100,7 @@ describe('route contract', () => {
       applicationRoutes
         .filter(({ loggedOut }) => 'pageErrors' in loggedOut)
         .map(({ loggedOut, path }) => [path, loggedOut.pageErrors])
-    ).toEqual([
-      [
-        '/profile/messages/smoke-thread',
-        ['Failed to get document because the client is offline.']
-      ],
-      [
-        '/profile/search/talent/smoke-production',
-        ['Failed to get document because the client is offline.']
-      ],
-      [
-        '/profile/search/talent/smoke-production/smoke-role',
-        ['Failed to get document because the client is offline.']
-      ],
-      [
-        '/production/smoke-production/manage',
-        ['Failed to get document because the client is offline.']
-      ]
-    ]);
+    ).toEqual([]);
   });
 
   it('defines the two compatibility redirects', () => {
@@ -180,26 +108,5 @@ describe('route contract', () => {
       { destination: '/home', path: '/' },
       { destination: '/admin/analytics', path: '/analytics' }
     ]);
-  });
-
-  it('uses representative server-smoke routes from every route class', () => {
-    expect(smokeHtmlRoutes).toEqual([
-      '/home',
-      '/login',
-      '/shows/smoke-production',
-      '/profile/messages/smoke-thread',
-      '/profile/search/talent/smoke-production/smoke-role',
-      '/production/smoke-production/manage',
-      '/admin/analytics'
-    ]);
-
-    const smokeRouteClasses = smokeHtmlRoutes.map(
-      (smokePath) =>
-        applicationRoutes.find(({ path }) => path === smokePath)?.routeClass
-    );
-
-    expect(new Set(smokeRouteClasses)).toEqual(
-      new Set(['public', 'account', 'admin'])
-    );
   });
 });

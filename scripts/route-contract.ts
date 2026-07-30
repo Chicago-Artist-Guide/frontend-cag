@@ -95,14 +95,6 @@ export const applicationRoutes = [
   },
   {
     loggedOut: {
-      destination: '/shows/smoke-production',
-      marker: { kind: 'heading', value: 'Show Not Found' }
-    },
-    path: '/shows/smoke-production',
-    routeClass: 'public'
-  },
-  {
-    loggedOut: {
       destination: '/events',
       marker: { kind: 'heading', value: 'EVENTS' }
     },
@@ -159,17 +151,6 @@ export const applicationRoutes = [
   },
   {
     loggedOut: {
-      destination: '/profile/view/smoke-account',
-      marker: {
-        kind: 'text',
-        value: 'Failed to load profile data. Please try again.'
-      }
-    },
-    path: '/profile/view/smoke-account',
-    routeClass: 'account'
-  },
-  {
-    loggedOut: {
       destination: '/profile/messages',
       marker: { kind: 'heading', value: 'Messages' }
     },
@@ -178,46 +159,10 @@ export const applicationRoutes = [
   },
   {
     loggedOut: {
-      destination: '/profile/messages/smoke-thread',
-      marker: { kind: 'heading', value: 'Messages' },
-      pageErrors: ['Failed to get document because the client is offline.']
-    },
-    path: '/profile/messages/smoke-thread',
-    routeClass: 'account'
-  },
-  {
-    loggedOut: {
       destination: '/profile/search/roles',
       marker: { kind: 'heading', value: 'Matches' }
     },
     path: '/profile/search/roles',
-    routeClass: 'account'
-  },
-  {
-    loggedOut: {
-      destination: '/profile/search/talent/smoke-production',
-      marker: { kind: 'heading', value: 'Matches' },
-      pageErrors: ['Failed to get document because the client is offline.']
-    },
-    path: '/profile/search/talent/smoke-production',
-    routeClass: 'account'
-  },
-  {
-    loggedOut: {
-      destination: '/profile/search/talent/smoke-production/smoke-role',
-      marker: { kind: 'heading', value: 'Matches' },
-      pageErrors: ['Failed to get document because the client is offline.']
-    },
-    path: '/profile/search/talent/smoke-production/smoke-role',
-    routeClass: 'account'
-  },
-  {
-    loggedOut: {
-      destination: '/production/smoke-production/manage',
-      marker: { kind: 'heading', value: 'Manage Production' },
-      pageErrors: ['Failed to get document because the client is offline.']
-    },
-    path: '/production/smoke-production/manage',
     routeClass: 'account'
   },
   {
@@ -279,13 +224,3 @@ export const redirectRoutes = [
   destination: ApplicationPath;
   path: '/' | '/analytics';
 }[];
-
-export const smokeHtmlRoutes = [
-  '/home',
-  '/login',
-  '/shows/smoke-production',
-  '/profile/messages/smoke-thread',
-  '/profile/search/talent/smoke-production/smoke-role',
-  '/production/smoke-production/manage',
-  '/admin/analytics'
-] as const satisfies readonly ApplicationPath[];

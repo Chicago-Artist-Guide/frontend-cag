@@ -118,7 +118,7 @@ describe('AppProviders', () => {
     const legacyAppSource = readProjectFile('app/legacy-app.tsx');
     const rootLayoutSource = readProjectFile('app/layout.tsx');
     const mainLayoutSource = readProjectFile('app/(main)/layout.tsx');
-    const catchAllSource = readProjectFile('app/[[...path]]/page.tsx');
+    const catchAllSource = readProjectFile('app/[...path]/page.tsx');
 
     expect(appSource.match(/<AppProviders>/g)).toHaveLength(1);
     expect(siteShellSource.match(/<AppProviders>/g)).toHaveLength(1);
@@ -147,7 +147,7 @@ describe('AppProviders', () => {
     expect(catchAllSource).not.toMatch(/SiteShell/);
     expect(
       fs.existsSync(
-        path.resolve(__dirname, '(main)', '[[...path]]', 'page.tsx')
+        path.resolve(__dirname, '(main)', '[...path]', 'page.tsx')
       )
     ).toBe(false);
   });
