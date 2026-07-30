@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useRef } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { colors, fonts, breakpoints } from '../../theme/styleVars';

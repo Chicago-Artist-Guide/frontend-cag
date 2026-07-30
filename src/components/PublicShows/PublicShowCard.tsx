@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { Col, Image, Row } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { Button } from '../shared';
 import { colors, fonts } from '../../theme/styleVars';
@@ -86,7 +88,7 @@ const PublicShowCard: React.FC<
             <div className="flex-grow-1">
               <ShowName>{show?.production_name}</ShowName>
               {theaterName ? (
-                <TheaterNameLink to={`/profile/view/${show?.account_id}`}>
+                <TheaterNameLink href={`/profile/view/${show?.account_id}`}>
                   {theaterName}
                 </TheaterNameLink>
               ) : null}
@@ -98,7 +100,7 @@ const PublicShowCard: React.FC<
               style={{ gap: '1em' }}
             >
               {show.production_id ? (
-                <Link to={`/shows/${show.production_id}`}>
+                <Link href={`/shows/${show.production_id}`}>
                   <ShowButton
                     text="View Details"
                     type="button"

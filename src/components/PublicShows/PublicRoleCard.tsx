@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import styled from 'styled-components';
 import { Role } from '../Profile/Company/types';
 import { Button } from '../shared';
@@ -67,7 +69,7 @@ const PublicRoleCard: React.FC<
     <RoleCardContainer>
       {isListMode && productionName && (
         <ProductionLine>
-          <ProductionLink to={`/shows/${productionId}`}>
+          <ProductionLink href={`/shows/${productionId}`}>
             {productionName}
           </ProductionLink>
         </ProductionLine>
@@ -110,7 +112,7 @@ const PublicRoleCard: React.FC<
 
       {isListMode && productionId && (
         <div className="mt-[12px]">
-          <Link to={`/shows/${productionId}`}>
+          <Link href={`/shows/${productionId}`}>
             <ViewButton
               text="View Production"
               type="button"

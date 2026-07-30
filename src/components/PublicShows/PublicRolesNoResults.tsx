@@ -1,5 +1,7 @@
+'use client';
+
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 interface PublicRolesNoResultsProps {
   onClearFilters: () => void;
@@ -20,9 +22,9 @@ const PublicRolesNoResults: React.FC<PublicRolesNoResultsProps> = ({
         No roles match your filters
       </h2>
       <p className="mx-auto mt-3 max-w-md font-montserrat text-base text-grayishBlue">
-        There are open roles in the system, but none match your current
-        filters. Try broadening your selections or clearing all filters to see
-        every available opportunity.
+        There are open roles in the system, but none match your current filters.
+        Try broadening your selections or clearing all filters to see every
+        available opportunity.
       </p>
       <div className="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <button
@@ -40,7 +42,7 @@ const PublicRolesNoResults: React.FC<PublicRolesNoResultsProps> = ({
           // text-darkPrimary on white -> 7.4:1 (AAA). text-mint was 2.39:1.
           className="inline-flex items-center justify-center rounded-full border border-darkPrimary px-6 py-2 font-montserrat text-sm font-bold uppercase tracking-wider text-darkPrimary transition-colors hover:bg-darkPrimary hover:text-white focus:outline-none focus:ring-2 focus:ring-darkPrimary focus:ring-offset-2"
           data-testid="no-results-signup-link"
-          to="/sign-up"
+          href="/sign-up"
         >
           Sign Up for Notifications
         </Link>

@@ -1,4 +1,10 @@
-import { faCheck, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+'use client';
+
+import {
+  faCheck,
+  faChevronDown,
+  faChevronUp
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import React, { useState } from 'react';
@@ -81,7 +87,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
       <button
         aria-controls={contentId}
         aria-expanded={open}
-        className="flex min-h-[64px] w-full items-center justify-between gap-4 px-4 text-left font-montserrat text-xl font-semibold tracking-[0.08em] text-mainFont focus:outline-none focus-visible:ring-2 focus-visible:ring-mint focus-visible:ring-inset"
+        className="flex min-h-[64px] w-full items-center justify-between gap-4 px-4 text-left font-montserrat text-xl font-semibold tracking-[0.08em] text-mainFont focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-mint"
         onClick={() => setOpen((current) => !current)}
         type="button"
       >
@@ -89,10 +95,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
         <FontAwesomeIcon icon={open ? faChevronUp : faChevronDown} />
       </button>
       {open && (
-        <div
-          className="border-t border-gold px-4 py-4"
-          id={contentId}
-        >
+        <div className="border-t border-gold px-4 py-4" id={contentId}>
           {children}
         </div>
       )}

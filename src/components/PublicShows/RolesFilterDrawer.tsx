@@ -1,6 +1,6 @@
-import {
-  faTimes
-} from '@fortawesome/free-solid-svg-icons';
+'use client';
+
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import clsx from 'clsx';
 import React, { useEffect, useRef, useState } from 'react';
@@ -65,8 +65,9 @@ const getFocusableElements = (container: HTMLDivElement | null) => {
     return [];
   }
 
-  return Array.from(container.querySelectorAll<HTMLElement>(focusableSelector))
-    .filter((element) => element.offsetParent !== null);
+  return Array.from(
+    container.querySelectorAll<HTMLElement>(focusableSelector)
+  ).filter((element) => element.offsetParent !== null);
 };
 
 const RolesFilterDrawer: React.FC<RolesFilterDrawerProps> = ({

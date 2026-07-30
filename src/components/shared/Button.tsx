@@ -1,3 +1,5 @@
+'use client';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Button as BSButton } from 'react-bootstrap';

@@ -3,7 +3,6 @@ import { collection, getDocs, query } from 'firebase/firestore';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import styled from 'styled-components';
-import { useSearchParams } from 'react-router-dom';
 import { PageContainer } from '../components/layout';
 import { Title, Tagline } from '../components/layout/Titles';
 import { useFirebaseContext } from '../context/FirebaseContext';
@@ -12,6 +11,7 @@ import Button from '../components/shared/Button';
 import { colors, fonts, breakpoints } from '../theme/styleVars';
 import { createEmail } from '../components/Messages/api';
 import { isDevelopment } from '../config/publicEnv';
+import { escapeHtml, escapeHtmlWithLineBreaks } from '../utils/escapeHtml';
 
 type RoleOpportunity = {
   id: string;
@@ -38,66 +38,17 @@ const contactFormSchema = Yup.object().shape({
     .required('Message is required')
 });
 
-const DEMO_ROLES: RoleOpportunity[] = [
-  {
-    id: 'demo-1',
-    roleName: 'Project Manager',
-    productionName: 'Demo Production',
-    description:
-      'We are seeking a talented and experienced manager to lead special projects, ensuring smooth execution and coordination of initiatives. The ideal candidate should be a proactive problem solver with strong interpersonal and organizational skills, capable of effectively navigating deadlines and facilitating clear communication across diverse teams and stakeholders.',
-    productionId: 'demo',
-    googleFormUrl: 'https://forms.google.com/example',
-    roleType: 'Offstage',
-    pay: '$250',
-    location: 'Chicago'
-  },
-  {
-    id: 'demo-2',
-    roleName: 'Grant Writer',
-    productionName: 'Demo Production',
-    description:
-      'If you have a talent for writing and have been in and around Chicago theatre, this is for you! Assist in project research, editing, and grant writing for a variety of funding opportunities.',
-    productionId: 'demo',
-    googleFormUrl: 'https://forms.google.com/example',
-    roleType: 'Offstage',
-    pay: '$250',
-    location: 'Chicago'
-  },
-  {
-    id: 'demo-3',
-    roleName: 'Marketing Assistant',
-    productionName: 'Demo Production',
-    description:
-      'This marketing assistant works closely with the administrative team to facilitate social media posts, conduct outreach to community organizations, and support event marketing efforts within the city.',
-    productionId: 'demo',
-    googleFormUrl: 'https://forms.google.com/example',
-    roleType: 'Offstage',
-    pay: '$250',
-    location: 'Chicago'
-  }
-];
-
 const GetInvolved: React.FC<React.PropsWithChildren<unknown>> = () => {
   const { firebaseFirestore } = useFirebaseContext();
-  const [searchParams] = useSearchParams();
   const [roles, setRoles] = useState<RoleOpportunity[]>([]);
   const [ongoingRoles, setOngoingRoles] = useState<RoleOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
   const [formSubmitted, setFormSubmitted] = useState(false);
-  const isDemoMode = searchParams.get('demo') === 'true';
 
   useEffect(() => {
     const fetchRoles = async () => {
       setLoading(true);
       try {
-        // If demo mode is enabled, use demo roles
-        if (isDemoMode) {
-          setRoles(DEMO_ROLES);
-          setOngoingRoles([]);
-          setLoading(false);
-          return;
-        }
-
         const temporalRoles: RoleOpportunity[] = [];
         const ongoingRolesList: RoleOpportunity[] = [];
 
@@ -152,7 +103,7 @@ const GetInvolved: React.FC<React.PropsWithChildren<unknown>> = () => {
     };
 
     fetchRoles();
-  }, [firebaseFirestore, isDemoMode]);
+  }, [firebaseFirestore]);
 
   const handleContactSubmit = async (
     values: {
@@ -182,10 +133,14 @@ ${values.message}
 
       const messageHtml = `
 <h2>New Contact Form Submission</h2>
-<p><strong>From:</strong> ${values.firstName} ${values.lastName}</p>
-<p><strong>Email:</strong> <a href="mailto:${values.email}">${values.email}</a></p>
+<p><strong>From:</strong> ${escapeHtml(values.firstName)} ${escapeHtml(
+        values.lastName
+      )}</p>
+<p><strong>Email:</strong> <a href="mailto:${escapeHtml(
+        values.email
+      )}">${escapeHtml(values.email)}</a></p>
 <h3>Message:</h3>
-<p>${values.message.replace(/\n/g, '<br>')}</p>
+<p>${escapeHtmlWithLineBreaks(values.message)}</p>
       `.trim();
 
       // Send email via Firebase mail collection
