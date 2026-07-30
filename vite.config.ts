@@ -87,6 +87,7 @@ export default defineConfig(({ mode }) => {
         '**/node_modules/**',
         '**/dist/**',
         '**/*.rules.test.ts',
+        '.claude/**',
         'infra/**'
       ]
     }

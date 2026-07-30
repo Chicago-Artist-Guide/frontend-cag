@@ -20,8 +20,8 @@
     "jsx": "react-jsx",
     "types": [
       "vite/client",
-      "jest",
-      "node"
+      "node",
+      "vitest/globals"
     ],
     "noFallthroughCasesInSwitch": true,
     "plugins": [

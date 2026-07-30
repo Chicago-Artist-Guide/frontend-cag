@@ -102,6 +102,69 @@ jobs:
       - name: Build, test, and synthesize CDK
         run: npm --prefix infra run verify
 
+  visual-regression-checks:
+    name: Verify visual-regression harness
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          node-version-file: .nvmrc
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Lint visual-regression scripts
+        run: npm run vr:lint
+
+      - name: Typecheck visual-regression scripts
+        run: npm run vr:typecheck
+
+      - name: Run visual-regression unit tests
+        run: npm run vr:unit
+
+  e2e:
+    name: Verify E2E specs
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: ci-firebase-api-key
+      NEXT_PUBLIC_FIREBASE_APP_ID: ci-firebase-app-id
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: ci-firebase-measurement-id
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ci-firebase-project-id
+      NEXT_PUBLIC_FIREBASE_SENDER_ID: ci-firebase-sender-id
+      NEXT_PUBLIC_LGL_API_KEY: ci-lgl-api-key
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          cache: npm
+          node-version-file: .nvmrc
+
+      - name: Install application dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Run E2E specs
+        run: npm run test:e2e
+
   container:
     name: Verify production container
     runs-on: ubuntu-latest
