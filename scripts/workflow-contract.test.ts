@@ -214,6 +214,19 @@ describe('GitHub workflow contracts', () => {
     expect(destroy).not.toContain('preview_id');
   });
 
+  it('boots the container image in CI before any deploy can ship it', () => {
+    const deploy = readWorkflow('canary-deploy.yml');
+    const containerJobIndex = deploy.indexOf('\n  container:');
+    const oidcIndex = deploy.indexOf('id-token: write');
+
+    expect(containerJobIndex).toBeGreaterThan(-1);
+    expect(containerJobIndex).toBeLessThan(oidcIndex);
+    expect(deploy).toContain('npm run container:smoke');
+    expect(deploy).toMatch(
+      /deploy:\s*\n\s+name:[^\n]*\n\s+needs:\s*\n\s+- verify\s*\n\s+- plan\s*\n\s+- container/
+    );
+  });
+
   it('captures read-only deployment diagnostics before rollback destroys them', () => {
     const deploy = readWorkflow('canary-deploy.yml');
     const watcherIndex = deploy.indexOf('Start canary deployment diagnostics');

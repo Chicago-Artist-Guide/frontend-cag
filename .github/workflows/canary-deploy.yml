@@ -64,6 +64,31 @@ jobs:
       - name: Verify application and infrastructure without AWS access
         run: npm run verify
 
+  container:
+    name: Smoke container image
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: validation-firebase-api-key
+      NEXT_PUBLIC_FIREBASE_APP_ID: validation-firebase-app-id
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: validation-firebase-measurement-id
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: validation-firebase-project-id
+      NEXT_PUBLIC_FIREBASE_SENDER_ID: validation-firebase-sender-id
+      NEXT_PUBLIC_LGL_API_KEY: validation-lgl-api-key
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build and boot the container image without AWS access
+        run: npm run container:smoke
+
   plan:
     name: Plan canary
     needs: verify
@@ -132,6 +157,7 @@ jobs:
     needs:
       - verify
       - plan
+      - container
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: canary
