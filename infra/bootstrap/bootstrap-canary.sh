@@ -3,6 +3,9 @@ set -euo pipefail
 
 EXPECTED_ACCOUNT_ID="095377239347"
 AWS_REGION="${CAG_AWS_REGION:-us-east-1}"
+IAM_STACK_REGION="${CAG_IAM_STACK_REGION:-us-east-2}"
+export AWS_REGION
+export AWS_DEFAULT_REGION="$AWS_REGION"
 STACK_NAME="CagGithubCanaryDelivery"
 QUALIFIER="cagcanary"
 
@@ -15,12 +18,12 @@ fi
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 aws cloudformation validate-template \
-  --region "$AWS_REGION" \
+  --region "$IAM_STACK_REGION" \
   --template-body "file://$SCRIPT_DIRECTORY/canary-iam.yaml" \
   >/dev/null
 
 aws cloudformation deploy \
-  --region "$AWS_REGION" \
+  --region "$IAM_STACK_REGION" \
   --stack-name "$STACK_NAME" \
   --template-file "$SCRIPT_DIRECTORY/canary-iam.yaml" \
   --capabilities CAPABILITY_NAMED_IAM \
@@ -28,7 +31,7 @@ aws cloudformation deploy \
 
 EXECUTION_POLICY_ARN="$(
   aws cloudformation describe-stacks \
-    --region "$AWS_REGION" \
+    --region "$IAM_STACK_REGION" \
     --stack-name "$STACK_NAME" \
     --query "Stacks[0].Outputs[?OutputKey=='CanaryExecutionPolicyArn'].OutputValue" \
     --output text
@@ -42,7 +45,7 @@ npx --yes aws-cdk@2.1131.0 bootstrap \
   --trust-for-lookup "$ACTUAL_ACCOUNT_ID"
 
 aws cloudformation describe-stacks \
-  --region "$AWS_REGION" \
+  --region "$IAM_STACK_REGION" \
   --stack-name "$STACK_NAME" \
   --query "Stacks[0].Outputs" \
   --output table
