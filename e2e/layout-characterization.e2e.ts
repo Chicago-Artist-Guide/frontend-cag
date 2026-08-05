@@ -42,7 +42,7 @@ test('legacy shell survives home to login to home navigation', async ({
   expect(pageErrors).toEqual([]);
 });
 
-test('legacy router preserves fallback to fallback transitions', async ({
+test('not-found shell stays stable across history transitions', async ({
   page
 }) => {
   const pageErrors: string[] = [];

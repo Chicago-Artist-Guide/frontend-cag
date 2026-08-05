@@ -108,7 +108,7 @@ test('unknown route preserves the current not-found shell', async ({
 
   const response = await page.goto('/__cag_missing_route__');
 
-  expect(response?.status()).toBe(200);
+  expect(response?.status()).toBe(404);
   await expect(page).toHaveURL(
     (url) => url.pathname === '/__cag_missing_route__'
   );
