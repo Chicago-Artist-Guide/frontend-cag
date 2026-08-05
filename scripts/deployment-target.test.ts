@@ -2,10 +2,27 @@ import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import {
   formatGitHubOutputs,
+  isValidCagStackName,
   resolveWorkflowTarget
 } from './deployment-target.mjs';
 
 const execFileAsync = promisify(execFile);
+
+describe('isValidCagStackName', () => {
+  it('accepts every stack name resolveWorkflowTarget can produce', () => {
+    expect(isValidCagStackName('CagPlatform-canary')).toBe(true);
+    expect(isValidCagStackName('CagPlatform-staging')).toBe(true);
+    expect(isValidCagStackName('CagPlatform-production')).toBe(true);
+    expect(isValidCagStackName('CagPlatform-preview-pr-123')).toBe(true);
+  });
+
+  it('rejects names outside the platform contract', () => {
+    expect(isValidCagStackName('CagPlatform-canary-extra')).toBe(false);
+    expect(isValidCagStackName('CagPlatform-preview-')).toBe(false);
+    expect(isValidCagStackName('OtherStack')).toBe(false);
+    expect(isValidCagStackName(undefined)).toBe(false);
+  });
+});
 
 describe('resolveWorkflowTarget', () => {
   it.each([

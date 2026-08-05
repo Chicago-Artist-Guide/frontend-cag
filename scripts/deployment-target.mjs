@@ -32,6 +32,9 @@ export const validatePreviewId = (previewId) => {
 };
 
 export const isValidCagStackName = (stackName) => {
+  if (stackName === 'CagPlatform-canary') {
+    return true;
+  }
   if (stackName === 'CagPlatform-staging') {
     return true;
   }
