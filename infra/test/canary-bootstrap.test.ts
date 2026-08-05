@@ -35,4 +35,10 @@ describe('canary bootstrap boundary', () => {
     expect(script).toContain('--cloudformation-execution-policies');
     expect(script).toContain('--trust-for-lookup');
   });
+
+  it('keeps workload-region permissions independent of the IAM stack region', () => {
+    expect(template).toContain('WorkloadRegion:');
+    expect(template).toContain('logs:${WorkloadRegion}:${AWS::AccountId}:log-group:/cag/canary*');
+    expect(script).toContain('--parameter-overrides "WorkloadRegion=$AWS_REGION"');
+  });
 });

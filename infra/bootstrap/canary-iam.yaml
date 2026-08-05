@@ -11,6 +11,9 @@ Parameters:
   BootstrapQualifier:
     Type: String
     Default: cagcanary
+  WorkloadRegion:
+    Type: String
+    Default: us-east-1
 
 Resources:
   CanaryCloudFormationExecutionPolicy:
@@ -95,8 +98,7 @@ Resources:
           - Sid: CanaryLogs
             Effect: Allow
             Resource:
-              - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/cag/canary/*
-              - !Sub arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/cag/canary*
+              - !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:/cag/canary*
             Action:
               - logs:CreateLogGroup
               - logs:DeleteLogGroup

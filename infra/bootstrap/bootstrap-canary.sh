@@ -26,6 +26,7 @@ aws cloudformation deploy \
   --region "$IAM_STACK_REGION" \
   --stack-name "$STACK_NAME" \
   --template-file "$SCRIPT_DIRECTORY/canary-iam.yaml" \
+  --parameter-overrides "WorkloadRegion=$AWS_REGION" \
   --capabilities CAPABILITY_NAMED_IAM \
   --no-fail-on-empty-changeset
 
