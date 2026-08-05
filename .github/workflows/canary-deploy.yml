@@ -186,6 +186,13 @@ jobs:
           role-session-name: cag-canary-deploy-${{ github.run_id }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
+      - name: Start canary deployment diagnostics
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+        run: |
+          nohup scripts/canary-diagnostics.sh watch "$RUNNER_TEMP/canary-diagnostics" \
+            > "$RUNNER_TEMP/canary-diagnostics-watcher.log" 2>&1 &
+
       - name: Deploy exact canary stack
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY }}
@@ -200,6 +207,10 @@ jobs:
             --context stage=canary \
             --outputs-file "$RUNNER_TEMP/cdk-outputs.json" \
             --require-approval never
+
+      - name: Report canary deployment diagnostics
+        if: failure()
+        run: scripts/canary-diagnostics.sh report "$RUNNER_TEMP/canary-diagnostics"
 
       - name: Read validated load balancer output
         id: deployment

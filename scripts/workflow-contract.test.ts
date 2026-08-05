@@ -213,4 +213,17 @@ describe('GitHub workflow contracts', () => {
     expect(deploy).not.toContain('preview_id');
     expect(destroy).not.toContain('preview_id');
   });
+
+  it('captures read-only deployment diagnostics before rollback destroys them', () => {
+    const deploy = readWorkflow('canary-deploy.yml');
+    const watcherIndex = deploy.indexOf('Start canary deployment diagnostics');
+    const deployStepIndex = deploy.indexOf('Deploy exact canary stack');
+    const reportIndex = deploy.indexOf('Report canary deployment diagnostics');
+
+    expect(watcherIndex).toBeGreaterThan(-1);
+    expect(watcherIndex).toBeLessThan(deployStepIndex);
+    expect(reportIndex).toBeGreaterThan(deployStepIndex);
+    expect(deploy).toContain('if: failure()');
+    expect(deploy).toContain('scripts/canary-diagnostics.sh');
+  });
 });
