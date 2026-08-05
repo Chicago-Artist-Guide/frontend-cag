@@ -38,7 +38,10 @@ import {
   Walton
 } from '../../config/publicImages';
 
-const bioId = () => (<any>crypto).randomUUID();
+// crypto.randomUUID only exists in secure contexts, and random ids
+// differ between server render and hydration; a counter does neither.
+let nextBioId = 0;
+const bioId = () => `bio-${++nextBioId}`;
 
 const bios = {
   board: [
