@@ -41,4 +41,10 @@ describe('canary bootstrap boundary', () => {
     expect(template).toContain('logs:${WorkloadRegion}:${AWS::AccountId}:log-group:/cag/canary*');
     expect(script).toContain('--parameter-overrides "WorkloadRegion=$AWS_REGION"');
   });
+
+  it('lets the execution role read only the dedicated bootstrap version parameter', () => {
+    expect(template).toContain(
+      'ssm:${WorkloadRegion}:${AWS::AccountId}:parameter/cdk-bootstrap/${BootstrapQualifier}/version'
+    );
+  });
 });

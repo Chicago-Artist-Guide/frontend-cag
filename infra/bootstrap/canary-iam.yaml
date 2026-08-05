@@ -107,6 +107,13 @@ Resources:
               - logs:PutRetentionPolicy
               - logs:TagResource
               - logs:UntagResource
+          - Sid: ReadBootstrapVersion
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:ssm:${WorkloadRegion}:${AWS::AccountId}:parameter/cdk-bootstrap/${BootstrapQualifier}/version
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
           - Sid: CanaryScaling
             Effect: Allow
             Resource: '*'
