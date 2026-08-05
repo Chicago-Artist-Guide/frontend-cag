@@ -102,11 +102,15 @@ Resources:
             Action:
               - logs:CreateLogGroup
               - logs:DeleteLogGroup
-              - logs:DescribeLogGroups
               - logs:ListTagsForResource
               - logs:PutRetentionPolicy
               - logs:TagResource
               - logs:UntagResource
+          - Sid: CanaryLogDiscovery
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:*
+            Action: logs:DescribeLogGroups
           - Sid: ReadBootstrapVersion
             Effect: Allow
             Resource:
