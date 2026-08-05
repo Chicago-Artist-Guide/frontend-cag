@@ -7,8 +7,8 @@ const readWorkflow = (name: string) =>
 
 const deploymentWorkflowNames = [
   'deploy-environment.yml',
-  'preview-deploy.yml',
-  'preview-destroy.yml'
+  'canary-deploy.yml',
+  'canary-destroy.yml'
 ];
 
 const externalActionPattern = /^\s*uses:\s*([^./\s][^@\s]*)@([^\s#]+)\s*(?:#.*)?$/gm;
@@ -39,12 +39,12 @@ describe('GitHub workflow contracts', () => {
   });
 
   it.each(deploymentWorkflowNames)(
-    '%s is manual-only, least-privilege, GitHub-hosted, and serialized',
+    '%s is least-privilege, GitHub-hosted, and serialized',
     (name) => {
       const workflow = readWorkflow(name);
 
-      expect(workflow).toMatch(/\bon:\s*\n\s+workflow_dispatch:/);
-      expect(workflow).not.toMatch(/^\s+(?:push|pull_request|schedule):/m);
+      expect(workflow).toContain('workflow_dispatch:');
+      expect(workflow).not.toMatch(/^\s+(?:pull_request|schedule):/m);
       expect(workflow).toMatch(/permissions:\s*\n\s+contents:\s*read/);
       const topLevelPermissions = workflow.match(
         /^permissions:\s*\n((?: {2}\S[^\n]*\n?)*)/m
@@ -69,16 +69,16 @@ describe('GitHub workflow contracts', () => {
 
   it('uses separate protected plan/deploy environments and validates before auth', () => {
     const durable = readWorkflow('deploy-environment.yml');
-    const preview = readWorkflow('preview-deploy.yml');
-    const destroy = readWorkflow('preview-destroy.yml');
+    const canary = readWorkflow('canary-deploy.yml');
+    const destroy = readWorkflow('canary-destroy.yml');
 
     expect(durable).toContain("format('{0}-plan', inputs.stage)");
     expect(durable).toContain('environment: ${{ inputs.stage }}');
-    expect(preview).toContain('environment: preview-plan');
-    expect(preview).toContain('environment: preview');
-    expect(destroy).toContain('environment: preview-destroy');
+    expect(canary).toContain('environment: canary-plan');
+    expect(canary).toContain('environment: canary');
+    expect(destroy).toContain('environment: canary-destroy');
 
-    for (const workflow of [durable, preview, destroy]) {
+    for (const workflow of [durable, canary]) {
       expect(workflow.indexOf('Validate deployment target')).toBeLessThan(
         workflow.indexOf('Configure AWS credentials')
       );
@@ -86,7 +86,7 @@ describe('GitHub workflow contracts', () => {
   });
 
   it('takes all application build values from GitHub Environment variables', () => {
-    for (const name of ['deploy-environment.yml', 'preview-deploy.yml']) {
+    for (const name of ['deploy-environment.yml', 'canary-deploy.yml']) {
       const workflow = readWorkflow(name);
 
       for (const variable of [
@@ -104,8 +104,8 @@ describe('GitHub workflow contracts', () => {
     }
   });
 
-  it('keeps preview destruction independent of application build values', () => {
-    const destroy = readWorkflow('preview-destroy.yml');
+  it('keeps canary destruction independent of application build values', () => {
+    const destroy = readWorkflow('canary-destroy.yml');
 
     expect(destroy).not.toContain('NEXT_PUBLIC_');
     expect(destroy).toContain('allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}');
@@ -143,7 +143,7 @@ describe('GitHub workflow contracts', () => {
       const workflow = readWorkflow(name);
       const oidcIndex = workflow.indexOf('id-token: write');
       const verificationIndex = workflow.indexOf(
-        name === 'preview-destroy.yml'
+        name === 'canary-destroy.yml'
           ? 'run: npm --prefix infra run verify'
           : 'run: npm run verify'
       );
@@ -154,7 +154,7 @@ describe('GitHub workflow contracts', () => {
   });
 
   it('requires deploy configuration to exactly match the approved plan', () => {
-    for (const name of ['deploy-environment.yml', 'preview-deploy.yml']) {
+    for (const name of ['deploy-environment.yml', 'canary-deploy.yml']) {
       const workflow = readWorkflow(name);
 
       expect(workflow).toContain(
@@ -198,5 +198,19 @@ describe('GitHub workflow contracts', () => {
       expect(workflow).not.toContain('/home/');
       expect(workflow).not.toContain('self-hosted');
     }
+  });
+
+  it('deploys one persistent canary from the canary branch', () => {
+    const deploy = readWorkflow('canary-deploy.yml');
+    const destroy = readWorkflow('canary-destroy.yml');
+
+    expect(deploy).toMatch(/push:\s*\n\s+branches:\s*\n\s+- canary/);
+    expect(deploy).toContain('STACK_NAME: CagPlatform-canary');
+    expect(deploy).toContain('--context stage=canary');
+    expect(deploy).toContain('--no-change-set');
+    expect(deploy).toContain('Smoke deployed canary');
+    expect(destroy).toContain('test "$CONFIRMATION" = "CagPlatform-canary"');
+    expect(deploy).not.toContain('preview_id');
+    expect(destroy).not.toContain('preview_id');
   });
 });

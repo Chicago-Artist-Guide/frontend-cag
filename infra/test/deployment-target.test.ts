@@ -18,6 +18,16 @@ const buildArguments = {
 };
 
 describe('resolveDeploymentTarget', () => {
+  it('resolves the persistent canary target', () => {
+    expect(resolveDeploymentTarget('canary')).toEqual({
+      deploymentId: 'canary',
+      isEphemeral: false,
+      isProduction: false,
+      stackName: 'CagPlatform-canary',
+      stageName: 'canary'
+    });
+  });
+
   it.each([
     [
       'staging',

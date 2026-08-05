@@ -23,7 +23,7 @@ const buildArguments: PublicBuildArguments = {
   NEXT_PUBLIC_LGL_API_KEY: 'lgl-key'
 };
 const createStack = (
-  stageName: 'preview' | 'production' | 'staging',
+  stageName: 'canary' | 'preview' | 'production' | 'staging',
   previewId?: string,
   overrides?: Partial<
     Pick<
@@ -71,6 +71,7 @@ const resourceTypes = (template: Template) =>
 
 describe('PlatformStack', () => {
   it.each([
+    ['canary', undefined],
     ['preview', 'dev-511'],
     ['staging', undefined],
     ['production', undefined]
@@ -252,6 +253,7 @@ describe('PlatformStack', () => {
   });
 
   it.each([
+    ['canary', undefined, 'canary'],
     ['preview', 'dev-511', 'preview-dev-511'],
     ['staging', undefined, 'staging'],
     ['production', undefined, 'production']
@@ -299,6 +301,16 @@ describe('PlatformStack', () => {
   it('keeps staging teardown and recreation self-contained', () => {
     const { template } = createStack('staging');
 
+    template.hasResource('AWS::Logs::LogGroup', {
+      DeletionPolicy: 'Delete',
+      UpdateReplacePolicy: 'Delete'
+    });
+  });
+
+  it('keeps canary teardown and recreation self-contained', () => {
+    const { stack, template } = createStack('canary');
+
+    expect(stack.terminationProtection).toBe(false);
     template.hasResource('AWS::Logs::LogGroup', {
       DeletionPolicy: 'Delete',
       UpdateReplacePolicy: 'Delete'

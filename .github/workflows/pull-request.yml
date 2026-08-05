@@ -42,6 +42,9 @@ jobs:
       - name: Install application dependencies
         run: npm ci
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
       - name: Check lint baseline
         run: npm run lint:check
 
@@ -121,6 +124,9 @@ jobs:
 
       - name: Install application dependencies
         run: npm ci
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
 
       - name: Lint visual-regression scripts
         run: npm run vr:lint

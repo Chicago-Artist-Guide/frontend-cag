@@ -10,6 +10,18 @@ const execFileAsync = promisify(execFile);
 describe('resolveWorkflowTarget', () => {
   it.each([
     [
+      { ref: 'canary', stage: 'canary' },
+      {
+        cdkStage: 'canary',
+        deployEnvironment: 'canary',
+        deploymentId: 'canary',
+        isEphemeral: false,
+        planEnvironment: 'canary-plan',
+        stackName: 'CagPlatform-canary',
+        stageName: 'canary'
+      }
+    ],
+    [
       { ref: 'staging', stage: 'staging' },
       {
         cdkStage: 'staging',
@@ -47,6 +59,12 @@ describe('resolveWorkflowTarget', () => {
     ]
   ])('resolves an exact CDK and GitHub target', (input, expected) => {
     expect(resolveWorkflowTarget(input)).toEqual(expected);
+  });
+
+  it('restricts canary deployment to the canary branch', () => {
+    expect(() =>
+      resolveWorkflowTarget({ ref: 'dev-512', stage: 'canary' })
+    ).toThrow('must run from ref canary');
   });
 
   it.each([

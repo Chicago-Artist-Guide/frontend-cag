@@ -1,14 +1,10 @@
-name: Destroy preview environment
+name: Destroy Next.js canary
 
 on:
   workflow_dispatch:
     inputs:
-      preview_id:
-        description: Lowercase preview slug used for deployment
-        required: true
-        type: string
       confirmation:
-        description: Enter the exact stack name CagPlatform-preview-<preview_id>
+        description: Enter CagPlatform-canary
         required: true
         type: string
 
@@ -17,14 +13,12 @@ permissions:
 
 concurrency:
   cancel-in-progress: false
-  group: cag-preview-${{ inputs.preview_id }}
+  group: cag-canary
 
 jobs:
   validate:
-    name: Validate preview destruction
+    name: Validate canary destruction
     runs-on: ubuntu-latest
-    outputs:
-      stack_name: ${{ steps.target.outputs.stack_name }}
     steps:
       - name: Check out source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -38,39 +32,27 @@ jobs:
           cache-dependency-path: infra/package-lock.json
           node-version-file: .nvmrc
 
-      - name: Validate deployment target
-        id: target
+      - name: Require exact stack confirmation
         env:
-          DESTROY_CONFIRMATION: ${{ inputs.confirmation }}
-          PREVIEW_ID: ${{ inputs.preview_id }}
-          TARGET_REF: ${{ github.ref_name }}
+          CONFIRMATION: ${{ inputs.confirmation }}
         run: |
-          node scripts/deployment-target.mjs \
-            --stage preview \
-            --preview-id "$PREVIEW_ID" \
-            --ref "$TARGET_REF" \
-            --operation destroy \
-            --confirmation "$DESTROY_CONFIRMATION" >> "$GITHUB_OUTPUT"
+          test "$CONFIRMATION" = "CagPlatform-canary"
 
-      - name: Install dependencies without OIDC permission
+      - name: Install dependencies without AWS access
         run: npm --prefix infra ci
 
-      - name: Verify infrastructure without OIDC permission
+      - name: Verify infrastructure without AWS access
         run: npm --prefix infra run verify
 
   destroy:
-    name: Destroy preview ${{ inputs.preview_id }}
+    name: Destroy canary
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment: preview-destroy
+    environment: canary-destroy
     permissions:
       contents: read
       id-token: write
-    env:
-      PREVIEW_ID: ${{ inputs.preview_id }}
-      STACK_NAME: ${{ needs.validate.outputs.stack_name }}
-
     steps:
       - name: Check out source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -93,21 +75,12 @@ jobs:
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
           aws-region: ${{ vars.AWS_REGION }}
           mask-aws-account-id: true
-          role-session-name: cag-preview-destroy-${{ github.run_id }}
+          role-session-name: cag-canary-destroy-${{ github.run_id }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
-      - name: Destroy exact preview stack
+      - name: Destroy exact canary stack
         working-directory: infra
         run: |
-          npm exec cdk -- destroy "$STACK_NAME" \
-            --context stage=preview \
-            --context "previewId=$PREVIEW_ID" \
+          npm exec cdk -- destroy CagPlatform-canary \
+            --context stage=canary \
             --force
-
-      - name: Publish destruction summary
-        run: |
-          {
-            echo "## Preview destroyed"
-            echo "Removed stack: $STACK_NAME"
-            echo "No durable stack or DNS record was targeted."
-          } >> "$GITHUB_STEP_SUMMARY"

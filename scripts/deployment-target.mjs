@@ -69,7 +69,24 @@ export const resolveWorkflowTarget = ({
 
   let target;
 
-  if (stage === 'staging') {
+  if (stage === 'canary') {
+    if (refType !== undefined && refType !== 'branch') {
+      throw new Error('Canary deployment must run from a branch');
+    }
+    if (ref !== 'canary') {
+      throw new Error('Canary deployment must run from ref canary');
+    }
+
+    target = {
+      cdkStage: 'canary',
+      deployEnvironment: 'canary',
+      deploymentId: 'canary',
+      isEphemeral: false,
+      planEnvironment: 'canary-plan',
+      stackName: 'CagPlatform-canary',
+      stageName: 'canary'
+    };
+  } else if (stage === 'staging') {
     if (refType !== undefined && refType !== 'branch') {
       throw new Error('Staging deployment must run from a branch');
     }

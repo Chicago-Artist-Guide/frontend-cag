@@ -1,4 +1,8 @@
-export type DeploymentStage = 'preview' | 'production' | 'staging';
+export type DeploymentStage =
+  | 'canary'
+  | 'preview'
+  | 'production'
+  | 'staging';
 
 export interface DeploymentTarget {
   deploymentId: string;
@@ -30,6 +34,16 @@ export const resolveDeploymentTarget = (
   stage: unknown,
   previewId?: unknown
 ): DeploymentTarget => {
+  if (stage === 'canary') {
+    return {
+      deploymentId: 'canary',
+      isEphemeral: false,
+      isProduction: false,
+      stackName: 'CagPlatform-canary',
+      stageName: 'canary'
+    };
+  }
+
   if (stage === 'preview') {
     const normalizedPreviewId = resolvePreviewId(previewId);
 
@@ -53,7 +67,7 @@ export const resolveDeploymentTarget = (
   }
 
   throw new Error(
-    'stage must be exactly one of preview, staging, or production.'
+    'stage must be exactly one of canary, preview, staging, or production.'
   );
 };
 
