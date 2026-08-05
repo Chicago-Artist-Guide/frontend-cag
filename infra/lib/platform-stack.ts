@@ -144,6 +144,10 @@ export class PlatformStack extends Stack {
 
     const container = taskDefinition.addContainer('Application', {
       environment: {
+        // Fargate injects HOSTNAME as the task's ENI hostname, and the
+        // Next.js standalone server binds to it — leaving 127.0.0.1
+        // unreachable for the container health check below.
+        HOSTNAME: '0.0.0.0',
         NODE_ENV: 'production',
         PORT: '3000',
         STAGE_NAME: target.stageName

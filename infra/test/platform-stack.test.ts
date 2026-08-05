@@ -198,6 +198,9 @@ describe('PlatformStack', () => {
     template.hasResourceProperties('AWS::ECS::TaskDefinition', {
       ContainerDefinitions: Match.arrayWith([
         Match.objectLike({
+          Environment: Match.arrayWith([
+            { Name: 'HOSTNAME', Value: '0.0.0.0' }
+          ]),
           HealthCheck: {
             Command: Match.arrayWith([
               Match.stringLikeRegexp('/api/health/live')
