@@ -31,7 +31,12 @@ import {
   artistToTheaterEmailText,
   theaterToArtistEmailHtml,
   artistToTheaterEmailHtml,
-  IN_APP_EMAIL_SENT_LABEL
+  IN_APP_EMAIL_SENT_LABEL,
+  getConversationPreview,
+  getMatchInvitationSenderName,
+  resolveArtistDisplayName,
+  resolveTheaterDisplayName,
+  shouldSendMatchInvitationFollowUp
 } from './messages';
 import Button from '../shared/Button';
 
@@ -116,8 +121,13 @@ export const MessageThread: React.FC<
         : currentUser?.email || NO_EMAIL;
 
     if (accountTypeForMatch === 'theater') {
-      const theaterName =
-        profile.data.theatre_name || production?.theater_name || 'Theater';
+      const theaterName = getMatchInvitationSenderName(
+        'theater',
+        resolveTheaterDisplayName(profile?.data, account?.data) !== 'Theatre'
+          ? resolveTheaterDisplayName(profile?.data, account?.data)
+          : profile.data.theatre_name || production?.theater_name,
+        null
+      );
 
       return {
         text: theaterToArtistEmailText(
@@ -135,9 +145,13 @@ export const MessageThread: React.FC<
       };
     }
 
-    const talentFullName =
-      `${profile.data.first_name || ''} ${profile.data.last_name || ''}`.trim() ||
-      'Artist';
+    const talentFullName = getMatchInvitationSenderName(
+      'talent',
+      null,
+      resolveArtistDisplayName(account?.data) !== 'Talent'
+        ? resolveArtistDisplayName(account?.data)
+        : `${profile.data.first_name || ''} ${profile.data.last_name || ''}`.trim()
+    );
 
     return {
       text: artistToTheaterEmailText(
@@ -292,8 +306,15 @@ export const MessageThread: React.FC<
         accountTypeForMatch
       );
 
-      // if a status is positive, send messages and emails
-      if (status) {
+      // The initiator already emailed when they applied. Sending again from
+      // Accept Match duplicates the invitation and previously swapped names.
+      if (
+        status &&
+        shouldSendMatchInvitationFollowUp(
+          match.initiated_by,
+          accountTypeForMatch
+        )
+      ) {
         await sendMatchActionNotifications(
           accountTypeForMatch,
           theaterId,
@@ -345,6 +366,17 @@ export const MessageThread: React.FC<
 
     setLoading(false);
   }, [account, thread, threadId]);
+
+  const accountTypeForMatch: TheaterOrTalent | null =
+    account?.data?.type === 'company'
+      ? 'theater'
+      : account?.data?.type === 'individual'
+        ? 'talent'
+        : null;
+  const isMatchInitiator =
+    !!match &&
+    !!accountTypeForMatch &&
+    match.initiated_by === accountTypeForMatch;
 
   useEffect(() => {
     if (!currentThreadMessages || !currentThreadMessages.length) {
@@ -430,7 +462,7 @@ export const MessageThread: React.FC<
                         {IN_APP_EMAIL_SENT_LABEL}
                       </div>
                     )}
-                    {msg.content}
+                    {getConversationPreview(msg.content)}
                   </div>
                 </div>
               );
@@ -443,6 +475,12 @@ export const MessageThread: React.FC<
                   <strong>Match Status:</strong>{' '}
                   {match.confirmed_by && <>accepted by {match.confirmed_by}</>}{' '}
                   {match.rejected_by && <>declined by {match.rejected_by}</>}
+                </p>
+              ) : isMatchInitiator ? (
+                <p className="text-sm sm:text-base">
+                  <strong>Match Status:</strong> you sent this invitation
+                  <br />
+                  <em className="text-xs">Waiting for a response.</em>
                 </p>
               ) : (
                 <>
