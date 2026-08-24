@@ -9,6 +9,7 @@ import { getAccountWithAccountId } from '../Profile/shared/api';
 import { createMessageThread, createEmail } from '../Messages/api';
 import {
   NO_EMAIL,
+  resolveTheaterDisplayName,
   theaterToArtistMessage,
   theaterToArtistEmailSubject,
   theaterToArtistEmailText,
@@ -63,15 +64,19 @@ export const TalentMatchCard = ({
       firebaseFirestore,
       profile.account_id
     );
+    const theaterName = resolveTheaterDisplayName(
+      userProfile?.data,
+      account?.data
+    );
     const subject = theaterToArtistEmailSubject(roleName, productionName);
     const messageContent = theaterToArtistEmailText(
-      userProfile?.data.theatre_name,
+      theaterName,
       roleName,
       productionName,
       userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL
     );
     const messageContentHtml = theaterToArtistEmailHtml(
-      userProfile?.data.theatre_name,
+      theaterName,
       roleName,
       productionName,
       userProfile.data.primary_contact_email || currentUser?.email || NO_EMAIL

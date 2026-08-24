@@ -75,4 +75,22 @@ describe('Messaging: apply-to-artist thread bugs', () => {
       expect(threadSrc).toMatch(/getConversationPreview\(msg\.content\)/);
     });
   });
+
+  describe('Invitation email does not duplicate or use the talent name as the company', () => {
+    it('does not pass recipientName into theater-to-artist email copy', () => {
+      const threadSrc = readSource('components/Messages/MessageThread.tsx');
+      expect(threadSrc).not.toMatch(
+        /theaterToArtistEmail(Text|Html)\(\s*recipientName/
+      );
+      expect(threadSrc).toMatch(/getMatchInvitationSenderName/);
+      expect(threadSrc).toMatch(/shouldSendMatchInvitationFollowUp/);
+      expect(threadSrc).toMatch(/isMatchInitiator/);
+    });
+
+    it('resolves the company name for Apply emails instead of only theatre_name', () => {
+      const src = readSource('components/Matches/TalentMatchCard.tsx');
+      expect(src).toMatch(/resolveTheaterDisplayName/);
+      expect(src).toMatch(/theaterToArtistEmailText\(\s*theaterName/);
+    });
+  });
 });

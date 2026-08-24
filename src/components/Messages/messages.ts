@@ -66,3 +66,42 @@ export const theaterToArtistEmailHtml = (
   email: string
 ) =>
   `<p>We are <strong>${theaterName}</strong> and we're interested in you for the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide your availability to audition by emailing ${email}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+
+export const resolveTheaterDisplayName = (
+  profile?: { theatre_name?: string; theater_name?: string } | null,
+  account?: { theater_name?: string; theatre_name?: string } | null
+) =>
+  [
+    profile?.theatre_name,
+    profile?.theater_name,
+    account?.theater_name,
+    account?.theatre_name
+  ].find((name) => typeof name === 'string' && name.trim().length > 0) ||
+  'Theatre';
+
+export const resolveArtistDisplayName = (
+  account?: {
+    first_name?: string;
+    last_name?: string;
+  } | null
+) =>
+  `${account?.first_name || ''} ${account?.last_name || ''}`.trim() || 'Talent';
+
+/** Sender shown in invitation copy ("We are X" / "My name is X"), never the recipient. */
+export const getMatchInvitationSenderName = (
+  accountType: 'theater' | 'talent',
+  theaterName?: string | null,
+  artistName?: string | null
+) =>
+  accountType === 'theater'
+    ? theaterName?.trim() || 'Theatre'
+    : artistName?.trim() || 'Talent';
+
+/**
+ * The party who already applied sent the invitation email. Accepting their own
+ * match from the thread must not send a second copy (often with swapped names).
+ */
+export const shouldSendMatchInvitationFollowUp = (
+  initiatedBy: 'theater' | 'talent' | undefined,
+  actingAs: 'theater' | 'talent'
+) => initiatedBy !== actingAs;
