@@ -69,6 +69,14 @@ describe('DEV-488: artist-side match card (CompanyMatchCard)', () => {
         /express interest in the following role/i
       );
     });
+
+    it('creates message threads with the company account document id, not the auth uid', () => {
+      expect(matchCardSource).toMatch(/theater\?\.account_id/);
+      expect(matchCardSource).toMatch(/getTheaterAccountByUid/);
+      expect(matchCardSource).toMatch(
+        /Cannot resolve theater account document id/
+      );
+    });
   });
 });
 

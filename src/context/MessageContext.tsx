@@ -62,22 +62,63 @@ export const MessageProvider: React.FC<
     }
 
     const threadsRef = collection(firestore, 'threads');
-    const currAccountRef = doc(firestore, 'accounts', accountId);
-    const threadQuery = query(
-      threadsRef,
-      or(
-        where('theater_account_id', '==', currAccountRef),
-        where('talent_account_id', '==', currAccountRef)
-      )
-    );
-    const threadSnapshot = await getDocs(threadQuery);
-    const userThreads = threadSnapshot.docs.map(
-      (threadDoc) =>
-        ({
+
+    const fetchThreadsForAccountRef = async (
+      accountRef: ReturnType<typeof doc>
+    ) => {
+      const threadQuery = query(
+        threadsRef,
+        or(
+          where('theater_account_id', '==', accountRef),
+          where('talent_account_id', '==', accountRef)
+        )
+      );
+      const threadSnapshot = await getDocs(threadQuery);
+      return threadSnapshot.docs;
+    };
+
+    const seen = new Set<string>();
+    const userThreads: MessageThreadType[] = [];
+
+    const addThreadDocs = (
+      threadDocs: Awaited<ReturnType<typeof fetchThreadsForAccountRef>>
+    ) => {
+      threadDocs.forEach((threadDoc) => {
+        if (seen.has(threadDoc.id)) {
+          return;
+        }
+        seen.add(threadDoc.id);
+        userThreads.push({
           ...threadDoc.data(),
           id: threadDoc.id
-        }) as MessageThreadType
-    );
+        } as MessageThreadType);
+      });
+    };
+
+    try {
+      addThreadDocs(
+        await fetchThreadsForAccountRef(doc(firestore, 'accounts', accountId))
+      );
+    } catch (error) {
+      console.error('Could not load threads', error);
+      return;
+    }
+
+    // Talent Apply used to store theater_account_id as accounts/{authUid}.
+    // Query that separately — folding it into the same or() makes Firestore
+    // deny the whole list when those refs fail the participant get().
+    const accountUid = account?.data?.uid as string | undefined;
+    if (accountUid && accountUid !== accountId) {
+      try {
+        addThreadDocs(
+          await fetchThreadsForAccountRef(
+            doc(firestore, 'accounts', accountUid)
+          )
+        );
+      } catch (legacyError) {
+        console.error('Could not load legacy uid-keyed threads', legacyError);
+      }
+    }
 
     setThreads(userThreads);
   };

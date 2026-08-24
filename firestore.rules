@@ -183,17 +183,12 @@ service cloud.firestore {
     // participation. (Previously checked `participants`/`created_by`
     // fields that the app never wrote, so every update after the initial
     // create was silently denied.)
-    function accountUidIsUser(accountRef) {
-      return accountRef != null &&
-        accountRef is path &&
-        exists(accountRef) &&
-        get(accountRef).data.uid == request.auth.uid;
-    }
-
     function isThreadParticipant(threadData) {
       return isAuthenticated() && (
-        accountUidIsUser(threadData.theater_account_id) ||
-        accountUidIsUser(threadData.talent_account_id)
+        (threadData.theater_account_id != null &&
+         get(threadData.theater_account_id).data.uid == request.auth.uid) ||
+        (threadData.talent_account_id != null &&
+         get(threadData.talent_account_id).data.uid == request.auth.uid)
       );
     }
 
@@ -216,22 +211,16 @@ service cloud.firestore {
     // query cannot be proven from sender/recipient rules alone, so
     // Firestore rejects it with permission-denied.
     function isMessageThreadParticipant(messageData) {
-      return messageData.thread_id != null && (
-        (messageData.thread_id is path &&
-         exists(messageData.thread_id) &&
-         isThreadParticipant(get(messageData.thread_id).data)) ||
-        (messageData.thread_id is string &&
-         exists(/databases/$(database)/documents/threads/$(messageData.thread_id)) &&
-         isThreadParticipant(
-           get(/databases/$(database)/documents/threads/$(messageData.thread_id)).data
-         ))
-      );
+      return messageData.thread_id != null &&
+        isThreadParticipant(get(messageData.thread_id).data);
     }
 
     function isMessageParticipant(messageData) {
       return isAuthenticated() && (
-        accountUidIsUser(messageData.sender_id) ||
-        accountUidIsUser(messageData.recipient_id) ||
+        (messageData.sender_id != null &&
+         get(messageData.sender_id).data.uid == request.auth.uid) ||
+        (messageData.recipient_id != null &&
+         get(messageData.recipient_id).data.uid == request.auth.uid) ||
         isMessageThreadParticipant(messageData)
       );
     }

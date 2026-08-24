@@ -169,10 +169,26 @@ export const CompanyMatchCard = ({
       const productionId = production?.production_id || '';
       const roleId = role.role_id || '';
       const talentAccountId = account.ref?.id;
-      const theaterAccountId = production?.account_id || '';
+      // production.account_id is the company auth uid, not the accounts
+      // document id. Threads are queried by account doc refs, so store
+      // that id or the company will never see the thread.
+      let theaterAccountId = theater?.account_id || '';
+
+      if (!theaterAccountId && production?.account_id) {
+        const theaterAccount = await getTheaterAccountByUid(
+          firebaseFirestore,
+          production.account_id
+        );
+        theaterAccountId = theaterAccount ? theaterAccount.id : '';
+      }
 
       if (!talentAccountId) {
         console.error('Cannot find current user account ref');
+        return false;
+      }
+
+      if (!theaterAccountId) {
+        console.error('Cannot resolve theater account document id');
         return false;
       }
 

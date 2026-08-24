@@ -17,6 +17,13 @@ describe('Messaging: apply-to-artist thread bugs', () => {
       expect(src).toMatch(/if \(!accountId\) \{\s*return;/s);
     });
 
+    it('lists legacy uid-keyed threads in a separate query so a rules miss cannot empty the inbox', () => {
+      const src = readSource('context/MessageContext.tsx');
+      expect(src).toMatch(/fetchThreadsForAccountRef/);
+      expect(src).toMatch(/accountUid && accountUid !== accountId/);
+      expect(src).toMatch(/Could not load legacy uid-keyed threads/);
+    });
+
     it('lets thread participants read messages so a thread_id query is allowed', () => {
       const src = readSource('../firestore.rules');
       expect(src).toMatch(/function isMessageThreadParticipant/);
