@@ -8,7 +8,7 @@ import { MessageThreadType } from './types';
 const MessagesContainer: React.FC<React.PropsWithChildren<unknown>> = () => {
   const navigate = useNavigate();
   const { threadId } = useParams();
-  const { currentThread: currThreadFromContext } = useMessages();
+  const { threads, currentThread: currThreadFromContext } = useMessages();
   const [currentThread, setCurrentThread] = useState<MessageThreadType | null>(
     null
   );
@@ -22,8 +22,21 @@ const MessagesContainer: React.FC<React.PropsWithChildren<unknown>> = () => {
   };
 
   useEffect(() => {
+    if (!threadId) {
+      setCurrentThread(null);
+      return;
+    }
+
+    // Prefer the already-loaded list so clicking a thread opens immediately
+    // even if a follow-up getDoc is slow or fails.
+    const fromList = threads.find((thread) => thread.id === threadId);
+    if (fromList) {
+      setCurrentThread(fromList);
+      return;
+    }
+
     setCurrentThread(currThreadFromContext);
-  }, [currThreadFromContext]);
+  }, [threadId, threads, currThreadFromContext]);
 
   // On mobile, show thread list or thread view, not both
   // On desktop, show both side by side

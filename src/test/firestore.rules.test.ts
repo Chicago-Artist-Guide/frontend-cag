@@ -18,7 +18,16 @@ import {
   initializeTestEnvironment,
   RulesTestEnvironment
 } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  setDoc,
+  updateDoc,
+  where
+} from 'firebase/firestore';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -58,8 +67,7 @@ const seed = (work: (db: AnyFirestore) => Promise<void>) =>
   testEnv.withSecurityRulesDisabled((ctx) => work(ctx.firestore()));
 
 const unauth = () => testEnv.unauthenticatedContext().firestore();
-const asUser = (uid: string) =>
-  testEnv.authenticatedContext(uid).firestore();
+const asUser = (uid: string) => testEnv.authenticatedContext(uid).firestore();
 
 describe('accounts collection', () => {
   // DEV-496 originally opened company accounts to public read so the unauth
@@ -124,7 +132,7 @@ describe('accounts collection', () => {
     );
   });
 
-  it('non-owner CANNOT update someone else\'s account', async () => {
+  it("non-owner CANNOT update someone else's account", async () => {
     await seed(async (db) => {
       await setDoc(doc(db, 'accounts', 'owner-1'), {
         uid: 'owner-1',
@@ -177,7 +185,7 @@ describe('productions collection', () => {
     );
   });
 
-  it('user CANNOT create a production with someone else\'s account_id', async () => {
+  it("user CANNOT create a production with someone else's account_id", async () => {
     await assertFails(
       setDoc(doc(asUser('attacker'), 'productions', 'prod-evil'), {
         production_id: 'prod-evil',
@@ -186,7 +194,7 @@ describe('productions collection', () => {
     );
   });
 
-  it('non-owner CANNOT update someone else\'s production', async () => {
+  it("non-owner CANNOT update someone else's production", async () => {
     await seed(async (db) => {
       await setDoc(doc(db, 'productions', 'prod-1'), {
         production_id: 'prod-1',
@@ -226,9 +234,7 @@ describe('profiles collection (must stay auth-gated)', () => {
       });
     });
 
-    await assertFails(
-      getDoc(doc(unauth(), 'profiles', 'profile-individual'))
-    );
+    await assertFails(getDoc(doc(unauth(), 'profiles', 'profile-individual')));
     // Even company profiles stay auth-gated — rules cannot cheaply
     // distinguish company profiles from individual ones.
     await assertFails(getDoc(doc(unauth(), 'profiles', 'profile-company')));
@@ -262,7 +268,7 @@ describe('profiles collection (must stay auth-gated)', () => {
     );
   });
 
-  it('non-owner CANNOT update someone else\'s profile', async () => {
+  it("non-owner CANNOT update someone else's profile", async () => {
     await seed(async (db) => {
       await setDoc(doc(db, 'profiles', 'profile-1'), {
         uid: 'owner-1'
@@ -438,13 +444,62 @@ describe('messages collection', () => {
   it('non-participant CANNOT read or update a message', async () => {
     await seedAccountsAndMessage();
 
-    await assertFails(
-      getDoc(doc(asUser('attacker'), 'messages', 'message-1'))
-    );
+    await assertFails(getDoc(doc(asUser('attacker'), 'messages', 'message-1')));
     await assertFails(
       updateDoc(doc(asUser('attacker'), 'messages', 'message-1'), {
         status: 'read'
       })
+    );
+  });
+
+  const seedThreadWithMessage = () =>
+    seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'theater-acct-doc'), {
+        uid: 'theater-auth-uid',
+        type: 'company'
+      });
+      await setDoc(doc(db, 'accounts', 'talent-acct-doc'), {
+        uid: 'talent-auth-uid',
+        type: 'individual'
+      });
+      await setDoc(doc(db, 'threads', 'thread-1'), {
+        theater_account_id: doc(db, 'accounts', 'theater-acct-doc'),
+        talent_account_id: doc(db, 'accounts', 'talent-acct-doc')
+      });
+      await setDoc(doc(db, 'messages', 'message-1'), {
+        sender_id: doc(db, 'accounts', 'theater-acct-doc'),
+        recipient_id: doc(db, 'accounts', 'talent-acct-doc'),
+        thread_id: doc(db, 'threads', 'thread-1'),
+        content: 'hi',
+        status: 'new'
+      });
+    });
+
+  it('theater participant CAN query messages by thread_id (needed to open a conversation)', async () => {
+    await seedThreadWithMessage();
+
+    const db = asUser('theater-auth-uid');
+    await assertSucceeds(
+      getDocs(
+        query(
+          collection(db, 'messages'),
+          where('thread_id', '==', doc(db, 'threads', 'thread-1'))
+        )
+      )
+    );
+  });
+
+  it('non-participant CANNOT query messages by thread_id', async () => {
+    await seedThreadWithMessage();
+
+    const db = asUser('attacker');
+    await assertFails(
+      getDocs(
+        query(
+          collection(db, 'messages'),
+          where('thread_id', '==', doc(db, 'threads', 'thread-1'))
+        )
+      )
     );
   });
 });
