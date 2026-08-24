@@ -3,6 +3,18 @@ export const UNKNOWN_ROLE = '(Unknown Role)';
 export const UNKNOWN_PRODUCTION = '(Unknown Production)';
 export const NO_EMAIL = '(Email N/A)';
 
+// Some stored thread previews were prefixed when the matching email was
+// sent. Threads should show only the conversation copy.
+const EMAIL_SENT_PREFIX = /^Email sent:\s*/i;
+
+export const getConversationPreview = (content?: string | null) => {
+  if (!content) {
+    return '';
+  }
+
+  return content.replace(EMAIL_SENT_PREFIX, '').trim();
+};
+
 // artist to theater
 export const artistToTheaterMessage = (
   roleName: string,

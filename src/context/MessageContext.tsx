@@ -57,6 +57,10 @@ export const MessageProvider: React.FC<
   >([]);
 
   const loadThreads = async (accountId: string) => {
+    if (!accountId) {
+      return;
+    }
+
     const threadsRef = collection(firestore, 'threads');
     const currAccountRef = doc(firestore, 'accounts', accountId);
     const threadQuery = query(
@@ -68,10 +72,10 @@ export const MessageProvider: React.FC<
     );
     const threadSnapshot = await getDocs(threadQuery);
     const userThreads = threadSnapshot.docs.map(
-      (doc) =>
+      (threadDoc) =>
         ({
-          id: doc.id,
-          ...doc.data()
+          ...threadDoc.data(),
+          id: threadDoc.id
         }) as MessageThreadType
     );
 
@@ -79,12 +83,21 @@ export const MessageProvider: React.FC<
   };
 
   const loadThread = async (threadId: string) => {
-    const threadDoc = doc(firestore, 'threads', threadId);
-    const threadSnapshot = await getDoc(threadDoc);
+    try {
+      const threadDoc = doc(firestore, 'threads', threadId);
+      const threadSnapshot = await getDoc(threadDoc);
 
-    if (threadSnapshot.exists()) {
-      const threadData = threadSnapshot.data() as MessageThreadType;
-      setCurrentThread(threadData);
+      if (threadSnapshot.exists()) {
+        setCurrentThread({
+          ...threadSnapshot.data(),
+          id: threadSnapshot.id
+        } as MessageThreadType);
+      } else {
+        setCurrentThread(null);
+      }
+    } catch (error) {
+      console.error('Could not fetch thread', error);
+      setCurrentThread(null);
     }
   };
 
@@ -93,41 +106,161 @@ export const MessageProvider: React.FC<
     recipient_id: string,
     thread_id?: string
   ) => {
+    if (!sender_id) {
+      return;
+    }
+
     const messagesRef = collection(firestore, 'messages');
-    const senderRef = doc(firestore, 'accounts', sender_id);
-    const recipientRef = doc(firestore, 'accounts', recipient_id);
+    const currentUserRef = doc(firestore, 'accounts', sender_id);
 
-    try {
-      let messagesQuery = query(
-        messagesRef,
-        or(
-          where('sender_id', 'in', [senderRef, recipientRef]),
-          where('recipient_id', 'in', [senderRef, recipientRef])
-        ),
-        orderBy('timestamp', 'asc')
-      );
+    const mapMessage = (messageDoc: { id: string; data: () => object }) =>
+      ({
+        ...messageDoc.data(),
+        id: messageDoc.id
+      }) as MessageType;
 
-      if (thread_id) {
-        const threadsRef = doc(firestore, 'threads', thread_id);
-        messagesQuery = query(
-          messagesQuery,
-          where('thread_id', '==', threadsRef)
-        );
+    const toMillis = (timestamp: MessageType['timestamp']) => {
+      if (!timestamp) {
+        return 0;
       }
 
-      const messagesSnapshot = await getDocs(messagesQuery);
-      const messagesDocs = messagesSnapshot.docs.map(
-        (doc) =>
-          ({
-            id: doc.id,
-            ...doc.data()
-          }) as MessageType
+      const withToMillis = timestamp as unknown as { toMillis?: () => number };
+      if (typeof withToMillis.toMillis === 'function') {
+        return withToMillis.toMillis();
+      }
+
+      if (timestamp instanceof Date) {
+        return timestamp.getTime();
+      }
+
+      const withSeconds = timestamp as unknown as { seconds?: number };
+      if (typeof withSeconds.seconds === 'number') {
+        return withSeconds.seconds * 1000;
+      }
+
+      return 0;
+    };
+
+    const mergeUnique = (
+      ...snapshots: Array<{ docs: Array<{ id: string; data: () => object }> }>
+    ) => {
+      const seen = new Set<string>();
+      const messages: MessageType[] = [];
+
+      snapshots.forEach((snapshot) => {
+        snapshot.docs.forEach((messageDoc) => {
+          if (seen.has(messageDoc.id)) {
+            return;
+          }
+          seen.add(messageDoc.id);
+          messages.push(mapMessage(messageDoc));
+        });
+      });
+
+      return messages;
+    };
+
+    const tryQuery = async (
+      messagesQuery: ReturnType<typeof query>,
+      errorLabel: string
+    ) => {
+      try {
+        return await getDocs(messagesQuery);
+      } catch (error) {
+        console.error(errorLabel, error);
+        return { docs: [] as Array<{ id: string; data: () => object }> };
+      }
+    };
+
+    let messagesDocs: MessageType[] = [];
+
+    // Prefer a thread_id query (allowed once rules treat thread
+    // participants as message readers). Also try sender/recipient
+    // constraints so we still match if thread_id is stored as a ref
+    // or a string, or if the thread-scoped query is denied.
+    if (thread_id) {
+      const threadRef = doc(firestore, 'threads', thread_id);
+      const byThreadRefSnapshot = await tryQuery(
+        query(messagesRef, where('thread_id', '==', threadRef)),
+        'Could not fetch messages by thread ref'
+      );
+      const byThreadIdSnapshot = await tryQuery(
+        query(messagesRef, where('thread_id', '==', thread_id)),
+        'Could not fetch messages by thread id string'
+      );
+      const sentInThreadSnapshot = await tryQuery(
+        query(
+          messagesRef,
+          where('sender_id', '==', currentUserRef),
+          where('thread_id', '==', threadRef),
+          orderBy('timestamp', 'asc')
+        ),
+        'Could not fetch sent messages in thread'
+      );
+      const receivedInThreadSnapshot = await tryQuery(
+        query(
+          messagesRef,
+          where('recipient_id', '==', currentUserRef),
+          where('thread_id', '==', threadRef),
+          orderBy('timestamp', 'asc')
+        ),
+        'Could not fetch received messages in thread'
       );
 
-      setCurrentThreadMessages(messagesDocs);
-    } catch (error) {
-      console.error('Could not fetch messages for thread', error);
+      messagesDocs = mergeUnique(
+        byThreadRefSnapshot,
+        byThreadIdSnapshot,
+        sentInThreadSnapshot,
+        receivedInThreadSnapshot
+      );
     }
+
+    if (!messagesDocs.length) {
+      const sentSnapshot = await tryQuery(
+        query(messagesRef, where('sender_id', '==', currentUserRef)),
+        'Could not fetch sent messages'
+      );
+      const receivedSnapshot = await tryQuery(
+        query(messagesRef, where('recipient_id', '==', currentUserRef)),
+        'Could not fetch received messages'
+      );
+      const counterpartIds = new Set([sender_id, recipient_id].filter(Boolean));
+
+      messagesDocs = mergeUnique(sentSnapshot, receivedSnapshot).filter(
+        (message) => {
+          const senderIdStr =
+            typeof message.sender_id === 'string'
+              ? message.sender_id
+              : message.sender_id?.id;
+          const recipientIdStr =
+            typeof message.recipient_id === 'string'
+              ? message.recipient_id
+              : message.recipient_id?.id;
+
+          const isBetweenPair =
+            counterpartIds.has(senderIdStr) &&
+            counterpartIds.has(recipientIdStr);
+
+          if (!isBetweenPair) {
+            return false;
+          }
+
+          if (!thread_id || !message.thread_id) {
+            return true;
+          }
+
+          const messageThreadId =
+            typeof message.thread_id === 'string'
+              ? message.thread_id
+              : message.thread_id.id;
+
+          return messageThreadId === thread_id;
+        }
+      );
+    }
+
+    messagesDocs.sort((a, b) => toMillis(a.timestamp) - toMillis(b.timestamp));
+    setCurrentThreadMessages(messagesDocs);
   };
 
   const updateThreadStatus = async (threadId: string, status: string) => {
@@ -142,6 +275,7 @@ export const MessageProvider: React.FC<
 
   useEffect(() => {
     if (!threadIdParam) {
+      setCurrentThread(null);
       return;
     }
 

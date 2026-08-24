@@ -23,6 +23,7 @@ import {
   NO_EMAIL,
   UNKNOWN_ROLE,
   UNKNOWN_PRODUCTION,
+  getConversationPreview,
   theaterToArtistMessage,
   artistToTheaterMessage,
   theaterToArtistEmailSubject,
@@ -294,14 +295,15 @@ export const MessageThread: React.FC<
       return;
     }
 
-    const theaterId =
-      typeof thread.theater_account_id === 'string'
-        ? thread.theater_account_id
-        : thread.theater_account_id.id;
-    const talentId =
-      typeof thread.talent_account_id === 'string'
-        ? thread.talent_account_id
-        : thread.talent_account_id.id;
+    const getDocId = (value?: { id?: string } | string | null) =>
+      typeof value === 'string' ? value : value?.id || '';
+
+    const theaterId = getDocId(thread.theater_account_id);
+    const talentId = getDocId(thread.talent_account_id);
+
+    if (!theaterId || !talentId) {
+      return;
+    }
     const senderId = accountType === 'company' ? theaterId : talentId;
     const recipientId = accountType === 'company' ? talentId : theaterId;
     const productionId =
@@ -381,6 +383,11 @@ export const MessageThread: React.FC<
           </h4>
           <div className="flex-1 space-y-4 overflow-y-auto">
             {currentThreadMessages.map((msg) => {
+              const content = getConversationPreview(msg.content);
+              if (!content) {
+                return null;
+              }
+
               const senderIdStr =
                 typeof msg.sender_id === 'string'
                   ? msg.sender_id
@@ -399,7 +406,7 @@ export const MessageThread: React.FC<
                         : 'text-gray-800 bg-lighterGrey'
                     }`}
                   >
-                    {msg.content}
+                    {content}
                   </div>
                 </div>
               );
