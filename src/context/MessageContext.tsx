@@ -154,9 +154,11 @@ export const MessageProvider: React.FC<
     const messagesRef = collection(firestore, 'messages');
     const currentUserRef = doc(firestore, 'accounts', sender_id);
 
-    const mapMessage = (messageDoc: { id: string; data: () => object }) =>
+    type MessageDoc = Awaited<ReturnType<typeof getDocs>>['docs'][number];
+
+    const mapMessage = (messageDoc: MessageDoc) =>
       ({
-        ...messageDoc.data(),
+        ...(messageDoc.data() as object),
         id: messageDoc.id
       }) as MessageType;
 
@@ -182,14 +184,12 @@ export const MessageProvider: React.FC<
       return 0;
     };
 
-    const mergeUnique = (
-      ...snapshots: Array<{ docs: Array<{ id: string; data: () => object }> }>
-    ) => {
+    const mergeUnique = (...docLists: MessageDoc[][]) => {
       const seen = new Set<string>();
       const messages: MessageType[] = [];
 
-      snapshots.forEach((snapshot) => {
-        snapshot.docs.forEach((messageDoc) => {
+      docLists.forEach((docs) => {
+        docs.forEach((messageDoc) => {
           if (seen.has(messageDoc.id)) {
             return;
           }
@@ -204,12 +204,13 @@ export const MessageProvider: React.FC<
     const tryQuery = async (
       messagesQuery: ReturnType<typeof query>,
       errorLabel: string
-    ) => {
+    ): Promise<MessageDoc[]> => {
       try {
-        return await getDocs(messagesQuery);
+        const snapshot = await getDocs(messagesQuery);
+        return snapshot.docs;
       } catch (error) {
         console.error(errorLabel, error);
-        return { docs: [] as Array<{ id: string; data: () => object }> };
+        return [];
       }
     };
 
