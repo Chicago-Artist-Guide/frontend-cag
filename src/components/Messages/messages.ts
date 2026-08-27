@@ -3,6 +3,18 @@ export const UNKNOWN_ROLE = '(Unknown Role)';
 export const UNKNOWN_PRODUCTION = '(Unknown Production)';
 export const NO_EMAIL = '(Email N/A)';
 
+// Some stored thread previews were prefixed when the matching email was
+// sent. Threads should show only the conversation copy.
+const EMAIL_SENT_PREFIX = /^Email sent:\s*/i;
+
+export const getConversationPreview = (content?: string | null) => {
+  if (!content) {
+    return '';
+  }
+
+  return content.replace(EMAIL_SENT_PREFIX, '').trim();
+};
+
 // artist to theater
 export const artistToTheaterMessage = (
   roleName: string,
@@ -90,3 +102,42 @@ export const stripEmailCtas = (text: string): string => {
 };
 
 export const IN_APP_EMAIL_SENT_LABEL = 'Email Sent';
+
+export const resolveTheaterDisplayName = (
+  profile?: { theatre_name?: string; theater_name?: string } | null,
+  account?: { theater_name?: string; theatre_name?: string } | null
+) =>
+  [
+    profile?.theatre_name,
+    profile?.theater_name,
+    account?.theater_name,
+    account?.theatre_name
+  ].find((name) => typeof name === 'string' && name.trim().length > 0) ||
+  'Theatre';
+
+export const resolveArtistDisplayName = (
+  account?: {
+    first_name?: string;
+    last_name?: string;
+  } | null
+) =>
+  `${account?.first_name || ''} ${account?.last_name || ''}`.trim() || 'Talent';
+
+/** Sender shown in invitation copy ("We are X" / "My name is X"), never the recipient. */
+export const getMatchInvitationSenderName = (
+  accountType: 'theater' | 'talent',
+  theaterName?: string | null,
+  artistName?: string | null
+) =>
+  accountType === 'theater'
+    ? theaterName?.trim() || 'Theatre'
+    : artistName?.trim() || 'Talent';
+
+/**
+ * The party who already applied sent the invitation email. Accepting their own
+ * match from the thread must not send a second copy (often with swapped names).
+ */
+export const shouldSendMatchInvitationFollowUp = (
+  initiatedBy: 'theater' | 'talent' | undefined,
+  actingAs: 'theater' | 'talent'
+) => initiatedBy !== actingAs;

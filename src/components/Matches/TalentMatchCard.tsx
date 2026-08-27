@@ -9,6 +9,7 @@ import { getAccountByIdOrUid } from '../../services/accounts/client';
 import { sendMessageThreadWithEmail } from '../Messages/api';
 import {
   NO_EMAIL,
+  resolveTheaterDisplayName,
   theaterToArtistMessage,
   theaterToArtistEmailSubject,
   theaterToArtistEmailText,
@@ -64,14 +65,18 @@ export const TalentMatchCard = ({
       productionName,
       contactEmail
     );
+    const theaterName = resolveTheaterDisplayName(
+      userProfile?.data,
+      account?.data
+    );
     const emailText = theaterToArtistEmailText(
-      userProfile.data?.theatre_name || '',
+      theaterName,
       roleName,
       productionName,
       contactEmail
     );
     const emailHtml = theaterToArtistEmailHtml(
-      userProfile.data?.theatre_name || '',
+      theaterName,
       roleName,
       productionName,
       contactEmail

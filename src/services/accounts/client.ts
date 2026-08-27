@@ -17,6 +17,7 @@ import type {
   DocumentSnapshot
 } from 'firebase/firestore';
 import { getFirebaseClient } from '../../lib/firebase/client';
+import { findProfileByUidOrAccountId } from '../profiles/client';
 import type {
   AccountData,
   AccountDto,
@@ -38,6 +39,10 @@ const getAccountByIdFromCollection = async <TData extends AccountData>(
   accounts: CollectionReference<DocumentData>,
   accountId: string
 ): Promise<AccountDto<TData> | null> => {
+  if (!accountId) {
+    return null;
+  }
+
   const snapshot = await getDoc(doc(accounts, accountId));
 
   return mapAccountSnapshot<TData>(snapshot);
@@ -124,13 +129,25 @@ export const getAccountDisplayName = async (
 };
 
 export const getTheaterDisplayNameByUid = async (
-  uid: string
+  idOrUid: string
 ): Promise<string> => {
-  const account = await findAccountByUid(uid);
+  // Thread refs store the accounts document ID, not the auth uid. Look up
+  // the account by doc id first (with uid fallback), and prefer the
+  // profile's theatre_name over account.theater_name — same fallback the
+  // rest of the app uses for companies that haven't finished a profile.
+  const [account, profile] = await Promise.all([
+    getAccountByIdOrUid(idOrUid),
+    findProfileByUidOrAccountId(idOrUid)
+  ]);
 
-  if (!account) {
-    return 'Theatre N/A';
-  }
+  const profileData = profile?.data as
+    | { theatre_name?: string; theater_name?: string }
+    | undefined;
 
-  return account.data.theater_name || `Theater ${uid}`;
+  return (
+    profileData?.theatre_name ||
+    profileData?.theater_name ||
+    account?.data.theater_name ||
+    'Theatre N/A'
+  );
 };

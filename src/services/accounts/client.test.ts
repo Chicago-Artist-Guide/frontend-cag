@@ -2,6 +2,7 @@ import type { AccountData, AccountDto, Unsubscribe } from './types';
 
 const firebaseMocks = vi.hoisted(() => ({
   accountsRef: { path: 'accounts' },
+  profilesRef: { path: 'profiles' },
   addDoc: vi.fn(),
   collection: vi.fn(),
   doc: vi.fn(),
@@ -11,6 +12,7 @@ const firebaseMocks = vi.hoisted(() => ({
   getFirebaseClient: vi.fn(),
   limit: vi.fn(),
   onSnapshot: vi.fn(),
+  or: vi.fn(),
   query: vi.fn(),
   updateDoc: vi.fn(),
   where: vi.fn()
@@ -28,6 +30,7 @@ vi.mock('firebase/firestore', () => ({
   getDocs: firebaseMocks.getDocs,
   limit: firebaseMocks.limit,
   onSnapshot: firebaseMocks.onSnapshot,
+  or: firebaseMocks.or,
   query: firebaseMocks.query,
   updateDoc: firebaseMocks.updateDoc,
   where: firebaseMocks.where
@@ -71,7 +74,9 @@ describe('account client service', () => {
     firebaseMocks.getFirebaseClient.mockReturnValue({
       firestore: firebaseMocks.firestore
     });
-    firebaseMocks.collection.mockReturnValue(firebaseMocks.accountsRef);
+    firebaseMocks.collection.mockImplementation((_db, name) =>
+      name === 'profiles' ? firebaseMocks.profilesRef : firebaseMocks.accountsRef
+    );
     firebaseMocks.doc.mockImplementation((_accountsRef, accountId) => ({
       accountId,
       path: `accounts/${accountId}`
@@ -82,6 +87,7 @@ describe('account client service', () => {
       value
     }));
     firebaseMocks.limit.mockImplementation((count) => ({ count }));
+    firebaseMocks.or.mockImplementation((...clauses) => ({ or: clauses }));
     firebaseMocks.query.mockImplementation((accountsRef, ...constraints) => ({
       accountsRef,
       constraints
@@ -366,43 +372,90 @@ describe('account client service', () => {
       await expect(getAccountDisplayName('account-1')).rejects.toBe(failure);
     });
 
-    it('looks theaters up by UID only and returns their theater name', async () => {
-      const company = {
-        theater_name: 'The Lookingglass',
-        type: 'company',
-        uid: 'auth-company'
-      } as const;
-      firebaseMocks.getDocs.mockResolvedValue({
-        docs: [existingSnapshot('company-account', company)],
-        empty: false
-      });
+    it('looks theaters up by doc id and returns their theater name when no profile exists', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(
+        existingSnapshot('company-account', {
+          theater_name: 'The Lookingglass',
+          type: 'company',
+          uid: 'auth-company'
+        })
+      );
+      firebaseMocks.getDocs.mockResolvedValue({ docs: [], empty: true });
+      const { getTheaterDisplayNameByUid } = await loadClient();
+
+      await expect(
+        getTheaterDisplayNameByUid('company-account')
+      ).resolves.toBe('The Lookingglass');
+      expect(firebaseMocks.getDoc).toHaveBeenCalledOnce();
+    });
+
+    it('prefers the profile theatre_name over the account theater_name', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(
+        existingSnapshot('company-account', {
+          theater_name: 'Account Name',
+          type: 'company',
+          uid: 'auth-company'
+        })
+      );
+      firebaseMocks.getDocs.mockImplementation(async (builtQuery) =>
+        builtQuery.accountsRef === firebaseMocks.profilesRef
+          ? {
+              docs: [
+                existingSnapshot('profile-1', {
+                  theatre_name: 'Goodman Theatre'
+                })
+              ],
+              empty: false
+            }
+          : { docs: [], empty: true }
+      );
+      const { getTheaterDisplayNameByUid } = await loadClient();
+
+      await expect(
+        getTheaterDisplayNameByUid('company-account')
+      ).resolves.toBe('Goodman Theatre');
+    });
+
+    it('falls back to a uid query when the account doc id does not exist', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(missingSnapshot('auth-company'));
+      firebaseMocks.getDocs.mockImplementation(async (builtQuery) =>
+        builtQuery.accountsRef === firebaseMocks.profilesRef
+          ? { docs: [], empty: true }
+          : {
+              docs: [
+                existingSnapshot('company-account', {
+                  theater_name: 'Chicago Shakespeare',
+                  type: 'company',
+                  uid: 'auth-company'
+                })
+              ],
+              empty: false
+            }
+      );
       const { getTheaterDisplayNameByUid } = await loadClient();
 
       await expect(getTheaterDisplayNameByUid('auth-company')).resolves.toBe(
-        'The Lookingglass'
-      );
-      expect(firebaseMocks.getDoc).not.toHaveBeenCalled();
-      expect(firebaseMocks.where).toHaveBeenCalledWith(
-        'uid',
-        '==',
-        'auth-company'
+        'Chicago Shakespeare'
       );
     });
 
-    it('falls back when a found theater has no theater name', async () => {
-      const company = { type: 'company', uid: 'auth-company' } as const;
-      firebaseMocks.getDocs.mockResolvedValue({
-        docs: [existingSnapshot('company-account', company)],
-        empty: false
-      });
+    it('returns Theatre N/A when a found theater has no theater name', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(
+        existingSnapshot('company-account', {
+          type: 'company',
+          uid: 'auth-company'
+        })
+      );
+      firebaseMocks.getDocs.mockResolvedValue({ docs: [], empty: true });
       const { getTheaterDisplayNameByUid } = await loadClient();
 
-      await expect(getTheaterDisplayNameByUid('auth-company')).resolves.toBe(
-        'Theater auth-company'
-      );
+      await expect(
+        getTheaterDisplayNameByUid('company-account')
+      ).resolves.toBe('Theatre N/A');
     });
 
-    it('returns Theatre N/A when the UID lookup is missing', async () => {
+    it('returns Theatre N/A when neither the account nor profile resolve', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(missingSnapshot('missing'));
       firebaseMocks.getDocs.mockResolvedValue({ docs: [], empty: true });
       const { getTheaterDisplayNameByUid } = await loadClient();
 
@@ -413,7 +466,8 @@ describe('account client service', () => {
 
     it('propagates theater lookup failures', async () => {
       const failure = new Error('theater lookup failed');
-      firebaseMocks.getDocs.mockRejectedValue(failure);
+      firebaseMocks.getDoc.mockRejectedValue(failure);
+      firebaseMocks.getDocs.mockResolvedValue({ docs: [], empty: true });
       const { getTheaterDisplayNameByUid } = await loadClient();
 
       await expect(getTheaterDisplayNameByUid('auth-company')).rejects.toBe(

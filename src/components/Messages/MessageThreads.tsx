@@ -10,6 +10,7 @@ import {
 import { findProfileByUidOrAccountId } from '../../services/profiles/client';
 import { getProduction } from '../Profile/Company/api';
 import { MessageThreadType } from './types';
+import { getConversationPreview } from './messages';
 import { defaultPfp } from '../../config/publicImages';
 
 interface MessageThreadsProps {
@@ -133,10 +134,11 @@ const MessageThreads: React.FC<
         <div className="space-y-2 sm:space-y-4">
           {threadData && threadData.length ? (
             threadData.map((thread, i) => (
-              <div
+              <button
+                type="button"
                 key={`${thread.id}-${i}`}
                 onClick={() => onThreadSelect(thread.id)}
-                className={`flex cursor-pointer items-center rounded-lg border-b border-stone-200 p-2 pl-2 transition-colors sm:pl-3 ${
+                className={`flex w-full cursor-pointer items-center rounded-lg border-b border-stone-200 p-2 pl-2 text-left transition-colors sm:pl-3 ${
                   threadId === thread.id
                     ? 'bg-blue-100'
                     : thread.statusNew
@@ -154,10 +156,10 @@ const MessageThreads: React.FC<
                     {thread.recipientName}
                   </h5>
                   <p className="text-gray-600 m-0 line-clamp-1 p-0 text-xs sm:text-sm">
-                    {thread.last_message.content}
+                    {getConversationPreview(thread.last_message?.content)}
                   </p>
                 </div>
-              </div>
+              </button>
             ))
           ) : (
             <p className="px-2 sm:px-0">No threads available.</p>

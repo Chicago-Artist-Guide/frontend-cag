@@ -14,6 +14,7 @@ export interface MessageType {
   message_type?: 'message' | 'email_sent';
   timestamp: Date;
   status: string;
+  thread_id?: DocumentReference<DocumentData> | string;
 }
 
 export interface LastMessage {
@@ -25,7 +26,7 @@ export interface LastMessage {
 export interface MessageThreadType {
   id: string;
   created_at: Date;
-  last_message: LastMessage;
+  last_message?: LastMessage;
   talent_account_id: DocumentReference<DocumentData> | string;
   talent_status: string;
   theater_account_id: DocumentReference<DocumentData> | string;
