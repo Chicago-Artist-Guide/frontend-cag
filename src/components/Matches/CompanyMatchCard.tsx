@@ -183,7 +183,6 @@ export const CompanyMatchCard = ({
       const productionId = production?.production_id || '';
       const roleId = role.role_id || '';
       const talentAccountId = account.ref?.id;
-      const theaterAccountId = production?.account_id || '';
 
       if (!talentAccountId) {
         console.error('Cannot find current user account ref');
@@ -211,8 +210,17 @@ export const CompanyMatchCard = ({
           return false;
         }
 
+        if (!theater.account_id) {
+          console.error(
+            'Could not find theater account id to send notifications'
+          );
+          return false;
+        }
+
+        // production.account_id is the company auth uid; threads are keyed
+        // by the accounts document ID already resolved onto theater.account_id.
         const messageThreadId = await sendApplyNotifications(
-          theaterAccountId,
+          theater.account_id,
           talentAccountId,
           theater
         );

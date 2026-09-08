@@ -93,4 +93,36 @@ describe('Messaging: apply-to-artist thread bugs', () => {
       expect(src).toMatch(/theaterToArtistEmailText\(\s*theaterName/);
     });
   });
+
+  describe('Artist Apply keys the theatre by account document id', () => {
+    it('does not pass production.account_id (auth uid) into the message thread', () => {
+      const src = readSource('components/Matches/CompanyMatchCard.tsx');
+      expect(src).toMatch(/theater\.account_id/);
+      expect(src).not.toMatch(
+        /const theaterAccountId = production\?\.account_id/
+      );
+    });
+
+    it('collapses uid-keyed and doc-id-keyed threads for the same pair', () => {
+      const src = readSource('components/Messages/api.ts');
+      expect(src).toMatch(/export const collapseDuplicateThreads/);
+      expect(src).toMatch(/mergedFromThreadIds/);
+      expect(src).toMatch(/resolveAccountIdentity/);
+    });
+
+    it('loads messages from merged duplicate thread ids', () => {
+      const contextSrc = readSource('context/MessageContext.tsx');
+      const threadSrc = readSource('components/Messages/MessageThread.tsx');
+      expect(contextSrc).toMatch(/additionalThreadIds/);
+      expect(contextSrc).toMatch(/collapseDuplicateThreads/);
+      expect(threadSrc).toMatch(/thread\.mergedFromThreadIds/);
+    });
+
+    it('treats accounts/{authUid} as a theatre participant in rules', () => {
+      const src = readSource('../firestore.rules');
+      expect(src).toMatch(/function accountRefBelongsToUser/);
+      expect(src).toMatch(/exists\(accountRef\)/);
+      expect(src).toMatch(/documents\/accounts\/\$\(request\.auth\.uid\)/);
+    });
+  });
 });

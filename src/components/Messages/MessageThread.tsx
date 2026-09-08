@@ -355,7 +355,12 @@ export const MessageThread: React.FC<
         ? thread.production_id
         : thread.production_id?.id;
 
-    loadThreadMessages(senderId, recipientId, threadId);
+    loadThreadMessages(
+      senderId,
+      recipientId,
+      threadId,
+      thread.mergedFromThreadIds
+    );
     setAccountId(accountIdStr);
     loadRecipientNameForThread(recipientId);
 
