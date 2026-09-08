@@ -1,5 +1,5 @@
 import { getDoc, getDocs } from 'firebase/firestore';
-import { getTheaterNameForAccount } from './api';
+import { getTheaterNameForAccount, resolveAccountIdentity } from './api';
 
 vi.mock('firebase/firestore', () => ({
   doc: vi.fn((_db, collectionName, id) => ({ collectionName, id })),
@@ -74,5 +74,49 @@ describe('getTheaterNameForAccount', () => {
     await expect(
       getTheaterNameForAccount({} as never, 'missing')
     ).resolves.toBe('Theatre N/A');
+  });
+});
+
+describe('resolveAccountIdentity', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('returns the document id when accounts/{id} exists', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => true,
+      id: 'account-doc-id',
+      data: () => ({ uid: 'auth-uid' })
+    } as never);
+
+    await expect(
+      resolveAccountIdentity({} as never, 'account-doc-id')
+    ).resolves.toEqual({ id: 'account-doc-id', uid: 'auth-uid' });
+    expect(mockGetDocs).not.toHaveBeenCalled();
+  });
+
+  it('falls back to a uid query when the document id does not exist', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => false
+    } as never);
+    mockGetDocs.mockResolvedValue({
+      empty: false,
+      docs: [{ id: 'account-doc-id', data: () => ({ uid: 'auth-uid' }) }]
+    } as never);
+
+    await expect(
+      resolveAccountIdentity({} as never, 'auth-uid')
+    ).resolves.toEqual({ id: 'account-doc-id', uid: 'auth-uid' });
+  });
+
+  it('returns null when the account cannot be resolved', async () => {
+    mockGetDoc.mockResolvedValue({
+      exists: () => false
+    } as never);
+    mockGetDocs.mockResolvedValue(emptySnapshot as never);
+
+    await expect(
+      resolveAccountIdentity({} as never, 'missing')
+    ).resolves.toBeNull();
   });
 });

@@ -11,6 +11,47 @@ import {
 } from 'firebase/firestore';
 import { IndividualAccountInit } from '../../SignUp/Individual/types';
 
+export type ResolvedAccountIdentity = {
+  id: string;
+  uid?: string;
+};
+
+// Account document IDs are auto-generated (addDoc) and distinct from the
+// auth uid stored on the document. Callers sometimes pass either value;
+// resolve to the canonical accounts/{docId} plus uid so threads can be
+// keyed and de-duplicated consistently.
+export const resolveAccountIdentity = async (
+  firebaseStore: Firestore,
+  accountId: string
+): Promise<ResolvedAccountIdentity | null> => {
+  if (!accountId) {
+    return null;
+  }
+
+  const docRef = doc(firebaseStore, 'accounts', accountId);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    const data = docSnap.data() as { uid?: string };
+    return { id: docSnap.id, uid: data.uid };
+  }
+
+  const accountQuery = query(
+    collection(firebaseStore, 'accounts'),
+    where('uid', '==', accountId),
+    limit(1)
+  );
+  const queryAccountSnapshot = await getDocs(accountQuery);
+
+  if (!queryAccountSnapshot.empty) {
+    const found = queryAccountSnapshot.docs[0];
+    const data = found.data() as { uid?: string };
+    return { id: found.id, uid: data.uid || accountId };
+  }
+
+  return null;
+};
+
 export const getAccountWithAccountId = async (
   firebaseStore: Firestore,
   accountId: string
