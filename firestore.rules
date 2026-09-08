@@ -191,12 +191,22 @@ service cloud.firestore {
     // participation. (Previously checked `participants`/`created_by`
     // fields that the app never wrote, so every update after the initial
     // create was silently denied.)
+    // Talent Apply used to store theater_account_id as accounts/{authUid}
+    // even though no such document exists (account docs use addDoc ids).
+    // Treat that path as the theatre participant, and never call get()
+    // on a missing ref — a failed get() fails the whole OR, which hid
+    // Apply threads from the theatre inbox.
+    function accountRefBelongsToUser(accountRef) {
+      return accountRef != null && (
+        accountRef == /databases/$(database)/documents/accounts/$(request.auth.uid) ||
+        (exists(accountRef) && get(accountRef).data.uid == request.auth.uid)
+      );
+    }
+
     function isThreadParticipant(threadData) {
       return isAuthenticated() && (
-        (threadData.theater_account_id != null &&
-         get(threadData.theater_account_id).data.uid == request.auth.uid) ||
-        (threadData.talent_account_id != null &&
-         get(threadData.talent_account_id).data.uid == request.auth.uid)
+        accountRefBelongsToUser(threadData.theater_account_id) ||
+        accountRefBelongsToUser(threadData.talent_account_id)
       );
     }
 
@@ -225,10 +235,8 @@ service cloud.firestore {
 
     function isMessageParticipant(messageData) {
       return isAuthenticated() && (
-        (messageData.sender_id != null &&
-         get(messageData.sender_id).data.uid == request.auth.uid) ||
-        (messageData.recipient_id != null &&
-         get(messageData.recipient_id).data.uid == request.auth.uid) ||
+        accountRefBelongsToUser(messageData.sender_id) ||
+        accountRefBelongsToUser(messageData.recipient_id) ||
         isMessageThreadParticipant(messageData)
       );
     }

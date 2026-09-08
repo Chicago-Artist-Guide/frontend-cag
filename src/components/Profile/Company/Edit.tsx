@@ -37,7 +37,9 @@ const CompanyProfileEdit: React.FC<
 > = ({ toggleEdit, autoAddAward = false }) => {
   const {
     profile: { ref, data },
-    setProfileData
+    setProfileData,
+    account,
+    setAccountData
   } = useUserContext();
   // Initialize form values directly from data - no useEffect needed
   const [formValues, setFormValues] = useForm<Profile>(
@@ -64,6 +66,21 @@ const CompanyProfileEdit: React.FC<
       await updateDoc(ref, nextData);
       const profileData = await getDoc(ref);
       setProfileData(profileData.data());
+
+      // Keep accounts.theater_name in sync so message-thread name
+      // fallbacks (and any uid-keyed lookups) show the renamed group.
+      const nextTheatreName = formValues.theatre_name;
+      if (
+        account.ref &&
+        nextTheatreName &&
+        nextTheatreName !== account.data?.theater_name
+      ) {
+        await updateDoc(account.ref, { theater_name: nextTheatreName });
+        setAccountData({
+          ...account.data,
+          theater_name: nextTheatreName
+        });
+      }
     }
     toggleEdit();
   };
