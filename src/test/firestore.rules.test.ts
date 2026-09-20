@@ -612,6 +612,52 @@ describe('messages collection', () => {
       )
     );
   });
+
+  it('theater CAN read a legacy Apply thread keyed by auth uid instead of account doc id', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'accounts', 'theater-acct-doc'), {
+        uid: 'theater-auth-uid',
+        type: 'company'
+      });
+      await setDoc(doc(db, 'accounts', 'talent-acct-doc'), {
+        uid: 'talent-auth-uid',
+        type: 'individual'
+      });
+      await setDoc(doc(db, 'threads', 'legacy-apply'), {
+        theater_account_id: doc(db, 'accounts', 'theater-auth-uid'),
+        talent_account_id: doc(db, 'accounts', 'talent-acct-doc'),
+        theater_status: 'new',
+        talent_status: 'new'
+      });
+      await setDoc(doc(db, 'messages', 'apply-message'), {
+        sender_id: doc(db, 'accounts', 'talent-acct-doc'),
+        recipient_id: doc(db, 'accounts', 'theater-auth-uid'),
+        thread_id: doc(db, 'threads', 'legacy-apply'),
+        content: 'I applied',
+        status: 'new'
+      });
+    });
+
+    await assertSucceeds(
+      getDoc(doc(asUser('theater-auth-uid'), 'threads', 'legacy-apply'))
+    );
+    await assertSucceeds(
+      getDoc(doc(asUser('talent-auth-uid'), 'threads', 'legacy-apply'))
+    );
+    await assertFails(
+      getDoc(doc(asUser('attacker'), 'threads', 'legacy-apply'))
+    );
+
+    const theaterDb = asUser('theater-auth-uid');
+    await assertSucceeds(
+      getDocs(
+        query(
+          collection(theaterDb, 'messages'),
+          where('thread_id', '==', doc(theaterDb, 'threads', 'legacy-apply'))
+        )
+      )
+    );
+  });
 });
 
 describe('default deny', () => {

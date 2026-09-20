@@ -230,6 +230,30 @@ describe('account client service', () => {
     });
   });
 
+  describe('resolveAccountIdentity', () => {
+    it('resolves an auth uid to the canonical account doc id', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(missingSnapshot('auth-jane'));
+      firebaseMocks.getDocs.mockResolvedValue({
+        docs: [existingSnapshot('account-1', account)],
+        empty: false
+      });
+      const { resolveAccountIdentity } = await loadClient();
+
+      await expect(resolveAccountIdentity('auth-jane')).resolves.toEqual({
+        id: 'account-1',
+        uid: 'auth-jane'
+      });
+    });
+
+    it('returns null when the account cannot be resolved', async () => {
+      firebaseMocks.getDoc.mockResolvedValue(missingSnapshot('missing'));
+      firebaseMocks.getDocs.mockResolvedValue({ docs: [], empty: true });
+      const { resolveAccountIdentity } = await loadClient();
+
+      await expect(resolveAccountIdentity('missing')).resolves.toBeNull();
+    });
+  });
+
   describe('writes', () => {
     it('creates with the exact input payload and returns it without rereading', async () => {
       const sentinel = Object.freeze({ type: 'server-timestamp' });

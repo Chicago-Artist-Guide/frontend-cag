@@ -83,6 +83,17 @@ export const getAccountByIdOrUid = async <
   return account ?? findAccountByUidFromCollection<TData>(accounts, idOrUid);
 };
 
+// Callers sometimes hold the auth uid instead of the accounts/{docId};
+// resolve to the canonical doc id plus uid so threads can be keyed and
+// de-duplicated consistently.
+export const resolveAccountIdentity = async (
+  idOrUid: string
+): Promise<{ id: string; uid?: string } | null> => {
+  const account = await getAccountByIdOrUid(idOrUid);
+
+  return account ? { id: account.id, uid: account.data.uid } : null;
+};
+
 export const createAccount = async <TData extends AccountData>(
   data: TData
 ): Promise<AccountDto<TData>> => {

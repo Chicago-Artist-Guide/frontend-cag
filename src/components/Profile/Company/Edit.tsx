@@ -8,6 +8,7 @@ import { useForm } from 'react-hooks-helper';
 import styled from 'styled-components';
 import { Button, InputField } from '../../../components/shared';
 import { useUserContext } from '../../../context/UserContext';
+import { updateAccount } from '../../../services/accounts/client';
 import { updateProfile } from '../../../services/profiles/client';
 import { breakpoints, colors, fonts } from '../../../theme/styleVars';
 import { neighborhoods } from '../../../utils/lookups';
@@ -37,7 +38,9 @@ const CompanyProfileEdit: React.FC<
 > = ({ toggleEdit, autoAddAward = false }) => {
   const {
     profile: { id, data },
-    setProfileData
+    setProfileData,
+    account,
+    setAccountData
   } = useUserContext();
   // Initialize form values directly from data - no useEffect needed
   const [formValues, setFormValues] = useForm<Profile>(
@@ -67,6 +70,22 @@ const CompanyProfileEdit: React.FC<
       };
       await updateProfile(id, nextData);
       setProfileData(nextData);
+
+      // Keep accounts.theater_name in sync so message-thread name
+      // fallbacks (and any uid-keyed lookups) show the renamed group.
+      const nextTheatreName = formValues.theatre_name;
+      if (
+        account.id &&
+        account.data &&
+        nextTheatreName &&
+        nextTheatreName !== account.data.theater_name
+      ) {
+        await updateAccount(account.id, { theater_name: nextTheatreName });
+        setAccountData({
+          ...account.data,
+          theater_name: nextTheatreName
+        });
+      }
     }
     toggleEdit();
   };

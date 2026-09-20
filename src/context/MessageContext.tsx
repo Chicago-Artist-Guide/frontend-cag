@@ -20,6 +20,11 @@ import {
 } from 'firebase/firestore';
 import { useUserContext } from './UserContext';
 import { MessageThreadType, MessageType } from '../components/Messages/types';
+import {
+  collapseDuplicateThreads,
+  getAccountRefId
+} from '../components/Messages/api';
+import { resolveAccountIdentity } from '../services/accounts/client';
 
 interface MessageContextType {
   clearMessages: () => void;
@@ -32,7 +37,8 @@ interface MessageContextType {
   loadThreadMessages: (
     sender_id: string,
     recipient_id: string,
-    thread_id?: string
+    thread_id?: string,
+    additionalThreadIds?: string[]
   ) => void;
   currentThreadMessages: MessageType[];
 }
@@ -148,11 +154,45 @@ export const MessageProvider: React.FC<
         }
       }
 
+      // Collapse threads that key the same pair by uid vs. accounts doc id.
+      const resolveMap = new Map<string, string>();
+      if (userThreads.length > 1) {
+        const idsToResolve = new Set<string>();
+        userThreads.forEach((thread) => {
+          idsToResolve.add(getAccountRefId(thread.theater_account_id));
+          idsToResolve.add(getAccountRefId(thread.talent_account_id));
+        });
+
+        await Promise.all(
+          Array.from(idsToResolve).map(async (id) => {
+            if (!id) {
+              return;
+            }
+            try {
+              const identity = await resolveAccountIdentity(id);
+              resolveMap.set(id, identity?.id || id);
+              if (identity?.uid) {
+                resolveMap.set(identity.uid, identity.id);
+              }
+            } catch (resolveError) {
+              console.error(
+                'Could not resolve thread account id',
+                id,
+                resolveError
+              );
+              resolveMap.set(id, id);
+            }
+          })
+        );
+      }
+
       if (threadLoadVersion.current !== loadVersion) {
         return;
       }
 
-      setThreads(userThreads);
+      setThreads(
+        collapseDuplicateThreads(userThreads, (id) => resolveMap.get(id) || id)
+      );
       setThreadsAccountId(accountId);
     },
     [firestore, accountUid]
@@ -180,7 +220,8 @@ export const MessageProvider: React.FC<
   const loadThreadMessages = async (
     sender_id: string,
     recipient_id: string,
-    thread_id?: string
+    thread_id?: string,
+    additionalThreadIds?: string[]
   ) => {
     if (!sender_id) {
       return;
@@ -250,26 +291,43 @@ export const MessageProvider: React.FC<
     };
 
     let messagesDocs: MessageType[] = [];
+    const threadIdsToLoad = Array.from(
+      new Set([thread_id, ...(additionalThreadIds || [])].filter(Boolean))
+    ) as string[];
 
     // Prefer a thread_id query (allowed once rules treat thread
     // participants as message readers). Also try sender/recipient
     // constraints so we still match if thread_id is stored as a ref
     // or a string, or if the thread-scoped query is denied.
-    if (thread_id) {
-      const threadRef = doc(firestore, 'threads', thread_id);
-      const byThreadRefSnapshot = await tryQuery(
-        query(messagesRef, where('thread_id', '==', threadRef)),
-        'Could not fetch messages by thread ref'
-      );
-      const byThreadIdSnapshot = await tryQuery(
-        query(messagesRef, where('thread_id', '==', thread_id)),
-        'Could not fetch messages by thread id string'
+    if (threadIdsToLoad.length) {
+      const threadDocLists: MessageDoc[][] = [];
+
+      for (const extraThreadId of threadIdsToLoad) {
+        const threadRef = doc(firestore, 'threads', extraThreadId);
+        threadDocLists.push(
+          await tryQuery(
+            query(messagesRef, where('thread_id', '==', threadRef)),
+            'Could not fetch messages by thread ref'
+          )
+        );
+        threadDocLists.push(
+          await tryQuery(
+            query(messagesRef, where('thread_id', '==', extraThreadId)),
+            'Could not fetch messages by thread id string'
+          )
+        );
+      }
+
+      const primaryThreadRef = doc(
+        firestore,
+        'threads',
+        thread_id || threadIdsToLoad[0]
       );
       const sentInThreadSnapshot = await tryQuery(
         query(
           messagesRef,
           where('sender_id', '==', currentUserRef),
-          where('thread_id', '==', threadRef),
+          where('thread_id', '==', primaryThreadRef),
           orderBy('timestamp', 'asc')
         ),
         'Could not fetch sent messages in thread'
@@ -278,15 +336,14 @@ export const MessageProvider: React.FC<
         query(
           messagesRef,
           where('recipient_id', '==', currentUserRef),
-          where('thread_id', '==', threadRef),
+          where('thread_id', '==', primaryThreadRef),
           orderBy('timestamp', 'asc')
         ),
         'Could not fetch received messages in thread'
       );
 
       messagesDocs = mergeUnique(
-        byThreadRefSnapshot,
-        byThreadIdSnapshot,
+        ...threadDocLists,
         sentInThreadSnapshot,
         receivedInThreadSnapshot
       );
@@ -301,7 +358,13 @@ export const MessageProvider: React.FC<
         query(messagesRef, where('recipient_id', '==', currentUserRef)),
         'Could not fetch received messages'
       );
-      const counterpartIds = new Set([sender_id, recipient_id].filter(Boolean));
+      const counterpartIds = new Set(
+        [
+          sender_id,
+          recipient_id,
+          account?.data?.uid as string | undefined
+        ].filter(Boolean)
+      );
 
       messagesDocs = mergeUnique(sentSnapshot, receivedSnapshot).filter(
         (message) => {
@@ -331,7 +394,10 @@ export const MessageProvider: React.FC<
               ? message.thread_id
               : message.thread_id.id;
 
-          return messageThreadId === thread_id;
+          return (
+            messageThreadId === thread_id ||
+            Boolean(additionalThreadIds?.includes(messageThreadId))
+          );
         }
       );
     }

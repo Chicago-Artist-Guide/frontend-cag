@@ -28,6 +28,7 @@ import {
   theaterToArtistEmailText,
   theaterToArtistMessage
 } from '../components/Messages/messages';
+import { MessageThreadType } from '../components/Messages/types';
 
 describe('stripEmailCtas', () => {
   it('removes login-to-messages CTA from email text', () => {
@@ -86,5 +87,53 @@ describe('appendEmailSentMessage', () => {
         })
       })
     );
+  });
+});
+
+describe('collapseDuplicateThreads', () => {
+  it('keeps a single thread unchanged', () => {
+    const threads = [
+      {
+        id: 'thread-1',
+        theater_account_id: 'theater-doc',
+        talent_account_id: 'talent-doc',
+        updated_at: { seconds: 1 }
+      }
+    ] as unknown as MessageThreadType[];
+
+    expect(messagesApi.collapseDuplicateThreads(threads, (id) => id)).toEqual(
+      threads
+    );
+  });
+
+  it('merges uid-keyed and doc-id-keyed threads for the same pair', () => {
+    const threads = [
+      {
+        id: 'apply-thread',
+        theater_account_id: 'theater-uid',
+        talent_account_id: 'talent-doc',
+        last_message: { content: 'I applied' },
+        updated_at: { seconds: 1 },
+        production_id: 'prod-1',
+        role_id: 'role-1'
+      },
+      {
+        id: 'accept-thread',
+        theater_account_id: 'theater-doc',
+        talent_account_id: 'talent-doc',
+        last_message: { content: 'We are interested' },
+        updated_at: { seconds: 2 }
+      }
+    ] as unknown as MessageThreadType[];
+
+    const collapsed = messagesApi.collapseDuplicateThreads(threads, (id) =>
+      id === 'theater-uid' ? 'theater-doc' : id
+    );
+
+    expect(collapsed).toHaveLength(1);
+    expect(collapsed[0].id).toBe('accept-thread');
+    expect(collapsed[0].last_message?.content).toBe('We are interested');
+    expect(collapsed[0].mergedFromThreadIds).toEqual(['apply-thread']);
+    expect(collapsed[0].production_id).toBe('prod-1');
   });
 });
