@@ -22,9 +22,10 @@ describe('robots', () => {
 
   it('does not drop any rule that public/robots.txt used to declare', () => {
     const { rules } = robots();
-    const disallow = Array.isArray(rules.disallow)
-      ? rules.disallow
-      : [rules.disallow].filter(Boolean);
+    const rule = Array.isArray(rules) ? rules[0] : rules;
+    const disallow = Array.isArray(rule.disallow)
+      ? rule.disallow
+      : [rule.disallow].filter(Boolean);
 
     // These four are the exact rules that used to live in public/robots.txt,
     // which this route replaces (and which was deleted alongside it).

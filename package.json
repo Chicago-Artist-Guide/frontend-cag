@@ -61,7 +61,7 @@
     "firebase": "^10.9.0",
     "formik": "^2.4.6",
     "multiselect-react-dropdown": "^2.0.25",
-    "next": "16.2.10",
+    "next": "16.3.5",
     "query-string": "^8.1.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.5",
