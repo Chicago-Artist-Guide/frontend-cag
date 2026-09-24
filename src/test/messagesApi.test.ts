@@ -31,7 +31,17 @@ import {
 import { MessageThreadType } from '../components/Messages/types';
 
 describe('stripEmailCtas', () => {
-  it('removes login-to-messages CTA from email text', () => {
+  // The CTA is no longer added to outgoing email, but threads stored before it
+  // was removed still contain it.
+  it('removes login-to-messages CTA from legacy email text', () => {
+    const emailText =
+      'We are Demo Theatre and we are interested in you for the role of Lead. You may also login to CAG and go to your Messages to respond.';
+
+    expect(stripEmailCtas(emailText)).not.toContain('login to CAG');
+    expect(stripEmailCtas(emailText)).toContain('Demo Theatre');
+  });
+
+  it('leaves current email text unchanged', () => {
     const emailText = theaterToArtistEmailText(
       'Demo Theatre',
       'Lead',
@@ -39,9 +49,7 @@ describe('stripEmailCtas', () => {
       'contact@example.com'
     );
 
-    expect(emailText).toContain('login to CAG');
-    expect(stripEmailCtas(emailText)).not.toContain('login to CAG');
-    expect(stripEmailCtas(emailText)).toContain('Demo Theatre');
+    expect(stripEmailCtas(emailText)).toBe(emailText);
   });
 
   it('leaves short in-app messages unchanged when they have no CTA', () => {

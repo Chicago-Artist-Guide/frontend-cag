@@ -32,14 +32,14 @@ export const artistToTheaterEmailText = (
   productionName: string,
   email: string
 ) =>
-  `My name is ${fullName} and I'm interested in the role of ${roleName} in ${productionName}. Please provide additional information if interested by emailing me at ${email}. You may also login to CAG and go to your Messages to respond.`;
+  `My name is ${fullName} and I'm interested in the role of ${roleName} in ${productionName}. Please provide additional information if interested by emailing me at ${email}.`;
 export const artistToTheaterEmailHtml = (
   fullName: string,
   roleName: string,
   productionName: string,
   email: string
 ) =>
-  `<p>My name is <strong>${fullName}</strong> and I'm interested in the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide additional information if interested by emailing me at ${email}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+  `<p>My name is <strong>${fullName}</strong> and I'm interested in the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide additional information if interested by emailing me at ${email}.</p>`;
 
 // theater to artist
 export const theaterToArtistMessage = (
@@ -58,14 +58,14 @@ export const theaterToArtistEmailText = (
   productionName: string,
   email: string
 ) =>
-  `We are ${theaterName} and we're interested in you for the role of ${roleName} in ${productionName}. Please provide your availability to audition/interview if interested by emailing me at ${email}. You may also login to CAG and go to your Messages to respond.`;
+  `We are ${theaterName} and we're interested in you for the role of ${roleName} in ${productionName}. Please provide your availability to audition/interview if interested by emailing me at ${email}.`;
 export const theaterToArtistEmailHtml = (
   theaterName: string,
   roleName: string,
   productionName: string,
   email: string
 ) =>
-  `<p>We are <strong>${theaterName}</strong> and we're interested in you for the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide your availability to audition/interview if interested by emailing me at ${email}.</p><p>You may also login to CAG and go to your Messages to respond.</p>`;
+  `<p>We are <strong>${theaterName}</strong> and we're interested in you for the role of <strong>${roleName}</strong> in <strong>${productionName}</strong>.</p><p>Please provide your availability to audition/interview if interested by emailing me at ${email}.</p>`;
 
 // theater decline artist
 export const theaterDeclineArtistMessage = (
@@ -89,6 +89,7 @@ export const theaterDeclineArtistEmailHtml = (
   `<p>Thank you for your interest in <strong>${roleName}</strong> with <strong>${theaterName}</strong>. We have decided to move forward with other candidates at this time, but we encourage you to apply for other roles in the future.</p>`;
 
 const EMAIL_CTA_PATTERNS = [
+  // No longer emitted, but older stored threads still contain this sentence.
   /\s*You may also login to CAG and go to your Messages to respond\.?/gi,
   /\s*We encourage you to apply to other roles on Chicago Artist Guide\.?/gi
 ];
