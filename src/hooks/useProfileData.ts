@@ -1,12 +1,5 @@
 import { User } from 'firebase/auth';
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AccountContextData,
   ProfileContextData,
@@ -24,20 +17,25 @@ const emptyProfile = (): UserDocument<ProfileContextData> => ({
   data: null
 });
 
+// A setter may be called from a closure captured under a different user
+// (sign-up creates the Firebase user, then publishes the documents it just
+// created for that uid; logout leaves stale handlers behind). Ownership is
+// decided by the document's uid, never by when the setter was captured.
+const belongsToCurrentUser = (
+  data: { uid?: unknown } | null | undefined,
+  currentUserUid: string | undefined
+) => typeof data?.uid !== 'string' || data.uid === currentUserUid;
+
 const useProfileData = (currentUser: User | null) => {
   const currentUserUid = currentUser?.uid;
-  const setterGeneration = useMemo(() => Symbol(), [currentUserUid]);
-  const activeSetterGeneration = useRef(setterGeneration);
+  const currentUserUidRef = useRef(currentUserUid);
+  currentUserUidRef.current = currentUserUid;
   const accountRevision = useRef(0);
   const profileRevision = useRef(0);
   const [account, setAccountState] =
     useState<UserDocument<AccountContextData>>(emptyAccount);
   const [profile, setProfileState] =
     useState<UserDocument<ProfileContextData>>(emptyProfile);
-
-  useLayoutEffect(() => {
-    activeSetterGeneration.current = setterGeneration;
-  }, [setterGeneration]);
 
   useEffect(() => {
     let cancelled = false;
@@ -84,36 +82,32 @@ const useProfileData = (currentUser: User | null) => {
 
   const setAccount = useCallback(
     (nextAccount: UserDocument<AccountContextData>) => {
-      if (activeSetterGeneration.current !== setterGeneration) return;
+      if (!belongsToCurrentUser(nextAccount.data, currentUserUidRef.current))
+        return;
       accountRevision.current += 1;
       setAccountState(nextAccount);
     },
-    [setterGeneration]
+    []
   );
-  const setAccountData = useCallback(
-    (data: AccountContextData | null) => {
-      if (activeSetterGeneration.current !== setterGeneration) return;
-      accountRevision.current += 1;
-      setAccountState((previous) => ({ ...previous, data }));
-    },
-    [setterGeneration]
-  );
+  const setAccountData = useCallback((data: AccountContextData | null) => {
+    if (!belongsToCurrentUser(data, currentUserUidRef.current)) return;
+    accountRevision.current += 1;
+    setAccountState((previous) => ({ ...previous, data }));
+  }, []);
   const setProfile = useCallback(
     (nextProfile: UserDocument<ProfileContextData>) => {
-      if (activeSetterGeneration.current !== setterGeneration) return;
+      if (!belongsToCurrentUser(nextProfile.data, currentUserUidRef.current))
+        return;
       profileRevision.current += 1;
       setProfileState(nextProfile);
     },
-    [setterGeneration]
+    []
   );
-  const setProfileData = useCallback(
-    (data: ProfileContextData | null) => {
-      if (activeSetterGeneration.current !== setterGeneration) return;
-      profileRevision.current += 1;
-      setProfileState((previous) => ({ ...previous, data }));
-    },
-    [setterGeneration]
-  );
+  const setProfileData = useCallback((data: ProfileContextData | null) => {
+    if (!belongsToCurrentUser(data, currentUserUidRef.current)) return;
+    profileRevision.current += 1;
+    setProfileState((previous) => ({ ...previous, data }));
+  }, []);
 
   return {
     account,

@@ -255,6 +255,44 @@ describe('useProfileData', () => {
     expect(result.current.profile.id).toBe('new-profile');
   });
 
+  it('accepts setters captured before sign-up once the documents belong to the new user', async () => {
+    // Sign-up flow: the component captured the setters while logged out,
+    // Firebase Auth then produced a uid, and the same closure publishes the
+    // account and profile it just created for that uid. The hook's own read
+    // for the new uid ran before the documents existed, so it resolves null
+    // late and must not clobber them.
+    const account = deferred<Awaited<ReturnType<typeof findAccountByUid>>>();
+    const profile = deferred<Awaited<ReturnType<typeof findProfileByUid>>>();
+    mockFindAccountByUid.mockReturnValue(account.promise);
+    mockFindProfileByUid.mockReturnValue(profile.promise);
+    const { result, rerender } = renderHook(
+      ({ currentUser }) => useProfileData(currentUser),
+      { initialProps: { currentUser: null as User | null } }
+    );
+    const setAccountFromSignUp = result.current.setAccount;
+    const setProfileFromSignUp = result.current.setProfile;
+
+    rerender({ currentUser: user('new-user') });
+    act(() => {
+      setAccountFromSignUp({
+        id: 'new-account',
+        data: { uid: 'new-user', type: 'individual' }
+      });
+      setProfileFromSignUp({
+        id: 'new-profile',
+        data: { uid: 'new-user', account_id: 'new-account' }
+      });
+    });
+
+    await act(async () => {
+      account.resolve(null);
+      profile.resolve(null);
+    });
+
+    expect(result.current.account.id).toBe('new-account');
+    expect(result.current.profile.id).toBe('new-profile');
+  });
+
   it('does not publish a slow result after unmount', async () => {
     const accountResult =
       deferred<Awaited<ReturnType<typeof findAccountByUid>>>();
