@@ -372,6 +372,17 @@ export const MessageThread: React.FC<
     !!match &&
     !!accountTypeForMatch &&
     match.initiated_by === accountTypeForMatch;
+  // TEMPORARY: the entire match footer (status line plus Accept/Decline) is
+  // hidden for both account types. A thread can cover several roles for the
+  // same theatre/artist pair while the footer describes a single match, so it
+  // reads as though the status and the buttons apply to every role at once.
+  // The footer also only surfaces on whichever thread still has a pending
+  // match, so it appears and disappears as you move between threads in the
+  // sidebar. Set this back to `true` to restore the footer below once product
+  // defines per-role match actions and the surrounding thread UX; the
+  // plumbing behind it (updateMatch, match invitation emails) is intentionally
+  // left intact.
+  const MATCH_FOOTER_ENABLED = false;
 
   useEffect(() => {
     if (!currentThreadMessages || !currentThreadMessages.length) {
@@ -463,7 +474,7 @@ export const MessageThread: React.FC<
               );
             })}
           </div>
-          {match && (
+          {MATCH_FOOTER_ENABLED && match && (
             <div className="mt-4 flex flex-col gap-2 border-t border-stone-200 pt-4 sm:flex-row sm:justify-end sm:space-x-4">
               {match.confirmed_by || match.rejected_by ? (
                 <p className="text-sm sm:text-base">

@@ -63,17 +63,19 @@ describe('declineNotifications', () => {
     it('is shorter than the email body sent to talent', () => {
       const email = 'contact@example.com';
 
-      expect(
-        theaterToArtistEmailText(theaterName, roleName, productionName, email)
-      ).toContain('login to CAG and go to your Messages to respond');
+      const emailText = theaterToArtistEmailText(
+        theaterName,
+        roleName,
+        productionName,
+        email
+      );
+
+      expect(emailText).toContain(theaterName);
+      expect(emailText).not.toContain('login to CAG');
       expect(
         theaterToArtistMessage(roleName, productionName, email)
-      ).not.toContain('login to CAG');
-      expect(
-        stripEmailCtas(
-          theaterToArtistEmailText(theaterName, roleName, productionName, email)
-        )
-      ).not.toContain('login to CAG');
+      ).not.toContain(theaterName);
+      expect(stripEmailCtas(emailText)).toBe(emailText);
     });
   });
 });
