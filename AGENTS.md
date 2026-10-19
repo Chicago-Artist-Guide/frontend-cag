@@ -139,17 +139,23 @@ Brand colors and the custom fonts (Open Sans, Lora, Montserrat) are defined in `
 ## Pull Request Guidelines
 
 ### Branch Naming
-- Create branches from `master`: `git checkout -b dev-XXX` (where XXX is the JIRA ticket number)
+
+- For normal Next.js work, fetch upstream and create branches from `main`: `git switch -c dev-XXX upstream/main` (where XXX is the JIRA ticket number)
 - Example: `dev-125` for ticket DEV-125
 
 ### PR Requirements
+
 - Title format: `[DEV-XXX] Descriptive Title`
-- Legacy Amplify PRs target `staging`, not `master`. Next.js delivery PRs target `main` for production or `canary` for staging; preserve the legacy branches during cutover.
+- Normal Next.js feature/fix PRs target `canary`; after staging deployment and observed UAT, promote the tested snapshot through a `canary` → `main` PR. Do not send application feature PRs directly to `main`.
+- Main-only IAM/bootstrap infrastructure changes may target `main` when the branch-scoped pipeline requires it; synchronize those prerequisites to `canary` through a reviewed PR.
+- While legacy www remains live, a legacy-only fix may branch from `master` and PR to `staging`. Preserve both legacy branches and carry any applicable fix into the Next.js flow separately.
+- Follow [DevOps cutover](infra/DEVOPS_CUTOVER.md) for developer commands, release evidence, existing PRs, and process activation. Changing the default branch is separate from public DNS cutover.
 - Include description of changes and screenshots for UI changes
 - Must pass linting; requires 1-2 tech lead approvals
 - Use "Squash and Merge"; ensure commit title matches PR title
 
 ### Code Standards
+
 - Do not add temporary dev-only routes, throwaway pages, or one-off "validation" URLs
 - 2 space indentation
 - Single quotes for strings (enforced by ESLint)
@@ -158,8 +164,9 @@ Brand colors and the custom fonts (Open Sans, Lora, Montserrat) are defined in `
 - No `package-lock.json` changes unless you modified `package.json`
 
 ### Important Notes
+
 - **Production deployment**: `master` retains the legacy Amplify deployment. `main` deploys the Next.js production ECS/Fargate stack through CI; `canary` is Next.js staging. See `infra/PRODUCTION_CUTOVER.md` for provisioning and pre-DNS acceptance.
-- Do not commit directly to `master` - always use the PR workflow, targeting `staging`
+- Do not commit directly to `main`, `canary`, `master`, or `staging`; use the corresponding PR and promotion flow above. Observe deployment/UAT results and fix forward; do not reset or force-push shared branches.
 - Husky pre-commit hook runs lint-staged (prettier then eslint on staged `.ts/.tsx/.jsx` files)
 
 ## Environment Variables

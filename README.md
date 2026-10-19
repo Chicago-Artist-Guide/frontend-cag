@@ -104,88 +104,51 @@ container and image. On Apple Silicon, the production check uses Docker's amd64
 emulation because ECS is explicitly x86_64. The development Compose target
 remains native to the host architecture.
 
-The image runs as UID/GID `1001:1001`. Pull requests targeting `staging` or
-`master` run app verification, credential-free CDK verification, standalone
-smoke, and a full `linux/amd64` image run. Pull requests never request AWS
-credentials and never deploy.
+The image runs as UID/GID `1001:1001`. Pull requests targeting `canary` or
+`main` run five credential-free checks: application,
+CDK infrastructure, visual-regression harness, E2E specs, and the production
+container. Legacy master/staging heads do not contain that GitHub workflow;
+their Amplify builds remain separate. Next.js PR checks never request AWS
+credentials or deploy.
 
-### CDK targets
+### Next.js delivery
 
-The CDK app models one independently named target at a time:
+Normal development follows **main → DEV branch → PR to canary → staging UAT →
+canary-to-main promotion PR**. GitHub’s default remains master until the
+coordinated process activation. Keep the existing DEV ticket titles, descriptions,
+UI screenshots, 1-2 tech lead reviews, passing checks, and Squash and Merge.
+See the [DevOps cutover runbook](infra/DEVOPS_CUTOVER.md) for developer commands,
+release steps, current GitHub controls, and the process-activation checklist.
+The [pre-switch status and call punchlist](infra/PRE_SWITCH_STATUS.md) contains
+the exact DNS delegation records and remaining acceptance actions.
 
-- `CagPlatform-preview-<id>` for an ephemeral lowercase preview ID;
-- `CagPlatform-staging` for the `staging` branch; and
-- `CagPlatform-production` for the `master` branch.
+- `canary` deploys `CagPlatform-canary` on ECS/Fargate using development Firebase.
+- `main` deploys `CagPlatform-production` using production Firebase
+  (`chicago-artist-guide`). Production remains separate from the public www site.
+- The six AWS GitHub Environments allow only their corresponding `canary` or
+  `main` branch and use OIDC; local AWS credentials are unnecessary.
+- Legacy `master`/`staging` still auto-build in Amplify. Public www remains there;
+  the existing apex redirect stays unchanged. Legacy fixes use the exception in the runbook.
 
-With no explicit target, synthesis covers staging and production. Useful
-credential-free commands from the repository root are:
+Approved Next.js hostnames are `prod.chicagoartistguide.org` and
+`staging.chicagoartistguide.org`. Managed DNS/HTTPS code is merged; HTTPS stays
+disabled until the Google parent DNS delegates the child zones. Use the actual
+validated application/ALB URL from the deployment summary during that sequence.
+Changing the development process or repository default branch does not authorize
+a www DNS switch. Follow [Production cutover](infra/PRODUCTION_CUTOVER.md) for
+infrastructure and hostname activation.
+
+Credential-free infrastructure checks from the repository root:
 
 ```bash
 npm --prefix infra run verify
-npm --prefix infra run list
-npm --prefix infra run list -- -c stage=preview -c previewId=dev-511
-npm --prefix infra run synth -- -c stage=staging
+npm --prefix infra run list -- -c stage=canary
+npm --prefix infra run synth -- -c stage=canary
 ```
 
-Each target has a two-AZ VPC, public app subnets, isolated future-data subnets,
-one Fargate task, and an HTTP ALB. There is no NAT gateway, RDS resource,
-database secret, proxy, or DNS record. A future-data security group accepts
-PostgreSQL port 5432 only from the app service; this is the cost-free RDS seam,
-not a database deployment.
-
-The ALB URL is an HTTP validation endpoint. Before production DNS moves, add an
-ACM certificate and HTTPS listener, redirect HTTP to HTTPS, confirm the custom
-domain and Firebase authorized-domain settings, and test rollback. This PR does
-not touch Amplify or DNS.
-
-### Manual GitHub-to-AWS delivery
-
-Three SHA-pinned, GitHub-hosted workflows provide manual durable deploy,
-preview deploy, and exact-confirmation preview destroy operations. They use
-GitHub OIDC; no static AWS keys or developer AWS profiles belong in this
-repository.
-
-Every manual workflow first installs and verifies dependencies in a job that
-cannot request an OIDC token. Jobs that can request OIDC install only the CDK
-package with npm lifecycle scripts disabled; the role ARN is passed directly
-to the pinned AWS credential action instead of being exposed job-wide. Plan
-and deploy environments may intentionally use different roles, but a SHA-256
-fingerprint requires the deploy account, region, and all six public image-build
-values to exactly match the approved plan before deploy authentication.
-
-The workflows cannot be dispatched until their definitions exist on the
-default branch. This draft PR is intentionally staying open and unmerged, so
-the definitions can be reviewed and tested but the AWS button is dormant.
-
-An administrator must complete these external steps before the first deploy:
-
-1. Confirm the AWS account, region, credits, quotas, and billing-alert owner.
-2. Bootstrap that account/region for CDK v2 using an authorized admin session.
-3. Create GitHub OIDC plan/deploy roles. Trust
-   `token.actions.githubusercontent.com`, require audience
-   `sts.amazonaws.com`, and restrict subjects to this repository and the exact
-   GitHub Environment. Give the roles only the CDK bootstrap/deployment access
-   required for these stacks; use a permissions boundary where available.
-4. Create `staging-plan`, `staging`, `production-plan`, `production`,
-   `preview-plan`, `preview`, and `preview-destroy` GitHub Environments. Add
-   required reviewers and branch/tag deployment rules. Production environments
-   must allow only `master`; staging environments must allow only `staging`.
-   Preview reviewers must verify the selected ref and CDK diff before approval,
-   because that approval authorizes the checked-out revision to use the preview
-   role.
-5. Set `AWS_ACCOUNT_ID`, `AWS_REGION`, and `AWS_ROLE_ARN` in every applicable
-   Environment. Plan/deploy environments also need the six `NEXT_PUBLIC_*`
-   values above. Paired plan/deploy environments must use the same account,
-   region, and public build configuration; their role ARN may differ.
-6. Confirm the repository Actions policy permits the three pinned external
-   actions and that branch protection requires the pull-request checks.
-
-As of July 16, 2026, the repository has zero GitHub Environments and no
-repository-level Actions variables or secrets. The current maintainer token has
-write access but cannot inspect the repository Actions policy or branch
-protection, so an administrator owns those checks. No AWS or billing credential
-was placed on this machine to probe the account. Billing access and ownership
-remain unconfirmed and are a go/no-go gate before the first deployment.
+The [infrastructure guide](infra/README.md) describes the stack boundaries and
+additional synthesis targets. CI builds and deploys the images through OIDC;
+plan/deploy configuration fingerprints must match before deployment.
 
 ### Representative AWS cost
 
@@ -213,25 +176,27 @@ only with an updated monitoring requirement and budget.
 
 We have standard guidelines for contributing code to the project.
 
-1. Fork the repo to your own GitHub. You should now have a repo in your account called `<your-username>/frontend-cag`.
-2. Clone that repo locally to your machine: `git clone git@github.com:<your-username>/frontend-cag.git` and then `cd frontend-cag`
-3. Add the org's repo as `upstream`: `git remote add upstream git@github.com:Chicago-Artist-Guide/frontend-cag.git`
-4. Create a branch off of `master` named after your JIRA ticket. For example, let's say you have JIRA ticket #125, you'd do: `git pull upstream master` on master, and then `git checkout -b dev125`
-5. Contribute changes as commits to your local branch `dev125`. For new files, `git add .`, and then to add commit messages: `git commit -am "<your commit message here>"`. Your commit messages don't matter too much here because we're going to Squash and Merge later, anyway.
-6. When you're ready to PR your changes, push: `git push origin dev125`
-6. Go to the Chicago-Artist-Guide/frontend-cag repo in GitHub and a message should pop up recognizing your new branch. Click on `Compare & Pull Request`
-7. Pull Requests must have:
-	- A title formatted like so: `[DEV-XXX] Some Descriptive Title`
-	- A description of the changes
-	- Screenshots of the changes, if applicable
-8. Your PR must be reviewed by one or both of the tech leads, depending on magnitude and/or who is available
-9. Once you have your approval(s), all comments have been addressed, and tests are passing, you may click on, `Squash and Merge`. Please make sure the commit title is the same as the PR title
+1. Fork the repo to your own GitHub and clone `<your-username>/frontend-cag`.
+2. Add the organization's repository as `upstream`: `git remote add upstream git@github.com:Chicago-Artist-Guide/frontend-cag.git`.
+3. Fetch upstream and create your DEV branch from `main`: `git fetch upstream`, then `git switch -c dev-125 upstream/main` for DEV-125.
+4. Commit your changes on the DEV branch, run the local checks, and push with `git push -u origin dev-125`.
+5. Open the PR against **canary**. Use `[DEV-XXX] Descriptive Title`, describe the changes, and include screenshots for UI changes.
+6. Obtain 1-2 tech lead approvals according to the change's scope and the existing review convention. Address comments and require all five CI checks to pass.
+7. Use **Squash and Merge**, with the squash commit title matching the PR title. Then verify the canary deployment and exercise the changed flow in staging.
+8. Promote the tested canary snapshot through a **canary → main** PR with the same reviews, CI, and squash convention. Do not target application feature PRs directly at main.
+
+Use the [cutover runbook](infra/DEVOPS_CUTOVER.md) for release evidence, existing
+PR handling, the main-only IAM/bootstrap exception, and temporary legacy fixes.
 
 PR tips:
+
 1. The smaller, the better. Smaller PRs help tech leads and team members do a better job of reviewing your code and is more respectful of everyone's time
 2. Do not commit a package-lock.json file unless you've explicitly made changes to package.json
 3. Do not commit and PR _any_ potentially sensitive or insecure information, keys, etc. Please confirm with the tech leads if you have a question about something being sensitive prior to it being in a commit
 4. Please follow linting rules. Make sure indentation is 2 spaces, general code style is consistent/cohesive, attributes and properties are ordered alphabetically, and so forth
 5. Please remind tech leads and team members in Slack if you need reviews and haven't received any
 
-**Warning:** commits to master trigger a push and build on production in AWS. Do not merge if you have any concerns about the branch breaking something. In some cases, we may work off of specific feature branches as an extra layer of protection, so please pay attention in those situations to use the feature branches instead of master.
+**Deployment branches:** merging into canary or main starts the corresponding
+Next.js deployment. Legacy master/staging still auto-build Amplify, and master
+continues to serve public www. Use the PR process for all four branches; verify
+the deployed flow and fix failures forward. A main deployment does not move www.
