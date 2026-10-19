@@ -10,9 +10,9 @@ Local = dev; `canary` = Next.js staging; `main` = Next.js production. Legacy `ma
 6. `production` and `production-plan` must both override these repository variables with live **production** values (never inherit dev):
    `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_APP_ID`, `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID=chicago-artist-guide`, `NEXT_PUBLIC_FIREBASE_SENDER_ID`, `NEXT_PUBLIC_LGL_API_KEY`.
 7. Both environments use identical config, `NEXT_PUBLIC_SITE_URL=https://www.chicagoartistguide.org`, AWS account `095377239347`, region `us-east-1`, and their dedicated Production Plan/Deploy role.
-8. Add the certificate validation CNAME printed by bootstrap at Google Cloud DNS; keep it for renewal. Re-run bootstrap to confirm ISSUED, then set identical `CERTIFICATE_ARN` variables in both production environments.
+8. Initial pre-switch production deploys over its HTTP ALB URL with `CERTIFICATE_ARN` unset. HTTPS activation is a later PR: publish the validation CNAME, confirm ISSUED, then configure both production environments identically.
 9. Dispatch canary deployment on `canary` and production deployment on `main`. Canary must still pass end to end.
-10. Before DNS, require CI ALB HTTPS and hydrated-browser smokes with valid TLS/SNI; verify `/`, `/shows`, `/login` and the served bundle's `chicago-artist-guide` Firebase project. Authenticated acceptance requires an existing production test account.
+10. Verify the HTTP ALB health/assets and hydrated home/login navigation, plus the served bundle's `chicago-artist-guide` Firebase project. Before any later traffic switch, require valid TLS/SNI and authenticated acceptance with an existing production test account.
 11. Production's five composite indexes and www Auth authorization were observed in Firebase on 2026-10-19. Keep rules/indexes unchanged during infrastructure cutover; verify authenticated flows before traffic moves.
 12. STOP after pre-DNS acceptance. Leave the www traffic CNAME on Amplify CloudFront and the public `/home` unchanged. A later traffic switch requires Chris’s separate explicit authorization; certificate-validation DNS is independent.
 
