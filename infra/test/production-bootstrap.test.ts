@@ -1,4 +1,6 @@
 import { readFileSync, writeFileSync } from 'node:fs';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { stripVTControlCharacters } from 'node:util';
 import { join } from 'node:path';
 import { Stack } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
@@ -26,6 +28,84 @@ describe('production bootstrap boundary', () => {
     expect(template).not.toContain('AdministratorAccess');
     expect(template).not.toMatch(/Action:\s*['"]?\*['"]?/);
   });
+
+  it.each(['false', 'true'])(
+    'passes both policies to the pinned CLI with CI=%s',
+    (ci) => {
+      const command = script.match(
+        /npm exec cdk -- bootstrap[\s\S]*?(?=\n\n)/
+      )?.[0];
+      expect(command).toBeDefined();
+      // Intercept npm to capture Bash's real argument expansion without AWS calls.
+      const captured = execFileSync(
+        'bash',
+        [
+          '-c',
+          `
+      npm() { node -e 'process.stdout.write(JSON.stringify(process.argv.slice(1)))' "$@"; }
+      ${command}
+    `
+        ],
+        {
+          encoding: 'utf8',
+          env: {
+            ...process.env,
+            AWS_ACCOUNT_ID: '123456789012',
+            AWS_REGION: 'us-east-1',
+            BOOTSTRAP_TEMPLATE: join(
+              process.cwd(),
+              'node_modules/aws-cdk/lib/api/bootstrap/bootstrap-template.yaml'
+            ),
+            EXECUTION_POLICY_ARN:
+              'arn:aws:iam::123456789012:policy/CagProductionCloudFormationExecution',
+            DNS_EXECUTION_POLICY_ARN:
+              'arn:aws:iam::123456789012:policy/CagProductionManagedDnsExecution'
+          }
+        }
+      );
+      const argumentsList = JSON.parse(captured) as string[];
+      // --show-template exits before bootstrap AWS calls; verbose exposes the
+      // actual pinned CLI parse, including its nargs=1 behavior for repeatable flags.
+      const result = spawnSync(
+        process.execPath,
+        [
+          join(process.cwd(), 'node_modules/aws-cdk/bin/cdk'),
+          ...argumentsList.slice(3),
+          '--show-template',
+          '--verbose',
+          '--no-notices'
+        ],
+        {
+          encoding: 'utf8',
+          env: {
+            ...process.env,
+            AWS_EC2_METADATA_DISABLED: 'true',
+            CI: ci,
+            FORCE_COLOR: ci === 'true' ? '1' : '0'
+          }
+        }
+      );
+      expect(result.status, result.stderr).toBe(0);
+      const diagnostics = stripVTControlCharacters(
+        `${result.stdout}\n${result.stderr}`
+      );
+      const parsed = {
+        ENVIRONMENTS: diagnostics
+          .match(/ENVIRONMENTS: \[([\s\S]*?)\]/)?.[1]
+          .match(/'[^']*'/g)
+          ?.map((value) => value.slice(1, -1)),
+        cloudformationExecutionPolicies: diagnostics
+          .match(/cloudformationExecutionPolicies: \[([\s\S]*?)\]/)?.[1]
+          .match(/'[^']*'/g)
+          ?.map((value) => value.slice(1, -1))
+      };
+      expect(parsed.ENVIRONMENTS).toEqual(['aws://123456789012/us-east-1']);
+      expect(parsed.cloudformationExecutionPolicies).toEqual([
+        'arn:aws:iam::123456789012:policy/CagProductionCloudFormationExecution',
+        'arn:aws:iam::123456789012:policy/CagProductionManagedDnsExecution'
+      ]);
+    }
+  );
 
   it('bootstraps production separately without updating the canary toolkit', () => {
     expect(script).toContain('--toolkit-stack-name CDKToolkit-cagprod');
