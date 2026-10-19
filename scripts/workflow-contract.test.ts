@@ -90,6 +90,10 @@ describe('GitHub workflow contracts', () => {
       ).toBeGreaterThanOrEqual(4);
     }
     expect(workflow).toContain('Smoke production HTTPS before DNS cutover');
+    expect(workflow).toContain('node scripts/smoke-production-browser.mjs');
+    expect(workflow.slice(workflow.indexOf('\n  acceptance:'))).not.toContain(
+      'id-token: write'
+    );
   });
 
   it('uses separate protected plan/deploy environments and validates before auth', () => {

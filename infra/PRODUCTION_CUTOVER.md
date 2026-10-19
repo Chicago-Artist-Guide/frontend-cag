@@ -44,7 +44,10 @@ CI validates live/ready health, HTML routes, a referenced Next static asset and
 public images against the new ALB. The pre-DNS HTTPS smoke keeps the public URL,
 Host and TLS SNI while curl --connect-to sends the connection to the new ALB;
 normal certificate verification stays enabled and redirects fail the check.
-Then exercise browser navigation and authentication on the new destination.
+A separate credential-free CI job exercises home → login → home browser
+navigation while mapping the public hostname to the new ALB IP. It asserts the
+remote address, normal TLS validation, hydrated page markers, one shell and no
+uncaught browser errors. Authenticated account actions require a test account.
 
 DNS is outside these workflows. After acceptance, replace the www CNAME currently
 pointing at CloudFront with the production ALB DNS name. Leave the apex redirect

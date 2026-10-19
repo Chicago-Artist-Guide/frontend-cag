@@ -182,6 +182,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: ${{ needs.validate.outputs.deploy_environment }}
+    outputs:
+      alb_dns: ${{ steps.deployment.outputs.load_balancer_dns_name }}
     permissions:
       contents: read
       id-token: write
@@ -275,12 +277,6 @@ jobs:
             --file "$RUNNER_TEMP/cdk-outputs.json" \
             --stack "$STACK_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Smoke deployed load balancer
-        if: needs.validate.outputs.stage_name != 'production'
-        env:
-          BASE_URL: ${{ steps.deployment.outputs.base_url }}
-        run: npm run smoke:server
-
       - name: Smoke production HTTPS before DNS cutover
         if: needs.validate.outputs.stage_name == 'production'
         env:
@@ -290,10 +286,40 @@ jobs:
 
       - name: Publish deployment URL
         env:
-          BASE_URL: ${{ steps.deployment.outputs.base_url }}
+          ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
+          BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: |
           {
-            echo "## Deployment complete"
-            echo "Validated ALB URL: $BASE_URL"
+            echo "## Production HTTPS smoke passed"
+            echo "Production origin: $BASE_URL"
+            echo "New DNS target: $ALB_DNS"
+            echo "TLS verification connected directly to this ALB before DNS cutover."
             echo "No DNS records were changed."
           } >> "$GITHUB_STEP_SUMMARY"
+
+  acceptance:
+    name: Verify deployed production browser flow
+    needs: deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+      - name: Install browser checks without AWS credentials
+        run: npm ci --ignore-scripts
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+      - name: Exercise production home to login to home before DNS cutover
+        env:
+          ALB_DNS: ${{ needs.deploy.outputs.alb_dns }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: node scripts/smoke-production-browser.mjs
