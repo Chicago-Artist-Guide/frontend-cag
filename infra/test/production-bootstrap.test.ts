@@ -61,7 +61,7 @@ describe('production CDK bootstrap role', () => {
 });
 
 describe('production CloudFormation templates', () => {
-  it.each(['production-iam.yaml', 'production-entry-iam.yaml'])(
+  it.each(['production-iam.yaml'])(
     'parses %s using the CloudFormation schema',
     (name) => {
       const app = createTestApp();

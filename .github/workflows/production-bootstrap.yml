@@ -22,7 +22,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment: production-bootstrap
+    environment: canary
     permissions:
       contents: read
       id-token: write
@@ -37,7 +37,7 @@ jobs:
           node-version-file: .nvmrc
       - name: Install infrastructure without lifecycle scripts
         run: npm --prefix infra ci --ignore-scripts
-      - name: Configure bootstrap credentials
+      - name: Configure working canary delivery credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
         with:
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}

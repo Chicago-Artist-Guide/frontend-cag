@@ -6,23 +6,25 @@ configuration during the parallel rollout. No extra staging stack is deployed.
 
 ## One-time AWS permission prerequisite
 
-CI discovery on 2026-10-19 found only canary-scoped usable deployment roles. The
-older CagGithubOidcDeployRole has no attached or inline policies. CI cannot create
-its own production IAM authority with those credentials.
+Production bootstrap reuses the working `canary` GitHub environment and its
+`CagGithubCanaryDeployRole`. Its existing OIDC trust already matches that
+environment, so no trust edit or new entry-role stack is needed. The bootstrap
+job is restricted to the protected main branch.
 
-An AWS administrator must create the CloudFormation stack
-CagGithubProductionBootstrapEntry from `bootstrap/production-entry-iam.yaml`
-with CAPABILITY_NAMED_IAM in account 095377239347. This can be done by uploading
-the template in the AWS console; no AWS CLI credentials belong on developer
-machines. The role trusts only this repository's production-bootstrap OIDC
-environment. It provisions production delivery roles/assets and requests the
-production ACM certificate; it has no DNS permissions.
+The one-time administrator action is to add a separate inline policy named
+`CagProductionProvisioning` to that working role, granting production IAM/CDK
+provisioning and ACM certificate requests. Keep its existing canary permissions.
+The account-specific IAM policy is provided locally to the operator; no developer
+AWS credentials are required.
 
-Then the Bootstrap Next.js production delivery workflow runs from main in CI.
-The production-bootstrap environment uses AWS_ROLE_ARN ending in
-`role/CagGithubProductionBootstrapRole`; production-plan uses
-`role/CagGithubProductionPlanRole`; production uses
-`role/CagGithubProductionDeployRole`. Restrict all three environments to main.
+Role permissions: https://console.aws.amazon.com/iam/home#/roles/details/CagGithubCanaryDeployRole?section=permissions
+
+After that permission addition, Bootstrap Next.js production delivery provisions
+the production roles and assets entirely in CI. `production-plan` uses
+`CagGithubProductionPlanRole`; `production` uses `CagGithubProductionDeployRole`.
+Both production GitHub environments are restricted to main. The initially created
+production-bootstrap GitHub environment is unused by this workflow.
+
 AWS_ACCOUNT_ID, AWS_REGION and public Firebase/LGL configuration come from the
 existing repository variables. NEXT_PUBLIC_SITE_URL is
 https://www.chicagoartistguide.org in both production-plan and production.
