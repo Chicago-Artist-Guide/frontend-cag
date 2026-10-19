@@ -299,6 +299,9 @@ jobs:
           aws cloudformation describe-stacks --query 'Stacks[].{Name:StackName,Status:StackStatus,Outputs:Outputs}'
           # shellcheck disable=SC2016
           aws iam list-roles --query 'Roles[?contains(RoleName, `Cag`) || contains(RoleName, `cag`) || contains(RoleName, `GitHub`) || contains(RoleName, `Github`)].{Name:RoleName,Arn:Arn,Trust:AssumeRolePolicyDocument}'
+          aws iam list-attached-role-policies --role-name CagGithubOidcDeployRole
+          aws iam list-role-policies --role-name CagGithubOidcDeployRole
+          aws cloudformation describe-stacks --region us-east-2 --query 'Stacks[].{Name:StackName,Status:StackStatus,Outputs:Outputs}'
           aws acm list-certificates --query 'CertificateSummaryList[].{Arn:CertificateArn,Domain:DomainName,Names:SubjectAlternativeNameSummaries,Status:Status}'
           aws amplify list-apps --query 'apps[].{Id:appId,Name:name,Domain:defaultDomain}'
           aws route53 list-hosted-zones --query 'HostedZones[].{Id:Id,Name:Name}'
