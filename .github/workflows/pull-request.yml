@@ -3,6 +3,8 @@ name: Pull request checks
 on:
   pull_request:
     branches:
+      - main
+      - canary
       - master
       - staging
 
