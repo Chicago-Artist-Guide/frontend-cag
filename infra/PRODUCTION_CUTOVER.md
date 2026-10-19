@@ -1,54 +1,19 @@
 # Next.js production cutover
 
-Local development runs Next.js. The canary branch is the deployed Next.js staging
-stack. Main deploys CagPlatform-production; master/staging retain their Amplify
-configuration during the parallel rollout. No extra staging stack is deployed.
+Local = dev; `canary` = Next.js staging; `main` = Next.js production. Legacy `master`/`staging` retain Amplify until DNS moves.
 
-## One-time AWS permission prerequisite
+1. Upload `infra/bootstrap/bootstrap-iam.yaml` in us-east-1 as `CagGithubBootstrap`, keep defaults, acknowledge named IAM, submit.
+2. `production-bootstrap` must allow only the `main` branch and use `CagGithubBootstrapRole`; never widen canary/preview roles.
+3. This role can rewrite delivery inline policies and production boundaries: it is effectively admin. Main currently requires **0 reviews**, and admins bypass protection (verified 2026-10-19); protection changes are the owner's decision.
+4. CI's **Bootstrap Next.js delivery** moves `CagGithubCanaryDelivery` from us-east-2 to us-east-1, retaining all four resources before deleting the old stack. It rejects drift and verifies live Retain policies before deletion.
+5. CI imports without Outputs, then changes resource metadata to restore Outputs; it provisions `CagGithubProductionDelivery`, `CDKToolkit-cagprod` and the www ACM certificate, all in us-east-1. Dispatch on main after the upload.
+6. `production` and `production-plan` must both override these repository variables with live **production** values (never inherit dev):
+   `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_APP_ID`, `NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID=chicago-artist-guide`, `NEXT_PUBLIC_FIREBASE_SENDER_ID`, `NEXT_PUBLIC_LGL_API_KEY`.
+7. Both environments use identical config, `NEXT_PUBLIC_SITE_URL=https://www.chicagoartistguide.org`, AWS account `095377239347`, region `us-east-1`, and their dedicated Production Plan/Deploy role.
+8. Add the certificate validation CNAME printed by bootstrap at Google Cloud DNS; keep it for renewal. Re-run bootstrap to confirm ISSUED, then set identical `CERTIFICATE_ARN` variables in both production environments.
+9. Dispatch canary deployment on `canary` and production deployment on `main`. Canary must still pass end to end.
+10. Before DNS, require CI ALB HTTPS and hydrated-browser smokes with valid TLS/SNI; verify `/`, `/shows`, `/login` and the served bundle's `chicago-artist-guide` Firebase project. Authenticated acceptance requires an existing production test account.
+11. Production's five composite indexes and www Auth authorization were observed in Firebase on 2026-10-19. Keep rules/indexes unchanged during infrastructure cutover; verify authenticated flows before traffic moves.
+12. STOP after pre-DNS acceptance. Leave the www traffic CNAME on Amplify CloudFront and the public `/home` unchanged. A later traffic switch requires Chris’s separate explicit authorization; certificate-validation DNS is independent.
 
-CI discovery on 2026-10-19 found only canary-scoped usable deployment roles. The
-older CagGithubOidcDeployRole has no attached or inline policies. CI cannot create
-its own production IAM authority with those credentials.
-
-An AWS administrator must create the CloudFormation stack
-CagGithubProductionBootstrapEntry from `bootstrap/production-entry-iam.yaml`
-with CAPABILITY_NAMED_IAM in account 095377239347. This can be done by uploading
-the template in the AWS console; no AWS CLI credentials belong on developer
-machines. The role trusts only this repository's production-bootstrap OIDC
-environment. It provisions production delivery roles/assets and requests the
-production ACM certificate; it has no DNS permissions.
-
-Then the Bootstrap Next.js production delivery workflow runs from main in CI.
-The production-bootstrap environment uses AWS_ROLE_ARN ending in
-`role/CagGithubProductionBootstrapRole`; production-plan uses
-`role/CagGithubProductionPlanRole`; production uses
-`role/CagGithubProductionDeployRole`. Restrict all three environments to main.
-AWS_ACCOUNT_ID, AWS_REGION and public Firebase/LGL configuration come from the
-existing repository variables. NEXT_PUBLIC_SITE_URL is
-https://www.chicagoartistguide.org in both production-plan and production.
-CERTIFICATE_ARN must match in those two environments.
-
-The bootstrap workflow creates CagGithubProductionDelivery in us-east-2 and
-CDKToolkit-cagprod in us-east-1. The dedicated cagprod qualifier preserves the
-existing CDKToolkit/cagcanary resources. Production deployment runs automatically
-on main pushes and can be dispatched again after provisioning.
-
-## Before traffic moves
-
-ACM must issue a certificate for the public hostname. Add only the ACM validation
-CNAME to the existing DNS provider, retaining it for renewal. This is independent
-of the www traffic CNAME. Do not change www until the production workflow passes
-TLS verification against the new ALB.
-
-CI validates live/ready health, HTML routes, a referenced Next static asset and
-public images against the new ALB. The pre-DNS HTTPS smoke keeps the public URL,
-Host and TLS SNI while curl --connect-to sends the connection to the new ALB;
-normal certificate verification stays enabled and redirects fail the check.
-A separate credential-free CI job exercises home → login → home browser
-navigation while mapping the public hostname to the new ALB IP. It asserts the
-remote address, normal TLS validation, hydrated page markers, one shell and no
-uncaught browser errors. Authenticated account actions require a test account.
-
-DNS is outside these workflows. After acceptance, replace the www CNAME currently
-pointing at CloudFront with the production ALB DNS name. Leave the apex redirect
-and existing legacy stacks in place during observation.
+Import constraints: [AWS import Outputs](https://repost.aws/knowledge-center/cloudformation-change-set-errors), [metadata forces Retain/Outputs updates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors-no-updates-to-perform).

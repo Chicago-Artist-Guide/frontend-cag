@@ -18,6 +18,10 @@ Parameters:
 Resources:
   CanaryCloudFormationExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Metadata:
+      DeliveryRegion: us-east-1
     Properties:
       ManagedPolicyName: CagCanaryCloudFormationExecution
       Description: Actions needed by CloudFormation to manage CagPlatform-canary
@@ -163,6 +167,8 @@ Resources:
 
   CanaryPlanRole:
     Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       RoleName: CagGithubCanaryPlanRole
       Description: Read-only CDK diff role for the CAG canary
@@ -197,6 +203,8 @@ Resources:
 
   CanaryDeployRole:
     Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       RoleName: CagGithubCanaryDeployRole
       Description: CDK asset publishing and deployment entry role for canary
@@ -231,6 +239,8 @@ Resources:
 
   CanaryDestroyRole:
     Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       RoleName: CagGithubCanaryDestroyRole
       Description: Manual destruction entry role for CagPlatform-canary

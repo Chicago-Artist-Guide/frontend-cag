@@ -6,7 +6,7 @@ set -euo pipefail
 ACTUAL_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
 test "$ACTUAL_ACCOUNT_ID" = "$AWS_ACCOUNT_ID"
 SCRIPT_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-IAM_STACK_REGION="${CAG_IAM_STACK_REGION:-us-east-2}"
+IAM_STACK_REGION="${CAG_IAM_STACK_REGION:-us-east-1}"
 
 aws cloudformation deploy \
   --region "$IAM_STACK_REGION" \
@@ -31,6 +31,7 @@ npm exec cdk -- bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" \
   --template "$BOOTSTRAP_TEMPLATE" \
   --toolkit-stack-name CDKToolkit-cagprod \
   --qualifier cagprod \
+  --bootstrap-kms-key-id AWS_MANAGED_KEY \
   --cloudformation-execution-policies "$EXECUTION_POLICY_ARN" \
   --trust "$AWS_ACCOUNT_ID" \
   --trust-for-lookup "$AWS_ACCOUNT_ID"

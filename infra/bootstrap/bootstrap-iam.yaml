@@ -1,14 +1,14 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: One-time CI provisioning entry point for CAG production
+Description: Main-only CI entry point that provisions CAG delivery roles, CDK toolkits and certificates
 Parameters:
   WorkloadRegion:
     Type: String
     Default: us-east-1
 Resources:
-  ProductionBootstrapRole:
+  BootstrapRole:
     Type: AWS::IAM::Role
     Properties:
-      RoleName: CagGithubProductionBootstrapRole
+      RoleName: CagGithubBootstrapRole
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -21,7 +21,7 @@ Resources:
                 token.actions.githubusercontent.com:aud: sts.amazonaws.com
                 token.actions.githubusercontent.com:sub: repo:Chicago-Artist-Guide/frontend-cag:environment:production-bootstrap
       Policies:
-        - PolicyName: ProvisionProductionDelivery
+        - PolicyName: ProvisionDelivery
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
@@ -29,12 +29,19 @@ Resources:
                 Action:
                   - cloudformation:CreateStack
                   - cloudformation:UpdateStack
+                  - cloudformation:DeleteStack
                   - cloudformation:CreateChangeSet
                   - cloudformation:ExecuteChangeSet
                   - cloudformation:DeleteChangeSet
                 Resource:
-                  - !Sub arn:${AWS::Partition}:cloudformation:us-east-2:${AWS::AccountId}:stack/CagGithubProductionDelivery/*
+                  - !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CagGithubCanaryDelivery/*
+                  # The July bootstrap left the canary stack in us-east-2; move-canary-iam.sh retires it.
+                  - !Sub arn:${AWS::Partition}:cloudformation:us-east-2:${AWS::AccountId}:stack/CagGithubCanaryDelivery/*
+                  - !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CagGithubProductionDelivery/*
                   - !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CDKToolkit-cagprod/*
+              - Effect: Allow
+                Action: cloudformation:UpdateTerminationProtection
+                Resource: !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CDKToolkit-cagprod/*
               - Effect: Allow
                 Action:
                   - cloudformation:Describe*
@@ -49,10 +56,11 @@ Resources:
                   - iam:DeleteRole
                   - iam:GetRole
                   - iam:UpdateAssumeRolePolicy
+                  - iam:UpdateRole
+                  - iam:UpdateRoleDescription
                   - iam:TagRole
                   - iam:UntagRole
-                  - iam:AttachRolePolicy
-                  - iam:DetachRolePolicy
+                  - iam:ListRoleTags
                   - iam:ListAttachedRolePolicies
                   - iam:PutRolePolicy
                   - iam:GetRolePolicy
@@ -60,9 +68,48 @@ Resources:
                   - iam:ListRolePolicies
                   - iam:PutRolePermissionsBoundary
                 Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubCanaryPlanRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubCanaryDeployRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubCanaryDestroyRole
                   - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubProductionPlanRole
                   - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubProductionDeployRole
                   - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-cagprod-*-role-${AWS::AccountId}-${WorkloadRegion}
+              - Effect: Deny
+                Action: iam:DeleteRolePermissionsBoundary
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubCanaryPlanRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubCanaryDeployRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubCanaryDestroyRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubProductionPlanRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubProductionDeployRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-cagprod-cfn-exec-role-${AWS::AccountId}-${WorkloadRegion}
+                Condition:
+                  ArnLike:
+                    iam:PolicyARN:
+                      - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagCanary*
+                      - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagProduction*
+              # The pinned toolkit attaches these AWS policies to these two roles only.
+              - Effect: Allow
+                Action:
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-cagprod-lookup-role-${AWS::AccountId}-${WorkloadRegion}
+                Condition:
+                  ArnLike:
+                    iam:PolicyARN: !Sub arn:${AWS::Partition}:iam::aws:policy/ReadOnlyAccess
+              - Effect: Allow
+                Action:
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-cagprod-deploy-role-${AWS::AccountId}-${WorkloadRegion}
+                Condition:
+                  ArnLike:
+                    iam:PolicyARN: !Sub arn:${AWS::Partition}:iam::aws:policy/AWSCloudFormationReadOnlyAccess
               - Effect: Allow
                 Action:
                   - iam:CreatePolicy
@@ -72,10 +119,14 @@ Resources:
                   - iam:GetPolicy
                   - iam:GetPolicyVersion
                   - iam:ListPolicyVersions
+                  - iam:ListEntitiesForPolicy
+                  - iam:ListPolicyTags
                   - iam:SetDefaultPolicyVersion
                   - iam:TagPolicy
                   - iam:UntagPolicy
-                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagProduction*
+                Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagCanary*
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagProduction*
               - Effect: Allow
                 Action: s3:*
                 Resource:
@@ -95,18 +146,15 @@ Resources:
                   - ssm:ListTagsForResource
                 Resource: !Sub arn:${AWS::Partition}:ssm:${WorkloadRegion}:${AWS::AccountId}:parameter/cdk-bootstrap/cagprod/version
               - Effect: Allow
-                Action:
-                  - acm:ListCertificates
+                Action: acm:ListCertificates
                 Resource: '*'
               - Effect: Allow
-                Action:
-                  - acm:RequestCertificate
+                Action: acm:RequestCertificate
                 Resource: '*'
                 Condition:
                   ForAllValues:StringEquals:
                     acm:DomainNames:
                       - www.chicagoartistguide.org
-                      - chicagoartistguide.org
                   StringEquals:
                     acm:ValidationMethod: DNS
               - Effect: Allow
@@ -116,5 +164,5 @@ Resources:
                   - acm:ListTagsForCertificate
                 Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
 Outputs:
-  ProductionBootstrapRoleArn:
-    Value: !GetAtt ProductionBootstrapRole.Arn
+  BootstrapRoleArn:
+    Value: !GetAtt BootstrapRole.Arn

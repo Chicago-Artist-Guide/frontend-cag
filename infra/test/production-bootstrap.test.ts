@@ -61,7 +61,7 @@ describe('production CDK bootstrap role', () => {
 });
 
 describe('production CloudFormation templates', () => {
-  it.each(['production-iam.yaml', 'production-entry-iam.yaml'])(
+  it.each(['production-iam.yaml', 'bootstrap-iam.yaml', 'canary-iam.yaml'])(
     'parses %s using the CloudFormation schema',
     (name) => {
       const app = createTestApp();
@@ -93,5 +93,81 @@ describe('production CloudFormation templates', () => {
           .Properties.PermissionsBoundary
       )
     ).toContain('CagProductionDeploymentBoundary');
+  });
+});
+
+describe('main-only delivery bootstrap entry role', () => {
+  const load = (name: string) => {
+    const stack = new Stack(createTestApp(), 'Entry');
+    new CfnInclude(stack, 'Template', {
+      templateFile: join(process.cwd(), 'bootstrap', name)
+    });
+    return Template.fromStack(stack).toJSON();
+  };
+
+  it('trusts only the dedicated environment and restricts policy attachments', () => {
+    const role = load('bootstrap-iam.yaml').Resources.BootstrapRole.Properties;
+    expect(role.AssumeRolePolicyDocument.Statement).toEqual([
+      expect.objectContaining({
+        Action: 'sts:AssumeRoleWithWebIdentity',
+        Condition: {
+          StringEquals: {
+            'token.actions.githubusercontent.com:aud': 'sts.amazonaws.com',
+            'token.actions.githubusercontent.com:sub':
+              'repo:Chicago-Artist-Guide/frontend-cag:environment:production-bootstrap'
+          }
+        }
+      })
+    ]);
+    const statements = role.Policies[0].PolicyDocument.Statement as {
+      Action: string | string[];
+      Condition?: { ArnLike?: { 'iam:PolicyARN'?: unknown } };
+      Resource: unknown;
+      Effect: string;
+    }[];
+    expect(JSON.stringify(statements)).not.toContain('AdministratorAccess');
+    for (const statement of statements) {
+      const actions = [statement.Action].flat();
+      expect(actions).not.toContain('*');
+      if (actions.includes('iam:AttachRolePolicy')) {
+        expect(statement.Condition?.ArnLike?.['iam:PolicyARN']).toBeDefined();
+      }
+    }
+    expect(statements).toContainEqual({
+      Action: 'iam:DeleteRolePermissionsBoundary',
+      Effect: 'Deny',
+      Resource: '*'
+    });
+    for (const policy of [
+      'ReadOnlyAccess',
+      'AWSCloudFormationReadOnlyAccess'
+    ]) {
+      const attachment = statements.find((statement) =>
+        JSON.stringify(statement.Condition ?? {}).includes(`policy/${policy}`)
+      );
+      expect(attachment).toBeDefined();
+      expect(JSON.stringify(attachment?.Resource)).toContain(
+        policy === 'ReadOnlyAccess' ? 'lookup-role' : 'deploy-role'
+      );
+    }
+  });
+
+  it('retains every canary IAM resource and forces the policy-only update', () => {
+    const resources = load('canary-iam.yaml').Resources;
+    expect(Object.keys(resources)).toHaveLength(4);
+    for (const resource of Object.values(resources) as {
+      DeletionPolicy?: string;
+      UpdateReplacePolicy?: string;
+    }[]) {
+      expect(resource.DeletionPolicy).toBe('Retain');
+      expect(resource.UpdateReplacePolicy).toBe('Retain');
+    }
+    expect(resources.CanaryCloudFormationExecutionPolicy.Metadata).toEqual({
+      DeliveryRegion: 'us-east-1'
+    });
+  });
+
+  it('selects an AWS managed key on both initial bootstrap and reruns', () => {
+    expect(script).toContain('--bootstrap-kms-key-id AWS_MANAGED_KEY');
   });
 });
