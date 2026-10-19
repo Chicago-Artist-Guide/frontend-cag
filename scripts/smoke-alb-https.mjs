@@ -59,18 +59,18 @@ if (
   try {
     await smokeServer({
       attempts: 1,
-      baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
+      baseUrl: process.env.BASE_URL || process.env.NEXT_PUBLIC_SITE_URL,
       fetchImpl: createAlbHttpsFetch(
-        process.env.NEXT_PUBLIC_SITE_URL,
+        process.env.BASE_URL || process.env.NEXT_PUBLIC_SITE_URL,
         process.env.ALB_DNS
       ),
       requestTimeoutMs: 35000
     });
     console.log(
-      'Production HTTPS smoke passed against the new ALB before DNS cutover.'
+      'Application HTTPS smoke passed directly against the deployed ALB with normal TLS validation.'
     );
   } catch (error) {
-    console.error(`Production HTTPS smoke failed: ${error.message}`);
+    console.error(`Application HTTPS smoke failed: ${error.message}`);
     process.exitCode = 1;
   }
 }

@@ -111,11 +111,13 @@ const liveIam = () => {
       ];
     })
   );
-  const statement = (
-    Sid: string,
-    Action: string | string[],
-    Resource: unknown
-  ) => ({ Sid, Effect: 'Allow', Resource, Action });
+  const statement = (Action: string | string[], Resource: unknown) => ({
+    Effect: 'Allow',
+    Resource,
+    Action
+  });
+  const certificateArn = `arn:aws:acm:${region}:${account}:certificate/*`;
+  const hostedZonesArn = 'arn:aws:route53:::hostedzone/*';
   return {
     roles,
     policy: {
@@ -133,8 +135,111 @@ const liveIam = () => {
       Document: {
         Version: '2012-10-17',
         Statement: [
+          {
+            ...statement(
+              ['acm:RequestCertificate', 'acm:AddTagsToCertificate'],
+              '*'
+            ),
+            Condition: {
+              'ForAllValues:StringEquals': {
+                'acm:DomainNames': ['staging.chicagoartistguide.org']
+              },
+              StringEquals: {
+                'acm:ValidationMethod': 'DNS',
+                'aws:RequestTag/Environment': 'canary',
+                'aws:RequestTag/DeploymentId': 'canary'
+              },
+              Null: { 'acm:DomainNames': 'false' }
+            }
+          },
           statement(
-            'Ec2Networking',
+            ['acm:DescribeCertificate', 'acm:ListTagsForCertificate'],
+            certificateArn
+          ),
+          {
+            ...statement(
+              [
+                'acm:AddTagsToCertificate',
+                'acm:UpdateCertificateOptions',
+                'acm:DeleteCertificate'
+              ],
+              certificateArn
+            ),
+            Condition: {
+              StringEquals: {
+                'aws:ResourceTag/Environment': 'canary',
+                'aws:ResourceTag/DeploymentId': 'canary'
+              },
+              StringEqualsIfExists: {
+                'aws:RequestTag/Environment': 'canary',
+                'aws:RequestTag/DeploymentId': 'canary'
+              }
+            }
+          },
+          {
+            ...statement('acm:RemoveTagsFromCertificate', certificateArn),
+            Condition: {
+              StringEquals: {
+                'aws:ResourceTag/Environment': 'canary',
+                'aws:ResourceTag/DeploymentId': 'canary'
+              }
+            }
+          },
+          {
+            ...statement('acm:RemoveTagsFromCertificate', certificateArn),
+            Effect: 'Deny',
+            Condition: {
+              'ForAnyValue:StringEquals': {
+                'aws:TagKeys': ['Environment', 'DeploymentId']
+              }
+            }
+          },
+          {
+            ...statement('route53:ChangeResourceRecordSets', hostedZonesArn),
+            Condition: {
+              'ForAllValues:StringEquals': {
+                'route53:ChangeResourceRecordSetsNormalizedRecordNames': [
+                  'staging.chicagoartistguide.org'
+                ],
+                'route53:ChangeResourceRecordSetsRecordTypes': ['A'],
+                'route53:ChangeResourceRecordSetsActions': [
+                  'CREATE',
+                  'UPSERT',
+                  'DELETE'
+                ]
+              },
+              Null: {
+                'route53:ChangeResourceRecordSetsNormalizedRecordNames': 'false'
+              }
+            }
+          },
+          {
+            ...statement('route53:ChangeResourceRecordSets', hostedZonesArn),
+            Condition: {
+              'ForAllValues:StringLike': {
+                'route53:ChangeResourceRecordSetsNormalizedRecordNames': [
+                  '_*.staging.chicagoartistguide.org'
+                ]
+              },
+              'ForAllValues:StringEquals': {
+                'route53:ChangeResourceRecordSetsRecordTypes': ['CNAME'],
+                'route53:ChangeResourceRecordSetsActions': ['CREATE', 'UPSERT']
+              },
+              Null: {
+                'route53:ChangeResourceRecordSetsNormalizedRecordNames': 'false'
+              }
+            }
+          },
+          statement(
+            [
+              'route53:GetHostedZone',
+              'route53:ListResourceRecordSets',
+              'route53:ListTagsForResource'
+            ],
+            hostedZonesArn
+          ),
+          statement('route53:GetChange', 'arn:aws:route53:::change/*'),
+          statement(
             [
               'ec2:AssociateRouteTable',
               'ec2:AttachInternetGateway',
@@ -165,7 +270,6 @@ const liveIam = () => {
             '*'
           ),
           statement(
-            'EcsCanary',
             [
               'ecs:CreateCluster',
               'ecs:CreateService',
@@ -187,7 +291,6 @@ const liveIam = () => {
             '*'
           ),
           statement(
-            'LoadBalancing',
             [
               'elasticloadbalancing:AddTags',
               'elasticloadbalancing:CreateListener',
@@ -211,7 +314,6 @@ const liveIam = () => {
             '*'
           ),
           statement(
-            'CanaryLogs',
             [
               'logs:CreateLogGroup',
               'logs:DeleteLogGroup',
@@ -222,18 +324,16 @@ const liveIam = () => {
             ],
             [`arn:aws:logs:${region}:${account}:log-group:/cag/canary*`]
           ),
-          statement('CanaryLogDiscovery', 'logs:DescribeLogGroups', [
+          statement('logs:DescribeLogGroups', [
             `arn:aws:logs:${region}:${account}:log-group:*`
           ]),
           statement(
-            'ReadBootstrapVersion',
             ['ssm:GetParameter', 'ssm:GetParameters'],
             [
               `arn:aws:ssm:${region}:${account}:parameter/cdk-bootstrap/cagcanary/version`
             ]
           ),
           statement(
-            'CanaryScaling',
             [
               'application-autoscaling:DeleteScalingPolicy',
               'application-autoscaling:DeregisterScalableTarget',
@@ -249,7 +349,6 @@ const liveIam = () => {
             '*'
           ),
           statement(
-            'CanaryTaskRoles',
             [
               'iam:AttachRolePolicy',
               'iam:CreateRole',
@@ -269,11 +368,7 @@ const liveIam = () => {
             `arn:aws:iam::${account}:role/CagPlatform-canary-*`
           ),
           {
-            ...statement(
-              'RequiredServiceLinkedRoles',
-              'iam:CreateServiceLinkedRole',
-              '*'
-            ),
+            ...statement('iam:CreateServiceLinkedRole', '*'),
             Condition: {
               StringEquals: {
                 'iam:AWSServiceName': [
@@ -484,10 +579,10 @@ describe('live canary IAM verification', () => {
     };
     const policy = expected.Resources.CanaryCloudFormationExecutionPolicy
       .Properties.PolicyDocument as {
-      Statement: { Sid: string; Resource: unknown }[];
+      Statement: { Action: string | string[]; Resource: unknown }[];
     };
-    const logs = policy.Statement.find(
-      (statement) => statement.Sid === 'CanaryLogs'
+    const logs = policy.Statement.find((statement) =>
+      [statement.Action].flat().includes('logs:CreateLogGroup')
     );
     if (!logs) throw new Error('Missing expected logs statement');
     logs.Resource = [

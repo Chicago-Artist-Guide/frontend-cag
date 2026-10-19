@@ -1,5 +1,6 @@
 /* eslint-env node */
 import { pathToFileURL } from 'node:url';
+import { validateApplicationUrl } from './read-cdk-output.mjs';
 
 export const validateHttpsOrigin = (value) => {
   let url;
@@ -43,6 +44,15 @@ export const resolveProductionBrowserOrigin = (environment) => {
     )
   ) {
     throw new Error('ALB_DNS must be an AWS ALB hostname');
+  }
+  if (environment.APPLICATION_URL) {
+    return new URL(
+      validateApplicationUrl(
+        environment.APPLICATION_URL,
+        'CagPlatform-production',
+        hostname
+      )
+    );
   }
   return environment.CERTIFICATE_ARN ? origin : new URL(`http://${hostname}`);
 };

@@ -32,6 +32,17 @@ Resources:
             Resource: !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CagPlatform-production/*
           - Effect: Allow
             Action:
+              - cloudformation:CreateStack
+              - cloudformation:UpdateStack
+              - cloudformation:CreateChangeSet
+              - cloudformation:DeleteChangeSet
+              - cloudformation:ExecuteChangeSet
+              - cloudformation:UpdateTerminationProtection
+              - cloudformation:ContinueUpdateRollback
+              - cloudformation:RollbackStack
+            Resource: !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CagPlatform-production-dns/*
+          - Effect: Allow
+            Action:
               - cloudformation:Describe*
               - cloudformation:Get*
               - cloudformation:List*
@@ -62,6 +73,124 @@ Resources:
           - Effect: Allow
             Action: logs:DescribeLogGroups
             Resource: '*'
+  ProductionManagedDnsExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CagProductionManagedDnsExecution
+      Description: Production child-zone DNS and owned public certificate lifecycle
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: RequestManagedCertificate
+            Effect: Allow
+            Resource: '*'
+            Action:
+              - acm:RequestCertificate
+              - acm:AddTagsToCertificate
+            Condition:
+              ForAllValues:StringEquals:
+                acm:DomainNames:
+                  - prod.chicagoartistguide.org
+              StringEquals:
+                acm:ValidationMethod: DNS
+                aws:RequestTag/Environment: production
+                aws:RequestTag/DeploymentId: production
+              'Null':
+                acm:DomainNames: 'false'
+          - Sid: ReadCertificates
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action:
+              - acm:DescribeCertificate
+              - acm:ListTagsForCertificate
+          - Sid: MutateOwnedCertificates
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action:
+              - acm:AddTagsToCertificate
+              - acm:UpdateCertificateOptions
+              - acm:DeleteCertificate
+            Condition:
+              StringEquals:
+                aws:ResourceTag/Environment: production
+                aws:ResourceTag/DeploymentId: production
+              StringEqualsIfExists:
+                aws:RequestTag/Environment: production
+                aws:RequestTag/DeploymentId: production
+          - Sid: RemoveOwnedCertificateTags
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action: acm:RemoveTagsFromCertificate
+            Condition:
+              StringEquals:
+                aws:ResourceTag/Environment: production
+                aws:ResourceTag/DeploymentId: production
+          - Effect: Deny
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action: acm:RemoveTagsFromCertificate
+            Condition:
+              ForAnyValue:StringEquals:
+                aws:TagKeys:
+                  - Environment
+                  - DeploymentId
+          # Zone IDs are created by the separate retained DNS stack. Restrict
+          # record writes by normalized name and type, including ACM validation.
+          - Sid: ApplicationAlias
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action: route53:ChangeResourceRecordSets
+            Condition:
+              ForAllValues:StringEquals:
+                route53:ChangeResourceRecordSetsNormalizedRecordNames:
+                  - prod.chicagoartistguide.org
+                route53:ChangeResourceRecordSetsRecordTypes:
+                  - A
+                route53:ChangeResourceRecordSetsActions:
+                  - CREATE
+                  - UPSERT
+                  - DELETE
+              'Null':
+                route53:ChangeResourceRecordSetsNormalizedRecordNames: 'false'
+          - Sid: CertificateValidationRecords
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action: route53:ChangeResourceRecordSets
+            Condition:
+              ForAllValues:StringLike:
+                route53:ChangeResourceRecordSetsNormalizedRecordNames:
+                  - '_*.prod.chicagoartistguide.org'
+              ForAllValues:StringEquals:
+                route53:ChangeResourceRecordSetsRecordTypes:
+                  - CNAME
+                route53:ChangeResourceRecordSetsActions:
+                  - CREATE
+                  - UPSERT
+              'Null':
+                route53:ChangeResourceRecordSetsNormalizedRecordNames: 'false'
+          - Sid: ReadManagedDns
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action:
+              - route53:GetHostedZone
+              - route53:ListResourceRecordSets
+              - route53:ListTagsForResource
+              - route53:ListQueryLoggingConfigs
+          - Sid: DnsChangeStatus
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::change/*
+            Action: route53:GetChange
+          # Hosted-zone creation has no IAM resource/name scoping support.
+          # Zones are retained; this role cannot delete hosted zones.
+          - Sid: CreatePersistentChildZones
+            Effect: Allow
+            Resource: '*'
+            Action: route53:CreateHostedZone
+          - Sid: ManagePersistentZoneMetadata
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action:
+              - route53:ChangeTagsForResource
+              - route53:UpdateHostedZoneComment
   ProductionCloudFormationExecutionPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -109,10 +238,6 @@ Resources:
               - wafv2:DisassociateWebACL
               - wafv2:GetWebACL
               - wafv2:GetWebACLForResource
-          - Sid: CertificateRead
-            Effect: Allow
-            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
-            Action: acm:DescribeCertificate
           - Sid: EcsProduction
             Effect: Allow
             Resource: '*'
@@ -296,6 +421,8 @@ Resources:
                   - ssm:GetParameter
 
 Outputs:
+  ProductionDnsExecutionPolicyArn:
+    Value: !Ref ProductionManagedDnsExecutionPolicy
   ProductionExecutionPolicyArn:
     Value: !Ref ProductionCloudFormationExecutionPolicy
   ProductionPlanRoleArn:

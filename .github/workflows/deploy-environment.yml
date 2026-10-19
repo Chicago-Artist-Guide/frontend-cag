@@ -132,6 +132,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
           WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
           FLOW_LOGS: ${{ vars.FLOW_LOGS }}
@@ -163,6 +165,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
           WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
           FLOW_LOGS: ${{ vars.FLOW_LOGS }}
@@ -184,6 +188,7 @@ jobs:
     environment: ${{ needs.validate.outputs.deploy_environment }}
     outputs:
       alb_dns: ${{ steps.deployment.outputs.load_balancer_dns_name }}
+      application_url: ${{ steps.deployment.outputs.base_url }}
     permissions:
       contents: read
       id-token: write
@@ -218,6 +223,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
           WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
           FLOW_LOGS: ${{ vars.FLOW_LOGS }}
@@ -259,6 +266,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
           WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
           FLOW_LOGS: ${{ vars.FLOW_LOGS }}
@@ -278,34 +287,28 @@ jobs:
             --stack "$STACK_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Smoke production HTTP before DNS cutover
-        if: vars.CERTIFICATE_ARN == ''
+        if: ${{ !startsWith(steps.deployment.outputs.base_url, 'https://') }}
         env:
           BASE_URL: ${{ steps.deployment.outputs.base_url }}
         run: npm run smoke:server
 
       - name: Smoke production HTTPS before DNS cutover
-        if: vars.CERTIFICATE_ARN != ''
+        if: startsWith(steps.deployment.outputs.base_url, 'https://')
         env:
           ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
-          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          BASE_URL: ${{ steps.deployment.outputs.base_url }}
         run: node scripts/smoke-alb-https.mjs
 
       - name: Publish deployment URL
         env:
           ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
-          BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
-          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          BASE_URL: ${{ steps.deployment.outputs.base_url }}
         run: |
           {
-            echo "## Production deployed before DNS cutover"
-            if [ -n "$CERTIFICATE_ARN" ]; then
-              echo "Production origin: $BASE_URL"
-              echo "HTTPS verification connected directly to $ALB_DNS."
-            else
-              echo "Pre-switch URL: http://$ALB_DNS/home"
-            fi
+            echo "## Production deployed before public www cutover"
+            echo "Production URL: $BASE_URL/home"
             echo "Load balancer: $ALB_DNS"
-            echo "No DNS records were changed."
+            echo "Public www remains on Amplify."
           } >> "$GITHUB_STEP_SUMMARY"
 
   acceptance:
@@ -332,6 +335,7 @@ jobs:
       - name: Exercise production home to login to home before DNS cutover
         env:
           ALB_DNS: ${{ needs.deploy.outputs.alb_dns }}
+          APPLICATION_URL: ${{ needs.deploy.outputs.application_url }}
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: node scripts/smoke-production-browser.mjs

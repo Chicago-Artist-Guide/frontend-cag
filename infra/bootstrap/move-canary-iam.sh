@@ -41,20 +41,28 @@ settled_status() {
 }
 
 verify_live_iam() {
-  node --import tsx "$DIR/verify-canary-iam.ts" "$DIR/canary-iam.yaml" "$AWS_ACCOUNT_ID" "$AWS_REGION"
+  node --import tsx "$DIR/verify-canary-iam.ts" "${1:-$DIR/canary-iam.yaml}" "$AWS_ACCOUNT_ID" "$AWS_REGION"
 }
 
 verify_target() {
+  local expected_template="$DIR/canary-iam.yaml"
   aws cloudformation list-stack-resources --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/resources.json"
   node --import tsx "$DIR/canary-iam-migration.ts" target "$TEMP_DIRECTORY/resources.json" "$AWS_ACCOUNT_ID"
   aws cloudformation get-template --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/target.json"
-  node --import tsx "$DIR/canary-iam-migration.ts" compare "$TEMP_DIRECTORY/target.json" "$DIR/canary-iam.yaml"
+  if [[ "${1:-desired}" == deployed ]]; then
+    # A completed migration must allow the following deploy to update its policy.
+    # Detect live drift against the stack's current template before that deploy.
+    expected_template="$TEMP_DIRECTORY/target.json"
+  else
+    node --import tsx "$DIR/canary-iam-migration.ts" compare "$TEMP_DIRECTORY/target.json" "$expected_template"
+  fi
   node --import tsx "$DIR/canary-iam-migration.ts" guard "$TEMP_DIRECTORY/target.json"
   aws cloudformation describe-stacks --region "$AWS_REGION" --stack-name "$STACK_NAME" --query 'Stacks[0].Parameters' --output json >"$TEMP_DIRECTORY/parameters.json"
   node --import tsx "$DIR/canary-iam-migration.ts" parameters "$TEMP_DIRECTORY/parameters.json" "$DIR/canary-iam.yaml"
-  verify_live_iam
+  verify_live_iam "$expected_template"
 }
 
+TARGET_TEMPLATE=deployed
 TARGET_STATUS="$(settled_status "$AWS_REGION")"
 case "$TARGET_STATUS" in
   DELETE_IN_PROGRESS)
@@ -62,6 +70,7 @@ case "$TARGET_STATUS" in
     TARGET_STATUS="$(settled_status "$AWS_REGION")"
     ;;
   IMPORT_IN_PROGRESS)
+    TARGET_TEMPLATE=desired
     aws cloudformation wait stack-import-complete --region "$AWS_REGION" --stack-name "$STACK_NAME"
     TARGET_STATUS="$(settled_status "$AWS_REGION")"
     ;;
@@ -86,7 +95,7 @@ fi
 case "$TARGET_STATUS" in
   CREATE_COMPLETE|IMPORT_COMPLETE|UPDATE_COMPLETE|UPDATE_ROLLBACK_COMPLETE)
     [[ "$SOURCE_STATUS" == MISSING ]] || { echo 'Both regions still own a canary IAM stack; refusing migration' >&2; exit 1; }
-    verify_target
+    verify_target "$TARGET_TEMPLATE"
     echo "Canary IAM already migrated to $AWS_REGION"
     exit 0
     ;;

@@ -28,8 +28,96 @@ Resources:
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Sid: Ec2Networking
-            Effect: Allow
+          - Effect: Allow
+            Resource: '*'
+            Action:
+              - acm:RequestCertificate
+              - acm:AddTagsToCertificate
+            Condition:
+              ForAllValues:StringEquals:
+                acm:DomainNames:
+                  - staging.chicagoartistguide.org
+              StringEquals:
+                acm:ValidationMethod: DNS
+                aws:RequestTag/Environment: canary
+                aws:RequestTag/DeploymentId: canary
+              'Null':
+                acm:DomainNames: 'false'
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action:
+              - acm:DescribeCertificate
+              - acm:ListTagsForCertificate
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action:
+              - acm:AddTagsToCertificate
+              - acm:UpdateCertificateOptions
+              - acm:DeleteCertificate
+            Condition:
+              StringEquals:
+                aws:ResourceTag/Environment: canary
+                aws:ResourceTag/DeploymentId: canary
+              StringEqualsIfExists:
+                aws:RequestTag/Environment: canary
+                aws:RequestTag/DeploymentId: canary
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action: acm:RemoveTagsFromCertificate
+            Condition:
+              StringEquals:
+                aws:ResourceTag/Environment: canary
+                aws:ResourceTag/DeploymentId: canary
+          - Effect: Deny
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action: acm:RemoveTagsFromCertificate
+            Condition:
+              ForAnyValue:StringEquals:
+                aws:TagKeys:
+                  - Environment
+                  - DeploymentId
+          # Zone IDs are created by the separate retained DNS stack. Restrict
+          # record writes by normalized name and type, including ACM validation.
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action: route53:ChangeResourceRecordSets
+            Condition:
+              ForAllValues:StringEquals:
+                route53:ChangeResourceRecordSetsNormalizedRecordNames:
+                  - staging.chicagoartistguide.org
+                route53:ChangeResourceRecordSetsRecordTypes:
+                  - A
+                route53:ChangeResourceRecordSetsActions:
+                  - CREATE
+                  - UPSERT
+                  - DELETE
+              'Null':
+                route53:ChangeResourceRecordSetsNormalizedRecordNames: 'false'
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action: route53:ChangeResourceRecordSets
+            Condition:
+              ForAllValues:StringLike:
+                route53:ChangeResourceRecordSetsNormalizedRecordNames:
+                  - '_*.staging.chicagoartistguide.org'
+              ForAllValues:StringEquals:
+                route53:ChangeResourceRecordSetsRecordTypes:
+                  - CNAME
+                route53:ChangeResourceRecordSetsActions:
+                  - CREATE
+                  - UPSERT
+              'Null':
+                route53:ChangeResourceRecordSetsNormalizedRecordNames: 'false'
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::hostedzone/*
+            Action:
+              - route53:GetHostedZone
+              - route53:ListResourceRecordSets
+              - route53:ListTagsForResource
+          - Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:route53:::change/*
+            Action: route53:GetChange
+          - Effect: Allow
             Resource: '*'
             Action:
               - ec2:AssociateRouteTable
@@ -57,8 +145,7 @@ Resources:
               - ec2:ModifyVpcAttribute
               - ec2:RevokeSecurityGroupEgress
               - ec2:RevokeSecurityGroupIngress
-          - Sid: EcsCanary
-            Effect: Allow
+          - Effect: Allow
             Resource: '*'
             Action:
               - ecs:CreateCluster
@@ -77,8 +164,7 @@ Resources:
               - ecs:TagResource
               - ecs:UntagResource
               - ecs:UpdateService
-          - Sid: LoadBalancing
-            Effect: Allow
+          - Effect: Allow
             Resource: '*'
             Action:
               - elasticloadbalancing:AddTags
@@ -99,8 +185,7 @@ Resources:
               - elasticloadbalancing:RemoveTags
               - elasticloadbalancing:SetSecurityGroups
               - elasticloadbalancing:SetSubnets
-          - Sid: CanaryLogs
-            Effect: Allow
+          - Effect: Allow
             Resource:
               - !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:/cag/canary*
             Action:
@@ -110,20 +195,17 @@ Resources:
               - logs:PutRetentionPolicy
               - logs:TagResource
               - logs:UntagResource
-          - Sid: CanaryLogDiscovery
-            Effect: Allow
+          - Effect: Allow
             Resource:
               - !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:*
             Action: logs:DescribeLogGroups
-          - Sid: ReadBootstrapVersion
-            Effect: Allow
+          - Effect: Allow
             Resource:
               - !Sub arn:${AWS::Partition}:ssm:${WorkloadRegion}:${AWS::AccountId}:parameter/cdk-bootstrap/${BootstrapQualifier}/version
             Action:
               - ssm:GetParameter
               - ssm:GetParameters
-          - Sid: CanaryScaling
-            Effect: Allow
+          - Effect: Allow
             Resource: '*'
             Action:
               - application-autoscaling:DeleteScalingPolicy
@@ -136,8 +218,7 @@ Resources:
               - cloudwatch:DeleteAlarms
               - cloudwatch:DescribeAlarms
               - cloudwatch:PutMetricAlarm
-          - Sid: CanaryTaskRoles
-            Effect: Allow
+          - Effect: Allow
             Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagPlatform-canary-*
             Action:
               - iam:AttachRolePolicy
@@ -154,8 +235,7 @@ Resources:
               - iam:TagRole
               - iam:UntagRole
               - iam:UpdateAssumeRolePolicy
-          - Sid: RequiredServiceLinkedRoles
-            Effect: Allow
+          - Effect: Allow
             Resource: '*'
             Action: iam:CreateServiceLinkedRole
             Condition:

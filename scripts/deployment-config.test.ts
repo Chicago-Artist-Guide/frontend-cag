@@ -46,6 +46,8 @@ describe('deployment configuration fingerprint', () => {
   });
 
   it.each([
+    'MANAGED_DNS',
+    'MANAGED_HTTPS',
     'CERTIFICATE_ARN',
     'WEB_ACL_ARN',
     'FLOW_LOGS',
