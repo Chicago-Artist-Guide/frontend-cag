@@ -1,0 +1,304 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Scoped GitHub OIDC and CDK execution roles for the CAG production
+
+Parameters:
+  GitHubOrganization:
+    Type: String
+    Default: Chicago-Artist-Guide
+  GitHubRepository:
+    Type: String
+    Default: frontend-cag
+  BootstrapQualifier:
+    Type: String
+    Default: cagprod
+  WorkloadRegion:
+    Type: String
+    Default: us-east-1
+
+Resources:
+  ProductionDeploymentBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CagProductionDeploymentBoundary
+      Description: Limit the stock CDK deployment role to the production stack
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            NotAction: cloudformation:*
+            Resource: '*'
+          - Effect: Allow
+            Action: cloudformation:*
+            Resource: !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CagPlatform-production/*
+          - Effect: Allow
+            Action:
+              - cloudformation:Describe*
+              - cloudformation:Get*
+              - cloudformation:List*
+            Resource: '*'
+  ProductionWorkloadBoundary:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CagProductionWorkloadBoundary
+      Description: Maximum AWS privileges for production ECS and flow-log roles
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action: ecr:GetAuthorizationToken
+            Resource: '*'
+          - Effect: Allow
+            Action:
+              - ecr:BatchCheckLayerAvailability
+              - ecr:BatchGetImage
+              - ecr:GetDownloadUrlForLayer
+            Resource: !Sub arn:${AWS::Partition}:ecr:${WorkloadRegion}:${AWS::AccountId}:repository/cdk-cagprod-container-assets-${AWS::AccountId}-${WorkloadRegion}
+          - Effect: Allow
+            Action:
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+              - logs:DescribeLogStreams
+            Resource: !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:/cag/production/*:*
+          - Effect: Allow
+            Action: logs:DescribeLogGroups
+            Resource: '*'
+  ProductionCloudFormationExecutionPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: CagProductionCloudFormationExecution
+      Description: Actions needed by CloudFormation to manage CagPlatform-production
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: Ec2Networking
+            Effect: Allow
+            Resource: '*'
+            Action:
+              - ec2:AssociateRouteTable
+              - ec2:AttachInternetGateway
+              - ec2:AuthorizeSecurityGroupEgress
+              - ec2:AuthorizeSecurityGroupIngress
+              - ec2:CreateFlowLogs
+              - ec2:CreateInternetGateway
+              - ec2:CreateRoute
+              - ec2:CreateRouteTable
+              - ec2:CreateSecurityGroup
+              - ec2:CreateSubnet
+              - ec2:CreateTags
+              - ec2:CreateVpc
+              - ec2:DeleteFlowLogs
+              - ec2:DeleteInternetGateway
+              - ec2:DeleteRoute
+              - ec2:DeleteRouteTable
+              - ec2:DeleteSecurityGroup
+              - ec2:DeleteSubnet
+              - ec2:DeleteTags
+              - ec2:DeleteVpc
+              - ec2:Describe*
+              - ec2:DetachInternetGateway
+              - ec2:DisassociateRouteTable
+              - ec2:ModifySubnetAttribute
+              - ec2:ModifyVpcAttribute
+              - ec2:RevokeSecurityGroupEgress
+              - ec2:RevokeSecurityGroupIngress
+          - Sid: WebAclAssociation
+            Effect: Allow
+            Resource: '*'
+            Action:
+              - wafv2:AssociateWebACL
+              - wafv2:DisassociateWebACL
+              - wafv2:GetWebACL
+              - wafv2:GetWebACLForResource
+          - Sid: CertificateRead
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+            Action: acm:DescribeCertificate
+          - Sid: EcsProduction
+            Effect: Allow
+            Resource: '*'
+            Action:
+              - ecs:CreateCluster
+              - ecs:CreateService
+              - ecs:DeleteCluster
+              - ecs:DeleteService
+              - ecs:DeregisterTaskDefinition
+              - ecs:DescribeClusters
+              - ecs:DescribeServices
+              - ecs:DescribeTaskDefinition
+              - ecs:ListClusters
+              - ecs:ListServices
+              - ecs:ListTagsForResource
+              - ecs:ListTaskDefinitions
+              - ecs:RegisterTaskDefinition
+              - ecs:TagResource
+              - ecs:UntagResource
+              - ecs:UpdateService
+          - Sid: LoadBalancing
+            Effect: Allow
+            Resource: '*'
+            Action:
+              - elasticloadbalancing:AddTags
+              - elasticloadbalancing:CreateListener
+              - elasticloadbalancing:CreateLoadBalancer
+              - elasticloadbalancing:CreateRule
+              - elasticloadbalancing:CreateTargetGroup
+              - elasticloadbalancing:DeleteListener
+              - elasticloadbalancing:DeleteLoadBalancer
+              - elasticloadbalancing:DeleteRule
+              - elasticloadbalancing:DeleteTargetGroup
+              - elasticloadbalancing:Describe*
+              - elasticloadbalancing:ModifyListener
+              - elasticloadbalancing:ModifyLoadBalancerAttributes
+              - elasticloadbalancing:ModifyRule
+              - elasticloadbalancing:ModifyTargetGroup
+              - elasticloadbalancing:ModifyTargetGroupAttributes
+              - elasticloadbalancing:RemoveTags
+              - elasticloadbalancing:SetSecurityGroups
+              - elasticloadbalancing:SetSubnets
+          - Sid: ProductionLogs
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:/cag/production*
+            Action:
+              - logs:CreateLogGroup
+              - logs:DeleteLogGroup
+              - logs:ListTagsForResource
+              - logs:PutRetentionPolicy
+              - logs:TagResource
+              - logs:UntagResource
+          - Sid: ProductionLogDiscovery
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:logs:${WorkloadRegion}:${AWS::AccountId}:log-group:*
+            Action: logs:DescribeLogGroups
+          - Sid: ReadBootstrapVersion
+            Effect: Allow
+            Resource:
+              - !Sub arn:${AWS::Partition}:ssm:${WorkloadRegion}:${AWS::AccountId}:parameter/cdk-bootstrap/${BootstrapQualifier}/version
+            Action:
+              - ssm:GetParameter
+              - ssm:GetParameters
+          - Sid: ProductionScaling
+            Effect: Allow
+            Resource: '*'
+            Action:
+              - application-autoscaling:DeleteScalingPolicy
+              - application-autoscaling:DeregisterScalableTarget
+              - application-autoscaling:DescribeScalingActivities
+              - application-autoscaling:DescribeScalingPolicies
+              - application-autoscaling:DescribeScalableTargets
+              - application-autoscaling:PutScalingPolicy
+              - application-autoscaling:RegisterScalableTarget
+              - cloudwatch:DeleteAlarms
+              - cloudwatch:DescribeAlarms
+              - cloudwatch:PutMetricAlarm
+          - Sid: ProductionTaskRoles
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagPlatform-production-*
+            Action:
+              - iam:AttachRolePolicy
+              - iam:DeleteRole
+              - iam:DeleteRolePolicy
+              - iam:DetachRolePolicy
+              - iam:GetRole
+              - iam:GetRolePolicy
+              - iam:ListAttachedRolePolicies
+              - iam:ListRolePolicies
+              - iam:PassRole
+              - iam:PutRolePolicy
+              - iam:TagRole
+              - iam:UntagRole
+              - iam:UpdateAssumeRolePolicy
+          - Sid: CreateBoundedWorkloadRoles
+            Effect: Allow
+            Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagPlatform-production-*
+            Action: iam:CreateRole
+            Condition:
+              StringEquals:
+                iam:PermissionsBoundary: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagProductionWorkloadBoundary
+          - Sid: RequiredServiceLinkedRoles
+            Effect: Allow
+            Resource: '*'
+            Action: iam:CreateServiceLinkedRole
+            Condition:
+              StringEquals:
+                iam:AWSServiceName:
+                  - ecs.amazonaws.com
+                  - elasticloadbalancing.amazonaws.com
+                  - ecs.application-autoscaling.amazonaws.com
+
+  ProductionPlanRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CagGithubProductionPlanRole
+      Description: Read-only CDK diff role for the CAG production
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrganization}/${GitHubRepository}:environment:production-plan
+      Policies:
+        - PolicyName: ReadProductionState
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Resource: '*'
+                Action:
+                  - cloudformation:DescribeStacks
+                  - cloudformation:GetTemplate
+                  - ec2:Describe*
+                  - elasticloadbalancing:Describe*
+                  - ecs:Describe*
+                  - ecs:List*
+                  - iam:GetRole
+                  - logs:DescribeLogGroups
+                  - ssm:GetParameter
+
+  ProductionDeployRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CagGithubProductionDeployRole
+      Description: CDK asset publishing and deployment entry role for production
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrganization}/${GitHubRepository}:environment:production
+      Policies:
+        - PolicyName: UseDedicatedCdkBootstrap
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: sts:AssumeRole
+                Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-${BootstrapQualifier}-deploy-role-${AWS::AccountId}-*
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-${BootstrapQualifier}-file-publishing-role-${AWS::AccountId}-*
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-${BootstrapQualifier}-image-publishing-role-${AWS::AccountId}-*
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-${BootstrapQualifier}-lookup-role-${AWS::AccountId}-*
+              - Effect: Allow
+                Resource: '*'
+                Action:
+                  - cloudformation:DescribeStacks
+                  - ssm:GetParameter
+
+Outputs:
+  ProductionExecutionPolicyArn:
+    Value: !Ref ProductionCloudFormationExecutionPolicy
+  ProductionPlanRoleArn:
+    Value: !GetAtt ProductionPlanRole.Arn
+  ProductionDeployRoleArn:
+    Value: !GetAtt ProductionDeployRole.Arn
