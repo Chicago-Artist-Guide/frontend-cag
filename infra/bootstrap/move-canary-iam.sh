@@ -28,23 +28,65 @@ stack_status() {
   fi
 }
 
-TARGET_STATUS="$(stack_status "$AWS_REGION")"
+# AWS has no waiter for UPDATE_ROLLBACK_COMPLETE. A previous invocation may
+# have ended while rollback was still settling; inspect until it is stable.
+settled_status() {
+  local region="$1" status
+  status="$(stack_status "$region")"
+  while [[ "$status" == UPDATE_ROLLBACK_IN_PROGRESS || "$status" == UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS || "$status" == IMPORT_ROLLBACK_IN_PROGRESS ]]; do
+    sleep 5
+    status="$(stack_status "$region")"
+  done
+  echo "$status"
+}
+
+verify_live_iam() {
+  node --import tsx "$DIR/verify-canary-iam.ts" "$DIR/canary-iam.yaml" "$AWS_ACCOUNT_ID" "$AWS_REGION"
+}
+
+verify_target() {
+  aws cloudformation list-stack-resources --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/resources.json"
+  node --import tsx "$DIR/canary-iam-migration.ts" target "$TEMP_DIRECTORY/resources.json" "$AWS_ACCOUNT_ID"
+  aws cloudformation get-template --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/target.json"
+  node --import tsx "$DIR/canary-iam-migration.ts" compare "$TEMP_DIRECTORY/target.json" "$DIR/canary-iam.yaml"
+  node --import tsx "$DIR/canary-iam-migration.ts" guard "$TEMP_DIRECTORY/target.json"
+  aws cloudformation describe-stacks --region "$AWS_REGION" --stack-name "$STACK_NAME" --query 'Stacks[0].Parameters' --output json >"$TEMP_DIRECTORY/parameters.json"
+  node --import tsx "$DIR/canary-iam-migration.ts" parameters "$TEMP_DIRECTORY/parameters.json" "$DIR/canary-iam.yaml"
+  verify_live_iam
+}
+
+TARGET_STATUS="$(settled_status "$AWS_REGION")"
 case "$TARGET_STATUS" in
+  DELETE_IN_PROGRESS)
+    aws cloudformation wait stack-delete-complete --region "$AWS_REGION" --stack-name "$STACK_NAME"
+    TARGET_STATUS="$(settled_status "$AWS_REGION")"
+    ;;
   IMPORT_IN_PROGRESS)
     aws cloudformation wait stack-import-complete --region "$AWS_REGION" --stack-name "$STACK_NAME"
-    TARGET_STATUS="$(stack_status "$AWS_REGION")"
+    TARGET_STATUS="$(settled_status "$AWS_REGION")"
     ;;
   UPDATE_IN_PROGRESS|UPDATE_COMPLETE_CLEANUP_IN_PROGRESS)
     aws cloudformation wait stack-update-complete --region "$AWS_REGION" --stack-name "$STACK_NAME"
-    TARGET_STATUS="$(stack_status "$AWS_REGION")"
+    TARGET_STATUS="$(settled_status "$AWS_REGION")"
     ;;
 esac
-SOURCE_STATUS="$(stack_status "$OLD_REGION")"
+SOURCE_STATUS="$(settled_status "$OLD_REGION")"
+if [[ "$TARGET_STATUS" == IMPORT_ROLLBACK_COMPLETE ]]; then
+  [[ "$SOURCE_STATUS" == MISSING ]] || { echo 'Import rollback has an unexpected source stack' >&2; exit 1; }
+  aws cloudformation get-template --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/target.json"
+  aws cloudformation list-stack-resources --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/resources.json"
+  node --import tsx "$DIR/canary-iam-migration.ts" empty-target "$TEMP_DIRECTORY/target.json" "$TEMP_DIRECTORY/resources.json" "$AWS_ACCOUNT_ID"
+  verify_live_iam
+  # Only the empty import placeholder is removed; the IAM resources are external.
+  aws cloudformation delete-stack --region "$AWS_REGION" --stack-name "$STACK_NAME"
+  aws cloudformation wait stack-delete-complete --region "$AWS_REGION" --stack-name "$STACK_NAME"
+  TARGET_STATUS=MISSING
+fi
+
 case "$TARGET_STATUS" in
-  CREATE_COMPLETE|IMPORT_COMPLETE|UPDATE_COMPLETE)
+  CREATE_COMPLETE|IMPORT_COMPLETE|UPDATE_COMPLETE|UPDATE_ROLLBACK_COMPLETE)
     [[ "$SOURCE_STATUS" == MISSING ]] || { echo 'Both regions still own a canary IAM stack; refusing migration' >&2; exit 1; }
-    aws cloudformation list-stack-resources --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/resources.json"
-    node --import tsx "$DIR/canary-iam-migration.ts" target "$TEMP_DIRECTORY/resources.json" "$AWS_ACCOUNT_ID"
+    verify_target
     echo "Canary IAM already migrated to $AWS_REGION"
     exit 0
     ;;
@@ -55,15 +97,15 @@ esac
 case "$SOURCE_STATUS" in
   UPDATE_IN_PROGRESS|UPDATE_COMPLETE_CLEANUP_IN_PROGRESS)
     aws cloudformation wait stack-update-complete --region "$OLD_REGION" --stack-name "$STACK_NAME"
-    SOURCE_STATUS="$(stack_status "$OLD_REGION")"
+    SOURCE_STATUS="$(settled_status "$OLD_REGION")"
     ;;
   DELETE_IN_PROGRESS)
     aws cloudformation wait stack-delete-complete --region "$OLD_REGION" --stack-name "$STACK_NAME"
-    SOURCE_STATUS="$(stack_status "$OLD_REGION")"
+    SOURCE_STATUS="$(settled_status "$OLD_REGION")"
     ;;
 esac
 case "$SOURCE_STATUS" in
-  CREATE_COMPLETE|UPDATE_COMPLETE)
+  CREATE_COMPLETE|UPDATE_COMPLETE|UPDATE_ROLLBACK_COMPLETE)
     aws cloudformation describe-stacks --region "$OLD_REGION" --stack-name "$STACK_NAME" --query 'Stacks[0].Parameters' --output json >"$TEMP_DIRECTORY/parameters.json"
     node --import tsx "$DIR/canary-iam-migration.ts" parameters "$TEMP_DIRECTORY/parameters.json" "$DIR/canary-iam.yaml"
     aws cloudformation get-template --region "$OLD_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/source.json"
@@ -75,6 +117,7 @@ case "$SOURCE_STATUS" in
     aws cloudformation get-template --region "$OLD_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/retained.json"
     node --import tsx "$DIR/canary-iam-migration.ts" compare "$TEMP_DIRECTORY/retained.json" "$DIR/canary-iam.yaml"
     node --import tsx "$DIR/canary-iam-migration.ts" guard "$TEMP_DIRECTORY/retained.json"
+    verify_live_iam
     aws cloudformation delete-stack --region "$OLD_REGION" --stack-name "$STACK_NAME"
     aws cloudformation wait stack-delete-complete --region "$OLD_REGION" --stack-name "$STACK_NAME"
     ;;
@@ -96,6 +139,5 @@ aws cloudformation create-change-set --region "$AWS_REGION" --stack-name "$STACK
 aws cloudformation wait change-set-create-complete --region "$AWS_REGION" --stack-name "$STACK_NAME" --change-set-name "$CHANGE_SET_NAME"
 aws cloudformation execute-change-set --region "$AWS_REGION" --stack-name "$STACK_NAME" --change-set-name "$CHANGE_SET_NAME"
 aws cloudformation wait stack-import-complete --region "$AWS_REGION" --stack-name "$STACK_NAME"
-aws cloudformation list-stack-resources --region "$AWS_REGION" --stack-name "$STACK_NAME" --output json >"$TEMP_DIRECTORY/resources.json"
-node --import tsx "$DIR/canary-iam-migration.ts" target "$TEMP_DIRECTORY/resources.json" "$AWS_ACCOUNT_ID"
+verify_target
 echo "Canary IAM imported into $AWS_REGION; deploy canary-iam.yaml to restore Outputs"

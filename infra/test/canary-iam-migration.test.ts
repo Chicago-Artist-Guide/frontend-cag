@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 import {
+  assertCanaryEmptyTarget,
   assertCanaryParameters,
   assertCanaryProperties,
   assertCanaryRetained,
@@ -31,6 +32,40 @@ const retainedTemplate = () => {
 };
 
 describe('canary IAM migration safeguards', () => {
+  it('only permits removing an empty rolled-back import placeholder', () => {
+    const empty = JSON.stringify({ TemplateBody: { Resources: {} } });
+    const removed = {
+      StackResourceSummaries: [
+        {
+          LogicalResourceId: 'CanaryPlanRole',
+          ResourceType: 'AWS::IAM::Role',
+          PhysicalResourceId: 'CagGithubCanaryPlanRole',
+          ResourceStatus: 'IMPORT_ROLLBACK_COMPLETE'
+        }
+      ]
+    };
+    expect(() =>
+      assertCanaryEmptyTarget(empty, removed, '123456789012')
+    ).not.toThrow();
+    removed.StackResourceSummaries[0].ResourceStatus = 'IMPORT_COMPLETE';
+    expect(() =>
+      assertCanaryEmptyTarget(empty, removed, '123456789012')
+    ).toThrow(/active/);
+    removed.StackResourceSummaries[0].ResourceStatus =
+      'IMPORT_ROLLBACK_COMPLETE';
+    removed.StackResourceSummaries[0].PhysicalResourceId = 'UnexpectedRole';
+    expect(() =>
+      assertCanaryEmptyTarget(empty, removed, '123456789012')
+    ).toThrow(/physical/);
+    expect(() =>
+      assertCanaryEmptyTarget(
+        JSON.stringify(repositoryTemplate()),
+        { StackResourceSummaries: [] },
+        '123456789012'
+      )
+    ).toThrow(/empty/);
+  });
+
   it('normalizes YAML and JSON GetTemplate bodies to the same resource properties', () => {
     const template = repositoryTemplate();
     const fromString = parseCanaryTemplate(
@@ -155,7 +190,12 @@ const runMigration = (scenario: string) => {
   }));
   writeFileSync(
     join(directory, 'fixture.json'),
-    JSON.stringify({ template, resources, scenario })
+    JSON.stringify({
+      template,
+      liveTemplate: structuredClone(template),
+      resources,
+      scenario
+    })
   );
   const fakeAws = join(directory, 'aws');
   writeFileSync(
@@ -170,10 +210,40 @@ const value = flag => args[args.indexOf(flag) + 1];
 const output = value => process.stdout.write(typeof value === 'string' ? value : JSON.stringify(value));
 let state;
 try { state = JSON.parse(fs.readFileSync(dir + '/state.json', 'utf8')); }
-catch { state = { oldExists: !['partial', 'complete', 'rollback', 'importing'].includes(fixture.scenario), updated: false, imported: fixture.scenario === 'complete' }; }
+catch { state = { oldExists: !['partial', 'complete', 'rollback', 'importing', 'target-update-rollback', 'placeholder-delete-once'].includes(fixture.scenario), updated: false, imported: ['complete', 'target-update-rollback'].includes(fixture.scenario), targetStatus: fixture.scenario === 'placeholder-delete-once' ? 'IMPORT_ROLLBACK_COMPLETE' : undefined }; }
 const save = () => fs.writeFileSync(dir + '/state.json', JSON.stringify(state));
 const fail = message => { process.stderr.write(message); process.exit(1); };
 if (args[0] === 'sts') { output(fixture.scenario === 'account' ? '999999999999' : '123456789012'); process.exit(0); }
+if (args[0] === 'iam') {
+  if (fixture.scenario === 'live-denied') fail('AccessDenied reading live IAM');
+  const variables = Object.fromEntries(Object.entries(fixture.liveTemplate.Parameters).map(([key, item]) => [key, item.Default]));
+  Object.assign(variables, {'AWS::Partition':'aws', 'AWS::AccountId':'123456789012', 'AWS::Region':'us-east-1'});
+  const resolve = value => {
+    if (Array.isArray(value)) return value.map(resolve);
+    if (!value || typeof value !== 'object') return value;
+    if (value.Ref) return variables[value.Ref];
+    if (typeof value['Fn::Sub'] === 'string') {
+      let text = value['Fn::Sub'];
+      for (const [key, item] of Object.entries(variables)) text = text.split('$' + '{' + key + '}').join(item);
+      return text;
+    }
+    return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, resolve(item)]));
+  };
+  const actual = resolve(fixture.liveTemplate);
+  const role = Object.values(actual.Resources).find(resource => resource.Properties.RoleName === value('--role-name'))?.Properties;
+  if (fixture.scenario === 'live-policy-drift' || (fixture.scenario === 'post-import-drift' && state.imported)) actual.Resources.CanaryDeployRole.Properties.Policies[0].PolicyDocument.Statement[0].Resource = '*';
+  if (fixture.scenario === 'live-trust-drift') actual.Resources.CanaryDeployRole.Properties.AssumeRolePolicyDocument.Statement[0].Condition.StringEquals['token.actions.githubusercontent.com:sub'] = 'repo:attacker/repo:environment:canary';
+  const operation = args[1];
+  if (operation === 'get-role') output({Role:{...role, Arn:'arn:aws:iam::123456789012:role/' + role.RoleName, Path:'/'}});
+  else if (operation === 'list-role-policies') output({PolicyNames:role.Policies.map(policy => policy.PolicyName)});
+  else if (operation === 'get-role-policy') output({PolicyDocument:role.Policies.find(policy => policy.PolicyName === value('--policy-name')).PolicyDocument});
+  else if (operation === 'list-attached-role-policies') output({AttachedPolicies:[]});
+  else if (operation === 'get-policy') output({Policy:{Arn:value('--policy-arn'), PolicyName:'CagCanaryCloudFormationExecution', Path:'/', Description:actual.Resources.CanaryCloudFormationExecutionPolicy.Properties.Description, DefaultVersionId:'v1'}});
+  else if (operation === 'get-policy-version') output({PolicyVersion:{VersionId:'v1', IsDefaultVersion:true, Document:actual.Resources.CanaryCloudFormationExecutionPolicy.Properties.PolicyDocument}});
+  else fail('Unexpected IAM operation: ' + operation);
+  process.exit(0);
+}
+
 const command = args[1];
 const old = value('--region') === 'us-east-2';
 if (command === 'describe-stacks') {
@@ -184,38 +254,53 @@ if (command === 'describe-stacks') {
   }
   if (fixture.scenario === 'denied') fail('An error occurred (AccessDenied) when calling DescribeStacks');
   if (fixture.scenario === 'network') fail('Could not connect to endpoint URL');
-  if (old && state.oldExists) output('UPDATE_COMPLETE');
-  else if (!old && state.imported) output('IMPORT_COMPLETE');
+  if (old && state.oldExists) output(state.sourceStatus || 'UPDATE_COMPLETE');
+  else if (!old && state.targetStatus) output(state.targetStatus);
+  else if (!old && state.imported) output(fixture.scenario === 'target-update-rollback' ? 'UPDATE_ROLLBACK_COMPLETE' : 'IMPORT_COMPLETE');
   else if (!old && fixture.scenario === 'partial') output('REVIEW_IN_PROGRESS');
   else if (!old && fixture.scenario === 'rollback') output('IMPORT_ROLLBACK_COMPLETE');
   else if (!old && fixture.scenario === 'importing') output('IMPORT_IN_PROGRESS');
   else fail('An error occurred (ValidationError) when calling DescribeStacks: Stack with id CagGithubCanaryDelivery does not exist');
 } else if (command === 'get-template') {
   const body = structuredClone(fixture.template);
-  if (!state.updated || fixture.scenario === 'guard') {
+  if (!old && state.targetStatus === 'IMPORT_ROLLBACK_COMPLETE') { output({TemplateBody:{Resources:{}}}); process.exit(0); }
+  if (old && (!state.updated || fixture.scenario === 'guard')) {
     for (const resource of Object.values(body.Resources)) { delete resource.DeletionPolicy; delete resource.UpdateReplacePolicy; delete resource.Metadata; }
   }
   if (fixture.scenario === 'drift') body.Resources.CanaryPlanRole.Properties.RoleName = 'UnexpectedRole';
   output({ TemplateBody: state.updated ? JSON.stringify(body) : body });
-} else if (command === 'deploy') { state.updated = true; save(); }
-else if (command === 'delete-stack') { state.oldExists = false; save(); }
+} else if (command === 'deploy') {
+  if (fixture.scenario === 'source-rollback-once' && !state.failedUpdate) {
+    state.failedUpdate = true; state.sourceStatus = 'UPDATE_ROLLBACK_COMPLETE'; save(); fail('Simulated update rollback');
+  }
+  state.updated = true; state.sourceStatus = 'UPDATE_COMPLETE'; save();
+}
+else if (command === 'delete-stack') {
+  if (!old && fixture.scenario === 'placeholder-delete-once' && !state.deleteInterrupted) {
+    state.deleteInterrupted = true; state.targetStatus = 'DELETE_IN_PROGRESS'; save(); fail('Interrupted placeholder deletion');
+  }
+  if (old) state.oldExists = false; else delete state.targetStatus; save();
+}
 else if (command === 'create-change-set') {
   const body = JSON.parse(fs.readFileSync(value('--template-body').slice(7), 'utf8'));
   if (body.Outputs || body.Resources.CanaryCloudFormationExecutionPolicy.Metadata.DeliveryRegion !== 'importing') fail('Unsafe import template');
   const resources = JSON.parse(value('--resources-to-import'));
   if (resources.length !== 4 || !resources[0].ResourceIdentifier.PolicyArn) fail('Invalid import identifiers');
-} else if (command === 'execute-change-set') { state.imported = true; save(); }
-else if (command === 'list-stack-resources') output({ StackResourceSummaries: fixture.resources });
-else if (command === 'wait') { if (args[2] === 'stack-import-complete') { state.imported = true; save(); } }
+} else if (command === 'execute-change-set') {
+  if (fixture.scenario === 'import-rollback-once' && !state.failedImport) {
+    state.failedImport = true; state.targetStatus = 'IMPORT_ROLLBACK_COMPLETE'; save(); fail('Simulated import rollback');
+  }
+  state.imported = true; delete state.targetStatus; save();
+}
+else if (command === 'list-stack-resources') output({ StackResourceSummaries: state.targetStatus === 'IMPORT_ROLLBACK_COMPLETE' ? [] : fixture.resources });
+else if (command === 'wait') { if (args[2] === 'stack-import-complete') { state.imported = true; save(); } if (!old && args[2] === 'stack-delete-complete') { delete state.targetStatus; save(); } }
 else fail('Unexpected AWS command: ' + args.join(' '));
 `
   );
   chmodSync(fakeAws, 0o755);
   try {
-    const result = spawnSync(
-      'bash',
-      [join(process.cwd(), 'bootstrap/move-canary-iam.sh')],
-      {
+    const run = () =>
+      spawnSync('bash', [join(process.cwd(), 'bootstrap/move-canary-iam.sh')], {
         encoding: 'utf8',
         env: {
           ...process.env,
@@ -224,19 +309,55 @@ else fail('Unexpected AWS command: ' + args.join(' '));
           CAG_MIGRATION_FIXTURE: directory,
           PATH: `${directory}:${process.env.PATH}`
         }
-      }
-    );
+      });
+    const first = run();
+    const result = scenario.endsWith('-once') ? run() : first;
     const calls = readFileSync(join(directory, 'calls.jsonl'), 'utf8')
       .trim()
       .split(String.fromCharCode(10))
       .map((line) => JSON.parse(line) as string[]);
-    return { ...result, calls };
+    return { ...result, calls, firstStatus: first.status };
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
 };
 
 describe('canary IAM migration shell flow', () => {
+  it('resumes while the empty rollback placeholder deletion is still in progress', () => {
+    const result = runMigration('placeholder-delete-once');
+    expect(result.firstStatus).not.toBe(0);
+    expect(result.status, result.stderr).toBe(0);
+    expect(
+      result.calls.filter((call) => call[1] === 'delete-stack')
+    ).toHaveLength(1);
+    expect(result.calls.some((call) => call[1] === 'execute-change-set')).toBe(
+      true
+    );
+  });
+
+  it('rejects live IAM drift introduced after the import', () => {
+    const result = runMigration('post-import-drift');
+    expect(result.status, result.stderr).not.toBe(0);
+    expect(result.stderr).toMatch(/drift/i);
+    expect(result.calls.some((call) => call[1] === 'execute-change-set')).toBe(
+      true
+    );
+  });
+
+  it.each(['source-rollback-once', 'import-rollback-once'])(
+    'recovers a failed %s on the next invocation using persisted service state',
+    (scenario) => {
+      const result = runMigration(scenario);
+      expect(result.firstStatus).not.toBe(0);
+      expect(result.status, result.stderr).toBe(0);
+      expect(
+        result.calls.filter(
+          (call) => call[1] === 'delete-stack' && call.includes('us-east-2')
+        )
+      ).toHaveLength(1);
+    }
+  );
+
   it.each([
     'account',
     'denied',
@@ -244,6 +365,9 @@ describe('canary IAM migration shell flow', () => {
     'drift',
     'guard',
     'parameters',
+    'live-policy-drift',
+    'live-trust-drift',
+    'live-denied',
     'rollback'
   ])('fails closed for %s without deleting the source stack', (scenario) => {
     const result = runMigration(scenario);
@@ -255,7 +379,10 @@ describe('canary IAM migration shell flow', () => {
       drift: /template drift/,
       guard: /both Retain/,
       parameters: /parameter drift/,
-      rollback: /IMPORT_ROLLBACK_COMPLETE/
+      'live-policy-drift': /drift/i,
+      'live-trust-drift': /drift/i,
+      'live-denied': /AccessDenied/,
+      rollback: /empty/
     };
     expect(result.stderr).toMatch(errors[scenario]);
     expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(false);
@@ -267,7 +394,9 @@ describe('canary IAM migration shell flow', () => {
   it('checks live retention immediately before deleting, then imports all resources', () => {
     const result = runMigration('normal');
     expect(result.status, result.stderr).toBe(0);
-    const actions = result.calls.map((call) => call[1]);
+    const actions = result.calls
+      .filter((call) => call[0] === 'cloudformation')
+      .map((call) => call[1]);
     expect(
       actions.slice(
         actions.indexOf('deploy'),
@@ -276,7 +405,9 @@ describe('canary IAM migration shell flow', () => {
     ).toEqual(['deploy', 'get-template', 'delete-stack']);
     expect(actions).toContain('create-change-set');
     expect(actions).toContain('execute-change-set');
-    expect(actions.at(-1)).toBe('list-stack-resources');
+    expect(result.calls.some((call) => call[1] === 'get-policy-version')).toBe(
+      true
+    );
   });
 
   it('resumes an interrupted import without recreating or deleting IAM resources', () => {
@@ -290,12 +421,17 @@ describe('canary IAM migration shell flow', () => {
     ).toBe(false);
   });
 
-  it.each(['complete', 'importing'])(
+  it.each(['complete', 'importing', 'target-update-rollback'])(
     'validates and skips a %s target',
     (scenario) => {
       const result = runMigration(scenario);
       expect(result.status, result.stderr).toBe(0);
-      expect(result.calls.at(-1)?.[1]).toBe('list-stack-resources');
+      expect(
+        result.calls.some((call) => call[1] === 'list-stack-resources')
+      ).toBe(true);
+      expect(
+        result.calls.some((call) => call[1] === 'get-policy-version')
+      ).toBe(true);
       expect(
         result.calls.some((call) =>
           [

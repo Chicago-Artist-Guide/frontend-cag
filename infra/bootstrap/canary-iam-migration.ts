@@ -25,7 +25,10 @@ const expectedResources = {
   CanaryDestroyRole: 'AWS::IAM::Role'
 };
 
-export const parseCanaryTemplate = (body: string): CanaryTemplate => {
+export const parseCanaryTemplate = (
+  body: string,
+  allowEmpty = false
+): CanaryTemplate => {
   if (body.trimStart().startsWith('{')) {
     const parsed = JSON.parse(body);
     if (Object.hasOwn(parsed, 'TemplateBody')) {
@@ -52,7 +55,9 @@ export const parseCanaryTemplate = (body: string): CanaryTemplate => {
     );
     new CfnInclude(stack, 'Included', { templateFile: file });
     const template = Template.fromStack(stack).toJSON() as CanaryTemplate;
-    assertResources(template);
+    template.Resources ??= {};
+    if (!allowEmpty || Object.keys(template.Resources).length > 0)
+      assertResources(template);
     return template;
   } finally {
     rmSync(directory, { recursive: true, force: true });
@@ -158,6 +163,55 @@ export const createCanaryImportTemplate = (
   return template;
 };
 
+export const assertCanaryEmptyTarget = (
+  body: string,
+  result: unknown,
+  account: string
+) => {
+  if (Object.keys(parseCanaryTemplate(body, true).Resources).length !== 0) {
+    throw new Error(
+      'Import rollback recovery requires an empty target template'
+    );
+  }
+  const resources = (
+    result as {
+      StackResourceSummaries?: {
+        LogicalResourceId: string;
+        ResourceType: string;
+        PhysicalResourceId: string;
+        ResourceStatus: string;
+      }[];
+    }
+  ).StackResourceSummaries;
+  if (!Array.isArray(resources))
+    throw new Error('Missing rollback resource inventory');
+  const identities: Record<string, string> = {
+    CanaryCloudFormationExecutionPolicy: `arn:aws:iam::${account}:policy/CagCanaryCloudFormationExecution`,
+    CanaryPlanRole: 'CagGithubCanaryPlanRole',
+    CanaryDeployRole: 'CagGithubCanaryDeployRole',
+    CanaryDestroyRole: 'CagGithubCanaryDestroyRole'
+  };
+  for (const resource of resources) {
+    const id = resource.LogicalResourceId;
+    if (
+      resource.ResourceType !==
+        expectedResources[id as keyof typeof expectedResources] ||
+      resource.PhysicalResourceId !== identities[id]
+    ) {
+      throw new Error('Unexpected rollback physical resource');
+    }
+    if (
+      ![
+        'DELETE_COMPLETE',
+        'DELETE_SKIPPED',
+        'IMPORT_ROLLBACK_COMPLETE'
+      ].includes(resource.ResourceStatus)
+    ) {
+      throw new Error('Rollback target still contains active resources');
+    }
+  }
+};
+
 export const assertCanaryTarget = (result: unknown, account: string) => {
   const resources = (
     result as {
@@ -196,7 +250,7 @@ if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
-  const [operation, first, second] = process.argv.slice(2);
+  const [operation, first, second, third] = process.argv.slice(2);
   if (operation === 'compare') {
     assertCanaryProperties(
       parseCanaryTemplate(readFileSync(first, 'utf8')),
@@ -216,6 +270,12 @@ if (
           parseCanaryTemplate(readFileSync(first, 'utf8'))
         )
       )
+    );
+  } else if (operation === 'empty-target') {
+    assertCanaryEmptyTarget(
+      readFileSync(first, 'utf8'),
+      JSON.parse(readFileSync(second, 'utf8')),
+      third
     );
   } else if (operation === 'target') {
     assertCanaryTarget(JSON.parse(readFileSync(first, 'utf8')), second);

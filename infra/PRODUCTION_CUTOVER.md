@@ -14,6 +14,6 @@ Local = dev; `canary` = Next.js staging; `main` = Next.js production. Legacy `ma
 9. Dispatch canary deployment on `canary` and production deployment on `main`. Canary must still pass end to end.
 10. Before DNS, require CI ALB HTTPS and hydrated-browser smokes with valid TLS/SNI; verify `/`, `/shows`, `/login` and the served bundle's `chicago-artist-guide` Firebase project. Authenticated acceptance requires an existing production test account.
 11. Production's five composite indexes and www Auth authorization were observed in Firebase on 2026-10-19. Keep rules/indexes unchanged during infrastructure cutover; verify authenticated flows before traffic moves.
-12. After acceptance, replace the www CNAME pointing at Amplify CloudFront with the production ALB DNS target. Verify resolution, valid HTTPS and Next.js after the flip; retain the apex redirect and legacy stacks.
+12. STOP after pre-DNS acceptance. Leave the www traffic CNAME on Amplify CloudFront and the public `/home` unchanged. A later traffic switch requires Chris’s separate explicit authorization; certificate-validation DNS is independent.
 
 Import constraints: [AWS import Outputs](https://repost.aws/knowledge-center/cloudformation-change-set-errors), [metadata forces Retain/Outputs updates](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html#troubleshooting-errors-no-updates-to-perform).
