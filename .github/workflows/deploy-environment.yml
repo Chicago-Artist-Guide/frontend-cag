@@ -138,7 +138,7 @@ jobs:
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
 
-      - name: Require production TLS configuration
+      - name: Validate production configuration
         if: needs.validate.outputs.stage_name == 'production'
         env:
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
@@ -234,7 +234,7 @@ jobs:
             exit 1
           fi
 
-      - name: Require production TLS configuration
+      - name: Validate production configuration
         if: needs.validate.outputs.stage_name == 'production'
         env:
           CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
@@ -277,8 +277,14 @@ jobs:
             --file "$RUNNER_TEMP/cdk-outputs.json" \
             --stack "$STACK_NAME" >> "$GITHUB_OUTPUT"
 
+      - name: Smoke production HTTP before DNS cutover
+        if: vars.CERTIFICATE_ARN == ''
+        env:
+          BASE_URL: ${{ steps.deployment.outputs.base_url }}
+        run: npm run smoke:server
+
       - name: Smoke production HTTPS before DNS cutover
-        if: needs.validate.outputs.stage_name == 'production'
+        if: vars.CERTIFICATE_ARN != ''
         env:
           ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
@@ -288,12 +294,17 @@ jobs:
         env:
           ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
           BASE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
         run: |
           {
-            echo "## Production HTTPS smoke passed"
-            echo "Production origin: $BASE_URL"
-            echo "New DNS target: $ALB_DNS"
-            echo "TLS verification connected directly to this ALB before DNS cutover."
+            echo "## Production deployed before DNS cutover"
+            if [ -n "$CERTIFICATE_ARN" ]; then
+              echo "Production origin: $BASE_URL"
+              echo "HTTPS verification connected directly to $ALB_DNS."
+            else
+              echo "Pre-switch URL: http://$ALB_DNS/home"
+            fi
+            echo "Load balancer: $ALB_DNS"
             echo "No DNS records were changed."
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -321,5 +332,6 @@ jobs:
       - name: Exercise production home to login to home before DNS cutover
         env:
           ALB_DNS: ${{ needs.deploy.outputs.alb_dns }}
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
           NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: node scripts/smoke-production-browser.mjs

@@ -24,6 +24,7 @@ export const validateHttpsOrigin = (value) => {
 
 export const validateProductionConfiguration = (environment) => {
   if (
+    environment.CERTIFICATE_ARN &&
     !/^arn:aws:acm:[a-z0-9-]+:\d{12}:certificate\/[a-f0-9-]{36}$/.test(
       environment.CERTIFICATE_ARN || ''
     )
@@ -33,13 +34,28 @@ export const validateProductionConfiguration = (environment) => {
   return validateHttpsOrigin(environment.NEXT_PUBLIC_SITE_URL);
 };
 
+export const resolveProductionBrowserOrigin = (environment) => {
+  const origin = validateProductionConfiguration(environment);
+  const hostname = environment.ALB_DNS || '';
+  if (
+    !/^[a-z0-9][a-z0-9-]*\.[a-z]{2}(?:-[a-z0-9]+)+-\d+\.elb\.amazonaws\.com$/i.test(
+      hostname
+    )
+  ) {
+    throw new Error('ALB_DNS must be an AWS ALB hostname');
+  }
+  return environment.CERTIFICATE_ARN ? origin : new URL(`http://${hostname}`);
+};
+
 if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(process.argv[1]).href
 ) {
   try {
     validateProductionConfiguration(process.env);
-    console.log('Production TLS configuration verified.');
+    console.log(
+      'Production configuration verified; TLS is optional before cutover.'
+    );
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

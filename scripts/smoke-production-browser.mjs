@@ -1,17 +1,10 @@
 /* eslint-env node */
 import { resolve4 } from 'node:dns/promises';
 import { chromium, expect } from '@playwright/test';
-import { validateHttpsOrigin } from './production-config.mjs';
+import { resolveProductionBrowserOrigin } from './production-config.mjs';
 
-const origin = validateHttpsOrigin(process.env.NEXT_PUBLIC_SITE_URL);
+const origin = resolveProductionBrowserOrigin(process.env);
 const hostname = process.env.ALB_DNS || '';
-if (
-  !/^[a-z0-9][a-z0-9-]*\.[a-z]{2}(?:-[a-z0-9]+)+-\d+\.elb\.amazonaws\.com$/i.test(
-    hostname
-  )
-) {
-  throw new Error('ALB_DNS must be an AWS ALB hostname');
-}
 const [address] = await resolve4(hostname);
 if (!address) throw new Error('The production ALB has no IPv4 address');
 
@@ -52,7 +45,7 @@ try {
   ).toBeVisible();
   expect(errors).toEqual([]);
   console.log(
-    `Production browser navigation passed through ${hostname} (${address}) with normal TLS validation.`
+    `Production browser navigation passed through ${hostname} (${address}) over ${origin.protocol === 'https:' ? 'HTTPS with normal TLS validation' : 'HTTP before cutover'}.`
   );
 } finally {
   await browser.close();
