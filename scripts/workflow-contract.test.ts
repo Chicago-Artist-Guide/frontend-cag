@@ -80,6 +80,8 @@ describe('GitHub workflow contracts', () => {
   it('passes TLS configuration into both plan and deployment', () => {
     const workflow = readWorkflow('deploy-environment.yml');
     for (const name of [
+      'MANAGED_DNS',
+      'MANAGED_HTTPS',
       'CERTIFICATE_ARN',
       'WEB_ACL_ARN',
       'FLOW_LOGS',
@@ -94,6 +96,17 @@ describe('GitHub workflow contracts', () => {
     expect(workflow.slice(workflow.indexOf('\n  acceptance:'))).not.toContain(
       'id-token: write'
     );
+  });
+
+  it('keeps managed DNS and HTTPS flags identical between planning and deployment', () => {
+    for (const name of ['deploy-environment.yml', 'canary-deploy.yml']) {
+      const workflow = readWorkflow(name);
+      for (const variable of ['MANAGED_DNS', 'MANAGED_HTTPS']) {
+        expect(
+          workflow.split(`${variable}: \${{ vars.${variable} }}`).length - 1
+        ).toBe(4);
+      }
+    }
   });
 
   it('uses separate protected plan/deploy environments and validates before auth', () => {

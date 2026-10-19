@@ -70,6 +70,25 @@ describe('production browser destination', () => {
       }).origin
     ).toBe(`http://${alb}`);
   });
+  it('uses managed prod HTTPS while retaining www as the canonical site', () => {
+    expect(
+      productionConfig.resolveProductionBrowserOrigin({
+        ...configuration,
+        ALB_DNS: alb,
+        CERTIFICATE_ARN: '',
+        APPLICATION_URL: 'https://prod.chicagoartistguide.org'
+      }).origin
+    ).toBe('https://prod.chicagoartistguide.org');
+  });
+  it('rejects a staging URL passed to production acceptance', () => {
+    expect(() =>
+      productionConfig.resolveProductionBrowserOrigin({
+        ...configuration,
+        ALB_DNS: alb,
+        APPLICATION_URL: 'https://staging.chicagoartistguide.org'
+      })
+    ).toThrow();
+  });
   it('uses the public HTTPS origin when a certificate is configured', () => {
     expect(typeof productionConfig.resolveProductionBrowserOrigin).toBe(
       'function'

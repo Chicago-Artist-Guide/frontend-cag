@@ -5,6 +5,12 @@ import {
   type PublicBuildArguments,
   type PlatformStackProps
 } from './platform-stack.js';
+import {
+  ManagedDnsStack,
+  managedZoneId,
+  MANAGED_DOMAINS,
+  readManagedDnsConfiguration
+} from './managed-dns.js';
 import { resolveRequestedDeploymentTargets } from './deployment-target.js';
 
 export const readPublicBuildArguments = (
@@ -25,6 +31,23 @@ export const configurePlatformApp = (
     app.node.tryGetContext('stage'),
     app.node.tryGetContext('previewId')
   );
+
+  const managedDns = readManagedDnsConfiguration(process.env);
+  if (
+    managedDns.enabled &&
+    targets.some(
+      (target) =>
+        target.stageName !== 'production' && target.stageName !== 'canary'
+    )
+  ) {
+    throw new Error(
+      'Managed DNS requires an explicit production or canary target'
+    );
+  }
+  const dnsStack =
+    managedDns.enabled && targets.some((target) => target.isProduction)
+      ? new ManagedDnsStack(app)
+      : undefined;
 
   return targets.map((target) => {
     const stackProps: PlatformStackProps = {
@@ -53,6 +76,18 @@ export const configurePlatformApp = (
       stackProps.flowLogs = true;
     }
 
-    return new PlatformStack(app, target.stackName, stackProps);
+    if (
+      managedDns.enabled &&
+      (target.stageName === 'production' || target.stageName === 'canary')
+    ) {
+      stackProps.managedDomain = {
+        domainName: MANAGED_DOMAINS[target.stageName],
+        hostedZoneId: managedZoneId(target.stageName),
+        https: managedDns.https
+      };
+    }
+    const stack = new PlatformStack(app, target.stackName, stackProps);
+    if (dnsStack) stack.addDependency(dnsStack);
+    return stack;
   });
 };

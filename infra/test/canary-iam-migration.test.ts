@@ -174,6 +174,21 @@ describe('canary IAM migration safeguards', () => {
 const runMigration = async (scenario: string) => {
   const directory = mkdtempSync(join(tmpdir(), 'cag-iam-flow-'));
   const template = retainedTemplate();
+  const deployedTemplate = structuredClone(template);
+  if (scenario.includes('policy-update')) {
+    const policy = deployedTemplate.Resources
+      .CanaryCloudFormationExecutionPolicy.Properties.PolicyDocument as {
+      Statement: { Action: string[] }[];
+    };
+    const networking = policy.Statement.find((statement) =>
+      statement.Action.includes('ec2:CreateVpc')
+    );
+    if (!networking)
+      throw new Error('Missing networking policy in test fixture');
+    networking.Action = networking.Action.filter(
+      (action) => action !== 'ec2:CreateVpc'
+    );
+  }
   const resources = [
     [
       'CanaryCloudFormationExecutionPolicy',
@@ -188,11 +203,18 @@ const runMigration = async (scenario: string) => {
     ResourceType,
     PhysicalResourceId
   }));
+  if (scenario === 'complete-policy-update-identity')
+    resources[0].PhysicalResourceId = 'UnexpectedPolicy';
   writeFileSync(
     join(directory, 'fixture.json'),
     JSON.stringify({
+      deployedTemplate,
       template,
-      liveTemplate: structuredClone(template),
+      liveTemplate: structuredClone(
+        scenario === 'complete-policy-update-live-drift'
+          ? template
+          : deployedTemplate
+      ),
       resources,
       scenario
     })
@@ -210,7 +232,7 @@ const value = flag => args[args.indexOf(flag) + 1];
 const output = value => process.stdout.write(typeof value === 'string' ? value : JSON.stringify(value));
 let state;
 try { state = JSON.parse(fs.readFileSync(dir + '/state.json', 'utf8')); }
-catch { state = { oldExists: !['partial', 'complete', 'rollback', 'importing', 'target-update-rollback', 'placeholder-delete-once'].includes(fixture.scenario), updated: false, imported: ['complete', 'target-update-rollback'].includes(fixture.scenario), targetStatus: fixture.scenario === 'placeholder-delete-once' ? 'IMPORT_ROLLBACK_COMPLETE' : undefined }; }
+catch { state = { oldExists: !fixture.scenario.startsWith('complete-policy-update') && fixture.scenario !== 'importing-policy-update' && !['partial', 'complete', 'rollback', 'importing', 'target-update-rollback', 'placeholder-delete-once'].includes(fixture.scenario), updated: false, imported: fixture.scenario.startsWith('complete-policy-update') || ['complete', 'target-update-rollback'].includes(fixture.scenario), targetStatus: fixture.scenario === 'placeholder-delete-once' ? 'IMPORT_ROLLBACK_COMPLETE' : undefined }; }
 const save = () => fs.writeFileSync(dir + '/state.json', JSON.stringify(state));
 const fail = message => { process.stderr.write(message); process.exit(1); };
 if (args[0] === 'sts') { output(fixture.scenario === 'account' ? '999999999999' : '123456789012'); process.exit(0); }
@@ -249,7 +271,7 @@ const old = value('--region') === 'us-east-2';
 if (command === 'describe-stacks') {
   if (value('--query') === 'Stacks[0].Parameters') {
     const parameters = Object.entries(fixture.template.Parameters).map(([ParameterKey, item]) => ({ ParameterKey, ParameterValue: item.Default }));
-    if (fixture.scenario === 'parameters') parameters[0].ParameterValue = 'UnrelatedOrganization';
+    if (['parameters', 'complete-policy-update-parameters'].includes(fixture.scenario)) parameters[0].ParameterValue = 'UnrelatedOrganization';
     output(parameters); process.exit(0);
   }
   if (fixture.scenario === 'denied') fail('An error occurred (AccessDenied) when calling DescribeStacks');
@@ -259,15 +281,16 @@ if (command === 'describe-stacks') {
   else if (!old && state.imported) output(fixture.scenario === 'target-update-rollback' ? 'UPDATE_ROLLBACK_COMPLETE' : 'IMPORT_COMPLETE');
   else if (!old && fixture.scenario === 'partial') output('REVIEW_IN_PROGRESS');
   else if (!old && fixture.scenario === 'rollback') output('IMPORT_ROLLBACK_COMPLETE');
-  else if (!old && fixture.scenario === 'importing') output('IMPORT_IN_PROGRESS');
+  else if (!old && ['importing', 'importing-policy-update'].includes(fixture.scenario)) output('IMPORT_IN_PROGRESS');
   else fail('An error occurred (ValidationError) when calling DescribeStacks: Stack with id CagGithubCanaryDelivery does not exist');
 } else if (command === 'get-template') {
-  const body = structuredClone(fixture.template);
+  const body = structuredClone(fixture.deployedTemplate);
   if (!old && state.targetStatus === 'IMPORT_ROLLBACK_COMPLETE') { output({TemplateBody:{Resources:{}}}); process.exit(0); }
   if (old && (!state.updated || fixture.scenario === 'guard')) {
     for (const resource of Object.values(body.Resources)) { delete resource.DeletionPolicy; delete resource.UpdateReplacePolicy; delete resource.Metadata; }
   }
   if (fixture.scenario === 'drift') body.Resources.CanaryPlanRole.Properties.RoleName = 'UnexpectedRole';
+  if (fixture.scenario === 'complete-policy-update-retention') delete body.Resources.CanaryPlanRole.DeletionPolicy;
   output({ TemplateBody: state.updated ? JSON.stringify(body) : body });
 } else if (command === 'deploy') {
   if (fixture.scenario === 'source-rollback-once' && !state.failedUpdate) {
@@ -339,6 +362,69 @@ else fail('Unexpected AWS command: ' + args.join(' '));
 };
 
 describe('canary IAM migration shell flow', () => {
+  it('permits a reviewed policy update after verifying the completed target against its deployed template', async () => {
+    const result = await runMigration('complete-policy-update');
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.calls.some((call) => call[1] === 'get-policy-version')).toBe(
+      true
+    );
+    expect(
+      result.calls.some((call) =>
+        [
+          'deploy',
+          'delete-stack',
+          'create-change-set',
+          'execute-change-set'
+        ].includes(call[1])
+      )
+    ).toBe(false);
+  });
+
+  it('rejects completed-target IAM drift even when the live policy already matches the desired template', async () => {
+    const result = await runMigration('complete-policy-update-live-drift');
+    expect(result.status, result.stderr).not.toBe(0);
+    expect(result.stderr).toMatch(/live canary IAM drift/i);
+    expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(false);
+  });
+
+  it.each([
+    ['identity', /physical/],
+    ['retention', /both Retain/],
+    ['parameters', /parameter drift/]
+  ])(
+    'keeps the completed-target %s safeguard during a policy update',
+    async (guard, error) => {
+      const result = await runMigration(`complete-policy-update-${guard}`);
+      expect(result.status, result.stderr).not.toBe(0);
+      expect(result.stderr).toMatch(error);
+      expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(
+        false
+      );
+    }
+  );
+
+  it('still checks desired properties when resuming an unfinished import', async () => {
+    const result = await runMigration('importing-policy-update');
+    expect(result.status, result.stderr).not.toBe(0);
+    expect(result.stderr).toMatch(/template drift/i);
+    expect(
+      result.calls.some(
+        (call) => call[1] === 'wait' && call[2] === 'stack-import-complete'
+      )
+    ).toBe(true);
+    expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(false);
+  });
+
+  it('still rejects policy changes before the source stack has been migrated', async () => {
+    const result = await runMigration('source-policy-update');
+    expect(result.status, result.stderr).not.toBe(0);
+    expect(result.stderr).toMatch(/template drift/i);
+    expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(false);
+    expect(result.calls.some((call) => call[1] === 'create-change-set')).toBe(
+      false
+    );
+  });
+
   it('resumes while the empty rollback placeholder deletion is still in progress', async () => {
     const result = await runMigration('placeholder-delete-once');
     expect(result.firstStatus).not.toBe(0);

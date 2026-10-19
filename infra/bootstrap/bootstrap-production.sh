@@ -22,6 +22,12 @@ EXECUTION_POLICY_ARN="$(aws cloudformation describe-stacks \
   --query "Stacks[0].Outputs[?OutputKey=='ProductionExecutionPolicyArn'].OutputValue" \
   --output text)"
 
+DNS_EXECUTION_POLICY_ARN="$(aws cloudformation describe-stacks \
+  --region "$IAM_STACK_REGION" \
+  --stack-name CagGithubProductionDelivery \
+  --query "Stacks[0].Outputs[?OutputKey=='ProductionDnsExecutionPolicyArn'].OutputValue" \
+  --output text)"
+
 cd "$SCRIPT_DIRECTORY/.."
 BOOTSTRAP_TEMPLATE="$(mktemp)"
 trap 'rm -f "$BOOTSTRAP_TEMPLATE"' EXIT
@@ -32,7 +38,7 @@ npm exec cdk -- bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" \
   --toolkit-stack-name CDKToolkit-cagprod \
   --qualifier cagprod \
   --bootstrap-kms-key-id AWS_MANAGED_KEY \
-  --cloudformation-execution-policies "$EXECUTION_POLICY_ARN" \
+  --cloudformation-execution-policies "$EXECUTION_POLICY_ARN" "$DNS_EXECUTION_POLICY_ARN" \
   --trust "$AWS_ACCOUNT_ID" \
   --trust-for-lookup "$AWS_ACCOUNT_ID"
 
@@ -78,5 +84,9 @@ for attempt in {1..12}; do
     fi
     break
   fi
-  sleep 5
+  if [[ "$attempt" == 12 ]]; then
+    echo "Certificate validation record is not available yet; inspect ACM before enabling HTTPS." >&2
+  else
+    sleep 5
+  fi
 done

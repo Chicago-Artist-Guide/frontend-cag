@@ -1,10 +1,7 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import {
-  formatCdkOutputs,
-  readCdkOutputs
-} from './read-cdk-output.mjs';
+import { formatCdkOutputs, readCdkOutputs } from './read-cdk-output.mjs';
 
 const stackName = 'CagPlatform-preview-dev-511';
 const loadBalancerDnsName =
@@ -52,6 +49,43 @@ describe('readCdkOutputs', () => {
     });
   });
 
+  it.each([
+    ['CagPlatform-production', 'https://prod.chicagoartistguide.org'],
+    ['CagPlatform-canary', 'https://staging.chicagoartistguide.org']
+  ])('uses the exact managed HTTPS origin from %s', async (name, origin) => {
+    const filePath = await writeOutputs({
+      [name]: {
+        LoadBalancerDnsName: loadBalancerDnsName,
+        ApplicationUrl: origin
+      }
+    });
+    await expect(readCdkOutputs(filePath, name)).resolves.toMatchObject({
+      baseUrl: origin
+    });
+  });
+  it.each([
+    'https://evil.test',
+    'https://www.chicagoartistguide.org',
+    'https://prod.chicagoartistguide.org/path',
+    'https://prod.chicagoartistguide.org:8443',
+    'https://user:password@prod.chicagoartistguide.org',
+    'http://prod.chicagoartistguide.org',
+    'https://prod.chicagoartistguide.org\nbase_url=https://evil.test'
+  ])(
+    'rejects an unsafe or cross-environment application URL %s',
+    async (origin) => {
+      const filePath = await writeOutputs({
+        'CagPlatform-canary': {
+          LoadBalancerDnsName: loadBalancerDnsName,
+          ApplicationUrl: origin
+        }
+      });
+      await expect(
+        readCdkOutputs(filePath, 'CagPlatform-canary')
+      ).rejects.toThrow();
+    }
+  );
+
   it('normalizes a CloudFormation-generated mixed-case ALB hostname', async () => {
     const mixedCaseHostname =
       'CagPlatform-LoadBalancer-A1B2C3D4.us-east-1.elb.amazonaws.com';
@@ -91,9 +125,9 @@ describe('readCdkOutputs', () => {
       [invalidStackName]: { LoadBalancerDnsName: loadBalancerDnsName }
     });
 
-    await expect(
-      readCdkOutputs(filePath, invalidStackName)
-    ).rejects.toThrow('valid CAG platform stack name');
+    await expect(readCdkOutputs(filePath, invalidStackName)).rejects.toThrow(
+      'valid CAG platform stack name'
+    );
   });
 
   it('rejects an output file without the exact requested stack', async () => {

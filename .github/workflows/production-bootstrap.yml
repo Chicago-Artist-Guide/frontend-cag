@@ -59,6 +59,12 @@ jobs:
             --parameter-overrides WorkloadRegion=us-east-1 \
             --capabilities CAPABILITY_NAMED_IAM \
             --no-fail-on-empty-changeset
+      - name: Verify canary IAM matches the desired template after deployment
+        working-directory: infra
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        run: node --import tsx bootstrap/verify-canary-iam.ts bootstrap/canary-iam.yaml "$AWS_ACCOUNT_ID" "$AWS_REGION"
       - name: Provision dedicated production delivery roles
         env:
           AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
