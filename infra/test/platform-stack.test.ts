@@ -320,6 +320,16 @@ describe('PlatformStack', () => {
     });
   });
 
+  it('bounds every production IAM role to the workload policy', () => {
+    const { template } = createStack('production');
+    template.allResourcesProperties('AWS::IAM::Role', {
+      PermissionsBoundary: Match.anyValue()
+    });
+    expect(JSON.stringify(template.toJSON())).toContain(
+      'CagProductionWorkloadBoundary'
+    );
+  });
+
   it('retains production logs', () => {
     const { template } = createStack('production');
 

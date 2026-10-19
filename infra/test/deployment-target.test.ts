@@ -147,7 +147,8 @@ describe('configurePlatformApp', () => {
       NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: '',
       NEXT_PUBLIC_FIREBASE_PROJECT_ID: '',
       NEXT_PUBLIC_FIREBASE_SENDER_ID: '',
-      NEXT_PUBLIC_LGL_API_KEY: ''
+      NEXT_PUBLIC_LGL_API_KEY: '',
+      NEXT_PUBLIC_SITE_URL: 'https://www.chicagoartistguide.org'
     });
   });
 });

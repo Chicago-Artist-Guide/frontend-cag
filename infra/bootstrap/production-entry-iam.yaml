@@ -1,0 +1,120 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: One-time CI provisioning entry point for CAG production
+Parameters:
+  WorkloadRegion:
+    Type: String
+    Default: us-east-1
+Resources:
+  ProductionBootstrapRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: CagGithubProductionBootstrapRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Federated: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com
+            Action: sts:AssumeRoleWithWebIdentity
+            Condition:
+              StringEquals:
+                token.actions.githubusercontent.com:aud: sts.amazonaws.com
+                token.actions.githubusercontent.com:sub: repo:Chicago-Artist-Guide/frontend-cag:environment:production-bootstrap
+      Policies:
+        - PolicyName: ProvisionProductionDelivery
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - cloudformation:CreateStack
+                  - cloudformation:UpdateStack
+                  - cloudformation:CreateChangeSet
+                  - cloudformation:ExecuteChangeSet
+                  - cloudformation:DeleteChangeSet
+                Resource:
+                  - !Sub arn:${AWS::Partition}:cloudformation:us-east-2:${AWS::AccountId}:stack/CagGithubProductionDelivery/*
+                  - !Sub arn:${AWS::Partition}:cloudformation:${WorkloadRegion}:${AWS::AccountId}:stack/CDKToolkit-cagprod/*
+              - Effect: Allow
+                Action:
+                  - cloudformation:Describe*
+                  - cloudformation:GetTemplate*
+                  - cloudformation:List*
+                  - cloudformation:ValidateTemplate
+                  - sts:GetCallerIdentity
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - iam:CreateRole
+                  - iam:DeleteRole
+                  - iam:GetRole
+                  - iam:UpdateAssumeRolePolicy
+                  - iam:TagRole
+                  - iam:UntagRole
+                  - iam:AttachRolePolicy
+                  - iam:DetachRolePolicy
+                  - iam:ListAttachedRolePolicies
+                  - iam:PutRolePolicy
+                  - iam:GetRolePolicy
+                  - iam:DeleteRolePolicy
+                  - iam:ListRolePolicies
+                  - iam:PutRolePermissionsBoundary
+                Resource:
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubProductionPlanRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/CagGithubProductionDeployRole
+                  - !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-cagprod-*-role-${AWS::AccountId}-${WorkloadRegion}
+              - Effect: Allow
+                Action:
+                  - iam:CreatePolicy
+                  - iam:CreatePolicyVersion
+                  - iam:DeletePolicy
+                  - iam:DeletePolicyVersion
+                  - iam:GetPolicy
+                  - iam:GetPolicyVersion
+                  - iam:ListPolicyVersions
+                  - iam:SetDefaultPolicyVersion
+                  - iam:TagPolicy
+                  - iam:UntagPolicy
+                Resource: !Sub arn:${AWS::Partition}:iam::${AWS::AccountId}:policy/CagProduction*
+              - Effect: Allow
+                Action: s3:*
+                Resource:
+                  - !Sub arn:${AWS::Partition}:s3:::cdk-cagprod-assets-${AWS::AccountId}-${WorkloadRegion}
+                  - !Sub arn:${AWS::Partition}:s3:::cdk-cagprod-assets-${AWS::AccountId}-${WorkloadRegion}/*
+              - Effect: Allow
+                Action: ecr:*
+                Resource: !Sub arn:${AWS::Partition}:ecr:${WorkloadRegion}:${AWS::AccountId}:repository/cdk-cagprod-container-assets-${AWS::AccountId}-${WorkloadRegion}
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                  - ssm:PutParameter
+                  - ssm:DeleteParameter
+                  - ssm:AddTagsToResource
+                  - ssm:RemoveTagsFromResource
+                  - ssm:ListTagsForResource
+                Resource: !Sub arn:${AWS::Partition}:ssm:${WorkloadRegion}:${AWS::AccountId}:parameter/cdk-bootstrap/cagprod/version
+              - Effect: Allow
+                Action:
+                  - acm:ListCertificates
+                Resource: '*'
+              - Effect: Allow
+                Action:
+                  - acm:RequestCertificate
+                Resource: '*'
+                Condition:
+                  ForAllValues:StringEquals:
+                    acm:DomainNames:
+                      - www.chicagoartistguide.org
+                      - chicagoartistguide.org
+                  StringEquals:
+                    acm:ValidationMethod: DNS
+              - Effect: Allow
+                Action:
+                  - acm:DescribeCertificate
+                  - acm:AddTagsToCertificate
+                  - acm:ListTagsForCertificate
+                Resource: !Sub arn:${AWS::Partition}:acm:${WorkloadRegion}:${AWS::AccountId}:certificate/*
+Outputs:
+  ProductionBootstrapRoleArn:
+    Value: !GetAtt ProductionBootstrapRole.Arn

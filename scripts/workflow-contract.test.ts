@@ -11,7 +11,8 @@ const deploymentWorkflowNames = [
   'canary-destroy.yml'
 ];
 
-const externalActionPattern = /^\s*uses:\s*([^./\s][^@\s]*)@([^\s#]+)\s*(?:#.*)?$/gm;
+const externalActionPattern =
+  /^\s*uses:\s*([^./\s][^@\s]*)@([^\s#]+)\s*(?:#.*)?$/gm;
 
 describe('GitHub workflow contracts', () => {
   it('keeps pull request CI credential-free and pins every action by SHA', () => {
@@ -67,13 +68,39 @@ describe('GitHub workflow contracts', () => {
     }
   );
 
+  it('autodeploys only main and gates durable deployment on the container', () => {
+    const workflow = readWorkflow('deploy-environment.yml');
+    expect(workflow).toMatch(/push:\s*\n\s+branches:\s*\n\s+- main\n/);
+    expect(workflow).toContain('npm run container:smoke');
+    expect(workflow).toContain('- container');
+    expect(workflow).not.toContain('|| true');
+    expect(readWorkflow('pull-request.yml')).toContain('      - main');
+  });
+
+  it('passes TLS configuration into both plan and deployment', () => {
+    const workflow = readWorkflow('deploy-environment.yml');
+    for (const name of [
+      'CERTIFICATE_ARN',
+      'WEB_ACL_ARN',
+      'FLOW_LOGS',
+      'NEXT_PUBLIC_SITE_URL'
+    ]) {
+      expect(
+        workflow.split(`${name}: \${{ vars.${name} }}`).length - 1
+      ).toBeGreaterThanOrEqual(4);
+    }
+    expect(workflow).toContain('Smoke production HTTPS before DNS cutover');
+  });
+
   it('uses separate protected plan/deploy environments and validates before auth', () => {
     const durable = readWorkflow('deploy-environment.yml');
     const canary = readWorkflow('canary-deploy.yml');
     const destroy = readWorkflow('canary-destroy.yml');
 
-    expect(durable).toContain("format('{0}-plan', inputs.stage)");
-    expect(durable).toContain('environment: ${{ inputs.stage }}');
+    expect(durable).toContain('needs.validate.outputs.plan_environment');
+    expect(durable).toContain(
+      'environment: ${{ needs.validate.outputs.deploy_environment }}'
+    );
     expect(canary).toContain('environment: canary-plan');
     expect(canary).toContain('environment: canary');
     expect(destroy).toContain('environment: canary-destroy');
@@ -108,7 +135,9 @@ describe('GitHub workflow contracts', () => {
     const destroy = readWorkflow('canary-destroy.yml');
 
     expect(destroy).not.toContain('NEXT_PUBLIC_');
-    expect(destroy).toContain('allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}');
+    expect(destroy).toContain(
+      'allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}'
+    );
     expect(destroy).toContain('aws-region: ${{ vars.AWS_REGION }}');
     expect(destroy).toContain('role-to-assume: ${{ vars.AWS_ROLE_ARN }}');
   });

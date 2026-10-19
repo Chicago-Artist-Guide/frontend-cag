@@ -29,7 +29,15 @@ const readDeploymentConfiguration = (environment) => {
     );
   }
 
-  return entries;
+  return [
+    ...entries,
+    ...[
+      'CERTIFICATE_ARN',
+      'WEB_ACL_ARN',
+      'FLOW_LOGS',
+      'NEXT_PUBLIC_SITE_URL'
+    ].map((name) => [name, environment[name] ?? ''])
+  ];
 };
 
 export const fingerprintDeploymentConfiguration = (environment) =>

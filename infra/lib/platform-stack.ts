@@ -13,6 +13,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import type { Construct } from 'constructs';
@@ -30,7 +31,7 @@ export const PUBLIC_BUILD_ARGUMENT_NAMES = [
 export type PublicBuildArguments = Record<
   (typeof PUBLIC_BUILD_ARGUMENT_NAMES)[number],
   string
->;
+> & { NEXT_PUBLIC_SITE_URL?: string };
 
 export interface PlatformStackProps extends StackProps {
   buildArguments: PublicBuildArguments;
@@ -63,6 +64,16 @@ export class PlatformStack extends Stack {
       ...stackProps,
       terminationProtection: target.isProduction
     });
+
+    if (target.isProduction) {
+      iam.PermissionsBoundary.of(this).apply(
+        iam.ManagedPolicy.fromManagedPolicyName(
+          this,
+          'WorkloadBoundary',
+          'CagProductionWorkloadBoundary'
+        )
+      );
+    }
 
     Tags.of(this).add('Application', 'chicago-artist-guide');
     Tags.of(this).add('DeploymentId', target.deploymentId);
@@ -100,7 +111,6 @@ export class PlatformStack extends Stack {
         destination: ec2.FlowLogDestination.toCloudWatchLogs(flowLogGroup)
       });
     }
-
 
     const applicationImage = new ecrAssets.DockerImageAsset(
       this,
@@ -272,7 +282,6 @@ export class PlatformStack extends Stack {
         webAclArn
       });
     }
-
 
     const scaling = service.autoScaleTaskCount({
       maxCapacity: target.isProduction ? 4 : 2,

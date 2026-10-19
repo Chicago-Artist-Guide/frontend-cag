@@ -1,5 +1,9 @@
 # AWS CDK platform foundation
 
+Current production setup and DNS sequencing: [Production cutover](PRODUCTION_CUTOVER.md).
+`canary` is Next.js staging; `main` deploys Next.js production.
+The older staging/master branches retain their Amplify deployments during cutover.
+
 This CDK v2 application defines the AWS-native ECS/Fargate foundation for the
 Chicago Artist Guide compatibility host. It does not create a database,
 credential, DNS record, or static AWS access key.

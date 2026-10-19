@@ -1,22 +1,17 @@
-name: Deploy durable environment
+name: Deploy Next.js production
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
-    inputs:
-      stage:
-        description: Durable target (staging must run from staging; production from master)
-        options:
-          - staging
-          - production
-        required: true
-        type: choice
 
 permissions:
   contents: read
 
 concurrency:
   cancel-in-progress: false
-  group: cag-durable-${{ inputs.stage }}
+  group: cag-production
 
 jobs:
   validate:
@@ -31,6 +26,9 @@ jobs:
       NEXT_PUBLIC_LGL_API_KEY: validation-lgl-api-key
     outputs:
       stack_name: ${{ steps.target.outputs.stack_name }}
+      stage_name: ${{ steps.target.outputs.stage_name }}
+      plan_environment: ${{ steps.target.outputs.plan_environment }}
+      deploy_environment: ${{ steps.target.outputs.deploy_environment }}
     steps:
       - name: Check out source
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -51,7 +49,7 @@ jobs:
         env:
           TARGET_REF: ${{ github.ref_name }}
           TARGET_REF_TYPE: ${{ github.ref_type }}
-          TARGET_STAGE: ${{ inputs.stage }}
+          TARGET_STAGE: production
         run: |
           node scripts/deployment-target.mjs \
             --stage "$TARGET_STAGE" \
@@ -63,15 +61,41 @@ jobs:
           npm ci
           npm --prefix infra ci
 
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
       - name: Verify application and infrastructure without OIDC permission
         run: npm run verify
 
+  container:
+    name: Smoke durable container
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      NEXT_PUBLIC_FIREBASE_API_KEY: validation-firebase-api-key
+      NEXT_PUBLIC_FIREBASE_APP_ID: validation-firebase-app-id
+      NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID: validation-firebase-measurement-id
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: validation-firebase-project-id
+      NEXT_PUBLIC_FIREBASE_SENDER_ID: validation-firebase-sender-id
+      NEXT_PUBLIC_LGL_API_KEY: validation-lgl-api-key
+    steps:
+      - name: Check out source
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Use project Node version
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e
+        with:
+          node-version-file: .nvmrc
+      - name: Build and boot image without AWS access
+        run: npm run container:smoke
+
   plan:
-    name: Plan ${{ inputs.stage }}
+    name: Plan ${{ needs.validate.outputs.stage_name }}
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    environment: ${{ format('{0}-plan', inputs.stage) }}
+    environment: ${{ needs.validate.outputs.plan_environment }}
     outputs:
       configuration_fingerprint: ${{ steps.configuration.outputs.configuration_fingerprint }}
     permissions:
@@ -79,7 +103,7 @@ jobs:
       id-token: write
     env:
       STACK_NAME: ${{ needs.validate.outputs.stack_name }}
-      TARGET_STAGE: ${{ inputs.stage }}
+      TARGET_STAGE: ${{ needs.validate.outputs.stage_name }}
 
     steps:
       - name: Check out source
@@ -108,7 +132,18 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
+          FLOW_LOGS: ${{ vars.FLOW_LOGS }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
+
+      - name: Require production TLS configuration
+        if: needs.validate.outputs.stage_name == 'production'
+        env:
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: node scripts/production-config.mjs
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
@@ -116,7 +151,8 @@ jobs:
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
           aws-region: ${{ vars.AWS_REGION }}
           mask-aws-account-id: true
-          role-session-name: cag-${{ inputs.stage }}-plan-${{ github.run_id }}
+          disable-retry: true
+          role-session-name: cag-${{ needs.validate.outputs.stage_name }}-plan-${{ github.run_id }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Diff exact CDK stack
@@ -127,33 +163,31 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
+          FLOW_LOGS: ${{ vars.FLOW_LOGS }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         working-directory: infra
         run: |
-          diff_file="$RUNNER_TEMP/cdk-diff.txt"
           npm exec cdk -- diff "$STACK_NAME" \
-            --context "stage=$TARGET_STAGE" > "$diff_file" 2>&1 || true
-          cat "$diff_file"
-          {
-            echo "## CDK diff: $STACK_NAME"
-            echo '```text'
-            cat "$diff_file"
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+            --context "stage=$TARGET_STAGE" \
+            --no-change-set
 
   deploy:
-    name: Deploy ${{ inputs.stage }}
+    name: Deploy ${{ needs.validate.outputs.stage_name }}
     needs:
       - validate
       - plan
+      - container
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    environment: ${{ inputs.stage }}
+    environment: ${{ needs.validate.outputs.deploy_environment }}
     permissions:
       contents: read
       id-token: write
     env:
       STACK_NAME: ${{ needs.validate.outputs.stack_name }}
-      TARGET_STAGE: ${{ inputs.stage }}
+      TARGET_STAGE: ${{ needs.validate.outputs.stage_name }}
 
     steps:
       - name: Check out source
@@ -182,6 +216,10 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
+          FLOW_LOGS: ${{ vars.FLOW_LOGS }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
 
       - name: Require the approved plan configuration
@@ -194,13 +232,21 @@ jobs:
             exit 1
           fi
 
+      - name: Require production TLS configuration
+        if: needs.validate.outputs.stage_name == 'production'
+        env:
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: node scripts/production-config.mjs
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
         with:
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
           aws-region: ${{ vars.AWS_REGION }}
           mask-aws-account-id: true
-          role-session-name: cag-${{ inputs.stage }}-deploy-${{ github.run_id }}
+          disable-retry: true
+          role-session-name: cag-${{ needs.validate.outputs.stage_name }}-deploy-${{ github.run_id }}
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
 
       - name: Deploy exact CDK stack
@@ -211,6 +257,10 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          CERTIFICATE_ARN: ${{ vars.CERTIFICATE_ARN }}
+          WEB_ACL_ARN: ${{ vars.WEB_ACL_ARN }}
+          FLOW_LOGS: ${{ vars.FLOW_LOGS }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
         working-directory: infra
         run: |
           npm exec cdk -- deploy "$STACK_NAME" \
@@ -226,9 +276,17 @@ jobs:
             --stack "$STACK_NAME" >> "$GITHUB_OUTPUT"
 
       - name: Smoke deployed load balancer
+        if: needs.validate.outputs.stage_name != 'production'
         env:
           BASE_URL: ${{ steps.deployment.outputs.base_url }}
         run: npm run smoke:server
+
+      - name: Smoke production HTTPS before DNS cutover
+        if: needs.validate.outputs.stage_name == 'production'
+        env:
+          ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
+          NEXT_PUBLIC_SITE_URL: ${{ vars.NEXT_PUBLIC_SITE_URL }}
+        run: node scripts/smoke-alb-https.mjs
 
       - name: Publish deployment URL
         env:

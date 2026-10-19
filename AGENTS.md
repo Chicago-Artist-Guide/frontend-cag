@@ -144,7 +144,7 @@ Brand colors and the custom fonts (Open Sans, Lora, Montserrat) are defined in `
 
 ### PR Requirements
 - Title format: `[DEV-XXX] Descriptive Title`
-- Target the `staging` branch, not `master` — this is the actual working PR workflow
+- Legacy Amplify PRs target `staging`, not `master`. Next.js delivery PRs target `main` for production or `canary` for staging; preserve the legacy branches during cutover.
 - Include description of changes and screenshots for UI changes
 - Must pass linting; requires 1-2 tech lead approvals
 - Use "Squash and Merge"; ensure commit title matches PR title
@@ -158,7 +158,7 @@ Brand colors and the custom fonts (Open Sans, Lora, Montserrat) are defined in `
 - No `package-lock.json` changes unless you modified `package.json`
 
 ### Important Notes
-- **Production deployment**: Commits to `master` trigger automatic build and deployment to production
+- **Production deployment**: `master` retains the legacy Amplify deployment. `main` deploys the Next.js production ECS/Fargate stack through CI; `canary` is Next.js staging. See `infra/PRODUCTION_CUTOVER.md` for provisioning and pre-DNS acceptance.
 - Do not commit directly to `master` - always use the PR workflow, targeting `staging`
 - Husky pre-commit hook runs lint-staged (prettier then eslint on staged `.ts/.tsx/.jsx` files)
 
