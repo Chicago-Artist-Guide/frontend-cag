@@ -1,4 +1,4 @@
-name: Bootstrap Next.js production delivery
+name: Bootstrap Next.js delivery
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    environment: canary
+    environment: production-bootstrap
     permissions:
       contents: read
       id-token: write
@@ -37,7 +37,7 @@ jobs:
           node-version-file: .nvmrc
       - name: Install infrastructure without lifecycle scripts
         run: npm --prefix infra ci --ignore-scripts
-      - name: Configure working canary delivery credentials
+      - name: Configure dedicated bootstrap credentials
         uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885
         with:
           allowed-account-ids: ${{ vars.AWS_ACCOUNT_ID }}
@@ -46,6 +46,19 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           disable-retry: true
           role-session-name: cag-production-bootstrap-${{ github.run_id }}
+      - name: Move canary delivery IAM to the workload region
+        env:
+          AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
+        run: bash infra/bootstrap/move-canary-iam.sh
+      - name: Restore canary delivery outputs and manage IAM from us-east-1
+        run: |
+          aws cloudformation deploy --region us-east-1 \
+            --stack-name CagGithubCanaryDelivery \
+            --template-file infra/bootstrap/canary-iam.yaml \
+            --parameter-overrides WorkloadRegion=us-east-1 \
+            --capabilities CAPABILITY_NAMED_IAM \
+            --no-fail-on-empty-changeset
       - name: Provision dedicated production delivery roles
         env:
           AWS_ACCOUNT_ID: ${{ vars.AWS_ACCOUNT_ID }}
