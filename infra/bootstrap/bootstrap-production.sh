@@ -38,7 +38,8 @@ npm exec cdk -- bootstrap "aws://${AWS_ACCOUNT_ID}/${AWS_REGION}" \
   --toolkit-stack-name CDKToolkit-cagprod \
   --qualifier cagprod \
   --bootstrap-kms-key-id AWS_MANAGED_KEY \
-  --cloudformation-execution-policies "$EXECUTION_POLICY_ARN" "$DNS_EXECUTION_POLICY_ARN" \
+  --cloudformation-execution-policies "$EXECUTION_POLICY_ARN" \
+  --cloudformation-execution-policies "$DNS_EXECUTION_POLICY_ARN" \
   --trust "$AWS_ACCOUNT_ID" \
   --trust-for-lookup "$AWS_ACCOUNT_ID"
 
