@@ -6,7 +6,7 @@ import {
   writeFileSync
 } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { join } from 'node:path';
 import {
   assertCanaryEmptyTarget,
@@ -171,7 +171,7 @@ describe('canary IAM migration safeguards', () => {
   });
 });
 
-const runMigration = (scenario: string) => {
+const runMigration = async (scenario: string) => {
   const directory = mkdtempSync(join(tmpdir(), 'cag-iam-flow-'));
   const template = retainedTemplate();
   const resources = [
@@ -299,19 +299,35 @@ else fail('Unexpected AWS command: ' + args.join(' '));
   );
   chmodSync(fakeAws, 0o755);
   try {
+    // Yield while Bash runs so Vitest can receive worker RPC acknowledgements.
     const run = () =>
-      spawnSync('bash', [join(process.cwd(), 'bootstrap/move-canary-iam.sh')], {
-        encoding: 'utf8',
-        env: {
-          ...process.env,
-          AWS_ACCOUNT_ID: '123456789012',
-          AWS_REGION: 'us-east-1',
-          CAG_MIGRATION_FIXTURE: directory,
-          PATH: `${directory}:${process.env.PATH}`
+      new Promise<{ status: number | null; stderr: string }>(
+        (resolve, reject) => {
+          const child = spawn(
+            'bash',
+            [join(process.cwd(), 'bootstrap/move-canary-iam.sh')],
+            {
+              stdio: ['ignore', 'ignore', 'pipe'],
+              env: {
+                ...process.env,
+                AWS_ACCOUNT_ID: '123456789012',
+                AWS_REGION: 'us-east-1',
+                CAG_MIGRATION_FIXTURE: directory,
+                PATH: `${directory}:${process.env.PATH}`
+              }
+            }
+          );
+          let stderr = '';
+          child.stderr.setEncoding('utf8');
+          child.stderr.on('data', (chunk: string) => {
+            stderr += chunk;
+          });
+          child.once('error', reject);
+          child.once('close', (status) => resolve({ status, stderr }));
         }
-      });
-    const first = run();
-    const result = scenario.endsWith('-once') ? run() : first;
+      );
+    const first = await run();
+    const result = scenario.endsWith('-once') ? await run() : first;
     const calls = readFileSync(join(directory, 'calls.jsonl'), 'utf8')
       .trim()
       .split(String.fromCharCode(10))
@@ -323,8 +339,8 @@ else fail('Unexpected AWS command: ' + args.join(' '));
 };
 
 describe('canary IAM migration shell flow', () => {
-  it('resumes while the empty rollback placeholder deletion is still in progress', () => {
-    const result = runMigration('placeholder-delete-once');
+  it('resumes while the empty rollback placeholder deletion is still in progress', async () => {
+    const result = await runMigration('placeholder-delete-once');
     expect(result.firstStatus).not.toBe(0);
     expect(result.status, result.stderr).toBe(0);
     expect(
@@ -335,8 +351,8 @@ describe('canary IAM migration shell flow', () => {
     );
   });
 
-  it('rejects live IAM drift introduced after the import', () => {
-    const result = runMigration('post-import-drift');
+  it('rejects live IAM drift introduced after the import', async () => {
+    const result = await runMigration('post-import-drift');
     expect(result.status, result.stderr).not.toBe(0);
     expect(result.stderr).toMatch(/drift/i);
     expect(result.calls.some((call) => call[1] === 'execute-change-set')).toBe(
@@ -346,8 +362,8 @@ describe('canary IAM migration shell flow', () => {
 
   it.each(['source-rollback-once', 'import-rollback-once'])(
     'recovers a failed %s on the next invocation using persisted service state',
-    (scenario) => {
-      const result = runMigration(scenario);
+    async (scenario) => {
+      const result = await runMigration(scenario);
       expect(result.firstStatus).not.toBe(0);
       expect(result.status, result.stderr).toBe(0);
       expect(
@@ -369,30 +385,35 @@ describe('canary IAM migration shell flow', () => {
     'live-trust-drift',
     'live-denied',
     'rollback'
-  ])('fails closed for %s without deleting the source stack', (scenario) => {
-    const result = runMigration(scenario);
-    expect(result.status, result.stderr).not.toBe(0);
-    const errors: Record<string, RegExp> = {
-      account: /account mismatch/,
-      denied: /AccessDenied/,
-      network: /Could not connect/,
-      drift: /template drift/,
-      guard: /both Retain/,
-      parameters: /parameter drift/,
-      'live-policy-drift': /drift/i,
-      'live-trust-drift': /drift/i,
-      'live-denied': /AccessDenied/,
-      rollback: /empty/
-    };
-    expect(result.stderr).toMatch(errors[scenario]);
-    expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(false);
-    expect(result.calls.some((call) => call[1] === 'create-change-set')).toBe(
-      false
-    );
-  });
+  ])(
+    'fails closed for %s without deleting the source stack',
+    async (scenario) => {
+      const result = await runMigration(scenario);
+      expect(result.status, result.stderr).not.toBe(0);
+      const errors: Record<string, RegExp> = {
+        account: /account mismatch/,
+        denied: /AccessDenied/,
+        network: /Could not connect/,
+        drift: /template drift/,
+        guard: /both Retain/,
+        parameters: /parameter drift/,
+        'live-policy-drift': /drift/i,
+        'live-trust-drift': /drift/i,
+        'live-denied': /AccessDenied/,
+        rollback: /empty/
+      };
+      expect(result.stderr).toMatch(errors[scenario]);
+      expect(result.calls.some((call) => call[1] === 'delete-stack')).toBe(
+        false
+      );
+      expect(result.calls.some((call) => call[1] === 'create-change-set')).toBe(
+        false
+      );
+    }
+  );
 
-  it('checks live retention immediately before deleting, then imports all resources', () => {
-    const result = runMigration('normal');
+  it('checks live retention immediately before deleting, then imports all resources', async () => {
+    const result = await runMigration('normal');
     expect(result.status, result.stderr).toBe(0);
     const actions = result.calls
       .filter((call) => call[0] === 'cloudformation')
@@ -410,8 +431,8 @@ describe('canary IAM migration shell flow', () => {
     );
   });
 
-  it('resumes an interrupted import without recreating or deleting IAM resources', () => {
-    const result = runMigration('partial');
+  it('resumes an interrupted import without recreating or deleting IAM resources', async () => {
+    const result = await runMigration('partial');
     expect(result.status, result.stderr).toBe(0);
     expect(result.calls.some((call) => call[1] === 'create-change-set')).toBe(
       true
@@ -423,8 +444,8 @@ describe('canary IAM migration shell flow', () => {
 
   it.each(['complete', 'importing', 'target-update-rollback'])(
     'validates and skips a %s target',
-    (scenario) => {
-      const result = runMigration(scenario);
+    async (scenario) => {
+      const result = await runMigration(scenario);
       expect(result.status, result.stderr).toBe(0);
       expect(
         result.calls.some((call) => call[1] === 'list-stack-resources')
