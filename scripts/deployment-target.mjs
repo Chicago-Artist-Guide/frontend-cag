@@ -110,8 +110,8 @@ export const resolveWorkflowTarget = ({
     if (refType !== undefined && refType !== 'branch') {
       throw new Error('Production deployment must run from a branch');
     }
-    if (ref !== 'master') {
-      throw new Error('Production deployment must run from ref master');
+    if (ref !== 'main') {
+      throw new Error('Production deployment must run from ref main');
     }
 
     target = {

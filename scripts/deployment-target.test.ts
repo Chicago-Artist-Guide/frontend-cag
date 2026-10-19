@@ -51,7 +51,7 @@ describe('resolveWorkflowTarget', () => {
       }
     ],
     [
-      { ref: 'master', stage: 'production' },
+      { ref: 'main', stage: 'production' },
       {
         cdkStage: 'production',
         deployEnvironment: 'production',
@@ -106,7 +106,8 @@ describe('resolveWorkflowTarget', () => {
 
   it.each([
     [{ ref: 'master', stage: 'staging' }, 'staging'],
-    [{ ref: 'staging', stage: 'production' }, 'master']
+    [{ ref: 'staging', stage: 'production' }, 'main'],
+    [{ ref: 'master', stage: 'production' }, 'main']
   ])('restricts durable deployments to their exact ref', (input, ref) => {
     expect(() => resolveWorkflowTarget(input)).toThrow(
       `must run from ref ${ref}`
@@ -116,7 +117,7 @@ describe('resolveWorkflowTarget', () => {
   it('requires durable refs to be branches rather than same-named tags', () => {
     expect(() =>
       resolveWorkflowTarget({
-        ref: 'master',
+        ref: 'main',
         refType: 'tag',
         stage: 'production'
       })
@@ -183,9 +184,9 @@ describe('resolveWorkflowTarget', () => {
       ].join('\n')
     );
 
-    expect(() =>
-      formatGitHubOutputs({ safe: 'value\ninjected=true' })
-    ).toThrow('GitHub output values must be single-line');
+    expect(() => formatGitHubOutputs({ safe: 'value\ninjected=true' })).toThrow(
+      'GitHub output values must be single-line'
+    );
   });
 });
 
@@ -218,7 +219,7 @@ describe('deployment target CLI', () => {
           '--stage',
           'production',
           '--ref',
-          'master',
+          'main',
           '--ref-type',
           'branch'
         ],
@@ -236,7 +237,7 @@ describe('deployment target CLI', () => {
           '--stage',
           'production',
           '--ref',
-          'master',
+          'main',
           '--ref-type',
           'tag'
         ],

@@ -13,7 +13,10 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as ecrAssets from 'aws-cdk-lib/aws-ecr-assets';
 import * as ecs from 'aws-cdk-lib/aws-ecs';
 import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as route53 from 'aws-cdk-lib/aws-route53';
+import * as route53Targets from 'aws-cdk-lib/aws-route53-targets';
 import * as wafv2 from 'aws-cdk-lib/aws-wafv2';
 import type { Construct } from 'constructs';
 import type { DeploymentTarget } from './deployment-target.js';
@@ -30,12 +33,17 @@ export const PUBLIC_BUILD_ARGUMENT_NAMES = [
 export type PublicBuildArguments = Record<
   (typeof PUBLIC_BUILD_ARGUMENT_NAMES)[number],
   string
->;
+> & { NEXT_PUBLIC_SITE_URL?: string };
 
 export interface PlatformStackProps extends StackProps {
   buildArguments: PublicBuildArguments;
   target: DeploymentTarget;
   certificateArn?: string;
+  managedDomain?: {
+    domainName: string;
+    hostedZoneId: string;
+    https: boolean;
+  };
   webAclArn?: string;
   flowLogs?: boolean;
   cpu?: number;
@@ -53,6 +61,7 @@ export class PlatformStack extends Stack {
       buildArguments,
       target,
       certificateArn,
+      managedDomain,
       webAclArn,
       flowLogs = false,
       cpu = 256,
@@ -63,6 +72,16 @@ export class PlatformStack extends Stack {
       ...stackProps,
       terminationProtection: target.isProduction
     });
+
+    if (target.isProduction) {
+      iam.PermissionsBoundary.of(this).apply(
+        iam.ManagedPolicy.fromManagedPolicyName(
+          this,
+          'WorkloadBoundary',
+          'CagProductionWorkloadBoundary'
+        )
+      );
+    }
 
     Tags.of(this).add('Application', 'chicago-artist-guide');
     Tags.of(this).add('DeploymentId', target.deploymentId);
@@ -100,7 +119,6 @@ export class PlatformStack extends Stack {
         destination: ec2.FlowLogDestination.toCloudWatchLogs(flowLogGroup)
       });
     }
-
 
     const applicationImage = new ecrAssets.DockerImageAsset(
       this,
@@ -212,24 +230,45 @@ export class PlatformStack extends Stack {
         vpc
       }
     );
+    let certificate = certificateArn
+      ? acm.Certificate.fromCertificateArn(this, 'Certificate', certificateArn)
+      : undefined;
+    if (managedDomain) {
+      const zone = route53.HostedZone.fromHostedZoneAttributes(
+        this,
+        'ManagedZone',
+        {
+          hostedZoneId: managedDomain.hostedZoneId,
+          zoneName: managedDomain.domainName
+        }
+      );
+      new route53.ARecord(this, 'ApplicationDns', {
+        zone,
+        target: route53.RecordTarget.fromAlias(
+          new route53Targets.LoadBalancerTarget(loadBalancer)
+        )
+      });
+      if (managedDomain.https) {
+        certificate = new acm.Certificate(this, 'ManagedCertificate', {
+          domainName: managedDomain.domainName,
+          validation: acm.CertificateValidation.fromDns(zone)
+        });
+      }
+    }
     const listener = loadBalancer.addListener('HttpListener', {
       open: true,
       port: 80,
       protocol: elbv2.ApplicationProtocol.HTTP
     });
-    if (certificateArn) {
+    if (certificate) {
       listener.addAction('RedirectToHttps', {
         action: elbv2.ListenerAction.redirect({
           permanent: true,
+          host: managedDomain?.domainName,
           port: '443',
           protocol: 'HTTPS'
         })
       });
-      const certificate = acm.Certificate.fromCertificateArn(
-        this,
-        'Certificate',
-        certificateArn
-      );
       const httpsListener = loadBalancer.addListener('HttpsListener', {
         certificates: [certificate],
         port: 443,
@@ -273,7 +312,6 @@ export class PlatformStack extends Stack {
       });
     }
 
-
     const scaling = service.autoScaleTaskCount({
       maxCapacity: target.isProduction ? 4 : 2,
       minCapacity: 1
@@ -303,6 +341,14 @@ export class PlatformStack extends Stack {
     new CfnOutput(this, 'LoadBalancerDnsName', {
       description: 'Use this hostname for validation before a DNS cutover.',
       value: loadBalancer.loadBalancerDnsName
+    });
+    new CfnOutput(this, 'ApplicationUrl', {
+      value: managedDomain?.https
+        ? `https://${managedDomain.domainName}`
+        : certificateArn
+          ? buildArguments.NEXT_PUBLIC_SITE_URL ||
+            'https://www.chicagoartistguide.org'
+          : `http://${loadBalancer.loadBalancerDnsName}`
     });
     new CfnOutput(this, 'LoadBalancerUrl', {
       value: `${certificateArn ? 'https' : 'http'}://${loadBalancer.loadBalancerDnsName}`

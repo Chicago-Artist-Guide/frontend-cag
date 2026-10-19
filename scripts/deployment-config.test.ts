@@ -35,20 +35,31 @@ describe('deployment configuration fingerprint', () => {
     }
   });
 
-  it.each(DEPLOYMENT_CONFIGURATION_NAMES)(
-    'changes when %s changes',
-    (name) => {
-      const baseline = fingerprintDeploymentConfiguration(
-        configuredEnvironment
-      );
-      const changed = fingerprintDeploymentConfiguration({
-        ...configuredEnvironment,
-        [name]: `${configuredEnvironment[name]}-changed`
-      });
+  it.each(DEPLOYMENT_CONFIGURATION_NAMES)('changes when %s changes', (name) => {
+    const baseline = fingerprintDeploymentConfiguration(configuredEnvironment);
+    const changed = fingerprintDeploymentConfiguration({
+      ...configuredEnvironment,
+      [name]: `${configuredEnvironment[name]}-changed`
+    });
 
-      expect(changed).not.toBe(baseline);
-    }
-  );
+    expect(changed).not.toBe(baseline);
+  });
+
+  it.each([
+    'MANAGED_DNS',
+    'MANAGED_HTTPS',
+    'CERTIFICATE_ARN',
+    'WEB_ACL_ARN',
+    'FLOW_LOGS',
+    'NEXT_PUBLIC_SITE_URL'
+  ])('detects changes to optional infrastructure configuration %s', (name) => {
+    expect(
+      fingerprintDeploymentConfiguration({
+        ...configuredEnvironment,
+        [name]: 'changed'
+      })
+    ).not.toBe(fingerprintDeploymentConfiguration(configuredEnvironment));
+  });
 
   it('rejects a missing value without exposing configured values', () => {
     expect(() =>

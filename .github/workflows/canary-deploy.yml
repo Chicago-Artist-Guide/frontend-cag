@@ -127,6 +127,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
         run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
 
       - name: Configure AWS credentials
@@ -146,6 +148,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
         working-directory: infra
         run: |
           npm exec cdk -- diff "$STACK_NAME" \
@@ -191,6 +195,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
         run: node scripts/deployment-config.mjs >> "$GITHUB_OUTPUT"
 
       - name: Require the planned configuration
@@ -227,6 +233,8 @@ jobs:
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
           NEXT_PUBLIC_FIREBASE_SENDER_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_SENDER_ID }}
           NEXT_PUBLIC_LGL_API_KEY: ${{ vars.NEXT_PUBLIC_LGL_API_KEY }}
+          MANAGED_DNS: ${{ vars.MANAGED_DNS }}
+          MANAGED_HTTPS: ${{ vars.MANAGED_HTTPS }}
         working-directory: infra
         run: |
           npm exec cdk -- deploy "$STACK_NAME" \
@@ -245,10 +253,18 @@ jobs:
             --file "$RUNNER_TEMP/cdk-outputs.json" \
             --stack "$STACK_NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Smoke deployed canary
+      - name: Smoke deployed canary HTTP
+        if: ${{ !startsWith(steps.deployment.outputs.base_url, 'https://') }}
         env:
           BASE_URL: ${{ steps.deployment.outputs.base_url }}
         run: npm run smoke:server
+
+      - name: Smoke deployed canary HTTPS directly through its ALB
+        if: startsWith(steps.deployment.outputs.base_url, 'https://')
+        env:
+          ALB_DNS: ${{ steps.deployment.outputs.load_balancer_dns_name }}
+          BASE_URL: ${{ steps.deployment.outputs.base_url }}
+        run: node scripts/smoke-alb-https.mjs
 
       - name: Publish canary URL
         env:
@@ -257,5 +273,5 @@ jobs:
           {
             echo "## Next.js canary deployment complete"
             echo "Validated ALB URL: $BASE_URL"
-            echo "Amplify staging and DNS were not changed."
+            echo "Public www remains on Amplify; canary owns the configured staging subdomain."
           } >> "$GITHUB_STEP_SUMMARY"

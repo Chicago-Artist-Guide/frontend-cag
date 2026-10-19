@@ -25,9 +25,51 @@ const optionalString = (outputs, name) => {
   return assertSingleLine(value);
 };
 
+export const validateApplicationUrl = (
+  value,
+  stackName,
+  loadBalancerDnsName
+) => {
+  assertSingleLine(value);
+  let url;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error('ApplicationUrl must be an absolute application origin');
+  }
+  const httpsNames = {
+    'CagPlatform-production': [
+      'prod.chicagoartistguide.org',
+      'www.chicagoartistguide.org'
+    ],
+    'CagPlatform-canary': ['staging.chicagoartistguide.org']
+  };
+  if (
+    url.username ||
+    url.password ||
+    url.port ||
+    url.pathname !== '/' ||
+    url.search ||
+    url.hash ||
+    !(
+      (url.protocol === 'http:' &&
+        url.hostname === loadBalancerDnsName.toLowerCase()) ||
+      (url.protocol === 'https:' &&
+        (httpsNames[stackName] || []).includes(url.hostname))
+    )
+  ) {
+    throw new Error(
+      'ApplicationUrl must match the exact stack application origin'
+    );
+  }
+  return url.origin;
+};
+
 export const readCdkOutputs = async (filePath, stackName) => {
   if (!isValidCagStackName(stackName)) {
-    throw new Error(`${String(stackName)} is not a valid CAG platform stack name`);
+    throw new Error(
+      `${String(stackName)} is not a valid CAG platform stack name`
+    );
   }
 
   let document;
@@ -44,11 +86,17 @@ export const readCdkOutputs = async (filePath, stackName) => {
     Array.isArray(document) ||
     !Object.hasOwn(document, stackName)
   ) {
-    throw new Error(`CDK outputs file does not contain exact stack ${stackName}`);
+    throw new Error(
+      `CDK outputs file does not contain exact stack ${stackName}`
+    );
   }
 
   const outputs = document[stackName];
-  if (outputs === null || typeof outputs !== 'object' || Array.isArray(outputs)) {
+  if (
+    outputs === null ||
+    typeof outputs !== 'object' ||
+    Array.isArray(outputs)
+  ) {
     throw new Error(`CDK outputs for ${stackName} must be an object`);
   }
 
@@ -65,7 +113,14 @@ export const readCdkOutputs = async (filePath, stackName) => {
   const normalizedLoadBalancerDnsName = loadBalancerDnsName.toLowerCase();
 
   return {
-    baseUrl: `http://${normalizedLoadBalancerDnsName}`,
+    baseUrl:
+      outputs.ApplicationUrl === undefined
+        ? `http://${normalizedLoadBalancerDnsName}`
+        : validateApplicationUrl(
+            outputs.ApplicationUrl,
+            stackName,
+            normalizedLoadBalancerDnsName
+          ),
     dataSubnetIds: optionalString(outputs, 'DataSubnetIds'),
     deploymentId: optionalString(outputs, 'DeploymentId'),
     futureDataSecurityGroupId: optionalString(

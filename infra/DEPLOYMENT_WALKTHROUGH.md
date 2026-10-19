@@ -1,5 +1,8 @@
 # Deployment Walkthrough — CDK Fargate Platform
 
+Historical foundation walkthrough. For the current `canary` staging / `main`
+production workflow, use [Production cutover](PRODUCTION_CUTOVER.md).
+
 **Target:** PR #335 (`dev-512` → `staging`)
 **Deploy date:** 2026-07-27
 **Audit reference:** `infra/AUDIT.md`
