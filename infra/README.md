@@ -1,30 +1,34 @@
 # AWS CDK platform foundation
 
-Current production setup and DNS sequencing: [Production cutover](PRODUCTION_CUTOVER.md).
-`canary` is Next.js staging; `main` deploys Next.js production.
-The older staging/master branches retain their Amplify deployments during cutover.
+Development/release process: [DevOps cutover](DEVOPS_CUTOVER.md).
+Infrastructure and DNS sequencing: [Production cutover](PRODUCTION_CUTOVER.md).
 
-This CDK v2 application defines the AWS-native ECS/Fargate foundation for the
-Chicago Artist Guide compatibility host. It does not create a database,
-credential, DNS record, or static AWS access key.
+`canary` is the active Next.js staging branch and deploys `CagPlatform-canary`;
+`main` deploys `CagPlatform-production`. The legacy `staging`/`master` branches
+retain their Amplify deployments while public www remains on Amplify.
+
+This CDK v2 application defines the AWS-native ECS/Fargate application stacks
+and optional managed subdomain DNS/HTTPS. It creates no database, credential,
+or static AWS access key.
 
 ## Deployment targets
 
-Every explicit CDK invocation selects one of three target classes:
+| CDK stage    | App stack                  | Delivery use                                                  |
+| ------------ | -------------------------- | ------------------------------------------------------------- |
+| `canary`     | `CagPlatform-canary`       | Active staging CI from the canary branch                      |
+| `production` | `CagPlatform-production`   | Active production CI from main                                |
+| `preview`    | `CagPlatform-preview-<id>` | Explicit isolated synthesis target                            |
+| `staging`    | `CagPlatform-staging`      | Earlier generic CDK target; not the active staging deployment |
 
-- `preview` requires a unique lowercase `previewId` and creates
-  `CagPlatform-preview-<id>`.
-- `staging` creates `CagPlatform-staging`.
-- `production` creates `CagPlatform-production`.
-
-With no stage context, CDK creates the two persistent stacks so CI can verify
-both configurations in one credential-free synth. A targeted invocation
-creates exactly one stack:
+With no stage context, credential-free synthesis still covers the generic
+`staging` and `production` configurations. Explicit context selects one app
+stack; managed production DNS also adds the persistent DNS-stack dependency.
+From `infra/`:
 
 ```bash
-npm run list
+npm run list -- -c stage=canary
+npm run synth -- -c stage=canary
 npm run list -- -c stage=preview -c previewId=dev-511
-npm run synth -- -c stage=staging
 ```
 
 Preview IDs must be 3-20 characters, start and end with a letter or number,
@@ -45,14 +49,15 @@ Each target contains:
   application service.
 
 The data subnets have no internet route. There is intentionally no RDS
-instance or cluster, RDS Proxy, Secrets Manager secret, VPC endpoint, Route 53
-record, or other database resource yet. The isolated subnet IDs, VPC ID, and
-future-data security group ID are outputs so a later relational-data change can
+instance or cluster, RDS Proxy, Secrets Manager secret, VPC endpoint, or other
+database resource yet. The isolated subnet IDs, VPC ID, and future-data security
+group ID are outputs so a later relational-data change can
 attach to the existing boundary.
 
 The ALB checks `/api/health/ready`; ECS checks `/api/health/live`. Failed ECS
-deployments roll back. Preview and staging logs are stack-owned so either target
-can be torn down and recreated without a retained-name collision. Production
+deployments use ECS deployment circuit breaker recovery. Preview and canary
+logs are stack-owned so either target can be torn down and recreated without a
+retained-name collision. Production
 logs are retained, and production also enables CloudFormation termination
 protection and ALB deletion protection. Paid ECS Container Insights is
 explicitly disabled for the zero-traffic baseline; application logs and native
@@ -88,10 +93,13 @@ npm ci
 npm run verify
 ```
 
-An AWS deployment is intentionally outside local verification. It should run
-from the approved GitHub-hosted workflow through OIDC only after account,
-region, role, CDK bootstrap, billing controls, and environment approvals have
-been configured outside this repository.
+AWS deployment runs through the branch-scoped GitHub OIDC workflows, after
+credential-free verification and plan/configuration checks. The six environments
+and their allowed branches are documented in [DevOps cutover](DEVOPS_CUTOVER.md).
 
-The stack outputs the load balancer hostname and `http://` URL for validation
-before any production DNS cutover.
+The validated `ApplicationUrl` output is HTTP until TLS is enabled. Optional
+managed DNS uses `prod.chicagoartistguide.org` and `staging.chicagoartistguide.org`;
+its retained `CagPlatform-production-dns` stack owns the two child zones while
+app stacks own ALB aliases and native ACM certificates. Keep `MANAGED_HTTPS=false`
+until parent delegation is verified. Follow [Production cutover](PRODUCTION_CUTOVER.md)
+for activation; public www stays on Amplify and apex records stay unchanged.
