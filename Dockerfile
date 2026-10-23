@@ -51,8 +51,12 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
+# The runner only executes node; the bundled package managers ship their own CVEs.
 RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nextjs
+  && adduser --system --uid 1001 nextjs \
+  && rm -rf /usr/local/lib/node_modules /opt/yarn-* \
+    /usr/local/bin/corepack /usr/local/bin/npm /usr/local/bin/npx \
+    /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
