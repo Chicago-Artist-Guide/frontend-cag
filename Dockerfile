@@ -1,11 +1,11 @@
-FROM node:22.22.0-alpine@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 AS dependencies
+FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS dependencies
 
 WORKDIR /app
 
 COPY .npmrc package.json package-lock.json ./
 RUN npm ci
 
-FROM node:22.22.0-alpine@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 AS development
+FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS development
 
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -18,7 +18,7 @@ EXPOSE 3000
 
 CMD ["npm", "run", "dev:container:start"]
 
-FROM node:22.22.0-alpine@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 AS builder
+FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS builder
 
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -43,7 +43,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 COPY . .
 RUN node scripts/public-env.mjs && npm run build
 
-FROM node:22.22.0-alpine@sha256:e4bf2a82ad0a4037d28035ae71529873c069b13eb0455466ae0bc13363826e34 AS runner
+FROM node:22.23.4-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS runner
 
 WORKDIR /app
 ENV HOSTNAME=0.0.0.0
@@ -51,8 +51,12 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 
+# The runner only executes node; the bundled package managers ship their own CVEs.
 RUN addgroup --system --gid 1001 nodejs \
-  && adduser --system --uid 1001 nextjs
+  && adduser --system --uid 1001 nextjs \
+  && rm -rf /usr/local/lib/node_modules /opt/yarn-* \
+    /usr/local/bin/corepack /usr/local/bin/npm /usr/local/bin/npx \
+    /usr/local/bin/yarn /usr/local/bin/yarnpkg
 
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { uuidv4 } from '@firebase/util';
+import { uuidv4 } from '../../utils/uuid';
 import { getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import styled from 'styled-components';
 import { useDropzone } from 'react-dropzone';

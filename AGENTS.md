@@ -35,7 +35,7 @@ The pre-migration Vite build still exists and is exercised locally, but CI no lo
 - `npm run preview:legacy` - `vite preview`
 
 ### Node Version
-- Use Node >=22 <23 via NVM (`nvm use`); pinned in `.nvmrc` (currently v22.22.0) and in `package.json` `engines`.
+- Use Node >=22 <23 via NVM (`nvm use`); pinned in `.nvmrc` (currently v22.23.4) and in `package.json` `engines`.
 
 ## Architecture
 

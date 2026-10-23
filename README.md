@@ -8,7 +8,7 @@ route-by-route server rendering is tracked separately in DEV-492.
 
 ### Local development
 
-The native and container paths both use Node 22.22.0 and npm 10.9.4. For a
+The native and container paths both use Node 22.23.4 and npm 10.9.9. For a
 clean native checkout:
 
 ```bash

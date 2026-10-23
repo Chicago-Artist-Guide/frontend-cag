@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import queryString from 'query-string';
 import PageContainer from '../components/layout/PageContainer';
 import AccountType from '../components/SignUp/AccountType';
 import CompanySignUp from '../components/SignUp/Company';
@@ -12,7 +11,7 @@ import { useUserContext } from '../context/UserContext';
 
 const SignUp: React.FC<React.PropsWithChildren<unknown>> = () => {
   const navigate = useNavigate();
-  const { flag } = queryString.parse(location.search);
+  const flag = new URLSearchParams(location.search).get('flag');
   const { currentUser } = useUserContext();
   const [currentStep, setCurrentStep] = useState(-1);
   const [accountType, setAccountType] = useState<AccountTypeOptions | null>(

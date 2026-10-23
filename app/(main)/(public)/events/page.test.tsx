@@ -17,7 +17,10 @@ import EventsPage from './page';
 
 const mockListEvents = vi.mocked(getCachedEvents);
 
-const pagePath = path.resolve(process.cwd(), 'app/(main)/(public)/events/page.tsx');
+const pagePath = path.resolve(
+  process.cwd(),
+  'app/(main)/(public)/events/page.tsx'
+);
 
 // EventsPage is an async Server Component. Outside the Next.js RSC runtime it
 // is still a plain async function — calling it directly and rendering the
@@ -33,11 +36,10 @@ describe('Events App Router page', () => {
     // this page) uses one for its scroll-in fade animation, same as
     // window.scrollTo is stubbed in src/test/setupTests.ts for ScrollToTop.
     if (typeof window.IntersectionObserver === 'undefined') {
-      window.IntersectionObserver = vi.fn().mockImplementation(() => ({
-        disconnect: vi.fn(),
-        observe: vi.fn(),
-        unobserve: vi.fn()
-      })) as unknown as typeof IntersectionObserver;
+      // Vitest 4 only constructs mocks implemented as a function or class.
+      window.IntersectionObserver = vi.fn().mockImplementation(function () {
+        return { disconnect: vi.fn(), observe: vi.fn(), unobserve: vi.fn() };
+      }) as unknown as typeof IntersectionObserver;
     }
   });
 
@@ -91,7 +93,9 @@ describe('Events App Router page', () => {
     await renderPage();
 
     expect(mockListEvents).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole('heading', { level: 1, name: 'EVENTS' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'EVENTS' })
+    ).toBeInTheDocument();
     // EventCard renders separate mobile/tablet/desktop markup (toggled by CSS
     // media queries, all present in jsdom), so each event's title appears
     // more than once in the DOM.
@@ -118,7 +122,9 @@ describe('Events App Router page', () => {
     await renderPage();
 
     expect(screen.queryAllByText('Draft Event')).toHaveLength(0);
-    expect(screen.getByText('No upcoming events at this time.')).toBeInTheDocument();
+    expect(
+      screen.getByText('No upcoming events at this time.')
+    ).toBeInTheDocument();
     expect(screen.getByText('No past events found.')).toBeInTheDocument();
   });
 
@@ -127,7 +133,9 @@ describe('Events App Router page', () => {
 
     await renderPage();
 
-    expect(screen.getByText('No upcoming events at this time.')).toBeInTheDocument();
+    expect(
+      screen.getByText('No upcoming events at this time.')
+    ).toBeInTheDocument();
     expect(screen.getByText('No past events found.')).toBeInTheDocument();
   });
 });
