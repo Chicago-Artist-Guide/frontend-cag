@@ -2,7 +2,7 @@
   "name": "frontend_cag",
   "version": "1.0.0",
   "private": true,
-  "packageManager": "npm@10.9.4",
+  "packageManager": "npm@10.9.9",
   "type": "module",
   "engines": {
     "node": ">=22 <23"
@@ -61,7 +61,7 @@
     "firebase": "^10.9.0",
     "formik": "^2.4.6",
     "multiselect-react-dropdown": "^2.0.25",
-    "next": "16.3.5",
+    "next": "16.4.2",
     "query-string": "^8.1.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.5",
