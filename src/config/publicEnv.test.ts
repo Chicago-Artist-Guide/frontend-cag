@@ -10,6 +10,7 @@ describe('createPublicConfig', () => {
       NEXT_PUBLIC_FIREBASE_SENDER_ID: 'sender-id',
       NEXT_PUBLIC_LGL_API_KEY: 'lgl-key',
       NEXT_PUBLIC_SITE_URL: 'https://staging.chicagoartistguide.org',
+      NEXT_PUBLIC_ZEFFY_DONATION_URL: 'https://www.zeffy.com/en-US/example',
       NODE_ENV: 'development'
     });
 
@@ -25,7 +26,8 @@ describe('createPublicConfig', () => {
       },
       isDevelopment: true,
       lglApiKey: 'lgl-key',
-      siteUrl: 'https://staging.chicagoartistguide.org'
+      siteUrl: 'https://staging.chicagoartistguide.org',
+      zeffyDonationUrl: 'https://www.zeffy.com/en-US/example'
     });
   });
 
@@ -48,6 +50,14 @@ describe('createPublicConfig', () => {
     const config = createPublicConfig({ NODE_ENV: 'test' });
 
     expect(config.siteUrl).toBe('https://www.chicagoartistguide.org');
+  });
+
+  it('falls back to the current Zeffy campaign when NEXT_PUBLIC_ZEFFY_DONATION_URL is unset', () => {
+    const config = createPublicConfig({ NODE_ENV: 'test' });
+
+    expect(config.zeffyDonationUrl).toBe(
+      'https://www.zeffy.com/en-US/donation-form/2026-cag-end-of-year-fundraiser'
+    );
   });
 
   it('disables development-only behavior in production', () => {
