@@ -20,6 +20,13 @@ export default defineConfig({
   assetsInclude: ['**/*.JPG', '**/*.jpg', '**/*.PNG', '**/*.png'],
   define: {
     'process.env': {},
+    // Donation campaign link; see src/utils/marketing.ts zeffyUrl
+    'process.env.NEXT_PUBLIC_ZEFFY_DONATION_URL': JSON.stringify(
+      process.env.ZEFFY_DONATION_URL ||
+        process.env.VITE_APP_ZEFFY_DONATION_URL ||
+        process.env.NEXT_PUBLIC_ZEFFY_DONATION_URL ||
+        ''
+    ),
     // Add empty default values for your env vars
     'import.meta.env.VITE_FIREBASE_API_KEY': JSON.stringify(''),
     'import.meta.env.VITE_FIREBASE_AUTH_DOMAIN': JSON.stringify(''),
