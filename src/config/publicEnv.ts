@@ -13,6 +13,7 @@ export interface PublicConfig {
   isDevelopment: boolean;
   lglApiKey: string;
   siteUrl: string;
+  zeffyDonationUrl: string;
 }
 
 // Production origin, used as the fallback when NEXT_PUBLIC_SITE_URL is
@@ -20,6 +21,13 @@ export interface PublicConfig {
 // Preview/staging environments override via the env var so sitemap.xml and
 // robots.txt point at their own origin instead of production.
 const DEFAULT_SITE_URL = 'https://www.chicagoartistguide.org';
+
+// Current donation campaign, used as the fallback when
+// NEXT_PUBLIC_ZEFFY_DONATION_URL is unset. Update the default here when the
+// baked-in link becomes the sanctioned one; point environments at a new Zeffy
+// form via the env var without a code change.
+const DEFAULT_ZEFFY_DONATION_URL =
+  'https://www.zeffy.com/en-US/donation-form/2026-cag-end-of-year-fundraiser';
 
 const valueOrEmpty = (value: string | undefined) => value || '';
 
@@ -44,7 +52,9 @@ export const createPublicConfig = (
     },
     isDevelopment: environment.NODE_ENV !== 'production',
     lglApiKey: valueOrEmpty(environment.NEXT_PUBLIC_LGL_API_KEY),
-    siteUrl: environment.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL
+    siteUrl: environment.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL,
+    zeffyDonationUrl:
+      environment.NEXT_PUBLIC_ZEFFY_DONATION_URL || DEFAULT_ZEFFY_DONATION_URL
   };
 };
 
@@ -57,6 +67,7 @@ export const publicConfig = createPublicConfig({
   NEXT_PUBLIC_FIREBASE_SENDER_ID: process.env.NEXT_PUBLIC_FIREBASE_SENDER_ID,
   NEXT_PUBLIC_LGL_API_KEY: process.env.NEXT_PUBLIC_LGL_API_KEY,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+  NEXT_PUBLIC_ZEFFY_DONATION_URL: process.env.NEXT_PUBLIC_ZEFFY_DONATION_URL,
   NODE_ENV: process.env.NODE_ENV
 });
 
