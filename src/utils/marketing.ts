@@ -123,5 +123,12 @@ export const submitLGLConstituent = async ({
     );
 };
 
+// Current donation campaign, used as the fallback when the Zeffy env var is
+// unset. Override via NEXT_PUBLIC_ZEFFY_DONATION_URL (mapped in
+// vite.config.ts) to point environments at a new Zeffy form without a code
+// change.
+const DEFAULT_ZEFFY_DONATION_URL =
+  'https://www.zeffy.com/en-US/donation-form/2026-cag-end-of-year-fundraiser';
+
 export const zeffyUrl =
-  'https://www.zeffy.com/en-US/donation-form/bf4f5b40-de6b-44d1-9276-ef91daa82842';
+  process.env.NEXT_PUBLIC_ZEFFY_DONATION_URL || DEFAULT_ZEFFY_DONATION_URL;
