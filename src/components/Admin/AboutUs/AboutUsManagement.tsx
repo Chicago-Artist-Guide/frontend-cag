@@ -74,7 +74,7 @@ const AboutUsManagement = () => {
   const [loadFailed, setLoadFailed] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [editing, setEditing] = useState<Editing | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [photoPending, setPhotoPending] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [status, setStatus] = useState<{ error: boolean; text: string }>();
 
@@ -379,19 +379,24 @@ const AboutUsManagement = () => {
                     helperText="Square photos work best. Max 5MB."
                     imageType="company"
                     onSave={(url) => setMember({ image: url })}
-                    onUploadStateChange={setUploading}
+                    onPendingChange={setPhotoPending}
                   />
                 </div>
               </div>
             </Modal.Body>
             <Modal.Footer>
+              {photoPending && (
+                <p className="mb-0 mr-auto text-sm" role="status">
+                  Click Upload File to finish adding the photo.
+                </p>
+              )}
               <AdminButton
                 onClick={() => setEditing(null)}
                 text="Cancel"
                 variant="secondary"
               />
               <AdminButton
-                disabled={!editing.member.name.trim() || uploading}
+                disabled={!editing.member.name.trim() || photoPending}
                 onClick={saveMember}
                 text="Done"
               />
