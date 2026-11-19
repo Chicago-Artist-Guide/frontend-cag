@@ -153,10 +153,12 @@ const AboutUsManagement = () => {
     setEditing(null);
   };
 
-  // Built-in photos are bundled site assets whose URLs differ per deployment;
-  // copy them to Storage on publish so every site renders the same URL.
+  // Built-in photos are bundled site assets (same origin as this page; Vite
+  // makes their URLs absolute, Next leaves them relative). Copy them to
+  // Storage on publish so every deployment renders the same URL.
   const toStorageUrl = async (src: string | null) => {
-    if (!src || /^https?:\/\//.test(src)) return src;
+    const { origin } = window.location;
+    if (!src || new URL(src, origin).origin !== origin) return src;
     const response = await fetch(src);
     if (!response.ok) throw new Error(`Could not copy photo ${src}`);
     const fileRef = ref(firebaseStorage, `images/about-us/${uuidv4()}`);
