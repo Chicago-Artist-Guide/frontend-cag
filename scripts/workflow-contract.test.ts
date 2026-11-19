@@ -52,7 +52,7 @@ describe('GitHub workflow contracts', () => {
       )?.[1];
       expect(topLevelPermissions).toBeDefined();
       expect(topLevelPermissions).not.toContain('id-token: write');
-      expect(workflow).toContain('runs-on: ubuntu-latest');
+      expect(workflow).toContain('runs-on: ubuntu-24.04');
       expect(workflow).toContain('cancel-in-progress: false');
       expect(workflow).toContain('id-token: write');
       expect(workflow).toContain(
