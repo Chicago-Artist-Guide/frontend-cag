@@ -6,7 +6,7 @@
  * site_content/about_us document that /about-us reads.
  */
 
-import { uuidv4 } from '@firebase/util';
+import { uuidv4 } from '../../../utils/uuid';
 import {
   faArrowLeft,
   faArrowRight,
