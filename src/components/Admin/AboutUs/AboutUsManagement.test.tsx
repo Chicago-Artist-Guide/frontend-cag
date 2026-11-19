@@ -87,12 +87,11 @@ describe('AboutUsManagement', () => {
       (await screen.findAllByRole('button', { name: 'Edit' }))[0]
     );
     const role = screen.getByLabelText('Title / role');
+    // paste, not type: per-key typing over 37 rendered cards is slow on CI
     await user.clear(role);
-    await user.type(role, 'Board Chair');
-    await user.type(
-      screen.getByLabelText(/LinkedIn/),
-      '{Control>}a{/Control}https://www.linkedin.com/in/jorie/'
-    );
+    await user.paste('Board Chair');
+    await user.clear(screen.getByLabelText(/LinkedIn/));
+    await user.paste('https://www.linkedin.com/in/jorie/');
     await user.click(screen.getByRole('button', { name: 'Done' }));
     await user.click(screen.getByRole('button', { name: 'Publish changes' }));
 
@@ -121,7 +120,7 @@ describe('AboutUsManagement', () => {
     expect(
       await screen.findByText(/Published\. The public About Us page/)
     ).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('offers no editor when the live content cannot be loaded', async () => {
     vi.mocked(getDoc).mockRejectedValue(new Error('offline'));
