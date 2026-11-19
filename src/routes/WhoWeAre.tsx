@@ -5,7 +5,8 @@ import Collapsible from '../components/layout/Collapsible';
 import PageContainer from '../components/layout/PageContainer';
 import {
   type AboutPageContent,
-  toAboutPageContent
+  toAboutPageContent,
+  toCollapsibleProps
 } from '../components/WhoWeAre/aboutPageContent';
 import Team from '../components/WhoWeAre/Team';
 import { useFirebaseContext } from '../context/FirebaseContext';
@@ -66,8 +67,7 @@ const WhoWeAre = () => {
           <MeetOurTeamTitle>Meet Our Team</MeetOurTeamTitle>
           <div className="w-[100%]">
             <Collapsible
-              sectionTitles={content.titles}
-              subSections={content.team}
+              {...toCollapsibleProps(content.sections)}
               subContainer={Team}
               grid={true}
             />
