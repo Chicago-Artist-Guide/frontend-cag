@@ -183,6 +183,14 @@ service cloud.firestore {
       );
     }
 
+    // Site content (About Us page)
+    // - Public read access (rendered on /about-us)
+    // - Admins edit it from /admin/about-us
+    match /site_content/{docId} {
+      allow read: if true;
+      allow write: if isAdminOrHigher();
+    }
+
     // Threads collection
     // Thread docs reference their two sides via theater_account_id /
     // talent_account_id — Firestore DocumentReferences into `accounts`,

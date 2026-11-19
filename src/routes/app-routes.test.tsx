@@ -52,7 +52,8 @@ describe('legacy route object contract', () => {
       'users',
       'openings',
       'events',
-      'companies'
+      'companies',
+      'about-us'
     ]);
   });
 

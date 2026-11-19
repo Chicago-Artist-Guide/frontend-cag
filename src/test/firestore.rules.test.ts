@@ -329,6 +329,40 @@ describe('admin_actions collection — production_visibility_change', () => {
   });
 });
 
+describe('site_content collection (About Us page)', () => {
+  it('unauthenticated user CAN read site content', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'site_content', 'about_us'), { vision: 'v' });
+    });
+
+    await assertSucceeds(getDoc(doc(unauth(), 'site_content', 'about_us')));
+  });
+
+  it('admin CAN write site content', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'admin_users', 'admin-1'), { role: 'admin' });
+    });
+
+    await assertSucceeds(
+      setDoc(doc(asUser('admin-1'), 'site_content', 'about_us'), {
+        vision: 'v'
+      })
+    );
+  });
+
+  it('staff and regular users CANNOT write site content', async () => {
+    await seed(async (db) => {
+      await setDoc(doc(db, 'admin_users', 'staff-1'), { role: 'staff' });
+    });
+
+    for (const uid of ['staff-1', 'user-1']) {
+      await assertFails(
+        setDoc(doc(asUser(uid), 'site_content', 'about_us'), { vision: 'x' })
+      );
+    }
+  });
+});
+
 describe('profiles collection (must stay auth-gated)', () => {
   it('unauthenticated user CANNOT read any profile', async () => {
     await seed(async (db) => {
