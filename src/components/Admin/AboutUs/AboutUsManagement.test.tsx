@@ -34,9 +34,31 @@ vi.mock('../../../hooks/useAdminAuth', () => ({
   useAdminAuth: () => ({ adminRole: 'admin' })
 }));
 
-vi.mock('../../shared/ImageUploadComponent', () => ({
-  default: () => null
-}));
+// Stub uploader: one button reports a picked-but-not-uploaded photo, one the upload finishing.
+vi.mock('../../shared/ImageUploadComponent', async () => {
+  const { createElement, Fragment } = await import('react');
+  return {
+    default: ({
+      onPendingChange
+    }: {
+      onPendingChange?: (p: boolean) => void;
+    }) =>
+      createElement(
+        Fragment,
+        null,
+        createElement(
+          'button',
+          { onClick: () => onPendingChange?.(true), type: 'button' },
+          'Pick photo'
+        ),
+        createElement(
+          'button',
+          { onClick: () => onPendingChange?.(false), type: 'button' },
+          'Finish upload'
+        )
+      )
+  };
+});
 
 const member = {
   affiliation: null,
@@ -133,6 +155,29 @@ describe('AboutUsManagement', () => {
     expect(
       await screen.findByText(/Published\. The public About Us page/)
     ).toBeInTheDocument();
+  }, 15000);
+
+  it('keeps Done disabled while a picked photo is not uploaded', async () => {
+    vi.mocked(getDoc).mockResolvedValue({ data: () => undefined } as never);
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(
+      (await screen.findAllByRole('button', { name: 'Add person' }))[0]
+    );
+    await user.click(screen.getByLabelText('Name'));
+    await user.paste('New Person');
+    const done = screen.getByRole('button', { name: 'Done' });
+    expect(done).toBeEnabled();
+
+    await user.click(screen.getByRole('button', { name: 'Pick photo' }));
+    expect(done).toBeDisabled();
+    expect(
+      screen.getByText('Click Upload File to finish adding the photo.')
+    ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Finish upload' }));
+    expect(done).toBeEnabled();
   }, 15000);
 
   it('offers no editor when the live content cannot be loaded', async () => {

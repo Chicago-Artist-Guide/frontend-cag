@@ -24,6 +24,8 @@ interface ImageUploadComponentProps {
   helperText?: string;
   className?: string;
   onUploadStateChange?: (isUploading: boolean) => void;
+  // True while a picked image is not uploaded yet (cropping, selected, uploading)
+  onPendingChange?: (isPending: boolean) => void;
 }
 
 type UploadState = 'idle' | 'selected' | 'cropping' | 'uploading' | 'complete';
@@ -39,7 +41,8 @@ const ImageUploadComponent: React.FC<
   maxSizeInMB = 5,
   helperText,
   className,
-  onUploadStateChange
+  onUploadStateChange,
+  onPendingChange
 }) => {
   const [state, setState] = useState<UploadState>('idle');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -61,6 +64,12 @@ const ImageUploadComponent: React.FC<
 
   const aspectRatio = getAspectRatio(imageType);
   const cropShape = imageType === 'user' ? 'round' : 'rect';
+
+  useEffect(() => {
+    onPendingChange?.(
+      state === 'cropping' || state === 'selected' || state === 'uploading'
+    );
+  }, [state, onPendingChange]);
 
   // Set initial state based on current image (only when not actively changing)
   useEffect(() => {
