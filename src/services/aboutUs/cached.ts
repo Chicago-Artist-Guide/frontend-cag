@@ -21,6 +21,6 @@ export const getCachedAboutContent = unstable_cache(
       return toAboutPageContent();
     }
   },
-  ['about-us-content'],
+  ['about-us-content-v2'],
   { revalidate: 60, tags: ['about-us'] }
 );

@@ -171,7 +171,7 @@ describe('public App Router pages', () => {
     const teamSource = fs.readFileSync(aboutTeamFile, 'utf8');
 
     expect(aboutSource).toMatch(
-      /<AboutFrame[\s\S]*<div className="header-section">[\s\S]*<h1 className="page-title">ABOUT US<\/h1>[\s\S]*<div className="divider-bar" \/>[\s\S]*<div className="about-section">[\s\S]*<div className="vision-mission-wrapper">[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Vision<\/h2>[\s\S]*<\/div>[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Mission<\/h2>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<div className="team-section">[\s\S]*<h2 className="meet-our-team-title">Meet Our Team<\/h2>[\s\S]*<AboutTeam team=\{content\.team\} titles=\{content\.titles\} \/>/u
+      /<AboutFrame[\s\S]*<div className="header-section">[\s\S]*<h1 className="page-title">ABOUT US<\/h1>[\s\S]*<div className="divider-bar" \/>[\s\S]*<div className="about-section">[\s\S]*<div className="vision-mission-wrapper">[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Vision<\/h2>[\s\S]*<\/div>[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Mission<\/h2>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<div className="team-section">[\s\S]*<h2 className="meet-our-team-title">Meet Our Team<\/h2>[\s\S]*<AboutTeam sections=\{content\.sections\} \/>/u
     );
     expect(aboutSource).toContain("from 'next/link'");
     expect(aboutSource).toContain('{content.vision}');
@@ -186,8 +186,7 @@ describe('public App Router pages', () => {
     );
 
     expect(teamSource.trimStart()).toMatch(/^'use client';/u);
-    expect(teamSource).toContain('sectionTitles={titles}');
-    expect(teamSource).toContain('subSections={team}');
+    expect(teamSource).toContain('{...toCollapsibleProps(sections)}');
     expect(teamSource).toContain('subContainer={Team}');
     expect(teamSource).toContain('grid={true}');
 
