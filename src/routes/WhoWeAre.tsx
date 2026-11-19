@@ -50,7 +50,7 @@ const WhoWeAre = ({
         <div className="team-section">
           <h2 className="meet-our-team-title">Meet Our Team</h2>
           <div className="w-[100%]">
-            <AboutTeam team={content.team} />
+            <AboutTeam team={content.team} titles={content.titles} />
           </div>
         </div>
       </AboutFrame>

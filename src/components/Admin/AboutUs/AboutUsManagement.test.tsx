@@ -123,6 +123,9 @@ describe('AboutUsManagement', () => {
     await user.clear(screen.getByLabelText(/LinkedIn/));
     await user.paste('https://www.linkedin.com/in/jorie/');
     await user.click(screen.getByRole('button', { name: 'Done' }));
+    const artistsTitle = screen.getAllByLabelText('Section title')[1];
+    await user.clear(artistsTitle);
+    await user.paste('ARTIST COUNCIL');
     await user.click(screen.getByRole('button', { name: 'Publish changes' }));
 
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));
@@ -130,6 +133,10 @@ describe('AboutUsManagement', () => {
     expect(ref.path).toBe('site_content/about_us');
     expect(data.vision).toBe('Live vision');
     expect(data.updated_by).toBe('admin-1');
+    expect(data.titles).toMatchObject({
+      artists: 'ARTIST COUNCIL',
+      board: 'BOARD OF DIRECTORS'
+    });
     expect(data.team.board).toEqual([
       {
         ...member,

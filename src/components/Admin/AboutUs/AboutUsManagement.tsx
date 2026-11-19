@@ -1,7 +1,7 @@
 /**
  * AboutUsManagement - Edit the public About Us page
  *
- * Shows Vision, Mission and every team card exactly as the public page
+ * Shows Vision, Mission, section titles and every team card as the public page
  * renders them. Edits stay local until "Publish changes" writes the single
  * site_content/about_us document that /about-us reads.
  */
@@ -250,7 +250,19 @@ const AboutUsManagement = () => {
       {sections.map((section) => (
         <section className="mb-10" key={section}>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <SectionTitle>{sectionTitles[section]}</SectionTitle>
+            <label className="block grow text-sm font-semibold">
+              Section title
+              <input
+                className={`${inputClass} max-w-md text-lg font-bold`}
+                onChange={(e) =>
+                  update({
+                    ...content,
+                    titles: { ...content.titles, [section]: e.target.value }
+                  })
+                }
+                value={content.titles[section]}
+              />
+            </label>
             <AdminButton
               icon={faPlus}
               onClick={() =>
@@ -353,7 +365,7 @@ const AboutUsManagement = () => {
                     >
                       {sections.map((s) => (
                         <option key={s} value={s}>
-                          {sectionTitles[s]}
+                          {content.titles[s]}
                         </option>
                       ))}
                     </select>
