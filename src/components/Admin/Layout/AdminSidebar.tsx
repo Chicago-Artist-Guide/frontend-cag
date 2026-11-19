@@ -15,11 +15,15 @@ import {
   faUsers,
   faBriefcase,
   faCalendarAlt,
-  faBuilding
+  faBuilding,
+  faIdCard
 } from '@fortawesome/free-solid-svg-icons';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
 import { colors, fonts } from '../../../theme/styleVars';
-import { hasAnyPermissionOn } from '../../../utils/adminPermissions';
+import {
+  hasAnyPermissionOn,
+  hasRoleLevel
+} from '../../../utils/adminPermissions';
 
 /**
  * Sidebar container
@@ -229,6 +233,17 @@ const AdminSidebar: React.FC<React.PropsWithChildren<unknown>> = () => {
             <StyledNavLink to="/admin/events">
               <FontAwesomeIcon icon={faCalendarAlt} />
               <span>All Events</span>
+            </StyledNavLink>
+          </div>
+        )}
+
+        {/* Site content - admin or higher, matching the Firestore rule */}
+        {hasRoleLevel(adminRole, 'admin') && (
+          <div className="mb-[1.5rem] last:mb-0">
+            <SectionTitle>Site Content</SectionTitle>
+            <StyledNavLink to="/admin/about-us">
+              <FontAwesomeIcon icon={faIdCard} />
+              <span>About Us</span>
             </StyledNavLink>
           </div>
         )}
