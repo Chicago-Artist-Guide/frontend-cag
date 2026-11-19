@@ -13,6 +13,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useUserContext } from '../../../context/UserContext';
+import { type AboutPageContent } from '../../WhoWeAre/aboutPageContent';
 import AboutUsManagement from './AboutUsManagement';
 
 vi.mock('firebase/firestore', () => ({
@@ -85,6 +86,13 @@ const kept = {
   name: 'Already Uploaded'
 };
 
+// The doc AboutUsManagement wrote with setDoc.
+const published = () =>
+  vi.mocked(setDoc).mock.calls[0] as unknown as [
+    { path: string },
+    AboutPageContent & { updated_by: string | null }
+  ];
+
 const renderPage = () =>
   render(
     <MemoryRouter>
@@ -135,7 +143,7 @@ describe('AboutUsManagement', () => {
     await user.click(screen.getByRole('button', { name: 'Publish changes' }));
 
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));
-    const [ref, data] = vi.mocked(setDoc).mock.calls[0] as [any, any];
+    const [ref, data] = published();
     expect(ref.path).toBe('site_content/about_us');
     expect(data.vision).toBe('Live vision');
     expect(data.updated_by).toBe('admin-1');
@@ -151,9 +159,7 @@ describe('AboutUsManagement', () => {
       kept
     ]);
     // Default cards in the other sections carry bundled photos too.
-    const images = data.sections.flatMap((s: any) =>
-      s.members.map((m: any) => m.image)
-    );
+    const images = data.sections.flatMap((s) => s.members.map((m) => m.image));
     expect(
       images.every((src) => src === null || src.startsWith('https:'))
     ).toBe(true);
@@ -233,7 +239,7 @@ describe('AboutUsManagement', () => {
 
     await user.click(screen.getByRole('button', { name: 'Publish changes' }));
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));
-    const [, data] = vi.mocked(setDoc).mock.calls[0] as [any, any];
+    const [, data] = published();
     expect(data.sections).toEqual([
       { hidden: true, id: 'b', members: [], title: 'SECOND' }
     ]);
