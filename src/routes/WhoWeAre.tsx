@@ -1,18 +1,31 @@
-import React from 'react';
+import { doc, getDoc } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import Collapsible from '../components/layout/Collapsible';
 import PageContainer from '../components/layout/PageContainer';
-import bios from '../components/WhoWeAre/bios';
+import {
+  type AboutPageContent,
+  sectionTitles,
+  toAboutPageContent
+} from '../components/WhoWeAre/aboutPageContent';
 import Team from '../components/WhoWeAre/Team';
+import { useFirebaseContext } from '../context/FirebaseContext';
 
 const WhoWeAre = () => {
-  const sectionTitles = {
-    board: 'BOARD OF DIRECTORS',
-    artists: 'ARTIST AUXILIARY BOARD',
-    operations: 'BUSINESS OPERATIONS',
-    technical: 'SITE DEVELOPMENT',
-    artistAdvisory: 'ADVISORY BOARD'
-  };
+  const { firebaseFirestore } = useFirebaseContext();
+  const [content, setContent] = useState<AboutPageContent | null>(null);
+
+  // Published by admins at /admin/about-us; the built-in bios cover a
+  // missing doc or a failed read.
+  useEffect(() => {
+    getDoc(doc(firebaseFirestore, 'site_content', 'about_us'))
+      .then((snapshot) => setContent(toAboutPageContent(snapshot.data())))
+      .catch(() => setContent(toAboutPageContent()));
+  }, [firebaseFirestore]);
+
+  if (!content) {
+    return <PageContainer />;
+  }
 
   return (
     <PageContainer>
@@ -26,14 +39,15 @@ const WhoWeAre = () => {
           <VisionMissionWrapper>
             <AboutCard>
               <AboutTitle>Vision</AboutTitle>
-              <AboutText>Theatre for everyone, made by anyone.</AboutText>
+              <AboutText className="whitespace-pre-line">
+                {content.vision}
+              </AboutText>
             </AboutCard>
 
             <AboutCard>
               <AboutTitle>Mission</AboutTitle>
-              <AboutText>
-                To diversify Chicago theatre with a centralized online network
-                for artists, producers, and community groups.
+              <AboutText className="whitespace-pre-line">
+                {content.mission}
               </AboutText>
               <AboutText>
                 Learn more about us on our{' '}
@@ -54,7 +68,7 @@ const WhoWeAre = () => {
           <div className="w-[100%]">
             <Collapsible
               sectionTitles={sectionTitles}
-              subSections={bios}
+              subSections={content.team}
               subContainer={Team}
               grid={true}
             />

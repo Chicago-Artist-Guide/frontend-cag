@@ -43,6 +43,9 @@ const EventsManagement = lazy(
 const CompanyManagement = lazy(
   () => import('../components/Admin/Companies/CompanyManagement')
 );
+const AboutUsManagement = lazy(
+  () => import('../components/Admin/AboutUs/AboutUsManagement')
+);
 
 const AppRoutes = () => {
   return (
@@ -95,6 +98,7 @@ const AppRoutes = () => {
         <Route path="openings" element={<OpeningsManagement />} />
         <Route path="events" element={<EventsManagement />} />
         <Route path="companies" element={<CompanyManagement />} />
+        <Route path="about-us" element={<AboutUsManagement />} />
       </Route>
     </Routes>
   );
