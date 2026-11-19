@@ -42,11 +42,19 @@ const member = {
   affiliation: null,
   bio: 'is on the board.',
   id: 'm1',
-  image: '/images/who-we-are/board/Board_Goins.jpg',
+  // Absolute same-origin URL, as Vite emits for bundled assets.
+  image: `${window.location.origin}/assets/Board_Goins-abc123.jpg`,
   linkedin: 'joriejgoins',
   name: 'Jorie Goins',
   pronouns: 'she/her',
   role: 'President'
+};
+
+const kept = {
+  ...member,
+  id: 'm2',
+  image: 'https://firebasestorage.googleapis.com/v0/b/demo/o/kept.jpg',
+  name: 'Already Uploaded'
 };
 
 const renderPage = () =>
@@ -78,7 +86,7 @@ describe('AboutUsManagement', () => {
 
   it('publishes an edited card and copies bundled photos to Storage', async () => {
     vi.mocked(getDoc).mockResolvedValue({
-      data: () => ({ team: { board: [member] }, vision: 'Live vision' })
+      data: () => ({ team: { board: [member, kept] }, vision: 'Live vision' })
     } as never);
     const user = userEvent.setup();
     renderPage();
@@ -106,7 +114,8 @@ describe('AboutUsManagement', () => {
         image: 'https://storage.example/copied.jpg',
         linkedin: 'jorie',
         role: 'Board Chair'
-      }
+      },
+      kept
     ]);
     // Default cards in the other sections carry bundled photos too.
     const images = Object.values(data.team).flatMap((members: any) =>
@@ -115,8 +124,12 @@ describe('AboutUsManagement', () => {
     expect(
       images.every((src) => src === null || src.startsWith('https:'))
     ).toBe(true);
-    expect(uploadBytes).toHaveBeenCalledTimes(images.filter(Boolean).length);
+    // Every bundled photo is copied; the Storage photo is left alone.
+    expect(uploadBytes).toHaveBeenCalledTimes(
+      images.filter(Boolean).length - 1
+    );
     expect(fetch).toHaveBeenCalledWith(member.image);
+    expect(fetch).not.toHaveBeenCalledWith(kept.image);
     expect(
       await screen.findByText(/Published\. The public About Us page/)
     ).toBeInTheDocument();
