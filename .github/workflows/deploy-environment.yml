@@ -16,7 +16,7 @@ concurrency:
 jobs:
   validate:
     name: Validate durable target
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       NEXT_PUBLIC_FIREBASE_API_KEY: validation-firebase-api-key
       NEXT_PUBLIC_FIREBASE_APP_ID: validation-firebase-app-id
@@ -69,7 +69,7 @@ jobs:
 
   container:
     name: Smoke durable container
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
       NEXT_PUBLIC_FIREBASE_API_KEY: validation-firebase-api-key
@@ -93,7 +93,7 @@ jobs:
   plan:
     name: Plan ${{ needs.validate.outputs.stage_name }}
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: ${{ needs.validate.outputs.plan_environment }}
     outputs:
@@ -183,7 +183,7 @@ jobs:
       - validate
       - plan
       - container
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 45
     environment: ${{ needs.validate.outputs.deploy_environment }}
     outputs:
@@ -314,7 +314,7 @@ jobs:
   acceptance:
     name: Verify deployed production browser flow
     needs: deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     environment: production
     permissions:
