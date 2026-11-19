@@ -5,7 +5,6 @@ import Collapsible from '../components/layout/Collapsible';
 import PageContainer from '../components/layout/PageContainer';
 import {
   type AboutPageContent,
-  sectionTitles,
   toAboutPageContent
 } from '../components/WhoWeAre/aboutPageContent';
 import Team from '../components/WhoWeAre/Team';
@@ -67,7 +66,7 @@ const WhoWeAre = () => {
           <MeetOurTeamTitle>Meet Our Team</MeetOurTeamTitle>
           <div className="w-[100%]">
             <Collapsible
-              sectionTitles={sectionTitles}
+              sectionTitles={content.titles}
               subSections={content.team}
               subContainer={Team}
               grid={true}
