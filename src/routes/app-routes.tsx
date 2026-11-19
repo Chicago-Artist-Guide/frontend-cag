@@ -43,6 +43,9 @@ const EventsManagement = lazy(
 const CompanyManagement = lazy(
   () => import('../components/Admin/Companies/CompanyManagement')
 );
+const AboutUsManagement = lazy(
+  () => import('../components/Admin/AboutUs/AboutUsManagement')
+);
 
 export const appRouteObjects: RouteObject[] = [
   {
@@ -93,7 +96,8 @@ export const appRouteObjects: RouteObject[] = [
       { path: 'users', element: <UserManagement /> },
       { path: 'openings', element: <OpeningsManagement /> },
       { path: 'events', element: <EventsManagement /> },
-      { path: 'companies', element: <CompanyManagement /> }
+      { path: 'companies', element: <CompanyManagement /> },
+      { path: 'about-us', element: <AboutUsManagement /> }
     ]
   }
 ];

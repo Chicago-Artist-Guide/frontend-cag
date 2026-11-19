@@ -2,9 +2,17 @@ import Link from 'next/link';
 import React from 'react';
 import PageContainer from '../components/layout/PageContainer';
 import AboutFrame from '../components/WhoWeAre/AboutFrame';
+import {
+  type AboutPageContent,
+  defaultAboutPageContent
+} from '../components/WhoWeAre/aboutPageContent';
 import AboutTeam from '../components/WhoWeAre/AboutTeam';
 
-const WhoWeAre = () => {
+const WhoWeAre = ({
+  content = defaultAboutPageContent
+}: {
+  content?: AboutPageContent;
+}) => {
   return (
     <PageContainer>
       <AboutFrame className="max-w-full">
@@ -17,16 +25,13 @@ const WhoWeAre = () => {
           <div className="vision-mission-wrapper">
             <div className="about-card">
               <h2 className="about-title">Vision</h2>
-              <p className="about-text">
-                Theatre for everyone, made by anyone.
-              </p>
+              <p className="about-text whitespace-pre-line">{content.vision}</p>
             </div>
 
             <div className="about-card">
               <h2 className="about-title">Mission</h2>
-              <p className="about-text">
-                To diversify Chicago theatre with a centralized online network
-                for artists, producers, and community groups.
+              <p className="about-text whitespace-pre-line">
+                {content.mission}
               </p>
               <p className="about-text">
                 Learn more about us on our{' '}
@@ -45,7 +50,7 @@ const WhoWeAre = () => {
         <div className="team-section">
           <h2 className="meet-our-team-title">Meet Our Team</h2>
           <div className="w-[100%]">
-            <AboutTeam />
+            <AboutTeam team={content.team} />
           </div>
         </div>
       </AboutFrame>

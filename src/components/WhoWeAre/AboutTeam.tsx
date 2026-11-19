@@ -2,23 +2,15 @@
 
 import React from 'react';
 import Collapsible from '../layout/Collapsible';
-import bios from './bios';
+import { type AboutPageContent, sectionTitles } from './aboutPageContent';
 import Team from './Team';
 
-const sectionTitles = {
-  board: 'BOARD OF DIRECTORS',
-  artists: 'ARTIST AUXILIARY BOARD',
-  operations: 'BUSINESS OPERATIONS',
-  technical: 'SITE DEVELOPMENT',
-  artistAdvisory: 'ADVISORY BOARD'
-};
-
-const AboutTeam = () => (
+const AboutTeam = ({ team }: { team: AboutPageContent['team'] }) => (
   <Collapsible
     grid={true}
     sectionTitles={sectionTitles}
     subContainer={Team}
-    subSections={bios}
+    subSections={team}
   />
 );
 

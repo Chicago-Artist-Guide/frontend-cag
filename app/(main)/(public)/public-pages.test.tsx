@@ -33,7 +33,7 @@ const expectServerPage = (
   const source = fs.readFileSync(absolutePage, 'utf8');
   expect(source.trimStart().startsWith("'use client';")).toBe(false);
   expect(source).toContain(routeFile);
-  expect(source).toMatch(new RegExp(`<${componentName}\\s*/>`));
+  expect(source).toMatch(new RegExp(`<${componentName}\\b[^>]*/>`));
   expect(source).not.toMatch(/LegacyApp|react-router|next\/dynamic/u);
 };
 
@@ -171,10 +171,11 @@ describe('public App Router pages', () => {
     const teamSource = fs.readFileSync(aboutTeamFile, 'utf8');
 
     expect(aboutSource).toMatch(
-      /<AboutFrame[\s\S]*<div className="header-section">[\s\S]*<h1 className="page-title">ABOUT US<\/h1>[\s\S]*<div className="divider-bar" \/>[\s\S]*<div className="about-section">[\s\S]*<div className="vision-mission-wrapper">[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Vision<\/h2>[\s\S]*<\/div>[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Mission<\/h2>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<div className="team-section">[\s\S]*<h2 className="meet-our-team-title">Meet Our Team<\/h2>[\s\S]*<AboutTeam \/>/u
+      /<AboutFrame[\s\S]*<div className="header-section">[\s\S]*<h1 className="page-title">ABOUT US<\/h1>[\s\S]*<div className="divider-bar" \/>[\s\S]*<div className="about-section">[\s\S]*<div className="vision-mission-wrapper">[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Vision<\/h2>[\s\S]*<\/div>[\s\S]*<div className="about-card">[\s\S]*<h2 className="about-title">Mission<\/h2>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<\/div>[\s\S]*<div className="team-section">[\s\S]*<h2 className="meet-our-team-title">Meet Our Team<\/h2>[\s\S]*<AboutTeam team=\{content\.team\} \/>/u
     );
     expect(aboutSource).toContain("from 'next/link'");
-    expect(aboutSource).toContain('Theatre for everyone, made by anyone.');
+    expect(aboutSource).toContain('{content.vision}');
+    expect(aboutSource).toContain('{content.mission}');
     expect(aboutSource).toContain('href="/faq"');
     expect(aboutSource).not.toMatch(/bios|Collapsible|styled-components/u);
 
@@ -186,7 +187,7 @@ describe('public App Router pages', () => {
 
     expect(teamSource.trimStart()).toMatch(/^'use client';/u);
     expect(teamSource).toContain('sectionTitles={sectionTitles}');
-    expect(teamSource).toContain('subSections={bios}');
+    expect(teamSource).toContain('subSections={team}');
     expect(teamSource).toContain('subContainer={Team}');
     expect(teamSource).toContain('grid={true}');
 
