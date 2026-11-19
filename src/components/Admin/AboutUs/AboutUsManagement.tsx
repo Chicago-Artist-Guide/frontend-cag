@@ -1,34 +1,42 @@
 /**
  * AboutUsManagement - Edit the public About Us page
  *
- * Shows Vision, Mission and every team card exactly as the public page
- * renders them. Edits stay local until "Publish changes" writes the single
- * site_content/about_us document that /about-us reads.
+ * Shows Vision, Mission and every team section and card as the public page
+ * renders them. Drag cards and sections to reorder them (the arrow buttons do
+ * the same from the keyboard). Edits stay local until "Publish changes"
+ * writes the single site_content/about_us document that /about-us reads.
  */
 
 import { uuidv4 } from '../../../utils/uuid';
 import {
+  faArrowDown,
   faArrowLeft,
   faArrowRight,
+  faArrowUp,
+  faEye,
+  faEyeSlash,
+  faGripVertical,
   faPen,
   faPlus,
   faTrash
 } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
+import Masonry from 'react-masonry-css';
 import { Navigate } from 'react-router-dom';
 import { useFirebaseContext } from '../../../context/FirebaseContext';
 import { useUserContext } from '../../../context/UserContext';
 import { useAdminAuth } from '../../../hooks/useAdminAuth';
+import { colors, fonts } from '../../../theme/styleVars';
 import { hasRoleLevel } from '../../../utils/adminPermissions';
 import ImageUploadComponent from '../../shared/ImageUploadComponent';
 import {
   type AboutPageContent,
-  type SectionKey,
   type TeamMember,
-  sectionTitles,
+  type TeamSection,
   toAboutPageContent,
   toLinkedinHandle
 } from '../../WhoWeAre/aboutPageContent';
@@ -36,8 +44,6 @@ import Team from '../../WhoWeAre/Team';
 import AdminButton from '../shared/AdminButton';
 import LoadingSpinner from '../shared/LoadingSpinner';
 import { PageSubtitle, PageTitle, SectionTitle } from '../shared/Typography';
-
-const sections = Object.keys(sectionTitles) as SectionKey[];
 
 const textFields: [keyof TeamMember, string][] = [
   ['name', 'Name'],
@@ -48,6 +54,9 @@ const textFields: [keyof TeamMember, string][] = [
 ];
 
 const inputClass = 'mt-1 w-full rounded border border-gray-300 p-2 font-normal';
+
+// Same columns as the public page (layout/Collapsible).
+const masonryColumns = { default: 3, 1100: 2, 700: 2, 500: 1 };
 
 const blankMember = (): TeamMember => ({
   affiliation: null,
@@ -62,8 +71,13 @@ const blankMember = (): TeamMember => ({
 
 interface Editing {
   member: TeamMember;
-  originalSection: SectionKey | null;
-  section: SectionKey;
+  originalSection: string | null;
+  section: string;
+}
+
+interface Drag {
+  id: string;
+  kind: 'member' | 'section';
 }
 
 const AboutUsManagement = () => {
@@ -77,6 +91,9 @@ const AboutUsManagement = () => {
   const [photoPending, setPhotoPending] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [status, setStatus] = useState<{ error: boolean; text: string }>();
+  const [drag, setDrag] = useState<Drag | null>(null);
+  const [dropTarget, setDropTarget] = useState<string | null>(null);
+  const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
 
   useEffect(() => {
     getDoc(doc(firebaseFirestore, 'site_content', 'about_us'))
@@ -104,19 +121,94 @@ const AboutUsManagement = () => {
     return <LoadingSpinner />;
   }
 
+  const { sections } = content;
+
   const update = (next: AboutPageContent) => {
     setContent(next);
     setDirty(true);
     setStatus(undefined);
+    setConfirmRemove(null);
   };
 
-  const setTeam = (section: SectionKey, members: TeamMember[]) =>
-    update({ ...content, team: { ...content.team, [section]: members } });
+  const setSections = (next: TeamSection[]) =>
+    update({ ...content, sections: next });
 
-  const moveMember = (section: SectionKey, index: number, delta: number) => {
-    const members = [...content.team[section]];
-    members.splice(index + delta, 0, ...members.splice(index, 1));
-    setTeam(section, members);
+  const setSection = (id: string, changes: Partial<TeamSection>) =>
+    setSections(sections.map((s) => (s.id === id ? { ...s, ...changes } : s)));
+
+  // Moving down lands after the target, moving up lands before it.
+  const moveSection = (id: string, toId: string) => {
+    const next = [...sections];
+    const to = next.findIndex((s) => s.id === toId);
+    next.splice(
+      to,
+      0,
+      ...next.splice(
+        next.findIndex((s) => s.id === id),
+        1
+      )
+    );
+    setSections(next);
+  };
+
+  // Same rule within a section; into another section it lands before the
+  // target card, or at the end when there is none.
+  const moveMember = (id: string, toSection: string, toId: string | null) => {
+    const next = sections.map((s) => ({ ...s, members: [...s.members] }));
+    const from = next.find((s) => s.members.some((m) => m.id === id));
+    const to = next.find((s) => s.id === toSection);
+    if (!from || !to) return;
+    const toIndex = toId
+      ? to.members.findIndex((m) => m.id === toId)
+      : to.members.length;
+    const [member] = from.members.splice(
+      from.members.findIndex((m) => m.id === id),
+      1
+    );
+    to.members.splice(toIndex, 0, member);
+    setSections(next);
+  };
+
+  const endDrag = () => {
+    setDrag(null);
+    setDropTarget(null);
+  };
+
+  const startDrag = (e: React.DragEvent, next: Drag) => {
+    e.stopPropagation();
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', next.id); // Firefox needs data to drag
+    setDrag(next);
+  };
+
+  // A drop on a card goes before that card; a drop anywhere else in the
+  // section goes to its end. Sections dropped anywhere in a section move there.
+  const dropProps = (sectionId: string, memberId: string | null) => ({
+    onDragOver: (e: React.DragEvent) => {
+      if (!drag) return;
+      e.preventDefault();
+      e.stopPropagation();
+      setDropTarget(drag.kind === 'member' && memberId ? memberId : sectionId);
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!drag) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (drag.kind === 'section') {
+        if (drag.id !== sectionId) moveSection(drag.id, sectionId);
+      } else if (drag.id !== memberId) {
+        moveMember(drag.id, sectionId, memberId);
+      }
+      endDrag();
+    }
+  });
+
+  const removeSection = (section: TeamSection) => {
+    if (section.members.length && confirmRemove !== section.id) {
+      setConfirmRemove(section.id);
+      return;
+    }
+    setSections(sections.filter((s) => s.id !== section.id));
   };
 
   const setMember = (changes: Partial<TeamMember>) =>
@@ -134,22 +226,24 @@ const AboutUsManagement = () => {
       linkedin: toLinkedinHandle(editing.member.linkedin),
       name: editing.member.name.trim()
     };
-    const team = { ...content.team };
 
-    if (originalSection === section) {
-      team[section] = team[section].map((m) =>
-        m.id === member.id ? member : m
-      );
-    } else {
-      if (originalSection) {
-        team[originalSection] = team[originalSection].filter(
-          (m) => m.id !== member.id
-        );
-      }
-      team[section] = [...team[section], member];
-    }
-
-    update({ ...content, team });
+    setSections(
+      sections.map((s) => {
+        if (originalSection === section) {
+          return s.id === section
+            ? {
+                ...s,
+                members: s.members.map((m) => (m.id === member.id ? member : m))
+              }
+            : s;
+        }
+        const members = s.members.filter((m) => m.id !== member.id);
+        return {
+          ...s,
+          members: s.id === section ? [...members, member] : members
+        };
+      })
+    );
     setEditing(null);
   };
 
@@ -171,16 +265,19 @@ const AboutUsManagement = () => {
     setStatus(undefined);
 
     try {
-      const team = { ...content.team };
+      const published: TeamSection[] = [];
       for (const section of sections) {
-        team[section] = await Promise.all(
-          team[section].map(async (m) => ({
-            ...m,
-            image: await toStorageUrl(m.image)
-          }))
-        );
+        published.push({
+          ...section,
+          members: await Promise.all(
+            section.members.map(async (m) => ({
+              ...m,
+              image: await toStorageUrl(m.image)
+            }))
+          )
+        });
       }
-      const next = { ...content, team };
+      const next = { ...content, sections: published };
 
       await setDoc(doc(firebaseFirestore, 'site_content', 'about_us'), {
         ...next,
@@ -210,8 +307,8 @@ const AboutUsManagement = () => {
         <div>
           <PageTitle>About Us</PageTitle>
           <PageSubtitle>
-            Cards look exactly as they do on the public page. Nothing goes live
-            until you publish.
+            Sections and cards look as they do on the public page. Drag them to
+            reorder. Nothing goes live until you publish.
           </PageSubtitle>
         </div>
         <AdminButton
@@ -247,17 +344,95 @@ const AboutUsManagement = () => {
         ))}
       </div>
 
-      {sections.map((section) => (
-        <section className="mb-10" key={section}>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <SectionTitle>{sectionTitles[section]}</SectionTitle>
+      {sections.map((section, sectionIndex) => (
+        <section
+          aria-label={section.title || 'Untitled section'}
+          className={`mb-10 rounded p-2 ${
+            dropTarget === section.id ? 'ring-2 ring-[#82B29A]' : ''
+          }`}
+          key={section.id}
+          {...dropProps(section.id, null)}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            <span
+              className="text-gray-400 cursor-grab px-1"
+              draggable
+              onDragEnd={endDrag}
+              onDragStart={(e) => {
+                const card = e.currentTarget.closest('section');
+                if (card) e.dataTransfer.setDragImage(card, 0, 0);
+                startDrag(e, { id: section.id, kind: 'section' });
+              }}
+              title="Drag to reorder sections"
+            >
+              <FontAwesomeIcon icon={faGripVertical} />
+            </span>
+            <input
+              aria-label="Section title"
+              className={`hover:border-gray-300 focus:border-gray-400 min-w-[12rem] flex-1 border-0 border-b-2 border-dashed border-transparent bg-transparent p-0 text-[21px] font-bold focus:outline-none ${
+                section.hidden ? 'opacity-50' : ''
+              }`}
+              onChange={(e) =>
+                setSection(section.id, { title: e.target.value })
+              }
+              placeholder="Section title"
+              style={{ color: colors.mainFont, fontFamily: fonts.montserrat }}
+              value={section.title}
+            />
+            {section.hidden && (
+              <span className="bg-gray-200 rounded px-2 py-1 text-xs font-semibold">
+                Hidden on the public page
+              </span>
+            )}
+            <AdminButton
+              disabled={sectionIndex === 0}
+              icon={faArrowUp}
+              onClick={() =>
+                moveSection(section.id, sections[sectionIndex - 1].id)
+              }
+              size="small"
+              text="Up"
+              variant="ghost"
+            />
+            <AdminButton
+              disabled={sectionIndex === sections.length - 1}
+              icon={faArrowDown}
+              onClick={() =>
+                moveSection(section.id, sections[sectionIndex + 1].id)
+              }
+              size="small"
+              text="Down"
+              variant="ghost"
+            />
+            <AdminButton
+              icon={section.hidden ? faEye : faEyeSlash}
+              onClick={() =>
+                setSection(section.id, { hidden: !section.hidden })
+              }
+              size="small"
+              text={section.hidden ? 'Show' : 'Hide'}
+              variant="ghost"
+            />
+            <AdminButton
+              icon={faTrash}
+              onClick={() => removeSection(section)}
+              size="small"
+              text={
+                confirmRemove === section.id
+                  ? `Remove section and ${section.members.length} ${
+                      section.members.length === 1 ? 'person' : 'people'
+                    }`
+                  : 'Remove section'
+              }
+              variant="danger"
+            />
             <AdminButton
               icon={faPlus}
               onClick={() =>
                 setEditing({
                   member: blankMember(),
                   originalSection: null,
-                  section
+                  section: section.id
                 })
               }
               size="small"
@@ -265,53 +440,108 @@ const AboutUsManagement = () => {
               variant="secondary"
             />
           </div>
-          <div className="flex flex-wrap gap-6">
-            {content.team[section].map((member, index) => (
-              <div key={member.id}>
-                <Team {...member} />
-                <div className="flex flex-wrap gap-2">
-                  <AdminButton
-                    icon={faPen}
-                    onClick={() =>
-                      setEditing({ member, originalSection: section, section })
-                    }
-                    size="small"
-                    text="Edit"
-                  />
-                  <AdminButton
-                    disabled={index === 0}
-                    icon={faArrowLeft}
-                    onClick={() => moveMember(section, index, -1)}
-                    size="small"
-                    text="Earlier"
-                    variant="ghost"
-                  />
-                  <AdminButton
-                    disabled={index === content.team[section].length - 1}
-                    icon={faArrowRight}
-                    onClick={() => moveMember(section, index, 1)}
-                    size="small"
-                    text="Later"
-                    variant="ghost"
-                  />
-                  <AdminButton
-                    icon={faTrash}
-                    onClick={() =>
-                      setTeam(
-                        section,
-                        content.team[section].filter((m) => m.id !== member.id)
-                      )
-                    }
-                    size="small"
-                    text="Remove"
-                    variant="danger"
-                  />
+          <hr
+            className="my-3 border-2 opacity-100"
+            style={{ borderColor: colors.salmon }}
+          />
+          <div className={section.hidden ? 'opacity-50' : ''}>
+            {section.members.length === 0 && (
+              <p className="text-gray-500 py-6 text-center">
+                No one here yet. Add a person or drag a card into this section.
+              </p>
+            )}
+            <Masonry
+              breakpointCols={masonryColumns}
+              className="-ml-[30px] flex w-auto"
+              columnClassName="bg-clip-padding pl-[30px]"
+            >
+              {section.members.map((member, index) => (
+                <div
+                  className={`mb-[30px] cursor-grab rounded ${
+                    dropTarget === member.id ? 'ring-2 ring-[#82B29A]' : ''
+                  } ${drag?.id === member.id ? 'opacity-40' : ''}`}
+                  draggable
+                  key={member.id}
+                  onDragEnd={endDrag}
+                  onDragStart={(e) =>
+                    startDrag(e, { id: member.id, kind: 'member' })
+                  }
+                  {...dropProps(section.id, member.id)}
+                >
+                  <Team {...member} />
+                  <div className="flex flex-wrap gap-2">
+                    <AdminButton
+                      icon={faPen}
+                      onClick={() =>
+                        setEditing({
+                          member,
+                          originalSection: section.id,
+                          section: section.id
+                        })
+                      }
+                      size="small"
+                      text="Edit"
+                    />
+                    <AdminButton
+                      disabled={index === 0}
+                      icon={faArrowLeft}
+                      onClick={() =>
+                        moveMember(
+                          member.id,
+                          section.id,
+                          section.members[index - 1].id
+                        )
+                      }
+                      size="small"
+                      text="Earlier"
+                      variant="ghost"
+                    />
+                    <AdminButton
+                      disabled={index === section.members.length - 1}
+                      icon={faArrowRight}
+                      onClick={() =>
+                        moveMember(
+                          member.id,
+                          section.id,
+                          section.members[index + 1].id
+                        )
+                      }
+                      size="small"
+                      text="Later"
+                      variant="ghost"
+                    />
+                    <AdminButton
+                      icon={faTrash}
+                      onClick={() =>
+                        setSection(section.id, {
+                          members: section.members.filter(
+                            (m) => m.id !== member.id
+                          )
+                        })
+                      }
+                      size="small"
+                      text="Remove"
+                      variant="danger"
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </Masonry>
           </div>
         </section>
       ))}
+
+      <AdminButton
+        icon={faPlus}
+        onClick={() =>
+          setSections([
+            ...sections,
+            { hidden: false, id: uuidv4(), members: [], title: 'NEW SECTION' }
+          ])
+        }
+        text="Add section"
+        variant="secondary"
+      />
 
       <Modal
         backdrop="static"
@@ -344,16 +574,13 @@ const AboutUsManagement = () => {
                     <select
                       className={inputClass}
                       onChange={(e) =>
-                        setEditing({
-                          ...editing,
-                          section: e.target.value as SectionKey
-                        })
+                        setEditing({ ...editing, section: e.target.value })
                       }
                       value={editing.section}
                     >
                       {sections.map((s) => (
-                        <option key={s} value={s}>
-                          {sectionTitles[s]}
+                        <option key={s.id} value={s.id}>
+                          {s.title || 'Untitled section'}
                         </option>
                       ))}
                     </select>
