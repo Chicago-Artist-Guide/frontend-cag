@@ -20,7 +20,7 @@ jobs:
   bootstrap:
     name: Bootstrap production IAM and CDK
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: production-bootstrap
     permissions:
