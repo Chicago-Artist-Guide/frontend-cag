@@ -2,15 +2,14 @@
 
 import React from 'react';
 import Collapsible from '../layout/Collapsible';
-import { type AboutPageContent, sectionTitles } from './aboutPageContent';
+import { type AboutPageContent, toCollapsibleProps } from './aboutPageContent';
 import Team from './Team';
 
-const AboutTeam = ({ team }: { team: AboutPageContent['team'] }) => (
+const AboutTeam = ({ sections }: Pick<AboutPageContent, 'sections'>) => (
   <Collapsible
     grid={true}
-    sectionTitles={sectionTitles}
     subContainer={Team}
-    subSections={team}
+    {...toCollapsibleProps(sections)}
   />
 );
 
