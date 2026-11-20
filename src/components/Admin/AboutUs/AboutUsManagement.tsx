@@ -13,6 +13,8 @@ import {
   faArrowLeft,
   faArrowRight,
   faArrowUp,
+  faChevronDown,
+  faChevronRight,
   faEye,
   faEyeSlash,
   faGripVertical,
@@ -94,6 +96,8 @@ const AboutUsManagement = () => {
   const [drag, setDrag] = useState<Drag | null>(null);
   const [dropTarget, setDropTarget] = useState<string | null>(null);
   const [confirmRemove, setConfirmRemove] = useState<string | null>(null);
+  // Section ids whose cards are folded away; view-only, never published.
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     getDoc(doc(firebaseFirestore, 'site_content', 'about_us'))
@@ -168,6 +172,15 @@ const AboutUsManagement = () => {
     to.members.splice(toIndex, 0, member);
     setSections(next);
   };
+
+  const toggleCollapsed = (id: string) =>
+    setCollapsed((current) => {
+      const next = new Set(current);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+
+  const allCollapsed = sections.every((s) => collapsed.has(s.id));
 
   const endDrag = () => {
     setDrag(null);
@@ -344,6 +357,20 @@ const AboutUsManagement = () => {
         ))}
       </div>
 
+      <div className="mb-2 flex justify-end">
+        <AdminButton
+          icon={allCollapsed ? faChevronDown : faChevronRight}
+          onClick={() =>
+            setCollapsed(
+              allCollapsed ? new Set() : new Set(sections.map((s) => s.id))
+            )
+          }
+          size="small"
+          text={allCollapsed ? 'Expand all' : 'Collapse all'}
+          variant="ghost"
+        />
+      </div>
+
       {sections.map((section, sectionIndex) => (
         <section
           aria-label={section.title || 'Untitled section'}
@@ -354,6 +381,22 @@ const AboutUsManagement = () => {
           {...dropProps(section.id, null)}
         >
           <div className="flex flex-wrap items-center gap-2">
+            <button
+              aria-expanded={!collapsed.has(section.id)}
+              aria-label={`${collapsed.has(section.id) ? 'Expand' : 'Collapse'} ${
+                section.title || 'section'
+              }`}
+              className="text-gray-500 px-1"
+              onClick={() => toggleCollapsed(section.id)}
+              type="button"
+            >
+              <FontAwesomeIcon
+                fixedWidth
+                icon={
+                  collapsed.has(section.id) ? faChevronRight : faChevronDown
+                }
+              />
+            </button>
             <span
               className="text-gray-400 cursor-grab px-1"
               draggable
@@ -379,6 +422,12 @@ const AboutUsManagement = () => {
               style={{ color: colors.mainFont, fontFamily: fonts.montserrat }}
               value={section.title}
             />
+            {collapsed.has(section.id) && (
+              <span className="text-gray-500 text-sm">
+                {section.members.length}{' '}
+                {section.members.length === 1 ? 'person' : 'people'}
+              </span>
+            )}
             {section.hidden && (
               <span className="bg-gray-200 rounded px-2 py-1 text-xs font-semibold">
                 Hidden on the public page
@@ -444,7 +493,10 @@ const AboutUsManagement = () => {
             className="my-3 border-2 opacity-100"
             style={{ borderColor: colors.salmon }}
           />
-          <div className={section.hidden ? 'opacity-50' : ''}>
+          <div
+            className={section.hidden ? 'opacity-50' : ''}
+            hidden={collapsed.has(section.id)}
+          >
             {section.members.length === 0 && (
               <p className="text-gray-500 py-6 text-center">
                 No one here yet. Add a person or drag a card into this section.
