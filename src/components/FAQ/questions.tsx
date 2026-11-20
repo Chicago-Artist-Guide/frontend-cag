@@ -42,8 +42,8 @@ export const aboutQ = {
         <a href="mailto: joey@mylawlynx.com">Joey McCall.</a>,
         <br />,
         <br />,
-        <b>Artist Auxiliary Board</b>,
-        ' - Chicagoland theatre practitioners are invited to join our Artist Board. You will have the opportunity to provide feedback on the platform and host events for the community. Please apply ',
+        <b>Artist Council</b>,
+        ' - Chicagoland theatre practitioners are invited to join our Artist Council. You will have the opportunity to provide feedback on the platform and host events for the community. Please apply ',
         <a href="https://forms.gle/S99sz1LLMQwpsAq16">here,</a>,
         ' if interested.',
         <br />,
@@ -93,7 +93,7 @@ export const aboutQ = {
       id: 9,
       question: 'What does "beta version" mean?',
       answer: [
-        'This is an early version of our platform which has been tested internally and with a select group of external users. It contains most of the major features, but is not yet complete. We will continue to test and add new features based on feedback from our users and Artist Auxiliary Board members.'
+        'This is an early version of our platform which has been tested internally and with a select group of external users. It contains most of the major features, but is not yet complete. We will continue to test and add new features based on feedback from our users and Artist Council members.'
       ]
     },
     {
