@@ -245,6 +245,34 @@ describe('AboutUsManagement', () => {
     ]);
   }, 15000);
 
+  it('collapses sections so they are easier to reorder', async () => {
+    vi.mocked(getDoc).mockResolvedValue({
+      data: () => ({
+        sections: [
+          { hidden: false, id: 'a', members: [member], title: 'FIRST' },
+          { hidden: false, id: 'b', members: [], title: 'SECOND' }
+        ]
+      })
+    } as never);
+    const user = userEvent.setup();
+    renderPage();
+
+    expect(await screen.findByText('Jorie Goins')).toBeVisible();
+    await user.click(screen.getByRole('button', { name: 'Collapse all' }));
+    expect(screen.getByText('Jorie Goins')).not.toBeVisible();
+    expect(screen.getByText('1 person')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Expand FIRST' }));
+    expect(screen.getByText('Jorie Goins')).toBeVisible();
+    expect(
+      screen.getByRole('button', { name: 'Collapse all' })
+    ).toBeInTheDocument();
+    // Folding is view-only: nothing to publish.
+    expect(
+      screen.getByRole('button', { name: 'All changes published' })
+    ).toBeDisabled();
+  });
+
   it('moves a card to another section by drag and drop', async () => {
     vi.mocked(getDoc).mockResolvedValue({
       data: () => ({
