@@ -55,7 +55,8 @@ const textFields: [keyof TeamMember, string][] = [
   ['linkedin', 'LinkedIn handle or profile URL (optional)']
 ];
 
-const inputClass = 'mt-1 w-full rounded border border-gray-300 p-2 font-normal';
+const inputClass =
+  'mt-1 w-full rounded border border-lightGrey p-2 font-normal';
 
 // Same columns as the public page (layout/Collapsible).
 const masonryColumns = { default: 3, 1100: 2, 700: 2, 500: 1 };
@@ -386,7 +387,7 @@ const AboutUsManagement = () => {
               aria-label={`${collapsed.has(section.id) ? 'Expand' : 'Collapse'} ${
                 section.title || 'section'
               }`}
-              className="text-gray-500 px-1"
+              className="px-1 text-grayishBlue"
               onClick={() => toggleCollapsed(section.id)}
               type="button"
             >
@@ -398,7 +399,7 @@ const AboutUsManagement = () => {
               />
             </button>
             <span
-              className="text-gray-400 cursor-grab px-1"
+              className="cursor-grab px-1 text-grayishBlue"
               draggable
               onDragEnd={endDrag}
               onDragStart={(e) => {
@@ -410,26 +411,32 @@ const AboutUsManagement = () => {
             >
               <FontAwesomeIcon icon={faGripVertical} />
             </span>
-            <input
-              aria-label="Section title"
-              className={`hover:border-gray-300 focus:border-gray-400 min-w-[12rem] flex-1 border-0 border-b-2 border-dashed border-transparent bg-transparent p-0 text-[21px] font-bold focus:outline-none ${
-                section.hidden ? 'opacity-50' : ''
-              }`}
-              onChange={(e) =>
-                setSection(section.id, { title: e.target.value })
-              }
-              placeholder="Section title"
-              style={{ color: colors.mainFont, fontFamily: fonts.montserrat }}
-              value={section.title}
-            />
+            <label
+              className="flex min-w-[12rem] flex-1 cursor-text items-center gap-2"
+              title="Click to rename this section"
+            >
+              <input
+                aria-label="Section title"
+                className={`w-full min-w-0 border-0 border-b-2 border-dashed border-lightGrey bg-transparent p-0 text-[21px] font-bold hover:border-grayishBlue focus:border-solid focus:border-mint focus:outline-none ${
+                  section.hidden ? 'opacity-50' : ''
+                }`}
+                onChange={(e) =>
+                  setSection(section.id, { title: e.target.value })
+                }
+                placeholder="Section title"
+                style={{ color: colors.mainFont, fontFamily: fonts.montserrat }}
+                value={section.title}
+              />
+              <FontAwesomeIcon className="text-grayishBlue" icon={faPen} />
+            </label>
             {collapsed.has(section.id) && (
-              <span className="text-gray-500 text-sm">
+              <span className="text-sm text-grayishBlue">
                 {section.members.length}{' '}
                 {section.members.length === 1 ? 'person' : 'people'}
               </span>
             )}
             {section.hidden && (
-              <span className="bg-gray-200 rounded px-2 py-1 text-xs font-semibold">
+              <span className="rounded bg-lightestGrey px-2 py-1 text-xs font-semibold">
                 Hidden on the public page
               </span>
             )}
@@ -498,7 +505,7 @@ const AboutUsManagement = () => {
             hidden={collapsed.has(section.id)}
           >
             {section.members.length === 0 && (
-              <p className="text-gray-500 py-6 text-center">
+              <p className="py-6 text-center text-grayishBlue">
                 No one here yet. Add a person or drag a card into this section.
               </p>
             )}
